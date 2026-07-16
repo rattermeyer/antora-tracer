@@ -1,0 +1,36 @@
+// Example requirements document showing intended syntax
+// This demonstrates what we'll implement in later tasks
+
+= Requirements Example
+:req-id-prefix: REQ
+
+// Future syntax - this will be implemented in Task 2
+[req, id=001, status=approved]
+====
+.Requirement: User Authentication
+The system shall require users to authenticate using username and password.
+
+.Satisfied by
+* implements:IMP-001[]
+* tests:TEST-001[]
+====
+
+[req, id=002, status=draft]
+====
+.Requirement: Password Complexity
+The system shall enforce password complexity requirements:
+
+* Minimum 8 characters
+* At least one uppercase letter
+* At least one number
+* At least one special character
+
+.Satisfied by
+* implements:IMP-001[]
+* tests:TEST-002[]
+====
+
+// Example of how requirements might be referenced
+This authentication module satisfies:REQ-001[] and satisfies:REQ-002[].
+
+See req:REQ-001[] for the full authentication requirement.

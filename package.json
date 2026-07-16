@@ -1,0 +1,32 @@
+{
+  "name": "antora-requirements-traceability",
+  "version": "0.1.0",
+  "description": "Requirements traceability extensions for Antora/AsciiDoc",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "test": "mocha test/**/*.js",
+    "lint": "echo 'Linting...'",
+    "start": "node lib/cli.js",
+    "dev": "nodemon --watch src --exec \"npm run build && node lib/index.js\""
+  },
+  "keywords": [
+    "antora",
+    "asciidoc",
+    "requirements",
+    "traceability",
+    "documentation"
+  ],
+  "author": "Richard",
+  "license": "MIT",
+  "dependencies": {
+    "@asciidoctor/core": "^2.2.7"
+  },
+  "devDependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "mocha": "^10.4.0",
+    "chai": "^5.1.1"
+  },
+  "type": "commonjs"
+}
