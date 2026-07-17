@@ -4,11 +4,13 @@
   "description": "Requirements traceability extensions for Antora/AsciiDoc",
   "main": "lib/index.js",
   "scripts": {
-    "build": "node scripts/build.js",
+    "build": "tsc && node scripts/build.js",
     "test": "mocha test/**/*.js",
     "lint": "echo 'Linting...'",
     "start": "node lib/cli.js",
-    "dev": "nodemon --watch src --exec \"npm run build && node lib/index.js\""
+    "dev": "nodemon --watch src --exec \"npm run build && node lib/index.js\"",
+    "tsc": "tsc",
+    "tsc:watch": "tsc --watch"
   },
   "keywords": [
     "antora",
@@ -23,10 +25,14 @@
     "@asciidoctor/core": "^2.2.7"
   },
   "devDependencies": {
+    "@types/chai": "^5.2.3",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^26.1.1",
+    "chai": "^5.1.1",
     "chalk": "^5.3.0",
     "commander": "^12.1.0",
     "mocha": "^10.4.0",
-    "chai": "^5.1.1"
+    "typescript": "^7.0.2"
   },
   "type": "commonjs"
 }

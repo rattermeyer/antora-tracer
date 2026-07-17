@@ -1,33 +1,40 @@
+// TypeScript build script
+const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-// Simple build script to copy src to lib
-const srcDir = path.join(__dirname, '..', 'src');
-const libDir = path.join(__dirname, '..', 'lib');
+console.log('🔧 Building TypeScript project...');
 
-// Create lib directory if it doesn't exist
-if (!fs.existsSync(libDir)) {
-  fs.mkdirSync(libDir, { recursive: true });
-}
-
-// Copy all files from src to lib
-function copyDir(src, dest) {
-  const entries = fs.readdirSync(src, { withFileTypes: true });
+try {
+  // Run TypeScript compiler
+  execSync('tsc', { stdio: 'inherit' });
   
-  for (const entry of entries) {
-    const srcPath = path.join(src, entry.name);
-    const destPath = path.join(dest, entry.name);
+  // Copy non-TypeScript files if needed
+  const srcDir = path.join(__dirname, '..', 'src');
+  const libDir = path.join(__dirname, '..', 'lib');
+  
+  // Copy any non-.ts files
+  if (fs.existsSync(srcDir)) {
+    const entries = fs.readdirSync(srcDir, { withFileTypes: true });
     
-    if (entry.isDirectory()) {
-      if (!fs.existsSync(destPath)) {
-        fs.mkdirSync(destPath, { recursive: true });
+    for (const entry of entries) {
+      if (!entry.name.endsWith('.ts') && !entry.name.endsWith('.js')) {
+        const srcPath = path.join(srcDir, entry.name);
+        const destPath = path.join(libDir, entry.name);
+        
+        if (entry.isDirectory()) {
+          if (!fs.existsSync(destPath)) {
+            fs.mkdirSync(destPath, { recursive: true });
+          }
+        } else {
+          fs.copyFileSync(srcPath, destPath);
+        }
       }
-      copyDir(srcPath, destPath);
-    } else {
-      fs.copyFileSync(srcPath, destPath);
     }
   }
+  
+  console.log('✅ Build completed: TypeScript → JavaScript in lib/');
+} catch (error) {
+  console.error('❌ Build failed:', error.message);
+  process.exit(1);
 }
-
-copyDir(srcDir, libDir);
-console.log('✅ Build completed: src/ → lib/');
