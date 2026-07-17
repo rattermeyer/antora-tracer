@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import { RequirementsTraceabilityExtension } from '../src/index';
-import type { Requirement } from '../src/types';
+import { RequirementsTraceabilityExtension } from '../src/index.js';
+import type { Requirement } from '../src/types.js';
 
 describe('Validation', function() {
   let extension: InstanceType<typeof RequirementsTraceabilityExtension>;

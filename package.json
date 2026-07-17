@@ -1,8 +1,9 @@
 {
   "name": "antora-requirements-traceability",
   "version": "0.1.0",
+  "type": "module",
   "description": "Requirements traceability extensions for Antora/AsciiDoc",
-  "main": "lib/index.js",
+  "main": "./lib/index.js",
   "module": "lib/index.js",
   "exports": {
     ".": "./lib/index.js",
@@ -11,12 +12,15 @@
   },
   "scripts": {
     "build": "tsc && node scripts/build.js",
-    "test": "tsc -p tsconfig.test.json && mocha 'lib/test/**/*.test.js'",
-    "lint": "echo 'Linting...'",
+    "test": "tsc -p tsconfig.test.json && node --import=tsx/cjs 'node_modules/mocha/bin/mocha' 'lib/test/**/*.test.js'",
+    "lint": "biome check .",
+    "lint:fix": "biome check --apply .",
+    "format": "biome format --write .",
     "start": "node lib/cli.js",
     "dev": "nodemon --watch src --exec \"npm run build && node lib/index.js\"",
     "tsc": "tsc",
-    "tsc:watch": "tsc --watch"
+    "tsc:watch": "tsc --watch",
+    "prepare": "husky"
   },
   "keywords": [
     "antora",
@@ -34,15 +38,16 @@
     "@types/chai": "^5.2.3",
     "@types/mocha": "^10.0.10",
     "@types/node": "^26.1.1",
+    "biome": "^0.3.3",
     "chai": "^5.1.1",
     "chalk": "^5.3.0",
     "commander": "^12.1.0",
     "mocha": "^10.4.0",
     "ts-mocha": "^11.1.0",
     "ts-node": "^10.9.2",
+    "tsx": "^4.23.1",
     "typescript": "^7.0.2"
   },
-  "type": "commonjs",
   "bin": {
     "antora-req-trace": "./lib/cli.js"
   },

@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import { RequirementsTraceabilityExtension } from '../src/index';
-import type { Requirement } from '../src/types';
+import { RequirementsTraceabilityExtension } from '../src/index.js';
+import type { Requirement } from '../src/types.js';
 
 describe('Requirements Traceability', function() {
   let extension: InstanceType<typeof RequirementsTraceabilityExtension>;
@@ -508,7 +508,7 @@ describe('Requirements Traceability', function() {
       // But there's no direct forward path from REQ-400 to REQ-402
       // Let's test a path that exists: IMP-400 -> REQ-401
       extension.addRelationship('REQ-400', 'REQ-401', 'satisfies');
-      
+
       const path = extension.findPath('REQ-400', 'REQ-401');
 
       expect(path).to.not.be.null;

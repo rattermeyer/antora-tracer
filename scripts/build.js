@@ -1,5 +1,5 @@
 // Build script: compiles TypeScript source to JavaScript in lib/
-const { execSync } = require('child_process');
+import { execSync } from 'child_process';
 
 console.log('🔧 Building TypeScript project...');
 try {

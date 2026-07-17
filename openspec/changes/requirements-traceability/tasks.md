@@ -424,6 +424,31 @@
 - ✅ Security review passed
 - ✅ Code quality verified
 
+### Task 19: Migrate to ESM (ECMAScript Modules)
+**Status**: ✅ Complete
+**Estimate**: 2 hours
+**Actual Time**: ~1 hour
+
+✅ Update package.json to use "type": "module"
+✅ Update tsconfig.json to use ESM settings (module: NodeNext, moduleResolution: NodeNext)
+✅ Update all import/export statements for ESM compatibility
+✅ Fix file extensions (.js) for ESM imports
+✅ Update scripts/build.js to use ESM imports
+✅ Update src/cli.ts to use ESM imports (chalk, package.json)
+✅ Test all functionality with ESM
+✅ Update test configuration to use tsx loader
+✅ All 155 tests still passing
+
+**Changes Made**:
+- package.json: type: "module", updated main exports
+- tsconfig.json: module: NodeNext, moduleResolution: NodeNext, target: ES2022
+- tsconfig.test.json: module: NodeNext, moduleResolution: NodeNext, target: ES2022
+- scripts/build.js: Converted to ESM (import instead of require)
+- src/cli.ts: Converted to ESM (import chalk, read package.json via fs)
+- All test files: Added .js extensions to imports
+- package.json test script: Uses tsx loader for mocha
+- Installed tsx as dev dependency
+
 ## Task Prioritization
 
 ### High Priority (Must have for MVP)

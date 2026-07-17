@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import createAntoraExtension, { AntoraTraceabilityExtension, AntoraExtensionContext } from '../src/antora-extension';
-import { RequirementsTraceabilityExtension } from '../src/index';
+import createAntoraExtension, { AntoraTraceabilityExtension, AntoraExtensionContext } from '../src/antora-extension.js';
+import { RequirementsTraceabilityExtension } from '../src/index.js';
 
 describe('Antora Extension', function() {
   let mockContext: AntoraExtensionContext;
@@ -39,8 +39,8 @@ describe('Antora Extension', function() {
     it('should load configuration from playbook', function() {
       mockContext.playbook = {
         extensions: [
-          { 
-            name: 'antora-requirements-traceability', 
+          {
+            name: 'antora-requirements-traceability',
             config: {
               enabled: false,
               outputDir: 'custom-output',
@@ -74,8 +74,8 @@ describe('Antora Extension', function() {
     it('should log disabled message when disabled', function() {
       mockContext.playbook = {
         extensions: [
-          { 
-            name: 'antora-requirements-traceability', 
+          {
+            name: 'antora-requirements-traceability',
             config: { enabled: false }
           }
         ]
@@ -147,7 +147,7 @@ describe('Antora Extension', function() {
 
     it('should share graph between Antora extension and traceability extension', function() {
       const traceability = extension.getTraceabilityExtension();
-      
+
       // Add a requirement through the traceability extension
       traceability.graph.addRequirement({
         id: 'REQ-001',

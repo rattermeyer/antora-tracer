@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { RequirementsTraceabilityExtension } from '../src/index';
+import { RequirementsTraceabilityExtension } from '../src/index.js';
 
 describe('Performance Optimization', function() {
   let extension: InstanceType<typeof RequirementsTraceabilityExtension>;

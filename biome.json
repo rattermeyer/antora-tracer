@@ -1,0 +1,50 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.5.3/schema.json",
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "rules": {
+      "correctness": {
+        "noUnusedVariables": "error",
+        "noUnusedImports": "error",
+        "noUnusedPrivateClassMembers": "error"
+      },
+      "suspicious": {
+        "noExplicitAny": "error",
+        "noImplicitAny": "error",
+        "noUnsafeAny": "error"
+      },
+      "style": {
+        "useNamingConvention": "off",
+        "useConst": "off"
+      }
+    }
+  },
+  "formatter": {
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "quoteStyle": "double"
+  },
+  "files": {
+    "ignore": [
+      "node_modules",
+      "lib",
+      "coverage",
+      "dist"
+    ]
+  },
+  "overrides": [
+    {
+      "include": ["*.md"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnusedVariables": "off"
+          }
+        }
+      }
+    }
+  ]
+}

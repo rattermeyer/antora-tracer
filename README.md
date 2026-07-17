@@ -2,11 +2,14 @@
 
 [![npm version](https://img.shields.io/npm/v/antora-requirements-traceability.svg)](https://www.npmjs.com/package/antora-requirements-traceability)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-7.x-blue.svg)](https://www.typescriptlang.org/)
+[![ESM](https://img.shields.io/badge/Module-ESM-red.svg)](https://nodejs.org/api/esm.html)
 
 The **Antora Requirements Traceability Extension** enables requirements traceability in your Antora documentation. Define requirements, implementations, tests, and documents using custom AsciiDoc macros, establish relationships between them, and generate traceability matrices and coverage reports.
 
 ## Features
+
+**Note**: This package uses ESM (ECMAScript Modules). Ensure your Node.js version is 14+ and your project is configured for ESM.
 
 * ✅ **Requirement Definition**: Define requirements with `[req]` block macros
 * ✅ **Implementation Tracking**: Track implementations with `[imp]` block macros
@@ -99,7 +102,7 @@ npx antora-req-trace validate
 **Process Command:**
 
 * `-i, --input <path>`: Input file or directory
-* `-o, --output <path>`: Output directory  
+* `-o, --output <path>`: Output directory
 * `-f, --format <format>`: Output format (html, csv, json)
 
 **Matrix Command:**

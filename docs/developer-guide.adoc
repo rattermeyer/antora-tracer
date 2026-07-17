@@ -408,7 +408,7 @@ interface Document extends TraceableNode { /* ... */ }
 type AnyNode = Requirement | Implementation | Test | Document;
 
 // Relationship types
-type RelationshipType = 
+type RelationshipType =
   | 'implements' | 'satisfies' | 'tests' | 'verifies'
   | 'documents' | 'depends' | 'requires';
 
@@ -620,6 +620,12 @@ npm test -- --grep "Matrix Generator"
 
 # Run with verbose output
 npm test -- --verbose
+
+# Run pre-commit hooks manually
+pre-commit run --all-files
+
+# Update hooks to latest versions
+pre-commit autoupdate
 ----
 
 === Test Coverage
@@ -682,6 +688,12 @@ describe('My Feature', function() {
 . Install dependencies: `npm install`
 . Build the project: `npm run build`
 . Run tests: `npm test`
+. Install pre-commit hooks: `pre-commit install`
+
+**Note on pre-commit:**
+This project uses https://github.com/pre-commit/pre-commit[pre-commit] for git hooks.
+The pre-commit hook will automatically run Biome linting and formatting on staged files before each commit.
+To skip the pre-commit checks (not recommended): `git commit --no-verify`
 
 === Code Style
 
@@ -765,11 +777,14 @@ npm publish
 
 * `@types/chai`: TypeScript types for Chai
 * `@types/mocha`: TypeScript types for Mocha
+* `biome`: Linter and formatter
 * `chai`: Assertion library
 * `commander`: CLI argument parsing
 * `mocha`: Test runner
 * `ts-mocha`: TypeScript test runner
 * `ts-node`: TypeScript execution
+* `tsx`: TypeScript execution with ESM support
+* `typescript`: TypeScript compiler
 
 == Version Compatibility
 
@@ -787,6 +802,11 @@ npm publish
 
 * Minimum: Antora 3.x
 * Tested with: Antora 3.x
+
+=== Python
+
+* Required for pre-commit: Python 3.7+
+* pre-commit is used for git hooks
 
 == Troubleshooting Development Issues
 

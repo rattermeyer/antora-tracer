@@ -1,7 +1,7 @@
 import { expect } from 'chai';
-import { RequirementsTraceabilityExtension } from '../src/index';
-import { DocumentParser } from '../src/DocumentParser';
-import type { Requirement } from '../src/types';
+import { RequirementsTraceabilityExtension } from '../src/index.js';
+import { DocumentParser } from '../src/DocumentParser.js';
+import type { Requirement } from '../src/types.js';
 
 describe('Integration Tests', function() {
   let extension: InstanceType<typeof RequirementsTraceabilityExtension>;
@@ -424,7 +424,7 @@ implements:SHARED-001[]
 `;
 
       const module1Parsed = parser.parse(module1Content, 'module1.adoc');
-      
+
       // Add module 1 elements
       for (const req of module1Parsed.requirements) {
         extension.graph.addRequirement(req);
@@ -435,7 +435,7 @@ implements:SHARED-001[]
 
       // Try to add module 2 elements - should fail on duplicate
       const module2Parsed = parser.parse(module2Content, 'module2.adoc');
-      
+
       expect(() => {
         for (const req of module2Parsed.requirements) {
           extension.graph.addRequirement(req);
@@ -505,12 +505,12 @@ implements:SHARED-001[]
       for (let i = 1; i <= 50; i++) {
         const id = `REQ-${String(i).padStart(3, '0')}`;
         const prevId = i > 1 ? `REQ-${String(i - 1).padStart(3, '0')}` : null;
-        
+
         let reqContent = `Requirement ${i}`;
         if (prevId) {
           reqContent += `\n\ndepends:${prevId}[`;
         }
-        
+
         contentParts.push(`[req, id=${id}]\n====\n${reqContent}\n====\n`);
       }
 

@@ -1,0 +1,48 @@
+# pre-commit configuration for antora-requirements-traceability
+# See https://github.com/pre-commit/pre-commit for more info
+
+repos:
+  # Biome for TypeScript/JavaScript linting and formatting
+  - repo: local
+    hooks:
+      - id: biome-check
+        name: biome check (TypeScript/JavaScript)
+        entry: npx biome check --apply
+        language: node
+        files: \.(ts|tsx|js)$
+
+      - id: biome-format
+        name: biome format (Markdown/JSON/YAML)
+        entry: npx biome format --write
+        language: node
+        files: \.(md|json|yaml|yml)$
+
+  # Ensure no large files are committed
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-added-large-files
+        name: check added large files
+        args: ['--maxkb=500']
+
+  # Trim trailing whitespace
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        name: trim trailing whitespace
+
+  # Check for mixed line endings
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: mixed-line-ending
+        name: fix mixed line endings
+        args: [--fix=lf]
+
+  # Check for merge conflict markers
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-merge-conflict
+        name: check for merge conflicts

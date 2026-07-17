@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { DocumentParser } from '../src/DocumentParser';
+import { DocumentParser } from '../src/DocumentParser.js';
 
 describe('DocumentParser', function() {
   let parser: DocumentParser;

@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import { RequirementsTraceabilityExtension } from '../src/index';
-import type { TraceabilityMatrix } from '../src/types';
+import { RequirementsTraceabilityExtension } from '../src/index.js';
+import type { TraceabilityMatrix } from '../src/types.js';
 
 describe('Matrix Generator Enhancement', function() {
   let extension: InstanceType<typeof RequirementsTraceabilityExtension>;

@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { RequirementsTraceabilityExtension } from '../src/index';
+import { RequirementsTraceabilityExtension } from '../src/index.js';
 
 describe('AsciiDoc Processor Plugin', function() {
   let extension: InstanceType<typeof RequirementsTraceabilityExtension>;
@@ -24,7 +24,7 @@ This is a test requirement.
 
       const result = extension.process(content);
       expect(extension.graph.getAllRequirements()).to.have.lengthOf(1);
-      
+
       const req = extension.graph.getRequirement('REQ-001');
       expect(req).to.exist;
       expect(req!.id).to.equal('REQ-001');
@@ -42,7 +42,7 @@ This requirement has no explicit ID.
 
       const result = extension.process(content);
       expect(extension.graph.getAllRequirements()).to.have.lengthOf(1);
-      
+
       const req = extension.graph.getAllRequirements()[0];
       expect(req.id).to.match(/REQ-\d+-\d+/);
       expect(req.title).to.equal('Auto ID Test');
@@ -68,7 +68,7 @@ Test with source info.
       // Register first requirement
       const content1 = '[req, id=REQ-003]\n====\nFirst\n====';
       await extension.process(content1);
-      
+
       // Try to register duplicate — parseRequirementsFromContent throws synchronously
       const content2 = '[req, id=REQ-003]\n====\nDuplicate\n====';
       let thrown: any = null;
@@ -81,11 +81,11 @@ Test with source info.
       const content = '[req, id=INVALID-ID]\n====\nTest\n====';
       const consoleWarn = console.warn;
       let warningCaptured = null;
-      
+
       console.warn = (msg) => { warningCaptured = msg; };
       extension.process(content);
       console.warn = consoleWarn;
-      
+
       expect(warningCaptured).to.contain('Non-standard requirement ID format');
     });
   });
@@ -109,7 +109,7 @@ Second requirement
 
     it('should add relationships between requirements', function() {
       extension.addRelationship('REQ-100', 'REQ-101', 'satisfies');
-      
+
       const rels = extension.graph.getRelationships('REQ-100');
       expect(rels).to.have.lengthOf(1);
       expect(rels[0].type).to.equal('satisfies');
@@ -144,7 +144,7 @@ Requirement 201
 
     it('should generate traceability matrices', function() {
       const matrix = extension.generateMatrix('req-impl');
-      
+
       expect(matrix.type).to.equal('req-impl');
       expect(matrix.requirements).to.have.lengthOf(2);
       expect(matrix.coverage).to.be.an('object');

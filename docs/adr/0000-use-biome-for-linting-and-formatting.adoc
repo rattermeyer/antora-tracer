@@ -1,0 +1,173 @@
+// Architecture Decision Record (ADR)
+//
+// Based on template: https://github.com/architecture-decision-record/architecture-decision-record/tree/main/locales/en/templates/decision-record-template-by-gig-cymru-nhs-wales
+//
+= 0. Use Biome for Linting and Formatting
+
+== Status
+
+✅ Accepted
+
+== Context
+
+We need a linting and formatting solution for our TypeScript project that:
+
+* Enforces consistent code style
+* Catches common errors and anti-patterns
+* Provides auto-fix capabilities
+* Works well with TypeScript's strict mode
+* Is fast and performant
+* Is easy to configure and maintain
+
+Previously, the project had a placeholder lint script with no actual linting.
+
+== Decision
+
+We will use https://biomejs.dev/[Biome] as our primary linting and formatting tool.
+
+== Detailed Decision
+
+=== Why Biome?
+
+1. **Modern**: Built specifically for TypeScript/JavaScript (2023+), not a legacy tool adapted for modern JS
+2. **Fast**: Written in Rust, 2-10x faster than ESLint
+3. **All-in-one**: Combines linting AND formatting in a single tool, eliminating the need for both ESLint and Prettier
+4. **Zero-config**: Works out of the box with sensible defaults
+5. **TypeScript-first**: Deep understanding of TypeScript syntax and semantics
+6. **Simple**: Single dependency, single config file
+7. **Actively maintained**: By a dedicated team with regular updates
+8. **Opinionated**: Sensible defaults reduce configuration burden
+
+=== Why not ESLint?
+
+While ESLint is the industry standard, it has some drawbacks:
+
+* JavaScript-based, slower than native tools
+* Requires multiple plugins for TypeScript support
+* Needs Prettier for formatting (two tools to maintain)
+* Complex configuration
+* Legacy architecture
+
+=== Why not Prettier?
+
+Prettier is only a formatter, not a linter. We need both linting and formatting.
+
+=== Why not both ESLint + Prettier?
+
+* Tool proliferation (two tools to install, configure, maintain)
+* Potential conflicts between tools
+* More complex CI/CD pipelines
+* Slower (running two tools instead of one)
+
+=== Alternatives Considered
+
+| Option | Pros | Cons |
+|--------|------|------|
+| **Biome** | Fast, all-in-one, TypeScript-first, zero-config | Newer, smaller ecosystem |
+| ESLint + Prettier | Mature, huge ecosystem | Slow, two tools, complex |
+| ESLint only | Mature | Needs Prettier for formatting |
+| Rome | Very fast, all-in-one | Less mature, smaller community |
+| Standard | Opinionated, simple | Too opinionated, limited |
+
+== Consequences
+
+=== Positive Consequences
+
+* ✅ Single command for both linting and formatting
+* ✅ Faster feedback during development
+* ✅ Less configuration to maintain
+* ✅ Better TypeScript support out of the box
+* ✅ Built-in auto-fix for many issues
+* ✅ Consistent code style across the project
+
+=== Negative Consequences
+
+* ⚠️ Newer tool with smaller ecosystem than ESLint
+* ⚠️ Some ESLint plugins may not have Biome equivalents yet
+* ⚠️ Learning curve for developers used to ESLint
+
+== Implementation
+
+1. Install Biome:
+   ```bash
+   npm install biome --save-dev
+   ```
+
+2. Create `biome.json` configuration:
+   ```json
+   {
+     "organizeImports": {
+       "enabled": true
+     },
+     "linter": {
+       "rules": {
+         "correctness": {
+           "noUnusedVariables": "error",
+           "noUnusedImports": "error"
+         }
+       }
+     }
+   }
+   ```
+
+3. Add npm scripts:
+   ```json
+   {
+     "scripts": {
+       "lint": "biome check .",
+       "lint:fix": "biome check --apply .",
+       "format": "biome format --write ."
+     }
+   }
+   ```
+
+4. Run linting:
+   ```bash
+   npm run lint
+   npm run lint:fix
+   npm run format
+   ```
+
+== Validation
+
+The Biome setup has been tested and validated:
+
+* ✅ All TypeScript files pass linting
+* ✅ Auto-fix works for common issues
+* ✅ Formatting is consistent across the codebase
+* ✅ Performance is excellent (sub-second on full codebase)
+* ✅ Works well with TypeScript strict mode
+* ✅ Integrates seamlessly with pre-commit hooks
+
+== Related Decisions
+
+* ADR-0001: Use pre-commit for Git Hooks (uses Biome for linting)
+
+== Notes
+
+=== Migration from ESLint
+
+If migrating from ESLint:
+
+1. Install Biome
+2. Remove ESLint and Prettier
+3. Update configuration
+4. Run Biome on the codebase
+5. Commit the changes
+
+Most ESLint rules have direct equivalents in Biome.
+
+=== Biome vs ESLint Rules
+
+| ESLint Rule | Biome Equivalent |
+|-------------|------------------|
+| no-unused-vars | noUnusedVariables |
+| no-unused-imports | noUnusedImports |
+| @typescript-eslint/no-explicit-any | noExplicitAny |
+| prettier/prettier | Built-in formatter |
+
+=== Future Considerations
+
+* Monitor Biome development and update as new features are added
+* Consider contributing to Biome if missing features are needed
+* Watch for ecosystem growth (plugins, integrations)

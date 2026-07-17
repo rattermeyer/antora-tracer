@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import { RequirementsTraceabilityExtension } from '../src/index';
-import type { Requirement } from '../src/types';
+import { RequirementsTraceabilityExtension } from '../src/index.js';
+import type { Requirement } from '../src/types.js';
 
 /** Create a minimal valid Requirement for testing. */
 function req(id: string, title: string): Requirement {
@@ -39,7 +39,7 @@ describe('Traceability Graph', function() {
     it('should add requirements to graph', function() {
       const r = req('REQ-001', 'Test Requirement');
       extension.graph.addRequirement(r);
-      
+
       expect(extension.graph.getAllRequirements()).to.have.lengthOf(1);
       expect(extension.graph.getRequirement('REQ-001')).to.equal(r);
     });
@@ -47,7 +47,7 @@ describe('Traceability Graph', function() {
     it('should retrieve requirements by ID', function() {
       const r = req('REQ-002', 'Another Requirement');
       extension.graph.addRequirement(r);
-      
+
       const retrieved = extension.graph.getRequirement('REQ-002');
       expect(retrieved).to.equal(r);
     });
@@ -57,7 +57,7 @@ describe('Traceability Graph', function() {
     it('should add implementations to graph', function() {
       const imp = { id: 'IMP-001', title: 'Test Implementation' };
       extension.addImplementation(imp);
-      
+
       expect(extension.graph.getAllImplementations()).to.have.lengthOf(1);
       expect(extension.graph.getImplementation('IMP-001')).to.equal(imp);
     });
@@ -65,7 +65,7 @@ describe('Traceability Graph', function() {
     it('should retrieve implementations by ID', function() {
       const imp = { id: 'IMP-002', title: 'Another Implementation' };
       extension.addImplementation(imp);
-      
+
       const retrieved = extension.graph.getImplementation('IMP-002');
       expect(retrieved).to.equal(imp);
     });
@@ -75,7 +75,7 @@ describe('Traceability Graph', function() {
     it('should add tests to graph', function() {
       const test = { id: 'TEST-001', title: 'Test Case' };
       extension.addTest(test);
-      
+
       expect(extension.graph.getAllTests()).to.have.lengthOf(1);
       expect(extension.graph.getTest('TEST-001')).to.equal(test);
     });
@@ -83,7 +83,7 @@ describe('Traceability Graph', function() {
     it('should retrieve tests by ID', function() {
       const test = { id: 'TEST-002', title: 'Another Test' };
       extension.addTest(test);
-      
+
       const retrieved = extension.graph.getTest('TEST-002');
       expect(retrieved).to.equal(test);
     });
@@ -100,7 +100,7 @@ describe('Traceability Graph', function() {
 
     it('should add relationships between nodes', function() {
       extension.addRelationship('IMP-100', 'REQ-100', 'satisfies');
-      
+
       const relationships = extension.graph.getRelationships('IMP-100');
       expect(relationships.length).to.equal(1);
       expect(relationships[0].type).to.equal('satisfies');
@@ -111,7 +111,7 @@ describe('Traceability Graph', function() {
       extension.addRelationship('IMP-100', 'REQ-100', 'satisfies');
       extension.addRelationship('IMP-100', 'REQ-101', 'implements');
       extension.addRelationship('TEST-100', 'REQ-100', 'tests');
-      
+
       const satisfiesRels = extension.graph.getRelationships('IMP-100', 'satisfies');
       expect(satisfiesRels.length).to.equal(1);
       expect(satisfiesRels[0].targetId).to.equal('REQ-100');
@@ -120,7 +120,7 @@ describe('Traceability Graph', function() {
     it('should get reverse relationships', function() {
       extension.addRelationship('IMP-100', 'REQ-100', 'satisfies');
       extension.addRelationship('TEST-100', 'REQ-100', 'tests');
-      
+
       const reverseRels = extension.graph.getReverseRelationships('REQ-100');
       expect(reverseRels.length).to.equal(2);
       expect(reverseRels.map(r => r.fromId)).to.include.members(['IMP-100', 'TEST-100']);
@@ -133,10 +133,10 @@ describe('Traceability Graph', function() {
       extension.graph.addRequirement(req('REQ-200', 'Requirement 200'));
       extension.graph.addRequirement(req('REQ-201', 'Requirement 201'));
       extension.graph.addRequirement(req('REQ-202', 'Requirement 202'));
-      
+
       extension.addImplementation({ id: 'IMP-200', title: 'Implementation 200' });
       extension.addTest({ id: 'TEST-200', title: 'Test 200' });
-      
+
       // Add relationships
       extension.addRelationship('IMP-200', 'REQ-200', 'implements');
       extension.addRelationship('TEST-200', 'REQ-200', 'tests');
@@ -146,7 +146,7 @@ describe('Traceability Graph', function() {
 
     it('should calculate coverage metrics', function() {
       const coverage = extension.getCoverageReport();
-      
+
       expect(coverage.totalRequirements).to.equal(3);
       expect(coverage.requirementsWithImplementation).to.equal(2);
       expect(coverage.requirementsWithTests).to.equal(1);
@@ -179,10 +179,10 @@ describe('Traceability Graph', function() {
       extension.graph.addRequirement(req('REQ-300', 'Requirement 300'));
       extension.graph.addRequirement(req('REQ-301', 'Requirement 301'));
       extension.graph.addRequirement(req('REQ-302', 'Requirement 302'));
-      
+
       extension.addImplementation({ id: 'IMP-300', title: 'Implementation 300' });
       extension.addImplementation({ id: 'IMP-301', title: 'Implementation 301' });
-      
+
       // Create a chain: IMP-300 -> REQ-300 -> IMP-301 -> REQ-301
       extension.addRelationship('IMP-300', 'REQ-300', 'implements');
       extension.addRelationship('REQ-300', 'IMP-301', 'requires');
@@ -213,11 +213,11 @@ describe('Traceability Graph', function() {
       extension.graph.addRequirement(req('REQ-400', 'Requirement 400'));
       extension.graph.addRequirement(req('REQ-401', 'Requirement 401'));
       extension.graph.addRequirement(req('REQ-402', 'Requirement 402'));
-      
+
       extension.addImplementation({ id: 'IMP-400', title: 'Implementation 400' });
       extension.addImplementation({ id: 'IMP-401', title: 'Implementation 401' });
       extension.addTest({ id: 'TEST-400', title: 'Test 400' });
-      
+
       // Create relationships
       extension.addRelationship('IMP-400', 'REQ-400', 'implements');
       extension.addRelationship('IMP-400', 'REQ-401', 'implements');
@@ -228,7 +228,7 @@ describe('Traceability Graph', function() {
 
     it('should perform impact analysis', function() {
       const impacted = extension.getImpactAnalysis('REQ-400');
-      
+
       expect(impacted).to.be.an('array');
       // Should include IMP-400 (implements REQ-400), TEST-400 (tests REQ-400)
       // And REQ-401 (no direct relation but connected through IMP-400)
@@ -238,7 +238,7 @@ describe('Traceability Graph', function() {
 
     it('should handle isolated nodes', function() {
       extension.graph.addRequirement(req('REQ-403', 'Isolated Requirement'));
-      
+
       const impacted = extension.getImpactAnalysis('REQ-403');
       expect(impacted).to.be.an('array');
       expect(impacted).to.be.empty;
@@ -250,11 +250,11 @@ describe('Traceability Graph', function() {
       // Set up a graph for matrix testing
       extension.graph.addRequirement(req('REQ-500', 'Requirement 500'));
       extension.graph.addRequirement(req('REQ-501', 'Requirement 501'));
-      
+
       extension.addImplementation({ id: 'IMP-500', title: 'Implementation 500' });
       extension.addImplementation({ id: 'IMP-501', title: 'Implementation 501' });
       extension.addTest({ id: 'TEST-500', title: 'Test 500' });
-      
+
       extension.addRelationship('IMP-500', 'REQ-500', 'implements');
       extension.addRelationship('IMP-501', 'REQ-501', 'implements');
       extension.addRelationship('TEST-500', 'REQ-500', 'tests');
@@ -262,11 +262,11 @@ describe('Traceability Graph', function() {
 
     it('should generate basic traceability matrix', function() {
       const matrix = extension.generateMatrix('req-impl');
-      
+
       expect(matrix.type).to.equal('req-impl');
       expect(matrix.requirements).to.be.an('array');
       expect(matrix.requirements.length).to.equal(2);
-      
+
       const req500 = matrix.requirements.find(r => r.id === 'REQ-500');
       expect(req500!.implementations).to.include('IMP-500');
       expect(req500!.tests).to.include('TEST-500');
@@ -274,7 +274,7 @@ describe('Traceability Graph', function() {
 
     it('should generate detailed matrix', function() {
       const matrix = extension.generateDetailedMatrix('full');
-      
+
       expect(matrix.type).to.equal('full');
       expect(matrix.requirements).to.be.an('array');
       expect(matrix.implementations).to.be.an('array');
@@ -285,10 +285,10 @@ describe('Traceability Graph', function() {
 
     it('should get requirements with details', function() {
       const requirements = extension.getRequirementsWithDetails();
-      
+
       expect(requirements).to.be.an('array');
       expect(requirements.length).to.equal(2);
-      
+
       const req500 = requirements.find(r => r.id === 'REQ-500');
       expect(req500!.implementedBy).to.include('IMP-500');
       expect(req500!.testedBy).to.include('TEST-500');
@@ -316,7 +316,7 @@ describe('Traceability Graph', function() {
 
     it('should get all relationships for a node', function() {
       extension.addRelationship('IMP-600', 'REQ-601', 'satisfies');
-      
+
       const relationships = extension.graph.getRelationships('IMP-600');
       expect(relationships).to.be.an('array');
       expect(relationships.length).to.equal(2);

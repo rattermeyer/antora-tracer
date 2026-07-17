@@ -3,8 +3,14 @@
 import { program } from 'commander';
 import { createWriteStream } from 'fs';
 import { RequirementsTraceabilityExtension } from './index.js';
-const chalk = require('chalk');
-const packageJson = require('../package.json');
+import chalk from 'chalk';
+import { readFileSync } from 'fs';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const packageJson = JSON.parse(readFileSync(resolve(__dirname, '../package.json'), 'utf8'));
 
 program
   .name('antora-req-trace')
@@ -35,7 +41,7 @@ program.command('matrix')
     console.log(chalk.green('Format:', options.format));
 
     const extension = new RequirementsTraceabilityExtension();
-    
+
     // For now, generate a sample matrix from any existing data
     // In real usage, this would process files first
     let output: string;
@@ -44,7 +50,7 @@ program.command('matrix')
     } else {
       output = extension.exportMatrixToCSV(options.type);
     }
-    
+
     if (options.output) {
       const stream = createWriteStream(options.output);
       stream.write(output);
