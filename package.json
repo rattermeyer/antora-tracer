@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "tsc && node scripts/build.js",
-    "test": "mocha test/**/*.js",
+    "test": "tsc -p tsconfig.test.json && mocha 'lib/test/**/*.test.js'",
     "lint": "echo 'Linting...'",
     "start": "node lib/cli.js",
     "dev": "nodemon --watch src --exec \"npm run build && node lib/index.js\"",
@@ -32,6 +32,8 @@
     "chalk": "^5.3.0",
     "commander": "^12.1.0",
     "mocha": "^10.4.0",
+    "ts-mocha": "^11.1.0",
+    "ts-node": "^10.9.2",
     "typescript": "^7.0.2"
   },
   "type": "commonjs"
