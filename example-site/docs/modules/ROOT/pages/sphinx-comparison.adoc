@@ -5,80 +5,211 @@ This page provides a comparison between https://sphinx-needs.readthedocs.io/[Sph
 
 == Overview
 
-| Aspect | Sphinx Needs | Requirements Traceability Extension |
-|--------|--------------|--------------------------------------|
-| **Platform** | Sphinx (Python) | Antora (JavaScript/Node.js) |
-| **Documentation Format** | reStructuredText | AsciiDoc |
-| **Integration** | Sphinx extension | Antora extension |
-| **Language** | Python | TypeScript |
-| **Maturity** | Mature (several years) | New (2026) |
-| **Community** | Large, active | Growing |
+[cols="1,2,2"]
+|===
+| Aspect | Sphinx Needs | Requirements Traceability Extension
+
+| *Platform*
+| Sphinx (Python)
+| Antora (JavaScript/Node.js)
+
+| *Documentation Format*
+| reStructuredText
+| AsciiDoc
+
+| *Integration*
+| Sphinx extension
+| Antora extension
+
+| *Language*
+| Python
+| TypeScript
+
+| *Maturity*
+| Mature (several years)
+| New (2026)
+
+| *Community*
+| Large, active
+| Growing
+|===
 
 == Requirement Definition
 
-| Feature | Sphinx Needs | Requirements Traceability Extension |
-|---------|--------------|--------------------------------------|
-| Syntax | `:need:` directive | `[req]` block macro |
-| ID Format | Free-form (recommends NEED-XXX) | TYPE-NUMBER (e.g., REQ-001) |
-| Title | Optional | Optional |
-| Description | Multi-line content | Multi-line content |
-| Status | Customizable | Customizable (draft, approved, etc.) |
-| Example | `:need:` User Login<br>All users must be able to log in. | `[req, id=REQ-001]`<br>====<br>All users must be able to log in.<br>==== |
+[cols="1,2,2"]
+|===
+| Feature | Sphinx Needs | Requirements Traceability Extension
+
+| Syntax
+| `:need:` directive
+| `[req]` block macro
+
+| ID Format
+| Free-form (recommends NEED-XXX)
+| TYPE-NUMBER (e.g., REQ-001)
+
+| Title
+| Optional
+| Optional
+
+| Description
+| Multi-line content
+| Multi-line content
+
+| Status
+| Customizable
+| Customizable (draft, approved, etc.)
+
+| Example
+a| `:need:` User Login +
+All users must be able to log in.
+a| `[req, id=REQ-001]` +
+`\====` +
+All users must be able to log in. +
+`\====`
+|===
 
 == Implementation Definition
 
-| Feature | Sphinx Needs | Requirements Traceability Extension |
-|---------|--------------|--------------------------------------|
-| Syntax | `:req:` directive | `[imp]` block macro |
-| Relationship to Requirements | `:satisfies:` | `satisfies:` or `implements:` |
-| Example | `:req:` Login Service<br>:satisfies:` USER-LOGIN | `[imp, id=IMP-001]`<br>====<br>Login Service<br>====<br>implements:REQ-001[] |
+[cols="1,2,2"]
+|===
+| Feature | Sphinx Needs | Requirements Traceability Extension
+
+| Syntax
+| `:req:` directive
+| `[imp]` block macro
+
+| Relationship to Requirements
+| `:satisfies:`
+| `satisfies:` or `implements:`
+
+| Example
+a| `:req:` Login Service +
+:satisfies: USER-LOGIN
+a| `[imp, id=IMP-001]` +
+`\====` +
+Login Service +
+`\====` +
+implements:REQ-001[]
+|===
 
 == Test Definition
 
-| Feature | Sphinx Needs | Requirements Traceability Extension |
-|---------|--------------|--------------------------------------|
-| Syntax | `:test:` directive | `[test]` block macro |
-| Relationship to Requirements | `:tests:` | `tests:` or `verifies:` |
-| Example | `:test:` Login Test<br>:tests:` USER-LOGIN | `[test, id=TEST-001]`<br>====<br>Login Test<br>====<br>tests:REQ-001[] |
+[cols="1,2,2"]
+|===
+| Feature | Sphinx Needs | Requirements Traceability Extension
+
+| Syntax
+| `:test:` directive
+| `[test]` block macro
+
+| Relationship to Requirements
+| `:tests:`
+| `tests:` or `verifies:`
+
+| Example
+a| `:test:` Login Test +
+:tests: USER-LOGIN
+a| `[test, id=TEST-001]` +
+`\====` +
+Login Test +
+`\====` +
+tests:REQ-001[]
+|===
 
 == Relationship Types
 
-| Relationship | Sphinx Needs | Requirements Traceability Extension |
-|-------------|--------------|--------------------------------------|
-| Satisfies | `:satisfies:` | `satisfies:` |
-| Implements | `:implements:` | `implements:` |
-| Tests | `:tests:` | `tests:` |
-| Verifies | `:verifies:` | `verifies:` |
-| Documents | `:doc:` | `documents:` |
-| Depends | `:depends:` | `depends:` |
-| Requires | N/A | `requires:` |
+[cols="1,1,1"]
+|===
+| Relationship | Sphinx Needs | Requirements Traceability Extension
 
-**Note:** Both extensions support similar relationship types. The main difference is the syntax (directive vs. block macro + inline macro).
+| Satisfies
+| `:satisfies:`
+| `satisfies:`
+
+| Implements
+| `:implements:`
+| `implements:`
+
+| Tests
+| `:tests:`
+| `tests:`
+
+| Verifies
+| `:verifies:`
+| `verifies:`
+
+| Documents
+| `:doc:`
+| `documents:`
+
+| Depends
+| `:depends:`
+| `depends:`
+
+| Requires
+| N/A
+| `requires:`
+|===
+
+*Note:* Both extensions support similar relationship types. The main difference is the syntax (directive vs. block macro + inline macro).
 
 == Matrix Generation
 
-| Feature | Sphinx Needs | Requirements Traceability Extension |
-|---------|--------------|--------------------------------------|
-| Matrix Types | needflow, needtable, needlist | req-impl, req-test, full |
-| Output Formats | HTML, LaTeX, text | HTML, CSV |
-| Coverage Reporting | Yes (needcoverage) | Yes (coverage.html) |
-| Customization | Highly customizable | Standardized, with styling |
-| Example | `:needflow:` | Auto-generated during build |
+[cols="1,2,2"]
+|===
+| Feature | Sphinx Needs | Requirements Traceability Extension
+
+| Matrix Types
+| needflow, needtable, needlist
+| req-impl, req-test, full
+
+| Output Formats
+| HTML, LaTeX, text
+| HTML, CSV
+
+| Coverage Reporting
+| Yes (needcoverage)
+| Yes (coverage.html)
+
+| Customization
+| Highly customizable
+| Standardized, with styling
+
+| Example
+| `:needflow:`
+| Auto-generated during build
+|===
 
 == Configuration
 
-| Aspect | Sphinx Needs | Requirements Traceability Extension |
-|--------|--------------|--------------------------------------|
-| Config File | conf.py | antora.yml + package.json |
-| Extension Registration | `extensions = ['sphinx_needs']` | `extensions: [require: antora-requirements-traceability]` |
-| Requirement Options | Many options in conf.py | Minimal configuration needed |
-| Example | `needs_types = [dict(name="req", title="Requirement", prefix="REQ_", color="#BFD8D2")]` | Simple YAML configuration |
+[cols="1,2,2"]
+|===
+| Aspect | Sphinx Needs | Requirements Traceability Extension
+
+| Config File
+| conf.py
+| antora.yml + package.json
+
+| Extension Registration
+| `extensions = ['sphinx_needs']`
+| `extensions: [require: antora-requirements-traceability]`
+
+| Requirement Options
+| Many options in conf.py
+| Minimal configuration needed
+
+| Example
+a| `needs_types = [dict(name="req", title="Requirement", prefix="REQ_", color="#BFD8D2")]`
+| Simple YAML configuration
+|===
 
 == Syntax Comparison
 
 === Sphinx Needs
 
-```rst
+[source,rst]
+----
 .. need:: User Login
    :id: USER-LOGIN
    :status: open
@@ -100,11 +231,12 @@ This page provides a comparison between https://sphinx-needs.readthedocs.io/[Sph
    :satisfies: USER-LOGIN
 
    The service that handles user authentication.
-```
+----
 
 === Requirements Traceability Extension
 
-```asciidoc
+[source,asciidoc]
+----
 [req, id=REQ-001, title="User Login", status=approved]
 ====
 All users must be able to log in to the system.
@@ -121,20 +253,20 @@ The service that handles user authentication.
 ====
 
 implements:REQ-001[]
-```
+----
 
 == Key Differences
 
 === Philosophy
 
-**Sphinx Needs:**
+*Sphinx Needs:*
 
 * Designed for Sphinx documentation
 * Uses reStructuredText syntax
 * Highly customizable (can define custom need types, statuses, etc.)
 * Mature ecosystem with many plugins
 
-**Requirements Traceability Extension:**
+*Requirements Traceability Extension:*
 
 * Designed for Antora documentation
 * Uses AsciiDoc syntax
@@ -144,7 +276,7 @@ implements:REQ-001[]
 
 === Strengths
 
-**Sphinx Needs Strengths:**
+*Sphinx Needs Strengths:*
 
 * Mature and battle-tested
 * Large community and ecosystem
@@ -152,7 +284,7 @@ implements:REQ-001[]
 * Good for complex requirements management
 * Integrates well with Sphinx ecosystem
 
-**Requirements Traceability Extension Strengths:**
+*Requirements Traceability Extension Strengths:*
 
 * Native Antora integration
 * Modern AsciiDoc syntax
@@ -163,15 +295,38 @@ implements:REQ-001[]
 
 === Use Case Fit
 
-| Use Case | Sphinx Needs | Requirements Traceability Extension |
-|----------|--------------|--------------------------------------|
-| Python documentation | ✅ Best fit | ⚠️ Works but not ideal |
-| Antora documentation | ⚠️ Works but not ideal | ✅ Best fit |
-| Complex requirements management | ✅ Good fit | ⚠️ Good fit |
-| Simple documentation traceability | ⚠️ Good fit | ✅ Best fit |
-| Multi-language projects | ⚠️ Good fit | ✅ Good fit |
-| Need for custom need types | ✅ Best fit | ⚠️ Limited |
-| Need for simple setup | ⚠️ Moderate | ✅ Best fit |
+[cols="2,1,1"]
+|===
+| Use Case | Sphinx Needs | Requirements Traceability Extension
+
+| Python documentation
+| ✅ Best fit
+| ⚠️ Works but not ideal
+
+| Antora documentation
+| ⚠️ Works but not ideal
+| ✅ Best fit
+
+| Complex requirements management
+| ✅ Good fit
+| ⚠️ Good fit
+
+| Simple documentation traceability
+| ⚠️ Good fit
+| ✅ Best fit
+
+| Multi-language projects
+| ⚠️ Good fit
+| ✅ Good fit
+
+| Need for custom need types
+| ✅ Best fit
+| ⚠️ Limited
+
+| Need for simple setup
+| ⚠️ Moderate
+| ✅ Best fit
+|===
 
 == Migration Guide
 
@@ -179,18 +334,40 @@ If you're migrating from Sphinx Needs to the Requirements Traceability Extension
 
 === Step 1: Convert Syntax
 
-| Sphinx Needs | Requirements Traceability Extension |
-|--------------|--------------------------------------|
-| `:need:` | `[req]` |
-| `:req:` | `[imp]` |
-| `:test:` | `[test]` |
-| `:doc:` | `[doc]` |
-| `:satisfies:` | `satisfies:` |
-| `:implements:` | `implements:` |
-| `:tests:` | `tests:` |
-| `:verifies:` | `verifies:` |
-| `:doc:` | `documents:` |
-| `:depends:` | `depends:` |
+[cols="1,1"]
+|===
+| Sphinx Needs | Requirements Traceability Extension
+
+| `:need:`
+| `[req]`
+
+| `:req:`
+| `[imp]`
+
+| `:test:`
+| `[test]`
+
+| `:doc:`
+| `[doc]`
+
+| `:satisfies:`
+| `satisfies:`
+
+| `:implements:`
+| `implements:`
+
+| `:tests:`
+| `tests:`
+
+| `:verifies:`
+| `verifies:`
+
+| `:doc:`
+| `documents:`
+
+| `:depends:`
+| `depends:`
+|===
 
 === Step 2: Update IDs
 
@@ -198,6 +375,7 @@ Sphinx Needs uses free-form IDs (e.g., USER-LOGIN, NEED-001).
 The Requirements Traceability Extension recommends TYPE-NUMBER format (e.g., REQ-001, IMP-001).
 
 You can:
+
 * Keep your existing IDs (they'll work, but generate warnings)
 * Update to the recommended format
 * Use a prefix that matches your project
@@ -206,22 +384,24 @@ You can:
 
 Sphinx Needs configuration goes in `conf.py`:
 
-```python
+[source,python]
+----
 # conf.py
 extensions = ['sphinx_needs']
 needs_types = [
     dict(name="req", title="Requirement", prefix="REQ_", color="#BFD8D2"),
     dict(name="imp", title="Implementation", prefix="IMP_", color="#D8BFD2"),
 ]
-```
+----
 
 Requirements Traceability Extension configuration goes in `antora.yml`:
 
-```yaml
+[source,yaml]
+----
 # antora.yml
 extensions:
   - require: antora-requirements-traceability
-```
+----
 
 Much simpler!
 
@@ -229,15 +409,17 @@ Much simpler!
 
 After migrating your content:
 
-```bash
+[source,bash]
+----
 # For Sphinx Needs
 make html
 
 # For Requirements Traceability Extension
 npx antora antora.yml
-```
+----
 
 Verify that:
+
 * All requirements are parsed correctly
 * All relationships are established correctly
 * Matrices are generated correctly
