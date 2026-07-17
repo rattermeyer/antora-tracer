@@ -1,0 +1,624 @@
+= Antora Requirements Traceability Extension: User Guide
+:description: Complete guide to using the Requirements Traceability Extension for Antora/AsciiDoc
+:keywords: antora, asciidoc, requirements, traceability, documentation
+:author: Requirements Traceability Team
+:revdate: 2026-07-16
+:version: 0.1.0
+
+== Overview
+
+The Antora Requirements Traceability Extension enables you to define, track, and visualize requirements traceability in your Antora documentation. With this extension, you can:
+
+* Define requirements, implementations, tests, and documents using custom AsciiDoc macros
+* Establish relationships between traceability elements
+* Generate traceability matrices in CSV and HTML formats
+* View coverage reports to track implementation and test status
+* Integrate traceability information into your Antora site navigation
+
+== Quick Start
+
+=== Installation
+
+. Install the extension as an npm package:
++
+[source,bash]
+----
+npm install antora-requirements-traceability --save-dev
+----
+
+. Add the extension to your Antora playbook (`antora.yml`):
++
+[source,yaml]
+----
+antora:
+  extensions:
+    - require: antora-requirements-traceability
+----
+
+. Run your Antora build:
++
+[source,bash]
+----
+npx antora --fetch antora-playbook.yml
+----
+
+That's it! The extension will automatically process your AsciiDoc files and generate traceability artifacts.
+
+=== Basic Usage
+
+Add requirements to your AsciiDoc files using the `[req]` block macro:
+
+[source,asciidoc]
+----
+[req, id=REQ-001, title="User Authentication"]
+====
+The system shall require user authentication for all protected endpoints.
+
+This requirement ensures that only authorized users can access sensitive data.
+====
+
+[req, id=REQ-002, title="Password Complexity"]
+====
+The system shall enforce minimum password complexity requirements:
+
+* Minimum 8 characters
+* At least one uppercase letter
+* At least one lowercase letter
+* At least one digit
+* At least one special character
+====
+----
+
+== Defining Traceability Elements
+
+The extension supports four types of traceability elements:
+
+=== Requirements
+
+Use the `[req]` block macro to define requirements:
+
+[source,asciidoc]
+----
+[req, id=REQ-001, title="Requirement Title", status=approved]
+====
+Requirement description goes here.
+
+Can span multiple paragraphs.
+====
+----
+
+**Attributes:**
+
+| Attribute | Description | Required | Default |
+| id | Unique identifier (e.g., REQ-001) | No | Auto-generated |
+| title | Human-readable title | No | "Requirement {id}" |
+| status | Requirement status | No | draft |
+
+**ID Format:**
+
+* Recommended: `{TYPE}-{NUMBER}` where TYPE is 2-4 uppercase letters
+* Examples: `REQ-001`, `FUNC-001`, `SEC-001`
+* Non-standard IDs will generate a warning but still work
+
+=== Implementations
+
+Use the `[imp]` block macro to define implementations:
+
+[source,asciidoc]
+----
+[imp, id=IMP-001, title="Authentication Service"]
+====
+Implementation of the user authentication functionality.
+
+This service handles:
+* User login
+* Token generation
+* Session management
+====
+
+implements:REQ-001[]
+----
+
+**Attributes:**
+
+Same as requirements: `id`, `title`, `status`
+
+=== Tests
+
+Use the `[test]` block macro to define tests:
+
+[source,asciidoc]
+----
+[test, id=TEST-001, title="Authentication Test Suite"]
+====
+Unit tests for the authentication service.
+
+Tests include:
+* Successful login
+* Failed login
+* Token validation
+* Session timeout
+====
+
+tests:REQ-001[]
+verifies:REQ-001[]
+----
+
+**Attributes:**
+
+Same as requirements: `id`, `title`, `status`
+
+=== Documents
+
+Use the `[doc]` block macro to define documentation:
+
+[source,asciidoc]
+----
+[doc, id=DOC-001, title="API Documentation"]
+====
+API documentation for the authentication endpoints.
+
+Includes:
+* Endpoint specifications
+* Request/response examples
+* Error codes
+====
+
+documents:REQ-001[]
+----
+
+**Attributes:**
+
+Same as requirements: `id`, `title`, `status`
+
+== Establishing Relationships
+
+Relationships between traceability elements are established using inline macros within the content of the elements.
+
+=== Relationship Types
+
+| Macro | Description | Example |
+| satisfies | This element satisfies another requirement | `satisfies:REQ-001[]` |
+| implements | This element implements a requirement | `implements:REQ-001[]` |
+| tests | This element tests a requirement | `tests:REQ-001[]` |
+| verifies | This element verifies a requirement | `verifies:REQ-001[]` |
+| documents | This element documents a requirement | `documents:REQ-001[]` |
+| depends | This element depends on another | `depends:REQ-001[]` |
+| requires | This element requires another | `requires:REQ-001[]` |
+
+=== Examples
+
+.Requirement that depends on another:
+[source,asciidoc]
+----
+[req, id=REQ-002]
+====
+Advanced Authentication
+====
+
+depends:REQ-001[]
+----
+
+.Implementation that satisfies a requirement:
+[source,asciidoc]
+----
+[imp, id=IMP-001]
+====
+Authentication Implementation
+====
+
+satisfies:REQ-001[]
+implements:REQ-001[]
+----
+
+.Test that verifies a requirement:
+[source,asciidoc]
+----
+[test, id=TEST-001]
+====
+Authentication Tests
+====
+
+tests:REQ-001[]
+verifies:REQ-001[]
+----
+
+.Document that documents a requirement:
+[source,asciidoc]
+----
+[doc, id=DOC-001]
+====
+Authentication Guide
+====
+
+documents:REQ-001[]
+----
+
+== Configuration
+
+The extension can be configured through your Antora playbook.
+
+=== Configuration Options
+
+| Option | Type | Default | Description |
+| enabled | boolean | true | Enable or disable the extension |
+| outputDir | string | "traceability" | Output directory for artifacts |
+| generateMatrices | boolean | true | Generate traceability matrices |
+| matrixFormats | array | ["html", "csv"] | Output formats for matrices |
+| includeInNavigation | boolean | true | Add traceability links to navigation |
+
+=== Example Configuration
+
+[source,yaml]
+----
+antora:
+  extensions:
+    - require: antora-requirements-traceability
+      config:
+        enabled: true
+        outputDir: docs/traceability
+        generateMatrices: true
+        matrixFormats:
+          - html
+          - csv
+        includeInNavigation: true
+----
+
+== Generated Artifacts
+
+The extension generates the following artifacts in the configured output directory:
+
+=== Traceability Index
+
+`traceability/index.html`:: Main index page with links to all traceability artifacts
+
+=== Traceability Matrices
+
+The extension generates three types of matrices:
+
+*Requirements-to-Implementation Matrix (req-impl):*
+
+* `traceability/matrix-req-impl.html` - HTML format
+* `traceability/matrix-req-impl.csv` - CSV format
+
+*Requirements-to-Test Matrix (req-test):*
+
+* `traceability/matrix-req-test.html` - HTML format
+* `traceability/matrix-req-test.csv` - CSV format
+
+*Full Traceability Matrix (full):*
+
+* `traceability/matrix-full.html` - HTML format
+* `traceability/matrix-full.csv` - CSV format
+
+=== Coverage Report
+
+`traceability/coverage.html`:: Comprehensive coverage report with:
+
+* Total requirements count
+* Requirements with implementations
+* Requirements with tests
+* Implementation coverage percentage
+* Test coverage percentage
+* Visual progress bars
+
+== Matrix Format
+
+=== CSV Format
+
+The CSV matrix includes the following columns:
+
+* Requirement ID
+* Requirement Title
+* Implementations (semicolon-separated list)
+* Tests (semicolon-separated list)
+* Status (✓ Complete, ⚠ Partial, ✗ Missing)
+
+Followed by summary rows:
+
+* Total Requirements
+* Requirements with Implementation
+* Requirements with Tests
+* Implementation Coverage (%)
+* Test Coverage (%)
+
+=== HTML Format
+
+The HTML matrix includes:
+
+* Styled data table with all requirements
+* Color-coded status badges:
+ ** ✓ Complete (green) - has both implementation and tests
+ ** ⚠ Partial (orange) - has implementation or tests but not both
+ ** ✗ Missing (red) - has neither implementation nor tests
+* Coverage summary section
+* Responsive design for mobile devices
+* Breadcrumb navigation
+
+== Coverage Report
+
+The coverage report provides a visual overview of your traceability status:
+
+*Total Requirements:: Total number of requirements defined
+*Requirements with Implementation:: Number of requirements with at least one implementation
+*Requirements with Tests:: Number of requirements with at least one test
+*Implementation Coverage:: Percentage of requirements with implementations
+*Test Coverage:: Percentage of requirements with tests
+
+The report uses color coding:
+
+* Green (≥80%): Excellent coverage
+* Orange (50-79%): Good coverage
+* Red (<50%): Needs improvement
+
+== Best Practices
+
+=== Organizing Requirements
+
+. Group related requirements together in the same file
+. Use consistent ID prefixes (e.g., REQ-, FUNC-, SEC-)
+. Include clear, descriptive titles
+. Add detailed descriptions with acceptance criteria
+
+=== Establishing Traceability
+
+. Create explicit relationships between elements
+. Use `implements` for implementation-requirement relationships
+. Use `tests` for test-requirement relationships
+. Use `depends` for requirement-requirement dependencies
+. Document relationships in both directions when appropriate
+
+=== Maintaining Quality
+
+. Regularly review coverage reports
+. Aim for 100% implementation coverage
+. Aim for 100% test coverage
+. Resolve circular dependencies
+. Use unique IDs for all elements
+
+== Troubleshooting
+
+=== Common Issues
+
+*Non-standard ID format warnings*:: 
+**Cause:** IDs don't match the recommended format (TYPE-NUMBER)
+**Solution:** Use IDs like REQ-001, IMP-001, TEST-001. While non-standard IDs work, they generate warnings.
+
+*Duplicate ID errors*:: 
+**Cause:** Two elements with the same ID exist
+**Solution:** Ensure all IDs are unique across all element types
+
+*Circular reference errors*:: 
+**Cause:** Circular dependencies between requirements/implementations
+**Solution:** Review your dependency graph and break the cycle
+
+*Missing node errors*:: 
+**Cause:** Relationship references a non-existent element
+**Solution:** Ensure all referenced IDs exist before creating relationships
+
+=== Debugging
+
+Enable debug logging to see detailed information about processing:
+
+[source,bash]
+----
+DEBUG=antora-requirements-traceability npx antora antora-playbook.yml
+----
+
+This will output detailed logs about:
+
+* Files being processed
+* Elements being registered
+* Relationships being created
+* Matrices being generated
+
+=== Verifying Installation
+
+To verify the extension is loaded correctly:
+
+. Check the Antora build logs for the message: "Requirements traceability extension initialized"
+. Look for traceability artifacts in your output directory
+. Open the generated index.html in a browser to view the traceability pages
+
+== Examples
+
+=== Complete Example
+
+[source,asciidoc]
+----
+= My Project Documentation
+
+== Requirements
+
+[req, id=REQ-001, title="User Authentication", status=approved]
+====
+The system shall require user authentication.
+
+This is a critical security requirement.
+====
+
+[req, id=REQ-002, title="Data Encryption", status=approved]
+====
+All sensitive data must be encrypted at rest and in transit.
+====
+
+depends:REQ-001[]
+
+== Implementation
+
+[imp, id=IMP-001, title="Authentication Service"]
+====
+Service that handles user authentication.
+====
+
+implements:REQ-001[]
+satisfies:REQ-001[]
+
+[imp, id=IMP-002, title="Encryption Service"]
+====
+Service that handles data encryption.
+====
+
+implements:REQ-002[]
+satisfies:REQ-002[]
+
+== Tests
+
+[test, id=TEST-001, title="Authentication Tests"]
+====
+Unit tests for authentication functionality.
+====
+
+tests:REQ-001[]
+verifies:REQ-001[]
+
+[test, id=TEST-002, title="Encryption Tests"]
+====
+Unit tests for encryption functionality.
+====
+
+tests:REQ-002[]
+verifies:REQ-002[]
+----
+
+=== Resulting Matrices
+
+This example would generate:
+
+*REQ-001:*
+
+* Implementations: IMP-001
+* Tests: TEST-001
+* Status: ✓ Complete
+
+*REQ-002:*
+
+* Implementations: IMP-002
+* Tests: TEST-002
+* Status: ✓ Complete
+
+*Coverage:*
+
+* Implementation Coverage: 100%
+* Test Coverage: 100%
+
+== Advanced Usage
+
+=== Multiple Files
+
+Traceability elements can be defined across multiple AsciiDoc files. The extension aggregates all elements from all files in your documentation.
+
+=== Custom ID Schemes
+
+While the recommended ID format is TYPE-NUMBER, you can use any format that works for your project:
+
+[source,asciidoc]
+----
+[req, id=MYPROJECT-AUTH-001]
+====
+Custom ID format
+====
+----
+
+Note: Non-standard IDs will generate warnings but will still work.
+
+=== Relationship Attributes
+
+Relationships can include additional attributes:
+
+[source,asciidoc]
+----
+[imp, id=IMP-001]
+====
+Implementation
+====
+
+implements:REQ-001[status=partial, coverage=80%]
+----
+
+== CLI Usage
+
+The extension also provides a CLI for processing files outside of Antora:
+
+=== Commands
+
+*Process AsciiDoc files:*
+[source,bash]
+----
+npx antora-req-trace process -i docs/ -o output/
+----
+
+*Generate matrices:*
+[source,bash]
+----
+npx antora-req-trace matrix -t req-impl -f html -o matrix.html
+----
+
+*Validate traceability:*
+[source,bash]
+----
+npx antora-req-trace validate
+----
+
+=== CLI Options
+
+*Process command:*
+
+* `-i, --input <path>`: Input file or directory
+* `-o, --output <path>`: Output directory
+* `-f, --format <format>`: Output format (html, csv, json)
+
+*Matrix command:*
+
+* `-t, --type <type>`: Matrix type (req-impl, req-test, full)
+* `-f, --format <format>`: Output format (csv, html)
+* `-o, --output <path>`: Output file (defaults to stdout)
+
+== Migration Guide
+
+If you're migrating from another traceability system:
+
+=== From Sphinx Needs
+
+| Sphinx Needs | This Extension |
+| `:need:` | `[req, id=]` |
+| `:req:` | `implements:[]` or `satisfies:[]` |
+| `:img:` | `[imp, id=]` |
+| `:tst:` | `[test, id=]` |
+
+=== From Confluence
+
+. Export Confluence pages to AsciiDoc
+. Replace Confluence macros with the appropriate AsciiDoc macros
+. Update relationship syntax
+
+== Support
+
+=== Getting Help
+
+* Check the troubleshooting section above
+* Review the examples
+* Enable debug logging for detailed information
+
+=== Reporting Issues
+
+When reporting issues, please include:
+
+* Version of the extension
+* Version of Antora
+* Version of Node.js
+* Relevant AsciiDoc content
+* Error messages
+* Steps to reproduce
+
+== Contributing
+
+See the Developer Documentation for information on contributing to this project.
+
+== License
+
+This extension is licensed under the MIT License. See the LICENSE file for details.
+
+== Version History
+
+*v0.1.0*:: Initial release with basic requirements, implementations, tests, documents, and matrix generation

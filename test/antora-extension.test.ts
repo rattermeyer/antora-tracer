@@ -129,7 +129,8 @@ describe('Antora Extension', function() {
 
     it('should be callable as module.exports', function() {
       // This tests CommonJS compatibility
-      const createExt = require('../lib/antora-extension.js');
+      // Note: The compiled file is at lib/src/antora-extension.js
+      const createExt = require('../src/antora-extension.js');
       const ext = createExt(mockContext);
       expect(ext).to.be.an('object');
       expect(ext.getTraceabilityExtension).to.be.a('function');

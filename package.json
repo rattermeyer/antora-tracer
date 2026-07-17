@@ -3,6 +3,12 @@
   "version": "0.1.0",
   "description": "Requirements traceability extensions for Antora/AsciiDoc",
   "main": "lib/index.js",
+  "module": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./antora-extension": "./lib/src/antora-extension.js",
+    "./package.json": "./package.json"
+  },
   "scripts": {
     "build": "tsc && node scripts/build.js",
     "test": "tsc -p tsconfig.test.json && mocha 'lib/test/**/*.test.js'",
@@ -36,5 +42,14 @@
     "ts-node": "^10.9.2",
     "typescript": "^7.0.2"
   },
-  "type": "commonjs"
+  "type": "commonjs",
+  "bin": {
+    "antora-req-trace": "./lib/cli.js"
+  },
+  "files": [
+    "lib",
+    "package.json",
+    "README.md",
+    "LICENSE"
+  ]
 }

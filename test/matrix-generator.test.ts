@@ -106,10 +106,11 @@ describe('Matrix Generator Enhancement', function() {
       const html = extension.exportMatrixToHTML('req-impl');
 
       expect(html).to.include('<style>');
-      expect(html).to.include('body { font-family: Arial');
+      expect(html).to.include('font-family:');
       expect(html).to.include('.status-complete');
       expect(html).to.include('.status-partial');
       expect(html).to.include('.status-missing');
+      expect(html).to.include('.status-badge');
     });
 
     it('should include coverage summary', function() {

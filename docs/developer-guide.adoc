@@ -1,0 +1,866 @@
+= Antora Requirements Traceability Extension: Developer Guide
+:description: Complete developer documentation for the Requirements Traceability Extension
+:keywords: antora, asciidoc, requirements, traceability, development, api
+:author: Requirements Traceability Team
+:revdate: 2026-07-16
+:version: 0.1.0
+
+== Overview
+
+This guide provides comprehensive information for developers who want to understand, extend, or contribute to the Antora Requirements Traceability Extension.
+
+== Architecture
+
+The extension follows a modular architecture with clear separation of concerns:
+
+[mermaid]
+----
+graph TD
+    A[Antora Extension] --> B[Document Parser]
+    A --> C[Traceability Graph]
+    A --> D[Matrix Generator]
+    A --> E[Asciidoctor Extension]
+    B --> C
+    C --> D
+    D --> F[Output: CSV/HTML]
+    E --> C
+----
+
+=== Component Diagram
+
+[plantuml]
+----
+@startuml
+package "Antora Extension" {
+  [AntoraTraceabilityExtension] as antora
+}
+
+package "Core" {
+  [RequirementsTraceabilityExtension] as main
+  [TraceabilityGraph] as graph
+  [DocumentParser] as parser
+  [MatrixGenerator] as matrix
+}
+
+package "Asciidoctor Integration" {
+  [AsciidoctorExtension] as asciidoc
+}
+
+antora --> main : uses
+antora --> parser : uses
+antora --> graph : uses
+antora --> matrix : uses
+main --> graph : contains
+main --> parser : uses
+main --> matrix : uses
+asciidoc --> graph : updates
+parser --> graph : populates
+matrix --> graph : queries
+@enduml
+----
+
+== Project Structure
+
+[source]
+----
+antora-asciidoc-tracing/
+├── src/
+│   ├── index.ts                 # Main extension class
+│   ├── types.ts                 # TypeScript interfaces and types
+│   ├── TraceabilityGraph.ts     # Graph data structure and algorithms
+│   ├── DocumentParser.ts        # AsciiDoc content parser
+│   ├── MatrixGenerator.ts       # Matrix generation logic
+│   ├── AsciidoctorExtension.ts  # Asciidoctor.js integration
+│   ├── antora-extension.ts      # Antora extension integration
+│   └── cli.ts                   # Command-line interface
+├── lib/
+│   └── (compiled TypeScript)
+├── test/
+│   ├── *.test.ts               # Test suites
+│   └── ...
+├── docs/
+│   ├── user-guide.adoc          # User documentation
+│   └── developer-guide.adoc     # Developer documentation
+├── openspec/
+│   └── changes/                 # OpenSpec change artifacts
+├── package.json
+├── tsconfig.json
+└── README.md
+----
+
+== Core Components
+
+=== RequirementsTraceabilityExtension (src/index.ts)
+
+The main orchestrator class that composes all the focused modules.
+
+**Responsibilities:**
+
+* Coordinate between parser, graph, and matrix generator
+* Provide public API for external use
+* Manage extension lifecycle
+* Handle Asciidoctor integration
+
+**Public API:**
+
+[source,typescript]
+----
+class RequirementsTraceabilityExtension {
+  // Properties
+  public readonly graph: TraceabilityGraph;
+  public currentFile: string | null;
+
+  // Processing
+  async process(content: string, options?: { sourceFile?: string }): Promise<string>;
+
+  // Node Management
+  addImplementation(imp: Implementation): void;
+  addTest(test: Test): void;
+  addDocument(doc: Document): void;
+  addRelationship(fromId: string, toId: string, type: RelationshipType): void;
+
+  // Matrix Generation
+  generateMatrix(type?: string): TraceabilityMatrix;
+  generateDetailedMatrix(type?: string): DetailedTraceabilityMatrix;
+  generateTestMatrix(): TraceabilityMatrix;
+  exportMatrixToCSV(type?: string): string;
+  exportMatrixToHTML(type?: string): string;
+
+  // Analysis
+  getCoverageReport(): CoverageReport;
+  getImpactAnalysis(id: string): string[];
+  findPath(fromId: string, toId: string, maxDepth?: number): string[] | null;
+  getUncoveredRequirements(): Requirement[];
+
+  // Validation
+  validate(): string[];
+  static isValidId(id: string): boolean;
+  static isValidRelationshipType(type: string): boolean;
+
+  // Details
+  getRequirementsWithDetails(): RequirementDetail[];
+  getImplementationsWithDetails(): ImplementationDetail[];
+  getTestsWithDetails(): TestDetail[];
+
+  // Lifecycle
+  clear(): void;
+}
+----
+
+=== TraceabilityGraph (src/TraceabilityGraph.ts)
+
+Manages the graph data structure for all traceability elements and their relationships.
+
+**Responsibilities:**
+
+* Store requirements, implementations, tests, and documents
+* Manage relationships between elements
+* Provide query methods for graph traversal
+* Calculate coverage metrics
+* Detect circular references
+* Validate graph integrity
+
+**Key Methods:**
+
+[source,typescript]
+----
+class TraceabilityGraph {
+  // Node Management
+  addRequirement(req: Requirement): void;
+  addImplementation(imp: Implementation): void;
+  addTest(test: Test): void;
+  addDocument(doc: Document): void;
+  getRequirement(id: string): Requirement | undefined;
+  getImplementation(id: string): Implementation | undefined;
+  getTest(id: string): Test | undefined;
+  getDocument(id: string): Document | undefined;
+  getNode(id: string): AnyNode | undefined;
+  hasNode(id: string): boolean;
+  getAllRequirements(): Requirement[];
+  getAllImplementations(): Implementation[];
+  getAllTests(): Test[];
+  getAllDocuments(): Document[];
+
+  // Relationship Management
+  addRelationship(relationship: Relationship): void;
+  getRelationships(fromId: string, type?: RelationshipType): Relationship[];
+  getReverseRelationships(targetId: string, type?: RelationshipType): Relationship[];
+
+  // Coverage Analysis
+  getCoverage(): CoverageReport;
+  getRequirementsWithImplementations(): Set<string>;
+  getRequirementsWithTests(): Set<string>;
+  getUncoveredRequirements(): Requirement[];
+
+  // Graph Traversal
+  findPath(fromId: string, toId: string, maxDepth?: number): string[] | null;
+  getImpactAnalysis(id: string): string[];
+
+  // Validation
+  validate(): string[];
+
+  // Lifecycle
+  size(): number;
+  clear(): void;
+}
+----
+
+**Data Structures:**
+
+* `_requirements: Map<string, Requirement>`
+* `_implementations: Map<string, Implementation>`
+* `_tests: Map<string, Test>`
+* `_documents: Map<string, Document>`
+* `_relationships: Map<string, Relationship>`
+
+**Performance Optimizations:**
+
+* Caching for `getAll*()` methods
+* Cache invalidation on mutations
+* O(1) existence checks with `hasNode()`
+
+=== DocumentParser (src/DocumentParser.ts)
+
+Parses AsciiDoc content to extract traceability elements and relationships.
+
+**Responsibilities:**
+
+* Parse block macros (`[req]`, `[imp]`, `[test]`, `[doc]`)
+* Parse inline relationship macros
+* Validate IDs for uniqueness
+* Extract metadata (title, status, attributes)
+* Track source file and line information
+
+**Key Methods:**
+
+[source,typescript]
+----
+class DocumentParser {
+  parse(content: string, sourceFile: string): {
+    requirements: Requirement[];
+    implementations: Implementation[];
+    tests: Test[];
+    documents: Document[];
+    relationships: Relationship[];
+  };
+}
+----
+
+**Parsing Logic:**
+
+. First pass: Parse all block macros to extract nodes
+. Second pass: Parse inline macros from node content to extract relationships
+. Validate IDs for uniqueness within each type
+. Auto-generate IDs for nodes without explicit IDs
+. Warn on non-standard ID formats
+
+**Supported Block Macros:**
+
+[cols="1,2,3"]
+|===
+| Macro | Description | Example
+
+| `[req]` | Requirement | `[req, id=REQ-001, title="User Auth"]`
+| `[imp]` | Implementation | `[imp, id=IMP-001, title="Auth Service"]`
+| `[test]` | Test | `[test, id=TEST-001, title="Auth Tests"]`
+| `[doc]` | Document | `[doc, id=DOC-001, title="API Docs"]`
+|===
+
+**Supported Inline Macros:**
+
+[cols="1,2"]
+|===
+| Macro | Description
+
+| `satisfies:TARGET[]` | This element satisfies the target
+| `implements:TARGET[]` | This element implements the target
+| `tests:TARGET[]` | This element tests the target
+| `verifies:TARGET[]` | This element verifies the target
+| `documents:TARGET[]` | This element documents the target
+| `depends:TARGET[]` | This element depends on the target
+| `requires:TARGET[]` | This element requires the target
+|===
+
+=== MatrixGenerator (src/MatrixGenerator.ts)
+
+Generates traceability matrices in various formats.
+
+**Responsibilities:**
+
+* Generate traceability matrices from graph data
+* Export matrices in CSV and HTML formats
+* Calculate coverage metrics
+* Provide detailed matrix views
+
+**Key Methods:**
+
+[source,typescript]
+----
+class MatrixGenerator {
+  constructor(private readonly graph: TraceabilityGraph);
+
+  // Matrix Generation
+  generateMatrix(type?: string): TraceabilityMatrix;
+  generateDetailedMatrix(type?: string): DetailedTraceabilityMatrix;
+  generateTestMatrix(): TraceabilityMatrix;
+
+  // Export
+  exportToCSV(type?: string): string;
+  exportToHTML(type?: string): string;
+
+  // Coverage
+  getCoverageReport(): CoverageReport;
+
+  // Details
+  getRequirementsWithDetails(): RequirementDetail[];
+  getImplementationsWithDetails(): ImplementationDetail[];
+  getTestsWithDetails(): TestDetail[];
+}
+----
+
+**Matrix Types:**
+
+* `req-impl`: Requirements-to-Implementation matrix
+* `req-test`: Requirements-to-Test matrix
+* `full`: Full traceability matrix with all details
+
+**Output Formats:**
+
+* CSV: Comma-separated values with summary rows
+* HTML: Styled HTML tables with color-coded status
+
+=== AsciidoctorExtension (src/AsciidoctorExtension.ts)
+
+Integrates with Asciidoctor.js to register custom block processors.
+
+**Responsibilities:**
+
+* Register `[req]` block processor with Asciidoctor
+* Convert AsciiDoc content to HTML
+* Provide fallback for when native API is unavailable
+
+**Key Methods:**
+
+[source,typescript]
+----
+class AsciidoctorExtension {
+  constructor(private readonly asciidoctor: any);
+
+  register(onRequirementFound: (req: Requirement) => void): void;
+  async convert(content: string, sourceFile?: string): Promise<string>;
+}
+----
+
+=== AntoraTraceabilityExtension (src/antora-extension.ts)
+
+Integrates the extension with Antora's build pipeline.
+
+**Responsibilities:**
+
+* Process AsciiDoc files during Antora build
+* Generate traceability artifacts (matrices, coverage reports)
+* Enhance site navigation with traceability links
+* Manage extension configuration
+
+**Key Methods:**
+
+[source,typescript]
+----
+class AntoraTraceabilityExtension {
+  constructor(private readonly context: AntoraExtensionContext);
+
+  getTraceabilityExtension(): RequirementsTraceabilityExtension;
+}
+----
+
+**Event Handlers:**
+
+* `contentClassified`: Process AsciiDoc files
+* `contentAggregated`: Generate traceability pages
+* `beforeSiteGenerated`: Enhance navigation
+
+== Data Model
+
+=== Type Definitions (src/types.ts)
+
+All type definitions are in `src/types.ts`:
+
+[source,typescript]
+----
+// Base interface for all traceable nodes
+interface TraceableNode {
+  id: string;
+  title: string;
+  content?: string;
+  status?: string;
+  attributes?: Record<string, string>;
+  sourceFile?: string;
+  sourceLine?: number;
+}
+
+// Specific node types
+interface Requirement extends TraceableNode { /* ... */ }
+interface Implementation extends TraceableNode { /* ... */ }
+interface Test extends TraceableNode { /* ... */ }
+interface Document extends TraceableNode { /* ... */ }
+
+// Union type for any node
+type AnyNode = Requirement | Implementation | Test | Document;
+
+// Relationship types
+type RelationshipType = 
+  | 'implements' | 'satisfies' | 'tests' | 'verifies'
+  | 'documents' | 'depends' | 'requires';
+
+// Relationship definition
+interface Relationship {
+  fromId: string;
+  targetId: string;
+  type: RelationshipType;
+}
+
+// Coverage metrics
+interface CoverageReport {
+  totalRequirements: number;
+  requirementsWithImplementation: number;
+  requirementsWithTests: number;
+  implementationCoverage: number;
+  testCoverage: number;
+}
+
+// Matrix types
+interface TraceabilityMatrix {
+  type: string;
+  coverage: CoverageReport;
+  requirements: RequirementRow[];
+  generatedAt: string;
+}
+
+interface DetailedTraceabilityMatrix {
+  type: string;
+  coverage: CoverageReport;
+  uncoveredRequirements: string[];
+  requirements: RequirementDetail[];
+  implementations: ImplementationDetail[];
+  tests: TestDetail[];
+  generatedAt: string;
+}
+----
+
+== APIs
+
+=== Public API
+
+The main public API is exported from `src/index.ts`:
+
+[source,typescript]
+----
+// Main class
+export { RequirementsTraceabilityExtension };
+
+// Types
+export type {
+  Requirement,
+  Implementation,
+  Test,
+  Document,
+  RelationshipType,
+  CoverageReport,
+  TraceabilityMatrix,
+  DetailedTraceabilityMatrix,
+};
+----
+
+=== Usage Examples
+
+**Basic Usage:**
+
+[source,typescript]
+----
+import { RequirementsTraceabilityExtension } from 'antora-requirements-traceability';
+
+const extension = new RequirementsTraceabilityExtension();
+
+// Process AsciiDoc content
+await extension.process(asciiDocContent, { sourceFile: 'requirements.adoc' });
+
+// Generate a matrix
+const matrix = extension.generateMatrix('req-impl');
+
+// Export to CSV
+const csv = extension.exportMatrixToCSV('req-impl');
+
+// Export to HTML
+const html = extension.exportMatrixToHTML('req-impl');
+
+// Get coverage report
+const coverage = extension.getCoverageReport();
+
+// Validate graph
+const errors = extension.validate();
+----
+
+**Adding Elements Programmatically:**
+
+[source,typescript]
+----
+const extension = new RequirementsTraceabilityExtension();
+
+// Add a requirement
+extension.graph.addRequirement({
+  id: 'REQ-001',
+  title: 'User Authentication',
+  content: 'The system shall require user authentication.',
+  status: 'approved',
+  attributes: { priority: 'high' },
+  sourceFile: 'requirements.adoc',
+  sourceLine: 1,
+});
+
+// Add an implementation
+extension.addImplementation({
+  id: 'IMP-001',
+  title: 'Authentication Service',
+  content: 'Implementation of user authentication.',
+  status: 'done',
+  attributes: {},
+  sourceFile: 'implementation.adoc',
+  sourceLine: 1,
+});
+
+// Add a relationship
+extension.addRelationship('IMP-001', 'REQ-001', 'implements');
+----
+
+**Querying the Graph:**
+
+[source,typescript]
+----
+// Get all requirements
+const allRequirements = extension.graph.getAllRequirements();
+
+// Get a specific requirement
+const req = extension.graph.getRequirement('REQ-001');
+
+// Get relationships
+const relationships = extension.graph.getRelationships('REQ-001');
+const reverseRelationships = extension.graph.getReverseRelationships('REQ-001');
+
+// Find path between nodes
+const path = extension.findPath('REQ-001', 'REQ-005');
+
+// Get impact analysis
+const impacted = extension.getImpactAnalysis('REQ-001');
+
+// Get coverage
+const coverage = extension.getCoverageReport();
+
+// Get uncovered requirements
+const uncovered = extension.getUncoveredRequirements();
+----
+
+== Extending the Extension
+
+=== Adding New Node Types
+
+To add a new type of traceable element:
+
+. Add the interface to `src/types.ts`
+. Add the node type to `AnyNode` union
+. Add storage map in `TraceabilityGraph`
+. Add `add*` and `get*` methods in `TraceabilityGraph`
+. Add parsing in `DocumentParser`
+. Add to matrix generation if needed
+
+=== Adding New Relationship Types
+
+To add a new relationship type:
+
+. Add to `RelationshipType` union in `src/types.ts`
+. Add to `mapMacroToRelationshipType` in `DocumentParser`
+. Add to circular reference check if applicable
+
+=== Adding New Matrix Types
+
+To add a new matrix type:
+
+. Add method to `MatrixGenerator`
+. Add export methods if needed
+. Expose through `RequirementsTraceabilityExtension`
+
+== Testing
+
+=== Test Structure
+
+Tests are organized in the `test/` directory:
+
+[source]
+----
+test/
+├── basic.test.ts              # Basic extension tests
+├── graph.test.ts              # TraceabilityGraph tests
+├── processor.test.ts          # Processor/parser tests
+├── traceability.test.ts       # Requirements traceability tests
+├── document-parser.test.ts    # DocumentParser tests
+├── matrix-generator.test.ts   # MatrixGenerator tests
+├── validation.test.ts         # Validation tests
+├── performance.test.ts        # Performance tests
+└── antora-extension.test.ts   # Antora extension tests
+----
+
+=== Running Tests
+
+[source,bash]
+----
+# Run all tests
+npm test
+
+# Run specific test file
+npm test -- --grep "Matrix Generator"
+
+# Run with verbose output
+npm test -- --verbose
+----
+
+=== Test Coverage
+
+The test suite covers:
+
+* Basic extension functionality
+* Graph operations (add, get, delete, traverse)
+* Parser functionality (requirements, implementations, tests, documents)
+* Relationship management
+* Matrix generation (CSV, HTML)
+* Coverage reporting
+* Validation (duplicate IDs, circular references)
+* Performance with large datasets
+* Antora integration
+
+=== Writing Tests
+
+**Example Test:**
+
+[source,typescript]
+----
+import { expect } from 'chai';
+import { RequirementsTraceabilityExtension } from '../src/index';
+
+describe('My Feature', function() {
+  let extension: InstanceType<typeof RequirementsTraceabilityExtension>;
+
+  beforeEach(function() {
+    extension = new RequirementsTraceabilityExtension();
+  });
+
+  afterEach(function() {
+    extension.clear();
+  });
+
+  it('should do something', function() {
+    // Test implementation
+    extension.graph.addRequirement({
+      id: 'REQ-001',
+      title: 'Test',
+      content: 'Test',
+      status: 'draft',
+      attributes: {},
+      sourceFile: 'test.adoc',
+      sourceLine: 1,
+    });
+
+    const req = extension.graph.getRequirement('REQ-001');
+    expect(req).to.not.be.undefined;
+  });
+});
+----
+
+== Contributing
+
+=== Setting Up Development Environment
+
+. Clone the repository
+. Install dependencies: `npm install`
+. Build the project: `npm run build`
+. Run tests: `npm test`
+
+=== Code Style
+
+* Use TypeScript with strict mode
+* Follow existing code patterns
+* Use meaningful variable and function names
+* Add JSDoc comments for complex functions
+* Keep functions focused and small
+
+=== Commit Messages
+
+Use conventional commit messages:
+
+* `feat: add new feature`
+* `fix: fix a bug`
+* `docs: update documentation`
+* `test: add tests`
+* `refactor: refactor code`
+* `chore: maintenance tasks`
+
+=== Pull Requests
+
+. Fork the repository
+. Create a feature branch
+. Make your changes
+. Add tests for new functionality
+. Ensure all tests pass
+. Submit a pull request
+
+=== Code Review
+
+All pull requests require:
+
+* Passing tests
+* Code review approval
+* Documentation updates (if applicable)
+* No breaking changes (unless approved)
+
+== Building and Packaging
+
+=== Building
+
+[source,bash]
+----
+npm run build
+----
+
+This compiles TypeScript to JavaScript in the `lib/` directory.
+
+=== Packaging
+
+To create an npm package:
+
+[source,bash]
+----
+npm pack
+----
+
+This creates a tarball that can be installed locally for testing.
+
+=== Publishing
+
+To publish to npm:
+
+[source,bash]
+----
+# Update version in package.json
+npm version patch
+
+# Publish
+npm publish
+----
+
+== Dependencies
+
+=== Production Dependencies
+
+* `@asciidoctor/core`: AsciiDoc processor
+
+=== Development Dependencies
+
+* `@types/chai`: TypeScript types for Chai
+* `@types/mocha`: TypeScript types for Mocha
+* `chai`: Assertion library
+* `commander`: CLI argument parsing
+* `mocha`: Test runner
+* `ts-mocha`: TypeScript test runner
+* `ts-node`: TypeScript execution
+
+== Version Compatibility
+
+=== Node.js
+
+* Minimum: Node.js 14+
+* Recommended: Node.js 16+
+
+=== TypeScript
+
+* Minimum: TypeScript 4.0+
+* Configured: TypeScript 5.x with strict mode
+
+=== Antora
+
+* Minimum: Antora 3.x
+* Tested with: Antora 3.x
+
+== Troubleshooting Development Issues
+
+=== TypeScript Errors
+
+* Ensure all types are properly imported
+* Check for missing type annotations
+* Verify `tsconfig.json` settings
+
+=== Test Failures
+
+* Run tests with verbose output: `npm test -- --verbose`
+* Check for async/await issues
+* Verify test data is properly set up
+
+=== Build Errors
+
+* Delete `lib/` directory and rebuild: `rm -rf lib && npm run build`
+* Check TypeScript version compatibility
+
+== Architecture Decisions
+
+=== Why Manual Parsing?
+
+The extension uses manual regex-based parsing instead of Asciidoctor.js extensions because:
+
+. Asciidoctor.js extension API is complex and version-dependent
+. Manual parsing provides more control and portability
+. Easier to test and debug
+. Works consistently across different Asciidoctor.js versions
+
+=== Why Separate Parser and Graph?
+
+Separating parsing from graph management allows:
+
+. Independent testing of each component
+. Easier maintenance and extension
+. Clear separation of concerns
+. Reusability of components
+
+=== Why Caching?
+
+Caching `getAll*()` methods improves performance because:
+
+. These methods are called frequently
+. Map iteration has overhead
+. Cache invalidation is straightforward
+. Memory overhead is minimal
+
+== Future Enhancements
+
+=== Planned Features
+
+* JSON output format for matrices
+* XML output format (XUnit, JUnit)
+* Integration with test runners
+* Web-based traceability viewer
+* Graph visualization
+* Export to requirements management tools
+
+=== Potential Improvements
+
+* Watch mode for development
+* Hot reloading
+* Better error recovery
+* More comprehensive validation
+* Performance optimizations for very large graphs
+
+== Resources
+
+* Source Code: https://github.com/earendil-works/antora-requirements-traceability
+* Issues: https://github.com/earendil-works/antora-requirements-traceability/issues
+* Documentation: https://github.com/earendil-works/antora-requirements-traceability/docs
+
+== License
+
+MIT License - see LICENSE file for details.
