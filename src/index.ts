@@ -1,7 +1,7 @@
 // Public API — thin orchestrator composing focused modules
 import Asciidoctor from '@asciidoctor/core';
 import { TraceabilityGraph } from './TraceabilityGraph.js';
-import { RequirementParser } from './RequirementParser.js';
+import { DocumentParser } from './DocumentParser.js';
 import { MatrixGenerator } from './MatrixGenerator.js';
 import { AsciidoctorExtension } from './AsciidoctorExtension.js';
 import type {
@@ -20,14 +20,15 @@ import type {
 
 class RequirementsTraceabilityExtension {
   public readonly graph: TraceabilityGraph;
-  private readonly parser: RequirementParser;
+
+  private readonly parser: DocumentParser;
   private readonly generator: MatrixGenerator;
   private readonly extension: AsciidoctorExtension;
   public currentFile: string | null = null;
 
   constructor() {
     this.graph = new TraceabilityGraph();
-    this.parser = new RequirementParser();
+    this.parser = new DocumentParser();
     this.generator = new MatrixGenerator(this.graph);
     this.extension = new AsciidoctorExtension(Asciidoctor);
     this.extension.register(req => this.graph.addRequirement(req));
@@ -39,13 +40,35 @@ class RequirementsTraceabilityExtension {
     this.currentFile = options.sourceFile || 'input';
     console.log(`🔄 Processing: ${this.currentFile}`);
     try {
-      const requirements = this.parser.parse(content, this.currentFile);
-      for (const req of requirements) {
+      // Parse all traceability elements from the content
+      const parsed = this.parser.parse(content, this.currentFile);
+
+      // Add all parsed nodes to the graph
+      for (const req of parsed.requirements) {
         this.graph.addRequirement(req);
         console.log(`📝 Requirement registered: ${req.id} - ${req.title}`);
       }
+      for (const imp of parsed.implementations) {
+        this.graph.addImplementation(imp);
+        console.log(`📝 Implementation registered: ${imp.id} - ${imp.title}`);
+      }
+      for (const test of parsed.tests) {
+        this.graph.addTest(test);
+        console.log(`📝 Test registered: ${test.id} - ${test.title}`);
+      }
+      for (const doc of parsed.documents) {
+        this.graph.addDocument(doc);
+        console.log(`📝 Document registered: ${doc.id} - ${doc.title}`);
+      }
+
+      // Add all parsed relationships to the graph
+      for (const rel of parsed.relationships) {
+        this.graph.addRelationship(rel);
+        console.log(`🔗 Relationship added: ${rel.fromId} ${rel.type} ${rel.targetId}`);
+      }
+
       const result = await this.extension.convert(content, this.currentFile);
-      console.log(`✅ Processing complete: ${this.graph.getAllRequirements().length} requirements found`);
+      console.log(`✅ Processing complete: ${parsed.requirements.length} requirements, ${parsed.implementations.length} implementations, ${parsed.tests.length} tests found`);
       return result;
     } catch (error: any) {
       console.error('❌ Processing error:', error.message);
@@ -99,6 +122,20 @@ class RequirementsTraceabilityExtension {
     return this.generator.getTestsWithDetails();
   }
 
+  // ── Matrix Export ──────────────────────────────────────────────────────────
+
+  exportMatrixToCSV(type?: string): string {
+    return this.generator.exportToCSV(type);
+  }
+
+  exportMatrixToHTML(type?: string): string {
+    return this.generator.exportToHTML(type);
+  }
+
+  generateTestMatrix(): any {
+    return this.generator.generateTestMatrix();
+  }
+
   // ── Analysis (delegated to TraceabilityGraph) ───────────────────────────────
 
   getCoverageReport(): CoverageReport {
@@ -109,12 +146,37 @@ class RequirementsTraceabilityExtension {
     return this.graph.getImpactAnalysis(id);
   }
 
-  findPath(fromId: string, toId: string): string[] | null {
-    return this.graph.findPath(fromId, toId);
+  findPath(fromId: string, toId: string, maxDepth?: number): string[] | null {
+    return this.graph.findPath(fromId, toId, maxDepth);
   }
 
   getUncoveredRequirements(): Requirement[] {
     return this.graph.getUncoveredRequirements();
+  }
+
+  // ── Validation ─────────────────────────────────────────────────────────────
+
+  /**
+   * Validate the entire graph for errors.
+   * Returns array of validation error messages, or empty array if valid.
+   */
+  validate(): string[] {
+    return this.graph.validate();
+  }
+
+  /**
+   * Check if a specific ID is valid (follows the pattern).
+   */
+  static isValidId(id: string): boolean {
+    return /^[A-Z]{2,4}-[0-9]+$/.test(id);
+  }
+
+  /**
+   * Check if a relationship type is valid.
+   */
+  static isValidRelationshipType(type: string): type is any {
+    const validTypes: any[] = ['implements', 'satisfies', 'tests', 'verifies', 'documents', 'depends', 'requires'];
+    return validTypes.includes(type);
   }
 
   // ── Lifecycle ───────────────────────────────────────────────────────────────

@@ -200,13 +200,10 @@ describe('Traceability Graph', function() {
       expect(path).to.be.null;
     });
 
-    it('should handle circular references', function() {
-      // Add a circular reference
-      extension.addRelationship('REQ-301', 'IMP-300', 'depends');
-      
-      const path = extension.findPath('IMP-300', 'REQ-301');
-      expect(path).to.be.an('array');
-      expect(path!.length).to.be.at.most(5); // Should not infinite loop
+    it('should detect and prevent circular references', function() {
+      // Try to add a circular reference - should throw
+      expect(() => extension.addRelationship('REQ-301', 'IMP-300', 'depends'))
+        .to.throw('Circular reference detected');
     });
   });
 

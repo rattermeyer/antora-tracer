@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 import { program } from 'commander';
+import { createWriteStream } from 'fs';
+import { RequirementsTraceabilityExtension } from './index.js';
 const chalk = require('chalk');
 const packageJson = require('../package.json');
 
@@ -14,7 +16,7 @@ program.command('process')
   .option('-i, --input <path>', 'Input file or directory')
   .option('-o, --output <path>', 'Output directory')
   .option('-f, --format <format>', 'Output format (html, csv, json)', 'html')
-  .action((options) => {
+  .action(async (options) => {
     console.log(chalk.blue('Processing requirements traceability...'));
     console.log(chalk.green('Input:', options.input));
     console.log(chalk.green('Output:', options.output));
@@ -25,10 +27,32 @@ program.command('process')
 program.command('matrix')
   .description('Generate traceability matrices')
   .option('-t, --type <type>', 'Matrix type (req-impl, req-test, full)', 'req-impl')
-  .action((options) => {
+  .option('-f, --format <format>', 'Output format (csv, html)', 'csv')
+  .option('-o, --output <path>', 'Output file (defaults to stdout)')
+  .action(async (options) => {
     console.log(chalk.blue('Generating traceability matrix...'));
     console.log(chalk.green('Type:', options.type));
-    console.log(chalk.yellow('⚠️  Implementation pending - this is a skeleton'));
+    console.log(chalk.green('Format:', options.format));
+
+    const extension = new RequirementsTraceabilityExtension();
+    
+    // For now, generate a sample matrix from any existing data
+    // In real usage, this would process files first
+    let output: string;
+    if (options.format === 'html') {
+      output = extension.exportMatrixToHTML(options.type);
+    } else {
+      output = extension.exportMatrixToCSV(options.type);
+    }
+    
+    if (options.output) {
+      const stream = createWriteStream(options.output);
+      stream.write(output);
+      stream.end();
+      console.log(chalk.green(`Matrix written to: ${options.output}`));
+    } else {
+      console.log(output);
+    }
   });
 
 program.command('validate')
