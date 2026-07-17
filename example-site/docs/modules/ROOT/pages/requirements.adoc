@@ -1,0 +1,136 @@
+= Example Requirements
+:description: Example requirements demonstrating the Requirements Traceability Extension
+
+This page demonstrates how to define requirements using the Requirements Traceability Extension.
+
+== Simple Example
+
+Here's how to define a requirement using the `[req]` block macro:
+
+[req, id=EXAMPLE-001, title="Welcome Page"]
+====
+The example site must have a welcome page that introduces the Requirements Traceability Extension and provides a quick start guide.
+
+**Acceptance Criteria:**
+
+* Welcome page must explain what the extension does
+* Welcome page must include a quick start guide
+* Welcome page must link to other sections
+====
+
+[req, id=EXAMPLE-002, title="Requirement Definition"]
+====
+The example site must demonstrate how to define requirements using the extension's syntax.
+
+**Acceptance Criteria:**
+
+* At least 4 example requirements must be defined
+* Each requirement must have a unique ID
+* Each requirement must have a title
+* Each requirement must have descriptive content
+====
+
+[req, id=EXAMPLE-003, title="Traceability Linking"]
+====
+The example site must demonstrate how to create traceability links between requirements, implementations, tests, and documents.
+
+**Acceptance Criteria:**
+
+* At least 4 implementations must be defined
+* At least 4 relationships must be created using inline macros
+* All relationship types must be demonstrated (satisfies, implements, tests, verifies, documents, depends, requires)
+====
+
+[req, id=EXAMPLE-004, title="Matrix Generation"]
+====
+The example site must demonstrate matrix generation capabilities.
+
+**Acceptance Criteria:**
+
+* The build must generate Requirements-to-Implementation matrix
+* The build must generate Requirements-to-Test matrix
+* The build must generate Full traceability matrix
+* Matrices must be generated in HTML format
+* Matrices must be generated in CSV format
+====
+
+== Real-World Example: Extension Requirements
+
+The following are the actual requirements from the Requirements Traceability Extension specification.
+These demonstrate how the extension can be used to document real-world requirements.
+
+[req, id=REQ-001, title="Define Requirements in AsciiDoc"]
+====
+The system shall allow users to define requirements using custom AsciiDoc syntax.
+
+**Acceptance Criteria:**
+
+* Users can define requirements using a `[req]` block macro
+* Requirements can have unique identifiers
+* Requirements can have titles and descriptions
+* Requirements can have custom attributes (status, priority, etc.)
+* Requirement syntax is validated during processing
+====
+
+[req, id=REQ-002, title="Establish Traceability Links"]
+====
+The system shall allow users to establish traceability links between requirements, implementations, tests, and documentation.
+
+**Acceptance Criteria:**
+
+* Users can link requirements to implementations using `implements:` macro
+* Users can link requirements to tests using `tests:` macro
+* Users can link requirements to documentation using `documents:` macro
+* Users can reference requirements inline using `req:` macro
+* Circular references are detected and reported
+* Invalid references are detected and reported
+====
+
+[req, id=REQ-003, title="Generate Traceability Matrices"]
+====
+The system shall generate traceability matrices showing relationships between requirements and their implementations.
+
+**Acceptance Criteria:**
+
+* Generate Requirements-to-Implementation matrix
+* Generate Requirements-to-Test matrix
+* Generate Full traceability matrix
+* Matrices can be output as AsciiDoc tables
+* Matrices can be output as HTML tables
+* Matrices can be output as CSV files
+* Matrices include coverage information
+====
+
+== Requirement Syntax
+
+=== Block Macro
+
+[source,asciidoc]
+----
+[req, id=UNIQUE-ID, title="Requirement Title", status=approved]
+====
+Requirement description goes here.
+
+Can span multiple paragraphs.
+====
+----
+
+=== Attributes
+
+| Attribute | Description | Required | Default |
+|-----------|-------------|----------|---------|
+| id | Unique identifier | No | Auto-generated |
+| title | Human-readable title | No | "Requirement {id}" |
+| status | Requirement status | No | draft |
+
+=== ID Format
+
+* Recommended: `{TYPE}-{NUMBER}` where TYPE is 2-4 uppercase letters
+* Examples: `REQ-001`, `FUNC-001`, `EXAMPLE-001`
+* Non-standard IDs will generate a warning but still work
+
+== Next Steps
+
+* Learn how these requirements are implemented in the xref:architecture.adoc[Architecture] section
+* See the generated matrices in the traceability/ directory
+* View the xref:matrices.adoc[Matrices] explanation

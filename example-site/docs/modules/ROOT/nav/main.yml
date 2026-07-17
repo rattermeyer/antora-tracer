@@ -1,0 +1,6 @@
+nav:
+  - index.adoc
+  - requirements.adoc
+  - architecture.adoc
+  - matrices.adoc
+  - sphinx-comparison.adoc

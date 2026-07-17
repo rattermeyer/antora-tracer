@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "description": "Requirements traceability extensions for Antora/AsciiDoc",
-  "main": "./lib/index.js",
+  "main": "./lib/src/index.js",
   "module": "lib/index.js",
   "exports": {
     ".": "./lib/index.js",
@@ -19,8 +19,7 @@
     "start": "node lib/cli.js",
     "dev": "nodemon --watch src --exec \"npm run build && node lib/index.js\"",
     "tsc": "tsc",
-    "tsc:watch": "tsc --watch",
-    "prepare": "husky"
+    "tsc:watch": "tsc --watch"
   },
   "keywords": [
     "antora",

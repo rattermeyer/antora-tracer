@@ -1,0 +1,6 @@
+schema: spec-driven
+name: example-site
+title: Example Antora Site with Traceability Demonstration
+description: Create an example Antora site that demonstrates the Requirements Traceability Extension
+author: ""
+status: planning

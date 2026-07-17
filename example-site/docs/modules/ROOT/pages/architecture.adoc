@@ -1,0 +1,165 @@
+= Extension Architecture
+:description: Architecture of the Requirements Traceability Extension with traceability links
+
+This page documents the architecture of the Requirements Traceability Extension and shows how each component satisfies the example requirements.
+
+== Overview
+
+The Requirements Traceability Extension uses a modular architecture with clear separation of concerns. The main components work together to parse AsciiDoc content, build a traceability graph, and generate matrices and reports.
+
+== AsciiDoc Processor
+
+The AsciiDoc Processor is responsible for parsing AsciiDoc content and extracting traceability elements from block macros and inline macros.
+
+satisfies:EXAMPLE-002[]
+
+=== Responsibilities
+
+* Parse `[req]`, `[imp]`, `[test]`, `[doc]` block macros
+* Extract inline relationship macros (satisfies:, implements:, tests:, etc.)
+* Validate requirement IDs
+* Track source file and line information
+
+=== Implementation
+
+The processor uses regular expressions to identify and extract traceability elements from AsciiDoc content. It supports both explicit IDs and auto-generated IDs.
+
+[source,typescript]
+----
+// Example: Parsing a requirement
+const reqRegex = /\[req,[\s]*id=([A-Z0-9_-]+)/g;
+const match = reqRegex.exec(content);
+const id = match[1]; // Extracted requirement ID
+----
+
+== Traceability Graph
+
+The Traceability Graph stores all traceability elements (requirements, implementations, tests, documents) and their relationships in a structured format.
+
+satisfies:EXAMPLE-002[]
+implements:EXAMPLE-003[]
+implements:EXAMPLE-004[]
+
+=== Responsibilities
+
+* Store requirements, implementations, tests, and documents
+* Manage relationships between elements
+* Provide query methods for analysis
+* Calculate coverage metrics
+* Detect circular references
+* Validate graph integrity
+
+=== Data Structures
+
+The graph uses Map objects for efficient storage and retrieval:
+
+* `_requirements: Map<string, Requirement>`
+* `_implementations: Map<string, Implementation>`
+* `_tests: Map<string, Test>`
+* `_documents: Map<string, Document>`
+* `_relationships: Map<string, Relationship>`
+
+=== Key Methods
+
+* `addRequirement(req)` - Add a requirement to the graph
+* `addImplementation(imp)` - Add an implementation to the graph
+* `addTest(test)` - Add a test to the graph
+* `addDocument(doc)` - Add a document to the graph
+* `addRelationship(rel)` - Add a relationship between elements
+* `getCoverage()` - Calculate coverage metrics
+* `findPath(from, to)` - Find path between two nodes
+* `getImpactAnalysis(id)` - Find all nodes impacted by a change
+
+== Matrix Generator
+
+The Matrix Generator creates traceability matrices in various formats (CSV, HTML) from the data in the traceability graph.
+
+implements:EXAMPLE-004[]
+
+=== Responsibilities
+
+* Generate Requirements-to-Implementation matrices
+* Generate Requirements-to-Test matrices
+* Generate Full traceability matrices
+* Export matrices in CSV format
+* Export matrices in HTML format
+* Calculate and display coverage metrics
+
+=== Matrix Types
+
+| Type | Description | Use Case |
+|------|-------------|----------|
+| req-impl | Requirements to Implementations | Track what's been implemented |
+| req-test | Requirements to Tests | Track what's been tested |
+| full | Full traceability | Complete view of all relationships |
+
+=== Example Output
+
+The matrix generator produces styled HTML tables with:
+
+* Color-coded status badges (✓ Complete, ⚠ Partial, ✗ Missing)
+* Sortable columns
+* Coverage summary
+* Responsive design
+
+== Antora Extension
+
+The Antora Extension integrates the traceability features into the Antora build pipeline, processing AsciiDoc files and generating traceability artifacts.
+
+implements:EXAMPLE-001[]
+
+=== Responsibilities
+
+* Process AsciiDoc files during Antora build
+* Register content classifiers for AsciiDoc files
+* Generate traceability pages (matrices, coverage reports)
+* Enhance site navigation with traceability links
+* Manage extension configuration
+
+=== Event Handlers
+
+The extension hooks into Antora's build lifecycle:
+
+* `contentClassified` - Process AsciiDoc files
+* `contentAggregated` - Generate traceability pages
+* `beforeSiteGenerated` - Enhance navigation
+
+== Component Relationships
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Component Interactions                       │
+├─────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐  │
+│  │ AsciiDoc    │────▶│ Traceability │────▶│ Matrix      │  │
+│  │ Processor   │     │ Graph        │     │ Generator   │  │
+│  └─────────────┘     └─────────────┘     └─────────────┘  │
+│         │                       │                    │        │
+│         ▼                       ▼                    ▼        │
+│  ┌─────────────────────────────────────────────────────┐  │
+│  │                    Data Flow                            │  │
+│  │                                                          │  │
+│  │  1. Parse AsciiDoc → Extract elements                     │  │
+│  │  2. Add to graph → Build relationships                    │  │
+│  │  3. Query graph → Generate matrices                       │  │
+│  │  4. Export matrices → HTML/CSV files                     │  │
+│  └─────────────────────────────────────────────────────┘  │
+│                                                                 │
+└─────────────────────────────────────────────────────────────┘
+```
+
+== Traceability Summary
+
+| Component | Satisfies | Implements | Tests |
+|-----------|-----------|-------------|-------|
+| AsciiDoc Processor | EXAMPLE-002 | - | - |
+| Traceability Graph | EXAMPLE-002 | EXAMPLE-003, EXAMPLE-004 | - |
+| Matrix Generator | - | EXAMPLE-004 | - |
+| Antora Extension | EXAMPLE-001 | - | - |
+
+== Next Steps
+
+* View the xref:matrices.adoc[Matrices] to see the generated traceability matrices
+* View the xref:coverage.html[Coverage Report] to see coverage metrics
+* Compare with xref:sphinx-comparison.adoc[Sphinx Needs] if you're migrating

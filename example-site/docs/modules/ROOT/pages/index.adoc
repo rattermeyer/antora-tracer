@@ -1,0 +1,130 @@
+= Antora Requirements Traceability Extension: Example Site
+:description: Example Antora site demonstrating requirements traceability features
+:keywords: antora, asciidoc, requirements, traceability, example
+
+This example site demonstrates the Requirements Traceability Extension for Antora/AsciiDoc.
+
+== Quick Start
+
+To see the extension in action:
+
+. Install dependencies:
++
+[source,bash]
+----
+cd example-site
+npm install
+----
+
+. Build the site:
++
+[source,bash]
+----
+npx antora antora.yml
+----
+
+. Open the site:
++
+[source,bash]
+----
+open _site/index.html
+----
+
+That's it! The extension will automatically:
+
+* Parse all `[req]`, `[imp]`, `[test]`, and `[doc]` block macros
+* Extract inline relationship macros (satisfies, implements, tests, etc.)
+* Build a traceability graph
+* Generate traceability matrices in HTML and CSV formats
+* Create a coverage report
+
+== What You'll See
+
+After building, open `_site/index.html` in your browser and navigate to:
+
+* **Requirements**: Example requirements defined using the extension's syntax
+* **Architecture**: Documentation of the extension's architecture with traceability links
+* **Matrices**: Generated traceability matrices showing relationships between elements
+* **Coverage Report**: Coverage metrics for the example requirements
+* **Sphinx Comparison**: Side-by-side comparison with Sphinx Needs
+
+== Site Structure
+
+[source]
+----
+example-site/
+├── antora.yml              # Antora configuration
+├── package.json            # Dependencies (includes extension)
+└── docs/
+    └── modules/
+        └── ROOT/
+            ├── pages/
+            │   ├── index.adoc          # This page
+            │   ├── requirements.adoc   # Example requirements
+            │   ├── architecture.adoc  # Architecture with traceability
+            │   ├── matrices.adoc       # Matrix explanation
+            │   └── sphinx-comparison.adoc  # Sphinx Needs comparison
+            └── nav/
+                └── main.yml           # Site navigation
+----
+
+== Requirements Defined in This Site
+
+This site demonstrates 4 example requirements:
+
+* EXAMPLE-001: Welcome Page
+* EXAMPLE-002: Requirement Definition
+* EXAMPLE-003: Traceability Linking
+* EXAMPLE-004: Matrix Generation
+
+Each requirement is implemented by one or more architecture components, creating a complete traceability chain.
+
+== Architecture Components
+
+The extension's architecture is documented in the Architecture section, with each component linked to the requirements it satisfies or implements:
+
+* **AsciiDoc Processor**: Parses AsciiDoc content (satisfies EXAMPLE-002)
+* **Traceability Graph**: Manages relationships (satisfies EXAMPLE-002, implements EXAMPLE-003, EXAMPLE-004)
+* **Matrix Generator**: Creates matrices (implements EXAMPLE-004)
+* **Antora Extension**: Integrates with Antora (implements EXAMPLE-001)
+
+== Generated Artifacts
+
+The extension generates the following artifacts during the build:
+
+* `traceability/index.html` - Hub page with links to all artifacts
+* `traceability/matrix-req-impl.html` - Requirements-to-Implementation matrix
+* `traceability/matrix-req-impl.csv` - CSV version of the matrix
+* `traceability/matrix-req-test.html` - Requirements-to-Test matrix
+* `traceability/matrix-full.html` - Full traceability matrix
+* `traceability/coverage.html` - Coverage report
+
+Open these files in your browser to see the traceability matrices and coverage report.
+
+== Next Steps
+
+* Explore the xref:requirements.adoc[Requirements] section to see how requirements are defined
+* Explore the xref:architecture.adoc[Architecture] section to see how components are linked to requirements
+* Explore the xref:matrices.adoc[Matrices] section to understand what the generated matrices show
+* Explore the xref:sphinx-comparison.adoc[Sphinx Comparison] if you're migrating from Sphinx Needs
+
+== Troubleshooting
+
+If you encounter issues:
+
+* Ensure Node.js 14+ is installed
+* Ensure npm is installed
+* Run `npm install` from the example-site directory
+* Check the console output for errors during the build
+* Verify that the extension is properly referenced in package.json
+
+== About This Extension
+
+The Requirements Traceability Extension adds requirements traceability capabilities to Antora/AsciiDoc:
+
+* Define requirements, implementations, tests, and documents using custom block macros
+* Establish relationships between elements using inline macros
+* Generate traceability matrices in HTML and CSV formats
+* View coverage reports showing implementation and test status
+
+For more information, see the User Guide and Developer Guide in the main repository.

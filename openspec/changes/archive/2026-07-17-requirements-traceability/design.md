@@ -126,7 +126,7 @@ interface TraceabilityGraph {
   implementations: Map<string, Implementation>;
   tests: Map<string, Test>;
   documents: Map<string, Document>;
-  
+
   addRequirement(req: Requirement): void;
   addRelationship(fromId: string, relationship: Relationship): void;
   getRequirement(id: string): Requirement | undefined;
