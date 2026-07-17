@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const RequirementsTraceabilityExtension = require('../src/index.js');
+const RequirementsTraceabilityExtension = require('../lib/index.js');
 
 describe('Traceability Graph', function() {
   let extension;

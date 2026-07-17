@@ -558,7 +558,11 @@ class RequirementsTraceabilityExtension {
 
   // Add a relationship between requirements
   addRelationship(fromId: string, toId: string, type: string = 'satisfies'): void {
-    const relationship: Relationship = { fromId, targetId: toId, type };
+    const relationship: Relationship = { 
+      fromId: fromId, 
+      targetId: toId, 
+      type: type 
+    };
     this.graph.addRelationship(fromId, relationship);
     console.log(`🔗 Relationship added: ${fromId} ${type} ${toId}`);
   }
