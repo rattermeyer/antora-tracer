@@ -240,10 +240,10 @@ describe('Requirements Traceability', function() {
       const matrix = extension.generateMatrix('req-impl');
 
       expect(matrix.type).to.equal('req-impl');
-      expect(matrix.requirements).to.have.lengthOf(2);
+      expect((matrix as any).requirements).to.have.lengthOf(2);
       expect(matrix.coverage).to.be.an('object');
 
-      const req200 = matrix.requirements.find(r => r.id === 'REQ-200');
+      const req200 = (matrix as any).requirements.find((r: any) => r.id === 'REQ-200');
       expect(req200).to.not.be.undefined;
       expect(req200!.implementations).to.include('IMP-200');
       expect(req200!.tests).to.include('TEST-200');
@@ -253,7 +253,7 @@ describe('Requirements Traceability', function() {
       const matrix = extension.generateDetailedMatrix('full');
 
       expect(matrix.type).to.equal('full');
-      expect(matrix.requirements).to.have.lengthOf(2);
+      expect((matrix as any).requirements).to.have.lengthOf(2);
       expect(matrix.implementations).to.have.lengthOf(1);
       expect(matrix.tests).to.have.lengthOf(1);
       expect(matrix.coverage).to.be.an('object');

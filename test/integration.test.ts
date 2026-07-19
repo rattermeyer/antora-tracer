@@ -134,7 +134,7 @@ documents:REQ-002[]
 
       // Verify matrix generation
       const matrix = extension.generateMatrix('req-impl');
-      expect(matrix.requirements).to.have.lengthOf(2);
+      expect((matrix as any).requirements).to.have.lengthOf(2);
       expect(matrix.type).to.equal('req-impl');
 
       // Verify detailed matrix
@@ -670,7 +670,7 @@ tests:REQ-001[]
 
       // Should be identical
       expect(matrix1.type).to.equal(matrix2.type);
-      expect(matrix1.requirements.length).to.equal(matrix2.requirements.length);
+      expect((matrix1 as any).requirements.length).to.equal((matrix2 as any).requirements.length);
       expect(matrix1.coverage.totalRequirements).to.equal(matrix2.coverage.totalRequirements);
 
       // Generate different matrix types

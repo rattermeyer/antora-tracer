@@ -3,6 +3,7 @@ import type {
   Implementation,
   Test,
   Document,
+  Design,
   AnyNode,
   RelationshipType,
   Relationship,
@@ -14,8 +15,9 @@ export class TraceabilityGraph {
   private _implementations = new Map<string, Implementation>();
   private _tests = new Map<string, Test>();
   private _documents = new Map<string, Document>();
+  private _designs = new Map<string, Design>();
   private _relationships = new Map<string, Relationship>();
-  
+
   // Cache for frequently accessed data
   private _allRequirementsCache: Requirement[] | null = null;
   private _allImplementationsCache: Implementation[] | null = null;
@@ -56,6 +58,13 @@ export class TraceabilityGraph {
     this._allDocumentsCache = null;
   }
 
+  addDesign(design: Design): void {
+    if (this._designs.has(design.id)) {
+      throw new Error(`Duplicate design ID: ${design.id}. A design with this ID already exists.`);
+    }
+    this._designs.set(design.id, design);
+  }
+
   getRequirement(id: string): Requirement | undefined {
     return this._requirements.get(id);
   }
@@ -77,7 +86,8 @@ export class TraceabilityGraph {
       this._requirements.get(id) ??
       this._implementations.get(id) ??
       this._tests.get(id) ??
-      this._documents.get(id)
+      this._documents.get(id) ??
+      this._designs.get(id)
     );
   }
 
@@ -87,7 +97,8 @@ export class TraceabilityGraph {
       this._requirements.has(id) ||
       this._implementations.has(id) ||
       this._tests.has(id) ||
-      this._documents.has(id)
+      this._documents.has(id) ||
+      this._designs.has(id)
     );
   }
 
@@ -117,6 +128,98 @@ export class TraceabilityGraph {
       this._allDocumentsCache = Array.from(this._documents.values());
     }
     return this._allDocumentsCache;
+  }
+
+  getAllDesigns(): Design[] {
+    return Array.from(this._designs.values());
+  }
+
+  // ── Design-specific queries ─────────────────────────────────────────────────
+
+  getDesignsForRequirement(reqId: string): Design[] {
+    const designs: Design[] = [];
+    for (const rel of this._relationships.values()) {
+      if (rel.type === 'addresses' && rel.targetId === reqId) {
+        const design = this._designs.get(rel.fromId);
+        if (design) designs.push(design);
+      }
+    }
+    return designs;
+  }
+
+  getRequirementsForDesign(designId: string): Requirement[] {
+    const requirements: Requirement[] = [];
+    for (const rel of this._relationships.values()) {
+      if (rel.type === 'addresses' && rel.fromId === designId) {
+        const req = this._requirements.get(rel.targetId);
+        if (req) requirements.push(req);
+      }
+    }
+    return requirements;
+  }
+
+  getImplementationsForDesign(designId: string): Implementation[] {
+    const implementations: Implementation[] = [];
+    for (const rel of this._relationships.values()) {
+      if (rel.type === 'implements' && rel.targetId === designId) {
+        const impl = this._implementations.get(rel.fromId);
+        if (impl) implementations.push(impl);
+      }
+    }
+    return implementations;
+  }
+
+  getDesignsForImplementation(implId: string): Design[] {
+    const designs: Design[] = [];
+    for (const rel of this._relationships.values()) {
+      if (rel.type === 'implements' && rel.fromId === implId) {
+        const design = this._designs.get(rel.targetId);
+        if (design) designs.push(design);
+      }
+    }
+    return designs;
+  }
+
+  getComposedOf(designId: string): Design[] {
+    const composed: Design[] = [];
+    for (const rel of this._relationships.values()) {
+      if (rel.type === 'composed-of' && rel.fromId === designId) {
+        const design = this._designs.get(rel.targetId);
+        if (design) composed.push(design);
+      }
+    }
+    return composed;
+  }
+
+  getDependencies(designId: string): Design[] {
+    const dependencies: Design[] = [];
+    for (const rel of this._relationships.values()) {
+      if (rel.type === 'depends-on' && rel.fromId === designId) {
+        const design = this._designs.get(rel.targetId);
+        if (design) dependencies.push(design);
+      }
+    }
+    return dependencies;
+  }
+
+  getDesignsWithImplementations(): Set<string> {
+    const designsWithImpl = new Set<string>();
+    for (const rel of this._relationships.values()) {
+      if (rel.type === 'implements') {
+        designsWithImpl.add(rel.targetId);
+      }
+    }
+    return designsWithImpl;
+  }
+
+  getRequirementsAddressedByDesigns(): Set<string> {
+    const addressedReqs = new Set<string>();
+    for (const rel of this._relationships.values()) {
+      if (rel.type === 'addresses') {
+        addressedReqs.add(rel.targetId);
+      }
+    }
+    return addressedReqs;
   }
 
   // ── Relationship management ─────────────────────────────────────────────────
@@ -228,12 +331,24 @@ export class TraceabilityGraph {
     const total = this._requirements.size;
     const withImpl = this.getRequirementsWithImplementations().size;
     const withTests = this.getRequirementsWithTests().size;
+
+    // Design coverage metrics
+    const totalDesigns = this._designs?.size || 0;
+    const designsWithImpl = this.getDesignsWithImplementations().size;
+    const requirementsAddressedByDesign = this.getRequirementsAddressedByDesigns().size;
+
     return {
       totalRequirements: total,
       requirementsWithImplementation: withImpl,
       requirementsWithTests: withTests,
       implementationCoverage: total > 0 ? (withImpl / total) * 100 : 0,
       testCoverage: total > 0 ? (withTests / total) * 100 : 0,
+      // Design coverage
+      totalDesigns,
+      designsWithImplementation: designsWithImpl,
+      designCoverage: totalDesigns > 0 ? (designsWithImpl / totalDesigns) * 100 : 0,
+      requirementsAddressedByDesign,
+      requirementCoverageByDesign: total > 0 ? (requirementsAddressedByDesign / total) * 100 : 0,
     };
   }
 

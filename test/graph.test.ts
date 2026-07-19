@@ -264,10 +264,10 @@ describe('Traceability Graph', function() {
       const matrix = extension.generateMatrix('req-impl');
 
       expect(matrix.type).to.equal('req-impl');
-      expect(matrix.requirements).to.be.an('array');
-      expect(matrix.requirements.length).to.equal(2);
+      expect((matrix as any).requirements).to.be.an('array');
+      expect((matrix as any).requirements.length).to.equal(2);
 
-      const req500 = matrix.requirements.find(r => r.id === 'REQ-500');
+      const req500 = (matrix as any).requirements.find((r: any) => r.id === 'REQ-500');
       expect(req500!.implementations).to.include('IMP-500');
       expect(req500!.tests).to.include('TEST-500');
     });
@@ -276,7 +276,7 @@ describe('Traceability Graph', function() {
       const matrix = extension.generateDetailedMatrix('full');
 
       expect(matrix.type).to.equal('full');
-      expect(matrix.requirements).to.be.an('array');
+      expect((matrix as any).requirements).to.be.an('array');
       expect(matrix.implementations).to.be.an('array');
       expect(matrix.tests).to.be.an('array');
       expect(matrix.coverage).to.be.an('object');

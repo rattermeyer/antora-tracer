@@ -32,6 +32,48 @@ const match = reqRegex.exec(content);
 const id = match[1]; // Extracted requirement ID
 ----
 
+== Design Concepts (Phase 2)
+
+The extension supports design concepts that bridge the gap between requirements and implementations.
+
+[design, id=ARCH-DES-001, title="Modular Architecture Design"]
+====
+The extension uses a modular architecture with:
+
+* Separate parsers for each element type
+* Clear interfaces between components
+* Dependency injection for testability
+* Single responsibility principle
+
+addresses:REQ-001[]
+composed-of:ARCH-DES-002[]
+composed-of:ARCH-DES-003[]
+====
+
+[design, id=ARCH-DES-002, title="AsciiDoc Processing Module"]
+====
+The AsciiDoc processing module:
+
+* Parses block macros for traceability elements
+* Extracts inline relationship macros
+* Validates element IDs
+* Tracks source information
+
+implements:DES-002[]
+====
+
+[design, id=ARCH-DES-003, title="Graph Management Module"]
+====
+The graph management module:
+
+* Stores all traceability nodes
+* Manages relationships between nodes
+* Provides query capabilities
+* Calculates coverage metrics
+
+implements:DES-003[]
+====
+
 == Traceability Graph
 
 The Traceability Graph stores all traceability elements (requirements, implementations, tests, documents) and their relationships in a structured format.

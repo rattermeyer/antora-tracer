@@ -21,8 +21,9 @@ export interface Requirement extends TraceableNode {
 export interface Implementation extends TraceableNode {}
 export interface Test extends TraceableNode {}
 export interface Document extends TraceableNode {}
+export interface Design extends TraceableNode {}
 
-export type AnyNode = Requirement | Implementation | Test | Document;
+export type AnyNode = Requirement | Implementation | Test | Document | Design;
 
 export type RelationshipType =
   | 'implements'
@@ -31,7 +32,10 @@ export type RelationshipType =
   | 'verifies'
   | 'documents'
   | 'depends'
-  | 'requires';
+  | 'requires'
+  | 'addresses'
+  | 'composed-of'
+  | 'depends-on';
 
 export interface Relationship {
   fromId: string;
@@ -45,9 +49,22 @@ export interface CoverageReport {
   requirementsWithTests: number;
   implementationCoverage: number;
   testCoverage: number;
+  // Design coverage metrics
+  totalDesigns: number;
+  designsWithImplementation: number;
+  designCoverage: number;
+  requirementsAddressedByDesign: number;
+  requirementCoverageByDesign: number;
 }
 
 export interface RequirementRow {
+  id: string;
+  title: string;
+  implementations: string[];
+  tests: string[];
+}
+
+export interface DesignRow {
   id: string;
   title: string;
   implementations: string[];
@@ -83,6 +100,13 @@ export interface TraceabilityMatrix {
   type: string;
   coverage: CoverageReport;
   requirements: RequirementRow[];
+  generatedAt: string;
+}
+
+export interface DesignTraceabilityMatrix {
+  type: string;
+  coverage: CoverageReport;
+  designs: DesignRow[];
   generatedAt: string;
 }
 

@@ -1,0 +1,6 @@
+schema: spec-driven
+name: phase2-design-concepts
+title: Add Design Concept Support (Phase 2)
+description: Add support for design concepts as first-class traceability nodes, enabling users to document architecture and design decisions that address requirements, with full traceability to implementations.
+author: ""
+status: planning

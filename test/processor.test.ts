@@ -146,7 +146,7 @@ Requirement 201
       const matrix = extension.generateMatrix('req-impl');
 
       expect(matrix.type).to.equal('req-impl');
-      expect(matrix.requirements).to.have.lengthOf(2);
+      expect((matrix as any).requirements).to.have.lengthOf(2);
       expect(matrix.coverage).to.be.an('object');
       expect(matrix.generatedAt).to.be.a('string');
     });

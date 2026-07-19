@@ -1,4 +1,4 @@
-import type { Requirement, Implementation, Test, Document, Relationship, RelationshipType } from './types.js';
+import type { Requirement, Implementation, Test, Document, Design, Relationship, RelationshipType } from './types.js';
 
 /**
  * Parses AsciiDoc content for all traceability elements:
@@ -18,6 +18,7 @@ export class DocumentParser {
     implementations: Implementation[];
     tests: Test[];
     documents: Document[];
+    designs: Design[];
     relationships: Relationship[];
   } {
     const result = {
@@ -25,6 +26,7 @@ export class DocumentParser {
       implementations: [] as Implementation[],
       tests: [] as Test[],
       documents: [] as Document[],
+      designs: [] as Design[],
       relationships: [] as Relationship[],
     };
 
@@ -50,6 +52,7 @@ export class DocumentParser {
       implementations: Implementation[];
       tests: Test[];
       documents: Document[];
+      designs: Design[];
     },
   ): void {
     // Parse requirements: [req, id=REQ-001]
@@ -165,6 +168,34 @@ export class DocumentParser {
       const document = this.parseDocument(block, autoId, sourceFile, match.index);
       result.documents.push(document);
     }
+
+    // Parse designs: [design, id=DES-001]
+    const designRegex = /\[design,[\s]*id=([A-Z0-9_-]+)/g;
+    while ((match = designRegex.exec(content)) !== null) {
+      const id = match[1];
+
+      if (seen.has(id)) {
+        throw new Error(`Duplicate design ID: ${id}`);
+      }
+      seen.add(id);
+
+      const block = this.extractBlock(content, match.index);
+      if (!block) continue;
+
+      const design = this.parseDesign(block, id, sourceFile, match.index);
+      result.designs.push(design);
+    }
+
+    // Parse designs without explicit IDs
+    const designNoIdRegex = /\[design(?!.*id=)/g;
+    while ((match = designNoIdRegex.exec(content)) !== null) {
+      const block = this.extractBlock(content, match.index);
+      if (!block) continue;
+
+      const autoId = this.generateId('DES');
+      const design = this.parseDesign(block, autoId, sourceFile, match.index);
+      result.designs.push(design);
+    }
   }
 
   /**
@@ -179,6 +210,7 @@ export class DocumentParser {
       implementations: Implementation[];
       tests: Test[];
       documents: Document[];
+      designs: Design[];
       relationships: Relationship[];
     },
   ): void {
@@ -188,12 +220,13 @@ export class DocumentParser {
       ...result.implementations.map(n => ({ type: 'implementation' as const, node: n })),
       ...result.tests.map(n => ({ type: 'test' as const, node: n })),
       ...result.documents.map(n => ({ type: 'document' as const, node: n })),
+      ...result.designs.map(n => ({ type: 'design' as const, node: n })),
     ];
 
     // For each node, parse its content for inline macros
     for (const { node } of nodes) {
       const content = node.content ?? '';
-      const inlineMacroRegex = /(\w+):([A-Z0-9_-]+)\[/g;
+      const inlineMacroRegex = /([a-zA-Z][a-zA-Z0-9-]*):([A-Z0-9_-]+)\[/g;
       let match: RegExpExecArray | null;
 
       while ((match = inlineMacroRegex.exec(content)) !== null) {
@@ -232,6 +265,13 @@ export class DocumentParser {
       depends: 'depends',
       require: 'requires',
       requires: 'requires',
+      // Design concept relationships
+      address: 'addresses',
+      addresses: 'addresses',
+      composed: 'composed-of',
+      'composed-of': 'composed-of',
+      dependson: 'depends-on',
+      'depends-on': 'depends-on',
     };
     // Try exact match first, then lowercase
     return mapping[macro] ?? mapping[macro.toLowerCase()] ?? null;
@@ -320,6 +360,30 @@ export class DocumentParser {
 
     if (!/^[A-Z]{2,4}-[0-9]+$/.test(id)) {
       console.warn(`⚠️  Non-standard document ID format: ${id}`);
+    }
+
+    return {
+      id,
+      title,
+      content: this.extractBody(block),
+      status,
+      attributes: { id, title, status },
+      sourceFile,
+      sourceLine: this.lineAt(block, position),
+    };
+  }
+
+  private parseDesign(
+    block: string,
+    id: string,
+    sourceFile: string,
+    position: number,
+  ): Design {
+    const title = block.match(/title="([^"]+)"/)?.[1] ?? `Design ${id}`;
+    const status = block.match(/status=([^,\s\]]+)/)?.[1] ?? 'draft';
+
+    if (!/^[A-Z]{2,4}-[0-9]+$/.test(id)) {
+      console.warn(`⚠️  Non-standard design ID format: ${id}`);
     }
 
     return {

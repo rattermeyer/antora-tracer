@@ -1,19 +1,23 @@
 import { expect } from 'chai';
-import createAntoraExtension, { AntoraTraceabilityExtension, AntoraExtensionContext } from '../src/antora-extension.js';
+import { createAntoraExtension, AntoraTraceabilityExtension, AntoraExtensionContext } from '../src/antora-extension.js';
 import { RequirementsTraceabilityExtension } from '../src/index.js';
 
 describe('Antora Extension', function() {
   let mockContext: AntoraExtensionContext;
   let extension: AntoraTraceabilityExtension;
 
+  let mockLogger: ReturnType<AntoraExtensionContext['getLogger']>;
+
   beforeEach(function() {
+    mockLogger = {
+      info: () => {},
+      warn: () => {},
+      error: () => {},
+      debug: () => {},
+    };
+
     mockContext = {
-      logger: {
-        info: () => {},
-        warn: () => {},
-        error: () => {},
-        debug: () => {},
-      },
+      getLogger: (name?: string) => mockLogger,
       playbook: {
         extensions: [
           { name: 'antora-requirements-traceability', config: {} }
@@ -61,7 +65,7 @@ describe('Antora Extension', function() {
 
     it('should log initialization message', function() {
       let infoCalled = false;
-      mockContext.logger.info = (message: string) => {
+      mockLogger.info = (message: string) => {
         if (message.includes('initialized')) {
           infoCalled = true;
         }
@@ -82,7 +86,7 @@ describe('Antora Extension', function() {
       };
 
       let infoCalled = false;
-      mockContext.logger.info = (message: string) => {
+      mockLogger.info = (message: string) => {
         if (message.includes('disabled')) {
           infoCalled = true;
         }
@@ -127,11 +131,9 @@ describe('Antora Extension', function() {
       expect(ext.getTraceabilityExtension).to.be.a('function');
     });
 
-    it('should be callable as module.exports', function() {
-      // This tests CommonJS compatibility
-      // Note: The compiled file is at lib/src/antora-extension.js
-      const createExt = require('../src/antora-extension.js');
-      const ext = createExt(mockContext);
+    it('should be callable as factory function', function() {
+      // Factory function returns AntoraTraceabilityExtension instance
+      const ext = createAntoraExtension(mockContext);
       expect(ext).to.be.an('object');
       expect(ext.getTraceabilityExtension).to.be.a('function');
     });

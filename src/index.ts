@@ -9,12 +9,14 @@ import type {
   Implementation,
   Test,
   Document,
+  Design,
   RelationshipType,
   CoverageReport,
   RequirementDetail,
   ImplementationDetail,
   TestDetail,
   TraceabilityMatrix,
+  DesignTraceabilityMatrix,
   DetailedTraceabilityMatrix,
 } from './types.js';
 
@@ -60,6 +62,10 @@ class RequirementsTraceabilityExtension {
         this.graph.addDocument(doc);
         console.log(`📝 Document registered: ${doc.id} - ${doc.title}`);
       }
+      for (const design of parsed.designs) {
+        this.graph.addDesign(design);
+        console.log(`📝 Design registered: ${design.id} - ${design.title}`);
+      }
 
       // Add all parsed relationships to the graph
       for (const rel of parsed.relationships) {
@@ -93,6 +99,11 @@ class RequirementsTraceabilityExtension {
     console.log(`📝 Document registered: ${doc.id} - ${doc.title}`);
   }
 
+  addDesign(design: Design): void {
+    this.graph.addDesign(design);
+    console.log(`📝 Design registered: ${design.id} - ${design.title}`);
+  }
+
   addRelationship(fromId: string, toId: string, type: RelationshipType = 'satisfies'): void {
     this.graph.addRelationship({ fromId, targetId: toId, type });
     console.log(`🔗 Relationship added: ${fromId} ${type} ${toId}`);
@@ -100,7 +111,7 @@ class RequirementsTraceabilityExtension {
 
   // ── Matrix generation (delegated to MatrixGenerator) ────────────────────────
 
-  generateMatrix(type?: string): TraceabilityMatrix {
+  generateMatrix(type?: string): TraceabilityMatrix | DesignTraceabilityMatrix {
     console.log(`📊 Generating ${type ?? 'req-impl'} matrix`);
     return this.generator.generateMatrix(type);
   }

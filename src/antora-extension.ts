@@ -206,11 +206,20 @@ export class AntoraTraceabilityExtension {
         this.traceability.graph.addDocument(doc);
         this.logger.debug(`Registered document: ${doc.id}`);
       }
+      for (const design of parsed.designs) {
+        this.traceability.graph.addDesign(design);
+        this.logger.debug(`Registered design: ${design.id}`);
+      }
 
       // Add relationships
       for (const rel of parsed.relationships) {
-        this.traceability.graph.addRelationship(rel);
-        this.logger.debug(`Registered relationship: ${rel.fromId} ${rel.type} ${rel.targetId}`);
+        try {
+          this.traceability.graph.addRelationship(rel);
+          this.logger.debug(`Registered relationship: ${rel.fromId} ${rel.type} ${rel.targetId}`);
+        } catch (error: any) {
+          // Skip relationships with missing nodes (cross-file references will be resolved in later passes)
+          this.logger.debug(`Skipped relationship: ${rel.fromId} ${rel.type} ${rel.targetId} - ${error.message}`);
+        }
       }
 
       // Store traceability data on the content node
@@ -221,6 +230,7 @@ export class AntoraTraceabilityExtension {
           implementations: parsed.implementations.map((i: any) => i.id),
           tests: parsed.tests.map((t: any) => t.id),
           documents: parsed.documents.map((d: any) => d.id),
+          designs: parsed.designs.map((d: any) => d.id),
         };
       }
     } catch (error: any) {
@@ -255,7 +265,7 @@ export class AntoraTraceabilityExtension {
       mkdirSync(traceabilityDir, { recursive: true });
 
       // Generate different matrix types
-      const matrixTypes = ['req-impl', 'req-test', 'full'];
+      const matrixTypes = ['req-impl', 'req-test', 'req-design', 'design-impl', 'full'];
 
       for (const matrixType of matrixTypes) {
         for (const format of this.config.matrixFormats) {
@@ -295,7 +305,7 @@ export class AntoraTraceabilityExtension {
    * Generate an index page that links to all traceability artifacts
    */
   private generateIndexContent(): string {
-    const matrixTypes = ['req-impl', 'req-test', 'full'];
+    const matrixTypes = ['req-impl', 'req-test', 'req-design', 'design-impl', 'full'];
     const formats = this.config.matrixFormats;
 
     let linksHtml = '<ul>';
@@ -688,8 +698,16 @@ function register(context: AntoraExtensionContext): void {
   new AntoraTraceabilityExtension(context);
 }
 
+// Factory function for testing and backward compatibility
+function createAntoraExtension(context: AntoraExtensionContext): AntoraTraceabilityExtension {
+  return new AntoraTraceabilityExtension(context);
+}
+
 // Export for Antora (expects { register } object)
 export { register };
+
+// Export factory function for testing
+export { createAntoraExtension };
 
 // Default export for compatibility
 export default { register };
