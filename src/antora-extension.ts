@@ -14,6 +14,8 @@
  */
 
 import { RequirementsTraceabilityExtension } from './index.js';
+import { mkdirSync, writeFileSync } from 'fs';
+import { join } from 'path';
 
 /**
  * Antora Extension Configuration
@@ -147,9 +149,22 @@ export class AntoraTraceabilityExtension {
    * Register a content classifier to process AsciiDoc files
    */
   private registerContentClassifier(): void {
-    this.context.on('contentClassified', ({ contentCatalog, file }: { contentCatalog: ContentCatalog; file: ContentNode }) => {
-      if (file.src.path.endsWith('.adoc')) {
-        this.processAsciiDocFile(contentCatalog, file);
+    this.context.on('contentClassified', (event: any) => {
+      const contentCatalog = event.contentCatalog;
+      if (!contentCatalog) {
+        this.logger.warn('contentCatalog not found in contentClassified event');
+        return;
+      }
+
+      this.logger.info('Processing content for traceability');
+
+      // Find all AsciiDoc files in the content catalog
+      const files = contentCatalog.findBy({ family: 'page' }) || [];
+
+      for (const file of files) {
+        if (file.src && file.src.path && file.src.path.endsWith('.adoc')) {
+          this.processAsciiDocFile(contentCatalog, file);
+        }
       }
     });
   }
@@ -157,10 +172,17 @@ export class AntoraTraceabilityExtension {
   /**
    * Process an AsciiDoc file for traceability elements
    */
-  private async processAsciiDocFile(contentCatalog: ContentCatalog, file: ContentNode): Promise<void> {
+  private async processAsciiDocFile(contentCatalog: ContentCatalog, file: any): Promise<void> {
     try {
-      const content = file.src.contents.toString('utf8');
-      const sourceFile = file.src.path;
+      // In Antora, contents might be in different places depending on the file type
+      const contentsBuffer = file.contents || file.src?.contents;
+      if (!contentsBuffer) {
+        this.logger.debug(`Skipping file without contents: ${file.src?.path || 'unknown'}`);
+        return;
+      }
+
+      const content = contentsBuffer.toString('utf8');
+      const sourceFile = file.src?.path || file.path || 'unknown';
 
       // Parse the file for traceability elements
       // Access the parser through the traceability extension
@@ -210,20 +232,29 @@ export class AntoraTraceabilityExtension {
    * Register a page processor to generate traceability pages
    */
   private registerPageProcessor(): void {
-    // This would be called after all content is processed
-    this.context.on('contentAggregated', ({ contentCatalog }: { contentCatalog: ContentCatalog }) => {
+    // Generate traceability files after site is published
+    this.context.on('sitePublished', (event: any) => {
       if (!this.config.generateMatrices) return;
 
-      this.generateTraceabilityPages(contentCatalog);
+      this.generateTraceabilityFiles(event);
     });
   }
 
   /**
-   * Generate traceability matrix pages
+   * Generate traceability files to output directory
    */
-  private generateTraceabilityPages(contentCatalog: ContentCatalog): void {
+  private generateTraceabilityFiles(event: any): void {
     try {
-      // Generate different matrix types if configured
+      // Get output directory from event
+      const outputDir = event.playbook?.output?.dir || event.playbook?.dir || '_site';
+      const traceabilityDir = join(outputDir, this.config.outputDir);
+
+      this.logger.info(`Writing traceability files to ${traceabilityDir}`);
+
+      // Create directory if it doesn't exist
+      mkdirSync(traceabilityDir, { recursive: true });
+
+      // Generate different matrix types
       const matrixTypes = ['req-impl', 'req-test', 'full'];
 
       for (const matrixType of matrixTypes) {
@@ -233,46 +264,28 @@ export class AntoraTraceabilityExtension {
             : this.traceability.exportMatrixToCSV(matrixType);
 
           const safeType = matrixType.replace('/', '-');
-          const page: any = {
-            id: `traceability-matrix-${safeType}.${format}`,
-            title: `Traceability Matrix: ${matrixType} (${format.toUpperCase()})`,
-            component: 'ROOT',
-            version: '0.1.0',
-            module: 'traceability',
-            family: 'page',
-            contents: Buffer.from(matrixContent, 'utf8'),
-            out: {
-              path: `${this.config.outputDir}/matrix-${safeType}.${format}`,
-            },
-          };
+          const fileName = `matrix-${safeType}.${format}`;
+          const filePath = join(traceabilityDir, fileName);
 
-          contentCatalog.addPage(page);
-          this.logger.info(`Generated traceability matrix: matrix-${safeType}.${format}`);
+          writeFileSync(filePath, matrixContent, 'utf8');
+          this.logger.info(`✓ Generated ${fileName}`);
         }
       }
 
       // Generate coverage report
       const coverage = this.traceability.getCoverageReport();
       const coverageContent = this.formatCoverageReport(coverage);
-
-      const coveragePage: any = {
-        id: 'traceability-coverage',
-        title: 'Traceability Coverage Report',
-        component: 'ROOT',
-        version: '0.1.0',
-        module: 'traceability',
-        family: 'page',
-        contents: Buffer.from(coverageContent, 'utf8'),
-        out: {
-          path: `${this.config.outputDir}/coverage.html`,
-        },
-      };
-
-      contentCatalog.addPage(coveragePage);
-      this.logger.info('Generated traceability coverage report');
+      const coveragePath = join(traceabilityDir, 'coverage.html');
+      writeFileSync(coveragePath, coverageContent, 'utf8');
+      this.logger.info('✓ Generated coverage.html');
 
       // Generate index page
-      this.generateIndexPage(contentCatalog);
+      const indexContent = this.generateIndexContent();
+      const indexPath = join(traceabilityDir, 'index.html');
+      writeFileSync(indexPath, indexContent, 'utf8');
+      this.logger.info('✓ Generated index.html');
+
+      this.logger.info(`✅ Traceability files written to ${this.config.outputDir}/`);
     } catch (error: any) {
       this.logger.error(`Error generating traceability pages: ${error.message}`);
     }
@@ -281,7 +294,7 @@ export class AntoraTraceabilityExtension {
   /**
    * Generate an index page that links to all traceability artifacts
    */
-  private generateIndexPage(contentCatalog: ContentCatalog): void {
+  private generateIndexContent(): string {
     const matrixTypes = ['req-impl', 'req-test', 'full'];
     const formats = this.config.matrixFormats;
 
@@ -394,21 +407,7 @@ export class AntoraTraceabilityExtension {
 </html>
     `;
 
-    const indexPage: any = {
-      id: 'traceability-index',
-      title: 'Requirements Traceability',
-      component: 'ROOT',
-      version: '0.1.0',
-      module: 'traceability',
-      family: 'page',
-      contents: Buffer.from(indexContent, 'utf8'),
-      out: {
-        path: `${this.config.outputDir}/index.html`,
-      },
-    };
-
-    contentCatalog.addPage(indexPage);
-    this.logger.info('Generated traceability index page');
+    return indexContent;
   }
 
   /**
