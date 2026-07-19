@@ -278,9 +278,9 @@ export class AntoraTraceabilityExtension {
       // Create directory if it doesn't exist
       mkdirSync(traceabilityDir, { recursive: true });
 
-      // Generate different matrix types (including inverse matrices)
+      // Generate different matrix types (including inverse matrices and design-design)
       const matrixTypes = ['req-impl', 'req-test', 'req-design', 'design-impl', 'full',
-        'impl-req', 'test-impl', 'test-req', 'design-req'];
+        'impl-req', 'test-impl', 'test-req', 'design-req', 'design-design'];
 
       for (const matrixType of matrixTypes) {
         for (const format of this.config.matrixFormats) {
@@ -321,7 +321,7 @@ export class AntoraTraceabilityExtension {
    */
   private generateIndexContent(): string {
     const matrixTypes = ['req-impl', 'req-test', 'req-design', 'design-impl', 'full',
-      'impl-req', 'test-impl', 'test-req', 'design-req'];
+      'impl-req', 'test-impl', 'test-req', 'design-req', 'design-design'];
     const formats = this.config.matrixFormats;
 
     let linksHtml = '<ul>';

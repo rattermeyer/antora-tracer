@@ -137,6 +137,7 @@ export interface DesignRow {
   title: string;
   implementations: string[];
   tests: string[];
+  depth?: number; // For visual hierarchy in design-design matrix
 }
 
 export interface RequirementDetail {

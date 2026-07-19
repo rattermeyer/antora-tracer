@@ -31,6 +31,9 @@ export class MatrixGenerator {
         return this.generateTestRequirementMatrix();
       case 'design-req':
         return this.generateDesignRequirementMatrix();
+      // Design-Design matrix (Phase 3)
+      case 'design-design':
+        return this.generateDesignDesignMatrix();
       default:
         return this.generateRequirementsImplementationMatrix();
     }
@@ -456,6 +459,21 @@ export class MatrixGenerator {
     html.push('      color: #666;');
     html.push('      font-size: 0.85rem;');
     html.push('    }');
+    // Visual hierarchy styles
+    html.push('    .hierarchy-0 { padding-left: 0 !important; }');
+    html.push('    .hierarchy-1 { padding-left: 20px !important; }');
+    html.push('    .hierarchy-2 { padding-left: 40px !important; }');
+    html.push('    .hierarchy-3 { padding-left: 60px !important; }');
+    html.push('    .hierarchy-4 { padding-left: 80px !important; }');
+    html.push('    .hierarchy-5 { padding-left: 100px !important; }');
+    html.push('    .hierarchy-indicator {');
+    html.push('      display: inline-block;');
+    html.push('      width: 10px;');
+    html.push('      height: 1px;');
+    html.push('      background: #ccc;');
+    html.push('      margin-right: 10px;');
+    html.push('      vertical-align: middle;');
+    html.push('    }');
     html.push('  </style>');
     html.push('</head>');
     html.push('<body>');
@@ -490,13 +508,21 @@ export class MatrixGenerator {
       const hasImpl = design.implementations.length > 0;
       const statusClass = hasImpl ? 'status-complete' : 'status-missing';
       const statusText = hasImpl ? '✓ Complete' : '✗ Missing';
+      const depth = design.depth || 0;
+      const hierarchyClass = `hierarchy-${Math.min(depth, 5)}`;
+
+      // Create hierarchy indicators (visual tree lines)
+      let hierarchyIndicators = '';
+      if (depth > 0) {
+        hierarchyIndicators = '<span class="hierarchy-indicator"></span>'.repeat(depth);
+      }
 
       html.push('        <tr>');
-      html.push(`          <td><strong>${this.escapeHtml(design.id)}</strong></td>`);
-      html.push(`          <td>${this.escapeHtml(design.title)}</td>`);
-      html.push(`          <td>${this.escapeHtml(impls || '-')}</td>`);
-      html.push(`          <td>${this.escapeHtml(tests || '-')}</td>`);
-      html.push(`          <td><span class="status-badge ${statusClass}">${statusText}</span></td>`);
+      html.push(`          <td class="${hierarchyClass}"><strong>${hierarchyIndicators}${this.escapeHtml(design.id)}</strong></td>`);
+      html.push(`          <td class="${hierarchyClass}">${hierarchyIndicators}${this.escapeHtml(design.title)}</td>`);
+      html.push(`          <td class="${hierarchyClass}">${this.escapeHtml(impls || '-')}</td>`);
+      html.push(`          <td class="${hierarchyClass}">${this.escapeHtml(tests || '-')}</td>`);
+      html.push(`          <td class="${hierarchyClass}"><span class="status-badge ${statusClass}">${statusText}</span></td>`);
       html.push('        </tr>');
     }
 
@@ -602,6 +628,96 @@ export class MatrixGenerator {
           .map(r => r.targetId),
         tests: [], // Not used for design-req matrix
       })),
+      generatedAt: new Date().toISOString(),
+    };
+  }
+
+  // ── Design-Design Matrix (Phase 3) ─────────────────────────────────────
+
+  /**
+   * Calculate hierarchy depth for each design based on composed-of relationships.
+   * Returns a map of design ID to depth level (0 = root, 1 = child, etc.)
+   */
+  private calculateDesignHierarchyDepths(): Map<string, number> {
+    const depths = new Map<string, number>();
+    const allDesigns = this.graph.getAllDesigns();
+    const allDesignIds = new Set(allDesigns.map(d => d.id));
+
+    // Find root designs (designs that are NOT composed by any other design)
+    // A design is a root if no other design has it in their composed-of relationships
+    const composedByOthers = new Set<string>();
+    for (const design of allDesigns) {
+      const composedOfRels = this.graph.getRelationships(design.id, 'composed-of');
+      for (const rel of composedOfRels) {
+        if (allDesignIds.has(rel.targetId)) {
+          // design is composed of rel.targetId, so rel.targetId is a child
+          composedByOthers.add(rel.targetId);
+        }
+      }
+    }
+
+    // Root designs (not composed by any other design) have depth 0
+    for (const design of allDesigns) {
+      if (!composedByOthers.has(design.id)) {
+        depths.set(design.id, 0);
+      }
+    }
+
+    // Calculate depths for child designs using BFS
+    // Children are designs that are composed-of by their parents
+    const queue: { designId: string; depth: number }[] = [];
+    for (const [designId, depth] of depths) {
+      queue.push({ designId, depth });
+    }
+
+    while (queue.length > 0) {
+      const current = queue.shift()!;
+
+      // Find designs that this design is composed of (these are children)
+      const composedOfRels = this.graph.getRelationships(current.designId, 'composed-of');
+      for (const rel of composedOfRels) {
+        if (allDesignIds.has(rel.targetId) && !depths.has(rel.targetId)) {
+          depths.set(rel.targetId, current.depth + 1);
+          queue.push({ designId: rel.targetId, depth: current.depth + 1 });
+        }
+      }
+    }
+
+    return depths;
+  }
+
+  private generateDesignDesignMatrix(): DesignTraceabilityMatrix {
+    const allDesigns = this.graph.getAllDesigns();
+    const designIds = new Set(allDesigns.map(d => d.id));
+    const depths = this.calculateDesignHierarchyDepths();
+
+    return {
+      type: 'design-design',
+      coverage: this.graph.getCoverage(),
+      designs: allDesigns.map(design => {
+        // Get all designs that this design is composed of
+        const composedOf = this.graph.getRelationships(design.id, 'composed-of')
+          .filter(r => designIds.has(r.targetId))
+          .map(r => r.targetId);
+
+        // Get all designs that depend on this design
+        const dependsOn = this.graph.getRelationships(design.id, 'depends-on')
+          .filter(r => designIds.has(r.targetId))
+          .map(r => r.targetId);
+
+        // Combine both types of relationships
+        const relatedDesigns = [...composedOf, ...dependsOn];
+
+        return {
+          id: design.id,
+          title: design.title,
+          // Use implementations field to store related designs
+          implementations: relatedDesigns,
+          tests: [], // Not used for design-design matrix
+          // Add hierarchy depth for visual indentation
+          depth: depths.get(design.id) || 0,
+        };
+      }),
       generatedAt: new Date().toISOString(),
     };
   }
