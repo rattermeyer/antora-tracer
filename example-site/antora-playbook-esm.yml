@@ -16,7 +16,7 @@ ui:
 
 antora:
   extensions:
-    - require: ../lib/antora-extension.cjs
+    - require: ../lib/src/antora-extension.js
 
 output:
   clean: true

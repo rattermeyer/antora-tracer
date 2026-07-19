@@ -43,18 +43,20 @@ const DEFAULT_CONFIG: Required<AntoraTraceabilityConfig> = {
 };
 
 /**
- * Antora Extension Context (simplified interface)
- * This is a minimal interface that works with Antora's extension system
+ * Antora Extension Context (Antora 3.x API)
  */
 export interface AntoraExtensionContext {
-  logger: {
+  getLogger: (name?: string) => {
     info: (message: string) => void;
     warn: (message: string) => void;
     error: (message: string) => void;
     debug: (message: string) => void;
   };
-  playbook: any;
   on: (event: string, handler: (...args: any[]) => void) => void;
+  once?: (event: string, handler: (...args: any[]) => void) => void;
+  config?: any;
+  module?: any;
+  playbook?: any;
 }
 
 /**
@@ -104,17 +106,19 @@ export interface Page {
 export class AntoraTraceabilityExtension {
   private readonly traceability: RequirementsTraceabilityExtension;
   private config: Required<AntoraTraceabilityConfig>;
+  private readonly logger: ReturnType<AntoraExtensionContext['getLogger']>;
 
   constructor(private readonly context: AntoraExtensionContext) {
+    this.logger = context.getLogger('requirements-traceability');
     this.traceability = new RequirementsTraceabilityExtension();
     this.config = { ...DEFAULT_CONFIG, ...this.loadConfig() };
 
     if (!this.config.enabled) {
-      this.context.logger.info('Requirements traceability extension is disabled');
+      this.logger.info('Requirements traceability extension is disabled');
       return;
     }
 
-    this.context.logger.info('Requirements traceability extension initialized');
+    this.logger.info('Requirements traceability extension initialized');
 
     // Register content classifier for AsciiDoc files
     this.registerContentClassifier();
@@ -166,25 +170,25 @@ export class AntoraTraceabilityExtension {
       // Add nodes to the graph
       for (const req of parsed.requirements) {
         this.traceability.graph.addRequirement(req);
-        this.context.logger.debug(`Registered requirement: ${req.id}`);
+        this.logger.debug(`Registered requirement: ${req.id}`);
       }
       for (const imp of parsed.implementations) {
         this.traceability.graph.addImplementation(imp);
-        this.context.logger.debug(`Registered implementation: ${imp.id}`);
+        this.logger.debug(`Registered implementation: ${imp.id}`);
       }
       for (const test of parsed.tests) {
         this.traceability.graph.addTest(test);
-        this.context.logger.debug(`Registered test: ${test.id}`);
+        this.logger.debug(`Registered test: ${test.id}`);
       }
       for (const doc of parsed.documents) {
         this.traceability.graph.addDocument(doc);
-        this.context.logger.debug(`Registered document: ${doc.id}`);
+        this.logger.debug(`Registered document: ${doc.id}`);
       }
 
       // Add relationships
       for (const rel of parsed.relationships) {
         this.traceability.graph.addRelationship(rel);
-        this.context.logger.debug(`Registered relationship: ${rel.fromId} ${rel.type} ${rel.targetId}`);
+        this.logger.debug(`Registered relationship: ${rel.fromId} ${rel.type} ${rel.targetId}`);
       }
 
       // Store traceability data on the content node
@@ -198,7 +202,7 @@ export class AntoraTraceabilityExtension {
         };
       }
     } catch (error: any) {
-      this.context.logger.warn(`Error processing ${file.src.path}: ${error.message}`);
+      this.logger.warn(`Error processing ${file.src.path}: ${error.message}`);
     }
   }
 
@@ -221,10 +225,10 @@ export class AntoraTraceabilityExtension {
     try {
       // Generate different matrix types if configured
       const matrixTypes = ['req-impl', 'req-test', 'full'];
-      
+
       for (const matrixType of matrixTypes) {
         for (const format of this.config.matrixFormats) {
-          const matrixContent = format === 'html' 
+          const matrixContent = format === 'html'
             ? this.traceability.exportMatrixToHTML(matrixType)
             : this.traceability.exportMatrixToCSV(matrixType);
 
@@ -243,7 +247,7 @@ export class AntoraTraceabilityExtension {
           };
 
           contentCatalog.addPage(page);
-          this.context.logger.info(`Generated traceability matrix: matrix-${safeType}.${format}`);
+          this.logger.info(`Generated traceability matrix: matrix-${safeType}.${format}`);
         }
       }
 
@@ -265,12 +269,12 @@ export class AntoraTraceabilityExtension {
       };
 
       contentCatalog.addPage(coveragePage);
-      this.context.logger.info('Generated traceability coverage report');
+      this.logger.info('Generated traceability coverage report');
 
       // Generate index page
       this.generateIndexPage(contentCatalog);
     } catch (error: any) {
-      this.context.logger.error(`Error generating traceability pages: ${error.message}`);
+      this.logger.error(`Error generating traceability pages: ${error.message}`);
     }
   }
 
@@ -280,9 +284,9 @@ export class AntoraTraceabilityExtension {
   private generateIndexPage(contentCatalog: ContentCatalog): void {
     const matrixTypes = ['req-impl', 'req-test', 'full'];
     const formats = this.config.matrixFormats;
-    
+
     let linksHtml = '<ul>';
-    
+
     // Add matrix links
     for (const matrixType of matrixTypes) {
       for (const format of formats) {
@@ -291,7 +295,7 @@ export class AntoraTraceabilityExtension {
         linksHtml += `<li><a href="matrix-${safeType}.${format}">${displayType} Matrix (${format.toUpperCase()})</a></li>`;
       }
     }
-    
+
     // Add coverage report link
     linksHtml += '<li><a href="coverage.html">Coverage Report</a></li>';
     linksHtml += '</ul>';
@@ -404,7 +408,7 @@ export class AntoraTraceabilityExtension {
     };
 
     contentCatalog.addPage(indexPage);
-    this.context.logger.info('Generated traceability index page');
+    this.logger.info('Generated traceability index page');
   }
 
   /**
@@ -432,7 +436,7 @@ export class AntoraTraceabilityExtension {
       --light-bg: #f8f9fa;
       --border-color: #dee2e6;
     }
-    
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       margin: 0;
@@ -440,29 +444,29 @@ export class AntoraTraceabilityExtension {
       background-color: #f5f5f5;
       color: #333;
     }
-    
+
     .container {
       max-width: 1200px;
       margin: 0 auto;
     }
-    
+
     header {
       background: linear-gradient(135deg, var(--primary-color), #0056b3);
       color: white;
       padding: 30px 0;
       margin-bottom: 30px;
     }
-    
+
     header h1 {
       margin: 0;
       font-size: 2rem;
     }
-    
+
     header .subtitle {
       opacity: 0.9;
       font-size: 1.1rem;
     }
-    
+
     .nav-breadcrumb {
       background: white;
       padding: 15px 20px;
@@ -470,23 +474,23 @@ export class AntoraTraceabilityExtension {
       margin-bottom: 20px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    
+
     .nav-breadcrumb a {
       color: var(--primary-color);
       text-decoration: none;
     }
-    
+
     .nav-breadcrumb a:hover {
       text-decoration: underline;
     }
-    
+
     .coverage-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 20px;
       margin-bottom: 30px;
     }
-    
+
     .coverage-card {
       background: white;
       padding: 25px;
@@ -494,12 +498,12 @@ export class AntoraTraceabilityExtension {
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       transition: transform 0.2s, box-shadow 0.2s;
     }
-    
+
     .coverage-card:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
-    
+
     .coverage-card h3 {
       margin-top: 0;
       color: #555;
@@ -507,18 +511,18 @@ export class AntoraTraceabilityExtension {
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-    
+
     .metric-value {
       font-size: 2.5rem;
       font-weight: bold;
       margin: 10px 0;
     }
-    
+
     .metric-label {
       color: #666;
       font-size: 0.9rem;
     }
-    
+
     .progress-bar {
       height: 8px;
       background: #e9ecef;
@@ -526,13 +530,13 @@ export class AntoraTraceabilityExtension {
       margin: 15px 0;
       overflow: hidden;
     }
-    
+
     .progress-fill {
       height: 100%;
       border-radius: 4px;
       transition: width 0.3s ease;
     }
-    
+
     .summary-section {
       background: white;
       padding: 25px;
@@ -540,27 +544,27 @@ export class AntoraTraceabilityExtension {
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       margin-bottom: 20px;
     }
-    
+
     .summary-section h2 {
       margin-top: 0;
       color: #333;
     }
-    
+
     .uncovered-list {
       list-style: none;
       padding: 0;
       margin: 0;
     }
-    
+
     .uncovered-list li {
       padding: 10px 0;
       border-bottom: 1px solid var(--border-color);
     }
-    
+
     .uncovered-list li:last-child {
       border-bottom: none;
     }
-    
+
     .status-badge {
       display: inline-block;
       padding: 4px 8px;
@@ -569,34 +573,34 @@ export class AntoraTraceabilityExtension {
       font-weight: bold;
       text-transform: uppercase;
     }
-    
+
     .status-complete {
       background: #d4edda;
       color: #155724;
     }
-    
+
     .status-partial {
       background: #fff3cd;
       color: #856404;
     }
-    
+
     .status-missing {
       background: #f8d7da;
       color: #721c24;
     }
-    
+
     footer {
       text-align: center;
       padding: 20px;
       color: #666;
       font-size: 0.85rem;
     }
-    
+
     @media (max-width: 768px) {
       .coverage-grid {
         grid-template-columns: 1fr;
       }
-      
+
       header h1 {
         font-size: 1.5rem;
       }
@@ -610,19 +614,19 @@ export class AntoraTraceabilityExtension {
       <p class="subtitle">Requirements Traceability Extension</p>
     </div>
   </header>
-  
+
   <div class="container">
     <nav class="nav-breadcrumb">
       <a href="../">← Back to Documentation</a>
     </nav>
-    
+
     <div class="coverage-grid">
       <div class="coverage-card">
         <h3>Total Requirements</h3>
         <div class="metric-value">${coverage.totalRequirements}</div>
         <div class="metric-label">requirements tracked</div>
       </div>
-      
+
       <div class="coverage-card">
         <h3>Implementation Coverage</h3>
         <div class="metric-value" style="color: ${implColor}">${implementationCoverage}%</div>
@@ -631,7 +635,7 @@ export class AntoraTraceabilityExtension {
         </div>
         <div class="metric-label">${coverage.requirementsWithImplementation} of ${coverage.totalRequirements} implemented</div>
       </div>
-      
+
       <div class="coverage-card">
         <h3>Test Coverage</h3>
         <div class="metric-value" style="color: ${testColor}">${testCoverage}%</div>
@@ -641,12 +645,12 @@ export class AntoraTraceabilityExtension {
         <div class="metric-label">${coverage.requirementsWithTests} of ${coverage.totalRequirements} tested</div>
       </div>
     </div>
-    
+
     <div class="summary-section">
       <h2>Coverage Details</h2>
       <p>This report shows the traceability coverage for your documentation. Requirements with implementations and tests are considered fully covered.</p>
     </div>
-    
+
     <footer>
       <p>Generated by Antora Requirements Traceability Extension v0.1.0</p>
     </footer>
@@ -665,7 +669,7 @@ export class AntoraTraceabilityExtension {
     this.context.on('beforeSiteGenerated', () => {
       // Add traceability section to navigation
       // This is a placeholder - actual implementation depends on Antora version
-      this.context.logger.info('Enhanced navigation with traceability links');
+      this.logger.info('Enhanced navigation with traceability links');
     });
   }
 
@@ -678,13 +682,15 @@ export class AntoraTraceabilityExtension {
 }
 
 /**
- * Antora extension factory function
+ * Antora extension registration
  * This is the entry point that Antora calls to load the extension
  */
-export default function createAntoraExtension(context: AntoraExtensionContext): AntoraTraceabilityExtension {
-  return new AntoraTraceabilityExtension(context);
+function register(context: AntoraExtensionContext): void {
+  new AntoraTraceabilityExtension(context);
 }
 
-// Export for CommonJS compatibility
-module.exports = createAntoraExtension;
-module.exports.default = createAntoraExtension;
+// Export for Antora (expects { register } object)
+export { register };
+
+// Default export for compatibility
+export default { register };
