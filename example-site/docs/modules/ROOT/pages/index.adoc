@@ -4,6 +4,25 @@
 
 This example site demonstrates the Requirements Traceability Extension for Antora/AsciiDoc.
 
+[.lead]
+*Quick Navigation:*
+
+[cols="1,3",frame=none,grid=none]
+|===
+a|
+*Documentation* +
+xref:requirements.adoc[Requirements] +
+xref:architecture.adoc[Architecture] +
+xref:matrices.adoc[Matrices Guide] +
+xref:sphinx-comparison.adoc[Sphinx Comparison]
+a|
+*Traceability Reports* +
+link:../traceability/index.html[🏠 Traceability Hub] +
+link:../traceability/matrix-req-impl.html[📊 Req→Impl Matrix] +
+link:../traceability/matrix-req-test.html[🧪 Req→Test Matrix] +
+link:../traceability/coverage.html[📈 Coverage Report]
+|===
+
 == Quick Start
 
 To see the extension in action:
@@ -40,13 +59,19 @@ That's it! The extension will automatically:
 
 == What You'll See
 
-After building, open `_site/index.html` in your browser and navigate to:
+After building, open `_site/index.html` in your browser and explore:
 
-* **Requirements**: Example requirements defined using the extension's syntax
-* **Architecture**: Documentation of the extension's architecture with traceability links
-* **Matrices**: Generated traceability matrices showing relationships between elements
-* **Coverage Report**: Coverage metrics for the example requirements
-* **Sphinx Comparison**: Side-by-side comparison with Sphinx Needs
+* xref:requirements.adoc[**Requirements**]: Example requirements defined using the extension's syntax
+* xref:architecture.adoc[**Architecture**]: Documentation of the extension's architecture with traceability links
+* xref:matrices.adoc[**Matrices Guide**]: Explanation of traceability matrices
+* xref:sphinx-comparison.adoc[**Sphinx Comparison**]: Side-by-side comparison with Sphinx Needs
+
+*Generated Reports:*
+
+* link:../traceability/index.html[**Traceability Hub**]: Start here for all generated reports
+* link:../traceability/matrix-req-impl.html[**Requirements-Implementation Matrix**]: See which requirements are implemented
+* link:../traceability/matrix-req-test.html[**Requirements-Test Matrix**]: See which requirements are tested
+* link:../traceability/coverage.html[**Coverage Report**]: View overall traceability coverage
 
 == Site Structure
 
@@ -136,3 +161,15 @@ The Requirements Traceability Extension adds requirements traceability capabilit
 * View coverage reports showing implementation and test status
 
 For more information, see the User Guide and Developer Guide in the main repository.
+
+== Next Steps
+
+[TIP]
+====
+*Ready to explore?*
+
+. Start with the xref:requirements.adoc[Requirements] page to see example requirements
+. Visit the xref:architecture.adoc[Architecture] page to see how components link to requirements
+. Check out the link:../traceability/index.html[Traceability Hub] to see all generated reports
+. Review the xref:matrices.adoc[Matrices Guide] to understand the output
+====
