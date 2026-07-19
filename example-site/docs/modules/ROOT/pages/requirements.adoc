@@ -7,7 +7,7 @@ This page demonstrates how to define requirements using the Requirements Traceab
 
 Here's how to define a requirement using the `[req]` block macro:
 
-[req, id=EXAMPLE-001, title="Welcome Page"]
+[req, id=REQ-011, title="Welcome Page"]
 ====
 The example site must have a welcome page that introduces the Requirements Traceability Extension and provides a quick start guide.
 
@@ -18,7 +18,7 @@ The example site must have a welcome page that introduces the Requirements Trace
 * Welcome page must link to other sections
 ====
 
-[req, id=EXAMPLE-002, title="Requirement Definition"]
+[req, id=REQ-012, title="Requirement Definition"]
 ====
 The example site must demonstrate how to define requirements using the extension's syntax.
 
@@ -30,18 +30,18 @@ The example site must demonstrate how to define requirements using the extension
 * Each requirement must have descriptive content
 ====
 
-[req, id=EXAMPLE-003, title="Traceability Linking"]
+[req, id=REQ-013, title="Traceability Linking"]
 ====
-The example site must demonstrate how to create traceability links between requirements, implementations, tests, and documents.
+The example site must demonstrate how to create traceability links between requirements, implementations, tests, documents, and designs.
 
 **Acceptance Criteria:**
 
 * At least 4 implementations must be defined
 * At least 4 relationships must be created using inline macros
-* All relationship types must be demonstrated (satisfies, implements, tests, verifies, documents, depends, requires)
+* All relationship types must be demonstrated (satisfies, implements, tests, verifies, documents, addresses, composed-of, depends-on)
 ====
 
-[req, id=EXAMPLE-004, title="Matrix Generation"]
+[req, id=REQ-014, title="Matrix Generation"]
 ====
 The example site must demonstrate matrix generation capabilities.
 
@@ -49,6 +49,8 @@ The example site must demonstrate matrix generation capabilities.
 
 * The build must generate Requirements-to-Implementation matrix
 * The build must generate Requirements-to-Test matrix
+* The build must generate Requirements-to-Design matrix (Phase 2)
+* The build must generate Design-to-Implementation matrix (Phase 2)
 * The build must generate Full traceability matrix
 * Matrices must be generated in HTML format
 * Matrices must be generated in CSV format
@@ -68,7 +70,7 @@ The welcome page design includes:
 * Quick start guide section
 * Links to other sections
 
-addresses:EXAMPLE-001[]
+addresses:REQ-011[]
 ====
 
 [design, id=DES-002, title="Requirement Definition Component"]
@@ -80,7 +82,8 @@ The requirement definition component provides:
 * Validation of requirement IDs
 * Auto-generation of IDs when not provided
 
-addresses:EXAMPLE-002[]
+addresses:REQ-012[]
+implements:DES-004[]
 ====
 
 [design, id=DES-003, title="Traceability Linking System"]
@@ -88,12 +91,13 @@ addresses:EXAMPLE-002[]
 The traceability linking system enables:
 
 * Inline macro syntax for relationships
-* Support for all relationship types
+* Support for all relationship types (addresses, composed-of, depends-on)
 * Bidirectional relationship tracking
 * Circular reference detection
 
-addresses:EXAMPLE-003[]
+addresses:REQ-013[]
 composed-of:DES-004[]
+implements:DES-004[]
 ====
 
 [design, id=DES-004, title="Inline Macro Parser"]
@@ -104,12 +108,16 @@ The inline macro parser handles:
 * Extracting relationship type and target ID
 * Validating referenced nodes exist
 * Associating relationships with source nodes
+* Supporting all relationship types: satisfies, implements, tests, verifies, documents, addresses, composed-of, depends-on
+* Supporting all relationship types: satisfies, implements, tests, verifies, documents, addresses, composed-of, depends-on
 ====
 
 == Real-World Example: Extension Requirements
 
 The following are the actual requirements from the Requirements Traceability Extension specification.
 These demonstrate how the extension can be used to document real-world requirements.
+
+NOTE: Design concepts (Phase 2) are demonstrated in the section above.
 
 [req, id=REQ-001, title="Define Requirements in AsciiDoc"]
 ====
@@ -126,13 +134,15 @@ The system shall allow users to define requirements using custom AsciiDoc syntax
 
 [req, id=REQ-002, title="Establish Traceability Links"]
 ====
-The system shall allow users to establish traceability links between requirements, implementations, tests, and documentation.
+The system shall allow users to establish traceability links between requirements, implementations, tests, documents, and design concepts.
 
 **Acceptance Criteria:**
 
 * Users can link requirements to implementations using `implements:` macro
 * Users can link requirements to tests using `tests:` macro
 * Users can link requirements to documentation using `documents:` macro
+* Users can link designs to requirements using `addresses:` macro (Phase 2)
+* Users can link designs to other designs using `composed-of:` and `depends-on:` macros (Phase 2)
 * Users can reference requirements inline using `req:` macro
 * Circular references are detected and reported
 * Invalid references are detected and reported
@@ -159,7 +169,7 @@ The system shall generate traceability matrices showing relationships between re
 
 [source,asciidoc]
 ----
-[req, id=UNIQUE-ID, title="Requirement Title", status=approved]
+[req, id=REQ-005, title="Requirement Title", status=approved]
 ====
 Requirement description goes here.
 
@@ -178,11 +188,12 @@ Can span multiple paragraphs.
 === ID Format
 
 * Recommended: `\{TYPE}-\{NUMBER}` where TYPE is 2-4 uppercase letters
-* Examples: `REQ-001`, `FUNC-001`, `EXAMPLE-001`
-* Non-standard IDs will generate a warning but still work
+* Examples: `REQ-001`, `FUNC-001`, `EXAMPLE-001`, `DES-001`, `ARCH-001`
+* Non-standard IDs (like `EXAMPLE-001` with 7+ letters) will generate a warning but still work
+* All node types (requirements, implementations, tests, documents, designs) use the same ID format
 
 == Next Steps
 
 * Learn how these requirements are implemented in the xref:architecture.adoc[Architecture] section
-* See the generated matrices in the traceability/ directory
+* See the generated matrices in the link:traceability/index.html[Traceability] directory
 * View the xref:matrices.adoc[Matrices] explanation

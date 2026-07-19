@@ -134,6 +134,10 @@ export class TraceabilityGraph {
     return Array.from(this._designs.values());
   }
 
+  getAllRelationships(): Relationship[] {
+    return Array.from(this._relationships.values());
+  }
+
   // ── Design-specific queries ─────────────────────────────────────────────────
 
   getDesignsForRequirement(reqId: string): Design[] {

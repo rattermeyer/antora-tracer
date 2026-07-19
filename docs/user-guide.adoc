@@ -2,17 +2,17 @@
 :description: Complete guide to using the Requirements Traceability Extension for Antora/AsciiDoc
 :keywords: antora, asciidoc, requirements, traceability, documentation
 :author: Requirements Traceability Team
-:revdate: 2026-07-16
-:version: 0.1.0
+:revdate: 2026-07-19
+:version: 0.2.0
 
 == Overview
 
 The Antora Requirements Traceability Extension enables you to define, track, and visualize requirements traceability in your Antora documentation. With this extension, you can:
 
-* Define requirements, implementations, tests, and documents using custom AsciiDoc macros
+* Define requirements, implementations, tests, documents, and design concepts using custom AsciiDoc macros
 * Establish relationships between traceability elements
 * Generate traceability matrices in CSV and HTML formats
-* View coverage reports to track implementation and test status
+* View coverage reports to track implementation, test, and design status
 * Integrate traceability information into your Antora site navigation
 
 == Quick Start
@@ -71,7 +71,7 @@ The system shall enforce minimum password complexity requirements:
 
 == Defining Traceability Elements
 
-The extension supports four types of traceability elements:
+The extension supports five types of traceability elements:
 
 === Requirements
 
@@ -171,6 +171,51 @@ documents:REQ-001[]
 
 Same as requirements: `id`, `title`, `status`
 
+=== Design Concepts (Phase 2)
+
+Use the `[design]` block macro to define architecture and design concepts that address requirements:
+
+[source,asciidoc]
+----
+[design, id=DES-001, title="Authentication Architecture"]
+====
+High-level design for user authentication.
+
+Includes:
+* Single sign-on flow
+* Multi-factor authentication
+* Session management strategy
+====
+
+addresses:REQ-001[]
+composed-of:DES-002[]
+====
+
+[design, id=DES-002, title="Token Service"]
+====
+Design for token generation and validation.
+
+implements:DES-001[]
+====
+----
+
+**Attributes:**
+
+Same as requirements: `id`, `title`, `status`
+
+**When to Use Design Concepts:**
+
+* Architecture decisions that address multiple requirements
+* High-level design documents
+* Component compositions and dependencies
+* Design patterns and strategies
+
+**ID Format:**
+
+* Recommended: `{TYPE}-{NUMBER}` where TYPE is 2-4 uppercase letters
+* Examples: `DES-001`, `ARCH-001`, `COMP-001`
+* Non-standard IDs will generate a warning but still work
+
 == Establishing Relationships
 
 Relationships between traceability elements are established using inline macros within the content of the elements.
@@ -179,12 +224,15 @@ Relationships between traceability elements are established using inline macros 
 
 | Macro | Description | Example |
 | satisfies | This element satisfies another requirement | `satisfies:REQ-001[]` |
-| implements | This element implements a requirement | `implements:REQ-001[]` |
+| implements | This element implements a requirement or design | `implements:REQ-001[]` |
 | tests | This element tests a requirement | `tests:REQ-001[]` |
 | verifies | This element verifies a requirement | `verifies:REQ-001[]` |
 | documents | This element documents a requirement | `documents:REQ-001[]` |
 | depends | This element depends on another | `depends:REQ-001[]` |
 | requires | This element requires another | `requires:REQ-001[]` |
+| addresses | This design addresses a requirement | `addresses:REQ-001[]` |
+| composed-of | This design is composed of other designs | `composed-of:DES-002[]` |
+| depends-on | This element depends on another (alias for depends) | `depends-on:REQ-001[]` |
 
 === Examples
 
@@ -234,6 +282,28 @@ Authentication Guide
 documents:REQ-001[]
 ----
 
+.Design that addresses a requirement:
+[source,asciidoc]
+----
+[design, id=DES-001]
+====
+Authentication Architecture
+====
+
+addresses:REQ-001[]
+composed-of:DES-002[]
+====
+
+[design, id=DES-002]
+====
+Token Service Design
+====
+
+implements:DES-001[]
+depends-on:DES-003[]
+====
+----
+
 == Configuration
 
 The extension can be configured through your Antora playbook.
@@ -274,7 +344,7 @@ The extension generates the following artifacts in the configured output directo
 
 === Traceability Matrices
 
-The extension generates three types of matrices:
+The extension generates five types of matrices:
 
 *Requirements-to-Implementation Matrix (req-impl):*
 
@@ -285,6 +355,18 @@ The extension generates three types of matrices:
 
 * `traceability/matrix-req-test.html` - HTML format
 * `traceability/matrix-req-test.csv` - CSV format
+
+*Requirements-to-Design Matrix (req-design) - Phase 2:*
+
+* `traceability/matrix-req-design.html` - HTML format
+* `traceability/matrix-req-design.csv` - CSV format
+* Shows which designs address each requirement
+
+*Design-to-Implementation Matrix (design-impl) - Phase 2:*
+
+* `traceability/matrix-design-impl.html` - HTML format
+* `traceability/matrix-design-impl.csv` - CSV format
+* Shows which implementations implement each design
 
 *Full Traceability Matrix (full):*
 
@@ -344,6 +426,11 @@ The coverage report provides a visual overview of your traceability status:
 *Requirements with Tests:: Number of requirements with at least one test
 *Implementation Coverage:: Percentage of requirements with implementations
 *Test Coverage:: Percentage of requirements with tests
+*Total Designs:: Total number of design concepts defined (Phase 2)
+*Designs with Implementation:: Number of designs with at least one implementation (Phase 2)
+*Design Coverage:: Percentage of designs with implementations (Phase 2)
+*Requirements Addressed by Designs:: Number of requirements addressed by at least one design (Phase 2)
+*Requirement Coverage by Design:: Percentage of requirements addressed by designs (Phase 2)
 
 The report uses color coding:
 
@@ -380,19 +467,19 @@ The report uses color coding:
 
 === Common Issues
 
-*Non-standard ID format warnings*:: 
+*Non-standard ID format warnings*::
 **Cause:** IDs don't match the recommended format (TYPE-NUMBER)
 **Solution:** Use IDs like REQ-001, IMP-001, TEST-001. While non-standard IDs work, they generate warnings.
 
-*Duplicate ID errors*:: 
+*Duplicate ID errors*::
 **Cause:** Two elements with the same ID exist
 **Solution:** Ensure all IDs are unique across all element types
 
-*Circular reference errors*:: 
+*Circular reference errors*::
 **Cause:** Circular dependencies between requirements/implementations
 **Solution:** Review your dependency graph and break the cycle
 
-*Missing node errors*:: 
+*Missing node errors*::
 **Cause:** Relationship references a non-existent element
 **Solution:** Ensure all referenced IDs exist before creating relationships
 
@@ -444,6 +531,24 @@ All sensitive data must be encrypted at rest and in transit.
 
 depends:REQ-001[]
 
+== Design Concepts (Phase 2)
+
+[design, id=DES-001, title="Security Architecture"]
+====
+High-level security design for the system.
+====
+
+addresses:REQ-001[]
+addresses:REQ-002[]
+composed-of:DES-002[]
+
+[design, id=DES-002, title="Authentication Flow"]
+====
+Detailed design for user authentication flow.
+====
+
+implements:DES-001[]
+
 == Implementation
 
 [imp, id=IMP-001, title="Authentication Service"]
@@ -489,24 +594,49 @@ This example would generate:
 
 * Implementations: IMP-001
 * Tests: TEST-001
+* Designs: DES-001, DES-002
 * Status: ✓ Complete
 
 *REQ-002:*
 
 * Implementations: IMP-002
 * Tests: TEST-002
+* Designs: DES-001, DES-002
+* Status: ✓ Complete
+
+*DES-001 (Security Architecture):*
+
+* Implementations: IMP-001, IMP-002
+* Status: ✓ Complete
+
+*DES-002 (Authentication Flow):*
+
+* Implementations: IMP-001
 * Status: ✓ Complete
 
 *Coverage:*
 
 * Implementation Coverage: 100%
 * Test Coverage: 100%
+* Design Coverage: 100% (Phase 2)
+* Requirement Coverage by Design: 100% (Phase 2)
 
 == Advanced Usage
 
 === Multiple Files
 
-Traceability elements can be defined across multiple AsciiDoc files. The extension aggregates all elements from all files in your documentation.
+Traceability elements (requirements, implementations, tests, documents, and designs) can be defined across multiple AsciiDoc files. The extension aggregates all elements from all files in your documentation.
+
+=== Organizing with Design Concepts (Phase 2)
+
+Use design concepts to organize high-level architecture and design decisions:
+
+. Create design blocks for architecture components
+. Use `addresses:` to link designs to requirements
+. Use `composed-of:` to show design composition
+. Use `depends-on:` to show design dependencies
+
+This helps bridge the gap between requirements and implementations.
 
 === Custom ID Schemes
 
@@ -585,6 +715,8 @@ If you're migrating from another traceability system:
 | `:req:` | `implements:[]` or `satisfies:[]` |
 | `:img:` | `[imp, id=]` |
 | `:tst:` | `[test, id=]` |
+| `:spec:` (design) | `[design, id=]` (Phase 2) |
+| `:addresses:` | `addresses:[]` (Phase 2) |
 
 === From Confluence
 
@@ -621,4 +753,5 @@ This extension is licensed under the MIT License. See the LICENSE file for detai
 
 == Version History
 
+*v0.2.0*:: Added design concepts support (Phase 2): `[design]` blocks, `addresses:`, `composed-of:`, `depends-on:` relationships, req-design and design-impl matrices, design coverage metrics
 *v0.1.0*:: Initial release with basic requirements, implementations, tests, documents, and matrix generation

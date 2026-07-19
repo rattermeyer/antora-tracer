@@ -28,13 +28,17 @@ export class MatrixGenerator {
   }
 
   private generateRequirementsImplementationMatrix(): TraceabilityMatrix {
+    const allImplementations = new Set(this.graph.getAllImplementations().map(imp => imp.id));
+
     return {
       type: 'req-impl',
       coverage: this.graph.getCoverage(),
       requirements: this.graph.getAllRequirements().map(req => ({
         id: req.id,
         title: req.title,
-        implementations: this.graph.getReverseRelationships(req.id, 'implements').map(r => r.fromId),
+        implementations: this.graph.getReverseRelationships(req.id, 'implements')
+          .filter(r => allImplementations.has(r.fromId))
+          .map(r => r.fromId),
         tests: this.graph.getReverseRelationships(req.id, 'tests').map(r => r.fromId),
       })),
       generatedAt: new Date().toISOString(),

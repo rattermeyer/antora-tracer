@@ -160,82 +160,96 @@ export class AntoraTraceabilityExtension {
 
       // Find all AsciiDoc files in the content catalog
       const files = contentCatalog.findBy({ family: 'page' }) || [];
+      const adocFiles = files.filter((file: any) => file.src && file.src.path && file.src.path.endsWith('.adoc'));
 
-      for (const file of files) {
-        if (file.src && file.src.path && file.src.path.endsWith('.adoc')) {
-          this.processAsciiDocFile(contentCatalog, file);
-        }
-      }
+      // Two-pass processing: first add all nodes, then add all relationships
+      // This ensures cross-file references can be resolved
+      this.processAsciiDocFilesNodes(adocFiles);
+      this.processAsciiDocFilesRelationships(adocFiles);
     });
   }
 
   /**
-   * Process an AsciiDoc file for traceability elements
+   * Process AsciiDoc files - first pass: add all nodes to the graph
    */
-  private async processAsciiDocFile(contentCatalog: ContentCatalog, file: any): Promise<void> {
-    try {
-      // In Antora, contents might be in different places depending on the file type
-      const contentsBuffer = file.contents || file.src?.contents;
-      if (!contentsBuffer) {
-        this.logger.debug(`Skipping file without contents: ${file.src?.path || 'unknown'}`);
-        return;
-      }
-
-      const content = contentsBuffer.toString('utf8');
-      const sourceFile = file.src?.path || file.path || 'unknown';
-
-      // Parse the file for traceability elements
-      // Access the parser through the traceability extension
-      const parser = (this.traceability as any).parser;
-      const parsed = parser.parse(content, sourceFile);
-
-      // Add nodes to the graph
-      for (const req of parsed.requirements) {
-        this.traceability.graph.addRequirement(req);
-        this.logger.debug(`Registered requirement: ${req.id}`);
-      }
-      for (const imp of parsed.implementations) {
-        this.traceability.graph.addImplementation(imp);
-        this.logger.debug(`Registered implementation: ${imp.id}`);
-      }
-      for (const test of parsed.tests) {
-        this.traceability.graph.addTest(test);
-        this.logger.debug(`Registered test: ${test.id}`);
-      }
-      for (const doc of parsed.documents) {
-        this.traceability.graph.addDocument(doc);
-        this.logger.debug(`Registered document: ${doc.id}`);
-      }
-      for (const design of parsed.designs) {
-        this.traceability.graph.addDesign(design);
-        this.logger.debug(`Registered design: ${design.id}`);
-      }
-
-      // Add relationships
-      for (const rel of parsed.relationships) {
-        try {
-          this.traceability.graph.addRelationship(rel);
-          this.logger.debug(`Registered relationship: ${rel.fromId} ${rel.type} ${rel.targetId}`);
-        } catch (error: any) {
-          // Skip relationships with missing nodes (cross-file references will be resolved in later passes)
-          this.logger.debug(`Skipped relationship: ${rel.fromId} ${rel.type} ${rel.targetId} - ${error.message}`);
+  private processAsciiDocFilesNodes(files: any[]): void {
+    for (const file of files) {
+      try {
+        const contentsBuffer = file.contents || file.src?.contents;
+        if (!contentsBuffer) {
+          this.logger.debug(`Skipping file without contents: ${file.src?.path || 'unknown'}`);
+          continue;
         }
-      }
 
-      // Store traceability data on the content node
-      const contentNode = contentCatalog.findBy({ src: file.src.path });
-      if (contentNode) {
-        (contentNode as any).traceability = {
-          requirements: parsed.requirements.map((r: any) => r.id),
-          implementations: parsed.implementations.map((i: any) => i.id),
-          tests: parsed.tests.map((t: any) => t.id),
-          documents: parsed.documents.map((d: any) => d.id),
-          designs: parsed.designs.map((d: any) => d.id),
-        };
+        const content = contentsBuffer.toString('utf8');
+        const sourceFile = file.src?.path || file.path || 'unknown';
+
+        // Parse the file for traceability elements
+        const parser = (this.traceability as any).parser;
+        const parsed = parser.parse(content, sourceFile);
+
+        // Add nodes to the graph (first pass - all nodes)
+        for (const req of parsed.requirements) {
+          this.traceability.graph.addRequirement(req);
+          this.logger.debug(`Registered requirement: ${req.id}`);
+        }
+        for (const imp of parsed.implementations) {
+          this.traceability.graph.addImplementation(imp);
+          this.logger.debug(`Registered implementation: ${imp.id}`);
+        }
+        for (const test of parsed.tests) {
+          this.traceability.graph.addTest(test);
+          this.logger.debug(`Registered test: ${test.id}`);
+        }
+        for (const doc of parsed.documents) {
+          this.traceability.graph.addDocument(doc);
+          this.logger.debug(`Registered document: ${doc.id}`);
+        }
+        for (const design of parsed.designs) {
+          this.traceability.graph.addDesign(design);
+          this.logger.debug(`Registered design: ${design.id}`);
+        }
+      } catch (error: any) {
+        this.logger.warn(`Error processing nodes for ${file.src?.path}: ${error.message}`);
       }
-    } catch (error: any) {
-      this.logger.warn(`Error processing ${file.src.path}: ${error.message}`);
     }
+    this.logger.info(`Registered ${this.traceability.graph.getAllRequirements().length} requirements, ${this.traceability.graph.getAllImplementations().length} implementations, ${this.traceability.graph.getAllTests().length} tests, ${this.traceability.graph.getAllDesigns().length} designs`);
+  }
+
+  /**
+   * Process AsciiDoc files - second pass: add all relationships
+   */
+  private processAsciiDocFilesRelationships(files: any[]): void {
+    for (const file of files) {
+      try {
+        const contentsBuffer = file.contents || file.src?.contents;
+        if (!contentsBuffer) {
+          this.logger.debug(`Skipping file without contents: ${file.src?.path || 'unknown'}`);
+          continue;
+        }
+
+        const content = contentsBuffer.toString('utf8');
+        const sourceFile = file.src?.path || file.path || 'unknown';
+
+        // Parse the file for traceability elements
+        const parser = (this.traceability as any).parser;
+        const parsed = parser.parse(content, sourceFile);
+
+        // Add relationships (second pass - all nodes should now exist)
+        for (const rel of parsed.relationships) {
+          try {
+            this.traceability.graph.addRelationship(rel);
+            this.logger.debug(`Registered relationship: ${rel.fromId} ${rel.type} ${rel.targetId}`);
+          } catch (error: any) {
+            // This should not happen anymore since all nodes were added in first pass
+            this.logger.warn(`Failed to add relationship: ${rel.fromId} ${rel.type} ${rel.targetId} - ${error.message}`);
+          }
+        }
+      } catch (error: any) {
+        this.logger.warn(`Error processing relationships for ${file.src?.path}: ${error.message}`);
+      }
+    }
+    this.logger.info(`Registered ${this.traceability.graph.getAllRelationships().length} relationships`);
   }
 
   /**
