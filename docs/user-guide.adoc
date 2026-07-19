@@ -3,7 +3,7 @@
 :keywords: antora, asciidoc, requirements, traceability, documentation
 :author: Requirements Traceability Team
 :revdate: 2026-07-19
-:version: 0.2.0
+:version: 0.3.0
 
 == Overview
 
@@ -215,6 +215,71 @@ Same as requirements: `id`, `title`, `status`
 * Recommended: `{TYPE}-{NUMBER}` where TYPE is 2-4 uppercase letters
 * Examples: `DES-001`, `ARCH-001`, `COMP-001`
 * Non-standard IDs will generate a warning but still work
+
+== Bidirectional Relationships (Phase 3)
+
+The extension automatically generates inverse relationships, enabling you to query the traceability graph from both directions without explicitly defining both.
+
+=== How It Works
+
+When you define a relationship in one direction, the extension automatically creates the inverse relationship:
+
+[source,asciidoc]
+----
+[design, id=DES-001]
+====
+Authentication System Design
+
+addresses:REQ-001[]  <1>
+====
+
+[req, id=REQ-001]
+====
+User Authentication Requirement
+====
+----
+<1> This automatically creates: `REQ-001 addressed-by DES-001`
+
+=== Relationship Type Mapping
+
+| Primary Relationship | Inverse Relationship | Direction | Description |
+|---------------------|---------------------|-----------|-------------|
+| `satisfies` | `satisfied-by` | Implementation → Requirement | Implementation satisfies requirement |
+| `tests` | `tested-by` | Test → Implementation | Test tests implementation |
+| `verifies` | `verified-by` | Test → Requirement | Test verifies requirement |
+| `documents` | `documented-by` | Document → Requirement | Document documents requirement |
+| `depends` | `depended-by` | Any → Any | Generic dependency |
+| `requires` | `required-by` | Any → Any | Generic requirement |
+| `addresses` | `addressed-by` | Design → Requirement | Design addresses requirement |
+| `implements` | `implemented-by` | Implementation → Design | Implementation implements design |
+| `composed-of` | `part-of` | Design → Design | Design is composed of other designs |
+| `depends-on` | `depends-on-by` | Design → Design | Design depends on other designs |
+
+=== Bidirectional Queries
+
+With auto-generated inverse relationships, you can query from either direction:
+
+* **From design to requirement:** Which requirements does this design address?
+  **From requirement to design:** Which designs address this requirement?
+
+* **From implementation to requirement:** Which requirements does this implementation satisfy?
+  **From requirement to implementation:** Which implementations satisfy this requirement?
+
+* **From implementation to design:** Which designs does this implementation implement?
+  **From design to implementation:** Which implementations implement this design?
+
+=== Inverse Matrices
+
+In addition to the standard matrices, the extension generates inverse matrices that show relationships from the opposite direction:
+
+| Matrix | Description | Shows |
+|--------|-------------|-------|
+| `matrix-impl-req.csv/html` | Implementation to Requirement | Which requirements each implementation satisfies |
+| `matrix-test-impl.csv/html` | Test to Implementation | Which implementations each test tests |
+| `matrix-test-req.csv/html` | Test to Requirement | Which requirements each test verifies |
+| `matrix-design-req.csv/html` | Design to Requirement | Which requirements each design addresses |
+
+These matrices are generated alongside the standard matrices and are accessible from the traceability index page.
 
 == Establishing Relationships
 

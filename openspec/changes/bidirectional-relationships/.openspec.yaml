@@ -1,0 +1,9 @@
+schema: spec-driven
+schemaVersion: "1.0"
+name: bidirectional-relationships
+changeType: feature
+capability: requirements-traceability
+state: planning
+owner: richard
+created: 2026-07-19
+updated: 2026-07-19

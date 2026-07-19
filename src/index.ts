@@ -11,6 +11,8 @@ import type {
   Document,
   Design,
   RelationshipType,
+  PrimaryRelationshipType,
+  InverseRelationshipType,
   CoverageReport,
   RequirementDetail,
   ImplementationDetail,
@@ -18,6 +20,12 @@ import type {
   TraceabilityMatrix,
   DesignTraceabilityMatrix,
   DetailedTraceabilityMatrix,
+} from './types.js';
+import {
+  INVERSE_MAP,
+  PRIMARY_MAP,
+  isPrimaryRelationshipType,
+  isInverseRelationshipType,
 } from './types.js';
 
 class RequirementsTraceabilityExtension {
@@ -105,7 +113,7 @@ class RequirementsTraceabilityExtension {
   }
 
   addRelationship(fromId: string, toId: string, type: RelationshipType = 'satisfies'): void {
-    this.graph.addRelationship({ fromId, targetId: toId, type });
+    this.graph.addRelationship({ id: `${fromId}-${type}-${toId}`, fromId, targetId: toId, type });
     console.log(`🔗 Relationship added: ${fromId} ${type} ${toId}`);
   }
 
@@ -185,9 +193,8 @@ class RequirementsTraceabilityExtension {
   /**
    * Check if a relationship type is valid.
    */
-  static isValidRelationshipType(type: string): type is any {
-    const validTypes: any[] = ['implements', 'satisfies', 'tests', 'verifies', 'documents', 'depends', 'requires'];
-    return validTypes.includes(type);
+  static isValidRelationshipType(type: string): type is RelationshipType {
+    return isPrimaryRelationshipType(type) || isInverseRelationshipType(type);
   }
 
   // ── Lifecycle ───────────────────────────────────────────────────────────────
@@ -204,8 +211,18 @@ export type {
   Implementation,
   Test,
   Document,
+  Design,
   RelationshipType,
+  PrimaryRelationshipType,
+  InverseRelationshipType,
   CoverageReport,
   TraceabilityMatrix,
+  DesignTraceabilityMatrix,
   DetailedTraceabilityMatrix,
+};
+export {
+  INVERSE_MAP,
+  PRIMARY_MAP,
+  isPrimaryRelationshipType,
+  isInverseRelationshipType,
 };

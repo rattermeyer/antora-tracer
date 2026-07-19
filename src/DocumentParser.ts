@@ -9,6 +9,8 @@ import type { Requirement, Implementation, Test, Document, Design, Relationship,
  * - Inline relationship macros (satisfies:, implements:, tests:, verifies:, documents:)
  */
 export class DocumentParser {
+  private currentFile: string = '';
+
   /**
    * Parse an AsciiDoc string and return all traceability elements found within it.
    * Returns requirements, implementations, tests, documents, and relationships.
@@ -21,6 +23,8 @@ export class DocumentParser {
     designs: Design[];
     relationships: Relationship[];
   } {
+    this.currentFile = sourceFile;
+
     const result = {
       requirements: [] as Requirement[],
       implementations: [] as Implementation[],
@@ -239,9 +243,11 @@ export class DocumentParser {
 
         // Create relationship: source is the current node, target is the referenced ID
         const relationship: Relationship = {
+          id: `${node.id}-${relType}-${targetId}`,
           fromId: node.id,
           targetId,
           type: relType,
+          sourceFile: this.currentFile,
         };
         result.relationships.push(relationship);
         console.log(`🔗 Inline relationship found: ${node.id} ${relType} ${targetId}`);
