@@ -1,6 +1,11 @@
-nav:
-  - index.adoc
-  - requirements.adoc
-  - architecture.adoc
-  - matrices.adoc
-  - sphinx-comparison.adoc
+* xref:index.adoc[Home]
+* xref:requirements.adoc[Requirements]
+* xref:architecture.adoc[Architecture]
+* xref:matrices.adoc[Matrices Guide]
+* xref:sphinx-comparison.adoc[Sphinx Comparison]
+
+* Traceability Reports
+** link:../traceability/index.html[Traceability Hub]
+** link:../traceability/matrix-req-impl.html[Req → Impl Matrix]
+** link:../traceability/matrix-req-test.html[Req → Test Matrix]
+** link:../traceability/coverage.html[Coverage Report]

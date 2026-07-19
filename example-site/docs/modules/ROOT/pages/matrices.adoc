@@ -143,6 +143,8 @@ When you build this example site, the extension generates the following matrices
 * link:../traceability/matrix-full.html[Full Traceability Matrix (HTML)]
 * link:../traceability/matrix-full.csv[Full Traceability Matrix (CSV)]
 
+NOTE: After building the site, these files will be available in the `traceability/` directory of your generated site. You can access them through the "Traceability Reports" section in the navigation menu.
+
 Click the links above to view the generated matrices for this example site.
 
 == Coverage Report

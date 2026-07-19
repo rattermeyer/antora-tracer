@@ -90,16 +90,24 @@ The extension's architecture is documented in the Architecture section, with eac
 
 == Generated Artifacts
 
+[IMPORTANT]
+====
+After building this site, the extension automatically generates traceability reports. Access them via:
+
+* link:../traceability/index.html[*Traceability Hub*] - Start here for all reports
+* Navigation menu → *Traceability Reports* section
+====
+
 The extension generates the following artifacts during the build:
 
-* `traceability/index.html` - Hub page with links to all artifacts
-* `traceability/matrix-req-impl.html` - Requirements-to-Implementation matrix
-* `traceability/matrix-req-impl.csv` - CSV version of the matrix
-* `traceability/matrix-req-test.html` - Requirements-to-Test matrix
-* `traceability/matrix-full.html` - Full traceability matrix
-* `traceability/coverage.html` - Coverage report
+* link:../traceability/index.html[traceability/index.html] - Hub page with links to all artifacts
+* link:../traceability/matrix-req-impl.html[traceability/matrix-req-impl.html] - Requirements-to-Implementation matrix
+* link:../traceability/matrix-req-impl.csv[traceability/matrix-req-impl.csv] - CSV version of the matrix
+* link:../traceability/matrix-req-test.html[traceability/matrix-req-test.html] - Requirements-to-Test matrix
+* link:../traceability/matrix-full.html[traceability/matrix-full.html] - Full traceability matrix
+* link:../traceability/coverage.html[traceability/coverage.html] - Coverage report
 
-Open these files in your browser to see the traceability matrices and coverage report.
+All files are clickable links in the built site!
 
 == Next Steps
 
