@@ -161,5 +161,5 @@ The extension hooks into Antora's build lifecycle:
 == Next Steps
 
 * View the xref:matrices.adoc[Matrices] to see the generated traceability matrices
-* View the xref:coverage.html[Coverage Report] to see coverage metrics
+* View the link:../traceability/coverage.html[Coverage Report] to see coverage metrics
 * Compare with xref:sphinx-comparison.adoc[Sphinx Needs] if you're migrating

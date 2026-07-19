@@ -63,7 +63,7 @@ This page provides a comparison between https://sphinx-needs.readthedocs.io/[Sph
 | Example
 a| `:need:` User Login +
 All users must be able to log in.
-a| `[req, id=REQ-001]` +
+a| `[req, id=EXAMPLE-101]` +
 `\====` +
 All users must be able to log in. +
 `\====`
@@ -86,11 +86,11 @@ All users must be able to log in. +
 | Example
 a| `:req:` Login Service +
 :satisfies: USER-LOGIN
-a| `[imp, id=IMP-001]` +
+a| `[imp, id=EXAMPLE-201]` +
 `\====` +
 Login Service +
 `\====` +
-implements:REQ-001[]
+`implements:EXAMPLE-101[]`
 |===
 
 == Test Definition
@@ -110,11 +110,11 @@ implements:REQ-001[]
 | Example
 a| `:test:` Login Test +
 :tests: USER-LOGIN
-a| `[test, id=TEST-001]` +
+a| `[test, id=EXAMPLE-301]` +
 `\====` +
 Login Test +
 `\====` +
-tests:REQ-001[]
+`tests:EXAMPLE-101[]`
 |===
 
 == Relationship Types
@@ -237,22 +237,22 @@ a| `needs_types = [dict(name="req", title="Requirement", prefix="REQ_", color="#
 
 [source,asciidoc]
 ----
-[req, id=REQ-001, title="User Login", status=approved]
+[req, id=DEMO-001, title="User Login", status=approved]
 ====
 All users must be able to log in to the system.
 ====
 
-[req, id=REQ-002, title="Password Reset", status=approved]
+[req, id=DEMO-002, title="Password Reset", status=approved]
 ====
 Users must be able to reset their password.
 ====
 
-[imp, id=IMP-001, title="Login Service", status=done]
+[imp, id=DEMO-IMP-001, title="Login Service", status=done]
 ====
 The service that handles user authentication.
 ====
 
-implements:REQ-001[]
+implements:DEMO-001[]
 ----
 
 == Key Differences

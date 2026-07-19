@@ -118,14 +118,14 @@ Can span multiple paragraphs.
 === Attributes
 
 | Attribute | Description | Required | Default |
-|-----------|-------------|----------|---------|
+|-----------|-------------|------------|---------|
 | id | Unique identifier | No | Auto-generated |
-| title | Human-readable title | No | "Requirement {id}" |
+| title | Human-readable title | No | "Requirement \{id}" |
 | status | Requirement status | No | draft |
 
 === ID Format
 
-* Recommended: `{TYPE}-{NUMBER}` where TYPE is 2-4 uppercase letters
+* Recommended: `\{TYPE}-\{NUMBER}` where TYPE is 2-4 uppercase letters
 * Examples: `REQ-001`, `FUNC-001`, `EXAMPLE-001`
 * Non-standard IDs will generate a warning but still work
 
