@@ -1,9 +1,71 @@
 # Release Notes: Antora Requirements Traceability Extension
 
+## v0.2.0 (Unreleased)
+
+**Status**: In Development
+**Git Commit**: [See Git History]
+
+### What's New
+
+#### Externalized HTML Templates
+
+The `MatrixGenerator` class has been refactored to use external Mustache templates instead of embedded string concatenation. This major improvement:
+
+* **Eliminates code duplication**: ~400 lines of duplicated HTML generation code replaced with ~50 lines of template rendering code + template files
+* **Separates concerns**: Presentation logic (templates) is now separate from business logic (graph processing)
+* **Enables customization**: Users can provide custom templates for their Antora projects
+* **Improves maintainability**: Templates are easier to read, modify, and test
+
+**New Files:**
+* `src/TemplateRenderer.ts` - Template loading, compilation, and caching class
+* `src/templates/` - Directory containing Mustache template files:
+  * `matrix.html.mustache` - Main requirements matrix template
+  * `design-matrix.html.mustache` - Design matrix template
+  * `partials/` - Reusable components:
+    * `styles.mustache` - CSS styling
+    * `header.mustache` - Page header
+    * `footer.mustache` - Page footer
+    * `breadcrumb.mustache` - Navigation breadcrumbs
+    * `summary.mustache` - Coverage summary table
+    * `requirement-row.mustache` - Requirement table rows
+    * `design-row.mustache` - Design table rows
+
+**New API:**
+* `MatrixGeneratorOptions` interface with `templateDir` property for custom template directories
+* `MatrixGenerator` constructor now accepts optional configuration
+
+**Backward Compatibility:**
+* Default templates produce **identical HTML output** to the previous string concatenation approach
+* No breaking changes to public API
+* All existing matrix types continue to work: req-impl, req-test, full
+
+**Dependencies:**
+* Added `mustache` package (~20KB minified) for template rendering
+
+#### Template Customization
+
+Users can now customize the HTML output by providing their own template directory:
+
+```typescript
+const generator = new MatrixGenerator(graph, {
+  templateDir: './my-custom-templates/'
+});
+```
+
+The extension falls back to built-in templates for any missing files, allowing partial overrides.
+
+### Bug Fixes
+
+* Fixed template loading error handling with clear error messages
+* Fixed template syntax validation at load time
+* Added warning logging for missing custom templates
+
+---
+
 ## v0.1.0 (Initial Release)
 
-**Release Date**: 2026-07-16  
-**Status**: Beta  
+**Release Date**: 2026-07-16
+**Status**: Beta
 **Git Commit**: [See Git History]
 
 ### What's New

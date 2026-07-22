@@ -231,7 +231,7 @@ This change adds support for design concepts as first-class traceability nodes, 
 - [x] Add `depends-on` relationships between designs
 
 **Files modified**:
-- `example-site/docs/modules/ROOT/pages/requirements.adoc`
+- `../../../../example-site/docs/modules/ROOT/pages/requirements.adoc.bak`
 - `example-site/docs/modules/ROOT/pages/architecture.adoc`
 
 **Acceptance Criteria**:

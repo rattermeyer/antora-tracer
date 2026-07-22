@@ -11,7 +11,7 @@ This example site demonstrates the Requirements Traceability Extension for Antor
 |===
 a|
 *Documentation* +
-xref:requirements.adoc[Requirements] +
+xref:requirements.adoc.bak[Requirements] +
 xref:architecture.adoc[Architecture] +
 xref:matrices.adoc[Matrices Guide] +
 xref:sphinx-comparison.adoc[Sphinx Comparison]
@@ -61,7 +61,7 @@ That's it! The extension will automatically:
 
 After building, open `_site/index.html` in your browser and explore:
 
-* xref:requirements.adoc[**Requirements**]: Example requirements defined using the extension's syntax
+* xref:requirements.adoc.bak[**Requirements**]: Example requirements defined using the extension's syntax
 * xref:architecture.adoc[**Architecture**]: Documentation of the extension's architecture with traceability links
 * xref:matrices.adoc[**Matrices Guide**]: Explanation of traceability matrices
 * xref:sphinx-comparison.adoc[**Sphinx Comparison**]: Side-by-side comparison with Sphinx Needs
@@ -136,7 +136,7 @@ All files are clickable links in the built site!
 
 == Next Steps
 
-* Explore the xref:requirements.adoc[Requirements] section to see how requirements are defined
+* Explore the xref:requirements.adoc.bak[Requirements] section to see how requirements are defined
 * Explore the xref:architecture.adoc[Architecture] section to see how components are linked to requirements
 * Explore the xref:matrices.adoc[Matrices] section to understand what the generated matrices show
 * Explore the xref:sphinx-comparison.adoc[Sphinx Comparison] if you're migrating from Sphinx Needs
@@ -168,7 +168,7 @@ For more information, see the User Guide and Developer Guide in the main reposit
 ====
 *Ready to explore?*
 
-. Start with the xref:requirements.adoc[Requirements] page to see example requirements
+. Start with the xref:requirements.adoc.bak[Requirements] page to see example requirements
 . Visit the xref:architecture.adoc[Architecture] page to see how components link to requirements
 . Check out the link:../traceability/index.html[Traceability Hub] to see all generated reports
 . Review the xref:matrices.adoc[Matrices Guide] to understand the output

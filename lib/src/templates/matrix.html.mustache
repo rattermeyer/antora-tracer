@@ -1,0 +1,22 @@
+{{> header}}
+
+    <table>
+      <thead>
+        <tr>
+          <th>Requirement ID</th>
+          <th>Title</th>
+          <th>Implementations</th>
+          <th>Tests</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#rows}}
+        {{> requirement-row}}
+        {{/rows}}
+      </tbody>
+    </table>
+
+    {{> summary}}
+
+{{> footer}}

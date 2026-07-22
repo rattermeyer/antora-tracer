@@ -433,6 +433,6 @@ Verify that:
 
 == Next Steps
 
-* Try the xref:requirements.adoc[Requirements] section to see the extension in action
+* Try the xref:requirements.adoc.bak[Requirements] section to see the extension in action
 * Explore the xref:architecture.adoc[Architecture] to understand how it works
 * View the xref:matrices.adoc[Matrices] to see the generated output

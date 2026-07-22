@@ -56,7 +56,7 @@ This change creates an example Antora site that demonstrates the Requirements Tr
 **Estimate**: 45 minutes
 **Dependencies**: Task 4
 
-- [x] Create `example-site/docs/modules/ROOT/pages/requirements.adoc`
+- [x] Create `../../../../example-site/docs/modules/ROOT/pages/requirements.adoc.bak`
 - [x] Add example requirements using `[req]` block macros:
   - REQ-011: Welcome Page
   - REQ-012: Requirement Definition
