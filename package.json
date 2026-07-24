@@ -13,7 +13,7 @@
   "scripts": {
     "build": "tsc && node scripts/build.js",
     "test": "tsc -p tsconfig.test.json && node --import=tsx/cjs 'node_modules/mocha/bin/mocha' 'lib/test/**/*.test.js'",
-    "test:coverage": "npm run build && c8 --all --include='lib/src/**/*.js' node --import=tsx/cjs node_modules/mocha/bin/mocha 'lib/test/**/*.test.js'",
+    "test:coverage": "npm run build && c8 --all --include='lib/src/**/*.js' --exclude='lib/test/**' node --import=tsx/cjs node_modules/mocha/bin/mocha 'lib/test/**/*.test.js'",
     "test:coverage:report": "c8 report",
     "test:coverage:check": "c8 check-coverage --lines 50 --branches 50 --functions 50 --statements 50",
     "test:coverage:open": "c8 report --reporter=html",
