@@ -230,7 +230,7 @@ export class DocumentParser {
     // For each node, parse its content for inline macros
     for (const { node } of nodes) {
       const content = node.content ?? '';
-      const inlineMacroRegex = /([a-zA-Z][a-zA-Z0-9-]*):([A-Z0-9_-]+)\[/g;
+      const inlineMacroRegex = /([a-zA-Z][a-zA-Z0-9_-]*):([A-Z0-9_-]+)\[/g;
       let match: RegExpExecArray | null;
 
       while ((match = inlineMacroRegex.exec(content)) !== null) {

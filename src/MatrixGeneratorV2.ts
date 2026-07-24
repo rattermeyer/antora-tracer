@@ -439,7 +439,10 @@ export class MatrixGeneratorV2 {
       type: matrix.type,
       rows,
       columns: matrix.columns,
-      coverage: matrix.coverage,
+      coverage: {
+        ...matrix.coverage,
+        overallFormatted: matrix.coverage.overall.toFixed(1),
+      },
       generatedAt: matrix.generatedAt,
     };
 

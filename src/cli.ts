@@ -134,6 +134,7 @@ program.command('process')
 
 program.command('matrix')
   .description('Generate traceability matrices from processed items')
+  .option('-i, --input <path>', 'Input file or directory to process first (required for v2)')
   .option('-t, --type <type>', 'Matrix type or name (uses configuration from preset/config)')
   .option('-f, --format <format>', 'Output format: csv, html, or json', 'csv')
   .option('-o, --output <path>', 'Output file path (defaults to stdout)')
@@ -142,11 +143,24 @@ program.command('matrix')
     const extension = await createExtension(options);
     try {
       let output: string;
+
+      // For v2, we need to process input files first to populate the graph
       if (extension instanceof RequirementsTraceabilityExtensionV2) {
+        if (options.input) {
+          const inputPath = resolve(process.cwd(), options.input);
+          if (!existsSync(inputPath)) {
+            console.error(chalk.red(`Error: Input file not found: ${inputPath}`));
+            process.exit(1);
+          }
+          const content = readFileSync(inputPath, 'utf8');
+          extension.process(content, { sourceFile: options.input });
+        }
+
         if (!extension.graph.size()) {
-          console.error(chalk.red('Error: No data in graph. Process files first with: antora-req-trace process -i <file>'));
+          console.error(chalk.red('Error: No data in graph. Use -i option to specify input file, or process files first'));
           process.exit(1);
         }
+
         const matrixName = options.type || 'default';
         const { MatrixGeneratorV2 } = await import('./MatrixGeneratorV2.js');
         const generator = new MatrixGeneratorV2(extension.graph, extension.configLoader);

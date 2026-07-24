@@ -27,11 +27,11 @@
 
 ## 4. Matrix Generation Updates
 
-- [ ] 4.1 Update MatrixGenerator to use configuration for matrix definitions
-- [ ] 4.2 Replace hardcoded matrix types with configurable matrices
-- [ ] 4.3 Update matrix data preparation for role-based filtering
-- [ ] 4.4 Integrate TemplateRenderer with role-aware templates
-- [ ] 4.5 Add role-specific styling options to templates
+- [x] 4.1 Update MatrixGenerator to use configuration for matrix definitions
+- [x] 4.2 Replace hardcoded matrix types with configurable matrices
+- [x] 4.3 Update matrix data preparation for role-based filtering
+- [x] 4.4 Integrate TemplateRenderer with role-aware templates
+- [x] 4.5 Add role-specific styling options to templates
 
 ## 5. Preset System
 

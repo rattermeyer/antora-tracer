@@ -291,7 +291,7 @@ export class DocumentParserV2 {
       if (!trimmed) continue;
 
       // Handle both key=value and key="value with spaces"
-      const match = trimmed.match(/^([a-zA-Z][a-zA-Z0-9-]*)\s*=\s*(.+)$/);
+      const match = trimmed.match(/^([a-zA-Z][a-zA-Z0-9_-]*)\s*=\s*(.+)$/);
       if (!match) continue;
 
       const key = match[1].toLowerCase();
@@ -364,8 +364,8 @@ export class DocumentParserV2 {
       const itemContent = item.content ?? '';
 
       // Parse inline relationship macros: relationType:targetId[]
-      // Example: satisfies:REQ-001[], addresses:DES-001[]
-      const inlineMacroRegex = /([a-zA-Z][a-zA-Z0-9-]*:[A-Z0-9_-]+)\[/g;
+      // Example: satisfies:REQ-001[], addresses:DES-001[], implemented_by:IMP-001[]
+      const inlineMacroRegex = /([a-zA-Z][a-zA-Z0-9_-]*:[A-Z0-9_-]+)\[/g;
       let match: RegExpExecArray | null;
 
       while ((match = inlineMacroRegex.exec(itemContent)) !== null) {
