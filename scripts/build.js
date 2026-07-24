@@ -28,6 +28,27 @@ try {
     console.log('✅ Templates copied to lib/templates/ and lib/src/templates/');
   }
 
+  // Copy presets directory to both lib/ and lib/src/ for compatibility
+  const srcPresets = path.join('src', 'presets');
+
+  if (fs.existsSync(srcPresets)) {
+    // Copy to lib/presets/
+    const libPresets = path.join('lib', 'presets');
+    if (!fs.existsSync('lib')) {
+      fs.mkdirSync('lib', { recursive: true });
+    }
+    copyDirRecursive(srcPresets, libPresets);
+
+    // Copy to lib/src/presets/ (for tests that import from lib/src/)
+    const libSrcPresets = path.join('lib', 'src', 'presets');
+    if (!fs.existsSync(path.join('lib', 'src'))) {
+      fs.mkdirSync(path.join('lib', 'src'), { recursive: true });
+    }
+    copyDirRecursive(srcPresets, libSrcPresets);
+
+    console.log('✅ Presets copied to lib/presets/ and lib/src/presets/');
+  }
+
   console.log('✅ Build completed: src/ → lib/');
 } catch (error) {
   console.error('❌ Build failed');
