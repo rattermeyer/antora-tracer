@@ -1,0 +1,207 @@
+# Requirements Engineering Preset
+# Standard traceability configuration for software and systems engineering
+# Based on IEEE/ISO standards for requirements management
+
+name: requirements-engineering
+description: |
+  Standard requirements traceability configuration for software and systems engineering.
+  This preset provides a comprehensive set of roles and relations for traditional
+  requirements-driven development projects.
+version: 1.0.0
+author: Antora Traceability Team
+tags: [software, systems, requirements, standard, ieee]
+
+compatibility:
+  minExtensionVersion: 2.0.0
+
+traceability:
+  roles:
+    - requirement
+    - design
+    - implementation
+    - test
+    - document
+
+  relations:
+    # Requirement relations
+    requirement:
+      requirement: [refines, depends_on, conflicts_with]
+      design: [addresses, satisfied_by]
+      implementation: [implemented_by]
+      test: [verified_by]
+      document: [derived_from]
+
+    # Design relations
+    design:
+      requirement: [implements]
+      design: [depends_on, composed_of, refined_by]
+      implementation: [realized_by]
+      test: [validated_by]
+      document: [documented_by]
+
+    # Implementation relations
+    implementation:
+      requirement: [satisfies]
+      design: [implements]
+      implementation: [depends_on, uses]
+      test: [tested_by]
+
+    # Test relations
+    test:
+      requirement: [covers, verifies]
+      design: [validates]
+      implementation: [tests]
+
+    # Document relations
+    document:
+      requirement: [contains]
+      design: [describes]
+
+  matrices:
+    - name: requirements-traceability
+      description: "Traceability from requirements to design, implementation, and tests"
+      rows: requirement
+      columns: [design, implementation, test, document]
+      coverageRelations:
+        design: [addresses, satisfied_by, implements]
+        implementation: [implemented_by, satisfies]
+        test: [verified_by, covers, verifies, tests, validates]
+        document: [derived_from, contains, describes]
+
+    - name: design-verification
+      description: "Verification of design elements"
+      rows: design
+      columns: [requirement, implementation, test, document]
+      coverageRelations:
+        requirement: [addresses, satisfied_by, implements]
+        implementation: [realized_by, implements]
+        test: [validated_by, validates, tests]
+        document: [documented_by, describes]
+
+    - name: implementation-coverage
+      description: "Implementation coverage of requirements and design"
+      rows: implementation
+      columns: [requirement, design, test]
+      coverageRelations:
+        requirement: [satisfies]
+        design: [implements, realized_by]
+        test: [tested_by, tests]
+
+    - name: test-coverage
+      description: "Test coverage of requirements, design, and implementation"
+      rows: test
+      columns: [requirement, design, implementation]
+      coverageRelations:
+        requirement: [covers, verifies]
+        design: [validates]
+        implementation: [tests]
+
+neo4j:
+    queries:
+      - name: uncovered-requirements
+        description: "Requirements without any implementation or test coverage"
+        cypher: |
+          MATCH (r:Item {role: 'requirement'})
+          WHERE NOT EXISTS {
+            MATCH (r)<-[:ADDRESSES|SATISFIED_BY|IMPLEMENTED_BY|IMPLEMENTS|VERIFIED_BY|COVERS|VERIFIES]-(:Item)
+          }
+          RETURN r.id, r.title ORDER BY r.id
+
+      - name: design-coverage
+        description: "Design elements and their requirement/test coverage"
+        cypher: |
+          MATCH (d:Item {role: 'design'})
+          OPTIONAL MATCH (d)-[:ADDRESSES|SATISFIED_BY|IMPLEMENTS]->(r:Item {role: 'requirement'})
+          OPTIONAL MATCH (d)-[:VALIDATED_BY|VALIDATES|TESTS]->(t:Item {role: 'test'})
+          RETURN d.id, d.title, count(r) as requirements, count(t) as tests
+          ORDER BY requirements DESC, tests DESC
+
+      - name: traceability-chain
+        description: "Full traceability chain from requirement to implementation to test"
+        cypher: |
+          MATCH path = (r:Item {role: 'requirement'})-[:ADDRESSES|SATISFIED_BY]->(d:Item {role: 'design'})
+                     -[:IMPLEMENTS|REALIZED_BY]->(i:Item {role: 'implementation'})
+                     -[:TESTED_BY|TESTS]->(t:Item {role: 'test'})
+          RETURN r.id as requirement, d.id as design, i.id as implementation, t.id as test
+          ORDER BY r.id, d.id, i.id, t.id
+
+      - name: impact-analysis
+        description: "What would be affected by changing a requirement?"
+        cypher: |
+          MATCH (r:Item {id: $requirementId, role: 'requirement'})
+          OPTIONAL MATCH (r)<-[:ADDRESSES|SATISFIED_BY|IMPLEMENTS]-(d:Item {role: 'design'})
+          OPTIONAL MATCH (d)-[:IMPLEMENTS|REALIZED_BY]->(i:Item {role: 'implementation'})
+          OPTIONAL MATCH (r)<-[:VERIFIED_BY|COVERS|VERIFIES]-(t:Item {role: 'test'})
+          RETURN r.id as requirement, collect(d.id) as designs, collect(i.id) as implementations, collect(t.id) as tests
+
+      - name: circular-dependencies
+        description: "Find circular dependencies between requirements"
+        cypher: |
+          MATCH path = (r:Item {role: 'requirement'})-[:DEPENDS_ON|REFINES*..10]->(r)
+          RETURN path
+
+documentation:
+  description: |
+    # Requirements Engineering Configuration
+
+    This preset provides a standard traceability model for software and systems engineering.
+
+    ## Roles
+
+    | Role | Description | Typical Use |
+    |------|-------------|-------------|
+    | requirement | A functional or non-functional requirement | System requirements, software requirements |
+    | design | A design element that addresses requirements | Architecture, components, modules |
+    | implementation | Code or implementation artifact | Classes, functions, services |
+    | test | A verification or validation procedure | Unit tests, integration tests, system tests |
+    | document | External documentation or specification | Standards, specifications, design docs |
+
+    ## Common Workflow
+
+    1. Define requirements with `[item, id=REQ-001, role=requirement]`
+    2. Create designs that address requirements with `[item, id=DES-001, role=design]`
+    3. Add `addresses:REQ-001[]` inline macro in design
+    4. Implement designs with `[item, id=IMP-001, role=implementation]`
+    5. Add `implements:DES-001[]` inline macro in implementation
+    6. Create tests with `[item, id=TEST-001, role=test]`
+    7. Add `verifies:REQ-001[]` or `validates:DES-001[]` inline macros in test
+
+    ## Example
+
+    ```asciidoc
+    [item, id=REQ-001, role=requirement]
+    ====
+    User Authentication
+
+    The system shall authenticate users via secure credentials.
+    ====
+
+    [item, id=DES-001, role=design]
+    ====
+    Authentication Service
+
+    JWT-based authentication service with token management.
+
+    addresses:REQ-001[]
+    ====
+
+    [item, id=IMP-001, role=implementation]
+    ====
+    AuthService Class
+
+    Implementation of JWT authentication.
+
+    implements:DES-001[]
+    ====
+
+    [item, id=TEST-001, role=test]
+    ====
+    Authentication Tests
+
+    Unit tests for authentication functionality.
+
+    verifies:REQ-001[]
+    validates:DES-001[]
+    tests:IMP-001[]
+    ====
+    ```

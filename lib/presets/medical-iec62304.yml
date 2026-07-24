@@ -1,0 +1,324 @@
+# Medical Device Software Preset (IEC 62304)
+# Traceability configuration for medical device software development
+# Compliant with IEC 62304: Medical device software - Software lifecycle processes
+
+name: medical-iec62304
+description: |
+  Medical device software lifecycle traceability configuration.
+  This preset is designed for medical device development following
+  IEC 62304 standard requirements.
+version: 1.0.0
+author: Antora Traceability Team
+tags: [medical, healthcare, iec62304, fda, iso13485, regulated]
+
+compatibility:
+  minExtensionVersion: 2.0.0
+
+traceability:
+  roles:
+    - system_requirement
+    - software_requirement
+    - software_item
+    - software_unit
+    - risk
+    - hazard
+    - mitigation
+    - regulation
+    - standard
+    - test_procedure
+    - test_case
+    - test_report
+    - soi  # Software of Unknown Provenance
+
+  relations:
+    # System requirement relations
+    system_requirement:
+      software_requirement: [allocated_to]
+      risk: [mitigated_by]
+      regulation: [derived_from]
+      standard: [complies_with]
+
+    # Software requirement relations
+    software_requirement:
+      software_requirement: [refines, depends_on]
+      software_item: [implemented_by]
+      software_unit: [implemented_by]
+      risk: [addresses]
+      test_procedure: [verified_by]
+      soi: [uses]
+
+    # Software item relations
+    software_item:
+      software_requirement: [satisfies]
+      software_unit: [composed_of]
+      risk: [addresses]
+      test_procedure: [validated_by]
+
+    # Software unit relations
+    software_unit:
+      software_requirement: [implements]
+      software_item: [part_of]
+      test_procedure: [tested_by]
+
+    # Risk relations
+    risk:
+      hazard: [caused_by]
+      mitigation: [mitigated_by]
+      software_requirement: [requires]
+      system_requirement: [requires]
+      test_procedure: [verified_by]
+
+    # Hazard relations
+    hazard:
+      risk: [poses]
+      mitigation: [mitigated_by]
+
+    # Mitigation relations
+    mitigation:
+      risk: [mitigates]
+      hazard: [addresses]
+      software_requirement: [implements]
+
+    # Regulation relations
+    regulation:
+      system_requirement: [requires]
+      software_requirement: [requires]
+
+    # Standard relations
+    standard:
+      system_requirement: [informs]
+      software_requirement: [informs]
+
+    # Test procedure relations
+    test_procedure:
+      software_requirement: [verifies]
+      software_item: [validates]
+      software_unit: [tests]
+      risk: [validates]
+      mitigation: [validates]
+      test_case: [contains]
+      test_report: [generates]
+
+    # Test case relations
+    test_case:
+      test_procedure: [part_of]
+      software_requirement: [traces_to]
+
+    # Test report relations
+    test_report:
+      test_procedure: [documents]
+      test_case: [documents]
+
+    # SOI relations
+    soi:
+      software_requirement: [fulfills]
+      regulation: [complies_with]
+
+  matrices:
+    - name: risk-mitigation
+      description: "Risk analysis and mitigation traceability"
+      rows: risk
+      columns: [mitigation, test_procedure, software_requirement, system_requirement]
+      coverageRelations:
+        mitigation: [mitigated_by, mitigates, addresses]
+        test_procedure: [verified_by, validates]
+        software_requirement: [requires, addresses]
+        system_requirement: [requires]
+
+    - name: requirements-allocation
+      description: "Allocation of system requirements to software requirements and items"
+      rows: system_requirement
+      columns: [software_requirement, software_item, software_unit]
+      coverageRelations:
+        software_requirement: [allocated_to]
+        software_item: [implemented_by]
+        software_unit: [implemented_by]
+
+    - name: software-verification
+      description: "Verification of software requirements, items, and units"
+      rows: software_requirement
+      columns: [software_item, software_unit, test_procedure, test_case, test_report]
+      coverageRelations:
+        software_item: [implemented_by]
+        software_unit: [implemented_by]
+        test_procedure: [verified_by]
+        test_case: [traces_to]
+        test_report: [generates]
+
+    - name: test-traceability
+      description: "Complete test traceability from procedures to cases to reports"
+      rows: test_procedure
+      columns: [test_case, test_report, software_requirement, risk]
+      coverageRelations:
+        test_case: [contains, part_of]
+        test_report: [generates, documents]
+        software_requirement: [verifies, traces_to]
+        risk: [validates]
+
+    - name: soi-traceability
+      description: "Software of Unknown Provenance traceability"
+      rows: soi
+      columns: [software_requirement, regulation, standard]
+      coverageRelations:
+        software_requirement: [fulfills]
+        regulation: [complies_with]
+        standard: [complies_with]
+
+  neo4j:
+    queries:
+      - name: risks-without-mitigation
+        description: "Risks that have not been mitigated"
+        cypher: |
+          MATCH (r:Item {role: 'risk'})
+          WHERE NOT EXISTS {
+            MATCH (r)-[:MITIGATED_BY|MITIGATES]->(:Item {role: 'mitigation'})
+          }
+          RETURN r.id, r.title ORDER BY r.id
+
+      - name: untested-software-requirements
+        description: "Software requirements without test procedures"
+        cypher: |
+          MATCH (sr:Item {role: 'software_requirement'})
+          WHERE NOT EXISTS {
+            MATCH (sr)<-[:VERIFIES]-(:Item {role: 'test_procedure'})
+          }
+          RETURN sr.id, sr.title ORDER BY sr.id
+
+      - name: regulation-compliance
+        description: "Traceability from regulations to system requirements to software"
+        cypher: |
+          MATCH path = (reg:Item {role: 'regulation'})-[:REQUIRES]->(sr:Item {role: 'system_requirement'})
+                     -[:ALLOCATED_TO]->(swr:Item {role: 'software_requirement'})
+          RETURN reg.id as regulation, sr.id as system_req, swr.id as software_req
+          ORDER BY reg.id, sr.id, swr.id
+
+      - name: hazard-analysis
+        description: "Complete hazard analysis chain: hazard -> risk -> mitigation -> test"
+        cypher: |
+          MATCH path = (h:Item {role: 'hazard'})-[:POSES]->(r:Item {role: 'risk'})
+                     -[:MITIGATED_BY]->(m:Item {role: 'mitigation'})
+                     -[:VALIDATES]->(tp:Item {role: 'test_procedure'})
+          RETURN h.id as hazard, r.id as risk, m.id as mitigation, tp.id as test_procedure
+          ORDER BY h.id
+
+      - name: soi-compliance
+        description: "SOI compliance with requirements and regulations"
+        cypher: |
+          MATCH (soi:Item {role: 'soi'})
+          OPTIONAL MATCH (soi)-[:FULFILLS]->(sr:Item {role: 'software_requirement'})
+          OPTIONAL MATCH (soi)-[:COMPLIES_WITH]->(reg:Item {role: 'regulation'})
+          OPTIONAL MATCH (soi)-[:COMPLIES_WITH]->(std:Item {role: 'standard'})
+          RETURN soi.id, soi.title, collect(sr.id) as requirements, collect(reg.id) as regulations, collect(std.id) as standards
+          ORDER BY soi.id
+
+      - name: test-coverage-completeness
+        description: "Software requirements with incomplete test coverage"
+        cypher: |
+          MATCH (sr:Item {role: 'software_requirement'})
+          OPTIONAL MATCH (sr)<-[:VERIFIES]-(tp:Item {role: 'test_procedure'})
+          OPTIONAL MATCH (tp)-[:CONTAINS]->(tc:Item {role: 'test_case'})
+          WITH sr, count(tp) as procedureCount, count(tc) as caseCount
+          WHERE procedureCount = 0 OR caseCount = 0
+          RETURN sr.id, sr.title, procedureCount, caseCount
+          ORDER BY procedureCount ASC, caseCount ASC
+
+documentation:
+  description: |
+    # Medical Device Software Traceability (IEC 62304)
+
+    This preset provides a comprehensive traceability model for medical device software
+    development compliant with IEC 62304 standards.
+
+    ## Roles
+
+    | Role | IEC 62304 Reference | Description |
+    |------|---------------------|-------------|
+    | system_requirement | 5.1 | System-level requirements |
+    | software_requirement | 5.2 | Software requirements derived from system requirements |
+    | software_item | 5.3 | Software items (configurable components) |
+    | software_unit | 5.3 | Software units (non-configurable components) |
+    | risk | 7.0 | Risk analysis and management |
+    | hazard | - | Potential sources of harm |
+    | mitigation | 7.0 | Risk mitigation measures |
+    | regulation | - | Regulatory requirements (FDA, EU MDR, etc.) |
+    | standard | - | Industry standards (IEC, ISO, etc.) |
+    | test_procedure | 5.5 | Test procedures for verification |
+    | test_case | 5.5 | Individual test cases |
+    | test_report | 5.5 | Test execution reports |
+    | soi | 5.3 | Software of Unknown Provenance (SOUP) |
+
+    ## IEC 62304 Compliance
+
+    This preset helps achieve compliance with IEC 62304 clauses:
+    - **Clause 5**: Software development process
+    - **Clause 7**: Software risk management
+    - **Clause 8**: Software configuration management
+    - **Clause 9**: Software problem resolution
+
+    ## Example
+
+    ```asciidoc
+    [item, id=IEC-62304-5.1, role=regulation]
+    ====
+    IEC 62304:2015 Section 5.1 - Software Development Process
+
+    The manufacturer shall establish and maintain a software development process.
+    ====
+
+    [item, id=SYS-REQ-001, role=system_requirement]
+    ====
+    System Requirement: Patient Data Security
+
+    The system shall ensure patient data is secure and compliant with regulations.
+
+    derived_from:IEC-62304-5.1[]
+    ====
+
+    [item, id=SW-REQ-001, role=software_requirement]
+    ====
+    Software Requirement: Data Encryption
+
+    The software shall encrypt patient data at rest and in transit.
+
+    allocated_to:SYS-REQ-001[]
+    ====
+
+    [item, id=RISK-001, role=risk]
+    ====
+    Risk: Unauthorized Data Access
+
+    Risk of unauthorized access to patient data.
+
+    addresses:SW-REQ-001[]
+    ====
+
+    [item, id=MIT-001, role=mitigation]
+    ====
+    Mitigation: Role-Based Access Control
+
+    Implement RBAC to restrict data access based on user roles.
+
+    mitigates:RISK-001[]
+    addresses:SW-REQ-001[]
+    ====
+
+    [item, id=TP-001, role=test_procedure]
+    ====
+    Test Procedure: Data Security Verification
+
+    Verify that data encryption and access controls are working correctly.
+
+    verifies:SW-REQ-001[]
+    validates:MIT-001[]
+    ====
+
+    [item, id=TC-001, role=test_case]
+    ====
+    Test Case: Encryption Verification
+
+    Verify that data is encrypted using AES-256.
+
+    part_of:TP-001[]
+    traces_to:SW-REQ-001[]
+    ====
+    ```
