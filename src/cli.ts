@@ -23,11 +23,11 @@ const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
 // Global options
 program
   .name('antora-req-trace')
-  .description('Antora Requirements Traceability Extension - Trace requirements, designs, implementations, and tests')
+  .description('Antora Requirements Traceability Extension - Trace requirements, designs, implementations, and tests using the v2.0 unified item architecture')
   .version(packageJson.version)
-  .option('--v2', 'Use v2.0 unified item architecture')
-  .option('--config <path>', 'Path to traceability configuration file (v2 only)')
-  .option('--preset <name>', 'Use a built-in preset: ' + BUILT_IN_PRESETS.join(', '), 'requirements-engineering');
+  .option('--v2', 'Use v2.0 unified item architecture (enables role-based traceability)')
+  .option('--config <path>', 'Path to traceability configuration YAML file (v2 only)')
+  .option('--preset <name>', 'Use a built-in preset configuration: ' + BUILT_IN_PRESETS.join(', ') + ' (v2 only)', 'requirements-engineering');
 
 // Helper to create the appropriate extension based on options
 async function createExtension(options: any) {
@@ -64,8 +64,8 @@ function ensureDirectory(dir: string) {
 program.command('process')
   .description('Process AsciiDoc files for requirements traceability')
   .option('-i, --input <path>', 'Input file or directory (required)')
-  .option('-o, --output <path>', 'Output directory', './output')
-  .option('-f, --format <format>', 'Output format (html, csv, json)', 'html')
+  .option('-o, --output <path>', 'Output directory for generated files', './output')
+  .option('-f, --format <format>', 'Output format: html, csv, or json', 'html')
   .action(async (options) => {
     console.log(chalk.blue('Processing requirements traceability...'));
     if (!options.input) {
@@ -133,10 +133,10 @@ program.command('process')
   });
 
 program.command('matrix')
-  .description('Generate traceability matrices')
-  .option('-t, --type <type>', 'Matrix type or name')
-  .option('-f, --format <format>', 'Output format (csv, html, json)', 'csv')
-  .option('-o, --output <path>', 'Output file (defaults to stdout)')
+  .description('Generate traceability matrices from processed items')
+  .option('-t, --type <type>', 'Matrix type or name (uses configuration from preset/config)')
+  .option('-f, --format <format>', 'Output format: csv, html, or json', 'csv')
+  .option('-o, --output <path>', 'Output file path (defaults to stdout)')
   .action(async (options) => {
     console.log(chalk.blue('Generating traceability matrix...'));
     const extension = await createExtension(options);
@@ -183,7 +183,7 @@ program.command('matrix')
   });
 
 program.command('validate')
-  .description('Validate requirements traceability')
+  .description('Validate requirements traceability (checks for orphaned items, missing coverage)')
   .option('-i, --input <path>', 'Input file or directory to validate')
   .action(async (options) => {
     console.log(chalk.blue('Validating requirements traceability...'));
@@ -239,7 +239,7 @@ program.command('validate')
   });
 
 const presetProgram = program.command('preset')
-  .description('Manage traceability presets (v2 only)');
+  .description('Manage traceability presets (v2 only) - list, show details, or initialize config from preset');
 
 presetProgram.command('list')
   .description('List available built-in presets')
@@ -439,10 +439,10 @@ tests:IMP-001[]
   });
 
 program.command('export neo4j')
-  .description('Export traceability data to Neo4j format')
+  .description('Export traceability data to Neo4j graph database format')
   .option('-i, --input <path>', 'Input file or directory to process first')
-  .option('-o, --output <path>', 'Output directory for Neo4j files', './neo4j')
-  .option('-f, --format <format>', 'Export format (csv, cypher)', 'csv')
+  .option('-o, --output <path>', 'Output directory for Neo4j import files', './neo4j')
+  .option('-f, --format <format>', 'Export format: csv or cypher', 'csv')
   .action(async (options) => {
     console.log(chalk.blue('Exporting to Neo4j...'));
     if (!options.input) {
@@ -487,7 +487,7 @@ program.command('export neo4j')
   });
 
 program.command('stats')
-  .description('Show traceability statistics')
+  .description('Show traceability statistics (counts by role, relationship types, coverage)')
   .option('-i, --input <path>', 'Input file or directory')
   .action(async (options) => {
     console.log(chalk.blue('Traceability Statistics'));

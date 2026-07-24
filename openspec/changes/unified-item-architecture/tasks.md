@@ -69,11 +69,11 @@
 
 ## 8. CLI Updates
 
-- [ ] 8.1 Add --config option to all commands
-- [ ] 8.2 Update process command to use new configuration
-- [ ] 8.3 Add preset management commands
-- [ ] 8.4 Add Neo4j export command
-- [ ] 8.5 Update help text and documentation
+- [x] 8.1 Add --config option to all commands
+- [x] 8.2 Update process command to use new configuration
+- [x] 8.3 Add preset management commands
+- [x] 8.4 Add Neo4j export command
+- [x] 8.5 Update help text and documentation
 
 ## 9. Documentation
 
