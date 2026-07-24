@@ -1,638 +1,534 @@
-import type {
-  Requirement,
-  Implementation,
-  Test,
-  Document,
-  Design,
-  AnyNode,
-  RelationshipType,
-  Relationship,
-  InverseRelationshipType,
-  CoverageReport,
-} from './types.js';
-import {
-  INVERSE_MAP,
-  isPrimaryRelationshipType,
-  isInverseRelationshipType,
-} from './types.js';
+/**
+ * TraceabilityGraph - Role-based traceability graph
+ *
+ * This replaces the old TraceabilityGraph with:
+ * - Single Item type with role property instead of separate types
+ * - Role-based relation validation
+ * - Configurable relation types
+ * - Warning system for unknown roles
+ */
 
+import type { Item, ItemRelationship } from './types.js';
+import type { ConfigLoader } from './config/TraceabilityConfig.js';
+
+/**
+ * Warning type for graph operations
+ */
+export interface GraphWarning {
+  type: 'unknown_role' | 'invalid_relation' | 'duplicate_node';
+  message: string;
+  file?: string;
+  line?: number;
+}
+
+/**
+ * Validation result
+ */
+export interface ValidationResult {
+  errors: string[];
+  warnings: GraphWarning[];
+}
+
+/**
+ * TraceabilityGraph - Role-based traceability graph
+ *
+ * Features:
+ * - Stores all items with their roles
+ * - Validates relations based on role configuration
+ * - Maintains indexes for fast queries
+ * - Generates warnings for unknown roles
+ */
 export class TraceabilityGraph {
-  private _requirements = new Map<string, Requirement>();
-  private _implementations = new Map<string, Implementation>();
-  private _tests = new Map<string, Test>();
-  private _documents = new Map<string, Document>();
-  private _designs = new Map<string, Design>();
-  private _relationships = new Map<string, Relationship>();
+  private _items = new Map<string, Item>();
 
-  // Inverse relationship index for fast queries
-  private _inverseIndex = new Map<InverseRelationshipType, Map<string, Relationship[]>>();
+  // Role-based indexes
+  private _itemsByRole = new Map<string, Map<string, Item>>();
 
-  // Relationship index for fast queries: fromId -> { type -> [Relationships] }
-  private _relationshipIndex = new Map<string, Map<RelationshipType, Relationship[]>>();
+  private _relationships = new Map<string, ItemRelationship>();
 
-  // Reverse relationship index for fast queries: targetId -> { type -> [Relationships] }
-  private _reverseRelationshipIndex = new Map<string, Map<RelationshipType, Relationship[]>>();
+  // Index for fast relationship queries: fromId -> { type -> [Relationships] }
+  private _relationshipIndex = new Map<string, Map<string, ItemRelationship[]>>();
+
+  // Reverse relationship index: targetId -> { type -> [Relationships] }
+  private _reverseRelationshipIndex = new Map<string, Map<string, ItemRelationship[]>>();
+
+  // Inverse relationship index
+  private _inverseIndex = new Map<string, Map<string, ItemRelationship[]>>();
+
+  private _configLoader?: ConfigLoader;
+  private _warnings: GraphWarning[] = [];
 
   // Cache for frequently accessed data
-  private _allRequirementsCache: Requirement[] | null = null;
-  private _allImplementationsCache: Implementation[] | null = null;
-  private _allTestsCache: Test[] | null = null;
-  private _allDocumentsCache: Document[] | null = null;
-  private _allDesignsCache: Design[] | null = null;
+  private _allItemsCache: Item[] | null = null;
+  private _allRelationshipsCache: ItemRelationship[] | null = null;
 
-  // ── Node management ────────────────────────────────────────────────────────
+  constructor(configLoader?: ConfigLoader) {
+    this._configLoader = configLoader;
+  }
 
-  addRequirement(req: Requirement): void {
-    if (this._requirements.has(req.id)) {
-      throw new Error(`Duplicate requirement ID: ${req.id}. A requirement with this ID already exists.`);
+  /**
+   * Set the configuration loader for relation validation
+   */
+  setConfigLoader(configLoader: ConfigLoader): void {
+    this._configLoader = configLoader;
+  }
+
+  // ========================================================================
+  // Node Management
+  // ========================================================================
+
+  /**
+   * Add an item to the graph
+   */
+  addItem(item: Item): void {
+    // Check for duplicate ID
+    if (this._items.has(item.id)) {
+      const existing = this._items.get(item.id)!;
+      const warning: GraphWarning = {
+        type: 'duplicate_node',
+        message: `Duplicate item ID: ${item.id}. Existing: ${existing.role} at ${existing.sourceFile}:${existing.sourceLine}, New: ${item.role} at ${item.sourceFile}:${item.sourceLine}`,
+        file: item.sourceFile,
+        line: item.sourceLine,
+      };
+      this._warnings.push(warning);
+      return;
     }
-    this._requirements.set(req.id, req);
-    this._allRequirementsCache = null;
-  }
 
-  addImplementation(imp: Implementation): void {
-    if (this._implementations.has(imp.id)) {
-      throw new Error(`Duplicate implementation ID: ${imp.id}. An implementation with this ID already exists.`);
+    // Store the item
+    this._items.set(item.id, item);
+
+    // Index by role
+    if (!this._itemsByRole.has(item.role)) {
+      this._itemsByRole.set(item.role, new Map());
     }
-    this._implementations.set(imp.id, imp);
-    this._allImplementationsCache = null;
+    this._itemsByRole.get(item.role)!.set(item.id, item);
+
+    // Invalidate caches
+    this._allItemsCache = null;
   }
 
-  addTest(test: Test): void {
-    if (this._tests.has(test.id)) {
-      throw new Error(`Duplicate test ID: ${test.id}. A test with this ID already exists.`);
+  /**
+   * Get an item by ID
+   */
+  getItem(id: string): Item | undefined {
+    return this._items.get(id);
+  }
+
+  /**
+   * Get all items
+   */
+  getAllItems(): Item[] {
+    if (this._allItemsCache === null) {
+      this._allItemsCache = Array.from(this._items.values());
     }
-    this._tests.set(test.id, test);
-    this._allTestsCache = null;
+    return this._allItemsCache;
   }
 
-  addDocument(doc: Document): void {
-    if (this._documents.has(doc.id)) {
-      throw new Error(`Duplicate document ID: ${doc.id}. A document with this ID already exists.`);
-    }
-    this._documents.set(doc.id, doc);
-    this._allDocumentsCache = null;
+  /**
+   * Get all items with a specific role
+   */
+  getItemsByRole(role: string): Item[] {
+    const roleMap = this._itemsByRole.get(role);
+    if (!roleMap) return [];
+    return Array.from(roleMap.values());
   }
 
-  addDesign(design: Design): void {
-    if (this._designs.has(design.id)) {
-      throw new Error(`Duplicate design ID: ${design.id}. A design with this ID already exists.`);
-    }
-    this._designs.set(design.id, design);
-    this._allDesignsCache = null;
+  /**
+   * Get all known roles
+   */
+  getAllRoles(): string[] {
+    return Array.from(this._itemsByRole.keys());
   }
 
-  getRequirement(id: string): Requirement | undefined {
-    return this._requirements.get(id);
+  /**
+   * Check if an item with the given ID exists
+   */
+  hasItem(id: string): boolean {
+    return this._items.has(id);
   }
 
-  getImplementation(id: string): Implementation | undefined {
-    return this._implementations.get(id);
+  /**
+   * Check if a role has any items
+   */
+  hasRole(role: string): boolean {
+    return this._itemsByRole.has(role) && this._itemsByRole.get(role)!.size > 0;
   }
 
-  getTest(id: string): Test | undefined {
-    return this._tests.get(id);
-  }
+  // ========================================================================
+  // Relationship Management
+  // ========================================================================
 
-  getDocument(id: string): Document | undefined {
-    return this._documents.get(id);
-  }
-
-  getNode(id: string): AnyNode | undefined {
-    return (
-      this._requirements.get(id) ??
-      this._implementations.get(id) ??
-      this._tests.get(id) ??
-      this._documents.get(id) ??
-      this._designs.get(id)
-    );
-  }
-
-  /** Check if a node with the given ID exists (faster than getNode for existence checks) */
-  hasNode(id: string): boolean {
-    return (
-      this._requirements.has(id) ||
-      this._implementations.has(id) ||
-      this._tests.has(id) ||
-      this._documents.has(id) ||
-      this._designs.has(id)
-    );
-  }
-
-  getAllRequirements(): Requirement[] {
-    if (this._allRequirementsCache === null) {
-      this._allRequirementsCache = Array.from(this._requirements.values());
-    }
-    return this._allRequirementsCache;
-  }
-
-  getAllImplementations(): Implementation[] {
-    if (this._allImplementationsCache === null) {
-      this._allImplementationsCache = Array.from(this._implementations.values());
-    }
-    return this._allImplementationsCache;
-  }
-
-  getAllTests(): Test[] {
-    if (this._allTestsCache === null) {
-      this._allTestsCache = Array.from(this._tests.values());
-    }
-    return this._allTestsCache;
-  }
-
-  getAllDocuments(): Document[] {
-    if (this._allDocumentsCache === null) {
-      this._allDocumentsCache = Array.from(this._documents.values());
-    }
-    return this._allDocumentsCache;
-  }
-
-  getAllDesigns(): Design[] {
-    if (this._allDesignsCache === null) {
-      this._allDesignsCache = Array.from(this._designs.values());
-    }
-    return this._allDesignsCache;
-  }
-
-  getAllRelationships(): Relationship[] {
-    return Array.from(this._relationships.values());
-  }
-
-  // ── Design-specific queries ─────────────────────────────────────────────────
-
-  getDesignsForRequirement(reqId: string): Design[] {
-    const designs: Design[] = [];
-    for (const rel of this._relationships.values()) {
-      if (rel.type === 'addresses' && rel.targetId === reqId) {
-        const design = this._designs.get(rel.fromId);
-        if (design) designs.push(design);
-      }
-    }
-    return designs;
-  }
-
-  getRequirementsForDesign(designId: string): Requirement[] {
-    const requirements: Requirement[] = [];
-    for (const rel of this._relationships.values()) {
-      if (rel.type === 'addresses' && rel.fromId === designId) {
-        const req = this._requirements.get(rel.targetId);
-        if (req) requirements.push(req);
-      }
-    }
-    return requirements;
-  }
-
-  getImplementationsForDesign(designId: string): Implementation[] {
-    const implementations: Implementation[] = [];
-    for (const rel of this._relationships.values()) {
-      if (rel.type === 'implements' && rel.targetId === designId) {
-        const impl = this._implementations.get(rel.fromId);
-        if (impl) implementations.push(impl);
-      }
-    }
-    return implementations;
-  }
-
-  getDesignsForImplementation(implId: string): Design[] {
-    const designs: Design[] = [];
-    for (const rel of this._relationships.values()) {
-      if (rel.type === 'implements' && rel.fromId === implId) {
-        const design = this._designs.get(rel.targetId);
-        if (design) designs.push(design);
-      }
-    }
-    return designs;
-  }
-
-  getComposedOf(designId: string): Design[] {
-    const composed: Design[] = [];
-    for (const rel of this._relationships.values()) {
-      if (rel.type === 'composed-of' && rel.fromId === designId) {
-        const design = this._designs.get(rel.targetId);
-        if (design) composed.push(design);
-      }
-    }
-    return composed;
-  }
-
-  getDependencies(designId: string): Design[] {
-    const dependencies: Design[] = [];
-    for (const rel of this._relationships.values()) {
-      if (rel.type === 'depends-on' && rel.fromId === designId) {
-        const design = this._designs.get(rel.targetId);
-        if (design) dependencies.push(design);
-      }
-    }
-    return dependencies;
-  }
-
-  getDesignsWithImplementations(): Set<string> {
-    const designsWithImpl = new Set<string>();
-    for (const rel of this._relationships.values()) {
-      if (rel.type === 'implements') {
-        designsWithImpl.add(rel.targetId);
-      }
-    }
-    return designsWithImpl;
-  }
-
-  getRequirementsAddressedByDesigns(): Set<string> {
-    const addressedReqs = new Set<string>();
-    for (const rel of this._relationships.values()) {
-      if (rel.type === 'addresses') {
-        addressedReqs.add(rel.targetId);
-      }
-    }
-    return addressedReqs;
-  }
-
-  // ── Relationship management ─────────────────────────────────────────────────
-
-  addRelationship(relationship: Relationship): void {
+  /**
+   * Add a relationship to the graph
+   */
+  addRelationship(relationship: ItemRelationship): void {
     // Validate that source node exists
-    const sourceNode = this.getNode(relationship.fromId);
+    const sourceNode = this.getItem(relationship.fromId);
     if (!sourceNode) {
-      throw new Error(`Source node not found: ${relationship.fromId}. Cannot create relationship of type '${relationship.type}'.`);
+      const warning: GraphWarning = {
+        type: 'unknown_role',
+        message: `Source item not found: ${relationship.fromId}. Cannot create relationship of type '${relationship.type}'.`,
+        file: relationship.sourceFile,
+        line: relationship.line,
+      };
+      this._warnings.push(warning);
+      return;
     }
 
     // Validate that target node exists
-    const targetNode = this.getNode(relationship.targetId);
+    const targetNode = this.getItem(relationship.targetId);
     if (!targetNode) {
-      throw new Error(`Target node not found: ${relationship.targetId}. Cannot create relationship of type '${relationship.type}'.`);
-    }
-
-    // Check for circular references (skip for auto-generated inverses as they mirror primary)
-    if (!relationship.autoGenerated) {
-      this.checkCircularReference(relationship.fromId, relationship.targetId, relationship.type);
-    }
-
-    const key = `${relationship.fromId}-${relationship.type}-${relationship.targetId}`;
-
-    // Check if this exact relationship already exists
-    if (this._relationships.has(key)) {
-      throw new Error(`Duplicate relationship: ${relationship.fromId} ${relationship.type} ${relationship.targetId}`);
-    }
-
-    // Ensure autoGenerated is set correctly for primary relationships
-    const relationshipToStore = {
-      ...relationship,
-      autoGenerated: relationship.autoGenerated !== undefined ? relationship.autoGenerated : false,
-    };
-
-    // Store the relationship
-    this._relationships.set(key, relationshipToStore);
-
-    // Update relationship index for fast queries
-    this._updateRelationshipIndex(relationshipToStore);
-
-    // Auto-generate inverse relationship for primary types
-    if (isPrimaryRelationshipType(relationship.type)) {
-      const inverseType = INVERSE_MAP[relationship.type];
-      const inverseKey = `${relationship.targetId}-${inverseType}-${relationship.fromId}`;
-
-      // Check if inverse already exists (shouldn't happen with proper usage)
-      if (this._relationships.has(inverseKey)) {
-        // Remove existing inverse to avoid duplicates
-        this._relationships.delete(inverseKey);
-        this._removeFromInverseIndex(inverseKey);
-      }
-
-      // Create and store inverse relationship
-      const inverseRelationship: Relationship = {
-        id: inverseKey,
-        fromId: relationship.targetId,
-        targetId: relationship.fromId,
-        type: inverseType,
-        sourceFile: relationship.sourceFile,
+      const warning: GraphWarning = {
+        type: 'unknown_role',
+        message: `Target item not found: ${relationship.targetId}. Cannot create relationship of type '${relationship.type}'.`,
+        file: relationship.sourceFile,
         line: relationship.line,
-        autoGenerated: true,
-        inverseOf: key,
       };
-      this._relationships.set(inverseKey, inverseRelationship);
-      this._updateInverseIndex(inverseRelationship);
-    } else if (isInverseRelationshipType(relationship.type)) {
-      // If someone tries to add an inverse relationship explicitly, warn but allow
-      // This updates the inverse index
-      this._updateInverseIndex(relationship);
-    }
-
-    // Invalidate caches that depend on relationships
-    this._allRequirementsCache = null;
-    this._allImplementationsCache = null;
-    this._allTestsCache = null;
-    this._allDocumentsCache = null;
-  }
-
-  /**
-   * Update the relationship index for fast queries.
-   * Index structure: _relationshipIndex[fromId][type] = [Relationships]
-   */
-  private _updateRelationshipIndex(relationship: Relationship): void {
-    // Update forward index: fromId -> type -> [Relationships]
-    if (!this._relationshipIndex.has(relationship.fromId)) {
-      this._relationshipIndex.set(relationship.fromId, new Map());
-    }
-    const fromIndex = this._relationshipIndex.get(relationship.fromId)!;
-    if (!fromIndex.has(relationship.type)) {
-      fromIndex.set(relationship.type, []);
-    }
-    fromIndex.get(relationship.type)!.push(relationship);
-
-    // Update reverse index: targetId -> type -> [Relationships]
-    if (!this._reverseRelationshipIndex.has(relationship.targetId)) {
-      this._reverseRelationshipIndex.set(relationship.targetId, new Map());
-    }
-    const targetIndex = this._reverseRelationshipIndex.get(relationship.targetId)!;
-    if (!targetIndex.has(relationship.type)) {
-      targetIndex.set(relationship.type, []);
-    }
-    targetIndex.get(relationship.type)!.push(relationship);
-  }
-
-  /**
-   * Update the inverse index with a relationship.
-   * Only indexes inverse relationship types.
-   */
-  private _updateInverseIndex(relationship: Relationship): void {
-    if (isInverseRelationshipType(relationship.type)) {
-      if (!this._inverseIndex.has(relationship.type)) {
-        this._inverseIndex.set(relationship.type, new Map());
-      }
-      const typeIndex = this._inverseIndex.get(relationship.type)!;
-      if (!typeIndex.has(relationship.fromId)) {
-        typeIndex.set(relationship.fromId, []);
-      }
-      typeIndex.get(relationship.fromId)!.push(relationship);
-    }
-  }
-
-  /**
-   * Remove a relationship from the inverse index.
-   */
-  private _removeFromInverseIndex(relationshipId: string): void {
-    // Find the relationship to get its type and fromId
-    const relationship = this._relationships.get(relationshipId);
-    if (!relationship || !isInverseRelationshipType(relationship.type)) {
+      this._warnings.push(warning);
       return;
     }
 
-    const typeIndex = this._inverseIndex.get(relationship.type);
-    if (!typeIndex) return;
-
-    const rels = typeIndex.get(relationship.fromId);
-    if (!rels) return;
-
-    // Remove the relationship from the array
-    const index = rels.findIndex(r => r.id === relationshipId);
-    if (index !== -1) {
-      rels.splice(index, 1);
-    }
-
-    // Clean up empty maps
-    if (rels.length === 0) {
-      typeIndex.delete(relationship.fromId);
-    }
-    if (typeIndex.size === 0) {
-      this._inverseIndex.delete(relationship.type);
-    }
-  }
-
-  /**
-   * Check if adding a relationship would create a circular reference.
-   * Throws an error if a circular dependency is detected.
-   */
-  private checkCircularReference(fromId: string, targetId: string, type: RelationshipType): void {
-    // Only check for circular dependencies for certain relationship types
-    // that can create cycles (depends, requires, satisfies)
-    if (!['depends', 'requires', 'satisfies'].includes(type)) {
+    // Check for duplicate relationship
+    const key = `${relationship.fromId}-${relationship.type}-${relationship.targetId}`;
+    if (this._relationships.has(key)) {
+      const warning: GraphWarning = {
+        type: 'duplicate_node',
+        message: `Duplicate relationship: ${relationship.fromId} ${relationship.type} ${relationship.targetId}`,
+        file: relationship.sourceFile,
+        line: relationship.line,
+      };
+      this._warnings.push(warning);
       return;
     }
 
-    // Use BFS to check if targetId can reach fromId
-    // Only follow relationship types that can create dependency cycles
-    const cycleCreatingTypes: RelationshipType[] = ['depends', 'requires', 'satisfies', 'depends-on', 'implements'];
+    // Validate relation based on roles (if config loader is available)
+    if (this._configLoader) {
+      const isValid = this._configLoader.isRelationAllowed(
+        sourceNode.role,
+        targetNode.role,
+        relationship.type
+      );
 
-    // Skip circular check if this is an auto-generated inverse relationship
-    // (bidirectional pairs like A->implements->B and B->implemented-by->A are valid)
-    if (type === 'implemented-by' || type === 'satisfied-by' || type === 'tested-by' ||
-        type === 'verified-by' || type === 'documented-by' || type === 'addressed-by' ||
-        type === 'part-of' || type === 'depended-by' || type === 'required-by' ||
-        type === 'depends-on-by') {
-      return;
-    }
+      if (!isValid) {
+        // Check if either role is unknown
+        const sourceKnown = this._configLoader.getConfig().roles.includes(sourceNode.role);
+        const targetKnown = this._configLoader.getConfig().roles.includes(targetNode.role);
 
-    const visited = new Set<string>();
-    const queue = [targetId];
+        if (!sourceKnown || !targetKnown) {
+          // If roles are unknown, just warn
+          const warning: GraphWarning = {
+            type: 'unknown_role',
+            message: `Relation '${relationship.type}' from '${sourceNode.id}' (role: ${sourceNode.role}) to '${targetNode.id}' (role: ${targetNode.role}) involves unknown role(s). Skipping validation.`,
+            file: relationship.sourceFile,
+            line: relationship.line,
+          };
+          this._warnings.push(warning);
+        } else {
+          // Both roles are known but relation is not allowed
+          const allowed = this._configLoader.getAllowedRelations(sourceNode.role, targetNode.role);
+          const warning: GraphWarning = {
+            type: 'invalid_relation',
+            message: `Relation '${relationship.type}' not allowed from '${sourceNode.role}' to '${targetNode.role}'. Allowed: [${allowed.join(', ')}]`,
+            file: relationship.sourceFile,
+            line: relationship.line,
+          };
+          this._warnings.push(warning);
 
-    while (queue.length > 0) {
-      const current = queue.shift()!;
+          // Store the relationship anyway for graceful degradation
+          // but mark it as invalid
+          relationship.autoGenerated = false;
+          this._relationships.set(key, relationship);
+          this._updateRelationshipIndex(relationship);
 
-      if (current === fromId) {
-        throw new Error(`Circular reference detected: ${fromId} -> ${targetId} (via ${type}). This would create a dependency cycle.`);
-      }
-
-      if (visited.has(current)) continue;
-      visited.add(current);
-
-      // Follow forward relationships of cycle-creating types only
-      // Exclude inverse types to avoid false positives on bidirectional pairs
-      for (const rel of this.getRelationships(current)) {
-        if (cycleCreatingTypes.includes(rel.type) && !visited.has(rel.targetId)) {
-          queue.push(rel.targetId);
+          // Don't auto-generate inverse for invalid relations
+          return;
         }
       }
     }
+
+    // Store the relationship
+    this._relationships.set(key, {
+      ...relationship,
+      autoGenerated: relationship.autoGenerated !== undefined ? relationship.autoGenerated : false,
+    });
+
+    // Update relationship indexes
+    this._updateRelationshipIndex(relationship);
+
+    // Invalidate caches
+    this._allRelationshipsCache = null;
   }
 
-  /** Returns all relationships where fromId matches (optionally filtered by type). */
-  getRelationships(fromId: string, type?: RelationshipType): Relationship[] {
-    // Use index for fast lookup
+  /**
+   * Get a relationship by ID
+   */
+  getRelationship(id: string): ItemRelationship | undefined {
+    return this._relationships.get(id);
+  }
+
+  /**
+   * Get all relationships
+   */
+  getAllRelationships(): ItemRelationship[] {
+    if (this._allRelationshipsCache === null) {
+      this._allRelationshipsCache = Array.from(this._relationships.values());
+    }
+    return this._allRelationshipsCache;
+  }
+
+  /**
+   * Get relationships from a specific item
+   */
+  getRelationships(fromId: string, type?: string): ItemRelationship[] {
     const fromIndex = this._relationshipIndex.get(fromId);
     if (fromIndex) {
       if (type) {
         return fromIndex.get(type) || [];
       }
-      // Return all relationships for this fromId
       return Array.from(fromIndex.values()).flat();
     }
     return [];
   }
 
-  /** Returns all relationships where targetId matches (optionally filtered by type). */
-  getReverseRelationships(targetId: string, type?: RelationshipType): Relationship[] {
-    // Use reverse index for fast lookup
+  /**
+   * Get relationships to a specific item (reverse)
+   */
+  getReverseRelationships(targetId: string, type?: string): ItemRelationship[] {
     const targetIndex = this._reverseRelationshipIndex.get(targetId);
     if (targetIndex) {
       if (type) {
         return targetIndex.get(type) || [];
       }
-      // Return all relationships for this targetId
       return Array.from(targetIndex.values()).flat();
     }
     return [];
   }
 
-  // ── Coverage analysis ───────────────────────────────────────────────────────
-
-  getRequirementsWithImplementations(): Set<string> {
-    const result = new Set<string>();
+  /**
+   * Get relationships by type
+   */
+  getRelationshipsByType(type: string): ItemRelationship[] {
+    const result: ItemRelationship[] = [];
     for (const rel of this._relationships.values()) {
-      if (rel.type === 'implements' || rel.type === 'satisfies') {
-        result.add(rel.targetId);
+      if (rel.type === type) {
+        result.push(rel);
       }
     }
     return result;
   }
 
-  getRequirementsWithTests(): Set<string> {
-    const result = new Set<string>();
-    for (const rel of this._relationships.values()) {
-      if (rel.type === 'tests' || rel.type === 'verifies') {
-        result.add(rel.targetId);
-      }
-    }
-    return result;
-  }
-
-  getCoverage(): CoverageReport {
-    const total = this._requirements.size;
-    const withImpl = this.getRequirementsWithImplementations().size;
-    const withTests = this.getRequirementsWithTests().size;
-
-    // Design coverage metrics
-    const totalDesigns = this._designs?.size || 0;
-    const designsWithImpl = this.getDesignsWithImplementations().size;
-    const requirementsAddressedByDesign = this.getRequirementsAddressedByDesigns().size;
-
-    return {
-      totalRequirements: total,
-      requirementsWithImplementation: withImpl,
-      requirementsWithTests: withTests,
-      implementationCoverage: total > 0 ? (withImpl / total) * 100 : 0,
-      testCoverage: total > 0 ? (withTests / total) * 100 : 0,
-      // Design coverage
-      totalDesigns,
-      designsWithImplementation: designsWithImpl,
-      designCoverage: totalDesigns > 0 ? (designsWithImpl / totalDesigns) * 100 : 0,
-      requirementsAddressedByDesign,
-      requirementCoverageByDesign: total > 0 ? (requirementsAddressedByDesign / total) * 100 : 0,
-    };
-  }
-
-  getUncoveredRequirements(): Requirement[] {
-    const covered = new Set<string>([
-      ...this.getRequirementsWithImplementations(),
-      ...this.getRequirementsWithTests(),
-    ]);
-    return this.getAllRequirements().filter(req => !covered.has(req.id));
-  }
-
-  // ── Transitive Coverage (Phase 3) ────────────────────────────────────────
-
   /**
-   * Get all requirements transitively satisfied by an implementation.
-   * This includes:
-   * - Direct satisfies relationships
-   * - Requirements addressed by designs that this implementation implements
+   * Get relationships filtered by source role and target role
    */
-  getTransitiveSatisfaction(implId: string, maxDepth: number = 10): Set<string> {
-    const satisfied = new Set<string>();
-    const visited = new Set<string>();
+  getRelationshipsByRoles(sourceRole: string, targetRole: string): ItemRelationship[] {
+    const result: ItemRelationship[] = [];
+    const sourceItems = this.getItemsByRole(sourceRole);
 
-    this._findTransitiveSatisfaction(implId, satisfied, visited, maxDepth, 0);
+    for (const sourceItem of sourceItems) {
+      const targetItems = this.getItemsByRole(targetRole);
+      const targetIds = new Set(targetItems.map(i => i.id));
 
-    return satisfied;
-  }
-
-  private _findTransitiveSatisfaction(
-    nodeId: string,
-    satisfied: Set<string>,
-    visited: Set<string>,
-    maxDepth: number,
-    currentDepth: number
-  ): void {
-    if (currentDepth > maxDepth || visited.has(nodeId)) return;
-    visited.add(nodeId);
-
-    // Get direct satisfies relationships
-    const directSatisfies = this.getRelationships(nodeId, 'satisfies');
-    for (const rel of directSatisfies) {
-      satisfied.add(rel.targetId);
-    }
-
-    // Get designs that this implementation implements
-    const implementedDesigns = this.getDesignsForImplementation(nodeId);
-    for (const design of implementedDesigns) {
-      // Get requirements addressed by each design
-      const addressedReqs = this.getRequirementsForDesign(design.id);
-      for (const req of addressedReqs) {
-        satisfied.add(req.id);
-        // Recursively find satisfaction through the design's requirements
-        this._findTransitiveSatisfaction(
-          req.id, satisfied, visited, maxDepth, currentDepth + 1
-        );
-      }
-
-      // Recursively find satisfaction through the design
-      this._findTransitiveSatisfaction(
-        design.id, satisfied, visited, maxDepth, currentDepth + 1
-      );
-    }
-
-    // Get implementations that this implementation depends on
-    const dependencies = this.getRelationships(nodeId, 'depends');
-    for (const rel of dependencies) {
-      this._findTransitiveSatisfaction(
-        rel.targetId, satisfied, visited, maxDepth, currentDepth + 1
-      );
-    }
-  }
-
-  /**
-   * Get transitive coverage report including indirect relationships.
-   */
-  getTransitiveCoverage(): CoverageReport & { transitiveCoverage: number } {
-    const baseCoverage = this.getCoverage();
-
-    // Calculate transitive coverage
-    let transitiveSatisfied = 0;
-    const allImpls = this.getAllImplementations();
-    const allReqs = this.getAllRequirements();
-    const allReqIds = new Set(allReqs.map(r => r.id));
-
-    for (const impl of allImpls) {
-      const transitiveReqs = this.getTransitiveSatisfaction(impl.id);
-      // Count unique requirements satisfied transitively
-      for (const reqId of transitiveReqs) {
-        if (allReqIds.has(reqId)) {
-          transitiveSatisfied++;
+      for (const rel of this.getRelationships(sourceItem.id)) {
+        if (targetIds.has(rel.targetId)) {
+          result.push(rel);
         }
       }
     }
 
-    // Calculate transitive coverage percentage
-    // This is the percentage of requirements that have at least one transitive path to an implementation
-    const uniqueTransitive = new Set<string>();
-    for (const impl of allImpls) {
-      const transitiveReqs = this.getTransitiveSatisfaction(impl.id);
-      for (const reqId of transitiveReqs) {
-        uniqueTransitive.add(reqId);
+    return result;
+  }
+
+  // ========================================================================
+  // Query Methods
+  // ========================================================================
+
+  /**
+   * Get all items that have a specific relation to a given item
+   */
+  getRelatedItems(itemId: string, relationType?: string): Item[] {
+    const result: Item[] = [];
+    const rels = this.getRelationships(itemId, relationType);
+
+    for (const rel of rels) {
+      const target = this.getItem(rel.targetId);
+      if (target) {
+        result.push(target);
       }
     }
 
-    const transitiveCoverage = allReqs.length > 0
-      ? (uniqueTransitive.size / allReqs.length) * 100
-      : 0;
-
-    return {
-      ...baseCoverage,
-      transitiveCoverage,
-    };
+    return result;
   }
 
-  // ── Graph traversal ─────────────────────────────────────────────────────────
+  /**
+   * Get all items that have a specific relation from a given item (reverse)
+   */
+  getItemsWithRelationTo(itemId: string, relationType?: string): Item[] {
+    const result: Item[] = [];
+    const rels = this.getReverseRelationships(itemId, relationType);
 
-  /** Finds a path between two node IDs using depth-limited DFS. Returns null if none exists. */
+    for (const rel of rels) {
+      const source = this.getItem(rel.fromId);
+      if (source) {
+        result.push(source);
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Get all items related to a given item (both directions)
+   */
+  getAllRelatedItems(itemId: string): Item[] {
+    const result = new Map<string, Item>();
+
+    // Get forward relationships
+    for (const rel of this.getRelationships(itemId)) {
+      const target = this.getItem(rel.targetId);
+      if (target) {
+        result.set(target.id, target);
+      }
+    }
+
+    // Get reverse relationships
+    for (const rel of this.getReverseRelationships(itemId)) {
+      const source = this.getItem(rel.fromId);
+      if (source) {
+        result.set(source.id, source);
+      }
+    }
+
+    return Array.from(result.values());
+  }
+
+  /**
+   * Get items by role that are related to a given item
+   */
+  getRelatedItemsByRole(itemId: string, role: string, relationType?: string): Item[] {
+    const items = this.getRelatedItems(itemId, relationType);
+    return items.filter(item => item.role === role);
+  }
+
+  // ========================================================================
+  // Coverage and Statistics
+  // ========================================================================
+
+  /**
+   * Get statistics about items by role
+   */
+  getRoleStatistics(): Record<string, number> {
+    const stats: Record<string, number> = {};
+    for (const role of this.getAllRoles()) {
+      stats[role] = this.getItemsByRole(role).length;
+    }
+    return stats;
+  }
+
+  /**
+   * Get total item count
+   */
+  size(): number {
+    return this._items.size;
+  }
+
+  /**
+   * Get total relationship count
+   */
+  relationshipCount(): number {
+    return this._relationships.size;
+  }
+
+  // ========================================================================
+  // Validation
+  // ========================================================================
+
+  /**
+   * Validate all items and relationships in the graph
+   */
+  validate(): ValidationResult {
+    const errors: string[] = [];
+    const warnings: GraphWarning[] = [...this._warnings];
+
+    // Check for orphaned relationships
+    for (const rel of this._relationships.values()) {
+      if (!this.getItem(rel.fromId)) {
+        errors.push(`Orphaned relationship: Source item '${rel.fromId}' not found for relationship type '${rel.type}'.`);
+      }
+      if (!this.getItem(rel.targetId)) {
+        errors.push(`Orphaned relationship: Target item '${rel.targetId}' not found for relationship type '${rel.type}'.`);
+      }
+    }
+
+    // Check for circular references
+    const circularErrors = this.findCircularReferences();
+    errors.push(...circularErrors);
+
+    // Check for items with unknown roles
+    if (this._configLoader) {
+      const knownRoles = this._configLoader.getConfig().roles;
+      for (const item of this._items.values()) {
+        if (!knownRoles.includes(item.role)) {
+          warnings.push({
+            type: 'unknown_role',
+            message: `Item '${item.id}' has unknown role '${item.role}'.`,
+            file: item.sourceFile,
+            line: item.sourceLine,
+          });
+        }
+      }
+    }
+
+    return { errors, warnings };
+  }
+
+  /**
+   * Find all circular references in the graph
+   */
+  private findCircularReferences(): string[] {
+    const errors: string[] = [];
+    const visited = new Set<string>();
+    const recursionStack = new Set<string>();
+
+    const checkNode = (nodeId: string, path: string[]) => {
+      if (recursionStack.has(nodeId)) {
+        const cycleStartIndex = path.indexOf(nodeId);
+        const cycle = path.slice(cycleStartIndex);
+        errors.push(`Circular reference detected: ${cycle.join(' -> ')} -> ${nodeId}`);
+        return;
+      }
+
+      if (visited.has(nodeId)) return;
+
+      visited.add(nodeId);
+      recursionStack.add(nodeId);
+      path.push(nodeId);
+
+      // Follow all forward relationships
+      for (const rel of this.getRelationships(nodeId)) {
+        // Skip auto-generated inverse relationships
+        if (rel.autoGenerated) continue;
+        checkNode(rel.targetId, [...path]);
+      }
+
+      path.pop();
+      recursionStack.delete(nodeId);
+    };
+
+    // Check all items
+    for (const item of this._items.values()) {
+      checkNode(item.id, []);
+    }
+
+    return errors;
+  }
+
+  // ========================================================================
+  // Path Finding
+  // ========================================================================
+
+  /**
+   * Finds a path between two item IDs using depth-limited DFS
+   */
   findPath(fromId: string, toId: string, maxDepth: number = 5): string[] | null {
     return this.findPathRecursive(fromId, toId, [], maxDepth);
   }
@@ -655,10 +551,12 @@ export class TraceabilityGraph {
     return null;
   }
 
-  /** Returns all node IDs reachable from the given ID in either direction (BFS). */
-  getImpactAnalysis(id: string): string[] {
+  /**
+   * Returns all item IDs reachable from the given ID in either direction (BFS)
+   */
+  getImpactAnalysis(itemId: string): string[] {
     const impacted = new Set<string>();
-    const queue = [id];
+    const queue = [itemId];
 
     while (queue.length > 0) {
       const current = queue.shift()!;
@@ -678,114 +576,66 @@ export class TraceabilityGraph {
       }
     }
 
-    return Array.from(impacted).filter(itemId => itemId !== id);
+    return Array.from(impacted).filter(id => id !== itemId);
   }
 
-  // ── Validation ─────────────────────────────────────────────────────────────
+  // ========================================================================
+  // Lifecycle
+  // ========================================================================
 
   /**
-   * Validate all nodes and relationships in the graph.
-   * Returns an array of validation errors, or empty array if valid.
+   * Clear all items and relationships
    */
-  validate(): string[] {
-    const errors: string[] = [];
-
-    // Check for orphaned relationships (relationships referencing non-existent nodes)
-    for (const rel of this._relationships.values()) {
-      if (!this.getNode(rel.fromId)) {
-        errors.push(`Orphaned relationship: Source node '${rel.fromId}' not found for relationship type '${rel.type}'.`);
-      }
-      if (!this.getNode(rel.targetId)) {
-        errors.push(`Orphaned relationship: Target node '${rel.targetId}' not found for relationship type '${rel.type}'.`);
-      }
-    }
-
-    // Check for circular references
-    const circularErrors = this.findCircularReferences();
-    errors.push(...circularErrors);
-
-    return errors;
-  }
-
-  /**
-   * Find all circular references in the graph.
-   * Returns an array of error messages describing the cycles.
-   */
-  private findCircularReferences(): string[] {
-    const errors: string[] = [];
-    const visited = new Set<string>();
-    const recursionStack = new Set<string>();
-
-    const checkNode = (nodeId: string, path: string[]) => {
-      if (recursionStack.has(nodeId)) {
-        // Found a cycle
-        const cycleStartIndex = path.indexOf(nodeId);
-        const cycle = path.slice(cycleStartIndex);
-        errors.push(`Circular reference detected: ${cycle.join(' -> ')} -> ${nodeId}`);
-        return;
-      }
-
-      if (visited.has(nodeId)) return;
-
-      visited.add(nodeId);
-      recursionStack.add(nodeId);
-      path.push(nodeId);
-
-      // Follow all forward relationships, but skip auto-generated inverses
-      // to avoid false positives on bidirectional pairs
-      for (const rel of this.getRelationships(nodeId)) {
-        // Skip auto-generated inverse relationships
-        if (rel.autoGenerated) continue;
-        checkNode(rel.targetId, [...path]);
-      }
-
-      path.pop();
-      recursionStack.delete(nodeId);
-    };
-
-    // Check all nodes
-    for (const req of this._requirements.values()) {
-      checkNode(req.id, []);
-    }
-    for (const imp of this._implementations.values()) {
-      checkNode(imp.id, []);
-    }
-    for (const test of this._tests.values()) {
-      checkNode(test.id, []);
-    }
-    for (const doc of this._documents.values()) {
-      checkNode(doc.id, []);
-    }
-
-    return errors;
-  }
-
-  // ── Lifecycle ───────────────────────────────────────────────────────────────
-
-  size(): number {
-    return (
-      this._requirements.size +
-      this._implementations.size +
-      this._tests.size +
-      this._documents.size
-    );
-  }
-
   clear(): void {
-    this._requirements.clear();
-    this._implementations.clear();
-    this._tests.clear();
-    this._documents.clear();
-    this._designs.clear();
+    this._items.clear();
+    this._itemsByRole.clear();
     this._relationships.clear();
-    this._inverseIndex.clear();
     this._relationshipIndex.clear();
     this._reverseRelationshipIndex.clear();
-    // Clear all caches
-    this._allRequirementsCache = null;
-    this._allImplementationsCache = null;
-    this._allTestsCache = null;
-    this._allDocumentsCache = null;
-    this._allDesignsCache = null;
+    this._inverseIndex.clear();
+    this._warnings = [];
+    this._allItemsCache = null;
+    this._allRelationshipsCache = null;
+  }
+
+  /**
+   * Merge another graph into this one
+   */
+  merge(other: TraceabilityGraph): void {
+    for (const item of other.getAllItems()) {
+      this.addItem({ ...item });
+    }
+    for (const rel of other.getAllRelationships()) {
+      this.addRelationship({ ...rel });
+    }
+  }
+
+  // ========================================================================
+  // Private Index Management
+  // ========================================================================
+
+  /**
+   * Update the relationship index for fast queries
+   */
+  private _updateRelationshipIndex(relationship: ItemRelationship): void {
+    // Update forward index: fromId -> type -> [Relationships]
+    if (!this._relationshipIndex.has(relationship.fromId)) {
+      this._relationshipIndex.set(relationship.fromId, new Map());
+    }
+    const fromIndex = this._relationshipIndex.get(relationship.fromId)!;
+    if (!fromIndex.has(relationship.type)) {
+      fromIndex.set(relationship.type, []);
+    }
+    fromIndex.get(relationship.type)!.push(relationship);
+
+    // Update reverse index: targetId -> type -> [Relationships]
+    if (!this._reverseRelationshipIndex.has(relationship.targetId)) {
+      this._reverseRelationshipIndex.set(relationship.targetId, new Map());
+    }
+    const targetIndex = this._reverseRelationshipIndex.get(relationship.targetId)!;
+    if (!targetIndex.has(relationship.type)) {
+      targetIndex.set(relationship.type, []);
+    }
+    targetIndex.get(relationship.type)!.push(relationship);
   }
 }

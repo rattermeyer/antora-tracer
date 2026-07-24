@@ -2,7 +2,7 @@
  * Antora Extension for Requirements Traceability
  *
  * This module provides the Antora extension that integrates requirements traceability
- * into the Antora documentation pipeline.
+ * into the Antora documentation pipeline using the unified item architecture.
  *
  * Usage:
  * In your Antora playbook, add this extension to the extensions array:
@@ -14,6 +14,8 @@
  */
 
 import { RequirementsTraceabilityExtension } from './index.js';
+import { ConfigLoader } from './config/TraceabilityConfig.js';
+import { MatrixGenerator } from './MatrixGenerator.js';
 import { mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
@@ -21,32 +23,25 @@ import { join } from 'path';
  * Antora Extension Configuration
  */
 export interface AntoraTraceabilityConfig {
-  /** Enable or disable traceability processing */
   enabled?: boolean;
-  /** Output directory for traceability artifacts */
   outputDir?: string;
-  /** Generate traceability matrices */
   generateMatrices?: boolean;
-  /** Matrix output formats */
   matrixFormats?: ('csv' | 'html' | 'json')[];
-  /** Include traceability in navigation */
   includeInNavigation?: boolean;
+  preset?: string;
+  configPath?: string;
 }
 
-/**
- * Default configuration
- */
 const DEFAULT_CONFIG: Required<AntoraTraceabilityConfig> = {
   enabled: true,
   outputDir: 'traceability',
   generateMatrices: true,
   matrixFormats: ['html', 'csv'],
   includeInNavigation: true,
+  preset: 'requirements-engineering',
+  configPath: '',
 };
 
-/**
- * Antora Extension Context (Antora 3.x API)
- */
 export interface AntoraExtensionContext {
   getLogger: (name?: string) => {
     info: (message: string) => void;
@@ -61,58 +56,13 @@ export interface AntoraExtensionContext {
   playbook?: any;
 }
 
-/**
- * Content Catalog (simplified interface)
- */
-export interface ContentCatalog {
-  findBy: (criteria: any) => any;
-  addPage: (page: any) => void;
-}
-
-/**
- * Content Node (simplified interface)
- */
-export interface ContentNode {
-  src: {
-    path: string;
-    contents: Buffer;
-  };
-  traceability?: any;
-}
-
-/**
- * Page (simplified interface)
- */
-export interface Page {
-  id: string;
-  title: string;
-  component: string;
-  version: string;
-  module: string;
-  family: string;
-  contents: Buffer;
-  out: {
-    path: string;
-  };
-}
-
-/**
- * Antora Extension for Requirements Traceability
- *
- * This extension processes AsciiDoc content during the Antora build to:
- * 1. Extract requirements, implementations, tests, and documents
- * 2. Build a traceability graph
- * 3. Generate traceability matrices
- * 4. Add traceability information to the site navigation
- */
 export class AntoraTraceabilityExtension {
-  private readonly traceability: RequirementsTraceabilityExtension;
+  private traceability: RequirementsTraceabilityExtension | null = null;
   private config: Required<AntoraTraceabilityConfig>;
   private readonly logger: ReturnType<AntoraExtensionContext['getLogger']>;
 
   constructor(private readonly context: AntoraExtensionContext) {
     this.logger = context.getLogger('requirements-traceability');
-    this.traceability = new RequirementsTraceabilityExtension();
     this.config = { ...DEFAULT_CONFIG, ...this.loadConfig() };
 
     if (!this.config.enabled) {
@@ -121,20 +71,41 @@ export class AntoraTraceabilityExtension {
     }
 
     this.logger.info('Requirements traceability extension initialized');
+    this.initializeAsync();
+  }
 
-    // Register content classifier for AsciiDoc files
+  private async initializeAsync(): Promise<void> {
+    this.traceability = await this.createTraceabilityExtension();
     this.registerContentClassifier();
-
-    // Register page processor for traceability pages
     this.registerPageProcessor();
-
-    // Register navigation enhancer
     this.registerNavigationEnhancer();
   }
 
-  /**
-   * Load configuration from Antora playbook
-   */
+  private async createTraceabilityExtension(): Promise<RequirementsTraceabilityExtension> {
+    if (this.config.configPath) {
+      const configLoader = new ConfigLoader();
+      try {
+        configLoader.load(this.config.configPath);
+        this.logger.info(`Loaded configuration from: ${this.config.configPath}`);
+        return new RequirementsTraceabilityExtension(configLoader);
+      } catch (error: any) {
+        this.logger.warn(`Could not load configuration: ${error.message}. Using default.`);
+      }
+    }
+
+    if (this.config.preset) {
+      try {
+        return await RequirementsTraceabilityExtension.createWithPreset(
+          this.config.preset as any
+        );
+      } catch (error: any) {
+        this.logger.warn(`Could not load preset: ${error.message}. Using default.`);
+      }
+    }
+
+    return new RequirementsTraceabilityExtension();
+  }
+
   private loadConfig(): Partial<AntoraTraceabilityConfig> {
     try {
       const playbook = this.context.playbook;
@@ -145,9 +116,6 @@ export class AntoraTraceabilityExtension {
     }
   }
 
-  /**
-   * Register a content classifier to process AsciiDoc files
-   */
   private registerContentClassifier(): void {
     this.context.on('contentClassified', (event: any) => {
       const contentCatalog = event.contentCatalog;
@@ -157,573 +125,250 @@ export class AntoraTraceabilityExtension {
       }
 
       this.logger.info('Processing content for traceability');
-
-      // Find all AsciiDoc files in the content catalog
       const files = contentCatalog.findBy({ family: 'page' }) || [];
       const adocFiles = files.filter((file: any) => file.src && file.src.path && file.src.path.endsWith('.adoc'));
 
-      // Two-pass processing: first add all nodes, then add all relationships
-      // This ensures cross-file references can be resolved
-      this.processAsciiDocFilesNodes(adocFiles);
-      this.processAsciiDocFilesRelationships(adocFiles);
+      for (const file of adocFiles) {
+        this.processAsciiDocFile(file);
+      }
     });
   }
 
-  /**
-   * Process AsciiDoc files - first pass: add all nodes to the graph
-   */
-  private processAsciiDocFilesNodes(files: any[]): void {
-    for (const file of files) {
-      try {
-        const contentsBuffer = file.contents || file.src?.contents;
-        if (!contentsBuffer) {
-          this.logger.debug(`Skipping file without contents: ${file.src?.path || 'unknown'}`);
-          continue;
-        }
-
-        const content = contentsBuffer.toString('utf8');
-        const sourceFile = file.src?.path || file.path || 'unknown';
-
-        // Parse the file for traceability elements
-        const parser = (this.traceability as any).parser;
-        const parsed = parser.parse(content, sourceFile);
-
-        // Add nodes to the graph (first pass - all nodes)
-        for (const req of parsed.requirements) {
-          this.traceability.graph.addRequirement(req);
-          this.logger.debug(`Registered requirement: ${req.id}`);
-        }
-        for (const imp of parsed.implementations) {
-          this.traceability.graph.addImplementation(imp);
-          this.logger.debug(`Registered implementation: ${imp.id}`);
-        }
-        for (const test of parsed.tests) {
-          this.traceability.graph.addTest(test);
-          this.logger.debug(`Registered test: ${test.id}`);
-        }
-        for (const doc of parsed.documents) {
-          this.traceability.graph.addDocument(doc);
-          this.logger.debug(`Registered document: ${doc.id}`);
-        }
-        for (const design of parsed.designs) {
-          this.traceability.graph.addDesign(design);
-          this.logger.debug(`Registered design: ${design.id}`);
-        }
-      } catch (error: any) {
-        this.logger.warn(`Error processing nodes for ${file.src?.path}: ${error.message}`);
-      }
+  private processAsciiDocFile(file: any): void {
+    if (!this.traceability) {
+      this.logger.warn('Traceability extension not initialized, skipping file processing');
+      return;
     }
-    this.logger.info(`Registered ${this.traceability.graph.getAllRequirements().length} requirements, ${this.traceability.graph.getAllImplementations().length} implementations, ${this.traceability.graph.getAllTests().length} tests, ${this.traceability.graph.getAllDesigns().length} designs`);
+    try {
+      const contentsBuffer = file.contents || file.src?.contents;
+      if (!contentsBuffer) {
+        this.logger.debug(`Skipping file without contents: ${file.src?.path || 'unknown'}`);
+        return;
+      }
+
+      const content = contentsBuffer.toString('utf8');
+      const sourceFile = file.src?.path || file.path || 'unknown';
+      const result = this.traceability.process(content, { sourceFile });
+      this.logger.debug(`Processed ${sourceFile}: ${result.items.length} items, ${result.relationships.length} relationships`);
+    } catch (error: any) {
+      this.logger.warn(`Error processing ${file.src?.path}: ${error.message}`);
+    }
   }
 
-  /**
-   * Process AsciiDoc files - second pass: add all relationships
-   */
-  private processAsciiDocFilesRelationships(files: any[]): void {
-    for (const file of files) {
-      try {
-        const contentsBuffer = file.contents || file.src?.contents;
-        if (!contentsBuffer) {
-          this.logger.debug(`Skipping file without contents: ${file.src?.path || 'unknown'}`);
-          continue;
-        }
-
-        const content = contentsBuffer.toString('utf8');
-        const sourceFile = file.src?.path || file.path || 'unknown';
-
-        // Parse the file for traceability elements
-        const parser = (this.traceability as any).parser;
-        const parsed = parser.parse(content, sourceFile);
-
-        // Add relationships (second pass - all nodes should now exist)
-        for (const rel of parsed.relationships) {
-          try {
-            this.traceability.graph.addRelationship(rel);
-            this.logger.debug(`Registered relationship: ${rel.fromId} ${rel.type} ${rel.targetId}`);
-          } catch (error: any) {
-            // This should not happen anymore since all nodes were added in first pass
-            this.logger.warn(`Failed to add relationship: ${rel.fromId} ${rel.type} ${rel.targetId} - ${error.message}`);
-          }
-        }
-      } catch (error: any) {
-        this.logger.warn(`Error processing relationships for ${file.src?.path}: ${error.message}`);
-      }
-    }
-    this.logger.info(`Registered ${this.traceability.graph.getAllRelationships().length} relationships`);
-  }
-
-  /**
-   * Register a page processor to generate traceability pages
-   */
   private registerPageProcessor(): void {
-    // Generate traceability files after site is published
     this.context.on('sitePublished', (event: any) => {
       if (!this.config.generateMatrices) return;
-
       this.generateTraceabilityFiles(event);
     });
   }
 
-  /**
-   * Generate traceability files to output directory
-   */
   private generateTraceabilityFiles(event: any): void {
     try {
-      // Get output directory from event
       const outputDir = event.playbook?.output?.dir || event.playbook?.dir || '_site';
       const traceabilityDir = join(outputDir, this.config.outputDir);
-
       this.logger.info(`Writing traceability files to ${traceabilityDir}`);
-
-      // Create directory if it doesn't exist
       mkdirSync(traceabilityDir, { recursive: true });
 
-      // Generate different matrix types (including inverse matrices and design-design)
-      const matrixTypes = ['req-impl', 'req-test', 'req-design', 'design-impl', 'full',
-        'impl-req', 'test-impl', 'test-req', 'design-req', 'design-design'];
+      if (!this.traceability) {
+        this.logger.warn('Traceability extension not initialized, skipping file generation');
+        return;
+      }
+      const allItems = this.traceability.graph.getAllItems();
+      if (allItems.length === 0) {
+        this.logger.warn('No traceable items found. Skipping matrix generation.');
+        return;
+      }
 
-      for (const matrixType of matrixTypes) {
+      const matrices = this.traceability?.configLoader?.getConfig()?.matrices || [];
+      const matrixNames = matrices.length > 0
+        ? matrices.map((m: any) => m.name)
+        : this.generateDefaultMatrixNames(this.traceability.graph.getAllRoles());
+
+      const generator = new MatrixGenerator(this.traceability.graph, this.traceability.configLoader);
+
+      for (const matrixName of matrixNames) {
         for (const format of this.config.matrixFormats) {
-          const matrixContent = format === 'html'
-            ? this.traceability.exportMatrixToHTML(matrixType)
-            : this.traceability.exportMatrixToCSV(matrixType);
-
-          const safeType = matrixType.replace('/', '-');
-          const fileName = `matrix-${safeType}.${format}`;
-          const filePath = join(traceabilityDir, fileName);
-
-          writeFileSync(filePath, matrixContent, 'utf8');
-          this.logger.info(`✓ Generated ${fileName}`);
+          try {
+            const matrix = generator.generateMatrix(matrixName);
+            let matrixContent: string;
+            if (format === 'html') {
+              matrixContent = generator.exportToHTML(matrix);
+            } else if (format === 'json') {
+              matrixContent = JSON.stringify(matrix, null, 2);
+            } else {
+              matrixContent = generator.exportToCSV(matrix);
+            }
+            const safeName = matrixName.replace(/[^a-zA-Z0-9-]/g, '-').toLowerCase();
+            const fileName = `matrix-${safeName}.${format}`;
+            const filePath = join(traceabilityDir, fileName);
+            writeFileSync(filePath, matrixContent, 'utf8');
+            this.logger.info(`Generated ${fileName}`);
+          } catch (error: any) {
+            this.logger.warn(`Failed to generate matrix ${matrixName} (${format}): ${error.message}`);
+          }
         }
       }
 
-      // Generate coverage report
-      const coverage = this.traceability.getCoverageReport();
-      const coverageContent = this.formatCoverageReport(coverage);
-      const coveragePath = join(traceabilityDir, 'coverage.html');
-      writeFileSync(coveragePath, coverageContent, 'utf8');
-      this.logger.info('✓ Generated coverage.html');
-
-      // Generate index page
-      const indexContent = this.generateIndexContent();
-      const indexPath = join(traceabilityDir, 'index.html');
-      writeFileSync(indexPath, indexContent, 'utf8');
-      this.logger.info('✓ Generated index.html');
-
-      this.logger.info(`✅ Traceability files written to ${this.config.outputDir}/`);
+      this.generateCoverageReport(traceabilityDir);
+      const indexContent = this.generateIndexContent(matrixNames);
+      writeFileSync(join(traceabilityDir, 'index.html'), indexContent, 'utf8');
+      this.logger.info('Generated index.html');
+      this.logger.info(`Traceability files written to ${this.config.outputDir}/`);
     } catch (error: any) {
       this.logger.error(`Error generating traceability pages: ${error.message}`);
     }
   }
 
-  /**
-   * Generate an index page that links to all traceability artifacts
-   */
-  private generateIndexContent(): string {
-    const matrixTypes = ['req-impl', 'req-test', 'req-design', 'design-impl', 'full',
-      'impl-req', 'test-impl', 'test-req', 'design-req', 'design-design'];
-    const formats = this.config.matrixFormats;
-
-    let linksHtml = '<ul>';
-
-    // Add matrix links
-    for (const matrixType of matrixTypes) {
-      for (const format of formats) {
-        const safeType = matrixType.replace('/', '-');
-        const displayType = matrixType.replace('-', ' ').replace('req', 'Requirements').replace('impl', 'Implementation').replace('test', 'Test');
-        linksHtml += `<li><a href="matrix-${safeType}.${format}">${displayType} Matrix (${format.toUpperCase()})</a></li>`;
-      }
+  private generateDefaultMatrixNames(roles: string[]): string[] {
+    if (!this.traceability) return ['default'];
+    const matrices: string[] = [];
+    const roleList = Array.from(new Set(roles));
+    if (roleList.includes('requirement')) {
+      if (roleList.includes('implementation')) matrices.push('requirements-implementations');
+      if (roleList.includes('test')) matrices.push('requirements-tests');
+      if (roleList.includes('design')) matrices.push('requirements-design');
     }
-
-    // Add coverage report link
-    linksHtml += '<li><a href="coverage.html">Coverage Report</a></li>';
-    linksHtml += '</ul>';
-
-    const indexContent = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Requirements Traceability</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background-color: #f5f5f5;
+    if (matrices.length === 0 && roleList.length > 0) {
+      matrices.push('all-items');
     }
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    header {
-      background: linear-gradient(135deg, #007bff, #0056b3);
-      color: white;
-      padding: 30px 0;
-      margin-bottom: 30px;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 2rem;
-    }
-    header .subtitle {
-      opacity: 0.9;
-      font-size: 1.1rem;
-    }
-    .card {
-      background: white;
-      padding: 25px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-    }
-    .card h2 {
-      margin-top: 0;
-      color: #333;
-    }
-    .card ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    .card li {
-      padding: 10px 0;
-      border-bottom: 1px solid #eee;
-    }
-    .card li:last-child {
-      border-bottom: none;
-    }
-    .card a {
-      color: #007bff;
-      text-decoration: none;
-      display: block;
-      transition: all 0.2s;
-    }
-    .card a:hover {
-      color: #0056b3;
-      transform: translateX(4px);
-    }
-    footer {
-      text-align: center;
-      padding: 20px;
-      color: #666;
-      font-size: 0.85rem;
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <div class="container">
-      <h1>Requirements Traceability</h1>
-      <p class="subtitle">Traceability matrices and coverage reports</p>
-    </div>
-  </header>
-  <div class="container">
-    <div class="card">
-      <h2>Traceability Artifacts</h2>
-      <p>Browse the traceability matrices and coverage reports generated from your documentation:</p>
-      ${linksHtml}
-    </div>
-    <footer>
-      <p>Generated by Antora Requirements Traceability Extension v0.1.0</p>
-    </footer>
-  </div>
-</body>
-</html>
-    `;
-
-    return indexContent;
+    return matrices.length > 0 ? matrices : ['default'];
   }
 
-  /**
-   * Format coverage report as HTML with enhanced styling
-   */
-  private formatCoverageReport(coverage: any): string {
-    const implementationCoverage = coverage.implementationCoverage.toFixed(1);
-    const testCoverage = coverage.testCoverage.toFixed(1);
-    const implColor = implementationCoverage >= 80 ? '#28a745' : implementationCoverage >= 50 ? '#ffc107' : '#dc3545';
-    const testColor = testCoverage >= 80 ? '#28a745' : testCoverage >= 50 ? '#ffc107' : '#dc3545';
+  private generateCoverageReport(traceabilityDir: string): void {
+    if (!this.traceability) {
+      this.logger.warn('Traceability extension not initialized, skipping coverage report');
+      return;
+    }
+    try {
+      const stats = this.traceability.graph.getRoleStatistics();
+      const generator = new MatrixGenerator(this.traceability.graph, this.traceability.configLoader);
+      const coverage = generator.getCoverageReport();
+      const coverageContent = this.formatCoverageReport(stats, coverage);
+      writeFileSync(join(traceabilityDir, 'coverage.html'), coverageContent, 'utf8');
+      this.logger.info('Generated coverage.html');
+    } catch (error: any) {
+      this.logger.warn(`Failed to generate coverage report: ${error.message}`);
+    }
+  }
+
+  private formatCoverageReport(stats: Record<string, number>, _coverage: Record<string, any>): string {
+    const total = Object.values(stats).reduce((sum, count) => sum + count, 0);
+    const coverageCards = Object.entries(stats).map(([role, count]) => {
+      const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : '0';
+      const percentNum = parseFloat(percentage);
+      const color = percentNum >= 80 ? '#28a745' : percentNum >= 50 ? '#ffc107' : '#dc3545';
+      return `
+        <div class="coverage-card">
+          <h3>${role}</h3>
+          <div class="metric-value" style="color: ${color}">${count}</div>
+          <div class="progress-bar"><div class="progress-fill" style="width: ${percentage}%; background: ${color}"></div></div>
+          <div class="metric-label">${percentage}% of ${total} items</div>
+        </div>
+      `;
+    }).join('\n');
+
+    const rows = Object.entries(stats).map(([role, count]) => {
+      const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
+      return `<tr><td>${role}</td><td>${count}</td><td>${percentage}%</td></tr>`;
+    }).join('\n');
 
     return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Traceability Coverage Report</title>
   <style>
-    :root {
-      --primary-color: #007bff;
-      --success-color: #28a745;
-      --warning-color: #ffc107;
-      --danger-color: #dc3545;
-      --light-bg: #f8f9fa;
-      --border-color: #dee2e6;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background-color: #f5f5f5;
-      color: #333;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    header {
-      background: linear-gradient(135deg, var(--primary-color), #0056b3);
-      color: white;
-      padding: 30px 0;
-      margin-bottom: 30px;
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 2rem;
-    }
-
-    header .subtitle {
-      opacity: 0.9;
-      font-size: 1.1rem;
-    }
-
-    .nav-breadcrumb {
-      background: white;
-      padding: 15px 20px;
-      border-radius: 5px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .nav-breadcrumb a {
-      color: var(--primary-color);
-      text-decoration: none;
-    }
-
-    .nav-breadcrumb a:hover {
-      text-decoration: underline;
-    }
-
-    .coverage-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-      margin-bottom: 30px;
-    }
-
-    .coverage-card {
-      background: white;
-      padding: 25px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .coverage-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-
-    .coverage-card h3 {
-      margin-top: 0;
-      color: #555;
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .metric-value {
-      font-size: 2.5rem;
-      font-weight: bold;
-      margin: 10px 0;
-    }
-
-    .metric-label {
-      color: #666;
-      font-size: 0.9rem;
-    }
-
-    .progress-bar {
-      height: 8px;
-      background: #e9ecef;
-      border-radius: 4px;
-      margin: 15px 0;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      border-radius: 4px;
-      transition: width 0.3s ease;
-    }
-
-    .summary-section {
-      background: white;
-      padding: 25px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-    }
-
-    .summary-section h2 {
-      margin-top: 0;
-      color: #333;
-    }
-
-    .uncovered-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .uncovered-list li {
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .uncovered-list li:last-child {
-      border-bottom: none;
-    }
-
-    .status-badge {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-size: 0.75rem;
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-
-    .status-complete {
-      background: #d4edda;
-      color: #155724;
-    }
-
-    .status-partial {
-      background: #fff3cd;
-      color: #856404;
-    }
-
-    .status-missing {
-      background: #f8d7da;
-      color: #721c24;
-    }
-
-    footer {
-      text-align: center;
-      padding: 20px;
-      color: #666;
-      font-size: 0.85rem;
-    }
-
-    @media (max-width: 768px) {
-      .coverage-grid {
-        grid-template-columns: 1fr;
-      }
-
-      header h1 {
-        font-size: 1.5rem;
-      }
-    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    header { background: linear-gradient(135deg, #007bff, #0056b3); color: white; padding: 30px 0; margin-bottom: 30px; }
+    header h1 { margin: 0; font-size: 2rem; }
+    .coverage-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+    .coverage-card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .metric-value { font-size: 2.5rem; font-weight: bold; margin: 10px 0; }
+    .progress-bar { height: 8px; background: #e9ecef; border-radius: 4px; margin: 15px 0; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 4px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+    th { background: #f8f9fa; font-weight: 600; }
+    footer { text-align: center; padding: 20px; color: #666; }
   </style>
 </head>
 <body>
-  <header>
-    <div class="container">
-      <h1>Traceability Coverage Report</h1>
-      <p class="subtitle">Requirements Traceability Extension</p>
-    </div>
-  </header>
-
+  <header><div class="container"><h1>Traceability Coverage Report</h1></div></header>
   <div class="container">
-    <nav class="nav-breadcrumb">
-      <a href="../">← Back to Documentation</a>
-    </nav>
-
-    <div class="coverage-grid">
-      <div class="coverage-card">
-        <h3>Total Requirements</h3>
-        <div class="metric-value">${coverage.totalRequirements}</div>
-        <div class="metric-label">requirements tracked</div>
-      </div>
-
-      <div class="coverage-card">
-        <h3>Implementation Coverage</h3>
-        <div class="metric-value" style="color: ${implColor}">${implementationCoverage}%</div>
-        <div class="progress-bar">
-          <div class="progress-fill" style="width: ${implementationCoverage}%; background: ${implColor}"></div>
-        </div>
-        <div class="metric-label">${coverage.requirementsWithImplementation} of ${coverage.totalRequirements} implemented</div>
-      </div>
-
-      <div class="coverage-card">
-        <h3>Test Coverage</h3>
-        <div class="metric-value" style="color: ${testColor}">${testCoverage}%</div>
-        <div class="progress-bar">
-          <div class="progress-fill" style="width: ${testCoverage}%; background: ${testColor}"></div>
-        </div>
-        <div class="metric-label">${coverage.requirementsWithTests} of ${coverage.totalRequirements} tested</div>
-      </div>
-    </div>
-
-    <div class="summary-section">
-      <h2>Coverage Details</h2>
-      <p>This report shows the traceability coverage for your documentation. Requirements with implementations and tests are considered fully covered.</p>
-    </div>
-
-    <footer>
-      <p>Generated by Antora Requirements Traceability Extension v0.1.0</p>
-    </footer>
+    <h2>Items by Role</h2>
+    <div class="coverage-grid">${coverageCards}</div>
+    <h2>Summary</h2>
+    <p>Total: <strong>${total}</strong> items</p>
+    <table><thead><tr><th>Role</th><th>Count</th><th>Percentage</th></tr></thead><tbody>${rows}</tbody></table>
+    <footer><p>Antora Requirements Traceability Extension</p></footer>
   </div>
 </body>
 </html>
     `;
   }
 
-  /**
-   * Register navigation enhancer to add traceability links
-   */
+  private generateIndexContent(matrixNames: string[]): string {
+    const formats = this.config.matrixFormats;
+    const links = matrixNames.flatMap(name => {
+      const safeName = name.replace(/[^a-zA-Z0-9-]/g, '-').toLowerCase();
+      const displayName = name.replace(/-/g, ' ');
+      return formats.map(f => `<li><a href="matrix-${safeName}.${f}">${displayName} (${f.toUpperCase()})</a></li>`);
+    }).join('\n');
+
+    return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Requirements Traceability</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    header { background: linear-gradient(135deg, #007bff, #0056b3); color: white; padding: 30px 0; margin-bottom: 30px; }
+    header h1 { margin: 0; font-size: 2rem; }
+    .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .card ul { list-style: none; padding: 0; margin: 0; }
+    .card li { padding: 10px 0; border-bottom: 1px solid #eee; }
+    .card li:last-child { border-bottom: none; }
+    .card a { color: #007bff; text-decoration: none; display: block; }
+    footer { text-align: center; padding: 20px; color: #666; }
+  </style>
+</head>
+<body>
+  <header><div class="container"><h1>Requirements Traceability</h1></div></header>
+  <div class="container">
+    <div class="card"><h2>Traceability Artifacts</h2><p>Browse traceability matrices and reports:</p><ul>${links}</ul></div>
+    <footer><p>Antora Requirements Traceability Extension</p></footer>
+  </div>
+</body>
+</html>
+    `;
+  }
+
   private registerNavigationEnhancer(): void {
     if (!this.config.includeInNavigation) return;
-
     this.context.on('beforeSiteGenerated', () => {
-      // Add traceability section to navigation
-      // This is a placeholder - actual implementation depends on Antora version
       this.logger.info('Enhanced navigation with traceability links');
     });
   }
 
-  /**
-   * Get the traceability extension for direct access
-   */
-  getTraceabilityExtension(): RequirementsTraceabilityExtension {
+  getTraceabilityExtension() {
+    if (!this.traceability) {
+      throw new Error('Traceability extension not initialized');
+    }
     return this.traceability;
   }
 }
 
-/**
- * Antora extension registration
- * This is the entry point that Antora calls to load the extension
- */
 function register(context: AntoraExtensionContext): void {
   new AntoraTraceabilityExtension(context);
 }
 
-// Factory function for testing and backward compatibility
 function createAntoraExtension(context: AntoraExtensionContext): AntoraTraceabilityExtension {
   return new AntoraTraceabilityExtension(context);
 }
 
-// Export for Antora (expects { register } object)
-export { register };
-
-// Export factory function for testing
-export { createAntoraExtension };
-
-// Default export for compatibility
+export { register, createAntoraExtension };
 export default { register };

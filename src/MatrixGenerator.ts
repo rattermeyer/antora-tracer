@@ -1,13 +1,16 @@
+/**
+ * MatrixGenerator - Role-based matrix generation
+ *
+ * This replaces the old MatrixGenerator with:
+ * - Configurable matrix types based on configuration
+ * - Role-based row and column filtering
+ * - Support for user-defined relation types
+ * - Template-based HTML output
+ */
+
 import type { TraceabilityGraph } from './TraceabilityGraph.js';
-import type {
-  CoverageReport,
-  RequirementDetail,
-  ImplementationDetail,
-  TestDetail,
-  TraceabilityMatrix,
-  DesignTraceabilityMatrix,
-  DetailedTraceabilityMatrix,
-} from './types.js';
+import type { ConfigLoader } from './config/TraceabilityConfig.js';
+import type { Item, ItemRelationship } from './types.js';
 import { TemplateRenderer } from './TemplateRenderer.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -16,219 +19,460 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_TEMPLATE_DIR = path.join(__dirname, 'templates');
 
 /**
- * Options for MatrixGenerator
+ * Matrix cell data
  */
-export interface MatrixGeneratorOptions {
-  /**
-   * Custom directory containing Mustache template files.
-   * If not provided, uses built-in templates.
-   */
-  templateDir?: string;
+export interface MatrixCell {
+  itemId: string;
+  itemTitle: string;
+  role: string;
+  sourceFile?: string;
 }
 
 /**
- * Prepared row data for template rendering
+ * Matrix row data
  */
-interface RequirementRowTemplateData {
-  id: string;
-  title: string;
-  implementations: string;
-  tests: string;
-  statusBadge: string;
+export interface MatrixRow {
+  rowId: string;
+  rowTitle: string;
+  rowRole: string;
+  cells: MatrixCell[];
+  coverage: number; // 0-100 percentage
+  status: 'complete' | 'partial' | 'missing';
 }
 
 /**
- * Prepared row data for design template rendering
+ * Matrix definition
  */
-interface DesignRowTemplateData {
-  id: string;
-  title: string;
-  implementations: string;
-  tests: string;
-  statusBadge: string;
-  hierarchyClass: string;
-  hierarchyIndicators: string;
+export interface MatrixConfig {
+  name: string;
+  description?: string;
+  rows: string; // Role name for rows
+  columns: string[]; // Role names for columns
+  coverageRelations?: Record<string, string[]>; // Which relations count for coverage per column
 }
 
 /**
- * Summary data for template rendering
+ * Generated matrix
  */
-interface SummaryTemplateData {
-  itemType: string;
-  total: number;
-  withImplementation?: number;
-  withTests?: number;
-  implCoverage: string;
-  testCoverage: string;
-}
-
-/**
- * Complete template data for matrix rendering
- */
-interface MatrixTemplateData {
+export interface GeneratedMatrix {
+  name: string;
   type: string;
-  rows: RequirementRowTemplateData[] | DesignRowTemplateData[];
-  summary: SummaryTemplateData;
-  styles?: string; // Optional - can be used if needed
+  rows: MatrixRow[];
+  columns: { name: string; role: string }[];
+  coverage: Record<string, number>;
+  generatedAt: string;
 }
 
+/**
+ * MatrixGenerator - Generates matrices based on role configuration
+ */
 export class MatrixGenerator {
+  private readonly graph: TraceabilityGraph;
+  private readonly configLoader?: ConfigLoader;
   private readonly templateRenderer: TemplateRenderer;
 
   constructor(
-    private readonly graph: TraceabilityGraph,
-    options: MatrixGeneratorOptions = {}
+    graph: TraceabilityGraph,
+    configLoader?: ConfigLoader,
+    options: { templateDir?: string } = {}
   ) {
+    this.graph = graph;
+    this.configLoader = configLoader;
     const templateDir = options.templateDir || DEFAULT_TEMPLATE_DIR;
     this.templateRenderer = new TemplateRenderer(templateDir);
   }
 
-  generateMatrix(type: string = 'req-impl'): TraceabilityMatrix | DesignTraceabilityMatrix {
-    switch (type) {
-      case 'req-impl':
-        return this.generateRequirementsImplementationMatrix();
-      case 'req-test':
-        return this.generateTestMatrix();
-      case 'req-design':
-        return this.generateRequirementsDesignMatrix();
-      case 'design-impl':
-        return this.generateDesignImplementationMatrix();
-      // Inverse matrices (Phase 3)
-      case 'impl-req':
-        return this.generateImplementationRequirementMatrix();
-      case 'test-impl':
-        return this.generateTestImplementationMatrix();
-      case 'test-req':
-        return this.generateTestRequirementMatrix();
-      case 'design-req':
-        return this.generateDesignRequirementMatrix();
-      // Design-Design matrix (Phase 3)
-      case 'design-design':
-        return this.generateDesignDesignMatrix();
-      default:
-        return this.generateRequirementsImplementationMatrix();
-    }
-  }
-
-  private generateRequirementsImplementationMatrix(): TraceabilityMatrix {
-    const allImplementations = new Set(this.graph.getAllImplementations().map(imp => imp.id));
-
-    return {
-      type: 'req-impl',
-      coverage: this.graph.getCoverage(),
-      requirements: this.graph.getAllRequirements().map(req => ({
-        id: req.id,
-        title: req.title,
-        implementations: this.graph.getReverseRelationships(req.id, 'implements')
-          .filter(r => allImplementations.has(r.fromId))
-          .map(r => r.fromId),
-        tests: this.graph.getReverseRelationships(req.id, 'tests').map(r => r.fromId),
-      })),
-      generatedAt: new Date().toISOString(),
-    };
-  }
-
-  private generateRequirementsDesignMatrix(): TraceabilityMatrix {
-    // For req-design matrix, we use RequirementRow but with designs instead of implementations
-    return {
-      type: 'req-design',
-      coverage: this.graph.getCoverage(),
-      requirements: this.graph.getAllRequirements().map(req => ({
-        id: req.id,
-        title: req.title,
-        implementations: this.graph.getDesignsForRequirement(req.id).map(d => d.id),
-        tests: this.graph.getReverseRelationships(req.id, 'tests').map(r => r.fromId),
-      })),
-      generatedAt: new Date().toISOString(),
-    };
-  }
-
-  private generateDesignImplementationMatrix(): DesignTraceabilityMatrix {
-    return {
-      type: 'design-impl',
-      coverage: this.graph.getCoverage(),
-      designs: this.graph.getAllDesigns().map(design => ({
-        id: design.id,
-        title: design.title,
-        implementations: this.graph.getImplementationsForDesign(design.id).map(impl => impl.id),
-        tests: [],
-      })),
-      generatedAt: new Date().toISOString(),
-    };
-  }
-
-  generateDetailedMatrix(type: string = 'full'): DetailedTraceabilityMatrix {
-    return {
-      type,
-      coverage: this.graph.getCoverage(),
-      uncoveredRequirements: this.graph.getUncoveredRequirements().map(r => r.id),
-      requirements: this.getRequirementsWithDetails(),
-      implementations: this.getImplementationsWithDetails(),
-      tests: this.getTestsWithDetails(),
-      generatedAt: new Date().toISOString(),
-    };
-  }
-
-  getCoverageReport(): CoverageReport {
-    return this.graph.getCoverage();
-  }
-
-  getRequirementsWithDetails(): RequirementDetail[] {
-    return this.graph.getAllRequirements().map(req => ({
-      id: req.id,
-      title: req.title,
-      status: req.status,
-      satisfiedBy: this.graph.getReverseRelationships(req.id, 'satisfies').map(r => r.fromId),
-      implementedBy: this.graph.getReverseRelationships(req.id, 'implements').map(r => r.fromId),
-      testedBy: this.graph.getReverseRelationships(req.id, 'tests').map(r => r.fromId),
-      verifiedBy: this.graph.getReverseRelationships(req.id, 'verifies').map(r => r.fromId),
-      documentedBy: this.graph.getReverseRelationships(req.id, 'documents').map(r => r.fromId),
-    }));
-  }
-
-  getImplementationsWithDetails(): ImplementationDetail[] {
-    return this.graph.getAllImplementations().map(imp => ({
-      id: imp.id,
-      title: imp.title,
-      satisfies: this.graph.getRelationships(imp.id, 'satisfies').map(r => r.targetId),
-      testedBy: this.graph.getReverseRelationships(imp.id, 'tests').map(r => r.fromId),
-    }));
-  }
-
-  getTestsWithDetails(): TestDetail[] {
-    return this.graph.getAllTests().map(test => ({
-      id: test.id,
-      title: test.title,
-      verifies: this.graph.getRelationships(test.id, 'verifies').map(r => r.targetId),
-      tests: this.graph.getRelationships(test.id, 'tests').map(r => r.targetId),
-    }));
-  }
+  // ========================================================================
+  // Matrix Generation
+  // ========================================================================
 
   /**
-   * Generate a Requirements-to-Test matrix specifically.
+   * Generate a matrix by name from configuration
    */
-  generateTestMatrix(): TraceabilityMatrix {
+  generateMatrix(matrixName?: string): GeneratedMatrix {
+    if (!this.configLoader) {
+      // Fallback: generate a default matrix if no config
+      return this.generateDefaultMatrix(matrixName);
+    }
+
+    const matrices = this.configLoader.getMatrices();
+
+    if (!matrixName && matrices.length > 0) {
+      // Use the first matrix as default
+      return this.generateMatrixFromConfig(matrices[0]);
+    }
+
+    const matrixConfig = matrices.find(m => m.name === matrixName);
+    if (!matrixConfig) {
+      throw new Error(`Matrix '${matrixName}' not found in configuration`);
+    }
+
+    return this.generateMatrixFromConfig(matrixConfig);
+  }
+
+  /**
+   * Generate matrix from configuration
+   */
+  private generateMatrixFromConfig(config: MatrixConfig): GeneratedMatrix {
+    const rowRole = config.rows;
+    const columnRoles = config.columns;
+
+    // Get all items with the row role
+    const rowItems = this.graph.getItemsByRole(rowRole);
+
+    if (rowItems.length === 0) {
+      return {
+        name: config.name,
+        type: `${rowRole}-matrix`,
+        rows: [],
+        columns: columnRoles.map(role => ({ name: role, role })),
+        coverage: {},
+        generatedAt: new Date().toISOString(),
+      };
+    }
+
+    const rows: MatrixRow[] = [];
+    const columnItems = new Map<string, Item[]>();
+
+    // Group items by column role
+    for (const colRole of columnRoles) {
+      columnItems.set(colRole, this.graph.getItemsByRole(colRole));
+    }
+
+    // Build rows
+    for (const rowItem of rowItems) {
+      const cells: MatrixCell[] = [];
+      let coveredCount = 0;
+      const totalColumns = columnRoles.length;
+
+      for (const colRole of columnRoles) {
+        // Find items in this column that are related to the row item
+        const relatedItems = this.findRelatedItems(rowItem.id, colRole, config);
+
+        if (relatedItems.length > 0) {
+          coveredCount++;
+          for (const related of relatedItems) {
+            cells.push({
+              itemId: related.id,
+              itemTitle: related.title,
+              role: related.role,
+              sourceFile: related.sourceFile,
+            });
+          }
+        } else {
+          // Empty cell
+          cells.push({
+            itemId: '',
+            itemTitle: '',
+            role: colRole,
+          });
+        }
+      }
+
+      const coverage = (coveredCount / totalColumns) * 100;
+      const status: 'complete' | 'partial' | 'missing' =
+        coverage === 100 ? 'complete' :
+        coverage > 0 ? 'partial' : 'missing';
+
+      rows.push({
+        rowId: rowItem.id,
+        rowTitle: rowItem.title,
+        rowRole: rowItem.role,
+        cells,
+        coverage,
+        status,
+      });
+    }
+
+    // Calculate overall coverage
+    const coveredRows = rows.filter(r => r.status === 'complete').length;
+    const overallCoverage = (coveredRows / rows.length) * 100;
+
     return {
-      type: 'req-test',
-      coverage: this.graph.getCoverage(),
-      requirements: this.graph.getAllRequirements().map(req => ({
-        id: req.id,
-        title: req.title,
-        implementations: this.graph.getReverseRelationships(req.id, 'implements').map(r => r.fromId),
-        tests: this.graph.getReverseRelationships(req.id, 'tests').map(r => r.fromId),
-      })),
+      name: config.name,
+      type: `${rowRole}-${columnRoles.join('-')}`,
+      rows,
+      columns: columnRoles.map(role => ({ name: role, role })),
+      coverage: {
+        overall: overallCoverage,
+        complete: coveredRows,
+        partial: rows.filter(r => r.status === 'partial').length,
+        missing: rows.filter(r => r.status === 'missing').length,
+        total: rows.length,
+      },
       generatedAt: new Date().toISOString(),
     };
   }
 
-  // ============================================================================
-  // Template Data Preparation Methods
-  // ============================================================================
+  /**
+   * Find items related to a row item in a specific column role
+   */
+  private findRelatedItems(rowId: string, columnRole: string, config: MatrixConfig): Item[] {
+    const result: Item[] = [];
+    const colItems = this.graph.getItemsByRole(columnRole);
+    const colItemIds = new Set(colItems.map(i => i.id));
+
+    // Get all relationships from the row item
+    const relationships = this.graph.getRelationships(rowId);
+
+    // Check coverage relations for this column
+    const coverageRels = config.coverageRelations?.[columnRole] || [];
+
+    for (const rel of relationships) {
+      // Check if the target is in the column role
+      if (colItemIds.has(rel.targetId)) {
+        // If coverage relations are specified, only include matching relation types
+        if (coverageRels.length > 0 && !coverageRels.includes(rel.type)) {
+          continue;
+        }
+
+        const target = this.graph.getItem(rel.targetId);
+        if (target) {
+          result.push(target);
+        }
+      }
+    }
+
+    return result;
+  }
 
   /**
-   * Escapes HTML special characters in a string.
+   * Generate a default matrix when no configuration is available
+   */
+  private generateDefaultMatrix(matrixName?: string): GeneratedMatrix {
+    // Try to find items with common roles
+    const allRoles = this.graph.getAllRoles();
+
+    let rowRole = 'requirement';
+    let columnRoles = ['implementation', 'test', 'design'];
+
+    // If we have the role in our graph, use it
+    if (!this.graph.hasRole(rowRole)) {
+      rowRole = allRoles[0] || 'item';
+      columnRoles = allRoles.slice(1, 4);
+    }
+
+    const rowItems = this.graph.getItemsByRole(rowRole);
+
+    const rows: MatrixRow[] = [];
+    const columnItems = new Map<string, Item[]>();
+
+    // Group items by column role
+    for (const colRole of columnRoles) {
+      columnItems.set(colRole, this.graph.getItemsByRole(colRole));
+    }
+
+    // Build rows
+    for (const rowItem of rowItems) {
+      const cells: MatrixCell[] = [];
+      let coveredCount = 0;
+      const totalColumns = columnRoles.length;
+
+      for (const colRole of columnRoles) {
+        const colItems = columnItems.get(colRole) || [];
+        const colItemIds = new Set(colItems.map(i => i.id));
+
+        // Find relationships from row item to this column
+        const relatedItems: Item[] = [];
+        for (const rel of this.graph.getRelationships(rowItem.id)) {
+          if (colItemIds.has(rel.targetId)) {
+            const target = this.graph.getItem(rel.targetId);
+            if (target) {
+              relatedItems.push(target);
+            }
+          }
+        }
+
+        if (relatedItems.length > 0) {
+          coveredCount++;
+          for (const related of relatedItems) {
+            cells.push({
+              itemId: related.id,
+              itemTitle: related.title,
+              role: related.role,
+              sourceFile: related.sourceFile,
+            });
+          }
+        } else {
+          cells.push({
+            itemId: '',
+            itemTitle: '',
+            role: colRole,
+          });
+        }
+      }
+
+      const coverage = (coveredCount / totalColumns) * 100;
+      const status: 'complete' | 'partial' | 'missing' =
+        coverage === 100 ? 'complete' :
+        coverage > 0 ? 'partial' : 'missing';
+
+      rows.push({
+        rowId: rowItem.id,
+        rowTitle: rowItem.title,
+        rowRole: rowItem.role,
+        cells,
+        coverage,
+        status,
+      });
+    }
+
+    const coveredRows = rows.filter(r => r.status === 'complete').length;
+    const overallCoverage = (coveredRows / rows.length) * 100 || 0;
+
+    return {
+      name: matrixName || `${rowRole}-matrix`,
+      type: `${rowRole}-${columnRoles.join('-')}`,
+      rows,
+      columns: columnRoles.map(role => ({ name: role, role })),
+      coverage: {
+        overall: overallCoverage,
+        complete: coveredRows,
+        partial: rows.filter(r => r.status === 'partial').length,
+        missing: rows.filter(r => r.status === 'missing').length,
+        total: rows.length,
+      },
+      generatedAt: new Date().toISOString(),
+    };
+  }
+
+  // ========================================================================
+  // Specific Matrix Types
+  // ========================================================================
+
+  /**
+   * Generate a requirements traceability matrix
+   */
+  generateRequirementsMatrix(): GeneratedMatrix {
+    if (this.configLoader) {
+      const matrices = this.configLoader.getMatrices();
+      const reqMatrix = matrices.find(m =>
+        m.rows === 'requirement' ||
+        m.name.toLowerCase().includes('requirement')
+      );
+
+      if (reqMatrix) {
+        return this.generateMatrixFromConfig(reqMatrix);
+      }
+    }
+
+    // Fallback to default
+    return this.generateDefaultMatrix('requirements-traceability');
+  }
+
+  /**
+   * Generate a design traceability matrix
+   */
+  generateDesignMatrix(): GeneratedMatrix {
+    if (this.configLoader) {
+      const matrices = this.configLoader.getMatrices();
+      const designMatrix = matrices.find(m =>
+        m.rows === 'design' ||
+        m.name.toLowerCase().includes('design')
+      );
+
+      if (designMatrix) {
+        return this.generateMatrixFromConfig(designMatrix);
+      }
+    }
+
+    return this.generateDefaultMatrix('design-traceability');
+  }
+
+  /**
+   * Generate all matrices from configuration
+   */
+  generateAllMatrices(): GeneratedMatrix[] {
+    if (!this.configLoader) {
+      return [this.generateDefaultMatrix()];
+    }
+
+    const matrices = this.configLoader.getMatrices();
+    return matrices.map(config => this.generateMatrixFromConfig(config));
+  }
+
+  // ========================================================================
+  // Export Methods
+  // ========================================================================
+
+  /**
+   * Export a matrix to CSV format
+   */
+  exportToCSV(matrix: GeneratedMatrix): string {
+    const lines: string[] = [];
+
+    // Header
+    const header = ['Row ID', 'Row Title', ...matrix.columns.map(c => c.name)];
+    lines.push(header.join(','));
+
+    // Data rows
+    for (const row of matrix.rows) {
+      const rowValues: string[] = [
+        row.rowId,
+        this.escapeCSV(row.rowTitle),
+      ];
+
+      // Add cell values
+      for (const cell of row.cells) {
+        rowValues.push(cell.itemId ? `${cell.itemId}: ${cell.itemTitle}` : '');
+      }
+
+      lines.push(rowValues.map(v => this.escapeCSV(v)).join(','));
+    }
+
+    // Summary
+    lines.push('');
+    lines.push(`Total ${matrix.rows.length} rows`);
+    lines.push(`Coverage: ${matrix.coverage.overall.toFixed(1)}%`);
+
+    return lines.join('\n');
+  }
+
+  /**
+   * Export a matrix to HTML format
+   */
+  exportToHTML(matrix: GeneratedMatrix): string {
+    const rows = matrix.rows.map(row => this.prepareRowForTemplate(row));
+
+    const templateData = {
+      name: matrix.name,
+      type: matrix.type,
+      rows,
+      columns: matrix.columns,
+      coverage: {
+        ...matrix.coverage,
+        overallFormatted: matrix.coverage.overall.toFixed(1),
+      },
+      generatedAt: matrix.generatedAt,
+    };
+
+    return this.templateRenderer.render('matrix', templateData);
+  }
+
+  /**
+   * Prepare a row for template rendering
+   */
+  private prepareRowForTemplate(row: MatrixRow): any {
+    return {
+      rowId: this.escapeHtml(row.rowId),
+      rowTitle: this.escapeHtml(row.rowTitle),
+      rowRole: this.escapeHtml(row.rowRole),
+      cells: row.cells.map(cell => ({
+        itemId: this.escapeHtml(cell.itemId),
+        itemTitle: this.escapeHtml(cell.itemTitle),
+        role: this.escapeHtml(cell.role),
+      })),
+      coverage: row.coverage,
+      status: row.status,
+      statusClass: `status-${row.status}`,
+    };
+  }
+
+  /**
+   * Escape HTML special characters
    */
   private escapeHtml(text: string): string {
+    if (!text) return '';
     return text
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
@@ -238,353 +482,120 @@ export class MatrixGenerator {
   }
 
   /**
-   * Prepares requirement row data for template rendering.
+   * Escape CSV special characters
    */
-  private prepareRequirementRow(row: { id: string; title: string; implementations: string[]; tests: string[] }): RequirementRowTemplateData {
-    const impls = row.implementations.join(', ');
-    const tests = row.tests.join(', ');
-    const hasImpl = row.implementations.length > 0;
-    const hasTest = row.tests.length > 0;
+  private escapeCSV(text: string): string {
+    if (!text) return '';
 
-    const statusClass = hasImpl && hasTest
-      ? 'status-complete'
-      : hasImpl
-        ? 'status-partial'
-        : 'status-missing';
-    const statusText = hasImpl && hasTest
-      ? '\u2713 Complete'
-      : hasImpl
-        ? '\u25BC Partial'
-        : '\u2717 Missing';
-
-    return {
-      id: this.escapeHtml(row.id),
-      title: this.escapeHtml(row.title),
-      implementations: this.escapeHtml(impls || '-'),
-      tests: this.escapeHtml(tests || '-'),
-      statusBadge: `<span class="status-badge ${statusClass}">${statusText}</span>`,
-    };
-  }
-
-  /**
-   * Prepares design row data for template rendering.
-   */
-  private prepareDesignRow(row: { id: string; title: string; implementations: string[]; tests: string[]; depth?: number }): DesignRowTemplateData {
-    const impls = row.implementations.join(', ');
-    const tests = row.tests.join(', ');
-    const hasImpl = row.implementations.length > 0;
-    const depth = row.depth || 0;
-
-    const statusClass = hasImpl ? 'status-complete' : 'status-missing';
-    const statusText = hasImpl ? '\u2713 Complete' : '\u2717 Missing';
-    const hierarchyClass = `hierarchy-${Math.min(depth, 5)}`;
-
-    // Create hierarchy indicators (visual tree lines)
-    let hierarchyIndicators = '';
-    if (depth > 0) {
-      hierarchyIndicators = '<span class="hierarchy-indicator"></span>'.repeat(depth);
+    if (text.includes(',') || text.includes('"') || text.includes('\n')) {
+      const escaped = text.replace(/"/g, '""');
+      return `"${escaped}"`;
     }
 
-    return {
-      id: this.escapeHtml(row.id),
-      title: this.escapeHtml(row.title),
-      implementations: this.escapeHtml(impls || '-'),
-      tests: this.escapeHtml(tests || '-'),
-      statusBadge: `<span class="status-badge ${statusClass}">${statusText}</span>`,
-      hierarchyClass,
-      hierarchyIndicators,
-    };
+    return text;
   }
 
-  /**
-   * Prepares summary data for template rendering.
-   */
-  private prepareSummaryData(coverage: CoverageReport, isDesignMatrix: boolean): SummaryTemplateData {
-    const itemType = isDesignMatrix ? 'Designs' : 'Requirements';
-    const total = isDesignMatrix ? coverage.totalDesigns : coverage.totalRequirements;
-    const withImplementation = isDesignMatrix
-      ? coverage.designsWithImplementation
-      : coverage.requirementsWithImplementation;
-    const withTests = isDesignMatrix ? undefined : coverage.requirementsWithTests;
-
-    return {
-      itemType,
-      total,
-      withImplementation,
-      withTests,
-      implCoverage: coverage.implementationCoverage.toFixed(1),
-      testCoverage: coverage.testCoverage.toFixed(1),
-    };
-  }
-
-
-
-  // ============================================================================
-  // Export Methods
-  // ============================================================================
+  // ========================================================================
+  // Coverage Analysis
+  // ========================================================================
 
   /**
-   * Export the traceability matrix as CSV format.
-   * Generates a Requirements-to-Implementation matrix with coverage info.
+   * Get coverage statistics for a specific role
    */
-  exportToCSV(type: string = 'req-impl'): string {
-    const matrix = type === 'req-test' ? this.generateTestMatrix() : this.generateMatrix(type);
-    const lines: string[] = [];
+  getRoleCoverage(role: string): { total: number; covered: number; coverage: number } {
+    const items = this.graph.getItemsByRole(role);
+    const total = items.length;
 
-    if ('designs' in matrix) {
-      // Design-Implementation matrix
-      const m = matrix as DesignTraceabilityMatrix;
-      lines.push('Design ID,Design Title,Implementations,Tests,Status');
-      for (const design of m.designs) {
-        const impls = design.implementations.join(';');
-        const tests = design.tests.join(';');
-        const hasImpl = design.implementations.length > 0;
-        const status = hasImpl ? '\u2713 Complete' : '\u2717 Missing';
-        const escapedTitle = design.title.includes(',') ? `"${design.title}"` : design.title;
-        lines.push(`${design.id},"${escapedTitle}","${impls}","${tests}",${status}`);
+    if (total === 0) {
+      return { total: 0, covered: 0, coverage: 0 };
+    }
+
+    // Count items that have at least one outgoing relationship
+    let covered = 0;
+    for (const item of items) {
+      const rels = this.graph.getRelationships(item.id);
+      if (rels.length > 0) {
+        covered++;
       }
-      lines.push('');
-      lines.push(`Total Designs,${m.designs.length}`);
-    } else {
-      // Requirements matrix (req-impl or req-test)
-      const m = matrix as TraceabilityMatrix;
-      lines.push('Requirement ID,Requirement Title,Implementations,Tests,Status');
-      for (const req of m.requirements) {
-        const impls = req.implementations.join(';');
-        const tests = req.tests.join(';');
-        const hasImpl = req.implementations.length > 0;
-        const hasTest = req.tests.length > 0;
-        const status = hasImpl && hasTest ? '\u2713 Complete' : hasImpl ? '\u25BC Partial' : '\u2717 Missing';
-        const escapedTitle = req.title.includes(',') ? `"${req.title}"` : req.title;
-        lines.push(`${req.id},"${escapedTitle}","${impls}","${tests}",${status}`);
-      }
-      lines.push('');
-      lines.push(`Total Requirements,${m.requirements.length}`);
-      lines.push(`Requirements with Implementation,${m.coverage.requirementsWithImplementation}`);
-      lines.push(`Requirements with Tests,${m.coverage.requirementsWithTests}`);
-      lines.push(`Implementation Coverage,${m.coverage.implementationCoverage}%`);
-      lines.push(`Test Coverage,${m.coverage.testCoverage}%`);
     }
 
-    return lines.join('\n');
-
-    return lines.join('\n');
+    const coverage = (covered / total) * 100;
+    return { total, covered, coverage };
   }
 
   /**
-   * Export the traceability matrix as HTML format.
-   * Generates a styled HTML table with coverage information using Mustache templates.
+   * Get overall coverage statistics
    */
-  exportToHTML(type: string = 'req-impl'): string {
-    const matrix = type === 'req-test' ? this.generateTestMatrix() : this.generateMatrix(type);
+  getCoverageReport(): Record<string, any> {
+    const roles = this.graph.getAllRoles();
+    const report: Record<string, any> = {};
 
-    if ('designs' in matrix) {
-      return this.exportDesignMatrixToHTML(matrix as DesignTraceabilityMatrix, type);
+    for (const role of roles) {
+      const coverage = this.getRoleCoverage(role);
+      report[`${role}_coverage`] = coverage;
     }
 
-    // Prepare data for template
-    const rows = matrix.requirements.map(row => this.prepareRequirementRow(row));
-    const summary = this.prepareSummaryData(matrix.coverage, false);
+    // Overall statistics
+    const allItems = this.graph.getAllItems();
+    const allRels = this.graph.getAllRelationships();
 
-    const templateData: Omit<MatrixTemplateData, 'styles'> = {
-      type,
-      rows,
-      summary,
-    };
+    report.total_items = allItems.length;
+    report.total_relationships = allRels.length;
+    report.roles = roles;
 
-    return this.templateRenderer.render('matrix', templateData);
+    return report;
   }
+
+  // ========================================================================
+  // Detailed Matrix Generation
+  // ========================================================================
 
   /**
-   * Export design matrix as HTML format using Mustache templates.
+   * Generate a detailed matrix with full item information
    */
-  private exportDesignMatrixToHTML(matrix: DesignTraceabilityMatrix, type: string): string {
-    // Prepare data for template
-    const rows = matrix.designs.map(row => this.prepareDesignRow(row));
-    const summary = this.prepareSummaryData(matrix.coverage, true);
+  generateDetailedMatrix(matrixName?: string): any {
+    const matrix = this.generateMatrix(matrixName);
 
-    const templateData: Omit<MatrixTemplateData, 'styles'> = {
-      type,
-      rows,
-      summary,
-    };
-
-    return this.templateRenderer.render('design-matrix', templateData);
-  }
-
-  // ============================================================================
-  // Inverse Matrix Generators (Phase 3)
-  // ============================================================================
-
-  private generateImplementationRequirementMatrix(): TraceabilityMatrix {
-    const allRequirements = new Set(this.graph.getAllRequirements().map(req => req.id));
-
-    // For impl-req matrix: rows are implementations, implementations field contains satisfied requirements
     return {
-      type: 'impl-req',
-      coverage: this.graph.getCoverage(),
-      requirements: this.graph.getAllImplementations().map(impl => ({
-        id: impl.id,
-        title: impl.title,
-        // Use satisfies relationships to find which requirements this impl satisfies
-        implementations: this.graph.getRelationships(impl.id, 'satisfies')
-          .filter(r => allRequirements.has(r.targetId))
-          .map(r => r.targetId),
-        tests: [], // Not used for impl-req matrix
+      ...matrix,
+      items: this.graph.getAllItems().map(item => ({
+        id: item.id,
+        title: item.title,
+        role: item.role,
+        status: item.status,
+        sourceFile: item.sourceFile,
+        sourceLine: item.sourceLine,
+        relationships: this.graph.getRelationships(item.id).map(rel => ({
+          type: rel.type,
+          targetId: rel.targetId,
+          target: this.graph.getItem(rel.targetId),
+        })),
       })),
-      generatedAt: new Date().toISOString(),
     };
   }
 
-  private generateTestImplementationMatrix(): TraceabilityMatrix {
-    const allImplementations = new Set(this.graph.getAllImplementations().map(imp => imp.id));
-
-    // For test-impl matrix: rows are tests, implementations field contains tested implementations
-    return {
-      type: 'test-impl',
-      coverage: this.graph.getCoverage(),
-      requirements: this.graph.getAllTests().map(test => ({
-        id: test.id,
-        title: test.title,
-        // Use tests relationships to find which implementations this test tests
-        implementations: this.graph.getRelationships(test.id, 'tests')
-          .filter(r => allImplementations.has(r.targetId))
-          .map(r => r.targetId),
-        tests: [], // Not used for test-impl matrix
-      })),
-      generatedAt: new Date().toISOString(),
-    };
-  }
-
-  private generateTestRequirementMatrix(): TraceabilityMatrix {
-    const allRequirements = new Set(this.graph.getAllRequirements().map(req => req.id));
-
-    // For test-req matrix: rows are tests, implementations field contains verified requirements
-    return {
-      type: 'test-req',
-      coverage: this.graph.getCoverage(),
-      requirements: this.graph.getAllTests().map(test => ({
-        id: test.id,
-        title: test.title,
-        // Use verifies relationships to find which requirements this test verifies
-        implementations: this.graph.getRelationships(test.id, 'verifies')
-          .filter(r => allRequirements.has(r.targetId))
-          .map(r => r.targetId),
-        tests: [], // Not used for test-req matrix
-      })),
-      generatedAt: new Date().toISOString(),
-    };
-  }
-
-  private generateDesignRequirementMatrix(): TraceabilityMatrix {
-    const allRequirements = new Set(this.graph.getAllRequirements().map(req => req.id));
-
-    // For design-req matrix: rows are designs, implementations field contains addressed requirements
-    return {
-      type: 'design-req',
-      coverage: this.graph.getCoverage(),
-      requirements: this.graph.getAllDesigns().map(design => ({
-        id: design.id,
-        title: design.title,
-        // Use addresses relationships to find which requirements this design addresses
-        implementations: this.graph.getRelationships(design.id, 'addresses')
-          .filter(r => allRequirements.has(r.targetId))
-          .map(r => r.targetId),
-        tests: [], // Not used for design-req matrix
-      })),
-      generatedAt: new Date().toISOString(),
-    };
-  }
-
-  // ============================================================================
-  // Design-Design Matrix (Phase 3)
-  // ============================================================================
+  // ========================================================================
+  // Relationship Analysis
+  // ========================================================================
 
   /**
-   * Calculate hierarchy depth for each design based on composed-of relationships.
-   * Returns a map of design ID to depth level (0 = root, 1 = child, etc.)
+   * Get all relationships between two roles
    */
-  private calculateDesignHierarchyDepths(): Map<string, number> {
-    const depths = new Map<string, number>();
-    const allDesigns = this.graph.getAllDesigns();
-    const allDesignIds = new Set(allDesigns.map(d => d.id));
-
-    // Find root designs (designs that are NOT composed by any other design)
-    // A design is a root if no other design has it in their composed-of relationships
-    const composedByOthers = new Set<string>();
-    for (const design of allDesigns) {
-      const composedOfRels = this.graph.getRelationships(design.id, 'composed-of');
-      for (const rel of composedOfRels) {
-        if (allDesignIds.has(rel.targetId)) {
-          // design is composed of rel.targetId, so rel.targetId is a child
-          composedByOthers.add(rel.targetId);
-        }
-      }
-    }
-
-    // Root designs (not composed by any other design) have depth 0
-    for (const design of allDesigns) {
-      if (!composedByOthers.has(design.id)) {
-        depths.set(design.id, 0);
-      }
-    }
-
-    // Calculate depths for child designs using BFS
-    // Children are designs that are composed-of by their parents
-    const queue: { designId: string; depth: number }[] = [];
-    for (const [designId, depth] of depths) {
-      queue.push({ designId, depth });
-    }
-
-    while (queue.length > 0) {
-      const current = queue.shift()!;
-
-      // Find designs that this design is composed of (these are children)
-      const composedOfRels = this.graph.getRelationships(current.designId, 'composed-of');
-      for (const rel of composedOfRels) {
-        if (allDesignIds.has(rel.targetId) && !depths.has(rel.targetId)) {
-          depths.set(rel.targetId, current.depth + 1);
-          queue.push({ designId: rel.targetId, depth: current.depth + 1 });
-        }
-      }
-    }
-
-    return depths;
+  getRelationshipsBetweenRoles(sourceRole: string, targetRole: string): ItemRelationship[] {
+    return this.graph.getRelationshipsByRoles(sourceRole, targetRole);
   }
 
-  generateDesignDesignMatrix(): DesignTraceabilityMatrix {
-    const allDesigns = this.graph.getAllDesigns();
-    const designIds = new Set(allDesigns.map(d => d.id));
-    const depths = this.calculateDesignHierarchyDepths();
+  /**
+   * Get relationship statistics by type
+   */
+  getRelationshipStatistics(): Record<string, number> {
+    const stats: Record<string, number> = {};
+    const allRels = this.graph.getAllRelationships();
 
-    return {
-      type: 'design-design',
-      coverage: this.graph.getCoverage(),
-      designs: allDesigns.map(design => {
-        // Get all designs that this design is composed of
-        const composedOf = this.graph.getRelationships(design.id, 'composed-of')
-          .filter(r => designIds.has(r.targetId))
-          .map(r => r.targetId);
+    for (const rel of allRels) {
+      stats[rel.type] = (stats[rel.type] || 0) + 1;
+    }
 
-        // Get all designs that depend on this design
-        const dependsOn = this.graph.getRelationships(design.id, 'depends-on')
-          .filter(r => designIds.has(r.targetId))
-          .map(r => r.targetId);
-
-        // Combine both types of relationships
-        const relatedDesigns = [...composedOf, ...dependsOn];
-
-        return {
-          id: design.id,
-          title: design.title,
-          // Use implementations field to store related designs
-          implementations: relatedDesigns,
-          tests: [], // Not used for design-design matrix
-          // Add hierarchy depth for visual indentation
-          depth: depths.get(design.id) || 0,
-        };
-      }),
-      generatedAt: new Date().toISOString(),
-    };
+    return stats;
   }
 }

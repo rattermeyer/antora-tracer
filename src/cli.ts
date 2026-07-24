@@ -7,13 +7,12 @@ import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import chalk from 'chalk';
 
-// Import both v1 and v2 extensions
-import { RequirementsTraceabilityExtension } from './index.js';
+// Import extension
 import {
-  RequirementsTraceabilityExtensionV2,
+  RequirementsTraceabilityExtension,
   ConfigLoader,
   BUILT_IN_PRESETS,
-} from './index-v2.js';
+} from './index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -23,35 +22,30 @@ const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
 // Global options
 program
   .name('antora-req-trace')
-  .description('Antora Requirements Traceability Extension - Trace requirements, designs, implementations, and tests using the v2.0 unified item architecture')
+  .description('Antora Requirements Traceability Extension - Trace requirements, designs, implementations, and tests using role-based traceability')
   .version(packageJson.version)
-  .option('--v2', 'Use v2.0 unified item architecture (enables role-based traceability)')
-  .option('--config <path>', 'Path to traceability configuration YAML file (v2 only)')
-  .option('--preset <name>', 'Use a built-in preset configuration: ' + BUILT_IN_PRESETS.join(', ') + ' (v2 only)', 'requirements-engineering');
+  .option('--config <path>', 'Path to traceability configuration YAML file')
+  .option('--preset <name>', 'Use a built-in preset configuration: ' + BUILT_IN_PRESETS.join(', ') + '\n  (default: requirements-engineering)', 'requirements-engineering');
 
-// Helper to create the appropriate extension based on options
+// Helper to create the extension
 async function createExtension(options: any) {
   const globalOpts = program.opts();
   const mergedOptions = { ...options, ...globalOpts };
 
-  if (mergedOptions.v2 || mergedOptions.config || mergedOptions.preset) {
-    try {
-      if (mergedOptions.preset) {
-        return await RequirementsTraceabilityExtensionV2.createWithPreset(mergedOptions.preset);
-      } else if (mergedOptions.config) {
-        const configLoader = new ConfigLoader();
-        configLoader.load(mergedOptions.config);
-        return new RequirementsTraceabilityExtensionV2(configLoader);
-      } else {
-        return new RequirementsTraceabilityExtensionV2();
-      }
-    } catch (error: any) {
-      console.error(chalk.red('Error creating v2 extension:', error.message));
-      console.error(chalk.yellow('Falling back to v1...'));
+  try {
+    if (mergedOptions.preset) {
+      return await RequirementsTraceabilityExtension.createWithPreset(mergedOptions.preset);
+    } else if (mergedOptions.config) {
+      const configLoader = new ConfigLoader();
+      configLoader.load(mergedOptions.config);
+      return new RequirementsTraceabilityExtension(configLoader);
+    } else {
       return new RequirementsTraceabilityExtension();
     }
+  } catch (error: any) {
+    console.error(chalk.red('Error creating extension:', error.message));
+    process.exit(1);
   }
-  return new RequirementsTraceabilityExtension();
 }
 
 function ensureDirectory(dir: string) {
@@ -80,52 +74,32 @@ program.command('process')
         process.exit(1);
       }
       const content = readFileSync(inputPath, 'utf8');
-      if (extension instanceof RequirementsTraceabilityExtensionV2) {
-        console.log(chalk.cyan('Using v2.0 architecture...'));
-        const result = extension.process(content, { sourceFile: options.input });
-        console.log(chalk.green(`Processed: ${result.items.length} items, ${result.relationships.length} relationships`));
-        let output: string;
-        if (options.format === 'json') {
-          output = JSON.stringify({ items: result.items, relationships: result.relationships, statistics: result.graph.getRoleStatistics() }, null, 2);
-        } else if (options.format === 'csv') {
-          const lines = ['id,role,title'];
-          for (const item of result.items) {
-            const escapedTitle = item.title.includes(',') ? `"${item.title}"` : item.title;
-            lines.push([item.id, item.role, escapedTitle].join(','));
-          }
-          output = lines.join('\n');
-        } else {
-          output = '<!DOCTYPE html><html><head><title>Traceability Report</title></head><body><h1>Traceability Report</h1>';
-          output += `<p>Items: ${result.items.length}, Relationships: ${result.relationships.length}</p><h2>Items</h2><table border="1"><tr><th>ID</th><th>Role</th><th>Title</th></tr>`;
-          for (const item of result.items) {
-            output += `<tr><td>${item.id}</td><td>${item.role}</td><td>${item.title}</td></tr>`;
-          }
-          output += '</table></body></html>';
+      const result = extension.process(content, { sourceFile: options.input });
+      console.log(chalk.green(`Processed: ${result.items.length} items, ${result.relationships.length} relationships`));
+      let output: string;
+      if (options.format === 'json') {
+        output = JSON.stringify({ items: result.items, relationships: result.relationships, statistics: result.graph.getRoleStatistics() }, null, 2);
+      } else if (options.format === 'csv') {
+        const lines = ['id,role,title'];
+        for (const item of result.items) {
+          const escapedTitle = item.title.includes(',') ? `"${item.title}"` : item.title;
+          lines.push([item.id, item.role, escapedTitle].join(','));
         }
-        ensureDirectory(options.output);
-        const outputPath = resolve(options.output, 'traceability.' + options.format);
-        const stream = createWriteStream(outputPath);
-        stream.write(output);
-        stream.end();
-        console.log(chalk.green(`Output written to: ${outputPath}`));
+        output = lines.join('\n');
       } else {
-        console.log(chalk.yellow('Using v1 architecture (deprecated)...'));
-        await extension.process(content, { sourceFile: options.input });
-        let output: string;
-        if (options.format === 'html') {
-          output = extension.exportMatrixToHTML();
-        } else if (options.format === 'csv') {
-          output = extension.exportMatrixToCSV();
-        } else {
-          output = JSON.stringify({ requirements: extension.graph.getAllRequirements(), implementations: extension.graph.getAllImplementations(), tests: extension.graph.getAllTests() }, null, 2);
+        output = '<!DOCTYPE html><html><head><title>Traceability Report</title></head><body><h1>Traceability Report</h1>';
+        output += `<p>Items: ${result.items.length}, Relationships: ${result.relationships.length}</p><h2>Items</h2><table border="1"><tr><th>ID</th><th>Role</th><th>Title</th></tr>`;
+        for (const item of result.items) {
+          output += `<tr><td>${item.id}</td><td>${item.role}</td><td>${item.title}</td></tr>`;
         }
-        ensureDirectory(options.output);
-        const outputPath = resolve(options.output, 'traceability.' + options.format);
-        const stream = createWriteStream(outputPath);
-        stream.write(output);
-        stream.end();
-        console.log(chalk.green(`Output written to: ${outputPath}`));
+        output += '</table></body></html>';
       }
+      ensureDirectory(options.output);
+      const outputPath = resolve(options.output, 'traceability.' + options.format);
+      const stream = createWriteStream(outputPath);
+      stream.write(output);
+      stream.end();
+      console.log(chalk.green(`Output written to: ${outputPath}`));
     } catch (error: any) {
       console.error(chalk.red('Processing error:', error.message));
       process.exit(1);
@@ -134,7 +108,7 @@ program.command('process')
 
 program.command('matrix')
   .description('Generate traceability matrices from processed items')
-  .option('-i, --input <path>', 'Input file or directory to process first (required for v2)')
+  .option('-i, --input <path>', 'Input file or directory to process first')
   .option('-t, --type <type>', 'Matrix type or name (uses configuration from preset/config)')
   .option('-f, --format <format>', 'Output format: csv, html, or json', 'csv')
   .option('-o, --output <path>', 'Output file path (defaults to stdout)')
@@ -144,42 +118,31 @@ program.command('matrix')
     try {
       let output: string;
 
-      // For v2, we need to process input files first to populate the graph
-      if (extension instanceof RequirementsTraceabilityExtensionV2) {
-        if (options.input) {
-          const inputPath = resolve(process.cwd(), options.input);
-          if (!existsSync(inputPath)) {
-            console.error(chalk.red(`Error: Input file not found: ${inputPath}`));
-            process.exit(1);
-          }
-          const content = readFileSync(inputPath, 'utf8');
-          extension.process(content, { sourceFile: options.input });
-        }
-
-        if (!extension.graph.size()) {
-          console.error(chalk.red('Error: No data in graph. Use -i option to specify input file, or process files first'));
+      if (options.input) {
+        const inputPath = resolve(process.cwd(), options.input);
+        if (!existsSync(inputPath)) {
+          console.error(chalk.red(`Error: Input file not found: ${inputPath}`));
           process.exit(1);
         }
+        const content = readFileSync(inputPath, 'utf8');
+        extension.process(content, { sourceFile: options.input });
+      }
 
-        const matrixName = options.type || 'default';
-        const { MatrixGeneratorV2 } = await import('./MatrixGeneratorV2.js');
-        const generator = new MatrixGeneratorV2(extension.graph, extension.configLoader);
-        const matrix = generator.generateMatrix(matrixName);
-        if (options.format === 'html') {
-          output = generator.exportToHTML(matrix);
-        } else if (options.format === 'json') {
-          output = JSON.stringify(matrix, null, 2);
-        } else {
-          output = generator.exportToCSV(matrix);
-        }
+      if (!extension.graph.size()) {
+        console.error(chalk.red('Error: No data in graph. Use -i option to specify input file, or process files first'));
+        process.exit(1);
+      }
+
+      const matrixName = options.type || 'default';
+      const { MatrixGenerator } = await import('./MatrixGenerator.js');
+      const generator = new MatrixGenerator(extension.graph, extension.configLoader);
+      const matrix = generator.generateMatrix(matrixName);
+      if (options.format === 'html') {
+        output = generator.exportToHTML(matrix);
+      } else if (options.format === 'json') {
+        output = JSON.stringify(matrix, null, 2);
       } else {
-        if (options.format === 'html') {
-          output = extension.exportMatrixToHTML(options.type);
-        } else if (options.format === 'json') {
-          output = JSON.stringify(extension.generateDetailedMatrix(options.type), null, 2);
-        } else {
-          output = extension.exportMatrixToCSV(options.type);
-        }
+        output = generator.exportToCSV(matrix);
       }
       if (options.output) {
         ensureDirectory(dirname(options.output));
@@ -210,38 +173,24 @@ program.command('validate')
           process.exit(1);
         }
         const content = readFileSync(inputPath, 'utf8');
-        if (extension instanceof RequirementsTraceabilityExtensionV2) {
-          const result = extension.process(content, { sourceFile: options.input });
-          const validation = extension.graph.validate();
-          if (validation.errors.length > 0) {
-            console.log(chalk.red(`Validation Errors (${validation.errors.length}):`));
-            for (const error of validation.errors) {
-              console.log(chalk.red(`  - ${error}`));
-            }
-            process.exit(1);
-          } else {
-            console.log(chalk.green('No validation errors found'));
+        const result = extension.process(content, { sourceFile: options.input });
+        const validation = extension.graph.validate();
+        if (validation.errors.length > 0) {
+          console.log(chalk.red(`Validation Errors (${validation.errors.length}):`));
+          for (const error of validation.errors) {
+            console.log(chalk.red(`  - ${error}`));
           }
-          if (validation.warnings.length > 0) {
-            console.log(chalk.yellow(`Warnings (${validation.warnings.length}):`));
-            for (const warning of validation.warnings) {
-              console.log(chalk.yellow(`  - ${warning.message}`));
-            }
-          }
-          console.log(chalk.green(`Summary: ${result.items.length} items, ${result.relationships.length} relationships`));
+          process.exit(1);
         } else {
-          await extension.process(content, { sourceFile: options.input });
-          const errors = extension.validate();
-          if (errors.length > 0) {
-            console.log(chalk.red(`Validation Errors (${errors.length}):`));
-            for (const error of errors) {
-              console.log(chalk.red(`  - ${error}`));
-            }
-            process.exit(1);
-          } else {
-            console.log(chalk.green('No validation errors found'));
+          console.log(chalk.green('No validation errors found'));
+        }
+        if (validation.warnings.length > 0) {
+          console.log(chalk.yellow(`Warnings (${validation.warnings.length}):`));
+          for (const warning of validation.warnings) {
+            console.log(chalk.yellow(`  - ${warning.message}`));
           }
         }
+        console.log(chalk.green(`Summary: ${result.items.length} items, ${result.relationships.length} relationships`));
       } else {
         console.log(chalk.yellow('No input specified, validating current graph...'));
         console.log(chalk.yellow('Note: Graph is empty without processing files first'));
@@ -253,7 +202,7 @@ program.command('validate')
   });
 
 const presetProgram = program.command('preset')
-  .description('Manage traceability presets (v2 only) - list, show details, or initialize config from preset');
+  .description('Manage traceability presets - list, show details, or initialize config from preset');
 
 presetProgram.command('list')
   .description('List available built-in presets')
@@ -386,7 +335,7 @@ ${(preset.traceability.matrices || []).map(matrix => {
       const samplePath = resolve(process.cwd(), options.output, 'requirements.adoc');
       const sampleContent = `= Requirements Example
 
-This file demonstrates the new v2.0 traceability syntax.
+This file demonstrates the traceability syntax.
 
 == Requirements
 
@@ -457,7 +406,7 @@ program.command('export neo4j')
   .option('-i, --input <path>', 'Input file or directory to process first')
   .option('-o, --output <path>', 'Output directory for Neo4j import files', './neo4j')
   .option('-f, --format <format>', 'Export format: csv or cypher', 'csv')
-  .action(async (options) => {
+  .action(async (_target, options) => {
     console.log(chalk.blue('Exporting to Neo4j...'));
     if (!options.input) {
       console.error(chalk.red('Error: Input file or directory is required'));
@@ -471,29 +420,23 @@ program.command('export neo4j')
         process.exit(1);
       }
       const content = readFileSync(inputPath, 'utf8');
-      if (extension instanceof RequirementsTraceabilityExtensionV2) {
-        extension.process(content, { sourceFile: options.input });
-        console.log(chalk.yellow('Neo4j export for v2 is not yet fully implemented'));
-        console.log(chalk.yellow('Use v1: antora-req-trace export neo4j -i <file> (without --v2)'));
-        process.exit(0);
-      } else {
-        await extension.process(content, { sourceFile: options.input });
-        const { Neo4jExporter } = await import('./Neo4jExporter.js');
-        const exporter = new Neo4jExporter(extension.graph);
-        ensureDirectory(options.output);
-        const result = exporter.export({
-          outputDir: resolve(process.cwd(), options.output),
-          format: options.format as 'csv' | 'cypher',
-          includeContent: true,
-          includeAllAttributes: true,
-        });
-        console.log(chalk.green(`Exported to Neo4j ${options.format} format`));
-        console.log(chalk.green(`  Nodes: ${result.nodeCount}`));
-        console.log(chalk.green(`  Relationships: ${result.relationshipCount}`));
-        if (result.nodesFile) console.log(chalk.green(`  Nodes file: ${result.nodesFile}`));
-        if (result.relationshipsFile) console.log(chalk.green(`  Relationships file: ${result.relationshipsFile}`));
-        if (result.cypherFile) console.log(chalk.green(`  Cypher file: ${result.cypherFile}`));
-      }
+      ensureDirectory(options.output);
+      const outputDir = resolve(process.cwd(), options.output);
+      extension.process(content, { sourceFile: options.input });
+      const { Neo4jExporter } = await import('./Neo4jExporter.js');
+      const exporter = new Neo4jExporter(extension.graph);
+      const result = exporter.export({
+        outputDir: outputDir,
+        format: options.format as 'csv' | 'cypher',
+        includeContent: true,
+        includeAllAttributes: true,
+      });
+      console.log(chalk.green(`Exported to Neo4j ${options.format} format`));
+      console.log(chalk.green(`  Nodes: ${result.nodeCount}`));
+      console.log(chalk.green(`  Relationships: ${result.relationshipCount}`));
+      if (result.nodesFile) console.log(chalk.green(`  Nodes file: ${result.nodesFile}`));
+      if (result.relationshipsFile) console.log(chalk.green(`  Relationships file: ${result.relationshipsFile}`));
+      if (result.cypherFile) console.log(chalk.green(`  Cypher file: ${result.cypherFile}`));
     } catch (error: any) {
       console.error(chalk.red('Export error:', error.message));
       process.exit(1);
@@ -517,50 +460,34 @@ program.command('stats')
         process.exit(1);
       }
       const content = readFileSync(inputPath, 'utf8');
-      if (extension instanceof RequirementsTraceabilityExtensionV2) {
-        extension.process(content, { sourceFile: options.input });
-        console.log('');
-        console.log(chalk.green('Items by Role:'));
-        const stats = extension.getRoleStatistics();
-        for (const [role, count] of Object.entries(stats)) {
-          console.log(`  ${role}: ${count}`);
+      const result = extension.process(content, { sourceFile: options.input });
+      console.log('');
+      console.log(chalk.green('Items by Role:'));
+      const stats = result.graph.getRoleStatistics();
+      for (const [role, count] of Object.entries(stats)) {
+        console.log(`  ${role}: ${count}`);
+      }
+      console.log('');
+      console.log(chalk.green('Relationships:'));
+      const allRels = result.graph.getAllRelationships();
+      console.log(`  Total: ${allRels.length}`);
+      const relStats: Record<string, number> = {};
+      for (const rel of allRels) {
+        relStats[rel.type] = (relStats[rel.type] || 0) + 1;
+      }
+      for (const [type, count] of Object.entries(relStats)) {
+        console.log(`    ${type}: ${count}`);
+      }
+      console.log('');
+      console.log(chalk.green('Coverage:'));
+      const coverage = result.graph.getRoleStatistics();
+      for (const [key, value] of Object.entries(coverage)) {
+        if (typeof value === 'object') {
+          const v = value as any;
+          console.log(`  ${key}: ${v.total} total, ${v.covered} covered (${v.coverage.toFixed(1)}%)`);
+        } else {
+          console.log(`  ${key}: ${value}`);
         }
-        console.log('');
-        console.log(chalk.green('Relationships:'));
-        const allRels = extension.getAllRelationships();
-        console.log(`  Total: ${allRels.length}`);
-        const relStats: Record<string, number> = {};
-        for (const rel of allRels) {
-          relStats[rel.type] = (relStats[rel.type] || 0) + 1;
-        }
-        for (const [type, count] of Object.entries(relStats)) {
-          console.log(`    ${type}: ${count}`);
-        }
-        console.log('');
-        console.log(chalk.green('Coverage:'));
-        const coverage = extension.getCoverageReport();
-        for (const [key, value] of Object.entries(coverage)) {
-          if (typeof value === 'object') {
-            const v = value as any;
-            console.log(`  ${key}: ${v.total} total, ${v.covered} covered (${v.coverage.toFixed(1)}%)`);
-          } else {
-            console.log(`  ${key}: ${value}`);
-          }
-        }
-      } else {
-        await extension.process(content, { sourceFile: options.input });
-        const coverage = extension.getCoverageReport();
-        console.log('');
-        console.log(chalk.green('Items:'));
-        console.log(`  Requirements: ${extension.graph.getAllRequirements().length}`);
-        console.log(`  Implementations: ${extension.graph.getAllImplementations().length}`);
-        console.log(`  Tests: ${extension.graph.getAllTests().length}`);
-        console.log(`  Documents: ${extension.graph.getAllDocuments().length}`);
-        console.log(`  Designs: ${extension.graph.getAllDesigns().length}`);
-        console.log('');
-        console.log(chalk.green('Coverage:'));
-        console.log(`  Requirements with Implementation: ${coverage.requirementsWithImplementation} (${coverage.implementationCoverage.toFixed(1)}%)`);
-        console.log(`  Requirements with Tests: ${coverage.requirementsWithTests} (${coverage.testCoverage.toFixed(1)}%)`);
       }
     } catch (error: any) {
       console.error(chalk.red('Statistics error:', error.message));

@@ -7,6 +7,9 @@ console.log('🔧 Building TypeScript project...');
 try {
   execSync('tsc', { stdio: 'inherit' });
 
+  // Copy compiled JS files to lib/src/ for compatibility with test imports
+  copyCompiledFilesToSrc();
+
   // Copy templates directory to both lib/ and lib/src/ for compatibility
   const srcTemplates = path.join('src', 'templates');
 
@@ -53,6 +56,37 @@ try {
 } catch (error) {
   console.error('❌ Build failed');
   process.exit(1);
+}
+
+/**
+ * Copy compiled JS files to lib/src/ so that test imports using '../src/*.js' work
+ */
+function copyCompiledFilesToSrc() {
+  const libDir = 'lib';
+  const libSrcDir = path.join(libDir, 'src');
+
+  // Ensure lib/src exists
+  if (!fs.existsSync(libSrcDir)) {
+    fs.mkdirSync(libSrcDir, { recursive: true });
+  }
+
+  // Get all JS files in lib/ (excluding lib/src/, lib/templates/, lib/presets/)
+  const entries = fs.readdirSync(libDir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    if (entry.isFile() && entry.name.endsWith('.js')) {
+      const srcPath = path.join(libDir, entry.name);
+      const destPath = path.join(libSrcDir, entry.name);
+      fs.copyFileSync(srcPath, destPath);
+    } else if (entry.isDirectory() && entry.name !== 'src' && entry.name !== 'templates' && entry.name !== 'presets') {
+      // Copy subdirectories (like config/)
+      const srcSubdir = path.join(libDir, entry.name);
+      const destSubdir = path.join(libSrcDir, entry.name);
+      copyDirRecursive(srcSubdir, destSubdir);
+    }
+  }
+
+  console.log('✅ Compiled files copied to lib/src/ for test compatibility');
 }
 
 /**
