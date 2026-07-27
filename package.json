@@ -32,7 +32,7 @@
     "traceability",
     "documentation"
   ],
-  "author": "Richard",
+  "author": "Richard Attermeyer",
   "license": "MIT",
   "dependencies": {
     "@asciidoctor/core": "^2.2.7",

@@ -24,7 +24,7 @@ REQ-005,Item REQ-005,requirement,,requirements.adoc,"""*Old macro syntax generat
 The system SHALL detect and report the old macro syntax (`[req]`, `[imp]`, `[test]`, `[doc]`) as a deprecation error, suggesting the equivalent `[item, role=...]` syntax.
 
 Related specs: `unified-item-macro/spec.md`"""
-ITEM-1785158225609-309,Item ITEM-1785158225609-309,...,,requirements.adoc,"""== Configuration System
+ITEM-1785167161549-873,Item ITEM-1785167161549-873,...,,requirements.adoc,"""== Configuration System
 
 [item, id=REQ-006, role=requirement]"""
 REQ-006,Item REQ-006,requirement,,requirements.adoc,"""*Configuration defines roles*
