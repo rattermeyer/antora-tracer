@@ -154,15 +154,26 @@ antora_ext -> antora_ext : registerPageProcessor()
 == Content Processing ==
 antora -> antora_ext : contentClassified event
 antora_ext -> antora_ext : find all .adoc files in contentCatalog
+
+== Pass 1: Populate graph ==
 loop for each .adoc file
   antora_ext -> main_ext : process(content, { sourceFile })
   main_ext -> parser : parse(content, sourceFile)
-  parser -> parser : Pass 1: extract [item] blocks
-  parser -> parser : Pass 2: extract relation:TARGET[] macros
+  parser -> parser : extract [item] blocks
+  parser -> parser : extract relation:TARGET[] macros
   parser --> main_ext : ParserResult { items, relationships }
   main_ext -> graph : addItem() for each item
   main_ext -> graph : addRelationship() for each relationship
   graph -> graph : validate relation (ConfigLoader.isRelationAllowed)
+end
+
+== Pass 2: Substitute links ==
+loop for each .adoc file
+  antora_ext -> antora_ext : substituteRelationshipLinks(content)
+  antora_ext -> graph : getItem(targetId) for each macro match
+  graph --> antora_ext : target item (sourceFile)
+  antora_ext -> antora_ext : replace macro with xref#ID or xref:page.adoc#ID
+  antora_ext -> antora_ext : write modified content to in-memory buffer
 end
 
 == Matrix Generation ==
@@ -254,7 +265,13 @@ This section captures the design decisions from `openspec/changes/unified-item-a
 | Config-driven matrix generation
 | Users define which roles go on rows and columns, which relations count as coverage
 | Hardcoded matrix types (req-impl, req-test, full) — inflexible for domain models with different roles
+
+| In-memory source substitution for clickable links
+| After processing, replace `addresses:REQ-001[]` with Asciidoctor xrefs in the content catalog buffer. Two-pass approach ensures cross-file targets are resolved. No disk writes.
+| HTML post-processing (PDF-incompatible), Asciidoctor inline macro extension (API dependency)
 |===
+
+addresses:REQ-010[]
 
 addresses:REQ-001[]
 addresses:REQ-006[]

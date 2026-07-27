@@ -112,3 +112,14 @@ verifies:REQ-025[]
 verifies:REQ-027[]
 verifies:REQ-028[]
 ====
+
+[item, id=TST-008, role=test]
+====
+*Relationship Link Substitution Tests*
+
+Test file: `test/relationship-link-substitution.test.ts`
+
+Tests the in-memory regex substitution that replaces relationship macros with Asciidoctor xrefs. Covers same-page xref generation, cross-page xref generation with basename path resolution, orphan reference handling, non-relationship text preservation, hyphenated/dotted IDs, missing sourceFile fallback, and surrounding text preservation.
+
+verifies:REQ-010[]
+====

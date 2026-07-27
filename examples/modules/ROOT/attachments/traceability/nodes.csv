@@ -24,7 +24,7 @@ REQ-005,Item REQ-005,requirement,,requirements.adoc,"""*Old macro syntax generat
 The system SHALL detect and report the old macro syntax (`[req]`, `[imp]`, `[test]`, `[doc]`) as a deprecation error, suggesting the equivalent `[item, role=...]` syntax.
 
 Related specs: `unified-item-macro/spec.md`"""
-ITEM-1785155446358-320,Item ITEM-1785155446358-320,...,,requirements.adoc,"""== Configuration System
+ITEM-1785158225609-309,Item ITEM-1785158225609-309,...,,requirements.adoc,"""== Configuration System
 
 [item, id=REQ-006, role=requirement]"""
 REQ-006,Item REQ-006,requirement,,requirements.adoc,"""*Configuration defines roles*
@@ -182,31 +182,100 @@ REQ-036,Item REQ-036,requirement,,requirements.adoc,"""*CLI commands*
 The system SHALL provide a Commander-based CLI with six subcommands: `process` (parse items), `matrix` (generate matrices), `validate` (check graph integrity), `export neo4j` (CSV/Cypher export), `stats` (role statistics), and `preset` (list/show/init). Global `--config` and `--preset` flags SHALL apply to all commands.
 
 Source: CLI implementation"""
-ARC-001,Item ARC-001,architecture,,architecture.adoc,"""*Project scope and architectural goals*
+ARC-001,Item ARC-001,architecture,,architecture.adoc,"""*Component-level architecture*
 
-The Antora Tracer is an Antora extension that adds role-based requirements traceability to AsciiDoc documentation. It replaces fixed macro types with a single configurable `[item]` macro.
+The extension is composed of eight modules organized in a layered architecture:
 
-Architectural goals:
+[plantuml, format=svg]
+....
+@startuml
+package """"Antora Pipeline"""" {
+  [AntoraTraceabilityExtension] as antora_ext
+}
 
-- Enable users to define their own traceability domain model (roles, relations, matrices) through YAML configuration
-- Maintain a clean separation between parsing, graph storage, validation, matrix generation, and export
-- Ship with built-in presets for common domains without requiring users to write configuration
-- Integrate with Antora's event pipeline without imposing runtime dependencies on users who don't need specific features
-- Provide a standalone CLI for use outside Antora
+package """"Core"""" {
+  [RequirementsTraceabilityExtension] as main_ext
+  [DocumentParser] as parser
+  [TraceabilityGraph] as graph
+}
+
+package """"Generation"""" {
+  [MatrixGenerator] as matrix
+  [TemplateRenderer] as templates
+}
+
+package """"Export"""" {
+  [Neo4jExporter] as neo4j
+}
+
+package """"Configuration"""" {
+  [ConfigLoader] as config
+  database """"Presets"""" as presets
+}
+
+antora_ext --> main_ext : orchestrates
+main_ext --> parser : delegates parsing
+main_ext --> graph : owns
+main_ext --> matrix : delegates generation
+main_ext --> neo4j : delegates export
+main_ext --> config : loads configuration
+
+parser --> graph : populates items & relationships
+matrix --> graph : queries for coverage
+matrix --> templates : renders HTML
+neo4j --> graph : exports nodes & relationships
+
+config --> presets : loads built-in presets
+config --> graph : provides validation rules
+@enduml
+....
+
+[width=100%, cols=""""25,75""""]
+|===
+| Component | Responsibility
+
+| `AntoraTraceabilityExtension`
+| Antora entry point. Registers event handlers, creates `RequirementsTraceabilityExtension`, reads playbook config.
+
+| `RequirementsTraceabilityExtension`
+| Orchestrator. Owns the graph, delegates to parser, matrix generator, and Neo4j exporter. Public API for programmatic use.
+
+| `DocumentParser`
+| Regex-based AsciiDoc parser. Two-pass: extracts `[item]` blocks, then scans for inline `relation:TARGET[]` macros.
+
+| `TraceabilityGraph`
+| In-memory directed graph. Items stored as `Map<string, Item>`, relationships as `Map<string, ItemRelationship>`. Provides query, validation, path finding, and impact analysis.
+
+| `MatrixGenerator`
+| Config-driven matrix generation. Reads matrix definitions from configuration, queries the graph, computes coverage, produces CSV output. Delegates HTML to TemplateRenderer.
+
+| `TemplateRenderer`
+| Mustache wrapper. Loads templates from `src/templates/`, supports custom template directories with fallback to built-ins.
+
+| `Neo4jExporter`
+| Graph-to-Neo4j export. Produces `nodes.csv`, `relationships.csv`, and `import.cypher`. Properly escapes special characters.
+
+| `ConfigLoader`
+| YAML configuration loader. Loads and validates config, merges with presets, provides role/relation validation queries to the graph.
+|===
 
 addresses:REQ-001[]
+addresses:REQ-002[]
+addresses:REQ-003[]
+addresses:REQ-004[]
 addresses:REQ-006[]
-addresses:REQ-009[]
-addresses:REQ-013[]
-addresses:REQ-018[]
+addresses:REQ-007[]
+addresses:REQ-008[]
+addresses:REQ-011[]
 addresses:REQ-024[]
-addresses:REQ-035[]
-addresses:REQ-036[]"""
+addresses:REQ-025[]
+addresses:REQ-029[]
+addresses:REQ-034[]"""
 ARC-002,Item ARC-002,architecture,,architecture.adoc,"""*Component-level architecture*
 
 The extension is composed of eight modules organized in a layered architecture:
 
-[kroki,plantuml]
+[plantuml, format=svg]
 ....
 @startuml
 package """"Antora Pipeline"""" {
@@ -295,7 +364,7 @@ ARC-003,Item ARC-003,architecture,,architecture.adoc,"""*Processing flow during 
 
 The following sequence shows how an AsciiDoc file flows through the system during an Antora build:
 
-[kroki,plantuml]
+[plantuml, format=svg]
 ....
 @startuml
 actor """"Antora Build"""" as antora
@@ -317,15 +386,26 @@ antora_ext -> antora_ext : registerPageProcessor()
 == Content Processing ==
 antora -> antora_ext : contentClassified event
 antora_ext -> antora_ext : find all .adoc files in contentCatalog
+
+== Pass 1: Populate graph ==
 loop for each .adoc file
   antora_ext -> main_ext : process(content, { sourceFile })
   main_ext -> parser : parse(content, sourceFile)
-  parser -> parser : Pass 1: extract [item] blocks
-  parser -> parser : Pass 2: extract relation:TARGET[] macros
+  parser -> parser : extract [item] blocks
+  parser -> parser : extract relation:TARGET[] macros
   parser --> main_ext : ParserResult { items, relationships }
   main_ext -> graph : addItem() for each item
   main_ext -> graph : addRelationship() for each relationship
   graph -> graph : validate relation (ConfigLoader.isRelationAllowed)
+end
+
+== Pass 2: Substitute links ==
+loop for each .adoc file
+  antora_ext -> antora_ext : substituteRelationshipLinks(content)
+  antora_ext -> graph : getItem(targetId) for each macro match
+  graph --> antora_ext : target item (sourceFile)
+  antora_ext -> antora_ext : replace macro with xref#ID or xref:page.adoc#ID
+  antora_ext -> antora_ext : write modified content to in-memory buffer
 end
 
 == Matrix Generation ==
@@ -411,7 +491,13 @@ This section captures the design decisions from `openspec/changes/unified-item-a
 | Config-driven matrix generation
 | Users define which roles go on rows and columns, which relations count as coverage
 | Hardcoded matrix types (req-impl, req-test, full) — inflexible for domain models with different roles
+
+| In-memory source substitution for clickable links
+| After processing, replace `addresses:REQ-001[]` with Asciidoctor xrefs in the content catalog buffer. Two-pass approach ensures cross-file targets are resolved. No disk writes.
+| HTML post-processing (PDF-incompatible), Asciidoctor inline macro extension (API dependency)
 |===
+
+addresses:REQ-010[]
 
 addresses:REQ-001[]
 addresses:REQ-006[]
@@ -505,3 +591,10 @@ verifies:REQ-024[]
 verifies:REQ-025[]
 verifies:REQ-027[]
 verifies:REQ-028[]"""
+TST-008,Item TST-008,test,,test-plan.adoc,"""*Relationship Link Substitution Tests*
+
+Test file: `test/relationship-link-substitution.test.ts`
+
+Tests the in-memory regex substitution that replaces relationship macros with Asciidoctor xrefs. Covers same-page xref generation, cross-page xref generation with basename path resolution, orphan reference handling, non-relationship text preservation, hyphenated/dotted IDs, missing sourceFile fallback, and surrounding text preservation.
+
+verifies:REQ-010[]"""
