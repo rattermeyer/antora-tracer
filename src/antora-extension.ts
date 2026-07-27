@@ -182,7 +182,12 @@ export class AntoraTraceabilityExtension {
 
       const content = contentsBuffer.toString('utf8');
       const sourceFile = file.src?.path || file.path || 'unknown';
-      const modifiedContent = this.substituteRelationshipLinks(content, sourceFile);
+
+      // Pass 2a: Substitute relationship macros with xrefs
+      let modifiedContent = this.substituteRelationshipLinks(content, sourceFile);
+
+      // Pass 2b: Inject item ID headings and anchors
+      modifiedContent = this.injectItemHeadings(modifiedContent);
 
       if (modifiedContent !== content) {
         const buf = Buffer.from(modifiedContent, 'utf8');
@@ -192,6 +197,37 @@ export class AntoraTraceabilityExtension {
     } catch (error: any) {
       this.logger.warn(`Error substituting links in ${file.src?.path}: ${error.message}`);
     }
+  }
+
+  /**
+   * Substitute inline relationship macros with Asciidoctor xrefs.
+   * Replaces "addresses:REQ-001[]" with "addresses: xref:#REQ-001[REQ-001]"
+   * (same page) or "addresses: xref:other.adoc#REQ-001[REQ-001]" (cross-page).
+   *
+   * The .adoc file on disk is never modified — only the in-memory content buffer.
+   */
+  private injectItemHeadings(content: string): string {
+    if (!this.traceability) return content;
+
+    // Match [item, id=XXX, ...] followed by ==== block
+    const itemRegex = /^\[item,[^\]]*\b(?:id=([^,\]]+))[^\]]*\](?=\s*\n\s*={4,})/gm;
+
+    return content.replace(itemRegex, (match: string, idAttr: string) => {
+      // Extract the id value
+      const id = idAttr?.trim() || '';
+      if (!id) return match;
+
+      // Look up the item in the graph for the title
+      const item = this.traceability!.graph.getItem(id);
+      const title = item?.title && item.title !== item.id ? item.title : '';
+
+      // Build the heading line
+      const heading = title
+        ? `\n[[${id}]]\n== ${id} \u2014 ${title}`
+        : `\n[[${id}]]\n== ${id}`;
+
+      return match + heading;
+    });
   }
 
   /**
