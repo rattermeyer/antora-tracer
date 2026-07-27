@@ -1,0 +1,121 @@
+= Sphinx Needs Comparison
+
+This page maps concepts from https://sphinx-needs.readthedocs.io/[Sphinx Needs] to their equivalents in Antora Tracer. Sphinx Needs is a popular requirements traceability extension for the Sphinx documentation builder (Python). Antora Tracer provides similar functionality for Antora/AsciiDoc (Node.js).
+
+== Directive Mapping
+
+[width=100%, cols="35,35,30"]
+|===
+| Sphinx Needs | Antora Tracer | Notes
+
+| `:need:` directive
+| `[item, role=requirement]`
+| Sphinx has separate directives per type; Antora Tracer uses one macro with a `role` attribute
+
+| `:spec:` (specification)
+| `[item, role=design]`
+| Design/specification items
+
+| `:test:` (test case)
+| `[item, role=test]`
+| Test items
+
+| `:impl:` (implementation)
+| `[item, role=implementation]`
+| Implementation items
+
+| `:req:` directive
+| `implements:ID[]` or `satisfies:ID[]`
+| Sphinx links via directive role; Antora Tracer links via inline relationship macros
+
+| `needs.json`
+| YAML configuration file
+| Antora Tracer uses YAML config for roles, relations, matrices
+
+| `needs_id_prefix`
+| Manual ID assignment
+| IDs are user-defined, no enforced prefix
+
+| `needs_types`
+| `roles` in `traceability.yml`
+| Both define the valid types for items
+|===
+
+== Feature Comparison
+
+[width=100%, cols="25,25,25,25"]
+|===
+| Feature | Sphinx Needs | Antora Tracer | Notes
+
+| Documentation tool
+| Sphinx (Python)
+| Antora (Node.js)
+| Different ecosystems
+
+| Item definition
+| Multiple directives (`:need:`, `:spec:`, etc.)
+| Single `[item]` macro with `role` attribute
+| Antora Tracer is simpler — one macro for all types
+
+| Role system
+| Fixed need types
+| User-defined roles via YAML
+| Antora Tracer is fully configurable
+
+| Relation system
+| Built-in `links` with types
+| User-defined relation types per role pair
+| Antora Tracer validates allowed relations between roles
+
+| Matrices
+| `needtable` directive
+| Config-driven matrix generation
+| Both produce traceability matrices
+
+| Coverage
+| `needpie` charts
+| Coverage reports with status badges
+| Antora Tracer generates HTML coverage reports
+
+| Export
+| needs.json, needs builder API
+| Neo4j CSV and Cypher export
+| Different export targets
+
+| Presets
+| Not available
+| 4 built-in presets (requirements-eng, agile, medical, minimal)
+| Antora Tracer ships with ready-to-use configurations
+
+| Validation
+| Warning on duplicate IDs
+| Role-based relation validation + duplicate detection
+| Antora Tracer enforces domain rules at processing time
+
+| CLI
+| Via Sphinx build
+| Standalone CLI with 6 commands
+| Antora Tracer works outside the documentation build
+|===
+
+== Migration Path
+
+If you're moving from Sphinx Needs to Antora Tracer:
+
+[arabic]
+. Replace `:need:\` with `[item, role=requirement]`, `:spec:\` with `[item, role=design]`, etc.
+. Move your needs types into `traceability.yml` `roles` field
+. Define allowed relations in `traceability.yml` `relations` section
+. Replace `:links:` with inline relationship macros (`satisfies:REQ-001[]`)
+. Replace `needtable` directives with matrix definitions in `traceability.yml`
+. Use `npx antora-req-trace process` instead of the Sphinx build for traceability
+
+== Key Differences
+
+*Sphinx Needs* is tightly integrated with Sphinx and Python. *Antora Tracer* is designed for Antora/AsciiDoc and Node.js projects.
+
+*Sphinx Needs* has fixed need types. *Antora Tracer* has user-defined roles — you define your own domain model.
+
+*Sphinx Needs* provides `needflow` for graph visualization. *Antora Tracer* exports to Neo4j for graph queries and visualization.
+
+*Sphinx Needs* is mature and well-established. *Antora Tracer* is newer but follows the same traceability principles with a more flexible, config-driven approach.

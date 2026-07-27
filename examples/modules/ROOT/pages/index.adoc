@@ -1,6 +1,11 @@
-= Antora Tracer — Self-Traceability Example
+= Antora Tracer — Project Site
 
-Welcome to the self-traceability site for the *Antora Tracer* extension. This site demonstrates the extension tracing its own requirements, architecture, and tests.
+Welcome to the project site for the *Antora Tracer* extension — a role-based traceability extension for Antora/AsciiDoc.
+
+== Documentation
+
+* xref:user-guide.adoc[User Guide] — Complete guide to using the extension
+* xref:developer-guide.adoc[Developer Guide] — API, architecture, and contributing
 
 == What's Here
 

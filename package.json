@@ -69,5 +69,13 @@
     "package.json",
     "README.adoc",
     "LICENSE"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rattermeyer/antora-tracer"
+  },
+  "bugs": {
+    "url": "https://github.com/rattermeyer/antora-tracer/issues"
+  },
+  "homepage": "https://rattermeyer.github.io/antora-tracer"
 }
