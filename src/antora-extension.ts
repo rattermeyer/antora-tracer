@@ -209,24 +209,28 @@ export class AntoraTraceabilityExtension {
   private injectItemHeadings(content: string): string {
     if (!this.traceability) return content;
 
-    // Match [item, id=XXX, ...] followed by ==== block
-    const itemRegex = /^\[item,[^\]]*\b(?:id=([^,\]]+))[^\]]*\](?=\s*\n\s*={4,})/gm;
+    // Match [item, id=XXX, ...] followed by ==== block content
+    const itemRegex = /^(\[item,[^\]]*\b(?:id=([^,\]]+))[^\]]*\]\s*\n\s*={4,})\n/gm;
 
-    return content.replace(itemRegex, (match: string, idAttr: string) => {
-      // Extract the id value
+    return content.replace(itemRegex, (match: string, itemLine: string, idAttr: string) => {
       const id = idAttr?.trim() || '';
       if (!id) return match;
 
-      // Look up the item in the graph for the title
       const item = this.traceability!.graph.getItem(id);
       const title = item?.title && item.title !== item.id ? item.title : '';
+      const hasTitleAttr = itemLine.includes('title=');
 
-      // Build the heading line
+      // If item already has a title attribute, Asciidoctor renders it as a block title.
+      // Just inject the anchor. Otherwise inject anchor + bold heading.
+      if (hasTitleAttr) {
+        return `[[${id}]]\n${match}`;
+      }
+
       const heading = title
-        ? `\n[[${id}]]\n== ${id} \u2014 ${title}`
-        : `\n[[${id}]]\n== ${id}`;
+        ? `*${id} \u2014 ${title}*`
+        : `*${id}*`;
 
-      return match + heading;
+      return `[[${id}]]\n${itemLine}\n${heading}\n`;
     });
   }
 
