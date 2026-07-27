@@ -30,5 +30,12 @@
 
 - [ ] 5.1 Run `npm run build && npm test` — all tests pass
 - [ ] 5.2 Run `npx antora antora-playbook.yml` — zero warnings, matrices generated
-- [ ] 5.3 Verify navigation includes all pages: Overview, User Guide, Developer Guide, Requirements, Architecture, Test Plan, Traceability
+- [ ] 5.3 Verify navigation includes all pages: Overview, User Guide, Developer Guide, Requirements, Architecture, Test Plan, Traceability, Sphinx Comparison
 - [ ] 5.4 Verify clickable links work in the deployed/rendered output
+
+## 6. Sphinx Needs Comparison
+
+- [ ] 6.1 Create `examples/modules/ROOT/pages/sphinx-comparison.adoc` mapping Sphinx Needs concepts to antora-tracer equivalents
+- [ ] 6.2 Include directive mapping table: `:need:` → `[item, role=...]`, link types, config formats
+- [ ] 6.3 Include feature comparison: roles, relations, matrices, export, presets
+- [ ] 6.4 Add to navigation via `nav.adoc`
