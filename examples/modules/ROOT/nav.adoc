@@ -3,5 +3,5 @@
 * xref:architecture.adoc[Architecture]
 * xref:test-plan.adoc[Test Plan]
 * xref:traceability/index.adoc[Traceability]
-* link:_attachments/traceability/matrix-requirements-architecture.html[Req → Architecture]
-* link:_attachments/traceability/matrix-requirements-tests.html[Req → Tests]
+* xref:attachment$traceability/matrix-requirements-architecture.html[Req → Architecture]
+* xref:attachment$traceability/matrix-requirements-tests.html[Req → Tests]
