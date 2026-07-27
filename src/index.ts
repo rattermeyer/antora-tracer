@@ -366,7 +366,7 @@ export class RequirementsTraceabilityExtension {
    * Check if a relation is allowed between roles
    */
   isRelationAllowed(sourceRole: string, targetRole: string, relationType: string): boolean {
-    return this.configLoader?.isRelationAllowed(sourceRole, targetRole, relationType) || true;
+    return this.configLoader?.isRelationAllowed(sourceRole, targetRole, relationType) ?? true;
   }
 
   /**

@@ -568,12 +568,10 @@ describe('RequirementsTraceabilityExtension - API Methods', () => {
       expect(extension.isRelationAllowed('design', 'requirement', 'implements')).to.be.true;
     });
 
-    it('should detect allowed vs disallowed relations via configLoader directly', async () => {
+    it('should return false for disallowed relations when configLoader is set', async () => {
       const extension = await RequirementsTraceabilityExtension.createWithPreset('requirements-engineering');
-      // The extension's isRelationAllowed returns true for undefined configLoader (|| true fallback)
-      // Use configLoader directly to verify the underlying config
-      expect(extension.configLoader?.isRelationAllowed('design', 'requirement', 'implements')).to.be.true;
-      expect(extension.configLoader?.isRelationAllowed('design', 'requirement', 'verified_by')).to.be.false;
+      expect(extension.isRelationAllowed('design', 'requirement', 'implements')).to.be.true;
+      expect(extension.isRelationAllowed('design', 'requirement', 'verified_by')).to.be.false;
     });
   });
 
