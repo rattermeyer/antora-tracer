@@ -96,6 +96,16 @@ This page maps concepts from https://sphinx-needs.readthedocs.io/[Sphinx Needs] 
 | Via Sphinx build
 | Standalone CLI with 6 commands
 | Antora Tracer works outside the documentation build
+
+| Link rendering
+| Inline via directives
+| `traceability:links[]` macro with configurable style (list, table, inline)
+| Antora Tracer separates data (inline macros) from rendering (links macro)
+
+| Matrix navigation
+| Links in needtable
+| Clickable deep links from matrix cells to item definitions
+| Antora Tracer matrices are interactive — click any ID to jump to source
 |===
 
 == Migration Path
