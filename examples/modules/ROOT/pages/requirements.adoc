@@ -6,13 +6,13 @@ This document lists the traceability requirements for the Antora Tracer extensio
 == Unified Item Macro
 
 [item, id=REQ-001, role=requirement, title="Single `item` macro replaces all block macros"]
-====
+--
 The system SHALL use a single `[item]` block macro to define all traceable artifacts, replacing the previous role-specific macros.
 
 Related specs: `unified-item-macro/spec.md`
 
 Source: OpenSpec specification — Scenario: Define a requirement using `[item, id=REQ-001, role=requirement]`
-====
+--
 
 [item, id=REQ-002, role=requirement, title="`item` macro accepts role attribute"]
 ====
