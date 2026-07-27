@@ -352,8 +352,8 @@ After a build, you'll find in `<site-output>/traceability/`:
 
 == Documentation
 
-* link:docs/user-guide.adoc[User Guide] — Full reference: macros, relations, CLI, presets
-* link:docs/developer-guide.adoc[Developer Guide] — API, architecture, contributing, testing
+* https://rattermeyer.github.io/antora-tracer[User Guide] — Full reference: macros, relations, CLI, presets
+* https://rattermeyer.github.io/antora-tracer[Developer Guide] — API, architecture, contributing, testing
 
 ---
 
@@ -367,7 +367,7 @@ Every feature, fix, and refactor starts as a proposal with specs, design, and ta
 
 == Contributing
 
-Contributions are welcome. See the link:docs/developer-guide.adoc[Developer Guide] for setup, code style, and testing.
+Contributions are welcome. See the https://rattermeyer.github.io/antora-tracer[Developer Guide] for setup, code style, and testing.
 
 [source,bash]
 ----

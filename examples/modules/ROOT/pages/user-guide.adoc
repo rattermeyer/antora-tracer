@@ -6,8 +6,6 @@
 :version: 0.7.0
 :toc: macro
 
-toc::[]
-
 == Overview
 
 The Antora Requirements Traceability Extension adds role-based traceability to your Antora documentation. Define items with a single `[item]` block macro, reference them through user-defined relation types, and generate traceability matrices and coverage reports — all driven by *your* domain model.
