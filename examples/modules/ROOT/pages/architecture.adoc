@@ -1,5 +1,5 @@
 = Architecture
-:traceability-links: true
+:traceability-links: false
 :traceability-style: list
 :traceability-order: target-id
 :arc42-sections: 1,5,6,9

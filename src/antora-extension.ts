@@ -61,6 +61,7 @@ export class AntoraTraceabilityExtension {
   private traceability: RequirementsTraceabilityExtension | null = null;
   private config: Required<AntoraTraceabilityConfig>;
   private readonly logger: ReturnType<AntoraExtensionContext['getLogger']>;
+  private itemsWithLinksMacro = new Set<string>();
 
   constructor(private readonly context: AntoraExtensionContext) {
     this.logger = context.getLogger('requirements-traceability');
@@ -216,6 +217,8 @@ export class AntoraTraceabilityExtension {
           replacements.push({ start: macroStart, end: macroEnd, text: '' });
           continue;
         }
+        this.itemsWithLinksMacro.add(itemId);
+
         const rels = this.traceability.graph.getRelationships(itemId);
         if (rels.length === 0) {
           replacements.push({ start: macroStart, end: macroEnd, text: '' });
@@ -325,6 +328,7 @@ export class AntoraTraceabilityExtension {
       }
 
       // Pass 2: Expand traceability:links[] macros
+      this.itemsWithLinksMacro.clear();
       for (const file of adocFiles) {
         this.expandLinksMacros(file);
       }
@@ -367,10 +371,9 @@ export class AntoraTraceabilityExtension {
       if (!contentsBuffer) return;
 
       const content = contentsBuffer.toString('utf8');
-      const sourceFile = file.src?.path || file.path || 'unknown';
 
-      // Pass 2: Substitute relationship macros with xrefs
-      let modifiedContent = this.substituteRelationshipLinks(content, sourceFile);
+      // Strip inline macros (always invisible)
+      let modifiedContent = this.substituteRelationshipLinks(content);
 
       // Pass 2b: Prepend item IDs to title attributes for visible display
       modifiedContent = this.injectTitleIds(modifiedContent);
@@ -414,37 +417,11 @@ export class AntoraTraceabilityExtension {
    *
    * The .adoc file on disk is never modified — only the in-memory content buffer.
    */
-  private substituteRelationshipLinks(content: string, currentFile: string): string {
-    if (!this.traceability) return content;
-
-    const docAttrs = this.parseDocAttributes(content);
-    const linksEnabled = this.isLinksEnabled(docAttrs);
-    const relRegex = /\b(\w+):([\w][-.\w]*)\[\]/g;
-
-    return content.replace(relRegex, (_match: string, _relType: string, targetId: string) => {
-      // When :traceability-links: is enabled, inline macros are invisible —
-      // they are pure data markers. traceability:links[] is the only renderer.
-      if (linksEnabled) return '';
-
-      const relType = _relType;
-      const target = this.traceability!.graph.getItem(targetId);
-
-      if (!target) {
-        return _match;
-      }
-
-      if (target.sourceFile === currentFile) {
-        return `${relType}: xref:#${targetId}[${targetId}]`;
-      } else if (target.sourceFile) {
-        // Use just the filename (basename) for cross-page xrefs.
-        // Antora resolves page-to-page xrefs within the same component
-        // by the page's resource ID, which includes the filename stem.
-        const targetPage = target.sourceFile.split('/').pop()!;
-        return `${relType}: xref:${targetPage}#${targetId}[${targetId}]`;
-      }
-
-      return `${relType}: xref:#${targetId}[${targetId}]`;
-    });
+  private substituteRelationshipLinks(content: string): string {
+    // Inline macros are always invisible — pure data markers.
+    // Exclude traceability:links[] (the rendering macro itself).
+    const relRegex = /\b(?!traceability:)(\w+):([\w][-.\w]*)\[\]/g;
+    return content.replace(relRegex, '');
   }
 
   private registerPageProcessor(): void {
