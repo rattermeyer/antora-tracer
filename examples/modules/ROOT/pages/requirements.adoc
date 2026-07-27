@@ -5,7 +5,7 @@ This document lists the traceability requirements for the Antora Tracer extensio
 
 == Unified Item Macro
 
-[item, id=REQ-001, role=requirement, title="Single [item] macro replaces all block macros"]
+[item, id=REQ-001, role=requirement, title="Single `item` macro replaces all block macros"]
 ====
 The system SHALL use a single `[item]` block macro to define all traceable artifacts, replacing the previous role-specific macros.
 
@@ -14,21 +14,21 @@ Related specs: `unified-item-macro/spec.md`
 Source: OpenSpec specification — Scenario: Define a requirement using `[item, id=REQ-001, role=requirement]`
 ====
 
-[item, id=REQ-002, role=requirement, title="[item] macro accepts role attribute"]
+[item, id=REQ-002, role=requirement, title="`item` macro accepts role attribute"]
 ====
 The `[item]` macro SHALL accept a `role` attribute that specifies the type of traceable artifact. Items without a `role` attribute receive the default role `unknown` with a warning.
 
 Related specs: `unified-item-macro/spec.md`
 ====
 
-[item, id=REQ-003, role=requirement, title="[item] macro maintains existing attributes"]
+[item, id=REQ-003, role=requirement, title="`item` macro maintains existing attributes"]
 ====
 The `[item]` macro SHALL support the attributes `id`, `title`, `status`, and any custom attributes. The `title` defaults to the item's `id` if omitted. The `status` field is free-form.
 
 Related specs: `unified-item-macro/spec.md`
 ====
 
-[item, id=REQ-004, role=requirement, title="[item] macro supports block content"]
+[item, id=REQ-004, role=requirement, title="`item` macro supports block content"]
 ====
 The `[item]` macro SHALL accept block content between `====` delimiters as the artifact description. Multi-line content and AsciiDoc formatting within the block SHALL be preserved.
 

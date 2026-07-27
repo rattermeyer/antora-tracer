@@ -5,7 +5,7 @@ This document describes the architecture of the Antora Tracer extension using se
 
 == Introduction and Goals
 
-[item, id=ARC-001, role=architecture]
+[item, id=ARC-001, role=architecture, title="Project scope and architectural goals"]
 --
 *Project scope and architectural goals*
 

@@ -209,8 +209,8 @@ export class AntoraTraceabilityExtension {
   private injectItemHeadings(content: string): string {
     if (!this.traceability) return content;
 
-    // Match [item, id=XXX, ...] followed by ==== block content
-    const itemRegex = /^(\[item,[^\]]*\b(?:id=([^,\]]+))[^\]]*\]\s*\n\s*={4,})\n/gm;
+    // Match [item, id=XXX, ...] followed by ==== or -- block delimiter
+    const itemRegex = /^(\[item,[^\]]*\b(?:id=([^,\]]+))[^\]]*\]\s*\n\s*(?:={4,}|-{2,}))\n/gm;
 
     return content.replace(itemRegex, (match: string, itemLine: string, idAttr: string) => {
       const id = idAttr?.trim() || '';
@@ -220,10 +220,12 @@ export class AntoraTraceabilityExtension {
       const title = item?.title && item.title !== item.id ? item.title : '';
       const hasTitleAttr = itemLine.includes('title=');
 
-      // If item already has a title attribute, Asciidoctor renders it as a block title.
-      // Just inject the anchor. Otherwise inject anchor + bold heading.
+      // Inject [[ID]] anchor and prepend ID to the title attribute
+      // so it's visible in the rendered output.
       if (hasTitleAttr) {
-        return `[[${id}]]\n${match}`;
+        // itemLine contains "[item,...]\n====" — replace title attr, keep the ====
+        const newItemLine = itemLine.replace(/title="([^"]*)"/, `title="${id} \u2014 $1"`);
+        return `[[${id}]]\n${newItemLine}\n`;
       }
 
       const heading = title
