@@ -7,6 +7,7 @@ ARC-001-addresses-REQ-018,ARC-001,REQ-018,addresses,architecture.adoc
 ARC-001-addresses-REQ-024,ARC-001,REQ-024,addresses,architecture.adoc
 ARC-001-addresses-REQ-035,ARC-001,REQ-035,addresses,architecture.adoc
 ARC-001-addresses-REQ-036,ARC-001,REQ-036,addresses,architecture.adoc
+ARC-002-relation-TARGET,ARC-002,TARGET,relation,architecture.adoc
 ARC-002-addresses-REQ-001,ARC-002,REQ-001,addresses,architecture.adoc
 ARC-002-addresses-REQ-002,ARC-002,REQ-002,addresses,architecture.adoc
 ARC-002-addresses-REQ-003,ARC-002,REQ-003,addresses,architecture.adoc
@@ -19,6 +20,7 @@ ARC-002-addresses-REQ-024,ARC-002,REQ-024,addresses,architecture.adoc
 ARC-002-addresses-REQ-025,ARC-002,REQ-025,addresses,architecture.adoc
 ARC-002-addresses-REQ-029,ARC-002,REQ-029,addresses,architecture.adoc
 ARC-002-addresses-REQ-034,ARC-002,REQ-034,addresses,architecture.adoc
+ARC-003-relation-TARGET,ARC-003,TARGET,relation,architecture.adoc
 ARC-003-addresses-REQ-001,ARC-003,REQ-001,addresses,architecture.adoc
 ARC-003-addresses-REQ-002,ARC-003,REQ-002,addresses,architecture.adoc
 ARC-003-addresses-REQ-004,ARC-003,REQ-004,addresses,architecture.adoc

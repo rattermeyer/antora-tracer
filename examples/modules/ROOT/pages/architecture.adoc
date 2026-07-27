@@ -1,4 +1,7 @@
 = Architecture
+:traceability-links: true
+:traceability-style: list
+:traceability-order: target-id
 :arc42-sections: 1,5,6,9
 
 This document describes the architecture of the Antora Tracer extension using selected arc42 sections. Each section is a traceable `[item]` that references the requirements it addresses.
@@ -27,6 +30,8 @@ addresses:REQ-018[]
 addresses:REQ-024[]
 addresses:REQ-035[]
 addresses:REQ-036[]
+
+traceability:links[]
 --
 
 == Building Block View
@@ -124,6 +129,8 @@ addresses:REQ-024[]
 addresses:REQ-025[]
 addresses:REQ-029[]
 addresses:REQ-034[]
+
+traceability:links[]
 --
 
 == Runtime View

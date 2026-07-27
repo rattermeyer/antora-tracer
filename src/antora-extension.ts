@@ -61,6 +61,7 @@ export class AntoraTraceabilityExtension {
   private traceability: RequirementsTraceabilityExtension | null = null;
   private config: Required<AntoraTraceabilityConfig>;
   private readonly logger: ReturnType<AntoraExtensionContext['getLogger']>;
+  private itemsWithLinksMacro = new Set<string>();
 
   constructor(private readonly context: AntoraExtensionContext) {
     this.logger = context.getLogger('requirements-traceability');
@@ -143,6 +144,168 @@ export class AntoraTraceabilityExtension {
     return result;
   }
 
+
+  /**
+   * Parse AsciiDoc document attributes from content header.
+   */
+  private parseDocAttributes(content: string): Record<string, string> {
+    const attrs: Record<string, string> = {};
+    const lines = content.split('\n');
+    for (const line of lines) {
+      const m = line.match(/^:(\w[\w-]*):\s*(.*)/);
+      if (m) {
+        attrs[m[1]] = m[2].trim();
+      }
+      if (line.trim() === '' && Object.keys(attrs).length > 0) break;
+    }
+    return attrs;
+  }
+
+  private isLinksEnabled(attrs: Record<string, string>): boolean {
+    const val = (attrs['traceability-links'] || '').toLowerCase();
+    return val === 'true' || val === 'yes' || val === '1';
+  }
+
+  private getLinksStyle(attrs: Record<string, string>): 'list' | 'table' | 'inline' {
+    const val = (attrs['traceability-style'] || '').toLowerCase();
+    if (val === 'table') return 'table';
+    if (val === 'inline') return 'inline';
+    return 'list';
+  }
+
+  private getLinksOrder(attrs: Record<string, string>): 'target-id' | 'target-title' | 'relation-type' {
+    const val = (attrs['traceability-order'] || '').toLowerCase();
+    if (val === 'target-title') return 'target-title';
+    if (val === 'relation-type') return 'relation-type';
+    return 'target-id';
+  }
+
+  /**
+   * Expand traceability:links[] macros.
+   */
+  private expandLinksMacros(file: any): void {
+    if (!this.traceability) return;
+    try {
+      const contentsBuffer = file.contents || file.src?.contents;
+      if (!contentsBuffer) return;
+      const content = contentsBuffer.toString('utf8');
+      const docAttrs = this.parseDocAttributes(content);
+      if (!this.isLinksEnabled(docAttrs)) return;
+      if (!content.includes('traceability:links[]')) return;
+
+      const style = this.getLinksStyle(docAttrs);
+      const order = this.getLinksOrder(docAttrs);
+      const sourceFile = file.src?.path || file.path || 'unknown';
+      const macroRegex = /traceability:links\[\]/g;
+      let match: RegExpExecArray | null;
+      const replacements: Array<{ start: number; end: number; text: string }> = [];
+
+      while ((match = macroRegex.exec(content)) !== null) {
+        const macroStart = match.index;
+        const macroEnd = macroStart + match[0].length;
+        const before = content.slice(0, macroStart);
+        const itemMatch = before.match(/\[#([^,\]]+),\s*item[^\]]*\]/g);
+        if (!itemMatch) {
+          this.logger.warn(`traceability:links[] found outside an item block in ${sourceFile}`);
+          continue;
+        }
+        const lastItem = itemMatch[itemMatch.length - 1];
+        const idMatch = lastItem.match(/\[#([^,\]]+),/);
+        if (!idMatch) continue;
+        const itemId = idMatch[1];
+        this.itemsWithLinksMacro.add(itemId);
+
+        const rels = this.traceability.graph.getRelationships(itemId);
+        if (rels.length === 0) {
+          replacements.push({ start: macroStart, end: macroEnd, text: '' });
+          continue;
+        }
+
+        const grouped = new Map<string, Array<{ id: string; title: string }>>();
+        for (const rel of rels) {
+          const target = this.traceability.graph.getItem(rel.targetId);
+          if (!target) continue;
+          if (!grouped.has(rel.type)) grouped.set(rel.type, []);
+          grouped.get(rel.type)!.push({ id: target.id, title: target.title || target.id });
+        }
+        if (grouped.size === 0) {
+          replacements.push({ start: macroStart, end: macroEnd, text: '' });
+          continue;
+        }
+
+        let groupEntries = Array.from(grouped.entries());
+        if (order === 'relation-type') groupEntries.sort((a, b) => a[0].localeCompare(b[0]));
+        for (const [, items] of groupEntries) {
+          if (order === 'target-id') items.sort((a, b) => a.id.localeCompare(b.id));
+          else if (order === 'target-title') items.sort((a, b) => a.title.localeCompare(b.title));
+        }
+
+        const generated = this.generateLinksAsciiDoc(groupEntries, style, sourceFile);
+        replacements.push({ start: macroStart, end: macroEnd, text: generated });
+      }
+
+      if (replacements.length > 0) {
+        let modifiedContent = content;
+        for (let i = replacements.length - 1; i >= 0; i--) {
+          const r = replacements[i];
+          modifiedContent = modifiedContent.slice(0, r.start) + r.text + modifiedContent.slice(r.end);
+        }
+        const buf = Buffer.from(modifiedContent, 'utf8');
+        if (file.contents) file.contents = buf;
+        if (file.src?.contents) file.src.contents = buf;
+      }
+    } catch (error: any) {
+      this.logger.warn(`Error expanding links in ${file.src?.path}: ${error.message}`);
+    }
+  }
+
+  private generateLinksAsciiDoc(
+    grouped: Array<[string, Array<{ id: string; title: string }>]>,
+    style: 'list' | 'table' | 'inline',
+    _sourceFile: string
+  ): string {
+    if (grouped.length === 0) return '';
+    if (style === 'table') return this.generateTableStyle(grouped);
+    if (style === 'inline') return this.generateInlineStyle(grouped);
+    return this.generateListStyle(grouped);
+  }
+
+  private generateListStyle(grouped: Array<[string, Array<{ id: string; title: string }>]>): string {
+    const lines: string[] = [];
+    for (const [relType, items] of grouped) {
+      lines.push('\n.' + this.capitalize(relType));
+      for (const item of items) {
+        const safeTitle = item.title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        lines.push('* xref:#' + item.id + '[' + safeTitle + ']');
+      }
+    }
+    return lines.join('\n') + '\n';
+  }
+
+  private generateTableStyle(grouped: Array<[string, Array<{ id: string; title: string }>]>): string {
+    const lines: string[] = ['\n[cols="15,15,70"]', '|==='];
+    lines.push('| Relation | ID | Title');
+    for (const [relType, items] of grouped) {
+      for (const item of items) {
+        lines.push('| ' + relType + ' | xref:#' + item.id + '[' + item.id + '] | ' + item.title.replace(/\|/g, '\\\\|').replace(/&/g, '&amp;'));
+      }
+    }
+    lines.push('|===');
+    return lines.join('\n') + '\n';
+  }
+
+  private generateInlineStyle(grouped: Array<[string, Array<{ id: string; title: string }>]>): string {
+    const lines: string[] = [];
+    for (const [relType, items] of grouped) {
+      lines.push('\n' + this.capitalize(relType) + ': ' + items.map(i => 'xref:#' + i.id + '[' + i.id + ']').join(', '));
+    }
+    return lines.join('\n') + '\n';
+  }
+
+  private capitalize(s: string): string {
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
+
   private registerContentClassifier(): void {
     this.context.on('contentClassified', (event: any) => {
       const contentCatalog = event.contentCatalog;
@@ -160,7 +323,13 @@ export class AntoraTraceabilityExtension {
         this.processAsciiDocFile(file);
       }
 
-      // Pass 2: Substitute relationship macros with xrefs now that the graph is complete
+      // Pass 2: Expand traceability:links[] macros
+      this.itemsWithLinksMacro.clear();
+      for (const file of adocFiles) {
+        this.expandLinksMacros(file);
+      }
+
+      // Pass 3: Substitute relationship macros with xrefs now that the graph is complete
       for (const file of adocFiles) {
         this.substituteLinksInFile(file);
       }
@@ -248,6 +417,10 @@ export class AntoraTraceabilityExtension {
   private substituteRelationshipLinks(content: string, currentFile: string): string {
     if (!this.traceability) return content;
 
+    const docAttrs = this.parseDocAttributes(content);
+    const linksEnabled = this.isLinksEnabled(docAttrs);
+    const suppressItems = this.itemsWithLinksMacro;
+
     const relRegex = /\b(\w+):([\w][-.\w]*)\[\]/g;
 
     return content.replace(relRegex, (_match: string, _relType: string, targetId: string) => {
@@ -255,7 +428,23 @@ export class AntoraTraceabilityExtension {
       const target = this.traceability!.graph.getItem(targetId);
 
       if (!target) {
-        return _match;
+        return '';
+      }
+
+      // If links macro is active, suppress inline macros inside items that have traceability:links[]
+      if (linksEnabled && suppressItems.size > 0) {
+        const matchPos = content.indexOf(_match);
+        if (matchPos >= 0) {
+          const before = content.slice(0, matchPos);
+          const itemMatch = before.match(/\[#([^,\]]+),\s*item[^\]]*\]/g);
+          if (itemMatch) {
+            const lastItem = itemMatch[itemMatch.length - 1];
+            const idMatch = lastItem.match(/\[#([^,\]]+),/);
+            if (idMatch && suppressItems.has(idMatch[1])) {
+              return '';
+            }
+          }
+        }
       }
 
       if (target.sourceFile === currentFile) {

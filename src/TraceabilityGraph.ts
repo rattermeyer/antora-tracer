@@ -167,25 +167,25 @@ export class TraceabilityGraph {
     if (!sourceNode) {
       const warning: GraphWarning = {
         type: 'unknown_role',
-        message: `Source item not found: ${relationship.fromId}. Cannot create relationship of type '${relationship.type}'.`,
+        message: `Source item not found: ${relationship.fromId}. Relationship '${relationship.type}' will be stored anyway.`,
         file: relationship.sourceFile,
         line: relationship.line,
       };
       this._warnings.push(warning);
-      return;
+      // Continue — don't block; target may be added later
     }
 
-    // Validate that target node exists
+    // Validate that target node exists (warn but don't block — cross-file ordering is normal)
     const targetNode = this.getItem(relationship.targetId);
     if (!targetNode) {
       const warning: GraphWarning = {
         type: 'unknown_role',
-        message: `Target item not found: ${relationship.targetId}. Cannot create relationship of type '${relationship.type}'.`,
+        message: `Target item not found: ${relationship.targetId}. Relationship ${relationship.fromId} ${relationship.type} ${relationship.targetId} stored pending target.`,
         file: relationship.sourceFile,
         line: relationship.line,
       };
       this._warnings.push(warning);
-      return;
+      // Continue — target exists in another file that hasn't been processed yet
     }
 
     // Check for duplicate relationship
@@ -201,8 +201,8 @@ export class TraceabilityGraph {
       return;
     }
 
-    // Validate relation based on roles (if config loader is available)
-    if (this._configLoader) {
+    // Validate relation based on roles (if config loader is available and both nodes exist)
+    if (this._configLoader && sourceNode && targetNode) {
       const isValid = this._configLoader.isRelationAllowed(
         sourceNode.role,
         targetNode.role,

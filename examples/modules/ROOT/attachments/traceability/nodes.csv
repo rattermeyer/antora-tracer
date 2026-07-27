@@ -147,7 +147,9 @@ addresses:REQ-013[]
 addresses:REQ-018[]
 addresses:REQ-024[]
 addresses:REQ-035[]
-addresses:REQ-036[]"""
+addresses:REQ-036[]
+
+traceability:links[]"""
 ARC-002,ARC-002 — Component-level architecture,architecture,,architecture.adoc,"""The extension is composed of eight modules organized in a layered architecture:
 
 [plantuml, format=svg]
@@ -238,7 +240,9 @@ addresses:REQ-011[]
 addresses:REQ-024[]
 addresses:REQ-025[]
 addresses:REQ-029[]
-addresses:REQ-034[]"""
+addresses:REQ-034[]
+
+traceability:links[]"""
 ARC-003,ARC-003 — Processing flow during Antora build,architecture,,architecture.adoc,"""The following sequence shows how an AsciiDoc file flows through the system during an Antora build:
 
 [plantuml, format=svg]
