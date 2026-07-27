@@ -1,5 +1,5 @@
 = Architecture
-:traceability-links: false
+:traceability-links: true
 :traceability-style: list
 :traceability-order: target-id
 :arc42-sections: 1,5,6,9
@@ -174,12 +174,20 @@ loop for each .adoc file
   graph -> graph : validate relation (ConfigLoader.isRelationAllowed)
 end
 
-== Pass 2: Substitute links ==
+== Pass 2: Expand traceability:links[] macros ==
+loop for each .adoc file
+  antora_ext -> antora_ext : expandLinksMacros(content)
+  antora_ext -> antora_ext : find traceability:links[] and enclosing item ID
+  antora_ext -> graph : getRelationships(itemId)
+  graph --> antora_ext : outgoing relationships
+  antora_ext -> antora_ext : generate AsciiDoc list/table/inline
+  antora_ext -> antora_ext : replace macro with generated content
+end
+
+== Pass 3: Strip inline macros ==
 loop for each .adoc file
   antora_ext -> antora_ext : substituteRelationshipLinks(content)
-  antora_ext -> graph : getItem(targetId) for each macro match
-  graph --> antora_ext : target item (sourceFile)
-  antora_ext -> antora_ext : replace macro with xref#ID or xref:page.adoc#ID
+  note right: inline macros always stripped\n(traceability:links[] is sole renderer)
   antora_ext -> antora_ext : write modified content to in-memory buffer
 end
 

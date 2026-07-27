@@ -42,6 +42,13 @@ REQ-040,REQ-040 — Context-aware link generation,TST-002: TST-002 — Antora Ex
 REQ-041,REQ-041 — Source file path normalization,
 REQ-042,REQ-042 — Backward compatibility without LinkResolver,TST-006: TST-006 — MatrixGenerator Tests
 REQ-043,REQ-043 — Non-HTML matrix outputs unchanged,TST-006: TST-006 — MatrixGenerator Tests
+REQ-044,"""REQ-044 — """"traceability:links[""",
+REQ-045,REQ-045 — Opt-in via AsciiDoc attribute,
+REQ-046,REQ-046 — Inline macros are pure data markers,
+REQ-047,REQ-047 — Configurable display style,
+REQ-048,REQ-048 — Configurable sort order,
+REQ-049,REQ-049 — PDF compatibility,
+REQ-050,REQ-050 — Source files never modified,
 
-Total 43 rows
-Coverage: 97.7%
+Total 50 rows
+Coverage: 84.0%

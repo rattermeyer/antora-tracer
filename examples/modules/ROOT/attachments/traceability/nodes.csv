@@ -128,6 +128,27 @@ Source: openspec/specs/matrix-item-linking/spec.md"""
 REQ-043,REQ-043 — Non-HTML matrix outputs unchanged,requirement,,requirements.adoc,"""The system SHALL NOT modify CSV and JSON matrix outputs to include links. CSV and JSON output SHALL contain item data as before.
 
 Source: openspec/specs/matrix-item-linking/spec.md"""
+REQ-044,"""REQ-044 — """"traceability:links[""",requirement,,requirements.adoc,"""The system SHALL provide a \`traceability:links[]\` macro that expands to a formatted list of all outgoing relationships for the enclosing item. Relationships SHALL be grouped by type and rendered using standard AsciiDoc constructs (lists, tables, inline xrefs).
+
+Source: openspec/specs/traceability-links-macro/spec.md"""
+REQ-045,REQ-045 — Opt-in via AsciiDoc attribute,requirement,,requirements.adoc,"""The system SHALL only expand \`traceability:links[]\` when the \`:traceability-links:\` document attribute is set to a truthy value. Without the attribute, the macro text SHALL be stripped from output.
+
+Source: openspec/specs/traceability-links-macro/spec.md"""
+REQ-046,REQ-046 — Inline macros are pure data markers,requirement,,requirements.adoc,"""Inline relationship macros (\`addresses:REQ-001[]\`) SHALL always be invisible in rendered output. They are pure data markers stored in the traceability graph. \`traceability:links[]\` is the sole mechanism for rendering relationships.
+
+Source: openspec/specs/traceability-links-macro/spec.md"""
+REQ-047,REQ-047 — Configurable display style,requirement,,requirements.adoc,"""The system SHALL support configurable display styles via the \`:traceability-style:\` document attribute: \`list\` (default, bulleted list), \`table\` (AsciiDoc table), or \`inline\` (comma-separated).
+
+Source: openspec/specs/traceability-links-macro/spec.md"""
+REQ-048,REQ-048 — Configurable sort order,requirement,,requirements.adoc,"""The system SHALL support configurable sort order via \`:traceability-order:\`: \`target-id\` (default), \`target-title\`, or \`relation-type\`.
+
+Source: openspec/specs/traceability-links-macro/spec.md"""
+REQ-049,REQ-049 — PDF compatibility,requirement,,requirements.adoc,"""Generated output from \`traceability:links[]\` SHALL be standard AsciiDoc constructs — not raw HTML — ensuring compatibility with both HTML and PDF backends.
+
+Source: openspec/specs/traceability-links-macro/spec.md"""
+REQ-050,REQ-050 — Source files never modified,requirement,,requirements.adoc,"""The system SHALL NOT modify \`.adoc\` source files on disk. All macro expansion and content substitution SHALL occur in the in-memory content buffer during Antora's \`contentClassified\` event.
+
+Source: openspec/specs/traceability-links-macro/spec.md"""
 ARC-001,ARC-001 — Project scope and architectural goals,architecture,,architecture.adoc,"""*Project scope and architectural goals*
 
 The Antora Tracer is an Antora extension that adds role-based requirements traceability to AsciiDoc documentation. It replaces fixed macro types with a single configurable `[item]` macro.
@@ -280,12 +301,20 @@ loop for each .adoc file
   graph -> graph : validate relation (ConfigLoader.isRelationAllowed)
 end
 
-== Pass 2: Substitute links ==
+== Pass 2: Expand traceability:links[] macros ==
+loop for each .adoc file
+  antora_ext -> antora_ext : expandLinksMacros(content)
+  antora_ext -> antora_ext : find traceability:links[] and enclosing item ID
+  antora_ext -> graph : getRelationships(itemId)
+  graph --> antora_ext : outgoing relationships
+  antora_ext -> antora_ext : generate AsciiDoc list/table/inline
+  antora_ext -> antora_ext : replace macro with generated content
+end
+
+== Pass 3: Strip inline macros ==
 loop for each .adoc file
   antora_ext -> antora_ext : substituteRelationshipLinks(content)
-  antora_ext -> graph : getItem(targetId) for each macro match
-  graph --> antora_ext : target item (sourceFile)
-  antora_ext -> antora_ext : replace macro with xref#ID or xref:page.adoc#ID
+  note right: inline macros always stripped\n(traceability:links[] is sole renderer)
   antora_ext -> antora_ext : write modified content to in-memory buffer
 end
 

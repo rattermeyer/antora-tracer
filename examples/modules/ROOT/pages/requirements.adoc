@@ -319,3 +319,54 @@ The system SHALL NOT modify CSV and JSON matrix outputs to include links. CSV an
 
 Source: openspec/specs/matrix-item-linking/spec.md
 --
+
+== traceability:links[] Rendering Macro
+
+[#REQ-044, item, role=requirement, title="traceability:links[] renders outgoing links"]
+--
+The system SHALL provide a \`traceability:links[]\` macro that expands to a formatted list of all outgoing relationships for the enclosing item. Relationships SHALL be grouped by type and rendered using standard AsciiDoc constructs (lists, tables, inline xrefs).
+
+Source: openspec/specs/traceability-links-macro/spec.md
+--
+
+[#REQ-045, item, role=requirement, title="Opt-in via AsciiDoc attribute"]
+--
+The system SHALL only expand \`traceability:links[]\` when the \`:traceability-links:\` document attribute is set to a truthy value. Without the attribute, the macro text SHALL be stripped from output.
+
+Source: openspec/specs/traceability-links-macro/spec.md
+--
+
+[#REQ-046, item, role=requirement, title="Inline macros are pure data markers"]
+--
+Inline relationship macros (\`addresses:REQ-001[]\`) SHALL always be invisible in rendered output. They are pure data markers stored in the traceability graph. \`traceability:links[]\` is the sole mechanism for rendering relationships.
+
+Source: openspec/specs/traceability-links-macro/spec.md
+--
+
+[#REQ-047, item, role=requirement, title="Configurable display style"]
+--
+The system SHALL support configurable display styles via the \`:traceability-style:\` document attribute: \`list\` (default, bulleted list), \`table\` (AsciiDoc table), or \`inline\` (comma-separated).
+
+Source: openspec/specs/traceability-links-macro/spec.md
+--
+
+[#REQ-048, item, role=requirement, title="Configurable sort order"]
+--
+The system SHALL support configurable sort order via \`:traceability-order:\`: \`target-id\` (default), \`target-title\`, or \`relation-type\`.
+
+Source: openspec/specs/traceability-links-macro/spec.md
+--
+
+[#REQ-049, item, role=requirement, title="PDF compatibility"]
+--
+Generated output from \`traceability:links[]\` SHALL be standard AsciiDoc constructs — not raw HTML — ensuring compatibility with both HTML and PDF backends.
+
+Source: openspec/specs/traceability-links-macro/spec.md
+--
+
+[#REQ-050, item, role=requirement, title="Source files never modified"]
+--
+The system SHALL NOT modify \`.adoc\` source files on disk. All macro expansion and content substitution SHALL occur in the in-memory content buffer during Antora's \`contentClassified\` event.
+
+Source: openspec/specs/traceability-links-macro/spec.md
+--
