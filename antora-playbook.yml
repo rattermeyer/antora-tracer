@@ -9,9 +9,10 @@ content:
       start_path: examples
       branches: HEAD
 
-# To enable live traceability generation during Antora builds,
-# uncomment the extension and run `npm run build` first:
-#
+asciidoc:
+  extensions:
+    - asciidoctor-kroki
+
 antora:
   extensions:
     - require: ./lib/src/antora-extension.js
@@ -21,7 +22,6 @@ antora:
         generateMatrices: true
         matrixFormats: [html, csv]
         includeInNavigation: true
-    - asciidoctor-kroki
 
 ui:
   bundle:

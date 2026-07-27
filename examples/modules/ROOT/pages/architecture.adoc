@@ -37,7 +37,7 @@ addresses:REQ-036[]
 
 The extension is composed of eight modules organized in a layered architecture:
 
-[kroki,plantuml]
+[plantuml, format=svg]
 ....
 @startuml
 package "Antora Pipeline" {
@@ -132,7 +132,7 @@ addresses:REQ-034[]
 
 The following sequence shows how an AsciiDoc file flows through the system during an Antora build:
 
-[kroki,plantuml]
+[plantuml, format=svg]
 ....
 @startuml
 actor "Antora Build" as antora
