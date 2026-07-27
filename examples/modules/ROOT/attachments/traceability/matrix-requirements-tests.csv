@@ -1,40 +1,40 @@
 Row ID,Row Title,test
-REQ-001,Item REQ-001,TST-001: Item TST-001
-REQ-002,Item REQ-002,TST-001: Item TST-001
-REQ-003,Item REQ-003,TST-001: Item TST-001
-REQ-004,Item REQ-004,TST-001: Item TST-001
-REQ-005,Item REQ-005,TST-001: Item TST-001
-REQ-006,Item REQ-006,TST-004: Item TST-004
-REQ-007,Item REQ-007,TST-004: Item TST-004
-REQ-008,Item REQ-008,TST-004: Item TST-004; TST-006: Item TST-006
-REQ-009,Item REQ-009,TST-003: Item TST-003
-REQ-010,Item REQ-010,TST-003: Item TST-003; TST-004: Item TST-004; TST-008: Item TST-008
-REQ-011,Item REQ-011,TST-004: Item TST-004
-REQ-012,Item REQ-012,TST-004: Item TST-004
-REQ-013,Item REQ-013,TST-005: Item TST-005
-REQ-014,Item REQ-014,TST-005: Item TST-005
-REQ-015,Item REQ-015,TST-005: Item TST-005
-REQ-016,Item REQ-016,TST-005: Item TST-005
-REQ-017,Item REQ-017,TST-005: Item TST-005
-REQ-018,Item REQ-018,TST-004: Item TST-004
-REQ-019,Item REQ-019,TST-004: Item TST-004
-REQ-020,Item REQ-020,TST-004: Item TST-004
-REQ-021,Item REQ-021,TST-004: Item TST-004
-REQ-022,Item REQ-022,TST-004: Item TST-004
-REQ-023,Item REQ-023,TST-004: Item TST-004
-REQ-024,Item REQ-024,TST-007: Item TST-007
-REQ-025,Item REQ-025,TST-007: Item TST-007
-REQ-026,Item REQ-026,TST-003: Item TST-003
-REQ-027,Item REQ-027,TST-007: Item TST-007
-REQ-028,Item REQ-028,TST-007: Item TST-007
-REQ-029,Item REQ-029,TST-001: Item TST-001; TST-006: Item TST-006
-REQ-030,Item REQ-030,TST-001: Item TST-001
-REQ-031,Item REQ-031,TST-005: Item TST-005
-REQ-032,Item REQ-032,TST-005: Item TST-005
-REQ-033,Item REQ-033,TST-005: Item TST-005
-REQ-034,Item REQ-034,TST-001: Item TST-001
-REQ-035,Item REQ-035,TST-002: Item TST-002
-REQ-036,Item REQ-036,TST-003: Item TST-003
+REQ-001,Single `item` macro replaces all block macros,TST-001: Core Extension Tests
+REQ-002,`item` macro accepts role attribute,TST-001: Core Extension Tests
+REQ-003,`item` macro maintains existing attributes,TST-001: Core Extension Tests
+REQ-004,`item` macro supports block content,TST-001: Core Extension Tests
+REQ-005,Old macro syntax generates deprecation error,TST-001: Core Extension Tests
+REQ-006,Configuration defines roles,TST-004: ConfigLoader Tests
+REQ-007,Configuration defines relations,TST-004: ConfigLoader Tests
+REQ-008,Configuration defines matrices,TST-004: ConfigLoader Tests; TST-006: MatrixGenerator Tests
+REQ-009,Configuration is required for validation,TST-003: CLI Tests
+REQ-010,Configuration file location,TST-003: CLI Tests; TST-004: ConfigLoader Tests; TST-008: Relationship Link Substitution Tests
+REQ-011,Configuration validation,TST-004: ConfigLoader Tests
+REQ-012,Configuration can extend presets,TST-004: ConfigLoader Tests
+REQ-013,Role-based relation validation,TST-005: Graph and API Tests
+REQ-014,Directional relation checking,TST-005: Graph and API Tests
+REQ-015,Error messages list allowed relations,TST-005: Graph and API Tests
+REQ-016,Warnings for unknown roles,TST-005: Graph and API Tests
+REQ-017,Graceful degradation for unknown roles,TST-005: Graph and API Tests
+REQ-018,Built-in preset configurations,TST-004: ConfigLoader Tests
+REQ-019,Each preset contains complete configuration,TST-004: ConfigLoader Tests
+REQ-020,Each preset includes documentation,TST-004: ConfigLoader Tests
+REQ-021,Each preset includes Neo4j Cypher queries,TST-004: ConfigLoader Tests
+REQ-022,Presets have independent versioning,TST-004: ConfigLoader Tests
+REQ-023,Users can define custom presets,TST-004: ConfigLoader Tests
+REQ-024,Neo4j CSV export,TST-007: Neo4jExporter Tests
+REQ-025,Neo4j Cypher export,TST-007: Neo4jExporter Tests
+REQ-026,Export command in CLI,TST-003: CLI Tests
+REQ-027,Export includes all item attributes,TST-007: Neo4jExporter Tests
+REQ-028,Export is optional,TST-007: Neo4jExporter Tests
+REQ-029,Configurable matrix generation with coverage calculations,TST-001: Core Extension Tests; TST-006: MatrixGenerator Tests
+REQ-030,Role statistics reporting,TST-001: Core Extension Tests
+REQ-031,Graph path finding,TST-005: Graph and API Tests
+REQ-032,Impact analysis,TST-005: Graph and API Tests
+REQ-033,Graph merge,TST-005: Graph and API Tests
+REQ-034,Mustache template rendering,TST-001: Core Extension Tests
+REQ-035,Antora extension integration,TST-002: Antora Extension Tests
+REQ-036,CLI commands,TST-003: CLI Tests
 
 Total 36 rows
 Coverage: 100.0%

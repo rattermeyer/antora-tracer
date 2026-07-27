@@ -5,338 +5,266 @@ This document lists the traceability requirements for the Antora Tracer extensio
 
 == Unified Item Macro
 
-[item, id=REQ-001, role=requirement]
-====
-*Single [item] macro replaces all block macros*
-
+[item, id=REQ-001, role=requirement, title="Single `item` macro replaces all block macros"]
+--
 The system SHALL use a single `[item]` block macro to define all traceable artifacts, replacing the previous role-specific macros.
 
 Related specs: `unified-item-macro/spec.md`
 
 Source: OpenSpec specification — Scenario: Define a requirement using `[item, id=REQ-001, role=requirement]`
-====
-
-[item, id=REQ-002, role=requirement]
-====
-*[item] macro accepts role attribute*
-
+--
+{empty}
+[item, id=REQ-002, role=requirement, title="`item` macro accepts role attribute"]
+--
 The `[item]` macro SHALL accept a `role` attribute that specifies the type of traceable artifact. Items without a `role` attribute receive the default role `unknown` with a warning.
 
 Related specs: `unified-item-macro/spec.md`
-====
+--
 
-[item, id=REQ-003, role=requirement]
-====
-*[item] macro maintains existing attributes*
-
+[item, id=REQ-003, role=requirement, title="`item` macro maintains existing attributes"]
+--
 The `[item]` macro SHALL support the attributes `id`, `title`, `status`, and any custom attributes. The `title` defaults to the item's `id` if omitted. The `status` field is free-form.
 
 Related specs: `unified-item-macro/spec.md`
-====
+--
 
-[item, id=REQ-004, role=requirement]
-====
-*[item] macro supports block content*
-
+[item, id=REQ-004, role=requirement, title="`item` macro supports block content"]
+--
 The `[item]` macro SHALL accept block content between `====` delimiters as the artifact description. Multi-line content and AsciiDoc formatting within the block SHALL be preserved.
 
 Related specs: `unified-item-macro/spec.md`
-====
+--
 
-[item, id=REQ-005, role=requirement]
-====
-*Old macro syntax generates deprecation error*
-
+[item, id=REQ-005, role=requirement, title="Old macro syntax generates deprecation error"]
+--
 The system SHALL detect and report the old macro syntax (`[req]`, `[imp]`, `[test]`, `[doc]`) as a deprecation error, suggesting the equivalent `[item, role=...]` syntax.
 
 Related specs: `unified-item-macro/spec.md`
-====
+--
 
 == Configuration System
 
-[item, id=REQ-006, role=requirement]
-====
-*Configuration defines roles*
-
+[item, id=REQ-006, role=requirement, title="Configuration defines roles"]
+--
 The system SHALL read roles from a YAML configuration file. Items with roles not in this list receive warnings. An empty roles list generates an error.
 
 Related specs: `configuration-system/spec.md`
-====
+--
 
-[item, id=REQ-007, role=requirement]
-====
-*Configuration defines relations*
-
+[item, id=REQ-007, role=requirement, title="Configuration defines relations"]
+--
 The system SHALL read relation definitions from configuration as a nested structure: `source_role → target_role → [allowed_types]`. Each entry defines which relation types are valid from one role to another.
 
 Related specs: `configuration-system/spec.md`
-====
+--
 
-[item, id=REQ-008, role=requirement]
-====
-*Configuration defines matrices*
-
+[item, id=REQ-008, role=requirement, title="Configuration defines matrices"]
+--
 The system SHALL read matrix definitions from configuration. Each matrix specifies a `name`, `rows` role, `columns` roles, and `coverageRelations` mapping column roles to relation types that count as coverage.
 
 Related specs: `configuration-system/spec.md`
-====
+--
 
-[item, id=REQ-009, role=requirement]
-====
-*Configuration is required for validation*
-
+[item, id=REQ-009, role=requirement, title="Configuration is required for validation"]
+--
 The system SHALL require a valid configuration to perform role-based relation validation. Without a ConfigLoader, all relations are allowed (unguarded mode).
 
 Related specs: `configuration-system/spec.md`
-====
+--
 
-[item, id=REQ-010, role=requirement]
-====
-*Configuration file location*
-
+[item, id=REQ-010, role=requirement, title="Configuration file location"]
+--
 The system SHALL search for `traceability.yml` or `traceability.yaml` in common locations. A custom path SHALL be specifiable via `--config` CLI flag or `configPath` playbook option.
 
 Related specs: `configuration-system/spec.md`
-====
+--
 
-[item, id=REQ-011, role=requirement]
-====
-*Configuration validation*
-
+[item, id=REQ-011, role=requirement, title="Configuration validation"]
+--
 The system SHALL validate the configuration structure: roles must be non-empty strings, relation source/target roles must be in the roles list, matrix row/column roles must be in the roles list, and relation types must be arrays. Invalid configurations produce clear error messages.
 
 Related specs: `configuration-system/spec.md`
-====
+--
 
-[item, id=REQ-012, role=requirement]
-====
-*Configuration can extend presets*
-
+[item, id=REQ-012, role=requirement, title="Configuration can extend presets"]
+--
 The system SHALL support the `extends` field in configuration to merge with a built-in preset. User configuration overrides preset values. Referencing a non-existent preset generates an error listing available presets.
 
 Related specs: `configuration-system/spec.md`
-====
+--
 
 == Role-Based Validation
 
-[item, id=REQ-013, role=requirement]
-====
-*Role-based relation validation*
-
+[item, id=REQ-013, role=requirement, title="Role-based relation validation"]
+--
 The system SHALL validate that relations between items are allowed based on their roles as defined in configuration. Valid relations are accepted; invalid relations generate errors listing the allowed types.
 
 Related specs: `role-based-validation/spec.md`
-====
+--
 
-[item, id=REQ-014, role=requirement]
-====
-*Directional relation checking*
-
+[item, id=REQ-014, role=requirement, title="Directional relation checking"]
+--
 Validation SHALL be directional: the system checks the source item's role against the target item's role. The same relation type may be valid in one direction but not the reverse.
 
 Related specs: `role-based-validation/spec.md`
-====
+--
 
-[item, id=REQ-015, role=requirement]
-====
-*Error messages list allowed relations*
-
+[item, id=REQ-015, role=requirement, title="Error messages list allowed relations"]
+--
 Error messages for invalid relations SHALL include the relation type, source role, target role, and the list of allowed relation types between those roles.
 
 Related specs: `role-based-validation/spec.md`
-====
+--
 
-[item, id=REQ-016, role=requirement]
-====
-*Warnings for unknown roles*
-
+[item, id=REQ-016, role=requirement, title="Warnings for unknown roles"]
+--
 The system SHALL generate warnings (not errors) when relations involve items with unknown roles. This enables graceful degradation and incremental role adoption.
 
 Related specs: `role-based-validation/spec.md`
-====
+--
 
-[item, id=REQ-017, role=requirement]
-====
-*Graceful degradation for unknown roles*
-
+[item, id=REQ-017, role=requirement, title="Graceful degradation for unknown roles"]
+--
 Items with unknown roles SHALL still be stored in the graph and appear in matrices. Relations involving unknown roles SHALL be stored but marked with warnings. Processing continues despite unknown roles.
 
 Related specs: `role-based-validation/spec.md`
-====
+--
 
 == Preset System
 
-[item, id=REQ-018, role=requirement]
-====
-*Built-in preset configurations*
-
+[item, id=REQ-018, role=requirement, title="Built-in preset configurations"]
+--
 The system SHALL ship with built-in preset configurations: `requirements-engineering`, `agile`, `medical-iec62304`, and `minimal`. Users SHALL be able to list and inspect presets via CLI.
 
 Related specs: `preset-system/spec.md`
-====
+--
 
-[item, id=REQ-019, role=requirement]
-====
-*Each preset contains complete configuration*
-
+[item, id=REQ-019, role=requirement, title="Each preset contains complete configuration"]
+--
 Each preset SHALL contain `roles`, `relations`, and `matrices` definitions that form a valid, loadable configuration. Presets with invalid configuration are rejected at load time.
 
 Related specs: `preset-system/spec.md`
-====
+--
 
-[item, id=REQ-020, role=requirement]
-====
-*Each preset includes documentation*
-
+[item, id=REQ-020, role=requirement, title="Each preset includes documentation"]
+--
 Each preset SHALL include a human-readable description, domain explanation, and example AsciiDoc snippets demonstrating typical usage.
 
 Related specs: `preset-system/spec.md`
-====
+--
 
-[item, id=REQ-021, role=requirement]
-====
-*Each preset includes Neo4j Cypher queries*
-
+[item, id=REQ-021, role=requirement, title="Each preset includes Neo4j Cypher queries"]
+--
 Each preset SHALL include a `neo4j.queries` section with named Cypher queries relevant to the domain, such as uncovered requirements, coverage summaries, and traceability chains.
 
 Related specs: `preset-system/spec.md`
-====
+--
 
-[item, id=REQ-022, role=requirement]
-====
-*Presets have independent versioning*
-
+[item, id=REQ-022, role=requirement, title="Presets have independent versioning"]
+--
 Presets SHALL have version numbers independent of the extension version, following semantic versioning. A `minExtensionVersion` compatibility field SHALL indicate the minimum extension version required.
 
 Related specs: `preset-system/spec.md`
-====
+--
 
-[item, id=REQ-023, role=requirement]
-====
-*Users can define custom presets*
-
+[item, id=REQ-023, role=requirement, title="Users can define custom presets"]
+--
 The system SHALL allow users to create their own preset YAML files. Custom presets are loaded and validated the same way as built-in presets. Invalid custom presets generate validation errors.
 
 Related specs: `preset-system/spec.md`
-====
+--
 
 == Neo4j Export
 
-[item, id=REQ-024, role=requirement]
-====
-*Neo4j CSV export*
-
+[item, id=REQ-024, role=requirement, title="Neo4j CSV export"]
+--
 The system SHALL export the traceability graph as `nodes.csv` and `relationships.csv` files with proper headers, comma delimiters, and escaped special characters. Files SHALL be importable via Neo4j's `LOAD CSV` command.
 
 Related specs: `neo4j-export/spec.md`
-====
+--
 
-[item, id=REQ-025, role=requirement]
-====
-*Neo4j Cypher export*
-
+[item, id=REQ-025, role=requirement, title="Neo4j Cypher export"]
+--
 The system SHALL export the traceability graph as `import.cypher` containing CREATE statements for all nodes (with `:Item` and role-specific labels) and relationships (with type-specific labels). Special characters SHALL be properly escaped.
 
 Related specs: `neo4j-export/spec.md`
-====
+--
 
-[item, id=REQ-026, role=requirement]
-====
-*Export command in CLI*
-
+[item, id=REQ-026, role=requirement, title="Export command in CLI"]
+--
 The system SHALL provide an `export neo4j` CLI command supporting `--format csv` and `--format cypher` options, with configurable input and output directories.
 
 Related specs: `neo4j-export/spec.md`
-====
+--
 
-[item, id=REQ-027, role=requirement]
-====
-*Export includes all item attributes*
-
+[item, id=REQ-027, role=requirement, title="Export includes all item attributes"]
+--
 Neo4j exports SHALL include all item attributes (id, role, title, content, status, custom attributes) as node properties. Special characters in attribute values SHALL be properly escaped.
 
 Related specs: `neo4j-export/spec.md`
-====
+--
 
-[item, id=REQ-028, role=requirement]
-====
-*Export is optional*
-
+[item, id=REQ-028, role=requirement, title="Export is optional"]
+--
 The Neo4j export functionality SHALL be completely optional. Normal extension operation (parsing, validation, matrix generation) SHALL not require any Neo4j runtime dependencies.
 
 Related specs: `neo4j-export/spec.md`
-====
+--
 
 == Broader Capabilities
 
-[item, id=REQ-029, role=requirement]
-====
-*Configurable matrix generation with coverage calculations*
-
+[item, id=REQ-029, role=requirement, title="Configurable matrix generation with coverage calculations"]
+--
 The system SHALL generate matrices from configuration definitions, computing per-item coverage based on `coverageRelations`. Each cell SHALL show related item IDs or `—` for no relationships. Coverage SHALL be expressed as overall, complete, partial, and missing counts.
 
 Source: Design Decision 2 — Configuration-Based Roles and Relations
-====
+--
 
-[item, id=REQ-030, role=requirement]
-====
-*Role statistics reporting*
-
+[item, id=REQ-030, role=requirement, title="Role statistics reporting"]
+--
 The system SHALL provide `getRoleStatistics()` returning item counts per role and total relationship counts, enabling quick inspection of the traceability graph.
 
 Source: RequirementsTraceabilityExtension API
-====
+--
 
-[item, id=REQ-031, role=requirement]
-====
-*Graph path finding*
-
+[item, id=REQ-031, role=requirement, title="Graph path finding"]
+--
 The system SHALL provide BFS-based path finding between any two items in the graph via `findPath(fromId, toId, maxDepth?)`. Connected items return the path; disconnected items return null. Depth is capped by `maxDepth` (default: 5).
 
 Source: TraceabilityGraph API
-====
+--
 
-[item, id=REQ-032, role=requirement]
-====
-*Impact analysis*
-
+[item, id=REQ-032, role=requirement, title="Impact analysis"]
+--
 The system SHALL provide `getImpactAnalysis(itemId)` returning all reachable items in both directions (forward and reverse relationships), excluding the source item from results.
 
 Source: TraceabilityGraph API
-====
+--
 
-[item, id=REQ-033, role=requirement]
-====
-*Graph merge*
-
+[item, id=REQ-033, role=requirement, title="Graph merge"]
+--
 The system SHALL support merging another TraceabilityGraph into the current graph via `merge()`. Items not already present are added; existing items are not duplicated. Relationships from the source graph are copied if both endpoints exist in the target graph.
 
 Source: TraceabilityGraph API
-====
+--
 
-[item, id=REQ-034, role=requirement]
-====
-*Mustache template rendering*
-
+[item, id=REQ-034, role=requirement, title="Mustache template rendering"]
+--
 The system SHALL use Mustache templates for HTML matrix output via `TemplateRenderer`. Built-in templates SHALL be shipped; custom template directories SHALL be supported with fallback to built-ins for missing files.
 
 Source: Design Decision 4 — Mustache Templates
-====
+--
 
-[item, id=REQ-035, role=requirement]
-====
-*Antora extension integration*
-
+[item, id=REQ-035, role=requirement, title="Antora extension integration"]
+--
 The system SHALL integrate with Antora via `AntoraTraceabilityExtension`, registering for `contentClassified` (parse items) and `sitePublished` (generate matrices and coverage). Configuration SHALL be read from the Antora playbook's extension config. Disabled extensions SHALL skip initialization.
 
 Source: Antora Extension implementation
-====
+--
 
-[item, id=REQ-036, role=requirement]
-====
-*CLI commands*
-
+[item, id=REQ-036, role=requirement, title="CLI commands"]
+--
 The system SHALL provide a Commander-based CLI with six subcommands: `process` (parse items), `matrix` (generate matrices), `validate` (check graph integrity), `export neo4j` (CSV/Cypher export), `stats` (role statistics), and `preset` (list/show/init). Global `--config` and `--preset` flags SHALL apply to all commands.
 
 Source: CLI implementation
-====
+--

@@ -5,7 +5,7 @@ This document describes the architecture of the Antora Tracer extension using se
 
 == Introduction and Goals
 
-[item, id=ARC-001, role=architecture]
+[item, id=ARC-001, role=architecture, title="Project scope and architectural goals"]
 --
 *Project scope and architectural goals*
 
@@ -31,10 +31,8 @@ addresses:REQ-036[]
 
 == Building Block View
 
-[item, id=ARC-002, role=architecture]
-====
-*Component-level architecture*
-
+[item, id=ARC-002, role=architecture, title="Component-level architecture"]
+--
 The extension is composed of eight modules organized in a layered architecture:
 
 [plantuml, format=svg]
@@ -122,14 +120,12 @@ addresses:REQ-024[]
 addresses:REQ-025[]
 addresses:REQ-029[]
 addresses:REQ-034[]
-====
+--
 
 == Runtime View
 
-[item, id=ARC-003, role=architecture]
-====
-*Processing flow during Antora build*
-
+[item, id=ARC-003, role=architecture, title="Processing flow during Antora build"]
+--
 The following sequence shows how an AsciiDoc file flows through the system during an Antora build:
 
 [plantuml, format=svg]
@@ -212,14 +208,12 @@ addresses:REQ-016[]
 addresses:REQ-017[]
 addresses:REQ-029[]
 addresses:REQ-035[]
-====
+--
 
 == Architecture Decisions
 
-[item, id=ARC-004, role=architecture]
-====
-*Key architectural decisions and their rationale*
-
+[item, id=ARC-004, role=architecture, title="Key architectural decisions and their rationale"]
+--
 This section captures the design decisions from `openspec/changes/unified-item-architecture/design.md`.
 
 [width=100%, cols="20,50,30"]
@@ -284,4 +278,4 @@ addresses:REQ-024[]
 addresses:REQ-028[]
 addresses:REQ-029[]
 addresses:REQ-034[]
-====
+--
