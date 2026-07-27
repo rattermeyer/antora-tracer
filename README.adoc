@@ -21,13 +21,13 @@ toc::[]
                             │  (your domain model)   │
   .adoc files               │                       │          Generated artifacts
  ┌──────────────────┐       │  roles:               │       ┌──────────────────────────┐
- │ [item, id=REQ-001,│       │  relations:           │       │  traceability/            │
+ │ [#REQ-001, item, │       │  relations:           │       │  traceability/            │
  │  role=requirement]│──────▶│  matrices:            │──────▶│    matrix-*.html          │
  │ ====              │       └───────────┬───────────┘       │    matrix-*.csv           │
  │ Req content       │                   │                   │    coverage.html          │
  │ ====              │                   │                   │    neo4j/nodes.csv        │
  │                    │       ┌───────────▼───────────┐       │    neo4j/relationships.csv│
- │ [item, id=IMP-001,│       │    Antora Extension    │       └──────────────────────────┘
+ │ [#IMP-001, item, │       │    Antora Extension    │       └──────────────────────────┘
  │  role=impl]        │       │                        │
  │ ====              │       │  parse → validate      │
  │ impl:REQ-001[]    │───▶   │  → graph → generate    │
@@ -66,14 +66,14 @@ antora:
 +
 [source,asciidoc]
 ----
-[item, id=REQ-001, role=requirement]
+[#REQ-001, item, role=requirement]
 ====
 User Authentication
 
 The system shall require authentication for all protected endpoints.
 ====
 
-[item, id=IMP-001, role=implementation]
+[#IMP-001, item, role=implementation]
 ====
 Auth Service
 
@@ -82,7 +82,7 @@ JWT-based authentication with token refresh.
 satisfies:REQ-001[]
 ====
 
-[item, id=TEST-001, role=test]
+[#TEST-001, item, role=test]
 ====
 Authentication Tests
 
@@ -110,7 +110,7 @@ Everything starts with a single macro:
 
 [source,asciidoc]
 ----
-[item, id=TYPE-XXX, role=<role>, title="Optional Title", status="draft"]
+[#TYPE-XXX, item, role=<role>, title="Optional Title", status="draft"]
 ====
 Item description and content.
 

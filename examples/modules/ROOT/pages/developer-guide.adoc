@@ -548,7 +548,7 @@ import { RequirementsTraceabilityExtension } from '../src/index.js';
 describe('MyFeature', () => {
   it('should do something', () => {
     const extension = new RequirementsTraceabilityExtension();
-    extension.process(`...[item, id=X, role=requirement]...`, { sourceFile: 'test.adoc' });
+    extension.process(`...[#X, item, role=requirement]...`, { sourceFile: 'test.adoc' });
     expect(extension.getAllItems()).to.have.lengthOf(1);
   });
 });

@@ -48,14 +48,14 @@ antora:
 +
 [source,asciidoc]
 ----
-[item, id=REQ-001, role=requirement]
+[#REQ-001, item, role=requirement]
 ====
 User Authentication
 
 The system shall require authentication for all protected endpoints.
 ====
 
-[item, id=IMP-001, role=implementation]
+[#IMP-001, item, role=implementation]
 ====
 Auth Service
 
@@ -64,7 +64,7 @@ JWT-based authentication with token refresh.
 satisfies:REQ-001[]
 ====
 
-[item, id=TEST-001, role=test]
+[#TEST-001, item, role=test]
 ====
 Authentication Tests
 
@@ -96,9 +96,9 @@ A *role* is a category of traceable item. Think of it as a type label: "requirem
 
 [source,asciidoc]
 ----
-[item, id=REQ-001, role=requirement]
-[item, id=STORY-001, role=user_story]
-[item, id=TEST-001, role=test]
+[#REQ-001, item, role=requirement]
+[#STORY-001, item, role=user_story]
+[#TEST-001, item, role=test]
 ----
 
 === Relations
@@ -107,7 +107,7 @@ A *relation* connects two items of specific roles. Relations are directional (`s
 
 [source,asciidoc]
 ----
-[item, id=IMP-001, role=implementation]
+[#IMP-001, item, role=implementation]
 ====
 satisfies:REQ-001[]     <1>
 implements:DES-001[]    <2>
@@ -240,7 +240,7 @@ When the extension processes your items, it validates every inline relationship 
 
 [source,asciidoc]
 ----
-[item, id=DES-001, role=design]
+[#DES-001, item, role=design]
 ====
 verifies:REQ-001[]       <1>
 ====
@@ -306,7 +306,7 @@ All playbook-level configuration options:
 
 [source,asciidoc]
 ----
-[item, id=TYPE-XXX, role=<role>, title="Title", status="draft"]
+[#TYPE-XXX, item, role=<role>, title="Title", status="draft"]
 ====
 Item content. Can span multiple paragraphs.
 
@@ -350,7 +350,7 @@ A relationship is expressed as `<relation-type>:<TARGET-ID>[]` anywhere inside t
 
 [source,asciidoc]
 ----
-[item, id=IMP-001, role=implementation]
+[#IMP-001, item, role=implementation]
 ====
 Auth Service
 
