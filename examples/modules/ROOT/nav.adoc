@@ -7,6 +7,6 @@
 ** xref:test-plan.adoc[Test Plan]
 ** Traceability
 *** xref:traceability/index.adoc[Overview]
-*** link:_attachments/traceability/matrix-requirements-architecture.html[Req → Architecture]
-*** link:_attachments/traceability/matrix-requirements-tests.html[Req → Tests]
+*** xref:attachment$traceability/matrix-requirements-architecture.html[Req → Architecture]
+*** xref:attachment$traceability/matrix-requirements-tests.html[Req → Tests]
 * xref:sphinx-comparison.adoc[Comparison with Sphinx Needs]

@@ -107,6 +107,27 @@ Source: Antora Extension implementation"""
 REQ-036,REQ-036 — CLI commands,requirement,,requirements.adoc,"""The system SHALL provide a Commander-based CLI with six subcommands: `process` (parse items), `matrix` (generate matrices), `validate` (check graph integrity), `export neo4j` (CSV/Cypher export), `stats` (role statistics), and `preset` (list/show/init). Global `--config` and `--preset` flags SHALL apply to all commands.
 
 Source: CLI implementation"""
+REQ-037,REQ-037 — Matrix row items are clickable links,requirement,,requirements.adoc,"""The system SHALL render row item IDs as hyperlinks that navigate to the item's definition in the rendered HTML documentation.
+
+Source: openspec/specs/matrix-item-linking/spec.md"""
+REQ-038,REQ-038 — Matrix cell items are clickable links,requirement,,requirements.adoc,"""The system SHALL render cell item IDs as hyperlinks that navigate to the item's definition in the rendered HTML documentation. Multiple items in a cell SHALL each render as separate clickable links.
+
+Source: openspec/specs/matrix-item-linking/spec.md"""
+REQ-039,REQ-039 — Source file tooltips on matrix links,requirement,,requirements.adoc,"""The system SHALL display the source file name as a tooltip when users hover over item links in the matrix.
+
+Source: openspec/specs/matrix-item-linking/spec.md"""
+REQ-040,REQ-040 — Context-aware link generation,requirement,,requirements.adoc,"""The system SHALL generate consistent relative link paths (\`../../\`) from matrix output to component root, regardless of execution context. The LinkResolver SHALL accept a configurable \`relativePathPrefix\` option.
+
+Source: openspec/specs/matrix-item-linking/spec.md"""
+REQ-041,REQ-041 — Source file path normalization,requirement,,requirements.adoc,"""The system SHALL normalize item \`sourceFile\` paths by stripping any \`pages/\` prefix and \`.adoc\` extension at link resolution time, producing clean HTML paths.
+
+Source: openspec/specs/matrix-item-linking/spec.md"""
+REQ-042,REQ-042 — Backward compatibility without LinkResolver,requirement,,requirements.adoc,"""The system SHALL maintain existing matrix rendering behavior when no \`LinkResolver\` is provided. Items SHALL render as plain text without links, and existing matrix HTML structure SHALL be preserved.
+
+Source: openspec/specs/matrix-item-linking/spec.md"""
+REQ-043,REQ-043 — Non-HTML matrix outputs unchanged,requirement,,requirements.adoc,"""The system SHALL NOT modify CSV and JSON matrix outputs to include links. CSV and JSON output SHALL contain item data as before.
+
+Source: openspec/specs/matrix-item-linking/spec.md"""
 ARC-001,ARC-001 — Project scope and architectural goals,architecture,,architecture.adoc,"""*Project scope and architectural goals*
 
 The Antora Tracer is an Antora extension that adds role-based requirements traceability to AsciiDoc documentation. It replaces fixed macro types with a single configurable `[item]` macro.
@@ -145,6 +166,7 @@ package """"Core"""" {
 package """"Generation"""" {
   [MatrixGenerator] as matrix
   [TemplateRenderer] as templates
+  [LinkResolver] as linkresolver
 }
 
 package """"Export"""" {
@@ -194,6 +216,9 @@ config --> graph : provides validation rules
 
 | `TemplateRenderer`
 | Mustache wrapper. Loads templates from `src/templates/`, supports custom template directories with fallback to built-ins.
+
+| `LinkResolver`
+| Path resolution for matrix-to-item deep links. Strips \`pages/\` prefix and \`.adoc\` extension from sourceFile values, generates \`../../component/page.html#ID\` links using a configurable \`relativePathPrefix\`.
 
 | `Neo4jExporter`
 | Graph-to-Neo4j export. Produces `nodes.csv`, `relationships.csv`, and `import.cypher`. Properly escapes special characters.
@@ -345,6 +370,10 @@ ARC-004,ARC-004 — Key architectural decisions and their rationale,architecture
 | In-memory source substitution for clickable links
 | After processing, replace `addresses:REQ-001[]` with Asciidoctor xrefs in the content catalog buffer. Two-pass approach ensures cross-file targets are resolved. No disk writes.
 | HTML post-processing (PDF-incompatible), Asciidoctor inline macro extension (API dependency)
+
+| Dedicated LinkResolver component
+| Separates path resolution from matrix generation, makes link generation configurable and testable in isolation. Robust `itemToHtmlPath` strips `pages/` prefix and `.adoc` extension from any sourceFile format.
+| Link generation in MatrixGenerator (mixes concerns), template-level logic (Mustache cannot do complex path manipulation)
 |===
 
 addresses:REQ-010[]
@@ -376,7 +405,8 @@ TST-002,TST-002 — Antora Extension Tests,test,,test-plan.adoc,"""Test file: `t
 
 Tests the `AntoraTraceabilityExtension` — initialization with default config, preset, config path, and disabled state. Tests event handler registration, content processing via `contentClassified` event, matrix generation via `sitePublished` event, and API access patterns.
 
-verifies:REQ-035[]"""
+verifies:REQ-035[]
+verifies:REQ-040[]"""
 TST-003,TST-003 — CLI Tests,test,,test-plan.adoc,"""Test file: `test/cli.test.ts`
 
 Tests the Commander-based CLI — process command (valid content, empty content, invalid paths, malformed macros), matrix command (generation, empty graph), validate command (invalid graph state), export command (empty graph), stats command (empty statistics), preset commands (invalid names, init, listing), and help command.
@@ -418,7 +448,12 @@ TST-006,TST-006 — MatrixGenerator Tests,test,,test-plan.adoc,"""Test file: `te
 Tests the `MatrixGenerator` — basic matrix generation with empty graph, matrix generation with default and named configurations, role-based matrix rows and columns, coverage percentage calculation and status determination, coverage relation filtering, CSV export, HTML export, JSON export, coverage report generation, and edge cases (no matching items, missing titles, missing source files, unknown matrix names).
 
 verifies:REQ-008[]
-verifies:REQ-029[]"""
+verifies:REQ-029[]
+verifies:REQ-037[]
+verifies:REQ-038[]
+verifies:REQ-039[]
+verifies:REQ-042[]
+verifies:REQ-043[]"""
 TST-007,TST-007 — Neo4jExporter Tests,test,,test-plan.adoc,"""Test file: `test/neo4j-exporter.test.ts`
 
 Tests the `Neo4jExporter` — empty graph CSV export, items and relationships in CSV, all attributes in export, special character escaping, empty graph Cypher export, items and relationships in Cypher, `includeContent` option, `includeAllAttributes` option, output directory creation, multiple role types, and export result counts and file paths.
