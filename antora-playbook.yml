@@ -16,12 +16,12 @@ asciidoc:
 antora:
   extensions:
     - require: ./lib/src/antora-extension.js
-      config:
-        configPath: ./examples/traceability.yml
-        outputDir: traceability
-        generateMatrices: true
-        matrixFormats: [html, csv]
-        includeInNavigation: true
+      preset: self-traceability
+      configPath: ./examples/traceability.yml
+      outputDir: traceability
+      generateMatrices: true
+      matrixFormats: [html, csv]
+      includeInNavigation: true
 
 ui:
   bundle:

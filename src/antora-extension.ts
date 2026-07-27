@@ -16,7 +16,7 @@
 import { RequirementsTraceabilityExtension } from './index.js';
 import { ConfigLoader } from './config/TraceabilityConfig.js';
 import { MatrixGenerator } from './MatrixGenerator.js';
-import { mkdirSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
 /**
@@ -64,6 +64,14 @@ export class AntoraTraceabilityExtension {
   constructor(private readonly context: AntoraExtensionContext) {
     this.logger = context.getLogger('requirements-traceability');
     this.config = { ...DEFAULT_CONFIG, ...this.loadConfig() };
+
+    // Fallback: if no configPath is set, try the example site config
+    if (!this.config.configPath) {
+      const exampleConfig = join(process.cwd(), 'examples', 'traceability.yml');
+      if (existsSync(exampleConfig)) {
+        this.config.configPath = exampleConfig;
+      }
+    }
 
     if (!this.config.enabled) {
       this.logger.info('Requirements traceability extension is disabled');
