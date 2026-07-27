@@ -1,31 +1,50 @@
 #!/usr/bin/env node
 
-import { program } from 'commander';
-import { createWriteStream, writeFileSync, mkdirSync, readFileSync, existsSync, readdirSync, statSync } from 'fs';
-import { resolve, dirname, sep } from 'path';
-import { fileURLToPath } from 'url';
-import chalk from 'chalk';
+import chalk from "chalk";
+import { program } from "commander";
+import {
+  createWriteStream,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
+import { dirname, resolve, sep } from "node:path";
+import { fileURLToPath } from "node:url";
 
 // Import extension
 import {
-  RequirementsTraceabilityExtension,
-  ConfigLoader,
   BUILT_IN_PRESETS,
-} from './index.js';
+  ConfigLoader,
+  RequirementsTraceabilityExtension,
+} from "./index.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const packageJsonPath = resolve(__dirname, '../package.json');
-const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
+const packageJsonPath = resolve(__dirname, "../package.json");
+const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8"));
 
 // Global options
 program
-  .name('antora-req-trace')
-  .description('Antora Requirements Traceability Extension - Trace requirements, designs, implementations, and tests using role-based traceability')
+  .name("antora-req-trace")
+  .description(
+    "Antora Requirements Traceability Extension - Trace requirements, designs, implementations, and tests using role-based traceability",
+  )
   .version(packageJson.version)
-  .option('--config <path>', 'Path to traceability configuration YAML file')
-  .option('--preset <name>', 'Use a built-in preset configuration: ' + BUILT_IN_PRESETS.join(', ') + '\n  (default: requirements-engineering)', 'requirements-engineering')
-  .option('--dry-run', 'Preview actions without writing files or making changes');
+  .option("--config <path>", "Path to traceability configuration YAML file")
+  .option(
+    "--preset <name>",
+    "Use a built-in preset configuration: " +
+      BUILT_IN_PRESETS.join(", ") +
+      "\n  (default: requirements-engineering)",
+    "requirements-engineering",
+  )
+  .option(
+    "--dry-run",
+    "Preview actions without writing files or making changes",
+  );
 
 // Helper to create the extension
 async function createExtension(options: any) {
@@ -34,7 +53,9 @@ async function createExtension(options: any) {
 
   try {
     if (mergedOptions.preset) {
-      return await RequirementsTraceabilityExtension.createWithPreset(mergedOptions.preset);
+      return await RequirementsTraceabilityExtension.createWithPreset(
+        mergedOptions.preset,
+      );
     } else if (mergedOptions.config) {
       const configLoader = new ConfigLoader();
       configLoader.load(mergedOptions.config);
@@ -43,7 +64,7 @@ async function createExtension(options: any) {
       return new RequirementsTraceabilityExtension();
     }
   } catch (error: any) {
-    console.error(chalk.red('Error creating extension:', error.message));
+    console.error(chalk.red("Error creating extension:", error.message));
     process.exit(1);
   }
 }
@@ -62,9 +83,13 @@ function ensureDirectory(dir: string) {
   const normalizedPath = resolve(fullPath);
   const normalizedProjectRoot = resolve(projectRoot);
 
-  if (!normalizedPath.startsWith(normalizedProjectRoot + sep) &&
-      normalizedPath !== normalizedProjectRoot) {
-    console.error(chalk.red(`Error: Output path escapes project directory: ${dir}`));
+  if (
+    !normalizedPath.startsWith(normalizedProjectRoot + sep) &&
+    normalizedPath !== normalizedProjectRoot
+  ) {
+    console.error(
+      chalk.red(`Error: Output path escapes project directory: ${dir}`),
+    );
     process.exit(1);
   }
 
@@ -77,7 +102,9 @@ function ensureDirectory(dir: string) {
  * Collect AsciiDoc files from a path (file or directory).
  * Returns array of { path, content } for use with processFiles().
  */
-function collectAdocFiles(inputPath: string): { path: string; content: string }[] {
+function collectAdocFiles(
+  inputPath: string,
+): { path: string; content: string }[] {
   const resolvedPath = resolve(process.cwd(), inputPath);
 
   // Validate path is within project directory to prevent path traversal
@@ -85,9 +112,13 @@ function collectAdocFiles(inputPath: string): { path: string; content: string }[
   const normalizedPath = resolve(resolvedPath);
   const normalizedProjectRoot = resolve(projectRoot);
 
-  if (!normalizedPath.startsWith(normalizedProjectRoot + sep) &&
-      normalizedPath !== normalizedProjectRoot) {
-    console.error(chalk.red(`Error: Path escapes project directory: ${inputPath}`));
+  if (
+    !normalizedPath.startsWith(normalizedProjectRoot + sep) &&
+    normalizedPath !== normalizedProjectRoot
+  ) {
+    console.error(
+      chalk.red(`Error: Path escapes project directory: ${inputPath}`),
+    );
     process.exit(1);
   }
 
@@ -102,10 +133,10 @@ function collectAdocFiles(inputPath: string): { path: string; content: string }[
     const entries = readdirSync(resolvedPath, { recursive: true }) as string[];
     for (const entry of entries) {
       const fullPath = resolve(resolvedPath, entry as string);
-      if (statSync(fullPath).isFile() && (entry as string).endsWith('.adoc')) {
+      if (statSync(fullPath).isFile() && (entry as string).endsWith(".adoc")) {
         files.push({
           path: entry as string,
-          content: readFileSync(fullPath, 'utf8'),
+          content: readFileSync(fullPath, "utf8"),
         });
       }
     }
@@ -113,21 +144,28 @@ function collectAdocFiles(inputPath: string): { path: string; content: string }[
   }
 
   // Single file
-  return [{
-    path: inputPath,
-    content: readFileSync(resolvedPath, 'utf8'),
-  }];
+  return [
+    {
+      path: inputPath,
+      content: readFileSync(resolvedPath, "utf8"),
+    },
+  ];
 }
 
-program.command('process')
-  .description('Process AsciiDoc files for requirements traceability')
-  .option('-i, --input <path>', 'Input file or directory (required)')
-  .option('-o, --output <path>', 'Output directory for generated files', './output')
-  .option('-f, --format <format>', 'Output format: html, csv, or json', 'html')
+program
+  .command("process")
+  .description("Process AsciiDoc files for requirements traceability")
+  .option("-i, --input <path>", "Input file or directory (required)")
+  .option(
+    "-o, --output <path>",
+    "Output directory for generated files",
+    "./output",
+  )
+  .option("-f, --format <format>", "Output format: html, csv, or json", "html")
   .action(async (options) => {
-    console.log(chalk.blue('Processing requirements traceability...'));
+    console.log(chalk.blue("Processing requirements traceability..."));
     if (!options.input) {
-      console.error(chalk.red('Error: Input file or directory is required'));
+      console.error(chalk.red("Error: Input file or directory is required"));
       process.exit(1);
     }
     const extension = await createExtension(options);
@@ -136,56 +174,88 @@ program.command('process')
 
       // Show progress indicator
       if (adocFiles.length > 1) {
-        console.log(chalk.cyan(`Found ${adocFiles.length} AsciiDoc files to process...`));
+        console.log(
+          chalk.cyan(`Found ${adocFiles.length} AsciiDoc files to process...`),
+        );
       }
 
       const result = extension.processFiles(adocFiles);
-      console.log(chalk.green(`Processed ${adocFiles.length} file(s): ${result.result.items.length} items, ${result.result.relationships.length} relationships`));
+      console.log(
+        chalk.green(
+          `Processed ${adocFiles.length} file(s): ${result.result.items.length} items, ${result.result.relationships.length} relationships`,
+        ),
+      );
 
-      console.log(chalk.green(`Processed ${adocFiles.length} file(s): ${result.result.items.length} items, ${result.result.relationships.length} relationships`));
+      console.log(
+        chalk.green(
+          `Processed ${adocFiles.length} file(s): ${result.result.items.length} items, ${result.result.relationships.length} relationships`,
+        ),
+      );
       let output: string;
-      if (options.format === 'json') {
-        output = JSON.stringify({ items: result.result.items, relationships: result.result.relationships, statistics: extension.graph.getRoleStatistics() }, null, 2);
-      } else if (options.format === 'csv') {
-        const lines = ['id,role,title'];
+      if (options.format === "json") {
+        output = JSON.stringify(
+          {
+            items: result.result.items,
+            relationships: result.result.relationships,
+            statistics: extension.graph.getRoleStatistics(),
+          },
+          null,
+          2,
+        );
+      } else if (options.format === "csv") {
+        const lines = ["id,role,title"];
         for (const item of result.result.items) {
-          const escapedTitle = item.title.includes(',') ? `"${item.title}"` : item.title;
-          lines.push([item.id, item.role, escapedTitle].join(','));
+          const escapedTitle = item.title.includes(",")
+            ? `"${item.title}"`
+            : item.title;
+          lines.push([item.id, item.role, escapedTitle].join(","));
         }
-        output = lines.join('\n');
+        output = lines.join("\n");
       } else {
-        output = '<!DOCTYPE html><html><head><title>Traceability Report</title></head><body><h1>Traceability Report</h1>';
+        output =
+          "<!DOCTYPE html><html><head><title>Traceability Report</title></head><body><h1>Traceability Report</h1>";
         output += `<p>Items: ${result.result.items.length}, Relationships: ${result.result.relationships.length}</p><h2>Items</h2><table border="1"><tr><th>ID</th><th>Role</th><th>Title</th></tr>`;
         for (const item of result.result.items) {
           output += `<tr><td>${item.id}</td><td>${item.role}</td><td>${item.title}</td></tr>`;
         }
-        output += '</table></body></html>';
+        output += "</table></body></html>";
       }
       if (isDryRun(options)) {
-        console.log(chalk.yellow(`[DRY RUN] Would write output to: ${resolve(options.output, 'traceability.' + options.format)}`));
+        console.log(
+          chalk.yellow(
+            `[DRY RUN] Would write output to: ${resolve(options.output, `traceability.${options.format}`)}`,
+          ),
+        );
       } else {
         ensureDirectory(options.output);
-        const outputPath = resolve(options.output, 'traceability.' + options.format);
+        const outputPath = resolve(
+          options.output,
+          `traceability.${options.format}`,
+        );
         const stream = createWriteStream(outputPath);
         stream.write(output);
         stream.end();
         console.log(chalk.green(`Output written to: ${outputPath}`));
       }
     } catch (error: any) {
-      console.error(chalk.red('Processing error:', error.message));
+      console.error(chalk.red("Processing error:", error.message));
       process.exit(1);
     }
   });
 
-program.command('matrix')
-  .description('Generate traceability matrices from processed items')
-  .option('-i, --input <path>', 'Input file or directory to process first')
-  .option('-t, --type <type>', 'Matrix type or name (uses configuration from preset/config)')
-  .option('-f, --format <format>', 'Output format: csv, html, or json', 'csv')
-  .option('-o, --output <path>', 'Output file path (defaults to stdout)')
-  .option('--templates <path>', 'Custom templates directory')
+program
+  .command("matrix")
+  .description("Generate traceability matrices from processed items")
+  .option("-i, --input <path>", "Input file or directory to process first")
+  .option(
+    "-t, --type <type>",
+    "Matrix type or name (uses configuration from preset/config)",
+  )
+  .option("-f, --format <format>", "Output format: csv, html, or json", "csv")
+  .option("-o, --output <path>", "Output file path (defaults to stdout)")
+  .option("--templates <path>", "Custom templates directory")
   .action(async (options) => {
-    console.log(chalk.blue('Generating traceability matrix...'));
+    console.log(chalk.blue("Generating traceability matrix..."));
     const extension = await createExtension(options);
     try {
       let output: string;
@@ -196,26 +266,36 @@ program.command('matrix')
       }
 
       if (!extension.graph.size()) {
-        console.error(chalk.red('Error: No data in graph. Use -i option to specify input file, or process files first'));
+        console.error(
+          chalk.red(
+            "Error: No data in graph. Use -i option to specify input file, or process files first",
+          ),
+        );
         process.exit(1);
       }
 
-      const matrixName = options.type || 'default';
-      const { MatrixGenerator } = await import('./MatrixGenerator.js');
-      const generator = new MatrixGenerator(extension.graph, extension.configLoader, {
-        templateDir: options.templates,
-      });
+      const matrixName = options.type || "default";
+      const { MatrixGenerator } = await import("./MatrixGenerator.js");
+      const generator = new MatrixGenerator(
+        extension.graph,
+        extension.configLoader,
+        {
+          templateDir: options.templates,
+        },
+      );
       const matrix = generator.generateMatrix(matrixName);
-      if (options.format === 'html') {
+      if (options.format === "html") {
         output = generator.exportToHTML(matrix);
-      } else if (options.format === 'json') {
+      } else if (options.format === "json") {
         output = JSON.stringify(matrix, null, 2);
       } else {
         output = generator.exportToCSV(matrix);
       }
       if (options.output) {
         if (isDryRun(options)) {
-          console.log(chalk.yellow(`[DRY RUN] Would write matrix to: ${options.output}`));
+          console.log(
+            chalk.yellow(`[DRY RUN] Would write matrix to: ${options.output}`),
+          );
         } else {
           ensureDirectory(dirname(options.output));
           const stream = createWriteStream(options.output);
@@ -227,20 +307,23 @@ program.command('matrix')
         if (!isDryRun(options)) {
           console.log(output);
         } else {
-          console.log(chalk.yellow('[DRY RUN] Would output matrix to stdout'));
+          console.log(chalk.yellow("[DRY RUN] Would output matrix to stdout"));
         }
       }
     } catch (error: any) {
-      console.error(chalk.red('Matrix generation error:', error.message));
+      console.error(chalk.red("Matrix generation error:", error.message));
       process.exit(1);
     }
   });
 
-program.command('validate')
-  .description('Validate requirements traceability (checks for orphaned items, missing coverage)')
-  .option('-i, --input <path>', 'Input file or directory to validate')
+program
+  .command("validate")
+  .description(
+    "Validate requirements traceability (checks for orphaned items, missing coverage)",
+  )
+  .option("-i, --input <path>", "Input file or directory to validate")
   .action(async (options) => {
-    console.log(chalk.blue('Validating requirements traceability...'));
+    console.log(chalk.blue("Validating requirements traceability..."));
     const extension = await createExtension(options);
     try {
       if (options.input) {
@@ -248,172 +331,218 @@ program.command('validate')
         extension.processFiles(adocFiles);
         const validation = extension.graph.validate();
         if (validation.errors.length > 0) {
-          console.log(chalk.red(`Validation Errors (${validation.errors.length}):`));
+          console.log(
+            chalk.red(`Validation Errors (${validation.errors.length}):`),
+          );
           for (const error of validation.errors) {
             console.log(chalk.red(`  - ${error}`));
           }
           process.exit(1);
         } else {
-          console.log(chalk.green('No validation errors found'));
+          console.log(chalk.green("No validation errors found"));
         }
         if (validation.warnings.length > 0) {
-          console.log(chalk.yellow(`Warnings (${validation.warnings.length}):`));
+          console.log(
+            chalk.yellow(`Warnings (${validation.warnings.length}):`),
+          );
           for (const warning of validation.warnings) {
             console.log(chalk.yellow(`  - ${warning.message}`));
           }
         }
-        console.log(chalk.green(`Summary: ${extension.getAllItems().length} items, ${extension.getAllRelationships().length} relationships`));
+        console.log(
+          chalk.green(
+            `Summary: ${extension.getAllItems().length} items, ${extension.getAllRelationships().length} relationships`,
+          ),
+        );
       } else {
-        console.log(chalk.yellow('No input specified, validating current graph...'));
-        console.log(chalk.yellow('Note: Graph is empty without processing files first'));
+        console.log(
+          chalk.yellow("No input specified, validating current graph..."),
+        );
+        console.log(
+          chalk.yellow("Note: Graph is empty without processing files first"),
+        );
       }
     } catch (error: any) {
-      console.error(chalk.red('Validation error:', error.message));
+      console.error(chalk.red("Validation error:", error.message));
       process.exit(1);
     }
   });
 
-const presetProgram = program.command('preset')
-  .description('Manage traceability presets - list, show details, or initialize config from preset');
+const presetProgram = program
+  .command("preset")
+  .description(
+    "Manage traceability presets - list, show details, or initialize config from preset",
+  );
 
-presetProgram.command('list')
-  .description('List available built-in presets')
+presetProgram
+  .command("list")
+  .description("List available built-in presets")
   .action(() => {
-    console.log(chalk.blue('Available Presets:'));
-    console.log('');
+    console.log(chalk.blue("Available Presets:"));
+    console.log("");
     const configLoader = new ConfigLoader();
     const presets = configLoader.listPresets();
     if (presets.length === 0) {
-      console.log(chalk.yellow('No presets found'));
+      console.log(chalk.yellow("No presets found"));
       process.exit(0);
     }
     for (const preset of presets) {
       console.log(chalk.green(`${preset.name}`));
-      console.log(`  ${preset.description || 'No description'}`);
+      console.log(`  ${preset.description || "No description"}`);
       console.log(`  v${preset.version}`);
-      console.log('');
+      console.log("");
     }
-    console.log(chalk.cyan('Usage: antora-req-trace process --preset <name> -i <file>'));
-    console.log(chalk.cyan('       antora-req-trace preset show <name>'));
-    console.log(chalk.cyan('       antora-req-trace preset init <name>'));
+    console.log(
+      chalk.cyan("Usage: antora-req-trace process --preset <name> -i <file>"),
+    );
+    console.log(chalk.cyan("       antora-req-trace preset show <name>"));
+    console.log(chalk.cyan("       antora-req-trace preset init <name>"));
   });
 
-presetProgram.command('show')
-  .description('Show details of a preset')
-  .arguments('<name>')
+presetProgram
+  .command("show")
+  .description("Show details of a preset")
+  .arguments("<name>")
   .action((name: string) => {
     console.log(chalk.blue(`Preset: ${name}`));
-    console.log('');
+    console.log("");
     try {
       const configLoader = new ConfigLoader();
       const preset = configLoader.loadPreset(name);
-      console.log(chalk.green('Metadata:'));
+      console.log(chalk.green("Metadata:"));
       console.log(`  Name: ${preset.name}`);
-      console.log(`  Description: ${preset.description || 'N/A'}`);
+      console.log(`  Description: ${preset.description || "N/A"}`);
       console.log(`  Version: ${preset.version}`);
-      console.log(`  Author: ${preset.author || 'N/A'}`);
+      console.log(`  Author: ${preset.author || "N/A"}`);
       if (preset.tags && preset.tags.length > 0) {
-        console.log(`  Tags: ${preset.tags.join(', ')}`);
+        console.log(`  Tags: ${preset.tags.join(", ")}`);
       }
-      console.log('');
-      console.log(chalk.green('Configuration:'));
-      console.log(`  Roles: ${preset.traceability.roles.join(', ')}`);
-      console.log('');
-      console.log(chalk.green('Relations:'));
+      console.log("");
+      console.log(chalk.green("Configuration:"));
+      console.log(`  Roles: ${preset.traceability.roles.join(", ")}`);
+      console.log("");
+      console.log(chalk.green("Relations:"));
       const relations = preset.traceability.relations || {};
       for (const [sourceRole, targets] of Object.entries(relations)) {
         console.log(`  ${sourceRole}:`);
         const targetsObj = targets as Record<string, string[]>;
         for (const [targetRole, relationTypes] of Object.entries(targetsObj)) {
-          console.log(`    -> ${targetRole}: [${relationTypes.join(', ')}]`);
+          console.log(`    -> ${targetRole}: [${relationTypes.join(", ")}]`);
         }
       }
-      console.log('');
-      if (preset.traceability.matrices && preset.traceability.matrices.length > 0) {
-        console.log(chalk.green('Matrices:'));
+      console.log("");
+      if (
+        preset.traceability.matrices &&
+        preset.traceability.matrices.length > 0
+      ) {
+        console.log(chalk.green("Matrices:"));
         for (const matrix of preset.traceability.matrices) {
-          console.log(`  - ${matrix.name}: ${matrix.rows} -> [${matrix.columns.join(', ')}]`);
+          console.log(
+            `  - ${matrix.name}: ${matrix.rows} -> [${matrix.columns.join(", ")}]`,
+          );
         }
-        console.log('');
+        console.log("");
       }
-      if (preset.neo4j && preset.neo4j.queries && preset.neo4j.queries.length > 0) {
-        console.log(chalk.green('Neo4j Queries:'));
+      if (
+        preset.neo4j?.queries &&
+        preset.neo4j.queries.length > 0
+      ) {
+        console.log(chalk.green("Neo4j Queries:"));
         for (const query of preset.neo4j.queries) {
           console.log(`  - ${query.name}: ${query.description}`);
         }
-        console.log('');
+        console.log("");
       }
       if (preset.documentation) {
-        console.log(chalk.green('Documentation:'));
+        console.log(chalk.green("Documentation:"));
         console.log(preset.documentation.description);
-        console.log('');
+        console.log("");
       }
       if (preset.documentation?.examples) {
-        console.log(chalk.green('Examples:'));
+        console.log(chalk.green("Examples:"));
         for (const example of preset.documentation.examples) {
           console.log(example);
         }
-        console.log('');
+        console.log("");
       }
-    } catch (error: any) {
+    } catch (_error: any) {
       console.error(chalk.red(`Error: Preset '${name}' not found`));
-      console.error(chalk.yellow(`Available presets: ${BUILT_IN_PRESETS.join(', ')}`));
+      console.error(
+        chalk.yellow(`Available presets: ${BUILT_IN_PRESETS.join(", ")}`),
+      );
       process.exit(1);
     }
   });
 
-presetProgram.command('init')
-  .description('Initialize a traceability configuration from a preset')
-  .arguments('<name>')
-  .option('-o, --output <path>', 'Output directory for config file', '.')
+presetProgram
+  .command("init")
+  .description("Initialize a traceability configuration from a preset")
+  .arguments("<name>")
+  .option("-o, --output <path>", "Output directory for config file", ".")
   .action((name: string, options: any) => {
     console.log(chalk.blue(`Initializing from preset: ${name}`));
     try {
       const configLoader = new ConfigLoader();
       const preset = configLoader.loadPreset(name);
       if (isDryRun(options)) {
-        console.log(chalk.yellow('[DRY RUN] Would initialize from preset:'));
+        console.log(chalk.yellow("[DRY RUN] Would initialize from preset:"));
         console.log(chalk.yellow(`  Preset: ${name}`));
-        console.log(chalk.yellow(`  Output directory: ${options.output || '.'}`));
-        console.log(chalk.yellow('  Files would be created:'));
+        console.log(
+          chalk.yellow(`  Output directory: ${options.output || "."}`),
+        );
+        console.log(chalk.yellow("  Files would be created:"));
         console.log(chalk.yellow(`    - traceability.yml`));
         console.log(chalk.yellow(`    - requirements.adoc`));
       } else {
         ensureDirectory(options.output);
-        const configPath = resolve(process.cwd(), options.output, 'traceability.yml');
+        const configPath = resolve(
+          process.cwd(),
+          options.output,
+          "traceability.yml",
+        );
         const configContent = `# Traceability Configuration
 # Generated from preset: ${preset.name}
 # Version: ${preset.version}
-# ${preset.description || ''}
+# ${preset.description || ""}
 
 # Roles define the types of traceable items in your project
 roles:
-${preset.traceability.roles.map(r => `  - ${r}`).join('\n')}
+${preset.traceability.roles.map((r) => `  - ${r}`).join("\n")}
 
 # Relations define which relationship types are allowed between roles
 # Format: sourceRole -> targetRole -> [relationTypes]
 relations:
-${Object.entries(preset.traceability.relations || {}).map(([source, targets]) => {
-  const targetsObj = targets as unknown as Record<string, string[]>;
-  return `  ${source}:
-${Object.entries(targetsObj).map(([target, types]) => {
-    return `    ${target}: [${(types as string[]).join(', ')}]`;
-  }).join('\n')}`;
-}).join('\n')}
+${Object.entries(preset.traceability.relations || {})
+  .map(([source, targets]) => {
+    const targetsObj = targets as unknown as Record<string, string[]>;
+    return `  ${source}:
+${Object.entries(targetsObj)
+  .map(([target, types]) => {
+    return `    ${target}: [${(types as string[]).join(", ")}]`;
+  })
+  .join("\n")}`;
+  })
+  .join("\n")}
 
 # Matrices define which traceability matrices to generate
 matrices:
-${(preset.traceability.matrices || []).map(matrix => {
-  return `  - name: ${matrix.name}
-    description: "${matrix.description || ''}"
+${(preset.traceability.matrices || [])
+  .map((matrix) => {
+    return `  - name: ${matrix.name}
+    description: "${matrix.description || ""}"
     rows: ${matrix.rows}
-    columns: [${matrix.columns.join(', ')}]`;
-}).join('\n')}
+    columns: [${matrix.columns.join(", ")}]`;
+  })
+  .join("\n")}
 `;
         writeFileSync(configPath, configContent);
         console.log(chalk.green(`Configuration written to: ${configPath}`));
-        const samplePath = resolve(process.cwd(), options.output, 'requirements.adoc');
-      const sampleContent = `= Requirements Example
+        const samplePath = resolve(
+          process.cwd(),
+          options.output,
+          "requirements.adoc",
+        );
+        const sampleContent = `= Requirements Example
 
 This file demonstrates the traceability syntax.
 
@@ -469,66 +598,103 @@ tests:IMP-001[]
 `;
         writeFileSync(samplePath, sampleContent);
         console.log(chalk.green(`Sample file written to: ${samplePath}`));
-        console.log('');
-        console.log(chalk.cyan('Next steps:'));
-        console.log(chalk.cyan(`  1. Process: antora-req-trace process -i ${samplePath} --config traceability.yml`));
-        console.log(chalk.cyan(`  2. Generate matrix: antora-req-trace matrix --config traceability.yml -o matrix.html -f html`));
-        console.log(chalk.cyan(`  3. Validate: antora-req-trace validate -i ${samplePath} --config traceability.yml`));
+        console.log("");
+        console.log(chalk.cyan("Next steps:"));
+        console.log(
+          chalk.cyan(
+            `  1. Process: antora-req-trace process -i ${samplePath} --config traceability.yml`,
+          ),
+        );
+        console.log(
+          chalk.cyan(
+            `  2. Generate matrix: antora-req-trace matrix --config traceability.yml -o matrix.html -f html`,
+          ),
+        );
+        console.log(
+          chalk.cyan(
+            `  3. Validate: antora-req-trace validate -i ${samplePath} --config traceability.yml`,
+          ),
+        );
       }
-    } catch (error: any) {
+    } catch (_error: any) {
       console.error(chalk.red(`Error: Preset '${name}' not found`));
-      console.error(chalk.yellow(`Available presets: ${BUILT_IN_PRESETS.join(', ')}`));
+      console.error(
+        chalk.yellow(`Available presets: ${BUILT_IN_PRESETS.join(", ")}`),
+      );
       process.exit(1);
     }
   });
 
 // Config validation command
-program.command('config validate')
-  .description('Validate traceability configuration file')
-  .option('-c, --config <path>', 'Path to config file (default: auto-discovered)')
+program
+  .command("config validate")
+  .description("Validate traceability configuration file")
+  .option(
+    "-c, --config <path>",
+    "Path to config file (default: auto-discovered)",
+  )
   .action(async (options) => {
-    console.log(chalk.blue('Validating traceability configuration...'));
+    console.log(chalk.blue("Validating traceability configuration..."));
     try {
       const configLoader = new ConfigLoader();
       const configPath = options.config || configLoader.getConfigPath();
 
       if (!configPath) {
-        console.error(chalk.red('Error: No configuration file found'));
-        console.log(chalk.yellow('Try: antora-req-trace config validate --config traceability.yml'));
-        console.log(chalk.yellow('Or: antora-req-trace config validate -c /path/to/config.yml'));
+        console.error(chalk.red("Error: No configuration file found"));
+        console.log(
+          chalk.yellow(
+            "Try: antora-req-trace config validate --config traceability.yml",
+          ),
+        );
+        console.log(
+          chalk.yellow(
+            "Or: antora-req-trace config validate -c /path/to/config.yml",
+          ),
+        );
         process.exit(1);
       }
 
       const config = configLoader.load(configPath);
-      console.log(chalk.green('✓ Configuration is valid'));
-      console.log('');
-      console.log(chalk.cyan('Configuration Summary:'));
-      console.log(chalk.cyan(`  Name: ${config.metadata?.name || 'unnamed'}`));
+      console.log(chalk.green("✓ Configuration is valid"));
+      console.log("");
+      console.log(chalk.cyan("Configuration Summary:"));
+      console.log(chalk.cyan(`  Name: ${config.metadata?.name || "unnamed"}`));
       console.log(chalk.cyan(`  Roles: ${config.roles.length}`));
       if (config.roles.length > 0) {
-        console.log(chalk.cyan(`    ${config.roles.join(', ')}`));
+        console.log(chalk.cyan(`    ${config.roles.join(", ")}`));
       }
       console.log(chalk.cyan(`  Matrices: ${config.matrices?.length || 0}`));
       if (config.matrices && config.matrices.length > 0) {
-        console.log(chalk.cyan(`    ${config.matrices.map(m => m.name).join(', ')}`));
+        console.log(
+          chalk.cyan(`    ${config.matrices.map((m) => m.name).join(", ")}`),
+        );
       }
-      console.log(chalk.cyan(`  Relations: ${Object.keys(config.relations || {}).length} source roles`));
+      console.log(
+        chalk.cyan(
+          `  Relations: ${Object.keys(config.relations || {}).length} source roles`,
+        ),
+      );
     } catch (error: any) {
-      console.error(chalk.red('✗ Configuration validation failed:'));
+      console.error(chalk.red("✗ Configuration validation failed:"));
       console.error(chalk.red(error.message));
       process.exit(1);
     }
   });
 
-program.command('export neo4j')
-  .description('Export traceability data to Neo4j graph database format')
-  .option('-i, --input <path>', 'Input file or directory to process first')
-  .option('-o, --output <path>', 'Output directory for Neo4j import files', './neo4j')
-  .option('-f, --format <format>', 'Export format: csv or cypher', 'csv')
+program
+  .command("export neo4j")
+  .description("Export traceability data to Neo4j graph database format")
+  .option("-i, --input <path>", "Input file or directory to process first")
+  .option(
+    "-o, --output <path>",
+    "Output directory for Neo4j import files",
+    "./neo4j",
+  )
+  .option("-f, --format <format>", "Export format: csv or cypher", "csv")
   .action(async (_target, options) => {
-    console.log(chalk.blue('Exporting to Neo4j...'));
+    console.log(chalk.blue("Exporting to Neo4j..."));
     if (!options.input) {
-      console.error(chalk.red('Error: Input file or directory is required'));
+      console.error(chalk.red("Error: Input file or directory is required"));
       process.exit(1);
     }
     const extension = await createExtension(options);
@@ -538,40 +704,54 @@ program.command('export neo4j')
         extension.processFiles(adocFiles);
       }
       if (isDryRun(options)) {
-        console.log(chalk.yellow('[DRY RUN] Would export to Neo4j'));
+        console.log(chalk.yellow("[DRY RUN] Would export to Neo4j"));
         console.log(chalk.yellow(`  Format: ${options.format}`));
-        console.log(chalk.yellow(`  Output directory: ${resolve(process.cwd(), options.output)}`));
+        console.log(
+          chalk.yellow(
+            `  Output directory: ${resolve(process.cwd(), options.output)}`,
+          ),
+        );
       } else {
         ensureDirectory(options.output);
         const outputDir = resolve(process.cwd(), options.output);
-        const { Neo4jExporter } = await import('./Neo4jExporter.js');
+        const { Neo4jExporter } = await import("./Neo4jExporter.js");
         const exporter = new Neo4jExporter(extension.graph);
         const result = exporter.export({
           outputDir: outputDir,
-          format: options.format as 'csv' | 'cypher',
+          format: options.format as "csv" | "cypher",
           includeContent: true,
           includeAllAttributes: true,
         });
         console.log(chalk.green(`Exported to Neo4j ${options.format} format`));
         console.log(chalk.green(`  Nodes: ${result.nodeCount}`));
-        console.log(chalk.green(`  Relationships: ${result.relationshipCount}`));
-        if (result.nodesFile) console.log(chalk.green(`  Nodes file: ${result.nodesFile}`));
-        if (result.relationshipsFile) console.log(chalk.green(`  Relationships file: ${result.relationshipsFile}`));
-        if (result.cypherFile) console.log(chalk.green(`  Cypher file: ${result.cypherFile}`));
+        console.log(
+          chalk.green(`  Relationships: ${result.relationshipCount}`),
+        );
+        if (result.nodesFile)
+          console.log(chalk.green(`  Nodes file: ${result.nodesFile}`));
+        if (result.relationshipsFile)
+          console.log(
+            chalk.green(`  Relationships file: ${result.relationshipsFile}`),
+          );
+        if (result.cypherFile)
+          console.log(chalk.green(`  Cypher file: ${result.cypherFile}`));
       }
     } catch (error: any) {
-      console.error(chalk.red('Export error:', error.message));
+      console.error(chalk.red("Export error:", error.message));
       process.exit(1);
     }
   });
 
-program.command('stats')
-  .description('Show traceability statistics (counts by role, relationship types, coverage)')
-  .option('-i, --input <path>', 'Input file or directory')
+program
+  .command("stats")
+  .description(
+    "Show traceability statistics (counts by role, relationship types, coverage)",
+  )
+  .option("-i, --input <path>", "Input file or directory")
   .action(async (options) => {
-    console.log(chalk.blue('Traceability Statistics'));
+    console.log(chalk.blue("Traceability Statistics"));
     if (!options.input) {
-      console.error(chalk.red('Error: Input file or directory is required'));
+      console.error(chalk.red("Error: Input file or directory is required"));
       process.exit(1);
     }
     const extension = await createExtension(options);
@@ -580,14 +760,14 @@ program.command('stats')
         const adocFiles = collectAdocFiles(options.input);
         extension.processFiles(adocFiles);
       }
-      console.log('');
-      console.log(chalk.green('Items by Role:'));
+      console.log("");
+      console.log(chalk.green("Items by Role:"));
       const stats = extension.graph.getRoleStatistics();
       for (const [role, count] of Object.entries(stats)) {
         console.log(`  ${role}: ${count}`);
       }
-      console.log('');
-      console.log(chalk.green('Relationships:'));
+      console.log("");
+      console.log(chalk.green("Relationships:"));
       const allRels = extension.graph.getAllRelationships();
       console.log(`  Total: ${allRels.length}`);
       const relStats: Record<string, number> = {};
@@ -597,19 +777,21 @@ program.command('stats')
       for (const [type, count] of Object.entries(relStats)) {
         console.log(`    ${type}: ${count}`);
       }
-      console.log('');
-      console.log(chalk.green('Coverage:'));
+      console.log("");
+      console.log(chalk.green("Coverage:"));
       const coverage = extension.graph.getRoleStatistics();
       for (const [key, value] of Object.entries(coverage)) {
-        if (typeof value === 'object') {
+        if (typeof value === "object") {
           const v = value as any;
-          console.log(`  ${key}: ${v.total} total, ${v.covered} covered (${v.coverage.toFixed(1)}%)`);
+          console.log(
+            `  ${key}: ${v.total} total, ${v.covered} covered (${v.coverage.toFixed(1)}%)`,
+          );
         } else {
           console.log(`  ${key}: ${value}`);
         }
       }
     } catch (error: any) {
-      console.error(chalk.red('Statistics error:', error.message));
+      console.error(chalk.red("Statistics error:", error.message));
       process.exit(1);
     }
   });

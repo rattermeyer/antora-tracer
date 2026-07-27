@@ -13,12 +13,12 @@
  * }
  */
 
-import { RequirementsTraceabilityExtension } from './index.js';
-import { ConfigLoader } from './config/TraceabilityConfig.js';
-import { MatrixGenerator } from './MatrixGenerator.js';
-import { LinkResolver } from './LinkResolver.js';
-import { existsSync, mkdirSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { ConfigLoader } from "./config/TraceabilityConfig.js";
+import { RequirementsTraceabilityExtension } from "./index.js";
+import { LinkResolver } from "./LinkResolver.js";
+import { MatrixGenerator } from "./MatrixGenerator.js";
 
 /**
  * Antora Extension Configuration
@@ -27,7 +27,7 @@ export interface AntoraTraceabilityConfig {
   enabled?: boolean;
   outputDir?: string;
   generateMatrices?: boolean;
-  matrixFormats?: ('csv' | 'html' | 'json')[];
+  matrixFormats?: ("csv" | "html" | "json")[];
   includeInNavigation?: boolean;
   preset?: string;
   configPath?: string;
@@ -35,12 +35,12 @@ export interface AntoraTraceabilityConfig {
 
 const DEFAULT_CONFIG: Required<AntoraTraceabilityConfig> = {
   enabled: true,
-  outputDir: 'traceability',
+  outputDir: "traceability",
   generateMatrices: true,
-  matrixFormats: ['html', 'csv'],
+  matrixFormats: ["html", "csv"],
   includeInNavigation: true,
-  preset: 'requirements-engineering',
-  configPath: '',
+  preset: "requirements-engineering",
+  configPath: "",
 };
 
 export interface AntoraExtensionContext {
@@ -60,27 +60,27 @@ export interface AntoraExtensionContext {
 export class AntoraTraceabilityExtension {
   private traceability: RequirementsTraceabilityExtension | null = null;
   private config: Required<AntoraTraceabilityConfig>;
-  private readonly logger: ReturnType<AntoraExtensionContext['getLogger']>;
+  private readonly logger: ReturnType<AntoraExtensionContext["getLogger"]>;
   private itemsWithLinksMacro = new Set<string>();
 
   constructor(private readonly context: AntoraExtensionContext) {
-    this.logger = context.getLogger('requirements-traceability');
+    this.logger = context.getLogger("requirements-traceability");
     this.config = { ...DEFAULT_CONFIG, ...this.loadConfig() };
 
     // Fallback: if no configPath is set, try the example site config
     if (!this.config.configPath) {
-      const exampleConfig = join(process.cwd(), 'examples', 'traceability.yml');
+      const exampleConfig = join(process.cwd(), "examples", "traceability.yml");
       if (existsSync(exampleConfig)) {
         this.config.configPath = exampleConfig;
       }
     }
 
     if (!this.config.enabled) {
-      this.logger.info('Requirements traceability extension is disabled');
+      this.logger.info("Requirements traceability extension is disabled");
       return;
     }
 
-    this.logger.info('Requirements traceability extension initialized');
+    this.logger.info("Requirements traceability extension initialized");
 
     // Register event handlers synchronously in constructor
     // They will check if traceability is loaded before processing
@@ -95,7 +95,7 @@ export class AntoraTraceabilityExtension {
   private async initializeAsync(): Promise<void> {
     // Load the traceability extension (may involve async preset loading)
     this.traceability = await this.createTraceabilityExtension();
-    this.logger.debug('Requirements traceability extension fully initialized');
+    this.logger.debug("Requirements traceability extension fully initialized");
   }
 
   private async createTraceabilityExtension(): Promise<RequirementsTraceabilityExtension> {
@@ -103,20 +103,26 @@ export class AntoraTraceabilityExtension {
       const configLoader = new ConfigLoader();
       try {
         configLoader.load(this.config.configPath);
-        this.logger.info(`Loaded configuration from: ${this.config.configPath}`);
+        this.logger.info(
+          `Loaded configuration from: ${this.config.configPath}`,
+        );
         return new RequirementsTraceabilityExtension(configLoader);
       } catch (error: any) {
-        this.logger.warn(`Could not load configuration: ${error.message}. Using default.`);
+        this.logger.warn(
+          `Could not load configuration: ${error.message}. Using default.`,
+        );
       }
     }
 
     if (this.config.preset) {
       try {
         return await RequirementsTraceabilityExtension.createWithPreset(
-          this.config.preset as any
+          this.config.preset as any,
         );
       } catch (error: any) {
-        this.logger.warn(`Could not load preset: ${error.message}. Using default.`);
+        this.logger.warn(
+          `Could not load preset: ${error.message}. Using default.`,
+        );
       }
     }
 
@@ -126,7 +132,9 @@ export class AntoraTraceabilityExtension {
   private loadConfig(): Partial<AntoraTraceabilityConfig> {
     try {
       const playbook = this.context.playbook;
-      const extConfig = playbook.extensions?.find((e: any) => e.name === 'antora-requirements-traceability');
+      const extConfig = playbook.extensions?.find(
+        (e: any) => e.name === "antora-requirements-traceability",
+      );
       return extConfig?.config ?? {};
     } catch {
       return {};
@@ -138,46 +146,49 @@ export class AntoraTraceabilityExtension {
    * Strips path prefix up to /pages/ and removes .adoc extension.
    */
   private normalizeSourceFile(sourceFile: string): string {
-    let result = sourceFile.replace(/\\/g, '/');
-    result = result.replace(/\\.adoc$/, '');
-    result = result.replace(/^.*[\\/]pages[\\/]/, '');
+    let result = sourceFile.replace(/\\/g, "/");
+    result = result.replace(/\\.adoc$/, "");
+    result = result.replace(/^.*[\\/]pages[\\/]/, "");
     return result;
   }
-
 
   /**
    * Parse AsciiDoc document attributes from content header.
    */
   private parseDocAttributes(content: string): Record<string, string> {
     const attrs: Record<string, string> = {};
-    const lines = content.split('\n');
+    const lines = content.split("\n");
     for (const line of lines) {
       const m = line.match(/^:(\w[\w-]*):\s*(.*)/);
       if (m) {
         attrs[m[1]] = m[2].trim();
       }
-      if (line.trim() === '' && Object.keys(attrs).length > 0) break;
+      if (line.trim() === "" && Object.keys(attrs).length > 0) break;
     }
     return attrs;
   }
 
   private isLinksEnabled(attrs: Record<string, string>): boolean {
-    const val = (attrs['traceability-links'] || '').toLowerCase();
-    return val === 'true' || val === 'yes' || val === '1';
+    const val = (attrs["traceability-links"] || "").toLowerCase();
+    return val === "true" || val === "yes" || val === "1";
   }
 
-  private getLinksStyle(attrs: Record<string, string>): 'list' | 'table' | 'inline' {
-    const val = (attrs['traceability-style'] || '').toLowerCase();
-    if (val === 'table') return 'table';
-    if (val === 'inline') return 'inline';
-    return 'list';
+  private getLinksStyle(
+    attrs: Record<string, string>,
+  ): "list" | "table" | "inline" {
+    const val = (attrs["traceability-style"] || "").toLowerCase();
+    if (val === "table") return "table";
+    if (val === "inline") return "inline";
+    return "list";
   }
 
-  private getLinksOrder(attrs: Record<string, string>): 'target-id' | 'target-title' | 'relation-type' {
-    const val = (attrs['traceability-order'] || '').toLowerCase();
-    if (val === 'target-title') return 'target-title';
-    if (val === 'relation-type') return 'relation-type';
-    return 'target-id';
+  private getLinksOrder(
+    attrs: Record<string, string>,
+  ): "target-id" | "target-title" | "relation-type" {
+    const val = (attrs["traceability-order"] || "").toLowerCase();
+    if (val === "target-title") return "target-title";
+    if (val === "relation-type") return "relation-type";
+    return "target-id";
   }
 
   /**
@@ -188,17 +199,18 @@ export class AntoraTraceabilityExtension {
     try {
       const contentsBuffer = file.contents || file.src?.contents;
       if (!contentsBuffer) return;
-      const content = contentsBuffer.toString('utf8');
+      const content = contentsBuffer.toString("utf8");
       const docAttrs = this.parseDocAttributes(content);
       const linksEnabled = this.isLinksEnabled(docAttrs);
-      if (!content.includes('traceability:links[]')) return;
+      if (!content.includes("traceability:links[]")) return;
 
       const style = this.getLinksStyle(docAttrs);
       const order = this.getLinksOrder(docAttrs);
-      const sourceFile = file.src?.path || file.path || 'unknown';
+      const sourceFile = file.src?.path || file.path || "unknown";
       const macroRegex = /traceability:links\[\]/g;
       let match: RegExpExecArray | null;
-      const replacements: Array<{ start: number; end: number; text: string }> = [];
+      const replacements: Array<{ start: number; end: number; text: string }> =
+        [];
 
       while ((match = macroRegex.exec(content)) !== null) {
         const macroStart = match.index;
@@ -206,7 +218,9 @@ export class AntoraTraceabilityExtension {
         const before = content.slice(0, macroStart);
         const itemMatch = before.match(/\[#([^,\]]+),\s*item[^\]]*\]/g);
         if (!itemMatch) {
-          this.logger.warn(`traceability:links[] found outside an item block in ${sourceFile}`);
+          this.logger.warn(
+            `traceability:links[] found outside an item block in ${sourceFile}`,
+          );
           continue;
         }
         const lastItem = itemMatch[itemMatch.length - 1];
@@ -214,14 +228,14 @@ export class AntoraTraceabilityExtension {
         if (!idMatch) continue;
         const itemId = idMatch[1];
         if (!linksEnabled) {
-          replacements.push({ start: macroStart, end: macroEnd, text: '' });
+          replacements.push({ start: macroStart, end: macroEnd, text: "" });
           continue;
         }
         this.itemsWithLinksMacro.add(itemId);
 
         const rels = this.traceability.graph.getRelationships(itemId);
         if (rels.length === 0) {
-          replacements.push({ start: macroStart, end: macroEnd, text: '' });
+          replacements.push({ start: macroStart, end: macroEnd, text: "" });
           continue;
         }
 
@@ -230,80 +244,120 @@ export class AntoraTraceabilityExtension {
           const target = this.traceability.graph.getItem(rel.targetId);
           if (!target) continue;
           if (!grouped.has(rel.type)) grouped.set(rel.type, []);
-          grouped.get(rel.type)!.push({ id: target.id, title: target.title || target.id });
+          grouped
+            .get(rel.type)?.push({ id: target.id, title: target.title || target.id });
         }
         if (grouped.size === 0) {
-          replacements.push({ start: macroStart, end: macroEnd, text: '' });
+          replacements.push({ start: macroStart, end: macroEnd, text: "" });
           continue;
         }
 
         let groupEntries = Array.from(grouped.entries());
-        if (order === 'relation-type') groupEntries.sort((a, b) => a[0].localeCompare(b[0]));
+        if (order === "relation-type")
+          groupEntries.sort((a, b) => a[0].localeCompare(b[0]));
         for (const [, items] of groupEntries) {
-          if (order === 'target-id') items.sort((a, b) => a.id.localeCompare(b.id));
-          else if (order === 'target-title') items.sort((a, b) => a.title.localeCompare(b.title));
+          if (order === "target-id")
+            items.sort((a, b) => a.id.localeCompare(b.id));
+          else if (order === "target-title")
+            items.sort((a, b) => a.title.localeCompare(b.title));
         }
 
-        const generated = this.generateLinksAsciiDoc(groupEntries, style, sourceFile);
-        replacements.push({ start: macroStart, end: macroEnd, text: generated });
+        const generated = this.generateLinksAsciiDoc(
+          groupEntries,
+          style,
+          sourceFile,
+        );
+        replacements.push({
+          start: macroStart,
+          end: macroEnd,
+          text: generated,
+        });
       }
 
       if (replacements.length > 0) {
         let modifiedContent = content;
         for (let i = replacements.length - 1; i >= 0; i--) {
           const r = replacements[i];
-          modifiedContent = modifiedContent.slice(0, r.start) + r.text + modifiedContent.slice(r.end);
+          modifiedContent =
+            modifiedContent.slice(0, r.start) +
+            r.text +
+            modifiedContent.slice(r.end);
         }
-        const buf = Buffer.from(modifiedContent, 'utf8');
+        const buf = Buffer.from(modifiedContent, "utf8");
         if (file.contents) file.contents = buf;
         if (file.src?.contents) file.src.contents = buf;
       }
     } catch (error: any) {
-      this.logger.warn(`Error expanding links in ${file.src?.path}: ${error.message}`);
+      this.logger.warn(
+        `Error expanding links in ${file.src?.path}: ${error.message}`,
+      );
     }
   }
 
   private generateLinksAsciiDoc(
     grouped: Array<[string, Array<{ id: string; title: string }>]>,
-    style: 'list' | 'table' | 'inline',
-    _sourceFile: string
+    style: "list" | "table" | "inline",
+    _sourceFile: string,
   ): string {
-    if (grouped.length === 0) return '';
-    if (style === 'table') return this.generateTableStyle(grouped);
-    if (style === 'inline') return this.generateInlineStyle(grouped);
+    if (grouped.length === 0) return "";
+    if (style === "table") return this.generateTableStyle(grouped);
+    if (style === "inline") return this.generateInlineStyle(grouped);
     return this.generateListStyle(grouped);
   }
 
-  private generateListStyle(grouped: Array<[string, Array<{ id: string; title: string }>]>): string {
+  private generateListStyle(
+    grouped: Array<[string, Array<{ id: string; title: string }>]>,
+  ): string {
     const lines: string[] = [];
     for (const [relType, items] of grouped) {
-      lines.push('\n.' + this.capitalize(relType));
+      lines.push(`\n.${this.capitalize(relType)}`);
       for (const item of items) {
-        const safeTitle = item.title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        lines.push('* xref:#' + item.id + '[' + safeTitle + ']');
+        const safeTitle = item.title
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+        lines.push(`* xref:#${item.id}[${safeTitle}]`);
       }
     }
-    return lines.join('\n') + '\n';
+    return `${lines.join("\n")}\n`;
   }
 
-  private generateTableStyle(grouped: Array<[string, Array<{ id: string; title: string }>]>): string {
-    const lines: string[] = ['\n[cols="15,15,70"]', '|==='];
-    lines.push('| Relation | ID | Title');
+  private generateTableStyle(
+    grouped: Array<[string, Array<{ id: string; title: string }>]>,
+  ): string {
+    const lines: string[] = ['\n[cols="15,15,70"]', "|==="];
+    lines.push("| Relation | ID | Title");
     for (const [relType, items] of grouped) {
       for (const item of items) {
-        lines.push('| ' + relType + ' | xref:#' + item.id + '[' + item.id + '] | ' + item.title.replace(/\|/g, '\\\\|').replace(/&/g, '&amp;'));
+        lines.push(
+          "| " +
+            relType +
+            " | xref:#" +
+            item.id +
+            "[" +
+            item.id +
+            "] | " +
+            item.title.replace(/\|/g, "\\\\|").replace(/&/g, "&amp;"),
+        );
       }
     }
-    lines.push('|===');
-    return lines.join('\n') + '\n';
+    lines.push("|===");
+    return `${lines.join("\n")}\n`;
   }
 
-  private generateInlineStyle(grouped: Array<[string, Array<{ id: string; title: string }>]>): string {
+  private generateInlineStyle(
+    grouped: Array<[string, Array<{ id: string; title: string }>]>,
+  ): string {
     const lines: string[] = [];
     for (const [relType, items] of grouped) {
-      lines.push('\n' + this.capitalize(relType) + ': ' + items.map(i => 'xref:#' + i.id + '[' + i.id + ']').join(', '));
+      lines.push(
+        "\n" +
+          this.capitalize(relType) +
+          ": " +
+          items.map((i) => `xref:#${i.id}[${i.id}]`).join(", "),
+      );
     }
-    return lines.join('\n') + '\n';
+    return `${lines.join("\n")}\n`;
   }
 
   private capitalize(s: string): string {
@@ -311,16 +365,19 @@ export class AntoraTraceabilityExtension {
   }
 
   private registerContentClassifier(): void {
-    this.context.on('contentClassified', (event: any) => {
+    this.context.on("contentClassified", (event: any) => {
       const contentCatalog = event.contentCatalog;
       if (!contentCatalog) {
-        this.logger.warn('contentCatalog not found in contentClassified event');
+        this.logger.warn("contentCatalog not found in contentClassified event");
         return;
       }
 
-      this.logger.info('Processing content for traceability');
-      const files = contentCatalog.findBy({ family: 'page' }) || [];
-      const adocFiles = files.filter((file: any) => file.src && file.src.path && file.src.path.endsWith('.adoc'));
+      this.logger.info("Processing content for traceability");
+      const files = contentCatalog.findBy({ family: "page" }) || [];
+      const adocFiles = files.filter(
+        (file: any) =>
+          file.src?.path?.endsWith(".adoc"),
+      );
 
       // Pass 1: Process all files to populate the traceability graph
       for (const file of adocFiles) {
@@ -342,7 +399,7 @@ export class AntoraTraceabilityExtension {
 
   private processAsciiDocFile(file: any): void {
     if (!this.traceability) {
-      this.logger.debug('Extension not loaded yet, skipping file processing');
+      this.logger.debug("Extension not loaded yet, skipping file processing");
       return;
     }
     try {
@@ -350,8 +407,8 @@ export class AntoraTraceabilityExtension {
       if (!contentsBuffer) {
         return;
       }
-      const content = contentsBuffer.toString('utf8');
-      let sourceFile = file.src?.path || file.path || 'unknown';
+      const content = contentsBuffer.toString("utf8");
+      let sourceFile = file.src?.path || file.path || "unknown";
       sourceFile = this.normalizeSourceFile(sourceFile);
       this.traceability.process(content, { sourceFile });
     } catch (error: any) {
@@ -370,7 +427,7 @@ export class AntoraTraceabilityExtension {
       const contentsBuffer = file.contents || file.src?.contents;
       if (!contentsBuffer) return;
 
-      const content = contentsBuffer.toString('utf8');
+      const content = contentsBuffer.toString("utf8");
 
       // Strip inline macros (always invisible)
       let modifiedContent = this.substituteRelationshipLinks(content);
@@ -379,12 +436,14 @@ export class AntoraTraceabilityExtension {
       modifiedContent = this.injectTitleIds(modifiedContent);
 
       if (modifiedContent !== content) {
-        const buf = Buffer.from(modifiedContent, 'utf8');
+        const buf = Buffer.from(modifiedContent, "utf8");
         if (file.contents) file.contents = buf;
         if (file.src?.contents) file.src.contents = buf;
       }
     } catch (error: any) {
-      this.logger.warn(`Error substituting links in ${file.src?.path}: ${error.message}`);
+      this.logger.warn(
+        `Error substituting links in ${file.src?.path}: ${error.message}`,
+      );
     }
   }
 
@@ -396,10 +455,16 @@ export class AntoraTraceabilityExtension {
 
     return content.replace(
       /^(\[#([^,\]]+),\s*item[^\]]*title=")([^"]+)(")/gm,
-      (_match: string, prefix: string, id: string, title: string, suffix: string) => {
+      (
+        _match: string,
+        prefix: string,
+        id: string,
+        title: string,
+        suffix: string,
+      ) => {
         if (title.startsWith(`${id} \u2014 `)) return _match;
         return `${prefix}${id} \u2014 ${title}${suffix}`;
-      }
+      },
     );
   }
 
@@ -421,11 +486,11 @@ export class AntoraTraceabilityExtension {
     // Inline macros are always invisible — pure data markers.
     // Exclude traceability:links[] (the rendering macro itself).
     const relRegex = /\b(?!traceability:)(\w+):([\w][-.\w]*)\[\]/g;
-    return content.replace(relRegex, '');
+    return content.replace(relRegex, "");
   }
 
   private registerPageProcessor(): void {
-    this.context.on('sitePublished', (event: any) => {
+    this.context.on("sitePublished", (event: any) => {
       if (!this.config.generateMatrices) return;
       this.generateTraceabilityFiles(event);
     });
@@ -433,100 +498,140 @@ export class AntoraTraceabilityExtension {
 
   private generateTraceabilityFiles(event: any): void {
     if (!this.traceability) {
-      this.logger.warn('Traceability extension not initialized, skipping file generation');
+      this.logger.warn(
+        "Traceability extension not initialized, skipping file generation",
+      );
       return;
     }
     try {
-      const outputDir = event.playbook?.output?.dir || event.playbook?.dir || '_site';
+      const outputDir =
+        event.playbook?.output?.dir || event.playbook?.dir || "_site";
       const traceabilityDir = join(outputDir, this.config.outputDir);
       this.logger.info(`Writing traceability files to ${traceabilityDir}`);
       mkdirSync(traceabilityDir, { recursive: true });
       const allItems = this.traceability.graph.getAllItems();
       if (allItems.length === 0) {
-        this.logger.warn('No traceable items found. Skipping matrix generation.');
+        this.logger.warn(
+          "No traceable items found. Skipping matrix generation.",
+        );
         return;
       }
 
-      const matrices = this.traceability?.configLoader?.getConfig()?.matrices || [];
-      const matrixNames = matrices.length > 0
-        ? matrices.map((m: any) => m.name)
-        : this.generateDefaultMatrixNames(this.traceability.graph.getAllRoles());
+      const matrices =
+        this.traceability?.configLoader?.getConfig()?.matrices || [];
+      const matrixNames =
+        matrices.length > 0
+          ? matrices.map((m: any) => m.name)
+          : this.generateDefaultMatrixNames(
+              this.traceability.graph.getAllRoles(),
+            );
 
-      const linkResolver = new LinkResolver({ relativePathPrefix: '../../' });
-      const generator = new MatrixGenerator(this.traceability.graph, this.traceability.configLoader, { linkResolver });
+      const linkResolver = new LinkResolver({ relativePathPrefix: "../../" });
+      const generator = new MatrixGenerator(
+        this.traceability.graph,
+        this.traceability.configLoader,
+        { linkResolver },
+      );
 
       for (const matrixName of matrixNames) {
         for (const format of this.config.matrixFormats) {
           try {
             const matrix = generator.generateMatrix(matrixName);
             let matrixContent: string;
-            if (format === 'html') {
+            if (format === "html") {
               matrixContent = generator.exportToHTML(matrix);
-            } else if (format === 'json') {
+            } else if (format === "json") {
               matrixContent = JSON.stringify(matrix, null, 2);
             } else {
               matrixContent = generator.exportToCSV(matrix);
             }
-            const safeName = matrixName.replace(/[^a-zA-Z0-9-]/g, '-').toLowerCase();
+            const safeName = matrixName
+              .replace(/[^a-zA-Z0-9-]/g, "-")
+              .toLowerCase();
             const fileName = `matrix-${safeName}.${format}`;
             const filePath = join(traceabilityDir, fileName);
-            writeFileSync(filePath, matrixContent, 'utf8');
+            writeFileSync(filePath, matrixContent, "utf8");
             this.logger.info(`Generated ${fileName}`);
           } catch (error: any) {
-            this.logger.warn(`Failed to generate matrix ${matrixName} (${format}): ${error.message}`);
+            this.logger.warn(
+              `Failed to generate matrix ${matrixName} (${format}): ${error.message}`,
+            );
           }
         }
       }
 
       this.generateCoverageReport(traceabilityDir);
       const indexContent = this.generateIndexContent(matrixNames);
-      writeFileSync(join(traceabilityDir, 'index.html'), indexContent, 'utf8');
-      this.logger.info('Generated index.html');
-      this.logger.info(`Traceability files written to ${this.config.outputDir}/`);
+      writeFileSync(join(traceabilityDir, "index.html"), indexContent, "utf8");
+      this.logger.info("Generated index.html");
+      this.logger.info(
+        `Traceability files written to ${this.config.outputDir}/`,
+      );
     } catch (error: any) {
-      this.logger.error(`Error generating traceability pages: ${error.message}`);
+      this.logger.error(
+        `Error generating traceability pages: ${error.message}`,
+      );
     }
   }
 
   private generateDefaultMatrixNames(roles: string[]): string[] {
-    if (!this.traceability) return ['default'];
+    if (!this.traceability) return ["default"];
     const matrices: string[] = [];
     const roleList = Array.from(new Set(roles));
-    if (roleList.includes('requirement')) {
-      if (roleList.includes('implementation')) matrices.push('requirements-implementations');
-      if (roleList.includes('test')) matrices.push('requirements-tests');
-      if (roleList.includes('design')) matrices.push('requirements-design');
+    if (roleList.includes("requirement")) {
+      if (roleList.includes("implementation"))
+        matrices.push("requirements-implementations");
+      if (roleList.includes("test")) matrices.push("requirements-tests");
+      if (roleList.includes("design")) matrices.push("requirements-design");
     }
     if (matrices.length === 0 && roleList.length > 0) {
-      matrices.push('all-items');
+      matrices.push("all-items");
     }
-    return matrices.length > 0 ? matrices : ['default'];
+    return matrices.length > 0 ? matrices : ["default"];
   }
 
   private generateCoverageReport(traceabilityDir: string): void {
     if (!this.traceability) {
-      this.logger.warn('Traceability extension not initialized, skipping coverage report');
+      this.logger.warn(
+        "Traceability extension not initialized, skipping coverage report",
+      );
       return;
     }
     try {
       const stats = this.traceability.graph.getRoleStatistics();
-      const generator = new MatrixGenerator(this.traceability.graph, this.traceability.configLoader);
+      const generator = new MatrixGenerator(
+        this.traceability.graph,
+        this.traceability.configLoader,
+      );
       const coverage = generator.getCoverageReport();
       const coverageContent = this.formatCoverageReport(stats, coverage);
-      writeFileSync(join(traceabilityDir, 'coverage.html'), coverageContent, 'utf8');
-      this.logger.info('Generated coverage.html');
+      writeFileSync(
+        join(traceabilityDir, "coverage.html"),
+        coverageContent,
+        "utf8",
+      );
+      this.logger.info("Generated coverage.html");
     } catch (error: any) {
       this.logger.warn(`Failed to generate coverage report: ${error.message}`);
     }
   }
 
-  private formatCoverageReport(stats: Record<string, number>, _coverage: Record<string, any>): string {
+  private formatCoverageReport(
+    stats: Record<string, number>,
+    _coverage: Record<string, any>,
+  ): string {
     const total = Object.values(stats).reduce((sum, count) => sum + count, 0);
-    const coverageCards = Object.entries(stats).map(([role, count]) => {
-      const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : '0';
-      const percentNum = parseFloat(percentage);
-      const color = percentNum >= 80 ? '#28a745' : percentNum >= 50 ? '#ffc107' : '#dc3545';
-      return `
+    const coverageCards = Object.entries(stats)
+      .map(([role, count]) => {
+        const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : "0";
+        const percentNum = parseFloat(percentage);
+        const color =
+          percentNum >= 80
+            ? "#28a745"
+            : percentNum >= 50
+              ? "#ffc107"
+              : "#dc3545";
+        return `
         <div class="coverage-card">
           <h3>${role}</h3>
           <div class="metric-value" style="color: ${color}">${count}</div>
@@ -534,12 +639,15 @@ export class AntoraTraceabilityExtension {
           <div class="metric-label">${percentage}% of ${total} items</div>
         </div>
       `;
-    }).join('\n');
+      })
+      .join("\n");
 
-    const rows = Object.entries(stats).map(([role, count]) => {
-      const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
-      return `<tr><td>${role}</td><td>${count}</td><td>${percentage}%</td></tr>`;
-    }).join('\n');
+    const rows = Object.entries(stats)
+      .map(([role, count]) => {
+        const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
+        return `<tr><td>${role}</td><td>${count}</td><td>${percentage}%</td></tr>`;
+      })
+      .join("\n");
 
     return `
 <!DOCTYPE html>
@@ -580,11 +688,16 @@ export class AntoraTraceabilityExtension {
 
   private generateIndexContent(matrixNames: string[]): string {
     const formats = this.config.matrixFormats;
-    const links = matrixNames.flatMap(name => {
-      const safeName = name.replace(/[^a-zA-Z0-9-]/g, '-').toLowerCase();
-      const displayName = name.replace(/-/g, ' ');
-      return formats.map(f => `<li><a href="matrix-${safeName}.${f}">${displayName} (${f.toUpperCase()})</a></li>`);
-    }).join('\n');
+    const links = matrixNames
+      .flatMap((name) => {
+        const safeName = name.replace(/[^a-zA-Z0-9-]/g, "-").toLowerCase();
+        const displayName = name.replace(/-/g, " ");
+        return formats.map(
+          (f) =>
+            `<li><a href="matrix-${safeName}.${f}">${displayName} (${f.toUpperCase()})</a></li>`,
+        );
+      })
+      .join("\n");
 
     return `
 <!DOCTYPE html>
@@ -618,14 +731,14 @@ export class AntoraTraceabilityExtension {
 
   private registerNavigationEnhancer(): void {
     if (!this.config.includeInNavigation) return;
-    this.context.on('beforeSiteGenerated', () => {
-      this.logger.info('Enhanced navigation with traceability links');
+    this.context.on("beforeSiteGenerated", () => {
+      this.logger.info("Enhanced navigation with traceability links");
     });
   }
 
   getTraceabilityExtension() {
     if (!this.traceability) {
-      throw new Error('Traceability extension not initialized');
+      throw new Error("Traceability extension not initialized");
     }
     return this.traceability;
   }
@@ -635,9 +748,11 @@ function register(context: AntoraExtensionContext): void {
   new AntoraTraceabilityExtension(context);
 }
 
-function createAntoraExtension(context: AntoraExtensionContext): AntoraTraceabilityExtension {
+function createAntoraExtension(
+  context: AntoraExtensionContext,
+): AntoraTraceabilityExtension {
   return new AntoraTraceabilityExtension(context);
 }
 
-export { register, createAntoraExtension };
+export { createAntoraExtension, register };
 export default { register };

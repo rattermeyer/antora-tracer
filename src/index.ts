@@ -3,11 +3,28 @@
  * This file provides the APIs for requirements traceability
  */
 
-import { DocumentParser, type ParserResult, type ParserWarning, type ParserError } from './DocumentParser.js';
-import { TraceabilityGraph, type ValidationResult } from './TraceabilityGraph.js';
-import { ConfigLoader, type CompleteConfig, type Preset, type BuiltInPresetName } from './config/TraceabilityConfig.js';
-import { Neo4jExporter, type Neo4jExportOptions, type Neo4jExportResult } from './Neo4jExporter.js';
-import type { Item, ItemRelationship } from './types.js';
+import {
+  type BuiltInPresetName,
+  type CompleteConfig,
+  ConfigLoader,
+  type Preset,
+} from "./config/TraceabilityConfig.js";
+import {
+  DocumentParser,
+  type ParserError,
+  type ParserResult,
+  type ParserWarning,
+} from "./DocumentParser.js";
+import {
+  Neo4jExporter,
+  type Neo4jExportOptions,
+  type Neo4jExportResult,
+} from "./Neo4jExporter.js";
+import {
+  TraceabilityGraph,
+  type ValidationResult,
+} from "./TraceabilityGraph.js";
+import type { Item, ItemRelationship } from "./types.js";
 
 /**
  * Main extension class for unified item architecture
@@ -36,16 +53,22 @@ export class RequirementsTraceabilityExtension {
   /**
    * Create extension with configuration path
    */
-  static async createWithConfig(configPath?: string): Promise<RequirementsTraceabilityExtension> {
+  static async createWithConfig(
+    configPath?: string,
+  ): Promise<RequirementsTraceabilityExtension> {
     let configLoader: ConfigLoader | undefined;
 
     try {
       configLoader = new ConfigLoader();
       configLoader.load(configPath);
-      console.log(`Configuration loaded from: ${configPath || 'default location'}`);
+      console.log(
+        `Configuration loaded from: ${configPath || "default location"}`,
+      );
     } catch (error: any) {
       console.warn(`Could not load configuration: ${error.message}`);
-      console.warn('Using extension without configuration. Role validation will be skipped.');
+      console.warn(
+        "Using extension without configuration. Role validation will be skipped.",
+      );
     }
 
     return new RequirementsTraceabilityExtension(configLoader);
@@ -54,7 +77,9 @@ export class RequirementsTraceabilityExtension {
   /**
    * Create extension with preset
    */
-  static async createWithPreset(presetName: BuiltInPresetName): Promise<RequirementsTraceabilityExtension> {
+  static async createWithPreset(
+    presetName: BuiltInPresetName,
+  ): Promise<RequirementsTraceabilityExtension> {
     const configLoader = new ConfigLoader();
     const preset = configLoader.loadPreset(presetName);
 
@@ -84,8 +109,11 @@ export class RequirementsTraceabilityExtension {
   /**
    * Process AsciiDoc content with the new [item] macro syntax
    */
-  process(content: string, options: { sourceFile?: string } = {}): ParserResult & { graph: TraceabilityGraph } {
-    this.currentFile = options.sourceFile || 'input';
+  process(
+    content: string,
+    options: { sourceFile?: string } = {},
+  ): ParserResult & { graph: TraceabilityGraph } {
+    this.currentFile = options.sourceFile || "input";
     console.log(`Processing: ${this.currentFile}`);
 
     const startTime = Date.now();
@@ -96,17 +124,23 @@ export class RequirementsTraceabilityExtension {
     // Add parsed items to the graph
     for (const item of parsed.items) {
       this.graph.addItem(item);
-      console.log(`Item registered: ${item.id} (role: ${item.role}) - ${item.title}`);
+      console.log(
+        `Item registered: ${item.id} (role: ${item.role}) - ${item.title}`,
+      );
     }
 
     // Add parsed relationships to the graph
     for (const rel of parsed.relationships) {
       this.graph.addRelationship(rel);
-      console.log(`Relationship added: ${rel.fromId} ${rel.type} ${rel.targetId}`);
+      console.log(
+        `Relationship added: ${rel.fromId} ${rel.type} ${rel.targetId}`,
+      );
     }
 
     const elapsed = Date.now() - startTime;
-    console.log(`Processing complete: ${parsed.items.length} items, ${parsed.relationships.length} relationships found (${elapsed}ms)`);
+    console.log(
+      `Processing complete: ${parsed.items.length} items, ${parsed.relationships.length} relationships found (${elapsed}ms)`,
+    );
 
     // Return the parse result with warnings and errors, plus the graph
     return {
@@ -121,13 +155,25 @@ export class RequirementsTraceabilityExtension {
   processFiles(files: { path: string; content: string }[]): {
     result: ParserResult;
     graph: TraceabilityGraph;
-    fileResults: { file: string; items: number; relationships: number; warnings: ParserWarning[]; errors: ParserError[] }[];
+    fileResults: {
+      file: string;
+      items: number;
+      relationships: number;
+      warnings: ParserWarning[];
+      errors: ParserError[];
+    }[];
   } {
     const allItems: Item[] = [];
     const allRelationships: ItemRelationship[] = [];
     const allWarnings: ParserWarning[] = [];
     const allErrors: ParserError[] = [];
-    const fileResults: { file: string; items: number; relationships: number; warnings: ParserWarning[]; errors: ParserError[] }[] = [];
+    const fileResults: {
+      file: string;
+      items: number;
+      relationships: number;
+      warnings: ParserWarning[];
+      errors: ParserError[];
+    }[] = [];
 
     for (const file of files) {
       console.log(`Processing file: ${file.path}`);
@@ -176,7 +222,9 @@ export class RequirementsTraceabilityExtension {
    */
   addItem(item: Item): void {
     this.graph.addItem(item);
-    console.log(`Item registered: ${item.id} (role: ${item.role}) - ${item.title}`);
+    console.log(
+      `Item registered: ${item.id} (role: ${item.role}) - ${item.title}`,
+    );
   }
 
   /**
@@ -184,7 +232,9 @@ export class RequirementsTraceabilityExtension {
    */
   addRelationship(relationship: ItemRelationship): void {
     this.graph.addRelationship(relationship);
-    console.log(`Relationship added: ${relationship.fromId} ${relationship.type} ${relationship.targetId}`);
+    console.log(
+      `Relationship added: ${relationship.fromId} ${relationship.type} ${relationship.targetId}`,
+    );
   }
 
   /**
@@ -196,7 +246,7 @@ export class RequirementsTraceabilityExtension {
       fromId,
       targetId: toId,
       type,
-      sourceFile: this.currentFile || 'unknown',
+      sourceFile: this.currentFile || "unknown",
     };
     this.addRelationship(relationship);
   }
@@ -294,7 +344,10 @@ export class RequirementsTraceabilityExtension {
   /**
    * Get relationships filtered by source and target roles
    */
-  getRelationshipsByRoles(sourceRole: string, targetRole: string): ItemRelationship[] {
+  getRelationshipsByRoles(
+    sourceRole: string,
+    targetRole: string,
+  ): ItemRelationship[] {
     return this.graph.getRelationshipsByRoles(sourceRole, targetRole);
   }
 
@@ -314,7 +367,9 @@ export class RequirementsTraceabilityExtension {
    */
   getConfigErrors(): string[] {
     if (!this.configLoader) {
-      return ['No configuration loaded. Use createWithConfig() or set a ConfigLoader.'];
+      return [
+        "No configuration loaded. Use createWithConfig() or set a ConfigLoader.",
+      ];
     }
 
     try {
@@ -365,8 +420,18 @@ export class RequirementsTraceabilityExtension {
   /**
    * Check if a relation is allowed between roles
    */
-  isRelationAllowed(sourceRole: string, targetRole: string, relationType: string): boolean {
-    return this.configLoader?.isRelationAllowed(sourceRole, targetRole, relationType) ?? true;
+  isRelationAllowed(
+    sourceRole: string,
+    targetRole: string,
+    relationType: string,
+  ): boolean {
+    return (
+      this.configLoader?.isRelationAllowed(
+        sourceRole,
+        targetRole,
+        relationType,
+      ) ?? true
+    );
   }
 
   /**
@@ -438,14 +503,18 @@ export class RequirementsTraceabilityExtension {
 /**
  * Create a new extension with default configuration
  */
-export function createExtension(_configPath?: string): RequirementsTraceabilityExtension {
+export function createExtension(
+  _configPath?: string,
+): RequirementsTraceabilityExtension {
   return new RequirementsTraceabilityExtension();
 }
 
 /**
  * Create a new extension with a specific preset
  */
-export async function createExtensionWithPreset(presetName: BuiltInPresetName): Promise<RequirementsTraceabilityExtension> {
+export async function createExtensionWithPreset(
+  presetName: BuiltInPresetName,
+): Promise<RequirementsTraceabilityExtension> {
   return RequirementsTraceabilityExtension.createWithPreset(presetName);
 }
 
@@ -453,24 +522,43 @@ export async function createExtensionWithPreset(presetName: BuiltInPresetName): 
 // Re-exports
 // ========================================================================
 
-// Parser types
-export type { ParserWarning, ParserError, ParserOptions, ParserResult } from './DocumentParser.js';
-
-// Graph types
-export type { GraphWarning, ValidationResult } from './TraceabilityGraph.js';
-
 // Config types
-export type { TraceabilityConfig, CompleteConfig, Preset, BuiltInPresetName } from './config/TraceabilityConfig.js';
-export { BUILT_IN_PRESETS } from './config/TraceabilityConfig.js';
-
-// Core types
-export type { Item, ItemRelationship } from './types.js';
+export type {
+  BuiltInPresetName,
+  CompleteConfig,
+  Preset,
+  TraceabilityConfig,
+} from "./config/TraceabilityConfig.js";
+// Config loader
+export {
+  BUILT_IN_PRESETS,
+  ConfigLoader,
+  loadConfig,
+} from "./config/TraceabilityConfig.js";
+// Parser types
+export type {
+  ParserError,
+  ParserOptions,
+  ParserResult,
+  ParserWarning,
+} from "./DocumentParser.js";
+// Matrix Generator
+export {
+  type GeneratedMatrix,
+  type MatrixCell,
+  type MatrixConfig,
+  MatrixGenerator,
+  type MatrixGeneratorOptions,
+  type MatrixRow,
+} from "./MatrixGenerator.js";
 
 // Exporters
-export { Neo4jExporter, type Neo4jExportOptions, type Neo4jExportResult } from './Neo4jExporter.js';
-
-// Matrix Generator
-export { MatrixGenerator, type MatrixGeneratorOptions, type MatrixConfig, type GeneratedMatrix, type MatrixRow, type MatrixCell } from './MatrixGenerator.js';
-
-// Config loader
-export { ConfigLoader, loadConfig } from './config/TraceabilityConfig.js';
+export {
+  Neo4jExporter,
+  type Neo4jExportOptions,
+  type Neo4jExportResult,
+} from "./Neo4jExporter.js";
+// Graph types
+export type { GraphWarning, ValidationResult } from "./TraceabilityGraph.js";
+// Core types
+export type { Item, ItemRelationship } from "./types.js";

@@ -1,6 +1,6 @@
-import mustache from 'mustache';
-import fs from 'fs';
-import path from 'path';
+import fs from "node:fs";
+import mustache from "mustache";
+import path from "node:path";
 
 /**
  * Renders Mustache templates with support for partials.
@@ -27,13 +27,13 @@ export class TemplateRenderer {
    */
   private loadTemplates(): void {
     // Load partials first
-    const partialsDir = path.join(this.templateDir, 'partials');
+    const partialsDir = path.join(this.templateDir, "partials");
     if (fs.existsSync(partialsDir)) {
       const partialFiles = fs.readdirSync(partialsDir);
       for (const file of partialFiles) {
-        if (file.endsWith('.mustache')) {
-          const name = path.basename(file, '.mustache');
-          const content = fs.readFileSync(path.join(partialsDir, file), 'utf8');
+        if (file.endsWith(".mustache")) {
+          const name = path.basename(file, ".mustache");
+          const content = fs.readFileSync(path.join(partialsDir, file), "utf8");
           this.partials.set(name, content);
         }
       }
@@ -48,13 +48,13 @@ export class TemplateRenderer {
         continue;
       }
 
-      if (file.endsWith('.mustache')) {
+      if (file.endsWith(".mustache")) {
         // Remove both .html and .mustache extensions
-        let name = path.basename(file, '.mustache');
-        if (name.endsWith('.html')) {
+        let name = path.basename(file, ".mustache");
+        if (name.endsWith(".html")) {
           name = name.slice(0, -5); // Remove .html
         }
-        const content = fs.readFileSync(filePath, 'utf8');
+        const content = fs.readFileSync(filePath, "utf8");
         this.templates.set(name, content);
       }
     }

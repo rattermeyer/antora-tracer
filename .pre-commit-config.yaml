@@ -7,9 +7,9 @@ repos:
     hooks:
       - id: biome-check
         name: biome check (TypeScript/JavaScript)
-        entry: npx biome check --apply
+        entry: npx biome lint --write --unsafe
         language: node
-        files: \.(ts|tsx|js)$
+        files: ^(src|test|examples|scripts)/.*\.(ts|tsx|js)$
 
       - id: biome-format
         name: biome format (Markdown/JSON/YAML)

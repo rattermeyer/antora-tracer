@@ -4,9 +4,9 @@
  * role-based traceability configuration system.
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
-import { load as yamlLoad } from 'js-yaml';
+import * as fs from "node:fs";
+import { load as yamlLoad } from "js-yaml";
+import * as path from "node:path";
 
 // ============================================================================
 // Configuration Interfaces
@@ -116,20 +116,20 @@ export interface CompleteConfig extends TraceabilityConfig {
  * Built-in preset names
  */
 export const BUILT_IN_PRESETS = [
-  'requirements-engineering',
-  'agile',
-  'medical-iec62304',
-  'minimal',
+  "requirements-engineering",
+  "agile",
+  "medical-iec62304",
+  "minimal",
 ] as const;
 
-export type BuiltInPresetName = typeof BUILT_IN_PRESETS[number];
+export type BuiltInPresetName = (typeof BUILT_IN_PRESETS)[number];
 
 /**
  * Default configuration file names to search for
  */
 export const DEFAULT_CONFIG_FILES = [
-  'traceability.yml',
-  'traceability.yaml',
+  "traceability.yml",
+  "traceability.yaml",
 ] as const;
 
 /**
@@ -155,14 +155,14 @@ export class ConfigLoader {
     if (!resolvedPath) {
       throw new Error(
         `Traceability configuration file not found. ` +
-        `Please provide a path using --config option, or create one of: ${DEFAULT_CONFIG_FILES.join(', ')}`
+          `Please provide a path using --config option, or create one of: ${DEFAULT_CONFIG_FILES.join(", ")}`,
       );
     }
 
     this.configPath = resolvedPath;
 
     // Load and parse the YAML file
-    const fileContent = fs.readFileSync(resolvedPath, 'utf8');
+    const fileContent = fs.readFileSync(resolvedPath, "utf8");
     const rawConfig = yamlLoad(fileContent) as Record<string, unknown>;
 
     // Validate and normalize the configuration
@@ -177,7 +177,7 @@ export class ConfigLoader {
     }
 
     // Validate the final configuration
-    this.validateConfig(this.config, this.configPath || 'configuration');
+    this.validateConfig(this.config, this.configPath || "configuration");
 
     return this.config;
   }
@@ -187,7 +187,7 @@ export class ConfigLoader {
    */
   getConfig(): CompleteConfig {
     if (!this.config) {
-      throw new Error('Configuration not loaded. Call load() first.');
+      throw new Error("Configuration not loaded. Call load() first.");
     }
     return this.config;
   }
@@ -214,12 +214,7 @@ export class ConfigLoader {
    */
   private findConfigFile(): string | undefined {
     // Check current directory and parent directories
-    const searchPaths = [
-      '.',
-      '..',
-      '../..',
-      process.cwd(),
-    ];
+    const searchPaths = [".", "..", "../..", process.cwd()];
 
     for (const searchPath of searchPaths) {
       for (const configFile of DEFAULT_CONFIG_FILES) {
@@ -238,7 +233,7 @@ export class ConfigLoader {
    */
   private normalizeConfig(
     rawConfig: Record<string, unknown>,
-    _configPath: string
+    _configPath: string,
   ): CompleteConfig {
     const config: CompleteConfig = {
       roles: [],
@@ -251,7 +246,7 @@ export class ConfigLoader {
     }
 
     // Normalize roles to lowercase
-    config.roles = config.roles.map(r => r.toString().toLowerCase());
+    config.roles = config.roles.map((r) => r.toString().toLowerCase());
 
     // Initialize relations if not present
     if (!config.relations) {
@@ -264,14 +259,16 @@ export class ConfigLoader {
       const source = sourceRole.toLowerCase();
       normalizedRelations[source] = {};
 
-      if (typeof targets === 'object' && targets !== null) {
-        for (const [targetRole, relationTypes] of Object.entries(targets as Record<string, unknown>)) {
+      if (typeof targets === "object" && targets !== null) {
+        for (const [targetRole, relationTypes] of Object.entries(
+          targets as Record<string, unknown>,
+        )) {
           const target = targetRole.toLowerCase();
           if (Array.isArray(relationTypes)) {
-            normalizedRelations[source][target] = relationTypes.map((r: unknown) =>
-              (r as string).toString().toLowerCase()
+            normalizedRelations[source][target] = relationTypes.map(
+              (r: unknown) => (r as string).toString().toLowerCase(),
             );
-          } else if (typeof relationTypes === 'string') {
+          } else if (typeof relationTypes === "string") {
             normalizedRelations[source][target] = [relationTypes.toLowerCase()];
           }
         }
@@ -290,18 +287,23 @@ export class ConfigLoader {
   /**
    * Validate configuration structure
    */
-  private validateConfig(config: CompleteConfig, context: string = 'configuration'): void {
+  private validateConfig(
+    config: CompleteConfig,
+    context: string = "configuration",
+  ): void {
     const errors: string[] = [];
 
     // Must have at least one role
     if (!config.roles || config.roles.length === 0) {
-      errors.push('Configuration must define at least one role');
+      errors.push("Configuration must define at least one role");
     }
 
     // Validate roles are strings
     for (const role of config.roles) {
-      if (typeof role !== 'string' || role.trim() === '') {
-        errors.push(`Invalid role: must be a non-empty string, got ${typeof role}`);
+      if (typeof role !== "string" || role.trim() === "") {
+        errors.push(
+          `Invalid role: must be a non-empty string, got ${typeof role}`,
+        );
       }
     }
 
@@ -309,10 +311,12 @@ export class ConfigLoader {
     if (config.relations) {
       for (const [sourceRole, targets] of Object.entries(config.relations)) {
         if (!config.roles.includes(sourceRole as string)) {
-          errors.push(`Relation source role '${sourceRole}' is not defined in roles`);
+          errors.push(
+            `Relation source role '${sourceRole}' is not defined in roles`,
+          );
         }
 
-        if (typeof targets !== 'object' || targets === null) {
+        if (typeof targets !== "object" || targets === null) {
           errors.push(`Relations for role '${sourceRole}' must be an object`);
           continue;
         }
@@ -320,13 +324,13 @@ export class ConfigLoader {
         for (const [targetRole, relationTypes] of Object.entries(targets)) {
           if (!config.roles.includes(targetRole)) {
             errors.push(
-              `Relation target role '${targetRole}' is not defined in roles (in relations for '${sourceRole}')`
+              `Relation target role '${targetRole}' is not defined in roles (in relations for '${sourceRole}')`,
             );
           }
 
           if (!Array.isArray(relationTypes)) {
             errors.push(
-              `Relation types for '${sourceRole}' -> '${targetRole}' must be an array`
+              `Relation types for '${sourceRole}' -> '${targetRole}' must be an array`,
             );
           }
         }
@@ -337,14 +341,14 @@ export class ConfigLoader {
     if (config.matrices) {
       for (const matrix of config.matrices) {
         if (!matrix.name) {
-          errors.push('Matrix must have a name');
+          errors.push("Matrix must have a name");
         }
 
         if (!matrix.rows) {
           errors.push(`Matrix '${matrix.name}' must have rows defined`);
         } else if (!config.roles.includes(matrix.rows)) {
           errors.push(
-            `Matrix '${matrix.name}' rows role '${matrix.rows}' is not defined`
+            `Matrix '${matrix.name}' rows role '${matrix.rows}' is not defined`,
           );
         }
 
@@ -355,7 +359,7 @@ export class ConfigLoader {
         for (const column of matrix.columns) {
           if (!config.roles.includes(column)) {
             errors.push(
-              `Matrix '${matrix.name}' column role '${column}' is not defined`
+              `Matrix '${matrix.name}' column role '${column}' is not defined`,
             );
           }
         }
@@ -363,10 +367,8 @@ export class ConfigLoader {
     }
 
     if (errors.length > 0) {
-      const prefix = context ? `Configuration '${context}':` : 'Configuration';
-      throw new Error(
-        `${prefix}\n${errors.map(e => `  - ${e}`).join('\n')}`
-      );
+      const prefix = context ? `Configuration '${context}':` : "Configuration";
+      throw new Error(`${prefix}\n${errors.map((e) => `  - ${e}`).join("\n")}`);
     }
   }
 
@@ -383,11 +385,11 @@ export class ConfigLoader {
     const presetPath = this.getPresetPath(presetName);
     if (!presetPath) {
       throw new Error(
-        `Preset '${presetName}' not found. Available presets: ${BUILT_IN_PRESETS.join(', ')}`
+        `Preset '${presetName}' not found. Available presets: ${BUILT_IN_PRESETS.join(", ")}`,
       );
     }
 
-    const presetContent = fs.readFileSync(presetPath, 'utf8');
+    const presetContent = fs.readFileSync(presetPath, "utf8");
     const preset = yamlLoad(presetContent) as Preset;
 
     // Validate preset
@@ -405,8 +407,8 @@ export class ConfigLoader {
     // First, check for built-in presets
     const builtInPath = path.resolve(
       path.dirname(fileURLToPath(import.meta.url)),
-      '../presets',
-      `${presetName}.yml`
+      "../presets",
+      `${presetName}.yml`,
     );
 
     if (fs.existsSync(builtInPath)) {
@@ -415,8 +417,8 @@ export class ConfigLoader {
 
     // Check in common locations
     const searchPaths = [
-      path.resolve(process.cwd(), 'presets', `${presetName}.yml`),
-      path.resolve(process.cwd(), 'presets', `${presetName}.yaml`),
+      path.resolve(process.cwd(), "presets", `${presetName}.yml`),
+      path.resolve(process.cwd(), "presets", `${presetName}.yaml`),
       path.resolve(process.cwd(), `${presetName}.yml`),
       path.resolve(process.cwd(), `${presetName}.yaml`),
     ];
@@ -434,26 +436,31 @@ export class ConfigLoader {
    * Validate preset structure
    */
   private validatePreset(preset: unknown): asserts preset is Preset {
-    if (!preset || typeof preset !== 'object') {
-      throw new Error('Invalid preset: must be an object');
+    if (!preset || typeof preset !== "object") {
+      throw new Error("Invalid preset: must be an object");
     }
 
     const p = preset as Record<string, unknown>;
 
-    if (!p.name || typeof p.name !== 'string') {
-      throw new Error('Preset must have a name');
+    if (!p.name || typeof p.name !== "string") {
+      throw new Error("Preset must have a name");
     }
 
-    if (!p.traceability || typeof p.traceability !== 'object') {
-      throw new Error('Preset must have a traceability configuration');
+    if (!p.traceability || typeof p.traceability !== "object") {
+      throw new Error("Preset must have a traceability configuration");
     }
 
     // Validate the traceability config within the preset
     try {
-      this.validateConfig(p.traceability as CompleteConfig, `preset '${p.name}'`);
+      this.validateConfig(
+        p.traceability as CompleteConfig,
+        `preset '${p.name}'`,
+      );
     } catch (error: unknown) {
       const err = error as Error;
-      throw new Error(`Invalid preset '${p.name}' configuration: ${err.message}`);
+      throw new Error(
+        `Invalid preset '${p.name}' configuration: ${err.message}`,
+      );
     }
   }
 
@@ -462,7 +469,7 @@ export class ConfigLoader {
    */
   private mergeConfig(
     base: TraceabilityConfig,
-    override: CompleteConfig
+    override: CompleteConfig,
   ): CompleteConfig {
     const result: CompleteConfig = {
       ...base,
@@ -485,12 +492,15 @@ export class ConfigLoader {
         if (!result.relations[sourceRole]) {
           result.relations[sourceRole] = {};
         }
-        if (targets && typeof targets === 'object') {
+        if (targets && typeof targets === "object") {
           const targetsObj = targets as Record<string, unknown>;
-          for (const [targetRole, relationTypes] of Object.entries(targetsObj)) {
+          for (const [targetRole, relationTypes] of Object.entries(
+            targetsObj,
+          )) {
             if (Array.isArray(relationTypes)) {
-              result.relations[sourceRole][targetRole] = relationTypes as string[];
-            } else if (typeof relationTypes === 'string') {
+              result.relations[sourceRole][targetRole] =
+                relationTypes as string[];
+            } else if (typeof relationTypes === "string") {
               result.relations[sourceRole][targetRole] = [relationTypes];
             }
           }
@@ -522,15 +532,16 @@ export class ConfigLoader {
    * List all available presets
    */
   listPresets(): { name: string; description: string; version: string }[] {
-    const presets: { name: string; description: string; version: string }[] = [];
+    const presets: { name: string; description: string; version: string }[] =
+      [];
 
     for (const presetName of BUILT_IN_PRESETS) {
       try {
         const preset = this.loadPreset(presetName);
         presets.push({
           name: preset.name,
-          description: preset.description || '',
-          version: preset.version || '1.0.0',
+          description: preset.description || "",
+          version: preset.version || "1.0.0",
         });
       } catch {
         // Skip presets that can't be loaded
@@ -554,7 +565,7 @@ export class ConfigLoader {
   isRelationAllowed(
     sourceRole: string,
     targetRole: string,
-    relationType: string
+    relationType: string,
   ): boolean {
     const config = this.getConfig();
     const source = sourceRole.toLowerCase();
@@ -608,7 +619,7 @@ export class ConfigLoader {
    */
   getMatrix(name: string): MatrixDefinition | undefined {
     const matrices = this.getMatrices();
-    return matrices.find(m => m.name === name);
+    return matrices.find((m) => m.name === name);
   }
 }
 
@@ -616,7 +627,7 @@ export class ConfigLoader {
 // Helper function for ES modules
 // ============================================================================
 
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from "node:url";
 
 // Export the config loader factory
 export function createConfigLoader(configPath?: string): ConfigLoader {

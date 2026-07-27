@@ -8,22 +8,27 @@
  * - Template-based HTML output
  */
 
-import type { TraceabilityGraph } from './TraceabilityGraph.js';
-import type { ConfigLoader } from './config/TraceabilityConfig.js';
-import type { Item, ItemRelationship } from './types.js';
-import type { LinkResolver } from './LinkResolver.js';
-import { TemplateRenderer } from './TemplateRenderer.js';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import type { ConfigLoader } from "./config/TraceabilityConfig.js";
+import type { LinkResolver } from "./LinkResolver.js";
+import { TemplateRenderer } from "./TemplateRenderer.js";
+import type { TraceabilityGraph } from "./TraceabilityGraph.js";
+import type { Item, ItemRelationship } from "./types.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DEFAULT_TEMPLATE_DIR = path.join(__dirname, 'templates');
+const DEFAULT_TEMPLATE_DIR = path.join(__dirname, "templates");
 
 /**
  * Matrix cell data
  */
 export interface MatrixCell {
-  items: { itemId: string; itemTitle: string; role: string; sourceFile?: string }[];
+  items: {
+    itemId: string;
+    itemTitle: string;
+    role: string;
+    sourceFile?: string;
+  }[];
   role: string;
 }
 
@@ -36,7 +41,7 @@ export interface MatrixRow {
   rowRole: string;
   cells: MatrixCell[];
   coverage: number; // 0-100 percentage
-  status: 'complete' | 'partial' | 'missing';
+  status: "complete" | "partial" | "missing";
 }
 
 /**
@@ -82,7 +87,7 @@ export class MatrixGenerator {
   constructor(
     graph: TraceabilityGraph,
     configLoader?: ConfigLoader,
-    options: MatrixGeneratorOptions = {}
+    options: MatrixGeneratorOptions = {},
   ) {
     this.graph = graph;
     this.configLoader = configLoader;
@@ -111,7 +116,7 @@ export class MatrixGenerator {
       return this.generateMatrixFromConfig(matrices[0]);
     }
 
-    const matrixConfig = matrices.find(m => m.name === matrixName);
+    const matrixConfig = matrices.find((m) => m.name === matrixName);
     if (!matrixConfig) {
       throw new Error(`Matrix '${matrixName}' not found in configuration`);
     }
@@ -134,7 +139,7 @@ export class MatrixGenerator {
         name: config.name,
         type: `${rowRole}-matrix`,
         rows: [],
-        columns: columnRoles.map(role => ({ name: role, role })),
+        columns: columnRoles.map((role) => ({ name: role, role })),
         coverage: {},
         generatedAt: new Date().toISOString(),
       };
@@ -144,7 +149,7 @@ export class MatrixGenerator {
     const roleItemIds = new Map<string, Set<string>>();
     for (const role of [rowRole, ...columnRoles]) {
       const items = this.graph.getItemsByRole(role);
-      roleItemIds.set(role, new Set(items.map(i => i.id)));
+      roleItemIds.set(role, new Set(items.map((i) => i.id)));
     }
 
     // Pre-compute: item ID -> item for fast lookup
@@ -156,7 +161,10 @@ export class MatrixGenerator {
     // Pre-compute coverage relations per column
     const coverageRelsByColumn = new Map<string, string[]>();
     for (const colRole of columnRoles) {
-      coverageRelsByColumn.set(colRole, config.coverageRelations?.[colRole] || []);
+      coverageRelsByColumn.set(
+        colRole,
+        config.coverageRelations?.[colRole] || [],
+      );
     }
 
     const rows: MatrixRow[] = [];
@@ -179,9 +187,9 @@ export class MatrixGenerator {
           colItemIds,
           coverageRels,
           hasCoverageFilter,
-          itemById
+          itemById,
         );
-        const cellItems = relatedItems.map(rel => ({
+        const cellItems = relatedItems.map((rel) => ({
           itemId: rel.id,
           itemTitle: rel.title,
           role: rel.role,
@@ -199,9 +207,8 @@ export class MatrixGenerator {
       }
 
       const coverage = (coveredCount / totalColumns) * 100;
-      const status: 'complete' | 'partial' | 'missing' =
-        coverage === 100 ? 'complete' :
-        coverage > 0 ? 'partial' : 'missing';
+      const status: "complete" | "partial" | "missing" =
+        coverage === 100 ? "complete" : coverage > 0 ? "partial" : "missing";
 
       rows.push({
         rowId: rowItem.id,
@@ -214,19 +221,19 @@ export class MatrixGenerator {
     }
 
     // Calculate overall coverage
-    const coveredRows = rows.filter(r => r.status === 'complete').length;
+    const coveredRows = rows.filter((r) => r.status === "complete").length;
     const overallCoverage = (coveredRows / rows.length) * 100;
 
     return {
       name: config.name,
-      type: `${rowRole}-${columnRoles.join('-')}`,
+      type: `${rowRole}-${columnRoles.join("-")}`,
       rows,
-      columns: columnRoles.map(role => ({ name: role, role })),
+      columns: columnRoles.map((role) => ({ name: role, role })),
       coverage: {
         overall: overallCoverage,
         complete: coveredRows,
-        partial: rows.filter(r => r.status === 'partial').length,
-        missing: rows.filter(r => r.status === 'missing').length,
+        partial: rows.filter((r) => r.status === "partial").length,
+        missing: rows.filter((r) => r.status === "missing").length,
         total: rows.length,
       },
       generatedAt: new Date().toISOString(),
@@ -242,7 +249,7 @@ export class MatrixGenerator {
     colItemIds: Set<string>,
     coverageRels: string[],
     hasCoverageFilter: boolean,
-    itemById: Map<string, Item>
+    itemById: Map<string, Item>,
   ): Item[] {
     const result: Item[] = [];
     const seen = new Set<string>();
@@ -287,12 +294,12 @@ export class MatrixGenerator {
     // Try to find items with common roles
     const allRoles = this.graph.getAllRoles();
 
-    let rowRole = 'requirement';
-    let columnRoles = ['implementation', 'test', 'design'];
+    let rowRole = "requirement";
+    let columnRoles = ["implementation", "test", "design"];
 
     // If we have the role in our graph, use it
     if (!this.graph.hasRole(rowRole)) {
-      rowRole = allRoles[0] || 'item';
+      rowRole = allRoles[0] || "item";
       columnRoles = allRoles.slice(1, 4);
     }
 
@@ -314,9 +321,14 @@ export class MatrixGenerator {
 
       for (const colRole of columnRoles) {
         const colItems = columnItems.get(colRole) || [];
-        const colItemIds = new Set(colItems.map(i => i.id));
+        const colItemIds = new Set(colItems.map((i) => i.id));
 
-        const relatedItems: { itemId: string; itemTitle: string; role: string; sourceFile?: string }[] = [];
+        const relatedItems: {
+          itemId: string;
+          itemTitle: string;
+          role: string;
+          sourceFile?: string;
+        }[] = [];
         const seenIds = new Set<string>();
 
         // Forward: row item → column item
@@ -362,9 +374,8 @@ export class MatrixGenerator {
       }
 
       const coverage = (coveredCount / totalColumns) * 100;
-      const status: 'complete' | 'partial' | 'missing' =
-        coverage === 100 ? 'complete' :
-        coverage > 0 ? 'partial' : 'missing';
+      const status: "complete" | "partial" | "missing" =
+        coverage === 100 ? "complete" : coverage > 0 ? "partial" : "missing";
 
       rows.push({
         rowId: rowItem.id,
@@ -376,19 +387,19 @@ export class MatrixGenerator {
       });
     }
 
-    const coveredRows = rows.filter(r => r.status === 'complete').length;
+    const coveredRows = rows.filter((r) => r.status === "complete").length;
     const overallCoverage = (coveredRows / rows.length) * 100 || 0;
 
     return {
       name: matrixName || `${rowRole}-matrix`,
-      type: `${rowRole}-${columnRoles.join('-')}`,
+      type: `${rowRole}-${columnRoles.join("-")}`,
       rows,
-      columns: columnRoles.map(role => ({ name: role, role })),
+      columns: columnRoles.map((role) => ({ name: role, role })),
       coverage: {
         overall: overallCoverage,
         complete: coveredRows,
-        partial: rows.filter(r => r.status === 'partial').length,
-        missing: rows.filter(r => r.status === 'missing').length,
+        partial: rows.filter((r) => r.status === "partial").length,
+        missing: rows.filter((r) => r.status === "missing").length,
         total: rows.length,
       },
       generatedAt: new Date().toISOString(),
@@ -405,9 +416,10 @@ export class MatrixGenerator {
   generateRequirementsMatrix(): GeneratedMatrix {
     if (this.configLoader) {
       const matrices = this.configLoader.getMatrices();
-      const reqMatrix = matrices.find(m =>
-        m.rows === 'requirement' ||
-        m.name.toLowerCase().includes('requirement')
+      const reqMatrix = matrices.find(
+        (m) =>
+          m.rows === "requirement" ||
+          m.name.toLowerCase().includes("requirement"),
       );
 
       if (reqMatrix) {
@@ -416,7 +428,7 @@ export class MatrixGenerator {
     }
 
     // Fallback to default
-    return this.generateDefaultMatrix('requirements-traceability');
+    return this.generateDefaultMatrix("requirements-traceability");
   }
 
   /**
@@ -425,9 +437,8 @@ export class MatrixGenerator {
   generateDesignMatrix(): GeneratedMatrix {
     if (this.configLoader) {
       const matrices = this.configLoader.getMatrices();
-      const designMatrix = matrices.find(m =>
-        m.rows === 'design' ||
-        m.name.toLowerCase().includes('design')
+      const designMatrix = matrices.find(
+        (m) => m.rows === "design" || m.name.toLowerCase().includes("design"),
       );
 
       if (designMatrix) {
@@ -435,7 +446,7 @@ export class MatrixGenerator {
       }
     }
 
-    return this.generateDefaultMatrix('design-traceability');
+    return this.generateDefaultMatrix("design-traceability");
   }
 
   /**
@@ -447,7 +458,7 @@ export class MatrixGenerator {
     }
 
     const matrices = this.configLoader.getMatrices();
-    return matrices.map(config => this.generateMatrixFromConfig(config));
+    return matrices.map((config) => this.generateMatrixFromConfig(config));
   }
 
   // ========================================================================
@@ -461,41 +472,44 @@ export class MatrixGenerator {
     const lines: string[] = [];
 
     // Header
-    const header = ['Row ID', 'Row Title', ...matrix.columns.map(c => c.name)];
-    lines.push(header.join(','));
+    const header = [
+      "Row ID",
+      "Row Title",
+      ...matrix.columns.map((c) => c.name),
+    ];
+    lines.push(header.join(","));
 
     // Data rows
     for (const row of matrix.rows) {
-      const rowValues: string[] = [
-        row.rowId,
-        this.escapeCSV(row.rowTitle),
-      ];
+      const rowValues: string[] = [row.rowId, this.escapeCSV(row.rowTitle)];
 
       // Add cell values
-      const cellValues = row.cells.map(cell => {
-        if (cell.items.length === 0) return '';
-        return cell.items.map(item => `${item.itemId}: ${item.itemTitle}`).join('; ');
+      const cellValues = row.cells.map((cell) => {
+        if (cell.items.length === 0) return "";
+        return cell.items
+          .map((item) => `${item.itemId}: ${item.itemTitle}`)
+          .join("; ");
       });
       for (const val of cellValues) {
         rowValues.push(val);
       }
 
-      lines.push(rowValues.map(v => this.escapeCSV(v)).join(','));
+      lines.push(rowValues.map((v) => this.escapeCSV(v)).join(","));
     }
 
     // Summary
-    lines.push('');
+    lines.push("");
     lines.push(`Total ${matrix.rows.length} rows`);
     lines.push(`Coverage: ${matrix.coverage.overall.toFixed(1)}%`);
 
-    return lines.join('\n');
+    return lines.join("\n");
   }
 
   /**
    * Export a matrix to HTML format
    */
   exportToHTML(matrix: GeneratedMatrix): string {
-    const rows = matrix.rows.map(row => this.prepareRowForTemplate(row));
+    const rows = matrix.rows.map((row) => this.prepareRowForTemplate(row));
 
     const templateData = {
       name: matrix.name,
@@ -509,7 +523,7 @@ export class MatrixGenerator {
       generatedAt: matrix.generatedAt,
     };
 
-    return this.templateRenderer.render('matrix', templateData);
+    return this.templateRenderer.render("matrix", templateData);
   }
 
   /**
@@ -520,9 +534,9 @@ export class MatrixGenerator {
       rowId: this.escapeHtml(row.rowId),
       rowTitle: this.escapeHtml(row.rowTitle),
       rowRole: this.escapeHtml(row.rowRole),
-      cells: row.cells.map(cell => ({
+      cells: row.cells.map((cell) => ({
         hasItems: cell.items.length > 0,
-        items: cell.items.map(item => {
+        items: cell.items.map((item) => {
           const base: any = {
             itemId: this.escapeHtml(item.itemId),
             itemTitle: this.escapeHtml(item.itemTitle),
@@ -559,22 +573,22 @@ export class MatrixGenerator {
    * Escape HTML special characters
    */
   private escapeHtml(text: string): string {
-    if (!text) return '';
+    if (!text) return "";
     return text
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
   }
 
   /**
    * Escape CSV special characters
    */
   private escapeCSV(text: string): string {
-    if (!text) return '';
+    if (!text) return "";
 
-    if (text.includes(',') || text.includes('"') || text.includes('\n')) {
+    if (text.includes(",") || text.includes('"') || text.includes("\n")) {
       const escaped = text.replace(/"/g, '""');
       return `"${escaped}"`;
     }
@@ -589,7 +603,11 @@ export class MatrixGenerator {
   /**
    * Get coverage statistics for a specific role
    */
-  getRoleCoverage(role: string): { total: number; covered: number; coverage: number } {
+  getRoleCoverage(role: string): {
+    total: number;
+    covered: number;
+    coverage: number;
+  } {
     const items = this.graph.getItemsByRole(role);
     const total = items.length;
 
@@ -645,14 +663,14 @@ export class MatrixGenerator {
 
     return {
       ...matrix,
-      items: this.graph.getAllItems().map(item => ({
+      items: this.graph.getAllItems().map((item) => ({
         id: item.id,
         title: item.title,
         role: item.role,
         status: item.status,
         sourceFile: item.sourceFile,
         sourceLine: item.sourceLine,
-        relationships: this.graph.getRelationships(item.id).map(rel => ({
+        relationships: this.graph.getRelationships(item.id).map((rel) => ({
           type: rel.type,
           targetId: rel.targetId,
           target: this.graph.getItem(rel.targetId),
@@ -668,7 +686,10 @@ export class MatrixGenerator {
   /**
    * Get all relationships between two roles
    */
-  getRelationshipsBetweenRoles(sourceRole: string, targetRole: string): ItemRelationship[] {
+  getRelationshipsBetweenRoles(
+    sourceRole: string,
+    targetRole: string,
+  ): ItemRelationship[] {
     return this.graph.getRelationshipsByRoles(sourceRole, targetRole);
   }
 

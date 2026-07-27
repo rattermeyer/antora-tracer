@@ -103,50 +103,50 @@ export type AnyNode = Requirement | Implementation | Test | Document | Design;
  * Legacy relationship types
  */
 export type RelationshipType =
-  | 'implements'
-  | 'satisfies'
-  | 'tests'
-  | 'verifies'
-  | 'documents'
-  | 'depends'
-  | 'requires'
-  | 'addresses'
-  | 'composed-of'
-  | 'depends-on'
-  | 'implemented-by'
-  | 'satisfied-by'
-  | 'tested-by'
-  | 'verified-by'
-  | 'documented-by'
-  | 'depended-by'
-  | 'required-by'
-  | 'addressed-by'
-  | 'part-of'
-  | 'depends-on-by';
+  | "implements"
+  | "satisfies"
+  | "tests"
+  | "verifies"
+  | "documents"
+  | "depends"
+  | "requires"
+  | "addresses"
+  | "composed-of"
+  | "depends-on"
+  | "implemented-by"
+  | "satisfied-by"
+  | "tested-by"
+  | "verified-by"
+  | "documented-by"
+  | "depended-by"
+  | "required-by"
+  | "addressed-by"
+  | "part-of"
+  | "depends-on-by";
 
 export type PrimaryRelationshipType =
-  | 'implements'
-  | 'satisfies'
-  | 'tests'
-  | 'verifies'
-  | 'documents'
-  | 'depends'
-  | 'requires'
-  | 'addresses'
-  | 'composed-of'
-  | 'depends-on';
+  | "implements"
+  | "satisfies"
+  | "tests"
+  | "verifies"
+  | "documents"
+  | "depends"
+  | "requires"
+  | "addresses"
+  | "composed-of"
+  | "depends-on";
 
 export type InverseRelationshipType =
-  | 'implemented-by'
-  | 'satisfied-by'
-  | 'tested-by'
-  | 'verified-by'
-  | 'documented-by'
-  | 'depended-by'
-  | 'required-by'
-  | 'addressed-by'
-  | 'part-of'
-  | 'depends-on-by';
+  | "implemented-by"
+  | "satisfied-by"
+  | "tested-by"
+  | "verified-by"
+  | "documented-by"
+  | "depended-by"
+  | "required-by"
+  | "addressed-by"
+  | "part-of"
+  | "depends-on-by";
 
 /**
  * Legacy relationship interface
@@ -165,30 +165,36 @@ export interface Relationship {
 /**
  * Mapping constants for bidirectional relationships (legacy)
  */
-export const INVERSE_MAP: Record<PrimaryRelationshipType, InverseRelationshipType> = {
-  'implements': 'implemented-by',
-  'satisfies': 'satisfied-by',
-  'tests': 'tested-by',
-  'verifies': 'verified-by',
-  'documents': 'documented-by',
-  'depends': 'depended-by',
-  'requires': 'required-by',
-  'addresses': 'addressed-by',
-  'composed-of': 'part-of',
-  'depends-on': 'depends-on-by',
+export const INVERSE_MAP: Record<
+  PrimaryRelationshipType,
+  InverseRelationshipType
+> = {
+  implements: "implemented-by",
+  satisfies: "satisfied-by",
+  tests: "tested-by",
+  verifies: "verified-by",
+  documents: "documented-by",
+  depends: "depended-by",
+  requires: "required-by",
+  addresses: "addressed-by",
+  "composed-of": "part-of",
+  "depends-on": "depends-on-by",
 };
 
-export const PRIMARY_MAP: Record<InverseRelationshipType, PrimaryRelationshipType> = {
-  'implemented-by': 'implements',
-  'satisfied-by': 'satisfies',
-  'tested-by': 'tests',
-  'verified-by': 'verifies',
-  'documented-by': 'documents',
-  'depended-by': 'depends',
-  'required-by': 'requires',
-  'addressed-by': 'addresses',
-  'part-of': 'composed-of',
-  'depends-on-by': 'depends-on',
+export const PRIMARY_MAP: Record<
+  InverseRelationshipType,
+  PrimaryRelationshipType
+> = {
+  "implemented-by": "implements",
+  "satisfied-by": "satisfies",
+  "tested-by": "tests",
+  "verified-by": "verifies",
+  "documented-by": "documents",
+  "depended-by": "depends",
+  "required-by": "requires",
+  "addressed-by": "addresses",
+  "part-of": "composed-of",
+  "depends-on-by": "depends-on",
 } as const;
 
 // ============================================================================
@@ -307,14 +313,18 @@ export interface DetailedTraceabilityMatrix {
 /**
  * Check if a relationship type is primary
  */
-export function isPrimaryRelationshipType(type: string): type is PrimaryRelationshipType {
+export function isPrimaryRelationshipType(
+  type: string,
+): type is PrimaryRelationshipType {
   return type in INVERSE_MAP;
 }
 
 /**
  * Check if a relationship type is inverse
  */
-export function isInverseRelationshipType(type: string): type is InverseRelationshipType {
+export function isInverseRelationshipType(
+  type: string,
+): type is InverseRelationshipType {
   return type in PRIMARY_MAP;
 }
 
@@ -322,35 +332,40 @@ export function isInverseRelationshipType(type: string): type is InverseRelation
  * Check if a node is a Requirement
  */
 export function isRequirement(node: AnyNode): node is Requirement {
-  return 'satisfiedBy' in node;
+  return "satisfiedBy" in node;
 }
 
 /**
  * Check if a node is an Implementation
  */
 export function isImplementation(node: AnyNode): node is Implementation {
-  return 'satisfies' in node && 'testedBy' in node;
+  return "satisfies" in node && "testedBy" in node;
 }
 
 /**
  * Check if a node is a Test
  */
 export function isTest(node: AnyNode): node is Test {
-  return 'verifies' in node || 'tests' in node;
+  return "verifies" in node || "tests" in node;
 }
 
 /**
  * Check if a node is a Document
  */
 export function isDocument(node: AnyNode): node is Document {
-  return 'documentedBy' in node || 'documents' in node;
+  return "documentedBy" in node || "documents" in node;
 }
 
 /**
  * Check if a node is a Design
  */
 export function isDesign(node: AnyNode): node is Design {
-  return !('satisfiedBy' in node) && !('satisfies' in node) && !('verifies' in node) && !('tests' in node);
+  return (
+    !("satisfiedBy" in node) &&
+    !("satisfies" in node) &&
+    !("verifies" in node) &&
+    !("tests" in node)
+  );
 }
 
 // ============================================================================
@@ -393,5 +408,3 @@ export interface MatrixGeneratorOptions {
   templateDir?: string;
   config?: TraceabilityConfigRef;
 }
-
-

@@ -2,87 +2,87 @@
  * Tests for ConfigLoader - Configuration loading and validation
  */
 
-import { expect } from 'chai';
-import { ConfigLoader, loadConfig } from '../src/config/TraceabilityConfig.js';
-import * as fs from 'fs';
-import * as path from 'path';
-import { fileURLToPath } from 'url';
+import { expect } from "chai";
+import * as fs from "node:fs";
+import * as path from "node:path";
+import { fileURLToPath } from "node:url";
+import { ConfigLoader, loadConfig } from "../src/config/TraceabilityConfig.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-describe('ConfigLoader', () => {
+describe("ConfigLoader", () => {
   let configLoader: ConfigLoader;
 
   beforeEach(() => {
     configLoader = new ConfigLoader();
   });
 
-  describe('Initialization', () => {
-    it('should create a new ConfigLoader instance', () => {
+  describe("Initialization", () => {
+    it("should create a new ConfigLoader instance", () => {
       expect(configLoader).to.exist;
     });
   });
 
-  describe('Built-in Presets', () => {
-    it('should list available presets', () => {
+  describe("Built-in Presets", () => {
+    it("should list available presets", () => {
       const presets = configLoader.listPresets();
-      expect(presets).to.be.an('array');
+      expect(presets).to.be.an("array");
       expect(presets.length).to.be.at.least(1);
 
       // Check that known presets are included
-      const presetNames = presets.map(p => p.name);
-      expect(presetNames).to.include('requirements-engineering');
-      expect(presetNames).to.include('agile');
-      expect(presetNames).to.include('medical-iec62304');
-      expect(presetNames).to.include('minimal');
+      const presetNames = presets.map((p) => p.name);
+      expect(presetNames).to.include("requirements-engineering");
+      expect(presetNames).to.include("agile");
+      expect(presetNames).to.include("medical-iec62304");
+      expect(presetNames).to.include("minimal");
     });
 
-    it('should load a specific preset by name', () => {
-      const preset = configLoader.loadPreset('requirements-engineering');
+    it("should load a specific preset by name", () => {
+      const preset = configLoader.loadPreset("requirements-engineering");
       expect(preset).to.exist;
-      expect(preset.name).to.equal('requirements-engineering');
+      expect(preset.name).to.equal("requirements-engineering");
       expect(preset.traceability).to.exist;
-      expect(preset.traceability.roles).to.be.an('array');
+      expect(preset.traceability.roles).to.be.an("array");
       expect(preset.traceability.roles.length).to.be.at.least(1);
     });
 
-    it('should load preset with correct structure', () => {
-      const preset = configLoader.loadPreset('requirements-engineering');
+    it("should load preset with correct structure", () => {
+      const preset = configLoader.loadPreset("requirements-engineering");
 
       // Check preset metadata
-      expect(preset).to.have.property('name');
-      expect(preset).to.have.property('description');
-      expect(preset).to.have.property('version');
+      expect(preset).to.have.property("name");
+      expect(preset).to.have.property("description");
+      expect(preset).to.have.property("version");
 
       // Check traceability config
-      expect(preset.traceability).to.have.property('roles');
-      expect(preset.traceability).to.have.property('relations');
-      expect(preset.traceability).to.have.property('matrices');
+      expect(preset.traceability).to.have.property("roles");
+      expect(preset.traceability).to.have.property("relations");
+      expect(preset.traceability).to.have.property("matrices");
 
       // Check roles
-      expect(preset.traceability.roles).to.be.an('array');
-      expect(preset.traceability.roles).to.include('requirement');
+      expect(preset.traceability.roles).to.be.an("array");
+      expect(preset.traceability.roles).to.include("requirement");
 
       // Check relations
-      expect(preset.traceability.relations).to.be.an('object');
+      expect(preset.traceability.relations).to.be.an("object");
     });
 
-    it('should get preset details via loadPreset', () => {
-      const preset = configLoader.loadPreset('requirements-engineering');
+    it("should get preset details via loadPreset", () => {
+      const preset = configLoader.loadPreset("requirements-engineering");
       expect(preset).to.exist;
-      expect(preset.name).to.equal('requirements-engineering');
+      expect(preset.name).to.equal("requirements-engineering");
     });
   });
 
-  describe('Configuration Loading', () => {
-    it('should load configuration from a file', () => {
+  describe("Configuration Loading", () => {
+    it("should load configuration from a file", () => {
       // Create a temporary config file
-      const tempDir = path.join(__dirname, 'temp');
+      const tempDir = path.join(__dirname, "temp");
       if (!fs.existsSync(tempDir)) {
         fs.mkdirSync(tempDir, { recursive: true });
       }
 
-      const configPath = path.join(tempDir, 'test-config.yml');
+      const configPath = path.join(tempDir, "test-config.yml");
       const configContent = `
 roles:
   - requirement
@@ -111,13 +111,13 @@ matrices:
         const config = configLoader.getConfig();
 
         expect(config).to.exist;
-        expect(config.roles).to.be.an('array');
-        expect(config.roles).to.include('requirement');
-        expect(config.roles).to.include('implementation');
-        expect(config.roles).to.include('test');
+        expect(config.roles).to.be.an("array");
+        expect(config.roles).to.include("requirement");
+        expect(config.roles).to.include("implementation");
+        expect(config.roles).to.include("test");
 
         expect(config.relations).to.exist;
-        expect(config.matrices).to.be.an('array');
+        expect(config.matrices).to.be.an("array");
       } finally {
         // Cleanup
         fs.unlinkSync(configPath);
@@ -125,20 +125,20 @@ matrices:
       }
     });
 
-    it('should handle missing configuration file gracefully', () => {
+    it("should handle missing configuration file gracefully", () => {
       expect(() => {
-        configLoader.load('/nonexistent/path/to/config.yml');
+        configLoader.load("/nonexistent/path/to/config.yml");
       }).to.throw;
     });
 
-    it('should handle invalid YAML gracefully', () => {
-      const tempDir = path.join(__dirname, 'temp');
+    it("should handle invalid YAML gracefully", () => {
+      const tempDir = path.join(__dirname, "temp");
       if (!fs.existsSync(tempDir)) {
         fs.mkdirSync(tempDir, { recursive: true });
       }
 
-      const configPath = path.join(tempDir, 'invalid-config.yml');
-      const configContent = 'this is not valid yaml: [unclosed bracket';
+      const configPath = path.join(tempDir, "invalid-config.yml");
+      const configContent = "this is not valid yaml: [unclosed bracket";
 
       fs.writeFileSync(configPath, configContent);
 
@@ -154,14 +154,14 @@ matrices:
     });
   });
 
-  describe('Configuration Validation', () => {
-    it('should validate roles configuration', () => {
-      const tempDir = path.join(__dirname, 'temp');
+  describe("Configuration Validation", () => {
+    it("should validate roles configuration", () => {
+      const tempDir = path.join(__dirname, "temp");
       if (!fs.existsSync(tempDir)) {
         fs.mkdirSync(tempDir, { recursive: true });
       }
 
-      const configPath = path.join(tempDir, 'valid-config.yml');
+      const configPath = path.join(tempDir, "valid-config.yml");
       const configContent = `
 roles:
   - requirement
@@ -182,20 +182,20 @@ matrices:
       try {
         configLoader.load(configPath);
         const config = configLoader.getConfig();
-        expect(config.roles).to.be.an('array');
+        expect(config.roles).to.be.an("array");
       } finally {
         fs.unlinkSync(configPath);
         fs.rmSync(tempDir, { recursive: true, force: true });
       }
     });
 
-    it('should validate relations configuration', () => {
-      const tempDir = path.join(__dirname, 'temp');
+    it("should validate relations configuration", () => {
+      const tempDir = path.join(__dirname, "temp");
       if (!fs.existsSync(tempDir)) {
         fs.mkdirSync(tempDir, { recursive: true });
       }
 
-      const configPath = path.join(tempDir, 'relations-config.yml');
+      const configPath = path.join(tempDir, "relations-config.yml");
       const configContent = `
 roles:
   - requirement
@@ -224,13 +224,13 @@ relations:
       }
     });
 
-    it('should validate matrices configuration', () => {
-      const tempDir = path.join(__dirname, 'temp');
+    it("should validate matrices configuration", () => {
+      const tempDir = path.join(__dirname, "temp");
       if (!fs.existsSync(tempDir)) {
         fs.mkdirSync(tempDir, { recursive: true });
       }
 
-      const configPath = path.join(tempDir, 'matrices-config.yml');
+      const configPath = path.join(tempDir, "matrices-config.yml");
       const configContent = `
 roles:
   - requirement
@@ -269,7 +269,7 @@ matrices:
       try {
         configLoader.load(configPath);
         const config = configLoader.getConfig();
-        expect(config.matrices).to.be.an('array');
+        expect(config.matrices).to.be.an("array");
         expect(config.matrices?.length).to.be.at.least(1);
       } finally {
         fs.unlinkSync(configPath);
@@ -278,14 +278,14 @@ matrices:
     });
   });
 
-  describe('Role Validation', () => {
-    it('should check if a role is known after loading config', () => {
-      const tempDir = path.join(__dirname, 'temp');
+  describe("Role Validation", () => {
+    it("should check if a role is known after loading config", () => {
+      const tempDir = path.join(__dirname, "temp");
       if (!fs.existsSync(tempDir)) {
         fs.mkdirSync(tempDir, { recursive: true });
       }
 
-      const configPath = path.join(tempDir, 'roles-config.yml');
+      const configPath = path.join(tempDir, "roles-config.yml");
       const configContent = `
 roles:
   - requirement
@@ -303,10 +303,10 @@ relations:
 
       try {
         configLoader.load(configPath);
-        const isKnown = configLoader.isKnownRole('requirement');
+        const isKnown = configLoader.isKnownRole("requirement");
         expect(isKnown).to.be.true;
 
-        const isUnknown = configLoader.isKnownRole('nonexistent');
+        const isUnknown = configLoader.isKnownRole("nonexistent");
         expect(isUnknown).to.be.false;
       } finally {
         fs.rmSync(configPath, { force: true });
@@ -314,13 +314,13 @@ relations:
       }
     });
 
-    it('should check if relation is allowed between roles after loading config', () => {
-      const tempDir = path.join(__dirname, 'temp');
+    it("should check if relation is allowed between roles after loading config", () => {
+      const tempDir = path.join(__dirname, "temp");
       if (!fs.existsSync(tempDir)) {
         fs.mkdirSync(tempDir, { recursive: true });
       }
 
-      const configPath = path.join(tempDir, 'relations-config.yml');
+      const configPath = path.join(tempDir, "relations-config.yml");
       const configContent = `
 roles:
   - requirement
@@ -335,10 +335,18 @@ relations:
 
       try {
         configLoader.load(configPath);
-        const isAllowed = configLoader.isRelationAllowed('requirement', 'implementation', 'implements');
+        const isAllowed = configLoader.isRelationAllowed(
+          "requirement",
+          "implementation",
+          "implements",
+        );
         expect(isAllowed).to.be.true;
 
-        const isNotAllowed = configLoader.isRelationAllowed('requirement', 'implementation', 'unknown-relation');
+        const isNotAllowed = configLoader.isRelationAllowed(
+          "requirement",
+          "implementation",
+          "unknown-relation",
+        );
         expect(isNotAllowed).to.be.false;
       } finally {
         fs.rmSync(configPath, { force: true });
@@ -346,13 +354,13 @@ relations:
       }
     });
 
-    it('should get allowed relations between roles after loading config', () => {
-      const tempDir = path.join(__dirname, 'temp');
+    it("should get allowed relations between roles after loading config", () => {
+      const tempDir = path.join(__dirname, "temp");
       if (!fs.existsSync(tempDir)) {
         fs.mkdirSync(tempDir, { recursive: true });
       }
 
-      const configPath = path.join(tempDir, 'relations2-config.yml');
+      const configPath = path.join(tempDir, "relations2-config.yml");
       const configContent = `
 roles:
   - requirement
@@ -368,10 +376,13 @@ relations:
 
       try {
         configLoader.load(configPath);
-        const allowed = configLoader.getAllowedRelations('requirement', 'implementation');
-        expect(allowed).to.be.an('array');
-        expect(allowed).to.include('implements');
-        expect(allowed).to.include('satisfies');
+        const allowed = configLoader.getAllowedRelations(
+          "requirement",
+          "implementation",
+        );
+        expect(allowed).to.be.an("array");
+        expect(allowed).to.include("implements");
+        expect(allowed).to.include("satisfies");
       } finally {
         fs.rmSync(configPath, { force: true });
         fs.rmSync(tempDir, { recursive: true, force: true });
@@ -379,12 +390,12 @@ relations:
     });
   });
 
-  describe('Matrix Definitions', () => {
-    it('should get matrix definitions from configuration after loading', () => {
-      const tempDir = path.join(__dirname, 'temp-matrix-defs');
+  describe("Matrix Definitions", () => {
+    it("should get matrix definitions from configuration after loading", () => {
+      const tempDir = path.join(__dirname, "temp-matrix-defs");
       fs.mkdirSync(tempDir, { recursive: true });
 
-      const configPath = path.join(tempDir, 'matrices-config.yml');
+      const configPath = path.join(tempDir, "matrices-config.yml");
       const configContent = `
 roles:
   - requirement
@@ -412,68 +423,72 @@ matrices:
       try {
         configLoader.load(configPath);
         const matrices = configLoader.getMatrices();
-        expect(matrices).to.be.an('array');
+        expect(matrices).to.be.an("array");
         expect(matrices.length).to.be.at.least(1);
-        expect(matrices[0].name).to.be.oneOf(['req-impl', 'req-test']);
+        expect(matrices[0].name).to.be.oneOf(["req-impl", "req-test"]);
       } finally {
         fs.rmSync(tempDir, { recursive: true, force: true });
       }
     });
 
-    it('should throw error when getting matrices without loading config', () => {
+    it("should throw error when getting matrices without loading config", () => {
       // Create a new loader without config
       const newLoader = new ConfigLoader();
-      expect(() => newLoader.getMatrices()).to.throw(/Configuration not loaded/);
+      expect(() => newLoader.getMatrices()).to.throw(
+        /Configuration not loaded/,
+      );
     });
   });
 
-  describe('Configuration Merging', () => {
-    it('should merge preset with custom configuration', () => {
-      const preset = configLoader.loadPreset('requirements-engineering');
-      expect(preset.traceability.roles).to.be.an('array');
+  describe("Configuration Merging", () => {
+    it("should merge preset with custom configuration", () => {
+      const preset = configLoader.loadPreset("requirements-engineering");
+      expect(preset.traceability.roles).to.be.an("array");
 
       // The preset should have a complete traceability config
-      expect(preset.traceability).to.have.property('roles');
-      expect(preset.traceability).to.have.property('relations');
-      expect(preset.traceability).to.have.property('matrices');
+      expect(preset.traceability).to.have.property("roles");
+      expect(preset.traceability).to.have.property("relations");
+      expect(preset.traceability).to.have.property("matrices");
     });
   });
 
-  describe('Error Handling', () => {
-    it('should provide clear error messages for invalid configurations', () => {
-      const tempDir = path.join(__dirname, 'temp-invalid');
+  describe("Error Handling", () => {
+    it("should provide clear error messages for invalid configurations", () => {
+      const tempDir = path.join(__dirname, "temp-invalid");
       fs.mkdirSync(tempDir, { recursive: true });
 
-      const configPath = path.join(tempDir, 'empty-config.yml');
-      const configContent = '';
+      const configPath = path.join(tempDir, "empty-config.yml");
+      const configContent = "";
 
       fs.writeFileSync(configPath, configContent);
 
       try {
         // Empty config should fail validation
-        expect(() => configLoader.load(configPath)).to.throw(/Configuration must define at least one role/);
+        expect(() => configLoader.load(configPath)).to.throw(
+          /Configuration must define at least one role/,
+        );
       } finally {
         fs.unlinkSync(configPath);
         fs.rmSync(tempDir, { recursive: true, force: true });
       }
     });
 
-    it('should handle invalid preset names', () => {
+    it("should handle invalid preset names", () => {
       expect(() => {
-        configLoader.loadPreset('nonexistent-preset');
+        configLoader.loadPreset("nonexistent-preset");
       }).to.throw;
     });
   });
 });
 
-describe('loadConfig function', () => {
-  it('should load configuration from a path', () => {
-    const tempDir = path.join(__dirname, 'temp');
+describe("loadConfig function", () => {
+  it("should load configuration from a path", () => {
+    const tempDir = path.join(__dirname, "temp");
     if (!fs.existsSync(tempDir)) {
       fs.mkdirSync(tempDir, { recursive: true });
     }
 
-    const configPath = path.join(tempDir, 'test-load-config.yml');
+    const configPath = path.join(tempDir, "test-load-config.yml");
     const configContent = `
 roles:
   - requirement
@@ -489,7 +504,7 @@ relations:
     try {
       const config = loadConfig(configPath);
       expect(config).to.exist;
-      expect(config.roles).to.include('requirement');
+      expect(config.roles).to.include("requirement");
     } finally {
       fs.unlinkSync(configPath);
       fs.rmSync(tempDir, { recursive: true, force: true });

@@ -5,7 +5,7 @@
  * and generates clickable deep links to item blocks in rendered HTML.
  */
 
-import type { Item } from './types.js';
+import type { Item } from "./types.js";
 
 /**
  * Options for LinkResolver
@@ -40,7 +40,7 @@ export class LinkResolver {
    */
   generateItemLink(item: Item): string {
     const htmlPath = this.itemToHtmlPath(item);
-    return this.options.relativePathPrefix + htmlPath + '#' + item.id;
+    return `${this.options.relativePathPrefix + htmlPath}#${item.id}`;
   }
 
   /**
@@ -50,7 +50,7 @@ export class LinkResolver {
    * @returns Fragment identifier, e.g., "#ARC-001"
    */
   generateItemAnchor(item: Item): string {
-    return '#' + item.id;
+    return `#${item.id}`;
   }
 
   /**
@@ -71,23 +71,23 @@ export class LinkResolver {
     let sourceFile = item.sourceFile || item.id;
 
     // Normalize path separators
-    sourceFile = sourceFile.replace(/\\/g, '/');
+    sourceFile = sourceFile.replace(/\\/g, "/");
 
     // Strip everything up to and including '/pages/' or 'pages/'
-    sourceFile = sourceFile.replace(/^.*[\/]pages[\/]/, '');
-    sourceFile = sourceFile.replace(/^pages[\/]/, '');
+    sourceFile = sourceFile.replace(/^.*[/]pages[/]/, "");
+    sourceFile = sourceFile.replace(/^pages[/]/, "");
 
     // Remove .adoc extension if present
-    if (sourceFile.endsWith('.adoc')) {
+    if (sourceFile.endsWith(".adoc")) {
       sourceFile = sourceFile.slice(0, -5);
     }
 
     // Remove .html extension if present (will be re-added)
-    if (sourceFile.endsWith('.html')) {
+    if (sourceFile.endsWith(".html")) {
       sourceFile = sourceFile.slice(0, -5);
     }
 
     // Add .html extension
-    return sourceFile + '.html';
+    return `${sourceFile}.html`;
   }
 }

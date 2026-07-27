@@ -8,14 +8,14 @@
  * - Warning system for unknown roles
  */
 
-import type { Item, ItemRelationship } from './types.js';
-import type { ConfigLoader } from './config/TraceabilityConfig.js';
+import type { ConfigLoader } from "./config/TraceabilityConfig.js";
+import type { Item, ItemRelationship } from "./types.js";
 
 /**
  * Warning type for graph operations
  */
 export interface GraphWarning {
-  type: 'unknown_role' | 'invalid_relation' | 'duplicate_node';
+  type: "unknown_role" | "invalid_relation" | "duplicate_node";
   message: string;
   file?: string;
   line?: number;
@@ -47,16 +47,27 @@ export class TraceabilityGraph {
   private _relationships = new Map<string, ItemRelationship>();
 
   // Index for fast relationship queries: fromId -> { type -> [Relationships] }
-  private _relationshipIndex = new Map<string, Map<string, ItemRelationship[]>>();
+  private _relationshipIndex = new Map<
+    string,
+    Map<string, ItemRelationship[]>
+  >();
 
   // Reverse relationship index: targetId -> { type -> [Relationships] }
-  private _reverseRelationshipIndex = new Map<string, Map<string, ItemRelationship[]>>();
+  private _reverseRelationshipIndex = new Map<
+    string,
+    Map<string, ItemRelationship[]>
+  >();
 
   // Inverse relationship index
   private _inverseIndex = new Map<string, Map<string, ItemRelationship[]>>();
 
   private _configLoader?: ConfigLoader;
   private _warnings: GraphWarning[] = [];
+
+  /** Exposed for test access */
+  get configLoader(): ConfigLoader | undefined {
+    return this._configLoader;
+  }
 
   // Cache for frequently accessed data
   private _allItemsCache: Item[] | null = null;
@@ -85,7 +96,7 @@ export class TraceabilityGraph {
     if (this._items.has(item.id)) {
       const existing = this._items.get(item.id)!;
       const warning: GraphWarning = {
-        type: 'duplicate_node',
+        type: "duplicate_node",
         message: `Duplicate item ID: ${item.id}. Existing: ${existing.role} at ${existing.sourceFile}:${existing.sourceLine}, New: ${item.role} at ${item.sourceFile}:${item.sourceLine}`,
         file: item.sourceFile,
         line: item.sourceLine,
@@ -101,7 +112,7 @@ export class TraceabilityGraph {
     if (!this._itemsByRole.has(item.role)) {
       this._itemsByRole.set(item.role, new Map());
     }
-    this._itemsByRole.get(item.role)!.set(item.id, item);
+    this._itemsByRole.get(item.role)?.set(item.id, item);
 
     // Invalidate caches
     this._allItemsCache = null;
@@ -151,7 +162,7 @@ export class TraceabilityGraph {
    * Check if a role has any items
    */
   hasRole(role: string): boolean {
-    return this._itemsByRole.has(role) && this._itemsByRole.get(role)!.size > 0;
+    return this._itemsByRole.has(role) && (this._itemsByRole.get(role)?.size ?? 0) > 0;
   }
 
   // ========================================================================
@@ -166,7 +177,7 @@ export class TraceabilityGraph {
     const sourceNode = this.getItem(relationship.fromId);
     if (!sourceNode) {
       const warning: GraphWarning = {
-        type: 'unknown_role',
+        type: "unknown_role",
         message: `Source item not found: ${relationship.fromId}. Relationship '${relationship.type}' will be stored anyway.`,
         file: relationship.sourceFile,
         line: relationship.line,
@@ -179,7 +190,7 @@ export class TraceabilityGraph {
     const targetNode = this.getItem(relationship.targetId);
     if (!targetNode) {
       const warning: GraphWarning = {
-        type: 'unknown_role',
+        type: "unknown_role",
         message: `Target item not found: ${relationship.targetId}. Relationship ${relationship.fromId} ${relationship.type} ${relationship.targetId} stored pending target.`,
         file: relationship.sourceFile,
         line: relationship.line,
@@ -192,7 +203,7 @@ export class TraceabilityGraph {
     const key = `${relationship.fromId}-${relationship.type}-${relationship.targetId}`;
     if (this._relationships.has(key)) {
       const warning: GraphWarning = {
-        type: 'duplicate_node',
+        type: "duplicate_node",
         message: `Duplicate relationship: ${relationship.fromId} ${relationship.type} ${relationship.targetId}`,
         file: relationship.sourceFile,
         line: relationship.line,
@@ -206,18 +217,22 @@ export class TraceabilityGraph {
       const isValid = this._configLoader.isRelationAllowed(
         sourceNode.role,
         targetNode.role,
-        relationship.type
+        relationship.type,
       );
 
       if (!isValid) {
         // Check if either role is unknown
-        const sourceKnown = this._configLoader.getConfig().roles.includes(sourceNode.role);
-        const targetKnown = this._configLoader.getConfig().roles.includes(targetNode.role);
+        const sourceKnown = this._configLoader
+          .getConfig()
+          .roles.includes(sourceNode.role);
+        const targetKnown = this._configLoader
+          .getConfig()
+          .roles.includes(targetNode.role);
 
         if (!sourceKnown || !targetKnown) {
           // If roles are unknown, just warn
           const warning: GraphWarning = {
-            type: 'unknown_role',
+            type: "unknown_role",
             message: `Relation '${relationship.type}' from '${sourceNode.id}' (role: ${sourceNode.role}) to '${targetNode.id}' (role: ${targetNode.role}) involves unknown role(s). Skipping validation.`,
             file: relationship.sourceFile,
             line: relationship.line,
@@ -225,10 +240,13 @@ export class TraceabilityGraph {
           this._warnings.push(warning);
         } else {
           // Both roles are known but relation is not allowed
-          const allowed = this._configLoader.getAllowedRelations(sourceNode.role, targetNode.role);
+          const allowed = this._configLoader.getAllowedRelations(
+            sourceNode.role,
+            targetNode.role,
+          );
           const warning: GraphWarning = {
-            type: 'invalid_relation',
-            message: `Relation '${relationship.type}' not allowed from '${sourceNode.role}' to '${targetNode.role}'. Allowed: [${allowed.join(', ')}]`,
+            type: "invalid_relation",
+            message: `Relation '${relationship.type}' not allowed from '${sourceNode.role}' to '${targetNode.role}'. Allowed: [${allowed.join(", ")}]`,
             file: relationship.sourceFile,
             line: relationship.line,
           };
@@ -249,7 +267,10 @@ export class TraceabilityGraph {
     // Store the relationship
     this._relationships.set(key, {
       ...relationship,
-      autoGenerated: relationship.autoGenerated !== undefined ? relationship.autoGenerated : false,
+      autoGenerated:
+        relationship.autoGenerated !== undefined
+          ? relationship.autoGenerated
+          : false,
     });
 
     // Update relationship indexes
@@ -320,13 +341,16 @@ export class TraceabilityGraph {
   /**
    * Get relationships filtered by source role and target role
    */
-  getRelationshipsByRoles(sourceRole: string, targetRole: string): ItemRelationship[] {
+  getRelationshipsByRoles(
+    sourceRole: string,
+    targetRole: string,
+  ): ItemRelationship[] {
     const result: ItemRelationship[] = [];
     const sourceItems = this.getItemsByRole(sourceRole);
 
     for (const sourceItem of sourceItems) {
       const targetItems = this.getItemsByRole(targetRole);
-      const targetIds = new Set(targetItems.map(i => i.id));
+      const targetIds = new Set(targetItems.map((i) => i.id));
 
       for (const rel of this.getRelationships(sourceItem.id)) {
         if (targetIds.has(rel.targetId)) {
@@ -404,9 +428,13 @@ export class TraceabilityGraph {
   /**
    * Get items by role that are related to a given item
    */
-  getRelatedItemsByRole(itemId: string, role: string, relationType?: string): Item[] {
+  getRelatedItemsByRole(
+    itemId: string,
+    role: string,
+    relationType?: string,
+  ): Item[] {
     const items = this.getRelatedItems(itemId, relationType);
-    return items.filter(item => item.role === role);
+    return items.filter((item) => item.role === role);
   }
 
   // ========================================================================
@@ -452,10 +480,14 @@ export class TraceabilityGraph {
     // Check for orphaned relationships
     for (const rel of this._relationships.values()) {
       if (!this.getItem(rel.fromId)) {
-        errors.push(`Orphaned relationship: Source item '${rel.fromId}' not found for relationship type '${rel.type}'.`);
+        errors.push(
+          `Orphaned relationship: Source item '${rel.fromId}' not found for relationship type '${rel.type}'.`,
+        );
       }
       if (!this.getItem(rel.targetId)) {
-        errors.push(`Orphaned relationship: Target item '${rel.targetId}' not found for relationship type '${rel.type}'.`);
+        errors.push(
+          `Orphaned relationship: Target item '${rel.targetId}' not found for relationship type '${rel.type}'.`,
+        );
       }
     }
 
@@ -469,7 +501,7 @@ export class TraceabilityGraph {
       for (const item of this._items.values()) {
         if (!knownRoles.includes(item.role)) {
           warnings.push({
-            type: 'unknown_role',
+            type: "unknown_role",
             message: `Item '${item.id}' has unknown role '${item.role}'.`,
             file: item.sourceFile,
             line: item.sourceLine,
@@ -493,7 +525,9 @@ export class TraceabilityGraph {
       if (recursionStack.has(nodeId)) {
         const cycleStartIndex = path.indexOf(nodeId);
         const cycle = path.slice(cycleStartIndex);
-        errors.push(`Circular reference detected: ${cycle.join(' -> ')} -> ${nodeId}`);
+        errors.push(
+          `Circular reference detected: ${cycle.join(" -> ")} -> ${nodeId}`,
+        );
         return;
       }
 
@@ -530,13 +564,17 @@ export class TraceabilityGraph {
    * Finds a path between two item IDs using depth-limited DFS (iterative)
    * Uses iterative approach with explicit stack to avoid recursion limits
    */
-  findPath(fromId: string, toId: string, maxDepth: number = 5): string[] | null {
+  findPath(
+    fromId: string,
+    toId: string,
+    maxDepth: number = 5,
+  ): string[] | null {
     if (fromId === toId) return [fromId];
     if (maxDepth < 0) return null;
 
     // Stack entries: { currentId, path, depth }
     const stack: { currentId: string; path: string[]; depth: number }[] = [
-      { currentId: fromId, path: [fromId], depth: 0 }
+      { currentId: fromId, path: [fromId], depth: 0 },
     ];
     const visited = new Set<string>([fromId]);
 
@@ -556,7 +594,7 @@ export class TraceabilityGraph {
           stack.push({
             currentId: rel.targetId,
             path: [...path, rel.targetId],
-            depth: depth + 1
+            depth: depth + 1,
           });
         }
       }
@@ -590,7 +628,7 @@ export class TraceabilityGraph {
       }
     }
 
-    return Array.from(impacted).filter(id => id !== itemId);
+    return Array.from(impacted).filter((id) => id !== itemId);
   }
 
   // ========================================================================
@@ -642,16 +680,18 @@ export class TraceabilityGraph {
     if (!fromIndex.has(relationship.type)) {
       fromIndex.set(relationship.type, []);
     }
-    fromIndex.get(relationship.type)!.push(relationship);
+    fromIndex.get(relationship.type)?.push(relationship);
 
     // Update reverse index: targetId -> type -> [Relationships]
     if (!this._reverseRelationshipIndex.has(relationship.targetId)) {
       this._reverseRelationshipIndex.set(relationship.targetId, new Map());
     }
-    const targetIndex = this._reverseRelationshipIndex.get(relationship.targetId)!;
+    const targetIndex = this._reverseRelationshipIndex.get(
+      relationship.targetId,
+    )!;
     if (!targetIndex.has(relationship.type)) {
       targetIndex.set(relationship.type, []);
     }
-    targetIndex.get(relationship.type)!.push(relationship);
+    targetIndex.get(relationship.type)?.push(relationship);
   }
 }

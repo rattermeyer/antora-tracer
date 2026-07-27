@@ -3,10 +3,10 @@
  * Exports traceability data in CSV or Cypher format for import into Neo4j
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
-import type { TraceabilityGraph } from './TraceabilityGraph.js';
-import type { Item, ItemRelationship } from './types.js';
+import * as fs from "node:fs";
+import * as path from "node:path";
+import type { TraceabilityGraph } from "./TraceabilityGraph.js";
+import type { Item, ItemRelationship } from "./types.js";
 
 /**
  * Options for Neo4j export
@@ -20,7 +20,7 @@ export interface Neo4jExportOptions {
   /**
    * Export format: 'csv' or 'cypher'
    */
-  format: 'csv' | 'cypher';
+  format: "csv" | "cypher";
 
   /**
    * Include item content in export (can be large)
@@ -99,20 +99,31 @@ export class Neo4jExporter {
       relationshipCount: relationships.length,
     };
 
-    if (format === 'csv') {
+    if (format === "csv") {
       // Export to CSV format
-      const nodesFile = path.resolve(outputDir, 'nodes.csv');
-      const relationshipsFile = path.resolve(outputDir, 'relationships.csv');
+      const nodesFile = path.resolve(outputDir, "nodes.csv");
+      const relationshipsFile = path.resolve(outputDir, "relationships.csv");
 
-      this.exportNodesToCSV(items, nodesFile, includeContent, includeAllAttributes);
+      this.exportNodesToCSV(
+        items,
+        nodesFile,
+        includeContent,
+        includeAllAttributes,
+      );
       this.exportRelationshipsToCSV(relationships, relationshipsFile);
 
       result.nodesFile = nodesFile;
       result.relationshipsFile = relationshipsFile;
     } else {
       // Export to Cypher format
-      const cypherFile = path.resolve(outputDir, 'import.cypher');
-      this.exportToCypher(items, relationships, cypherFile, includeContent, includeAllAttributes);
+      const cypherFile = path.resolve(outputDir, "import.cypher");
+      this.exportToCypher(
+        items,
+        relationships,
+        cypherFile,
+        includeContent,
+        includeAllAttributes,
+      );
       result.cypherFile = cypherFile;
     }
 
@@ -122,8 +133,13 @@ export class Neo4jExporter {
   /**
    * Export nodes to CSV format
    */
-  private exportNodesToCSV(items: Item[], filePath: string, includeContent: boolean, includeAllAttributes: boolean): void {
-    const headers = ['id', 'title', 'role', 'status', 'sourceFile'];
+  private exportNodesToCSV(
+    items: Item[],
+    filePath: string,
+    includeContent: boolean,
+    includeAllAttributes: boolean,
+  ): void {
+    const headers = ["id", "title", "role", "status", "sourceFile"];
     const attributeKeys: string[] = [];
 
     // Collect all attribute keys if including all attributes
@@ -139,7 +155,7 @@ export class Neo4jExporter {
     }
 
     if (includeContent) {
-      headers.push('content');
+      headers.push("content");
     }
 
     const lines: string[] = [this.escapeCSVRow(headers)];
@@ -147,33 +163,36 @@ export class Neo4jExporter {
     for (const item of items) {
       const row = [
         item.id,
-        this.escapeCSVValue(item.title || ''),
+        this.escapeCSVValue(item.title || ""),
         item.role,
-        item.status || '',
-        item.sourceFile || '',
+        item.status || "",
+        item.sourceFile || "",
       ];
 
       if (includeAllAttributes) {
         for (const key of attributeKeys) {
-          row.push(this.escapeCSVValue(item.attributes?.[key] || ''));
+          row.push(this.escapeCSVValue(item.attributes?.[key] || ""));
         }
       }
 
       if (includeContent) {
-        row.push(this.escapeCSVValue(item.content || ''));
+        row.push(this.escapeCSVValue(item.content || ""));
       }
 
       lines.push(this.escapeCSVRow(row));
     }
 
-    fs.writeFileSync(filePath, lines.join('\n'), 'utf8');
+    fs.writeFileSync(filePath, lines.join("\n"), "utf8");
   }
 
   /**
    * Export relationships to CSV format
    */
-  private exportRelationshipsToCSV(relationships: ItemRelationship[], filePath: string): void {
-    const headers = ['id', 'source', 'target', 'type', 'sourceFile'];
+  private exportRelationshipsToCSV(
+    relationships: ItemRelationship[],
+    filePath: string,
+  ): void {
+    const headers = ["id", "source", "target", "type", "sourceFile"];
     const lines: string[] = [this.escapeCSVRow(headers)];
 
     for (const rel of relationships) {
@@ -182,12 +201,12 @@ export class Neo4jExporter {
         rel.fromId,
         rel.targetId,
         rel.type,
-        rel.sourceFile || '',
+        rel.sourceFile || "",
       ];
       lines.push(this.escapeCSVRow(row));
     }
 
-    fs.writeFileSync(filePath, lines.join('\n'), 'utf8');
+    fs.writeFileSync(filePath, lines.join("\n"), "utf8");
   }
 
   /**
@@ -198,20 +217,20 @@ export class Neo4jExporter {
     relationships: ItemRelationship[],
     filePath: string,
     includeContent: boolean,
-    includeAllAttributes: boolean
+    includeAllAttributes: boolean,
   ): void {
     const lines: string[] = [
-      '// Neo4j Cypher import file',
-      '// Generated by antora-requirements-traceability',
-      '// Use: neo4j-admin import --nodes=import.cypher --relationships=import.cypher',
-      '',
+      "// Neo4j Cypher import file",
+      "// Generated by antora-requirements-traceability",
+      "// Use: neo4j-admin import --nodes=import.cypher --relationships=import.cypher",
+      "",
     ];
 
     // Add node creation statements
     for (const item of items) {
       const props: Record<string, string> = {
         id: item.id,
-        title: item.title || '',
+        title: item.title || "",
         role: item.role,
       };
 
@@ -235,7 +254,7 @@ export class Neo4jExporter {
 
       const propsStr = this.formatCypherProperties(props);
       lines.push(`MERGE (n:Item ${propsStr});`);
-      lines.push('');
+      lines.push("");
     }
 
     // Add relationship creation statements
@@ -252,18 +271,18 @@ export class Neo4jExporter {
       const propsStr = this.formatCypherProperties(props);
       lines.push(
         `MATCH (source:Item {id: $sourceId}), (target:Item {id: $targetId}) ` +
-        `MERGE (source)-[r:RELATIONSHIP ${propsStr}]->(target);`
+          `MERGE (source)-[r:RELATIONSHIP ${propsStr}]->(target);`,
       );
-      lines.push('');
+      lines.push("");
     }
 
     // Add indexes for better performance
-    lines.push('// Indexes');
-    lines.push('CREATE INDEX IF NOT EXISTS FOR (n:Item) ON (n.id);');
-    lines.push('CREATE INDEX IF NOT EXISTS FOR (n:Item) ON (n.role);');
-    lines.push('');
+    lines.push("// Indexes");
+    lines.push("CREATE INDEX IF NOT EXISTS FOR (n:Item) ON (n.id);");
+    lines.push("CREATE INDEX IF NOT EXISTS FOR (n:Item) ON (n.role);");
+    lines.push("");
 
-    fs.writeFileSync(filePath, lines.join('\n'), 'utf8');
+    fs.writeFileSync(filePath, lines.join("\n"), "utf8");
   }
 
   /**
@@ -271,11 +290,16 @@ export class Neo4jExporter {
    */
   private escapeCSVValue(value: string): string {
     if (value === undefined || value === null) {
-      return '';
+      return "";
     }
     const str = String(value);
     // If the value contains commas, quotes, or newlines, wrap in quotes and escape quotes
-    if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+    if (
+      str.includes(",") ||
+      str.includes('"') ||
+      str.includes("\n") ||
+      str.includes("\r")
+    ) {
       return `"${str.replace(/"/g, '""')}"`;
     }
     return str;
@@ -285,7 +309,7 @@ export class Neo4jExporter {
    * Escape a row for CSV (array of values)
    */
   private escapeCSVRow(row: string[]): string {
-    return row.map(v => this.escapeCSVValue(v)).join(',');
+    return row.map((v) => this.escapeCSVValue(v)).join(",");
   }
 
   /**
@@ -298,6 +322,6 @@ export class Neo4jExporter {
       const escapedValue = value.replace(/'/g, "\\'");
       parts.push(`${key}: '${escapedValue}'`);
     }
-    return `{${parts.join(', ')}}`;
+    return `{${parts.join(", ")}}`;
   }
 }

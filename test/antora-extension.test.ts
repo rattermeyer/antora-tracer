@@ -11,18 +11,18 @@
  * - Wait for async init via setImmediate (one microtask)
  */
 
-import { expect } from 'chai';
-import { mkdtempSync, rmSync, readFileSync, existsSync, readdirSync } from 'fs';
-import { join } from 'path';
-import { tmpdir } from 'os';
-import { AntoraTraceabilityExtension } from '../src/antora-extension.js';
+import { expect } from "chai";
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { AntoraTraceabilityExtension } from "../src/antora-extension.js";
 
 // ============================================================================
 // Helper Types
 // ============================================================================
 
 interface LogEntry {
-  level: 'info' | 'warn' | 'error' | 'debug';
+  level: "info" | "warn" | "error" | "debug";
   message: string;
 }
 
@@ -56,16 +56,16 @@ function createMockContext(overrides: Partial<MockContext> = {}): MockContext {
 
   const ctx: MockContext = {
     getLogger: () => ({
-      info: (message: string) => logs.push({ level: 'info', message }),
-      warn: (message: string) => logs.push({ level: 'warn', message }),
-      error: (message: string) => logs.push({ level: 'error', message }),
-      debug: (message: string) => logs.push({ level: 'debug', message }),
+      info: (message: string) => logs.push({ level: "info", message }),
+      warn: (message: string) => logs.push({ level: "warn", message }),
+      error: (message: string) => logs.push({ level: "error", message }),
+      debug: (message: string) => logs.push({ level: "debug", message }),
     }),
     on: (event: string, handler: (...args: any[]) => void) => {
       events[event] = handler;
     },
     playbook: {
-      output: { dir: '/tmp' },
+      output: { dir: "/tmp" },
       extensions: [],
     },
     logs,
@@ -108,11 +108,13 @@ satisfies:REQ-001[]
 /**
  * Create a content catalog event with traceable items.
  */
-function createContentClassifiedEvent(files: Array<{ path: string; content: string }>) {
+function createContentClassifiedEvent(
+  files: Array<{ path: string; content: string }>,
+) {
   return {
     contentCatalog: {
-      findBy: ({ family }: { family: string }) =>
-        files.map(f => ({
+      findBy: ({ family: _family }: { family: string }) =>
+        files.map((f) => ({
           src: { path: f.path },
           contents: Buffer.from(f.content),
         })),
@@ -126,18 +128,18 @@ function createContentClassifiedEvent(files: Array<{ path: string; content: stri
  * (createWithPreset is async-declared but sync internally).
  */
 function waitForInit(): Promise<void> {
-  return new Promise(resolve => setImmediate(resolve));
+  return new Promise((resolve) => setImmediate(resolve));
 }
 
 // ============================================================================
 // Tests
 // ============================================================================
 
-describe('AntoraTraceabilityExtension', () => {
+describe("AntoraTraceabilityExtension", () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = mkdtempSync(join(tmpdir(), 'antora-test-'));
+    tempDir = mkdtempSync(join(tmpdir(), "antora-test-"));
   });
 
   afterEach(() => {
@@ -148,24 +150,24 @@ describe('AntoraTraceabilityExtension', () => {
   // Initialization
   // ========================================================================
 
-  describe('Initialization', () => {
-    it('should initialize with default configuration', async () => {
+  describe("Initialization", () => {
+    it("should initialize with default configuration", async () => {
       const ctx = createMockContext();
       const ext = new AntoraTraceabilityExtension(ctx as any);
       await waitForInit();
 
       const traceExt = ext.getTraceabilityExtension();
       expect(traceExt).to.exist;
-      expect(traceExt.getAllItems()).to.be.an('array').that.is.empty;
+      expect(traceExt.getAllItems()).to.be.an("array").that.is.empty;
     });
 
-    it('should initialize with config path from playbook', async () => {
+    it("should initialize with config path from playbook", async () => {
       const ctx = createMockContext({
         playbook: {
           extensions: [
             {
-              name: 'antora-requirements-traceability',
-              config: { configPath: '/nonexistent/config.yml' },
+              name: "antora-requirements-traceability",
+              config: { configPath: "/nonexistent/config.yml" },
             },
           ],
         },
@@ -176,16 +178,16 @@ describe('AntoraTraceabilityExtension', () => {
       // Config path doesn't exist, falls back to default preset
       const traceExt = ext.getTraceabilityExtension();
       expect(traceExt).to.exist;
-      expect(ctx.logs.some(l => l.level === 'warn')).to.be.true;
+      expect(ctx.logs.some((l) => l.level === "warn")).to.be.true;
     });
 
-    it('should initialize with preset from playbook config', async () => {
+    it("should initialize with preset from playbook config", async () => {
       const ctx = createMockContext({
         playbook: {
           extensions: [
             {
-              name: 'antora-requirements-traceability',
-              config: { preset: 'agile' },
+              name: "antora-requirements-traceability",
+              config: { preset: "agile" },
             },
           ],
         },
@@ -198,12 +200,12 @@ describe('AntoraTraceabilityExtension', () => {
       expect(traceExt.configLoader).to.exist;
     });
 
-    it('should handle disabled extension without initializing', () => {
+    it("should handle disabled extension without initializing", () => {
       const ctx = createMockContext({
         playbook: {
           extensions: [
             {
-              name: 'antora-requirements-traceability',
+              name: "antora-requirements-traceability",
               config: { enabled: false },
             },
           ],
@@ -213,20 +215,21 @@ describe('AntoraTraceabilityExtension', () => {
 
       // No need to wait for init — constructor returns early
       expect(() => ext.getTraceabilityExtension()).to.throw(
-        'Traceability extension not initialized',
+        "Traceability extension not initialized",
       );
-      expect(ctx.logs.some(l => l.message.includes('is disabled'))).to.be.true;
+      expect(ctx.logs.some((l) => l.message.includes("is disabled"))).to.be
+        .true;
     });
 
-    it('should register event handlers on initialization', async () => {
+    it("should register event handlers on initialization", async () => {
       const ctx = createMockContext();
       new AntoraTraceabilityExtension(ctx as any);
       await waitForInit();
 
       // Should register handlers for all three events
-      expect(ctx.events['contentClassified']).to.exist;
-      expect(ctx.events['sitePublished']).to.exist;
-      expect(ctx.events['beforeSiteGenerated']).to.exist;
+      expect(ctx.events.contentClassified).to.exist;
+      expect(ctx.events.sitePublished).to.exist;
+      expect(ctx.events.beforeSiteGenerated).to.exist;
     });
   });
 
@@ -234,16 +237,18 @@ describe('AntoraTraceabilityExtension', () => {
   // Content Processing
   // ========================================================================
 
-  describe('Content Processing', () => {
-    it('should process AsciiDoc files when contentClassified fires', async () => {
-      const ctx = createMockContext({ playbook: { output: { dir: tempDir }, extensions: [] } });
+  describe("Content Processing", () => {
+    it("should process AsciiDoc files when contentClassified fires", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
       const ext = new AntoraTraceabilityExtension(ctx as any);
       await waitForInit();
 
       ctx.fireEvent(
-        'contentClassified',
+        "contentClassified",
         createContentClassifiedEvent([
-          { path: 'test.adoc', content: createSampleContent() },
+          { path: "test.adoc", content: createSampleContent() },
         ]),
       );
 
@@ -251,38 +256,42 @@ describe('AntoraTraceabilityExtension', () => {
       const items = traceExt.getAllItems();
       expect(items).to.have.lengthOf(2);
 
-      const req = traceExt.graph.getItem('REQ-001');
+      const req = traceExt.graph.getItem("REQ-001");
       expect(req).to.exist;
-      expect(req!.role).to.equal('requirement');
-      expect(req!.title).to.equal('REQ-001 — User Authentication');
+      expect(req?.role).to.equal("requirement");
+      expect(req?.title).to.equal("REQ-001 — User Authentication");
 
-      const imp = traceExt.graph.getItem('IMP-001');
+      const imp = traceExt.graph.getItem("IMP-001");
       expect(imp).to.exist;
-      expect(imp!.role).to.equal('implementation');
+      expect(imp?.role).to.equal("implementation");
     });
 
-    it('should register relationships from inline macros', async () => {
-      const ctx = createMockContext({ playbook: { output: { dir: tempDir }, extensions: [] } });
+    it("should register relationships from inline macros", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
       const ext = new AntoraTraceabilityExtension(ctx as any);
       await waitForInit();
 
       ctx.fireEvent(
-        'contentClassified',
+        "contentClassified",
         createContentClassifiedEvent([
-          { path: 'test.adoc', content: createSampleContent() },
+          { path: "test.adoc", content: createSampleContent() },
         ]),
       );
 
       const traceExt = ext.getTraceabilityExtension();
       const rels = traceExt.getAllRelationships();
       expect(rels).to.have.lengthOf(1);
-      expect(rels[0].type).to.equal('satisfies');
-      expect(rels[0].fromId).to.equal('IMP-001');
-      expect(rels[0].targetId).to.equal('REQ-001');
+      expect(rels[0].type).to.equal("satisfies");
+      expect(rels[0].fromId).to.equal("IMP-001");
+      expect(rels[0].targetId).to.equal("REQ-001");
     });
 
-    it('should handle files with multiple items and relationships', async () => {
-      const ctx = createMockContext({ playbook: { output: { dir: tempDir }, extensions: [] } });
+    it("should handle files with multiple items and relationships", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
       const ext = new AntoraTraceabilityExtension(ctx as any);
       await waitForInit();
 
@@ -313,8 +322,8 @@ satisfies:REQ-002[]
 `;
 
       ctx.fireEvent(
-        'contentClassified',
-        createContentClassifiedEvent([{ path: 'multi.adoc', content }]),
+        "contentClassified",
+        createContentClassifiedEvent([{ path: "multi.adoc", content }]),
       );
 
       const traceExt = ext.getTraceabilityExtension();
@@ -322,15 +331,17 @@ satisfies:REQ-002[]
       expect(traceExt.getAllRelationships()).to.have.lengthOf(2);
     });
 
-    it('should skip non-AsciiDoc files', async () => {
-      const ctx = createMockContext({ playbook: { output: { dir: tempDir }, extensions: [] } });
+    it("should skip non-AsciiDoc files", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
       const ext = new AntoraTraceabilityExtension(ctx as any);
       await waitForInit();
 
       ctx.fireEvent(
-        'contentClassified',
+        "contentClassified",
         createContentClassifiedEvent([
-          { path: 'readme.md', content: '# Just markdown\nno items here' },
+          { path: "readme.md", content: "# Just markdown\nno items here" },
         ]),
       );
 
@@ -338,15 +349,20 @@ satisfies:REQ-002[]
       expect(traceExt.getAllItems()).to.have.lengthOf(0);
     });
 
-    it('should handle files without any traceable items', async () => {
-      const ctx = createMockContext({ playbook: { output: { dir: tempDir }, extensions: [] } });
+    it("should handle files without any traceable items", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
       const ext = new AntoraTraceabilityExtension(ctx as any);
       await waitForInit();
 
       ctx.fireEvent(
-        'contentClassified',
+        "contentClassified",
         createContentClassifiedEvent([
-          { path: 'plain.adoc', content: '= Just a regular document\n\nNo items here.' },
+          {
+            path: "plain.adoc",
+            content: "= Just a regular document\n\nNo items here.",
+          },
         ]),
       );
 
@@ -354,24 +370,30 @@ satisfies:REQ-002[]
       expect(traceExt.getAllItems()).to.have.lengthOf(0);
     });
 
-    it('should handle missing contentCatalog gracefully', async () => {
-      const ctx = createMockContext({ playbook: { output: { dir: tempDir }, extensions: [] } });
+    it("should handle missing contentCatalog gracefully", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
       new AntoraTraceabilityExtension(ctx as any);
       await waitForInit();
 
-      ctx.fireEvent('contentClassified', {});
+      ctx.fireEvent("contentClassified", {});
 
-      expect(ctx.logs.some(l => l.message.includes('contentCatalog not found'))).to.be.true;
+      expect(
+        ctx.logs.some((l) => l.message.includes("contentCatalog not found")),
+      ).to.be.true;
     });
 
-    it('should handle files without contents buffer', async () => {
-      const ctx = createMockContext({ playbook: { output: { dir: tempDir }, extensions: [] } });
+    it("should handle files without contents buffer", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
       const ext = new AntoraTraceabilityExtension(ctx as any);
       await waitForInit();
 
-      ctx.fireEvent('contentClassified', {
+      ctx.fireEvent("contentClassified", {
         contentCatalog: {
-          findBy: () => [{ src: { path: 'empty.adoc' } }],
+          findBy: () => [{ src: { path: "empty.adoc" } }],
         },
       });
 
@@ -385,116 +407,122 @@ satisfies:REQ-002[]
   // Matrix Generation
   // ========================================================================
 
-  describe('Matrix Generation', () => {
-    it('should generate matrix files on sitePublished when items exist', async () => {
+  describe("Matrix Generation", () => {
+    it("should generate matrix files on sitePublished when items exist", async () => {
       const ctx = createMockContext({
         playbook: { output: { dir: tempDir }, extensions: [] },
       });
-      const ext = new AntoraTraceabilityExtension(ctx as any);
+      const _ext = new AntoraTraceabilityExtension(ctx as any);
       await waitForInit();
 
       // Populate with items
       ctx.fireEvent(
-        'contentClassified',
+        "contentClassified",
         createContentClassifiedEvent([
-          { path: 'reqs.adoc', content: createSampleContent() },
+          { path: "reqs.adoc", content: createSampleContent() },
         ]),
       );
 
-      ctx.fireEvent('sitePublished', {
+      ctx.fireEvent("sitePublished", {
         playbook: { output: { dir: tempDir } },
       });
 
       // Check that matrix files were written
-      const traceDir = join(tempDir, 'traceability');
+      const traceDir = join(tempDir, "traceability");
       expect(existsSync(traceDir)).to.be.true;
-      expect(existsSync(join(traceDir, 'index.html'))).to.be.true;
-      expect(existsSync(join(traceDir, 'coverage.html'))).to.be.true;
+      expect(existsSync(join(traceDir, "index.html"))).to.be.true;
+      expect(existsSync(join(traceDir, "coverage.html"))).to.be.true;
 
       // Should have generated at least one matrix file
       const files = readdirSync(traceDir);
-      const matrixFiles = files.filter((f: string) => f.startsWith('matrix-'));
+      const matrixFiles = files.filter((f: string) => f.startsWith("matrix-"));
       expect(matrixFiles.length).to.be.greaterThan(0);
     });
 
-    it('should generate matrices in configured formats', async () => {
+    it("should generate matrices in configured formats", async () => {
       const ctx = createMockContext({
         playbook: {
           output: { dir: tempDir },
           extensions: [
             {
-              name: 'antora-requirements-traceability',
-              config: { matrixFormats: ['html', 'csv'] },
+              name: "antora-requirements-traceability",
+              config: { matrixFormats: ["html", "csv"] },
             },
           ],
         },
       });
-      const ext = new AntoraTraceabilityExtension(ctx as any);
+      const _ext = new AntoraTraceabilityExtension(ctx as any);
       await waitForInit();
 
       ctx.fireEvent(
-        'contentClassified',
+        "contentClassified",
         createContentClassifiedEvent([
-          { path: 'reqs.adoc', content: createSampleContent() },
+          { path: "reqs.adoc", content: createSampleContent() },
         ]),
       );
 
-      ctx.fireEvent('sitePublished', {
+      ctx.fireEvent("sitePublished", {
         playbook: { output: { dir: tempDir } },
       });
 
-      const traceDir = join(tempDir, 'traceability');
+      const traceDir = join(tempDir, "traceability");
       const files = readdirSync(traceDir);
 
       // Should have both .html and .csv matrix files
-      const htmlMatrices = files.filter((f: string) => f.startsWith('matrix-') && f.endsWith('.html'));
-      const csvMatrices = files.filter((f: string) => f.startsWith('matrix-') && f.endsWith('.csv'));
+      const htmlMatrices = files.filter(
+        (f: string) => f.startsWith("matrix-") && f.endsWith(".html"),
+      );
+      const csvMatrices = files.filter(
+        (f: string) => f.startsWith("matrix-") && f.endsWith(".csv"),
+      );
       expect(htmlMatrices.length).to.be.greaterThan(0);
       expect(csvMatrices.length).to.be.greaterThan(0);
     });
 
-    it('should log warning when no items exist', async () => {
+    it("should log warning when no items exist", async () => {
       const ctx = createMockContext({
         playbook: { output: { dir: tempDir }, extensions: [] },
       });
       new AntoraTraceabilityExtension(ctx as any);
       await waitForInit();
 
-      ctx.fireEvent('sitePublished', {
+      ctx.fireEvent("sitePublished", {
         playbook: { output: { dir: tempDir } },
       });
 
-      expect(ctx.logs.some(l => l.message.includes('No traceable items found'))).to.be.true;
+      expect(
+        ctx.logs.some((l) => l.message.includes("No traceable items found")),
+      ).to.be.true;
     });
 
-    it('should generate coverage report with correct statistics', async () => {
+    it("should generate coverage report with correct statistics", async () => {
       const ctx = createMockContext({
         playbook: { output: { dir: tempDir }, extensions: [] },
       });
-      const ext = new AntoraTraceabilityExtension(ctx as any);
+      const _ext = new AntoraTraceabilityExtension(ctx as any);
       await waitForInit();
 
       ctx.fireEvent(
-        'contentClassified',
+        "contentClassified",
         createContentClassifiedEvent([
-          { path: 'reqs.adoc', content: createSampleContent() },
+          { path: "reqs.adoc", content: createSampleContent() },
         ]),
       );
 
-      ctx.fireEvent('sitePublished', {
+      ctx.fireEvent("sitePublished", {
         playbook: { output: { dir: tempDir } },
       });
 
-      const coveragePath = join(tempDir, 'traceability', 'coverage.html');
+      const coveragePath = join(tempDir, "traceability", "coverage.html");
       expect(existsSync(coveragePath)).to.be.true;
 
-      const content = readFileSync(coveragePath, 'utf8');
+      const content = readFileSync(coveragePath, "utf8");
       // Coverage report shows role names and counts, not item IDs
-      expect(content).to.include('requirement');
-      expect(content).to.include('implementation');
+      expect(content).to.include("requirement");
+      expect(content).to.include("implementation");
       // Should show item count and percentages
-      expect(content).to.include('2'); // total items
-      expect(content).to.include('100'); // percentage
+      expect(content).to.include("2"); // total items
+      expect(content).to.include("100"); // percentage
     });
   });
 
@@ -502,18 +530,20 @@ satisfies:REQ-002[]
   // API Access
   // ========================================================================
 
-  describe('API Access', () => {
-    it('should return traceability extension after initialization', async () => {
-      const ctx = createMockContext({ playbook: { output: { dir: tempDir }, extensions: [] } });
+  describe("API Access", () => {
+    it("should return traceability extension after initialization", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
       const ext = new AntoraTraceabilityExtension(ctx as any);
       await waitForInit();
 
       const traceExt = ext.getTraceabilityExtension();
       expect(traceExt).to.exist;
-      expect(traceExt).to.have.property('graph');
+      expect(traceExt).to.have.property("graph");
     });
 
-    it('should throw when getTraceabilityExtension is called before init', () => {
+    it("should throw when getTraceabilityExtension is called before init", () => {
       // We skip waitForInit to test pre-init state
       // But the constructor still calls initializeAsync(), so we need
       // to test this by checking that calling before the microtask yields throws.
@@ -524,7 +554,7 @@ satisfies:REQ-002[]
         playbook: {
           extensions: [
             {
-              name: 'antora-requirements-traceability',
+              name: "antora-requirements-traceability",
               config: { enabled: false },
             },
           ],
@@ -533,19 +563,21 @@ satisfies:REQ-002[]
       const ext = new AntoraTraceabilityExtension(ctx as any);
 
       expect(() => ext.getTraceabilityExtension()).to.throw(
-        'Traceability extension not initialized',
+        "Traceability extension not initialized",
       );
     });
 
-    it('should return extension for enabled config with data', async () => {
-      const ctx = createMockContext({ playbook: { output: { dir: tempDir }, extensions: [] } });
+    it("should return extension for enabled config with data", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
       const ext = new AntoraTraceabilityExtension(ctx as any);
       await waitForInit();
 
       ctx.fireEvent(
-        'contentClassified',
+        "contentClassified",
         createContentClassifiedEvent([
-          { path: 'reqs.adoc', content: createSampleContent() },
+          { path: "reqs.adoc", content: createSampleContent() },
         ]),
       );
 
@@ -558,21 +590,23 @@ satisfies:REQ-002[]
   // Error Handling
   // ========================================================================
 
-  describe('Error Handling', () => {
-    it('should log error and continue on processing failure', async () => {
-      const ctx = createMockContext({ playbook: { output: { dir: tempDir }, extensions: [] } });
+  describe("Error Handling", () => {
+    it("should log error and continue on processing failure", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
       new AntoraTraceabilityExtension(ctx as any);
       await waitForInit();
 
       // Fire with a catalog that returns a file whose toString throws
-      ctx.fireEvent('contentClassified', {
+      ctx.fireEvent("contentClassified", {
         contentCatalog: {
           findBy: () => [
             {
-              src: { path: 'broken.adoc' },
+              src: { path: "broken.adoc" },
               contents: {
                 toString: () => {
-                  throw new Error('Simulated parse error');
+                  throw new Error("Simulated parse error");
                 },
               },
             },
@@ -581,11 +615,14 @@ satisfies:REQ-002[]
       });
 
       // Should have logged a warning about the error
-      expect(ctx.logs.some(l => l.level === 'warn' && l.message.includes('broken.adoc'))).to.be
-        .true;
+      expect(
+        ctx.logs.some(
+          (l) => l.level === "warn" && l.message.includes("broken.adoc"),
+        ),
+      ).to.be.true;
     });
 
-    it('should log error and continue on matrix generation failure', async () => {
+    it("should log error and continue on matrix generation failure", async () => {
       const ctx = createMockContext({
         playbook: { output: { dir: tempDir }, extensions: [] },
       });
@@ -593,11 +630,13 @@ satisfies:REQ-002[]
       await waitForInit();
 
       // Fire sitePublished without any items — should warn, not crash
-      ctx.fireEvent('sitePublished', {
+      ctx.fireEvent("sitePublished", {
         playbook: { output: { dir: tempDir } },
       });
 
-      expect(ctx.logs.some(l => l.message.includes('No traceable items found'))).to.be.true;
+      expect(
+        ctx.logs.some((l) => l.message.includes("No traceable items found")),
+      ).to.be.true;
     });
   });
 });

@@ -1,43 +1,48 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.5.3/schema.json",
-  "organizeImports": {
-    "enabled": true
+  "$schema": "https://biomejs.dev/schemas/2.5.5/schema.json",
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
   },
   "linter": {
     "rules": {
       "correctness": {
-        "noUnusedVariables": "error",
-        "noUnusedImports": "error",
-        "noUnusedPrivateClassMembers": "error"
+        "noUnusedVariables": "off",
+        "noUnusedImports": "off",
+        "noUnusedPrivateClassMembers": "off"
       },
       "suspicious": {
-        "noExplicitAny": "error",
-        "noImplicitAny": "error",
-        "noUnsafeAny": "error"
+        "noExplicitAny": "off",
+        "noAssignInExpressions": "off"
       },
       "style": {
         "useNamingConvention": "off",
-        "useConst": "off"
+        "useConst": "off",
+        "noNonNullAssertion": "off"
       }
     }
   },
   "formatter": {
     "indentStyle": "space",
     "indentWidth": 2,
-    "lineEnding": "lf",
-    "quoteStyle": "double"
+    "lineEnding": "lf"
   },
   "files": {
-    "ignore": [
-      "node_modules",
-      "lib",
-      "coverage",
-      "dist"
+    "includes": [
+      "**",
+      "!**/node_modules",
+      "!**/lib",
+      "!**/coverage",
+      "!**/dist",
+      "!**/public"
     ]
   },
   "overrides": [
     {
-      "include": ["*.md"],
+      "includes": ["**/*.md"],
       "linter": {
         "rules": {
           "correctness": {

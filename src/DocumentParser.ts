@@ -3,14 +3,14 @@
  * Replaces the old DocumentParser that used [req], [imp], [test], [doc] macros
  */
 
-import type { Item, ItemRelationship } from './types.js';
-import type { ConfigLoader } from './config/TraceabilityConfig.js';
+import type { ConfigLoader } from "./config/TraceabilityConfig.js";
+import type { Item, ItemRelationship } from "./types.js";
 
 /**
  * Warning type for parser warnings
  */
 export interface ParserWarning {
-  type: 'old_macro' | 'missing_role' | 'unknown_role' | 'invalid_attribute';
+  type: "old_macro" | "missing_role" | "unknown_role" | "invalid_attribute";
   message: string;
   file: string;
   line?: number;
@@ -21,7 +21,7 @@ export interface ParserWarning {
  * Parse error type
  */
 export interface ParserError {
-  type: 'syntax_error' | 'duplicate_id' | 'invalid_relation';
+  type: "syntax_error" | "duplicate_id" | "invalid_relation";
   message: string;
   file: string;
   line?: number;
@@ -59,14 +59,14 @@ export interface ParserResult {
  * - Parses inline relationship macros
  */
 export class DocumentParser {
-  private currentFile: string = '';
+  private currentFile: string = "";
   private configLoader?: ConfigLoader;
   private strictMode: boolean = true;
   private warnings: ParserWarning[] = [];
   private errors: ParserError[] = [];
 
   constructor(options: ParserOptions = {}) {
-    this.currentFile = options.sourceFile || '';
+    this.currentFile = options.sourceFile || "";
     this.configLoader = options.configLoader;
     this.strictMode = options.strictMode !== false;
   }
@@ -77,11 +77,11 @@ export class DocumentParser {
    */
   parse(content: string, sourceFile?: string): ParserResult {
     // Validate input
-    if (typeof content !== 'string') {
-      throw new TypeError('Content must be a string');
+    if (typeof content !== "string") {
+      throw new TypeError("Content must be a string");
     }
 
-    this.currentFile = sourceFile?.trim() || 'unknown';
+    this.currentFile = sourceFile?.trim() || "unknown";
 
     this.warnings = [];
     this.errors = [];
@@ -102,7 +102,11 @@ export class DocumentParser {
     this.parseItemMacros(content, sourceFile || this.currentFile, seen, result);
 
     // Third pass: Parse inline relationship macros from item content
-    this.parseInlineMacrosFromItems(content, sourceFile || this.currentFile, result);
+    this.parseInlineMacrosFromItems(
+      content,
+      sourceFile || this.currentFile,
+      result,
+    );
 
     // Add accumulated warnings and errors to result
     result.warnings = this.warnings;
@@ -115,16 +119,16 @@ export class DocumentParser {
    * Check for old macro syntax and generate errors
    */
   private checkForOldMacros(content: string, _result: ParserResult): void {
-    const oldMacros = ['req', 'imp', 'test', 'doc', 'design'];
+    const oldMacros = ["req", "imp", "test", "doc", "design"];
 
     for (const macro of oldMacros) {
-      const regex = new RegExp(`\[${macro}(,\s*|\s)\.?\]`, 'g');
+      const regex = new RegExp(`[${macro}(,s*|s).?]`, "g");
       let match: RegExpExecArray | null;
 
       while ((match = regex.exec(content)) !== null) {
         const line = this.lineAt(content, match.index);
         const error: ParserError = {
-          type: 'syntax_error',
+          type: "syntax_error",
           message: `Old macro syntax '[${macro}]' is deprecated. Use [item, role=${this.getSuggestedRole(macro)}] instead.`,
           file: this.currentFile,
           line,
@@ -136,7 +140,7 @@ export class DocumentParser {
         } else {
           // In non-strict mode, add as warning
           this.warnings.push({
-            type: 'old_macro',
+            type: "old_macro",
             message: error.message,
             file: this.currentFile,
             line,
@@ -152,13 +156,13 @@ export class DocumentParser {
    */
   private getSuggestedRole(macro: string): string {
     const mapping: Record<string, string> = {
-      'req': 'requirement',
-      'imp': 'implementation',
-      'test': 'test',
-      'doc': 'document',
-      'design': 'design',
+      req: "requirement",
+      imp: "implementation",
+      test: "test",
+      doc: "document",
+      design: "design",
     };
-    return mapping[macro] || 'unknown';
+    return mapping[macro] || "unknown";
   }
 
   /**
@@ -185,7 +189,7 @@ export class DocumentParser {
       const block = this.extractBlock(content, startPosition);
       if (!block) {
         this.warnings.push({
-          type: 'invalid_attribute',
+          type: "invalid_attribute",
           message: `Item block macro at line ${line} has no content block (missing delimiter)`,
           file: sourceFile,
           line,
@@ -201,9 +205,9 @@ export class DocumentParser {
       attributes.id = id;
       if (!id) {
         // Generate auto ID
-        id = this.generateId('ITEM');
+        id = this.generateId("ITEM");
         this.warnings.push({
-          type: 'invalid_attribute',
+          type: "invalid_attribute",
           message: `Item at line ${line} has no id attribute. Generated: ${id}`,
           file: sourceFile,
           line,
@@ -214,7 +218,7 @@ export class DocumentParser {
       // Check for duplicate ID
       if (seen.has(id)) {
         this.errors.push({
-          type: 'duplicate_id',
+          type: "duplicate_id",
           message: `Duplicate item ID: ${id}. An item with this ID already exists.`,
           file: sourceFile,
           line,
@@ -227,9 +231,9 @@ export class DocumentParser {
       // Extract role
       let role = attributes.role;
       if (!role) {
-        role = 'unknown';
+        role = "unknown";
         this.warnings.push({
-          type: 'missing_role',
+          type: "missing_role",
           message: `Item '${id}' at line ${line} has no role attribute. Defaulting to 'unknown'.`,
           file: sourceFile,
           line,
@@ -238,11 +242,11 @@ export class DocumentParser {
       }
 
       // Check if role is known in configuration (if config loader available)
-      if (this.configLoader && role !== 'unknown') {
+      if (this.configLoader && role !== "unknown") {
         if (!this.configLoader.isKnownRole(role)) {
           this.warnings.push({
-            type: 'unknown_role',
-            message: `Item '${id}' at line ${line} has unknown role '${role}'. Known roles: ${this.configLoader.getConfig().roles.join(', ')}`,
+            type: "unknown_role",
+            message: `Item '${id}' at line ${line} has unknown role '${role}'. Known roles: ${this.configLoader.getConfig().roles.join(", ")}`,
             file: sourceFile,
             line,
             position: startPosition,
@@ -302,8 +306,10 @@ export class DocumentParser {
       let value = match[2];
 
       // Remove surrounding quotes if present
-      if ((value.startsWith('"') && value.endsWith('"')) ||
-          (value.startsWith("'") && value.endsWith("'"))) {
+      if (
+        (value.startsWith('"') && value.endsWith('"')) ||
+        (value.startsWith("'") && value.endsWith("'"))
+      ) {
         value = value.slice(1, -1);
       }
 
@@ -318,25 +324,28 @@ export class DocumentParser {
    */
   private splitAttributes(attributesStr: string): string[] {
     const parts: string[] = [];
-    let current = '';
+    let current = "";
     let inQuotes = false;
-    let quoteChar = '';
+    let quoteChar = "";
 
     for (let i = 0; i < attributesStr.length; i++) {
       const char = attributesStr[i];
 
-      if ((char === '"' || char === "'") && (i === 0 || attributesStr[i - 1] !== '\\')) {
+      if (
+        (char === '"' || char === "'") &&
+        (i === 0 || attributesStr[i - 1] !== "\\")
+      ) {
         if (!inQuotes) {
           inQuotes = true;
           quoteChar = char;
         } else if (char === quoteChar) {
           inQuotes = false;
-          quoteChar = '';
+          quoteChar = "";
         }
         current += char;
-      } else if (char === ',' && !inQuotes) {
+      } else if (char === "," && !inQuotes) {
         parts.push(current);
-        current = '';
+        current = "";
       } else {
         current += char;
       }
@@ -365,7 +374,7 @@ export class DocumentParser {
 
     // For each item, parse its content for inline macros
     for (const item of result.items) {
-      const itemContent = item.content ?? '';
+      const itemContent = item.content ?? "";
 
       // Parse inline relationship macros: relationType:targetId[]
       // Example: satisfies:REQ-001[], addresses:DES-001[], implemented_by:IMP-001[]
@@ -374,10 +383,11 @@ export class DocumentParser {
 
       while ((match = inlineMacroRegex.exec(itemContent)) !== null) {
         const macro = match[1];
-        const line = this.lineAt(itemContent, match.index) + (item.sourceLine || 0);
+        const line =
+          this.lineAt(itemContent, match.index) + (item.sourceLine || 0);
 
         // Split macro into relation type and target ID
-        const colonIndex = macro.indexOf(':');
+        const colonIndex = macro.indexOf(":");
         if (colonIndex === -1) continue;
 
         const relationType = macro.substring(0, colonIndex);
@@ -398,7 +408,9 @@ export class DocumentParser {
         // Note: Relation validation is deferred to the extension level where the full graph is available.
         // The parser only extracts relationships; it doesn't validate them against config.
         result.relationships.push(relationship);
-        console.log(`Inline relationship found: ${item.id} ${relationType} ${targetId}`);
+        console.log(
+          `Inline relationship found: ${item.id} ${relationType} ${targetId}`,
+        );
       }
     }
   }
@@ -409,15 +421,18 @@ export class DocumentParser {
     if (!m || m.index === undefined) return null;
     const blockStart = startIndex + m.index! + 1;
     const delimiter = m[1];
-    const blockEnd = content.indexOf(`\n${delimiter}\n`, blockStart + delimiter.length + 1);
+    const blockEnd = content.indexOf(
+      `\n${delimiter}\n`,
+      blockStart + delimiter.length + 1,
+    );
     if (blockEnd === -1) return null;
     return content.substring(startIndex, blockEnd + delimiter.length + 2);
   }
 
   private extractBody(block: string): string {
     // Find the delimiter: either ==== or --
-    const hasEquals = block.includes('====');
-    const delimiter = hasEquals ? '====' : '--';
+    const hasEquals = block.includes("====");
+    const delimiter = hasEquals ? "====" : "--";
     const start = block.indexOf(delimiter) + delimiter.length;
     const end = block.lastIndexOf(delimiter);
     return block.substring(start, end).trim();
@@ -437,7 +452,7 @@ export class DocumentParser {
    */
   parseLegacyFormat?(
     content: string,
-    sourceFile: string
+    sourceFile: string,
   ): {
     requirements: any[];
     implementations: any[];
