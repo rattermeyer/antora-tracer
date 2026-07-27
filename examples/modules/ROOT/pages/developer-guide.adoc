@@ -219,7 +219,7 @@ Parsing supports:
 - Malformed item handling with auto-generated ids
 - Source file and line tracking
 
-Inline macro regex: `/<relation-type>:<TARGET-ID>\[\]/` — relation types are user-defined, so the parser accepts any valid identifier before the colon.
+Inline macro regex: `/<relation-type>:<TARGET-ID>\[\]/` — relation types are user-defined, so the parser accepts any valid identifier before the colon. Inline macros are parsed during Pass 1 and stored in the graph. They are always stripped from rendered output in Pass 3 — `traceability:links[]` is the sole rendering mechanism.
 
 === MatrixGenerator
 

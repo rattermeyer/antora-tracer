@@ -366,6 +366,61 @@ Relationship syntax:
 - Multiple types per item: write each on its own line
 - The extension validates that each relation is allowed by your config
 
+=== Inline Macros Are Data Markers
+
+[IMPORTANT]
+====
+Inline relationship macros (`addresses:REQ-001[]`) are *always invisible* in rendered output. They are pure data markers stored in the traceability graph. To display relationships in your documentation, use the `traceability:links[]` macro described below.
+
+This keeps your source clean — type the relationship once, let the macro handle display.
+====
+
+=== The `traceability:links[]` Macro
+
+Place `traceability:links[]` inside an item block to render all outgoing relationships as a formatted list:
+
+[source,asciidoc]
+----
+[#ARC-001, item, role=architecture, title="Project Scope"]
+====
+Project description...
+
+addresses:REQ-001[]
+addresses:REQ-006[]
+addresses:REQ-009[]
+
+traceability:links[]
+====
+----
+
+The macro queries the traceability graph at build time and generates AsciiDoc output — lists, tables, or inline xrefs — showing each relationship with the target's full title.
+
+*Opt-in per page via document attributes:*
+
+[source,asciidoc]
+----
+= Architecture
+:traceability-links: true
+:traceability-style: list
+:traceability-order: target-id
+----
+
+[width="100%", cols="25,75"]
+|===
+| Attribute | Effect
+
+| `:traceability-links:`
+| `true` to enable the macro. Without it, `traceability:links[]` text is stripped.
+
+| `:traceability-style:`
+| `list` (default, bulleted list), `table` (AsciiDoc table), or `inline` (comma-separated)
+
+| `:traceability-order:`
+| `target-id` (default, alphabetical by ID), `target-title` (by title), or `relation-type` (grouped by type)
+|===
+
+*PDF compatibility:* The macro generates standard AsciiDoc constructs (xrefs, lists, tables) — compatible with both HTML and PDF backends identically.
+
 === Role-Based Validation
 
 The extension validates:
@@ -424,7 +479,7 @@ One HTML and one CSV file per configured matrix:
 | CSV with header row and summary statistics
 |===
 
-Each matrix row shows one item (from the `rows` role) and its related items per column role. Cells show IDs of related items, or `—` if none exist.
+Each matrix row shows one item (from the `rows` role) and its related items per column role. Cells show IDs of related items, or `—` if none exist. All item IDs are *clickable links* — clicking navigates to the item's definition in the rendered HTML documentation.
 
 Status badges in the HTML output:
 
