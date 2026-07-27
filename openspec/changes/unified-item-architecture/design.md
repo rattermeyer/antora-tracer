@@ -19,7 +19,7 @@ This design introduces a unified `[item]` macro with user-defined roles, enablin
 **Non-Goals:**
 - Support both old and new macro syntax simultaneously
 - Build a custom query language (use Neo4j instead)
-- Support template inheritance in v2.0
+- Support template inheritance in 0.7.0
 - Support hot-reloading of configuration
 - Build a web-based traceability viewer (future enhancement)
 
@@ -212,9 +212,49 @@ Known roles: requirement, design, test, document
 - **Error on unknown roles**: Too strict, blocks users from experimenting
 - **Silent ignore**: Users might not notice configuration issues
 
+### 9. Documentation Structure — User Guide and Developer Guide
+
+**Decision**: Rewrite both guides from scratch for the unified architecture. The existing guides describe the pre-unification `[req]`/`[imp]`/`[test]`/`[doc]` API and don't mention `[item]`, configuration, presets, Neo4j, or role-based validation.
+
+**User Guide** (10 sections, follows the user journey):
+
+1. Overview — 3-sentence pitch + key capabilities
+2. Getting Started — install → preset → first `[item]` → build → look
+3. The Traceability Model — roles, relations, how they connect (conceptual)
+4. Configuration — presets path → custom YAML → playbook options
+5. Writing Items — `[item]` macro reference, inline relationships, attributes, validation
+6. Generated Output — matrices, coverage, reading the reports
+7. CLI Reference — all 6 commands with examples
+8. Presets Reference — table of all 4 presets with per-preset roles and relations
+9. Neo4j Export — CSV/Cypher, example queries from presets
+10. Recipes & Patterns — common setups, troubleshooting
+
+**Developer Guide** (8 sections, mirrors `src/` layout):
+
+1. Architecture Overview — real component diagram showing DocumentParser → TraceabilityGraph → MatrixGenerator/Neo4jExporter
+2. Core Components — RequirementsTraceabilityExtension, TraceabilityGraph, DocumentParser, MatrixGenerator, Neo4jExporter, TemplateRenderer
+3. Configuration System — ConfigLoader, presets, relation validation
+4. Antora Integration — AntoraTraceabilityExtension, events, lifecycle
+5. Data Model — Item, ItemRelationship, TraceabilityConfig
+6. CLI Architecture — commander setup
+7. Contributing — setup, testing (short overview), code style
+8. Build & Release — build script, npm publish
+
+**Dropped from old dev guide:**
+- AsciidoctorExtension section (component no longer exists)
+- "Bidirectional Relationships" section (was Phase 3, now role-based)
+- "Extending the Extension" section (users extend via config, not code)
+- v0.2.0/v0.3.0 version history (pre-dates unified architecture)
+
+**Both guides:**
+- All content references `[item]` macro, not `[req]`/`[imp]`/`[test]`/`[doc]`/`[design]`
+- All relationship types are configuration-driven, not hardcoded
+- Version framing is 0.7.0 (first real release), not v2.0
+- No "Phase 2" or "Phase 3" framing — all features are unified
+
 ## Risks / Trade-offs
 
-**[Risk] Breaking changes** → Document migration path clearly. Since extension is not in production, this is acceptable. Provide migration guide and examples.
+**[Risk] Breaking changes from pre-release** → Since there was no stable v1.x release or existing user base, breaking changes are acceptable. Document the current API as the first version.
 
 **[Risk] Configuration complexity** → Provide presets and good documentation. Most users will start from a preset and customize.
 
@@ -230,7 +270,7 @@ Known roles: requirement, design, test, document
 
 ## Migration Plan
 
-### For Users (When v2.0 is Released)
+### For Users (0.7.0 Release)
 
 1. **Update configuration**: Create `traceability.yml` with roles, relations, matrices
 2. **Update AsciiDoc files**: Replace `[req]`, `[imp]`, `[test]`, `[doc]` with `[item, role=...]`
@@ -245,10 +285,7 @@ Known roles: requirement, design, test, document
 
 ### Rollback Strategy
 
-Since this is a major version bump (v2.0), rollback is simple:
-- Revert to v1.x
-- No database migrations or data changes
-- All artifacts are generated from source files
+Since this is the first stable release (v0.7.0), there is no previous version to roll back to.
 
 ## Open Questions
 
@@ -256,6 +293,4 @@ Since this is a major version bump (v2.0), rollback is simple:
 
 2. **Should presets include matrix templates?** - Different domains might want different matrix layouts. Could add HTML template customization per preset.
 
-3. **Should we validate configuration files at startup?** - Yes, fail fast with clear error messages for invalid configs.
-
-4. **Should we support multiple configuration files?** - For large projects with multiple traceability domains, could support config inheritance or composition.
+3. **Should we support multiple configuration files?** - For large projects with multiple traceability domains, could support config inheritance or composition.

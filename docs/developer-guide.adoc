@@ -1,63 +1,48 @@
-= Antora Requirements Traceability Extension: Developer Guide
-:description: Complete developer documentation for the Requirements Traceability Extension
+= Developer Guide
+:description: Developer documentation for the Antora Requirements Traceability Extension
 :keywords: antora, asciidoc, requirements, traceability, development, api
-:author: Requirements Traceability Team
-:revdate: 2026-07-19
-:version: 0.3.0
+:author: Antora Traceability Team
+:revdate: 2026-07-27
+:version: 0.7.0
+:toc: macro
+
+toc::[]
 
 == Overview
 
-This guide provides comprehensive information for developers who want to understand, extend, or contribute to the Antora Requirements Traceability Extension.
+This guide covers the internal architecture, APIs, and contribution workflow for the Antora Requirements Traceability Extension. It assumes familiarity with TypeScript, Antora's extension system, and the traceability concepts described in the User Guide.
 
 == Architecture
 
-The extension follows a modular architecture with clear separation of concerns:
+[listing]
+....
+  ┌─────────────────────────────────────────────────────────┐
+  │                    Antora Pipeline                       │
+  │                                                         │
+  │  contentClassified ──▶ AntoraTraceabilityExtension      │
+  │  sitePublished     ──▶   │                              │
+  │                          │ register, on(), generate     │
+  │                          ▼                              │
+  │               RequirementsTraceabilityExtension         │
+  │                 │         │         │         │         │
+  │                 ▼         ▼         ▼         ▼         │
+  │         DocumentParser  Graph   MatrixGen  Neo4jExport  │
+  │                 │         │         │         │         │
+  │                 └─────────┴────┬────┴─────────┘         │
+  │                                │                        │
+  │                     ConfigLoader + Presets             │
+  │                     TemplateRenderer (Mustache)         │
+  └─────────────────────────────────────────────────────────┘
+....
 
-[mermaid]
-----
-graph TD
-    A[Antora Extension] --> B[Document Parser]
-    A --> C[Traceability Graph]
-    A --> D[Matrix Generator]
-    A --> E[Asciidoctor Extension]
-    B --> C
-    C --> D
-    D --> F[Output: CSV/HTML]
-    E --> C
-----
+The extension sits inside Antora's event pipeline. `AntoraTraceabilityExtension` registers for `contentClassified` (process items from AsciiDoc) and `sitePublished` (generate matrices and coverage). It delegates to `RequirementsTraceabilityExtension` which orchestrates the core components. Configuration flows in through `ConfigLoader` — either from a built-in preset or a user-provided YAML file.
 
-=== Component Diagram
+Key architectural decisions:
 
-[plantuml]
-----
-@startuml
-package "Antora Extension" {
-  [AntoraTraceabilityExtension] as antora
-}
-
-package "Core" {
-  [RequirementsTraceabilityExtension] as main
-  [TraceabilityGraph] as graph
-  [DocumentParser] as parser
-  [MatrixGenerator] as matrix
-}
-
-package "Asciidoctor Integration" {
-  [AsciidoctorExtension] as asciidoc
-}
-
-antora --> main : uses
-antora --> parser : uses
-antora --> graph : uses
-antora --> matrix : uses
-main --> graph : contains
-main --> parser : uses
-main --> matrix : uses
-asciidoc --> graph : updates
-parser --> graph : populates
-matrix --> graph : queries
-@enduml
-----
+- *Manual regex parsing* over Asciidoctor.js block processors — simpler, version-independent, easier to test
+- *Config-driven roles and relations* — the graph doesn't know about "requirements" or "tests"; it knows about items with roles and validated relations
+- *Fire-and-forget async init* — the Antora extension constructor starts initialization asynchronously; event handlers are registered after config loads
+- *Unknown roles = warnings* — graceful degradation for items with roles not yet in config
 
 == Project Structure
 
@@ -65,980 +50,584 @@ matrix --> graph : queries
 ----
 antora-asciidoc-tracing/
 ├── src/
-│   ├── index.ts                 # Main extension class
-│   ├── types.ts                 # TypeScript interfaces and types
-│   ├── TraceabilityGraph.ts     # Graph data structure and algorithms
-│   ├── DocumentParser.ts        # AsciiDoc content parser
-│   ├── MatrixGenerator.ts       # Matrix generation logic
-│   ├── AsciidoctorExtension.ts  # Asciidoctor.js integration
-│   ├── antora-extension.ts      # Antora extension integration
-│   └── cli.ts                   # Command-line interface
-├── lib/
-│   └── (compiled TypeScript)
+│   ├── index.ts                     # RequirementsTraceabilityExtension (orchestrator)
+│   ├── types.ts                     # Item, ItemRelationship interfaces
+│   ├── TraceabilityGraph.ts         # In-memory graph with query + validation
+│   ├── DocumentParser.ts            # Regex-based AsciiDoc parser
+│   ├── MatrixGenerator.ts           # Config-driven matrix generation
+│   ├── Neo4jExporter.ts             # Neo4j CSV + Cypher export
+│   ├── TemplateRenderer.ts          # Mustache template loading + rendering
+│   ├── antora-extension.ts          # Antora extension entry point
+│   ├── cli.ts                       # Commander CLI entry point
+│   ├── config/
+│   │   └── TraceabilityConfig.ts    # ConfigLoader, types, presets
+│   ├── presets/
+│   │   ├── requirements-engineering.yml
+│   │   ├── agile.yml
+│   │   ├── medical-iec62304.yml
+│   │   └── minimal.yml
+│   └── templates/
+│       ├── matrix.html.mustache
+│       └── partials/
 ├── test/
-│   ├── *.test.ts               # Test suites
+│   ├── cli.test.ts
+│   ├── antora-extension.test.ts
+│   ├── graph-and-api.test.ts
 │   └── ...
 ├── docs/
-│   ├── user-guide.adoc          # User documentation
-│   └── developer-guide.adoc     # Developer documentation
-├── openspec/
-│   └── changes/                 # OpenSpec change artifacts
+│   ├── user-guide.adoc
+│   ├── developer-guide.adoc
+│   └── adr/
+├── scripts/
+│   └── build.js                    # Post-compile copy script
 ├── package.json
 ├── tsconfig.json
-└── README.md
+├── tsconfig.test.json
+└── README.adoc
 ----
+
+Two TypeScript configurations:
+
+- `tsconfig.json` — production build: `src/` → `lib/`
+- `tsconfig.test.json` — test build: `src/` + `test/` → `lib/src/` + `lib/test/`
+
+The build script (`scripts/build.js`) copies templates, presets, and compiled files to `lib/` for npm distribution.
 
 == Core Components
 
-=== RequirementsTraceabilityExtension (src/index.ts)
+=== RequirementsTraceabilityExtension
 
-The main orchestrator class that composes all the focused modules.
-
-**Responsibilities:**
-
-* Coordinate between parser, graph, and matrix generator
-* Provide public API for external use
-* Manage extension lifecycle
-* Handle Asciidoctor integration
-
-**Public API:**
+`src/index.ts` — the orchestrator. Owns the `TraceabilityGraph`, delegates processing to `DocumentParser`, generation to `MatrixGenerator`, and export to `Neo4jExporter`.
 
 [source,typescript]
 ----
-class RequirementsTraceabilityExtension {
-  // Properties
-  public readonly graph: TraceabilityGraph;
-  public currentFile: string | null;
+export class RequirementsTraceabilityExtension {
+  readonly graph: TraceabilityGraph;
+  configLoader?: ConfigLoader;
+  currentFile: string | null;
+}
 
-  // Processing
-  async process(content: string, options?: { sourceFile?: string }): Promise<string>;
+// Factory methods
+RequirementsTraceabilityExtension.createWithConfig(configPath?: string): Promise<RequirementsTraceabilityExtension>;
+RequirementsTraceabilityExtension.createWithPreset(presetName: string): Promise<RequirementsTraceabilityExtension>;
+----
 
-  // Node Management
-  addImplementation(imp: Implementation): void;
-  addTest(test: Test): void;
-  addDocument(doc: Document): void;
-  addRelationship(fromId: string, toId: string, type: RelationshipType): void;
+Key methods:
 
-  // Matrix Generation
-  generateMatrix(type?: string): TraceabilityMatrix;
-  generateDetailedMatrix(type?: string): DetailedTraceabilityMatrix;
-  generateTestMatrix(): TraceabilityMatrix;
-  exportMatrixToCSV(type?: string): string;
-  exportMatrixToHTML(type?: string): string;
+[width=100%, cols="35,65"]
+|===
+| Method | Description
 
-  // Analysis
-  getCoverageReport(): CoverageReport;
-  getImpactAnalysis(id: string): string[];
+| `process(content, options)` | Parse AsciiDoc content, register items and relationships in the graph, return `ParserResult`
+| `processFiles(files)` | Process multiple files, return per-file results and aggregate
+| `getAllItems()` | All items in the graph
+| `getAllRelationships()` | All relationships in the graph
+| `getItemsByRole(role)` | Filter items by role
+| `getRelationships(id, type?)` | Relationships from an item, optionally filtered by type
+| `getRelatedItems(id, type?)` | Items targeted by relationships from an item
+| `getRoleStatistics()` | Item counts per role
+| `validate()` | Run graph validation (orphaned references, missing targets)
+| `getCoverageReport()` | Per-role item counts and matrix-specific coverage
+| `getConfigErrors()` | Configuration validation errors
+| `createNeo4jExporter()` | Create a Neo4jExporter for the current graph
+| `exportToNeo4jCSV(options)` | Export directly to CSV
+| `getMatrixDefinitions()` | Matrix definitions from loaded config
+| `isKnownRole(role)` | Check if a role is in the loaded config
+| `isRelationAllowed(src, tgt, type)` | Check if a relation is allowed by config
+| `getAllowedRelations(src, tgt)` | Get allowed relation types between roles
+| `listPresets()` | List all built-in presets
+| `getPreset(name)` | Get a specific preset
+| `clear()` | Clear graph and reset state
+| `resetWithConfig(configLoader)` | Set a new ConfigLoader and update graph
+|===
+
+Delegate methods on the extension (forward to `graph`):
+
+- `findPath(from, to, maxDepth?)` — BFS path between items
+- `getImpactAnalysis(id)` — all reachable items in both directions
+- `getRelationshipsByRoles(src, tgt)` — relationships between two roles
+
+=== TraceabilityGraph
+
+`src/TraceabilityGraph.ts` — in-memory directed graph. Items stored in a `Map<string, Item>` keyed by id. Relationships stored in a `Map<string, ItemRelationship>` keyed by composite key `fromId-type-targetId`.
+
+[source,typescript]
+----
+export class TraceabilityGraph {
+  // Node management
+  addItem(item: Item): void;
+  getItem(id: string): Item | undefined;
+  getAllItems(): Item[];
+  getItemsByRole(role: string): Item[];
+  getAllRoles(): string[];
+
+  // Relationship management
+  addRelationship(relationship: ItemRelationship): void;
+  getRelationship(id: string): ItemRelationship | undefined;
+  getAllRelationships(): ItemRelationship[];
+  getRelationships(fromId: string, type?: string): ItemRelationship[];
+  getReverseRelationships(targetId: string, type?: string): ItemRelationship[];
+
+  // Query
+  getRelatedItems(itemId: string, relationType?: string): Item[];
+  getItemsWithRelationTo(itemId: string, relationType?: string): Item[];
+  getRelationshipsByRoles(sourceRole: string, targetRole: string): ItemRelationship[];
+  getRoleStatistics(): Record<string, number>;
+
+  // Graph algorithms
   findPath(fromId: string, toId: string, maxDepth?: number): string[] | null;
-  getUncoveredRequirements(): Requirement[];
+  getImpactAnalysis(itemId: string): string[];
 
   // Validation
-  validate(): string[];
-  static isValidId(id: string): boolean;
-  static isValidRelationshipType(type: string): boolean;
-
-  // Details
-  getRequirementsWithDetails(): RequirementDetail[];
-  getImplementationsWithDetails(): ImplementationDetail[];
-  getTestsWithDetails(): TestDetail[];
+  validate(): ValidationResult;  // { errors: string[], warnings: string[] }
 
   // Lifecycle
   clear(): void;
+  merge(other: TraceabilityGraph): void;
+  setConfigLoader(configLoader: ConfigLoader): void;
 }
 ----
 
-=== TraceabilityGraph (src/TraceabilityGraph.ts)
+Internally uses private maps: `_items`, `_relationships`. Maintains indexes for fast role-based and type-based queries. The `addRelationship` method validates:
+. Source item exists
+. Target item exists
+. If ConfigLoader is set, relation is allowed between the two item roles
 
-Manages the graph data structure for all traceability elements and their relationships.
+Invalid relations are stored anyway (graceful degradation) with a warning logged.
 
-**Responsibilities:**
+=== DocumentParser
 
-* Store requirements, implementations, tests, and documents
-* Manage relationships between elements
-* Provide query methods for graph traversal
-* Calculate coverage metrics
-* Detect circular references
-* Validate graph integrity
+`src/DocumentParser.ts` — regex-based AsciiDoc parser. Two-pass approach:
 
-**Key Methods:**
+. *First pass* — find all `[item, ...]` block macros and extract id, role, title, status, attributes
+. *Second pass* — scan item content for inline relationship macros: `<type>:<TARGET-ID>[]`
 
 [source,typescript]
 ----
-class TraceabilityGraph {
-  // Node Management
-  addRequirement(req: Requirement): void;
-  addImplementation(imp: Implementation): void;
-  addTest(test: Test): void;
-  addDocument(doc: Document): void;
-  getRequirement(id: string): Requirement | undefined;
-  getImplementation(id: string): Implementation | undefined;
-  getTest(id: string): Test | undefined;
-  getDocument(id: string): Document | undefined;
-  getNode(id: string): AnyNode | undefined;
-  hasNode(id: string): boolean;
-  getAllRequirements(): Requirement[];
-  getAllImplementations(): Implementation[];
-  getAllTests(): Test[];
-  getAllDocuments(): Document[];
+export interface ParserResult {
+  items: Item[];
+  relationships: ItemRelationship[];
+  warnings: ParserWarning[];
+  errors: ParserError[];
+}
+----
 
-  // Relationship Management
-  addRelationship(relationship: Relationship): void;
-  getRelationships(fromId: string, type?: RelationshipType): Relationship[];
-  getReverseRelationships(targetId: string, type?: RelationshipType): Relationship[];
+Parsing supports:
+- Block attributes on `[item]` macros
+- Multiple inline relationships per item
+- Old macro syntax detection (`[req]`, `[imp]`, etc.) with deprecation warnings
+- Malformed item handling with auto-generated ids
+- Source file and line tracking
 
-  // Coverage Analysis
-  getCoverage(): CoverageReport;
-  getRequirementsWithImplementations(): Set<string>;
-  getRequirementsWithTests(): Set<string>;
-  getUncoveredRequirements(): Requirement[];
+Inline macro regex: `/<relation-type>:<TARGET-ID>\[\]/` — relation types are user-defined, so the parser accepts any valid identifier before the colon.
 
-  // Graph Traversal
-  findPath(fromId: string, toId: string, maxDepth?: number): string[] | null;
-  getImpactAnalysis(id: string): string[];
+=== MatrixGenerator
+
+`src/MatrixGenerator.ts` — generates matrices from the graph using matrix definitions from configuration.
+
+[source,typescript]
+----
+export class MatrixGenerator {
+  constructor(graph: TraceabilityGraph, configLoader?: ConfigLoader);
+
+  generateMatrix(name: string): GeneratedMatrix;
+  generateDefaultMatrix(): GeneratedMatrix;
+  generateCoverageReport(): { overall: number; complete: number; partial: number; missing: number; total: number };
+}
+
+export interface GeneratedMatrix {
+  name: string;
+  description?: string;
+  rows: MatrixRow[];
+  coverage: CoverageStats;
+  generatedAt: string;
+}
+----
+
+Matrix generation is config-driven: for each row role's items, it queries the graph for relationships to column-role items, filtering by `coverageRelations`. The `MatrixGenerator` delegates HTML rendering to `TemplateRenderer`. CSV output is generated directly.
+
+=== Neo4jExporter
+
+`src/Neo4jExporter.ts` — exports the graph to Neo4j-compatible formats.
+
+[source,typescript]
+----
+export class Neo4jExporter {
+  constructor(graph: TraceabilityGraph);
+
+  export(options: Neo4jExportOptions): Neo4jExportResult;
+}
+
+export interface Neo4jExportOptions {
+  outputDir: string;
+  format: 'csv' | 'cypher';
+  includeContent?: boolean;       // default: true
+  includeAllAttributes?: boolean;  // default: true
+}
+
+export interface Neo4jExportResult {
+  format: 'csv' | 'cypher';
+  nodeCount: number;
+  relationshipCount: number;
+  files: string[];
+}
+----
+
+CSV export produces `nodes.csv` and `relationships.csv`. Cypher export produces a single `import.cypher` file. Special characters in content are properly escaped for both formats.
+
+=== TemplateRenderer
+
+`src/TemplateRenderer.ts` — Mustache template engine wrapper.
+
+[source,typescript]
+----
+export class TemplateRenderer {
+  constructor(templateDir?: string);
+
+  render(templateName: string, data: any): string;
+  renderMatrix(matrix: GeneratedMatrix, template?: string): string;
+}
+----
+
+Loads templates from `src/templates/` by default. Falls back to built-in templates when custom template directory is provided but specific files are missing. Uses `mustache` as the underlying renderer.
+
+== Configuration System
+
+=== ConfigLoader
+
+`src/config/TraceabilityConfig.ts` — loads, validates, and exposes configuration.
+
+[source,typescript]
+----
+export class ConfigLoader {
+  load(configPath?: string): CompleteConfig;
+  loadPreset(presetName: string): Preset;
+  getConfig(): CompleteConfig;
+  reload(): CompleteConfig;
+  listPresets(): { name: string; description: string; version: string }[];
 
   // Validation
-  validate(): string[];
-
-  // Lifecycle
-  size(): number;
-  clear(): void;
+  isKnownRole(role: string): boolean;
+  isRelationAllowed(sourceRole, targetRole, relationType): boolean;
+  getAllowedRelations(sourceRole, targetRole): string[];
+  getMatrices(): MatrixDefinition[];
+  getMatrix(name: string): MatrixDefinition | undefined;
 }
 ----
 
-**Data Structures:**
+Configuration loading flow:
 
-* `_requirements: Map<string, Requirement>`
-* `_implementations: Map<string, Implementation>`
-* `_tests: Map<string, Test>`
-* `_documents: Map<string, Document>`
-* `_relationships: Map<string, Relationship>`
+. Load YAML file or use preset
+. Normalize (roles to lowercase, initialize empty relations/matrices)
+. If `extends` field present, merge with preset
+. Validate final config (roles are non-empty strings, relations reference valid roles, matrices have valid row/column roles)
+. Cache and expose
 
-**Performance Optimizations:**
+Presets are loaded from `src/presets/*.yml` (at build time, copied to `lib/presets/`). The `loadPreset` method searches built-in paths first, then common cwd locations for custom presets.
 
-* Caching for `getAll*()` methods
-* Cache invalidation on mutations
-* O(1) existence checks with `hasNode()`
+=== Preset System
 
-=== DocumentParser (src/DocumentParser.ts)
+Built-in presets are YAML files shipped with the package. Each preset defines:
 
-Parses AsciiDoc content to extract traceability elements and relationships.
+```yaml
+name: requirements-engineering
+description: "..."
+version: 1.0.0
+compatibility:
+  minExtensionVersion: 0.7.0
+traceability:
+  roles: [...]
+  relations: {...}
+  matrices: [...]
+neo4j:
+  queries: [...]
+documentation:
+  description: "..."
+```
 
-**Responsibilities:**
+The `minExtensionVersion` field in `compatibility` is reserved for future version checks. Currently informational.
 
-* Parse block macros (`[req]`, `[imp]`, `[test]`, `[doc]`)
-* Parse inline relationship macros
-* Validate IDs for uniqueness
-* Extract metadata (title, status, attributes)
-* Track source file and line information
+=== Relation Validation
 
-**Key Methods:**
+The `TraceabilityGraph.addRelationship()` method calls `ConfigLoader.isRelationAllowed()`:
 
-[source,typescript]
-----
-class DocumentParser {
-  parse(content: string, sourceFile: string): {
-    requirements: Requirement[];
-    implementations: Implementation[];
-    tests: Test[];
-    documents: Document[];
-    relationships: Relationship[];
-  };
-}
-----
+. Lowercase both roles and relation type
+. Check both roles are in the config's `roles` list
+. Look up `config.relations[sourceRole][targetRole]`
+. Check the relation type is in the allowed list
+. Return `true`/`false`
 
-**Parsing Logic:**
+If ConfigLoader is not set (no config loaded), all relations are allowed (unguarded mode). Unknown roles generate warnings; disallowed relations generate errors.
 
-. First pass: Parse all block macros to extract nodes
-. Second pass: Parse inline macros from node content to extract relationships
-. Validate IDs for uniqueness within each type
-. Auto-generate IDs for nodes without explicit IDs
-. Warn on non-standard ID formats
+== Antora Integration
 
-**Supported Block Macros:**
+=== AntoraTraceabilityExtension
 
-[cols="1,2,3"]
-|===
-| Macro | Description | Example
-
-| `[req]` | Requirement | `[req, id=REQ-001, title="User Auth"]`
-| `[imp]` | Implementation | `[imp, id=IMP-001, title="Auth Service"]`
-| `[test]` | Test | `[test, id=TEST-001, title="Auth Tests"]`
-| `[doc]` | Document | `[doc, id=DOC-001, title="API Docs"]`
-|===
-
-**Supported Inline Macros:**
-
-[cols="1,2"]
-|===
-| Macro | Description
-
-| `satisfies:TARGET[]` | This element satisfies the target
-| `implements:TARGET[]` | This element implements the target
-| `tests:TARGET[]` | This element tests the target
-| `verifies:TARGET[]` | This element verifies the target
-| `documents:TARGET[]` | This element documents the target
-| `depends:TARGET[]` | This element depends on the target
-| `requires:TARGET[]` | This element requires the target
-|===
-
-=== MatrixGenerator (src/MatrixGenerator.ts)
-
-Generates traceability matrices in various formats.
-
-**Responsibilities:**
-
-* Generate traceability matrices from graph data
-* Export matrices in CSV and HTML formats
-* Calculate coverage metrics
-* Provide detailed matrix views
-
-**Key Methods:**
+`src/antora-extension.ts` — the Antora extension entry point. Implements the Antora extension interface:
 
 [source,typescript]
 ----
-class MatrixGenerator {
-  constructor(private readonly graph: TraceabilityGraph);
-
-  // Matrix Generation
-  generateMatrix(type?: string): TraceabilityMatrix;
-  generateDetailedMatrix(type?: string): DetailedTraceabilityMatrix;
-  generateTestMatrix(): TraceabilityMatrix;
-
-  // Export
-  exportToCSV(type?: string): string;
-  exportToHTML(type?: string): string;
-
-  // Coverage
-  getCoverageReport(): CoverageReport;
-
-  // Details
-  getRequirementsWithDetails(): RequirementDetail[];
-  getImplementationsWithDetails(): ImplementationDetail[];
-  getTestsWithDetails(): TestDetail[];
-}
-----
-
-**Matrix Types:**
-
-* `req-impl`: Requirements-to-Implementation matrix
-* `req-test`: Requirements-to-Test matrix
-* `full`: Full traceability matrix with all details
-
-**Output Formats:**
-
-* CSV: Comma-separated values with summary rows
-* HTML: Styled HTML tables with color-coded status
-
-=== AsciidoctorExtension (src/AsciidoctorExtension.ts)
-
-Integrates with Asciidoctor.js to register custom block processors.
-
-**Responsibilities:**
-
-* Register `[req]` block processor with Asciidoctor
-* Convert AsciiDoc content to HTML
-* Provide fallback for when native API is unavailable
-
-**Key Methods:**
-
-[source,typescript]
-----
-class AsciidoctorExtension {
-  constructor(private readonly asciidoctor: any);
-
-  register(onRequirementFound: (req: Requirement) => void): void;
-  async convert(content: string, sourceFile?: string): Promise<string>;
-}
-----
-
-=== AntoraTraceabilityExtension (src/antora-extension.ts)
-
-Integrates the extension with Antora's build pipeline.
-
-**Responsibilities:**
-
-* Process AsciiDoc files during Antora build
-* Generate traceability artifacts (matrices, coverage reports)
-* Enhance site navigation with traceability links
-* Manage extension configuration
-
-**Key Methods:**
-
-[source,typescript]
-----
-class AntoraTraceabilityExtension {
-  constructor(private readonly context: AntoraExtensionContext);
+export class AntoraTraceabilityExtension {
+  static register(context: AntoraExtensionContext): void;
 
   getTraceabilityExtension(): RequirementsTraceabilityExtension;
 }
 ----
 
-**Event Handlers:**
+*Registration flow:*
 
-* `contentClassified`: Process AsciiDoc files
-* `contentAggregated`: Generate traceability pages
-* `beforeSiteGenerated`: Enhance navigation
+. `register()` creates an instance and stores it in a global map keyed by playbook
+. Constructor calls `initializeAsync()` as fire-and-forget
+. `initializeAsync()` loads config (from playbook's extension config), creates `RequirementsTraceabilityExtension`, and registers event handlers
+. Event handlers registered: `contentClassified` (process items), `sitePublished` (generate matrices)
+
+*Playbook config resolution:*
+
+The extension reads its config from the Antora playbook's `extensions` array, matching by name `antora-requirements-traceability`. Config keys: `enabled`, `preset`, `configPath`, `outputDir`, `generateMatrices`, `matrixFormats`, `includeInNavigation`.
+
+*Lifecycle:*
+
+```
+register() → constructor → initializeAsync() [fire-and-forget]
+                              │
+                              ├─ loadConfig()     (from playbook)
+                              ├─ createExtension() (with preset or config)
+                              ├─ registerContentClassifier()
+                              ├─ registerPageProcessor()
+                              ├─ registerNavigationEnhancer()
+                              │
+                              ▼
+                         Event handlers active
+```
+
+Since `initializeAsync` is fire-and-forget, event handlers may not be registered for the first microtask. In tests and Antora, the build pipeline provides enough latency that handlers are always registered before events fire.
+
+=== Access Pattern
+
+The `getTraceabilityExtension()` method retrieves the underlying extension from the global map. Throws if called before initialization completes. This is used after events fire to verify data was populated.
 
 == Data Model
 
-=== Type Definitions (src/types.ts)
+=== Item
 
-All type definitions are in `src/types.ts`:
+`src/types.ts`:
 
 [source,typescript]
 ----
-// Base interface for all traceable nodes
-interface TraceableNode {
-  id: string;
-  title: string;
-  content?: string;
-  status?: string;
-  attributes?: Record<string, string>;
+export interface Item {
+  id: string;                        // Unique identifier
+  title: string;                     // Display title
+  content?: string;                  // Raw AsciiDoc content
+  role: string;                      // User-defined role
+  status?: string;                   // Free-form status
+  attributes: Record<string, string>; // Additional attributes
+  sourceFile?: string;               // Source AsciiDoc file
+  sourceLine?: number;               // Line number in source
+}
+----
+
+=== ItemRelationship
+
+[source,typescript]
+----
+export interface ItemRelationship {
+  id: string;                        // Composite: "fromId-type-targetId"
+  fromId: string;                    // Source item id
+  targetId: string;                  // Target item id
+  type: string;                      // User-defined relation type
   sourceFile?: string;
-  sourceLine?: number;
-}
-
-// Specific node types
-interface Requirement extends TraceableNode { /* ... */ }
-interface Implementation extends TraceableNode { /* ... */ }
-interface Test extends TraceableNode { /* ... */ }
-interface Document extends TraceableNode { /* ... */ }
-
-// Union type for any node
-type AnyNode = Requirement | Implementation | Test | Document;
-
-// Relationship types
-type RelationshipType =
-  | 'implements' | 'satisfies' | 'tests' | 'verifies'
-  | 'documents' | 'depends' | 'requires';
-
-// Relationship definition
-interface Relationship {
-  fromId: string;
-  targetId: string;
-  type: RelationshipType;
-}
-
-// Coverage metrics
-interface CoverageReport {
-  totalRequirements: number;
-  requirementsWithImplementation: number;
-  requirementsWithTests: number;
-  implementationCoverage: number;
-  testCoverage: number;
-}
-
-// Matrix types
-interface TraceabilityMatrix {
-  type: string;
-  coverage: CoverageReport;
-  requirements: RequirementRow[];
-  generatedAt: string;
-}
-
-interface DetailedTraceabilityMatrix {
-  type: string;
-  coverage: CoverageReport;
-  uncoveredRequirements: string[];
-  requirements: RequirementDetail[];
-  implementations: ImplementationDetail[];
-  tests: TestDetail[];
-  generatedAt: string;
+  line?: number;
+  autoGenerated?: boolean;
+  inverseOf?: string;
 }
 ----
 
-=== Bidirectional Relationships (Phase 3)
+=== Configuration Types
 
-**New in v0.3.0**: The extension now supports auto-generated inverse relationships.
-
-==== Type System Updates
+`src/config/TraceabilityConfig.ts`:
 
 [source,typescript]
 ----
-// Primary relationship types (user-defined)
-type PrimaryRelationshipType =
-  | 'implements' | 'satisfies' | 'tests' | 'verifies'
-  | 'documents' | 'depends' | 'requires'
-  | 'addresses' | 'composed-of' | 'depends-on';
+export interface TraceabilityConfig {
+  roles: string[];
+  relations: Record<string, Record<string, string[]>>;
+  matrices: MatrixDefinition[];
+  extends?: string;                  // Preset name to extend
+}
 
-// Inverse relationship types (auto-generated)
-type InverseRelationshipType =
-  | 'implemented-by' | 'satisfied-by' | 'tested-by' | 'verified-by'
-  | 'documented-by' | 'depended-by' | 'required-by'
-  | 'addressed-by' | 'part-of' | 'depends-on-by';
+export interface MatrixDefinition {
+  name: string;
+  description?: string;
+  rows: string;
+  columns: string[];
+  coverageRelations: Record<string, string[]>;
+}
 
-// Complete relationship type union
-type RelationshipType = PrimaryRelationshipType | InverseRelationshipType;
-
-// Mapping constants
-const INVERSE_MAP: Record<PrimaryRelationshipType, InverseRelationshipType> = {
-  'implements': 'implemented-by',
-  'satisfies': 'satisfied-by',
-  'tests': 'tested-by',
-  'verifies': 'verified-by',
-  'documents': 'documented-by',
-  'depends': 'depended-by',
-  'requires': 'required-by',
-  'addresses': 'addressed-by',
-  'composed-of': 'part-of',
-  'depends-on': 'depends-on-by',
-};
-
-const PRIMARY_MAP: Record<InverseRelationshipType, PrimaryRelationshipType> = {
-  'implemented-by': 'implements',
-  'satisfied-by': 'satisfies',
-  'tested-by': 'tests',
-  'verified-by': 'verifies',
-  'documented-by': 'documents',
-  'depended-by': 'depends',
-  'required-by': 'requires',
-  'addressed-by': 'addresses',
-  'part-of': 'composed-of',
-  'depends-on-by': 'depends-on',
-};
-
-// Updated Relationship interface
-interface Relationship {
-  id: string;                    // Unique ID: "fromId-type-targetId"
-  fromId: string;                // Source node ID
-  targetId: string;              // Target node ID
-  type: RelationshipType;        // Primary or inverse type
-  sourceFile?: string;           // Source file where defined
-  line?: number;                 // Line number
-  autoGenerated?: boolean;       // true for inverse relationships
-  inverseOf?: string;            // ID of the primary relationship
+export interface Preset extends PresetMetadata {
+  traceability: TraceabilityConfig;
+  neo4j?: { queries: Neo4jQuery[] };
+  documentation?: { description: string };
 }
 ----
 
-==== Graph Storage Updates
+== CLI Architecture
 
-The `TraceabilityGraph` class now:
-
-1. **Auto-generates inverse relationships** when a primary relationship is added
-2. **Maintains an inverse index** (`_inverseIndex`) for fast inverse queries
-3. **Prevents duplicate relationships** by checking relationship IDs
-4. **Skips circular reference checks for auto-generated inverses** (bidirectional pairs are valid)
-
-[source,typescript]
-----
-// In TraceabilityGraph class
-private _inverseIndex = new Map<InverseRelationshipType, Map<string, Relationship[]>>();
-
-addRelationship(relationship: Relationship): void {
-  // Validate nodes exist...
-
-  // Store primary relationship
-  this._relationships.set(relationship.id, relationship);
-
-  // Auto-generate inverse for primary types
-  if (isPrimaryRelationshipType(relationship.type)) {
-    const inverseType = INVERSE_MAP[relationship.type];
-    const inverseId = `${relationship.targetId}-${inverseType}-${relationship.fromId}`;
-
-    const inverseRelationship: Relationship = {
-      id: inverseId,
-      fromId: relationship.targetId,
-      targetId: relationship.fromId,
-      type: inverseType,
-      sourceFile: relationship.sourceFile,
-      line: relationship.line,
-      autoGenerated: true,
-      inverseOf: relationship.id,
-    };
-    this._relationships.set(inverseId, inverseRelationship);
-    this._updateInverseIndex(inverseRelationship);
-  }
-}
-----
-
-==== New Query Methods
-
-All existing query methods continue to work. Additionally, you can use `getRelationships()` with inverse types:
-
-[source,typescript]
-----
-// Get all requirements satisfied by an implementation
-const reqs = graph.getRelationships('IMP-001', 'satisfies')
-  .map(r => r.targetId); // Returns: ['REQ-001', 'REQ-002', ...]
-
-// Get all implementations that satisfy a requirement
-const impls = graph.getRelationships('REQ-001', 'satisfied-by')
-  .map(r => r.fromId); // Returns: ['IMP-001', 'IMP-002', ...]
-
-// Get all designs that implement a design
-const designs = graph.getRelationships('DES-001', 'implements')
-  .map(r => r.targetId);
-
-// Get all implementations that implement a design
-const implsForDesign = graph.getRelationships('DES-001', 'implemented-by')
-  .map(r => r.fromId);
-----
-
-==== Matrix Generation Updates
-
-Four new matrix types are available:
-
-[source,typescript]
-----
-// In MatrixGenerator class
-generateMatrix(type: string): TraceabilityMatrix | DesignTraceabilityMatrix {
-  switch (type) {
-    case 'impl-req':
-      return this.generateImplementationRequirementMatrix();
-    case 'test-impl':
-      return this.generateTestImplementationMatrix();
-    case 'test-req':
-      return this.generateTestRequirementMatrix();
-    case 'design-req':
-      return this.generateDesignRequirementMatrix();
-    // ... existing cases
-  }
-}
-----
-
-Each inverse matrix uses the same `TraceabilityMatrix` structure but with different semantics:
-
-| Matrix Type | Rows | Implementations Field Contains |
-|-------------|------|--------------------------------|
-| `impl-req` | Implementations | Requirements they satisfy |
-| `test-impl` | Tests | Implementations they test |
-| `test-req` | Tests | Requirements they verify |
-| `design-req` | Designs | Requirements they address |
-
-== APIs
-
-=== Public API
-
-The main public API is exported from `src/index.ts`:
-
-[source,typescript]
-----
-// Main class
-export { RequirementsTraceabilityExtension };
-
-// Types
-export type {
-  Requirement,
-  Implementation,
-  Test,
-  Document,
-  RelationshipType,
-  CoverageReport,
-  TraceabilityMatrix,
-  DetailedTraceabilityMatrix,
-};
-----
-
-=== Usage Examples
-
-**Basic Usage:**
-
-[source,typescript]
-----
-import { RequirementsTraceabilityExtension } from 'antora-requirements-traceability';
-
-const extension = new RequirementsTraceabilityExtension();
-
-// Process AsciiDoc content
-await extension.process(asciiDocContent, { sourceFile: 'requirements.adoc' });
-
-// Generate a matrix
-const matrix = extension.generateMatrix('req-impl');
-
-// Export to CSV
-const csv = extension.exportMatrixToCSV('req-impl');
-
-// Export to HTML
-const html = extension.exportMatrixToHTML('req-impl');
-
-// Get coverage report
-const coverage = extension.getCoverageReport();
-
-// Validate graph
-const errors = extension.validate();
-----
-
-**Adding Elements Programmatically:**
-
-[source,typescript]
-----
-const extension = new RequirementsTraceabilityExtension();
-
-// Add a requirement
-extension.graph.addRequirement({
-  id: 'REQ-001',
-  title: 'User Authentication',
-  content: 'The system shall require user authentication.',
-  status: 'approved',
-  attributes: { priority: 'high' },
-  sourceFile: 'requirements.adoc',
-  sourceLine: 1,
-});
-
-// Add an implementation
-extension.addImplementation({
-  id: 'IMP-001',
-  title: 'Authentication Service',
-  content: 'Implementation of user authentication.',
-  status: 'done',
-  attributes: {},
-  sourceFile: 'implementation.adoc',
-  sourceLine: 1,
-});
-
-// Add a relationship
-extension.addRelationship('IMP-001', 'REQ-001', 'implements');
-----
-
-**Querying the Graph:**
-
-[source,typescript]
-----
-// Get all requirements
-const allRequirements = extension.graph.getAllRequirements();
-
-// Get a specific requirement
-const req = extension.graph.getRequirement('REQ-001');
-
-// Get relationships
-const relationships = extension.graph.getRelationships('REQ-001');
-const reverseRelationships = extension.graph.getReverseRelationships('REQ-001');
-
-// Find path between nodes
-const path = extension.findPath('REQ-001', 'REQ-005');
-
-// Get impact analysis
-const impacted = extension.getImpactAnalysis('REQ-001');
-
-// Get coverage
-const coverage = extension.getCoverageReport();
-
-// Get uncovered requirements
-const uncovered = extension.getUncoveredRequirements();
-----
-
-== Extending the Extension
-
-=== Adding New Node Types
-
-To add a new type of traceable element:
-
-. Add the interface to `src/types.ts`
-. Add the node type to `AnyNode` union
-. Add storage map in `TraceabilityGraph`
-. Add `add*` and `get*` methods in `TraceabilityGraph`
-. Add parsing in `DocumentParser`
-. Add to matrix generation if needed
-
-=== Adding New Relationship Types
-
-To add a new relationship type:
-
-. Add to `RelationshipType` union in `src/types.ts`
-. Add to `mapMacroToRelationshipType` in `DocumentParser`
-. Add to circular reference check if applicable
-
-=== Adding New Matrix Types
-
-To add a new matrix type:
-
-. Add method to `MatrixGenerator`
-. Add export methods if needed
-. Expose through `RequirementsTraceabilityExtension`
-
-== Testing
-
-=== Test Structure
-
-Tests are organized in the `test/` directory:
-
-[source]
-----
-test/
-├── basic.test.ts              # Basic extension tests
-├── graph.test.ts              # TraceabilityGraph tests
-├── processor.test.ts          # Processor/parser tests
-├── traceability.test.ts       # Requirements traceability tests
-├── document-parser.test.ts    # DocumentParser tests
-├── matrix-generator.test.ts   # MatrixGenerator tests
-├── validation.test.ts         # Validation tests
-├── performance.test.ts        # Performance tests
-└── antora-extension.test.ts   # Antora extension tests
-----
-
-=== Running Tests
+`src/cli.ts` — Commander-based CLI entry point.
 
 [source,bash]
 ----
-# Run all tests
-npm test
-
-# Run specific test file
-npm test -- --grep "Matrix Generator"
-
-# Run with verbose output
-npm test -- --verbose
-
-# Run pre-commit hooks manually
-pre-commit run --all-files
-
-# Update hooks to latest versions
-pre-commit autoupdate
+npx antora-req-trace <command> [options]
 ----
 
-=== Test Coverage
+Commands:
 
-The test suite covers:
+[width=100%, cols="20,40,40"]
+|===
+| Command | Purpose | Key options
+| `process` | Process AsciiDoc files | `-i <path>`, `-o <path>`, `-f <fmt>`, `--preset`, `--config`
+| `matrix` | Generate matrices | `-i <path>`, `-t <name>`, `-f <fmt>`, `-o <path>`
+| `validate` | Validate traceability | `-i <path>`, `--preset`, `--config`
+| `export neo4j` | Neo4j CSV/Cypher export | `-i <path>`, `--format`, `-o <path>`
+| `stats` | Graph statistics | `-i <path>`, `--preset`, `--config`
+| `preset <sub>` | Preset management | `list`, `show <name>`, `init -n <name> -o <path>`
+|===
 
-* Basic extension functionality
-* Graph operations (add, get, delete, traverse)
-* Parser functionality (requirements, implementations, tests, documents)
-* Relationship management
-* Matrix generation (CSV, HTML)
-* Coverage reporting
-* Validation (duplicate IDs, circular references)
-* Performance with large datasets
-* Antora integration
+Global options (`--config`, `--preset`) are inherited by all commands. Each command creates an extension with the appropriate configuration, processes input if specified, then performs its action.
 
-=== Writing Tests
+== Contributing
 
-**Example Test:**
+=== Setup
+
+[source,bash]
+----
+git clone <repo-url>
+cd antora-asciidoc-tracing
+npm install
+npm run build
+npm test
+----
+
+=== Development Workflow
+
+[source,bash]
+----
+npm run build          # Compile TypeScript
+npm test               # Run all tests (compiles test files first)
+npm run test:coverage  # Run tests with c8 coverage
+npm run lint           # Run biome checks
+npm run format         # Auto-format with biome
+----
+
+The project uses pre-commit hooks (biome lint + format) via the `pre-commit` framework.
+
+=== Testing
+
+Tests use Mocha + Chai, written in TypeScript, compiled with `tsconfig.test.json` to `lib/test/`. The test suite covers:
+
+[width=100%, cols="30,70"]
+|===
+| Area | Test file
+| DocumentParser | Parsing `[item]` macros, inline relationships, edge cases
+| TraceabilityGraph | Item/relationship CRUD, queries, path finding, validation
+| MatrixGenerator | Matrix generation, coverage calculation, CSV/HTML export
+| Neo4jExporter | CSV export, Cypher export, escaping, options
+| ConfigLoader | YAML loading, preset loading, validation, merge
+| Antora Extension | Event handling, content processing, matrix generation, error paths
+| CLI | Process, matrix, validate, export, stats, preset commands
+| Graph Queries | merge, findPath, getImpactAnalysis, getRelatedItems, etc.
+| API Methods | All RequirementsTraceabilityExtension public methods
+|===
+
+Writing tests:
 
 [source,typescript]
 ----
 import { expect } from 'chai';
-import { RequirementsTraceabilityExtension } from '../src/index';
+import { RequirementsTraceabilityExtension } from '../src/index.js';
 
-describe('My Feature', function() {
-  let extension: InstanceType<typeof RequirementsTraceabilityExtension>;
-
-  beforeEach(function() {
-    extension = new RequirementsTraceabilityExtension();
-  });
-
-  afterEach(function() {
-    extension.clear();
-  });
-
-  it('should do something', function() {
-    // Test implementation
-    extension.graph.addRequirement({
-      id: 'REQ-001',
-      title: 'Test',
-      content: 'Test',
-      status: 'draft',
-      attributes: {},
-      sourceFile: 'test.adoc',
-      sourceLine: 1,
-    });
-
-    const req = extension.graph.getRequirement('REQ-001');
-    expect(req).to.not.be.undefined;
+describe('MyFeature', () => {
+  it('should do something', () => {
+    const extension = new RequirementsTraceabilityExtension();
+    extension.process(`...[item, id=X, role=requirement]...`, { sourceFile: 'test.adoc' });
+    expect(extension.getAllItems()).to.have.lengthOf(1);
   });
 });
 ----
 
-== Contributing
-
-=== Setting Up Development Environment
-
-. Clone the repository
-. Install dependencies: `npm install`
-. Build the project: `npm run build`
-. Run tests: `npm test`
-. Install pre-commit hooks: `pre-commit install`
-
-**Note on pre-commit:**
-This project uses https://github.com/pre-commit/pre-commit[pre-commit] for git hooks.
-The pre-commit hook will automatically run Biome linting and formatting on staged files before each commit.
-To skip the pre-commit checks (not recommended): `git commit --no-verify`
+Run individual test files:
+[source,bash]
+----
+npx mocha 'lib/test/graph-and-api.test.js'
+----
 
 === Code Style
 
-* Use TypeScript with strict mode
-* Follow existing code patterns
-* Use meaningful variable and function names
-* Add JSDoc comments for complex functions
-* Keep functions focused and small
+- TypeScript strict mode
+- ESM imports with `.js` extensions in import paths
+- JSDoc comments on public methods
+- No default exports (named exports only)
+- Biome for linting and formatting
 
-=== Commit Messages
+=== Commit Conventions
 
-Use conventional commit messages:
+[source]
+----
+feat: add new feature
+fix: fix a bug
+docs: update documentation
+test: add or update tests
+refactor: restructure code
+chore: maintenance tasks
+----
 
-* `feat: add new feature`
-* `fix: fix a bug`
-* `docs: update documentation`
-* `test: add tests`
-* `refactor: refactor code`
-* `chore: maintenance tasks`
+== Build & Release
 
-=== Pull Requests
-
-. Fork the repository
-. Create a feature branch
-. Make your changes
-. Add tests for new functionality
-. Ensure all tests pass
-. Submit a pull request
-
-=== Code Review
-
-All pull requests require:
-
-* Passing tests
-* Code review approval
-* Documentation updates (if applicable)
-* No breaking changes (unless approved)
-
-== Building and Packaging
-
-=== Building
+=== Build
 
 [source,bash]
 ----
 npm run build
 ----
 
-This compiles TypeScript to JavaScript in the `lib/` directory.
+The build pipeline:
 
-=== Packaging
+. `tsc` — compiles `src/` → `lib/` (tsconfig.json)
+. `scripts/build.js` — copies compiled files to `lib/src/`, copies templates to `lib/templates/` and `lib/src/templates/`, copies presets to `lib/presets/` and `lib/src/presets/`
 
-To create an npm package:
+The dual `lib/` and `lib/src/` structure exists for compatibility: `lib/` is the npm entry point, `lib/src/` is referenced during development and testing.
 
-[source,bash]
+=== Package Exports
+
+[source,json]
 ----
-npm pack
+{
+  "exports": {
+    ".": "./lib/index.js",
+    "./antora-extension": "./lib/src/antora-extension.js",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "antora-req-trace": "./lib/cli.js"
+  }
+}
 ----
-
-This creates a tarball that can be installed locally for testing.
 
 === Publishing
 
-To publish to npm:
-
 [source,bash]
 ----
-# Update version in package.json
-npm version patch
-
-# Publish
-npm publish
+npm version 0.7.0    # Bump version
+npm run build         # Fresh build
+npm test              # Verify all 181 tests pass
+npm publish           # Publish to npm
 ----
 
-== Dependencies
+=== Version Compatibility
 
-=== Production Dependencies
-
-* `@asciidoctor/core`: AsciiDoc processor
-
-=== Development Dependencies
-
-* `@types/chai`: TypeScript types for Chai
-* `@types/mocha`: TypeScript types for Mocha
-* `biome`: Linter and formatter
-* `chai`: Assertion library
-* `commander`: CLI argument parsing
-* `mocha`: Test runner
-* `ts-mocha`: TypeScript test runner
-* `ts-node`: TypeScript execution
-* `tsx`: TypeScript execution with ESM support
-* `typescript`: TypeScript compiler
-
-== Version Compatibility
-
-=== Node.js
-
-* Minimum: Node.js 14+
-* Recommended: Node.js 16+
-
-=== TypeScript
-
-* Minimum: TypeScript 4.0+
-* Configured: TypeScript 5.x with strict mode
-
-=== Antora
-
-* Minimum: Antora 3.x
-* Tested with: Antora 3.x
-
-=== Python
-
-* Required for pre-commit: Python 3.7+
-* pre-commit is used for git hooks
-
-== Troubleshooting Development Issues
-
-=== TypeScript Errors
-
-* Ensure all types are properly imported
-* Check for missing type annotations
-* Verify `tsconfig.json` settings
-
-=== Test Failures
-
-* Run tests with verbose output: `npm test -- --verbose`
-* Check for async/await issues
-* Verify test data is properly set up
-
-=== Build Errors
-
-* Delete `lib/` directory and rebuild: `rm -rf lib && npm run build`
-* Check TypeScript version compatibility
-
-== Architecture Decisions
-
-=== Why Manual Parsing?
-
-The extension uses manual regex-based parsing instead of Asciidoctor.js extensions because:
-
-. Asciidoctor.js extension API is complex and version-dependent
-. Manual parsing provides more control and portability
-. Easier to test and debug
-. Works consistently across different Asciidoctor.js versions
-
-=== Why Separate Parser and Graph?
-
-Separating parsing from graph management allows:
-
-. Independent testing of each component
-. Easier maintenance and extension
-. Clear separation of concerns
-. Reusability of components
-
-=== Why Caching?
-
-Caching `getAll*()` methods improves performance because:
-
-. These methods are called frequently
-. Map iteration has overhead
-. Cache invalidation is straightforward
-. Memory overhead is minimal
-
-== Future Enhancements
-
-=== Planned Features
-
-* JSON output format for matrices
-* XML output format (XUnit, JUnit)
-* Integration with test runners
-* Web-based traceability viewer
-* Graph visualization
-* Export to requirements management tools
-
-=== Potential Improvements
-
-* Watch mode for development
-* Hot reloading
-* Better error recovery
-* More comprehensive validation
-* Performance optimizations for very large graphs
-
-== Resources
-
-* Source Code: https://github.com/earendil-works/antora-requirements-traceability
-* Issues: https://github.com/earendil-works/antora-requirements-traceability/issues
-* Documentation: https://github.com/earendil-works/antora-requirements-traceability/docs
-
-== License
-
-MIT License - see LICENSE file for details.
+[width=100%, cols="20,80"]
+|===
+| Node.js | 14+ (recommended: 18+)
+| TypeScript | 5.x (strict mode)
+| Antora | 3.x
+| Module system | ESM only
+|===

@@ -1,822 +1,705 @@
-= Antora Requirements Traceability Extension: User Guide
-:description: Complete guide to using the Requirements Traceability Extension for Antora/AsciiDoc
+= User Guide
+:description: Complete guide to using the Antora Requirements Traceability Extension
 :keywords: antora, asciidoc, requirements, traceability, documentation
-:author: Requirements Traceability Team
-:revdate: 2026-07-19
-:version: 0.3.0
+:author: Antora Traceability Team
+:revdate: 2026-07-27
+:version: 0.7.0
+:toc: macro
+
+toc::[]
 
 == Overview
 
-The Antora Requirements Traceability Extension enables you to define, track, and visualize requirements traceability in your Antora documentation. With this extension, you can:
+The Antora Requirements Traceability Extension adds role-based traceability to your Antora documentation. Define items with a single `[item]` block macro, reference them through user-defined relation types, and generate traceability matrices and coverage reports — all driven by *your* domain model.
 
-* Define requirements, implementations, tests, documents, and design concepts using custom AsciiDoc macros
-* Establish relationships between traceability elements
-* Generate traceability matrices in CSV and HTML formats
-* View coverage reports to track implementation, test, and design status
-* Integrate traceability information into your Antora site navigation
+Key capabilities:
 
-== Quick Start
+* One macro for everything — `[item, role=...]` replaces role-specific macros
+* User-defined roles and relations — configure your own traceability domain (requirements engineering, agile, medical, or custom)
+* Built-in presets — start with `requirements-engineering`, `agile`, `medical-iec62304`, or `minimal`
+* Matrix generation — HTML and CSV matrices per your configuration
+* Coverage reports — visual per-role coverage with status badges
+* Neo4j export — CSV and Cypher for graph queries
+* CLI — standalone processing outside Antora
+* Validation — catches invalid relations at processing time
 
-=== Installation
+== Getting Started
 
-. Install the extension as an npm package:
+Already have an Antora site? Skip to step 2.
+
+[arabic]
+. Install the extension
 +
 [source,bash]
 ----
 npm install antora-requirements-traceability --save-dev
 ----
 
-. Add the extension to your Antora playbook (`antora.yml`):
+. Add it to your Antora playbook (`antora.yml`)
 +
 [source,yaml]
 ----
 antora:
   extensions:
-    - require: antora-requirements-traceability
+    - require: antora-requirements-traceability/antora-extension
+      config:
+        preset: requirements-engineering
 ----
 
-. Run your Antora build:
+. Write items in your AsciiDoc files
++
+[source,asciidoc]
+----
+[item, id=REQ-001, role=requirement]
+====
+User Authentication
+
+The system shall require authentication for all protected endpoints.
+====
+
+[item, id=IMP-001, role=implementation]
+====
+Auth Service
+
+JWT-based authentication with token refresh.
+
+satisfies:REQ-001[]
+====
+
+[item, id=TEST-001, role=test]
+====
+Authentication Tests
+
+Unit and integration tests for the auth service.
+
+verifies:REQ-001[]
+tests:IMP-001[]
+====
+----
+
+. Build your site
 +
 [source,bash]
 ----
-npx antora --fetch antora-playbook.yml
+npx antora antora-playbook.yml
 ----
 
-That's it! The extension will automatically process your AsciiDoc files and generate traceability artifacts.
+. Open the output
++
+Open `<site-output>/traceability/index.html` — you'll find matrices and a coverage report.
 
-=== Basic Usage
+== The Traceability Model
 
-Add requirements to your AsciiDoc files using the `[req]` block macro:
+Before you write items, understand the three concepts that define your traceability domain.
+
+=== Roles
+
+A *role* is a category of traceable item. Think of it as a type label: "requirement", "design", "test", "user_story", "risk_control". Roles are purely user-defined — the extension has no built-in roles. You define them in your traceability configuration, and every `[item]` gets a `role` attribute.
 
 [source,asciidoc]
 ----
-[req, id=REQ-001, title="User Authentication"]
-====
-The system shall require user authentication for all protected endpoints.
-
-This requirement ensures that only authorized users can access sensitive data.
-====
-
-[req, id=REQ-002, title="Password Complexity"]
-====
-The system shall enforce minimum password complexity requirements:
-
-* Minimum 8 characters
-* At least one uppercase letter
-* At least one lowercase letter
-* At least one digit
-* At least one special character
-====
+[item, id=REQ-001, role=requirement]
+[item, id=STORY-001, role=user_story]
+[item, id=TEST-001, role=test]
 ----
 
-== Defining Traceability Elements
+=== Relations
 
-The extension supports five types of traceability elements:
-
-=== Requirements
-
-Use the `[req]` block macro to define requirements:
+A *relation* connects two items of specific roles. Relations are directional (`source → target`) and typed (`satisfies`, `verifies`, `implements`, etc.). Which relation types are allowed between which roles is defined in your configuration.
 
 [source,asciidoc]
 ----
-[req, id=REQ-001, title="Requirement Title", status=approved]
+[item, id=IMP-001, role=implementation]
 ====
-Requirement description goes here.
-
-Can span multiple paragraphs.
-====
-----
-
-**Attributes:**
-
-| Attribute | Description | Required | Default |
-| id | Unique identifier (e.g., REQ-001) | No | Auto-generated |
-| title | Human-readable title | No | "Requirement {id}" |
-| status | Requirement status | No | draft |
-
-**ID Format:**
-
-* Recommended: `{TYPE}-{NUMBER}` where TYPE is 2-4 uppercase letters
-* Examples: `REQ-001`, `FUNC-001`, `SEC-001`
-* Non-standard IDs will generate a warning but still work
-
-=== Implementations
-
-Use the `[imp]` block macro to define implementations:
-
-[source,asciidoc]
-----
-[imp, id=IMP-001, title="Authentication Service"]
-====
-Implementation of the user authentication functionality.
-
-This service handles:
-* User login
-* Token generation
-* Session management
-====
-
-implements:REQ-001[]
-----
-
-**Attributes:**
-
-Same as requirements: `id`, `title`, `status`
-
-=== Tests
-
-Use the `[test]` block macro to define tests:
-
-[source,asciidoc]
-----
-[test, id=TEST-001, title="Authentication Test Suite"]
-====
-Unit tests for the authentication service.
-
-Tests include:
-* Successful login
-* Failed login
-* Token validation
-* Session timeout
-====
-
-tests:REQ-001[]
-verifies:REQ-001[]
-----
-
-**Attributes:**
-
-Same as requirements: `id`, `title`, `status`
-
-=== Documents
-
-Use the `[doc]` block macro to define documentation:
-
-[source,asciidoc]
-----
-[doc, id=DOC-001, title="API Documentation"]
-====
-API documentation for the authentication endpoints.
-
-Includes:
-* Endpoint specifications
-* Request/response examples
-* Error codes
-====
-
-documents:REQ-001[]
-----
-
-**Attributes:**
-
-Same as requirements: `id`, `title`, `status`
-
-=== Design Concepts (Phase 2)
-
-Use the `[design]` block macro to define architecture and design concepts that address requirements:
-
-[source,asciidoc]
-----
-[design, id=DES-001, title="Authentication Architecture"]
-====
-High-level design for user authentication.
-
-Includes:
-* Single sign-on flow
-* Multi-factor authentication
-* Session management strategy
-====
-
-addresses:REQ-001[]
-composed-of:DES-002[]
-====
-
-[design, id=DES-002, title="Token Service"]
-====
-Design for token generation and validation.
-
-implements:DES-001[]
+satisfies:REQ-001[]     <1>
+implements:DES-001[]    <2>
 ====
 ----
+<1> Implementation satisfies Requirement
+<2> Implementation implements Design
 
-**Attributes:**
+=== Matrices
 
-Same as requirements: `id`, `title`, `status`
+A *matrix* cross-references items of one role (rows) against items of other roles (columns), counting how many of each relation type exist. Matrices are configurable — you decide which roles go on rows, which on columns, and which relation types count as "coverage."
 
-**When to Use Design Concepts:**
+[cols="4*,4*"]
+|===
+.^|
+| ==== Requirements Traceability ====
 
-* Architecture decisions that address multiple requirements
-* High-level design documents
-* Component compositions and dependencies
-* Design patterns and strategies
+[width=100%,cols="3,2,2,2"]
+|===
+| Requirement | Design | Implementation | Test
+| REQ-001 | DES-001 | IMP-001 | TEST-001
+| REQ-002 | — | — | TEST-002
+|===
+|===
 
-**ID Format:**
-
-* Recommended: `{TYPE}-{NUMBER}` where TYPE is 2-4 uppercase letters
-* Examples: `DES-001`, `ARCH-001`, `COMP-001`
-* Non-standard IDs will generate a warning but still work
-
-== Bidirectional Relationships (Phase 3)
-
-The extension automatically generates inverse relationships, enabling you to query the traceability graph from both directions without explicitly defining both.
-
-=== How It Works
-
-When you define a relationship in one direction, the extension automatically creates the inverse relationship:
-
-[source,asciidoc]
-----
-[design, id=DES-001]
-====
-Authentication System Design
-
-addresses:REQ-001[]  <1>
-====
-
-[req, id=REQ-001]
-====
-User Authentication Requirement
-====
-----
-<1> This automatically creates: `REQ-001 addressed-by DES-001`
-
-=== Relationship Type Mapping
-
-| Primary Relationship | Inverse Relationship | Direction | Description |
-|---------------------|---------------------|-----------|-------------|
-| `satisfies` | `satisfied-by` | Implementation → Requirement | Implementation satisfies requirement |
-| `tests` | `tested-by` | Test → Implementation | Test tests implementation |
-| `verifies` | `verified-by` | Test → Requirement | Test verifies requirement |
-| `documents` | `documented-by` | Document → Requirement | Document documents requirement |
-| `depends` | `depended-by` | Any → Any | Generic dependency |
-| `requires` | `required-by` | Any → Any | Generic requirement |
-| `addresses` | `addressed-by` | Design → Requirement | Design addresses requirement |
-| `implements` | `implemented-by` | Implementation → Design | Implementation implements design |
-| `composed-of` | `part-of` | Design → Design | Design is composed of other designs |
-| `depends-on` | `depends-on-by` | Design → Design | Design depends on other designs |
-
-=== Bidirectional Queries
-
-With auto-generated inverse relationships, you can query from either direction:
-
-* **From design to requirement:** Which requirements does this design address?
-  **From requirement to design:** Which designs address this requirement?
-
-* **From implementation to requirement:** Which requirements does this implementation satisfy?
-  **From requirement to implementation:** Which implementations satisfy this requirement?
-
-* **From implementation to design:** Which designs does this implementation implement?
-  **From design to implementation:** Which implementations implement this design?
-
-=== Inverse Matrices
-
-In addition to the standard matrices, the extension generates inverse matrices that show relationships from the opposite direction:
-
-| Matrix | Description | Shows |
-|--------|-------------|-------|
-| `matrix-impl-req.csv/html` | Implementation to Requirement | Which requirements each implementation satisfies |
-| `matrix-test-impl.csv/html` | Test to Implementation | Which implementations each test tests |
-| `matrix-test-req.csv/html` | Test to Requirement | Which requirements each test verifies |
-| `matrix-design-req.csv/html` | Design to Requirement | Which requirements each design addresses |
-
-These matrices are generated alongside the standard matrices and are accessible from the traceability index page.
-
-== Establishing Relationships
-
-Relationships between traceability elements are established using inline macros within the content of the elements.
-
-=== Relationship Types
-
-| Macro | Description | Example |
-| satisfies | This element satisfies another requirement | `satisfies:REQ-001[]` |
-| implements | This element implements a requirement or design | `implements:REQ-001[]` |
-| tests | This element tests a requirement | `tests:REQ-001[]` |
-| verifies | This element verifies a requirement | `verifies:REQ-001[]` |
-| documents | This element documents a requirement | `documents:REQ-001[]` |
-| depends | This element depends on another | `depends:REQ-001[]` |
-| requires | This element requires another | `requires:REQ-001[]` |
-| addresses | This design addresses a requirement | `addresses:REQ-001[]` |
-| composed-of | This design is composed of other designs | `composed-of:DES-002[]` |
-| depends-on | This element depends on another (alias for depends) | `depends-on:REQ-001[]` |
-
-=== Examples
-
-.Requirement that depends on another:
-[source,asciidoc]
-----
-[req, id=REQ-002]
-====
-Advanced Authentication
-====
-
-depends:REQ-001[]
-----
-
-.Implementation that satisfies a requirement:
-[source,asciidoc]
-----
-[imp, id=IMP-001]
-====
-Authentication Implementation
-====
-
-satisfies:REQ-001[]
-implements:REQ-001[]
-----
-
-.Test that verifies a requirement:
-[source,asciidoc]
-----
-[test, id=TEST-001]
-====
-Authentication Tests
-====
-
-tests:REQ-001[]
-verifies:REQ-001[]
-----
-
-.Document that documents a requirement:
-[source,asciidoc]
-----
-[doc, id=DOC-001]
-====
-Authentication Guide
-====
-
-documents:REQ-001[]
-----
-
-.Design that addresses a requirement:
-[source,asciidoc]
-----
-[design, id=DES-001]
-====
-Authentication Architecture
-====
-
-addresses:REQ-001[]
-composed-of:DES-002[]
-====
-
-[design, id=DES-002]
-====
-Token Service Design
-====
-
-implements:DES-001[]
-depends-on:DES-003[]
-====
-----
+When you read a matrix, you're asking: "For each requirement, which designs address it? Which implementations satisfy it? Which tests verify it?" The answers come from the relationships defined in your items.
 
 == Configuration
 
-The extension can be configured through your Antora playbook.
+The extension is configured through your Antora playbook.
 
-=== Configuration Options
+=== Using a Preset
 
-| Option | Type | Default | Description |
-| enabled | boolean | true | Enable or disable the extension |
-| outputDir | string | "traceability" | Output directory for artifacts |
-| generateMatrices | boolean | true | Generate traceability matrices |
-| matrixFormats | array | ["html", "csv"] | Output formats for matrices |
-| includeInNavigation | boolean | true | Add traceability links to navigation |
-
-=== Example Configuration
+The simplest path. Pick a preset that matches your domain:
 
 [source,yaml]
 ----
 antora:
   extensions:
-    - require: antora-requirements-traceability
+    - require: antora-requirements-traceability/antora-extension
       config:
-        enabled: true
-        outputDir: docs/traceability
-        generateMatrices: true
-        matrixFormats:
-          - html
-          - csv
-        includeInNavigation: true
+        preset: requirements-engineering
 ----
 
-== Generated Artifacts
+Four built-in presets are available:
 
-The extension generates the following artifacts in the configured output directory:
+| Preset | Best For |
+|--------|----------|
+| `requirements-engineering` | Systems & software engineering |
+| `agile` | Agile/Scrum teams with user stories |
+| `medical-iec62304` | Medical device software (IEC 62304) |
+| `minimal` | Getting started, simple projects |
+
+See <<Presets Reference>> for the full breakdown of each preset.
+
+=== Custom Configuration
+
+For full control, point to a traceability YAML file:
+
+[source,yaml]
+----
+antora:
+  extensions:
+    - require: antora-requirements-traceability/antora-extension
+      config:
+        configPath: ./config/traceability.yml
+----
+
+The configuration file defines your roles, the allowed relations between them, and the matrices to generate:
+
+[source,yaml]
+----
+traceability:
+  roles:
+    - requirement
+    - design
+    - implementation
+    - test
+
+  relations:
+    requirement:
+      design: [addresses, satisfied_by]
+      implementation: [implemented_by]
+      test: [verified_by]
+
+    design:
+      requirement: [implements]
+      implementation: [realized_by]
+      test: [validated_by]
+
+    implementation:
+      requirement: [satisfies]
+      design: [implements]
+      test: [tested_by]
+
+    test:
+      requirement: [covers, verifies]
+      implementation: [tests]
+
+  matrices:
+    - name: requirements-traceability
+      description: "Requirements to design, implementation, and test"
+      rows: requirement
+      columns: [design, implementation, test]
+      coverageRelations:
+        design: [addresses, satisfied_by, implements]
+        implementation: [implemented_by, satisfies, implements]
+        test: [verified_by, covers, verifies, tests]
+----
+
+==== Understanding the Config
+
+*Roles*::
+  A flat list of strings. Every `[item]` must have a `role` that appears in this list. Roles are case-insensitive.
+
+*Relations*::
+  A nested map: `source_role → target_role → [allowed_types]`. Each entry says "items with role X can use relation types [A, B, C] to point at items with role Y." If you write a relation that isn't in this map, the extension reports an error with the allowed types.
+
+*Matrices*::
+  An array of matrix definitions. Each matrix has:
+  - `name` — used in the output filename (`matrix-<name>.html`)
+  - `rows` — the role that becomes the row index
+  - `columns` — roles that become columns
+  - `coverageRelations` — which relation types count as "coverage" for each column role
+
+==== Relation Validation
+
+When the extension processes your items, it validates every inline relationship against your configuration. If you write:
+
+[source,asciidoc]
+----
+[item, id=DES-001, role=design]
+====
+verifies:REQ-001[]       <1>
+====
+----
+<1> `verifies` from `design` to `requirement` — is that allowed?
+
+The extension checks: does `relations.design.requirement` include `verifies`? If not, you get:
+
+----
+Error: Relation 'verifies' not allowed from 'design' to 'requirement'.
+Allowed: [addresses, satisfied_by, implements]
+----
+
+This catches misconfigurations early and prevents invalid traceability graphs.
+
+=== Playbook Options
+
+All playbook-level configuration options:
+
+[width=100%, cols="25,15,30,30"]
+|===
+| Option | Type | Default | Description
+
+| `enabled`
+| boolean
+| `true`
+| Set to `false` to disable the extension
+
+| `preset`
+| string
+| `requirements-engineering`
+| Built-in preset name; overridden by `configPath`
+
+| `configPath`
+| string
+| —
+| Path to a custom traceability YAML file; takes precedence over `preset`
+
+| `outputDir`
+| string
+| `traceability`
+| Output directory relative to the site output root
+
+| `generateMatrices`
+| boolean
+| `true`
+| Generate traceability matrices; set to `false` for Neo4j-only usage
+
+| `matrixFormats`
+| string[]
+| `['html', 'csv']`
+| Output formats; valid values: `html`, `csv`
+
+| `includeInNavigation`
+| boolean
+| `true`
+| Add traceability pages to the Antora site navigation
+|===
+
+== Writing Items
+
+=== The `[item]` Block Macro
+
+[source,asciidoc]
+----
+[item, id=TYPE-XXX, role=<role>, title="Title", status="draft"]
+====
+Item content. Can span multiple paragraphs.
+
+Inline relationships go anywhere inside the block:
+
+<relation-type>:TARGET-ID[]
+<relation-type>:TARGET-ID[]
+====
+----
+
+=== Attributes
+
+[width=100%, cols="25,10,65"]
+|===
+| Attribute | Required | Description
+
+| `id`
+| Yes
+| Unique identifier. Recommended format: `ROLE-NNN` (e.g., `REQ-001`, `STORY-042`)
+
+| `role`
+| Yes
+| Must match a role in your configuration. Case-insensitive
+
+| `title`
+| No
+| Display title. Defaults to the `id` if omitted
+
+| `status`
+| No
+| Free-form status: `draft`, `reviewed`, `approved`, `implemented`, `deprecated`
+
+| `priority`
+| No
+| Free-form priority: `high`, `medium`, `low`
+|===
+
+=== Inline Relationships
+
+A relationship is expressed as `<relation-type>:<TARGET-ID>[]` anywhere inside the item block. The `TARGET-ID` must match the `id` of another item.
+
+[source,asciidoc]
+----
+[item, id=IMP-001, role=implementation]
+====
+Auth Service
+
+satisfies:REQ-001[]
+implements:DES-001[]
+depends_on:IMP-002[]
+====
+----
+
+Relationship syntax:
+
+- Multiple targets per type: `satisfies:REQ-001,REQ-002,REQ-003[]`
+- Multiple types per item: write each on its own line
+- The extension validates that each relation is allowed by your config
+
+=== Role-Based Validation
+
+The extension validates:
+
+. **Role exists** — if `role=widget` and `widget` isn't in your config, you get a warning: `Unknown role "widget". Known roles: requirement, design, test.`
+. **Relation allowed** — if you write `verifies:REQ-001[]` from a `document` but your config only allows `document → requirement: [contains]`, you get an error listing the allowed types.
+. **Target exists** — if `TARGET-ID` doesn't exist, you get: `Target item not found: MISSING-001.`
+
+Warnings don't block processing; errors do. Unknown roles generate warnings (graceful degradation). Invalid relations generate errors.
+
+=== ID Conventions
+
+While any unique string works, a consistent convention helps readability:
+
+| Pattern | Example | Convention |
+|---------|---------|------------|
+| Role prefix | `REQ-001`, `IMP-042`, `TEST-099` | Two-to-four uppercase letters, hyphen, number |
+| Hierarchical | `SYS.SEC.AUTH-001` | Dotted namespace |
+| Domain prefix | `PROJ-REQ-001` | Project prefix |
+
+=== Sharing Items Across Files
+
+Items can live in any `.adoc` file in your Antora component. The extension aggregates all items across all files into a single traceability graph. A requirement in `modules/ROOT/pages/requirements.adoc` can be referenced by an implementation in `modules/impl/pages/services.adoc` — as long as the IDs match.
+
+== Generated Output
+
+After a build, generated artifacts appear in `<site-output>/traceability/` (or wherever you set `outputDir`).
 
 === Traceability Index
 
-`traceability/index.html`:: Main index page with links to all traceability artifacts
+`traceability/index.html` — a landing page with links to all matrices and the coverage report.
 
-=== Traceability Matrices
+=== Matrices
 
-The extension generates five types of matrices:
+One HTML and one CSV file per configured matrix:
 
-*Requirements-to-Implementation Matrix (req-impl):*
+[width=100%, cols="40,60"]
+|===
+| File | Description
 
-* `traceability/matrix-req-impl.html` - HTML format
-* `traceability/matrix-req-impl.csv` - CSV format
+| `matrix-<name>.html`
+| HTML table with color-coded status badges
 
-*Requirements-to-Test Matrix (req-test):*
+| `matrix-<name>.csv`
+| CSV with header row and summary statistics
+|===
 
-* `traceability/matrix-req-test.html` - HTML format
-* `traceability/matrix-req-test.csv` - CSV format
+Each matrix row shows one item (from the `rows` role) and its related items per column role. Cells show IDs of related items, or `—` if none exist.
 
-*Requirements-to-Design Matrix (req-design) - Phase 2:*
+Status badges in the HTML output:
 
-* `traceability/matrix-req-design.html` - HTML format
-* `traceability/matrix-req-design.csv` - CSV format
-* Shows which designs address each requirement
+| Badge | Meaning |
+|--------|---------|
+| ✓ Complete | At least one relationship in every column |
+| ◐ Partial | Relationships in some columns but not all |
+| ✗ Missing | No relationships at all |
 
-*Design-to-Implementation Matrix (design-impl) - Phase 2:*
-
-* `traceability/matrix-design-impl.html` - HTML format
-* `traceability/matrix-design-impl.csv` - CSV format
-* Shows which implementations implement each design
-
-*Full Traceability Matrix (full):*
-
-* `traceability/matrix-full.html` - HTML format
-* `traceability/matrix-full.csv` - CSV format
+*Matrix filenames use the matrix `name` from your config.* With the `requirements-engineering` preset, you'll see files like `matrix-requirements-traceability.html` and `matrix-design-verification.html`.
 
 === Coverage Report
 
-`traceability/coverage.html`:: Comprehensive coverage report with:
+`traceability/coverage.html` — a visual breakdown:
 
-* Total requirements count
-* Requirements with implementations
-* Requirements with tests
-* Implementation coverage percentage
-* Test coverage percentage
-* Visual progress bars
+- Total items per role
+- Items with at least one relationship per configured coverage relation
+- Overall coverage percentage
+- Color-coded progress bars: green (≥80%), orange (50-79%), red (<50%)
 
-== Matrix Format
+=== Neo4j Export
 
-=== CSV Format
+`traceability/neo4j/nodes.csv` and `traceability/neo4j/relationships.csv` — see <<Neo4j Export>> for details.
 
-The CSV matrix includes the following columns:
+== CLI Reference
 
-* Requirement ID
-* Requirement Title
-* Implementations (semicolon-separated list)
-* Tests (semicolon-separated list)
-* Status (✓ Complete, ⚠ Partial, ✗ Missing)
-
-Followed by summary rows:
-
-* Total Requirements
-* Requirements with Implementation
-* Requirements with Tests
-* Implementation Coverage (%)
-* Test Coverage (%)
-
-=== HTML Format
-
-The HTML matrix includes:
-
-* Styled data table with all requirements
-* Color-coded status badges:
- ** ✓ Complete (green) - has both implementation and tests
- ** ⚠ Partial (orange) - has implementation or tests but not both
- ** ✗ Missing (red) - has neither implementation nor tests
-* Coverage summary section
-* Responsive design for mobile devices
-* Breadcrumb navigation
-
-== Coverage Report
-
-The coverage report provides a visual overview of your traceability status:
-
-*Total Requirements:: Total number of requirements defined
-*Requirements with Implementation:: Number of requirements with at least one implementation
-*Requirements with Tests:: Number of requirements with at least one test
-*Implementation Coverage:: Percentage of requirements with implementations
-*Test Coverage:: Percentage of requirements with tests
-*Total Designs:: Total number of design concepts defined (Phase 2)
-*Designs with Implementation:: Number of designs with at least one implementation (Phase 2)
-*Design Coverage:: Percentage of designs with implementations (Phase 2)
-*Requirements Addressed by Designs:: Number of requirements addressed by at least one design (Phase 2)
-*Requirement Coverage by Design:: Percentage of requirements addressed by designs (Phase 2)
-
-The report uses color coding:
-
-* Green (≥80%): Excellent coverage
-* Orange (50-79%): Good coverage
-* Red (<50%): Needs improvement
-
-== Best Practices
-
-=== Organizing Requirements
-
-. Group related requirements together in the same file
-. Use consistent ID prefixes (e.g., REQ-, FUNC-, SEC-)
-. Include clear, descriptive titles
-. Add detailed descriptions with acceptance criteria
-
-=== Establishing Traceability
-
-. Create explicit relationships between elements
-. Use `implements` for implementation-requirement relationships
-. Use `tests` for test-requirement relationships
-. Use `depends` for requirement-requirement dependencies
-. Document relationships in both directions when appropriate
-
-=== Maintaining Quality
-
-. Regularly review coverage reports
-. Aim for 100% implementation coverage
-. Aim for 100% test coverage
-. Resolve circular dependencies
-. Use unique IDs for all elements
-
-== Troubleshooting
-
-=== Common Issues
-
-*Non-standard ID format warnings*::
-**Cause:** IDs don't match the recommended format (TYPE-NUMBER)
-**Solution:** Use IDs like REQ-001, IMP-001, TEST-001. While non-standard IDs work, they generate warnings.
-
-*Duplicate ID errors*::
-**Cause:** Two elements with the same ID exist
-**Solution:** Ensure all IDs are unique across all element types
-
-*Circular reference errors*::
-**Cause:** Circular dependencies between requirements/implementations
-**Solution:** Review your dependency graph and break the cycle
-
-*Missing node errors*::
-**Cause:** Relationship references a non-existent element
-**Solution:** Ensure all referenced IDs exist before creating relationships
-
-=== Debugging
-
-Enable debug logging to see detailed information about processing:
+The extension provides a CLI for use outside Antora:
 
 [source,bash]
 ----
-DEBUG=antora-requirements-traceability npx antora antora-playbook.yml
+# Display help
+npx antora-req-trace --help
 ----
 
-This will output detailed logs about:
+=== process
 
-* Files being processed
-* Elements being registered
-* Relationships being created
-* Matrices being generated
+Process AsciiDoc files to populate the traceability graph.
 
-=== Verifying Installation
-
-To verify the extension is loaded correctly:
-
-. Check the Antora build logs for the message: "Requirements traceability extension initialized"
-. Look for traceability artifacts in your output directory
-. Open the generated index.html in a browser to view the traceability pages
-
-== Examples
-
-=== Complete Example
-
-[source,asciidoc]
-----
-= My Project Documentation
-
-== Requirements
-
-[req, id=REQ-001, title="User Authentication", status=approved]
-====
-The system shall require user authentication.
-
-This is a critical security requirement.
-====
-
-[req, id=REQ-002, title="Data Encryption", status=approved]
-====
-All sensitive data must be encrypted at rest and in transit.
-====
-
-depends:REQ-001[]
-
-== Design Concepts (Phase 2)
-
-[design, id=DES-001, title="Security Architecture"]
-====
-High-level security design for the system.
-====
-
-addresses:REQ-001[]
-addresses:REQ-002[]
-composed-of:DES-002[]
-
-[design, id=DES-002, title="Authentication Flow"]
-====
-Detailed design for user authentication flow.
-====
-
-implements:DES-001[]
-
-== Implementation
-
-[imp, id=IMP-001, title="Authentication Service"]
-====
-Service that handles user authentication.
-====
-
-implements:REQ-001[]
-satisfies:REQ-001[]
-
-[imp, id=IMP-002, title="Encryption Service"]
-====
-Service that handles data encryption.
-====
-
-implements:REQ-002[]
-satisfies:REQ-002[]
-
-== Tests
-
-[test, id=TEST-001, title="Authentication Tests"]
-====
-Unit tests for authentication functionality.
-====
-
-tests:REQ-001[]
-verifies:REQ-001[]
-
-[test, id=TEST-002, title="Encryption Tests"]
-====
-Unit tests for encryption functionality.
-====
-
-tests:REQ-002[]
-verifies:REQ-002[]
-----
-
-=== Resulting Matrices
-
-This example would generate:
-
-*REQ-001:*
-
-* Implementations: IMP-001
-* Tests: TEST-001
-* Designs: DES-001, DES-002
-* Status: ✓ Complete
-
-*REQ-002:*
-
-* Implementations: IMP-002
-* Tests: TEST-002
-* Designs: DES-001, DES-002
-* Status: ✓ Complete
-
-*DES-001 (Security Architecture):*
-
-* Implementations: IMP-001, IMP-002
-* Status: ✓ Complete
-
-*DES-002 (Authentication Flow):*
-
-* Implementations: IMP-001
-* Status: ✓ Complete
-
-*Coverage:*
-
-* Implementation Coverage: 100%
-* Test Coverage: 100%
-* Design Coverage: 100% (Phase 2)
-* Requirement Coverage by Design: 100% (Phase 2)
-
-== Advanced Usage
-
-=== Multiple Files
-
-Traceability elements (requirements, implementations, tests, documents, and designs) can be defined across multiple AsciiDoc files. The extension aggregates all elements from all files in your documentation.
-
-=== Organizing with Design Concepts (Phase 2)
-
-Use design concepts to organize high-level architecture and design decisions:
-
-. Create design blocks for architecture components
-. Use `addresses:` to link designs to requirements
-. Use `composed-of:` to show design composition
-. Use `depends-on:` to show design dependencies
-
-This helps bridge the gap between requirements and implementations.
-
-=== Custom ID Schemes
-
-While the recommended ID format is TYPE-NUMBER, you can use any format that works for your project:
-
-[source,asciidoc]
-----
-[req, id=MYPROJECT-AUTH-001]
-====
-Custom ID format
-====
-----
-
-Note: Non-standard IDs will generate warnings but will still work.
-
-=== Relationship Attributes
-
-Relationships can include additional attributes:
-
-[source,asciidoc]
-----
-[imp, id=IMP-001]
-====
-Implementation
-====
-
-implements:REQ-001[status=partial, coverage=80%]
-----
-
-== CLI Usage
-
-The extension also provides a CLI for processing files outside of Antora:
-
-=== Commands
-
-*Process AsciiDoc files:*
 [source,bash]
 ----
-npx antora-req-trace process -i docs/ -o output/
+npx antora-req-trace process -i docs/ --preset requirements-engineering
+npx antora-req-trace process -i requirements.adoc --config ./traceability.yml
 ----
 
-*Generate matrices:*
+Options:
+- `-i, --input <path>` — input file or directory (required)
+- `-o, --output <path>` — output directory (default: `./output`)
+- `-f, --format <format>` — output format: `html`, `csv`, `json` (default: `html`)
+- `--preset <name>` — built-in preset
+- `--config <path>` — custom traceability YAML
+
+=== matrix
+
+Generate traceability matrices from processed items.
+
 [source,bash]
 ----
-npx antora-req-trace matrix -t req-impl -f html -o matrix.html
+npx antora-req-trace matrix -i docs/ -t requirements-traceability -f html
+npx antora-req-trace matrix -t requirements-traceability -f csv -o matrix.csv
 ----
 
-*Validate traceability:*
+Options:
+- `-i, --input <path>` — input file to process first (optional)
+- `-t, --type <type>` — matrix name from your config
+- `-f, --format <format>` — `csv`, `html`, or `json` (default: `csv`)
+- `-o, --output <path>` — output file (defaults to stdout)
+
+=== validate
+
+Validate the traceability graph for orphaned items, missing targets, and invalid relations.
+
 [source,bash]
 ----
-npx antora-req-trace validate
+npx antora-req-trace validate -i docs/ --preset requirements-engineering
 ----
 
-=== CLI Options
+Options:
+- `-i, --input <path>` — input file or directory to validate
+- `--preset <name>` — built-in preset
+- `--config <path>` — custom traceability YAML
 
-*Process command:*
+The command exits with a non-zero code if errors are found.
 
-* `-i, --input <path>`: Input file or directory
-* `-o, --output <path>`: Output directory
-* `-f, --format <format>`: Output format (html, csv, json)
+=== export neo4j
 
-*Matrix command:*
+Export the graph to Neo4j-compatible formats.
 
-* `-t, --type <type>`: Matrix type (req-impl, req-test, full)
-* `-f, --format <format>`: Output format (csv, html)
-* `-o, --output <path>`: Output file (defaults to stdout)
+[source,bash]
+----
+npx antora-req-trace export neo4j -i docs/ --format csv -o ./neo4j-export/
+npx antora-req-trace export neo4j -i docs/ --format cypher -o ./neo4j-export/
+----
 
-== Migration Guide
+Options:
+- `-i, --input <path>` — input file or directory to process first
+- `--format <format>` — `csv` (nodes + relationships) or `cypher` (single script)
+- `-o, --output <path>` — output directory
 
-If you're migrating from another traceability system:
+=== stats
 
-=== From Sphinx Needs
+Display role statistics for the current graph.
 
-| Sphinx Needs | This Extension |
-| `:need:` | `[req, id=]` |
-| `:req:` | `implements:[]` or `satisfies:[]` |
-| `:img:` | `[imp, id=]` |
-| `:tst:` | `[test, id=]` |
-| `:spec:` (design) | `[design, id=]` (Phase 2) |
-| `:addresses:` | `addresses:[]` (Phase 2) |
+[source,bash]
+----
+npx antora-req-trace stats -i docs/ --preset requirements-engineering
+----
 
-=== From Confluence
+Output shows item counts per role and relationship counts.
 
-. Export Confluence pages to AsciiDoc
-. Replace Confluence macros with the appropriate AsciiDoc macros
-. Update relationship syntax
+=== preset
 
-== Support
+Manage built-in presets.
 
-=== Getting Help
+[source,bash]
+----
+npx antora-req-trace preset list                          <1>
+npx antora-req-trace preset show requirements-engineering <2>
+npx antora-req-trace preset init -n medical-iec62304 -o ./config/  <3>
+----
+<1> List all available presets with descriptions
+<2> Show a preset's configuration details
+<3> Write a preset's traceability YAML to a file for customization
 
-* Check the troubleshooting section above
-* Review the examples
-* Enable debug logging for detailed information
+Options (init):
+- `-n, --name <name>` — preset name (required)
+- `-o, --output <path>` — output directory (default: current directory)
 
-=== Reporting Issues
+== Presets Reference
 
-When reporting issues, please include:
+=== requirements-engineering
 
-* Version of the extension
-* Version of Antora
-* Version of Node.js
-* Relevant AsciiDoc content
-* Error messages
-* Steps to reproduce
+Systems and software engineering. Five roles with comprehensive relation coverage.
 
-== Contributing
+[width=100%, cols="20,80"]
+|===
+| Roles | `requirement`, `design`, `implementation`, `test`, `document`
+| Matrices | `requirements-traceability`, `design-verification`, `implementation-coverage`, `test-coverage`
+|===
 
-See the Developer Documentation for information on contributing to this project.
+Key relations: `design → requirement [implements]`, `implementation → requirement [satisfies]`, `implementation → design [implements]`, `test → requirement [covers, verifies]`, `test → implementation [tests]`.
 
-== License
+=== agile
 
-This extension is licensed under the MIT License. See the LICENSE file for details.
+Agile/Scrum teams. Eight roles mapping the Scrum backlog.
 
-== Version History
+[width=100%, cols="20,80"]
+|===
+| Roles | `epic`, `feature`, `user_story`, `acceptance_criterion`, `task`, `spike`, `bug`, `test`
+| Matrices | `user-story-traceability`, `task-implementation`
+|===
 
-*v0.2.0*:: Added design concepts support (Phase 2): `[design]` blocks, `addresses:`, `composed-of:`, `depends-on:` relationships, req-design and design-impl matrices, design coverage metrics
-*v0.1.0*:: Initial release with basic requirements, implementations, tests, documents, and matrix generation
+Key relations: `epic → feature [contains]`, `user_story → task [broken_down_into]`, `task → user_story [implements]`, `test → user_story [verified_by]`, `task → bug [fixes]`.
+
+=== medical-iec62304
+
+Medical device software compliant with IEC 62304. Five roles with safety classification support.
+
+[width=100%, cols="20,80"]
+|===
+| Roles | `system_requirement`, `software_requirement`, `software_item`, `test`, `risk_control`
+| Matrices | `software-traceability`, `risk-control-coverage`
+|===
+
+Key relations: `software_requirement → system_requirement [derived_from]`, `software_item → software_requirement [implements]`, `test → software_requirement [verifies]`, `risk_control → software_requirement [mitigates]`.
+
+=== minimal
+
+Two roles — the simplest possible setup. Good for learning and prototypes.
+
+[width=100%, cols="20,80"]
+|===
+| Roles | `requirement`, `test`
+| Matrices | `requirements-tests`
+|===
+
+Key relations: `test → requirement [covers]`, `test → requirement [verified_by]`, `requirement → requirement [depends_on]`.
+
+=== Initializing a Custom Preset
+
+Start from a built-in preset, then customize:
+
+[source,bash]
+----
+npx antora-req-trace preset init -n requirements-engineering -o ./config/
+----
+
+This writes the preset's YAML to `./config/traceability.yml`. Edit it to add roles, change relations, or add matrices, then point your playbook at it with `configPath`.
+
+== Neo4j Export
+
+=== CSV Export
+
+Generates two files:
+
+- `nodes.csv` — all items with id, role, title, content, and attributes
+- `relationships.csv` — all relationships with source, target, and type
+
+Import into Neo4j:
+
+[source,cypher]
+----
+LOAD CSV WITH HEADERS FROM 'file:///nodes.csv' AS row
+CREATE (n:Item {id: row.id, role: row.role, title: row.title});
+
+LOAD CSV WITH HEADERS FROM 'file:///relationships.csv' AS row
+MATCH (a:Item {id: row.fromId}), (b:Item {id: row.targetId})
+CREATE (a)-[r:RELATES {type: row.type}]->(b);
+----
+
+=== Cypher Export
+
+Generates a single `import.cypher` file with `CREATE` statements for all nodes and relationships. Can be executed directly in Neo4j Browser or via `cypher-shell`.
+
+=== Example Queries
+
+Once imported into Neo4j, ask questions like:
+
+[source,cypher]
+----
+// Requirements without any implementation or test coverage
+MATCH (r:Item {role: 'requirement'})
+WHERE NOT EXISTS {
+  MATCH (r)<-[:RELATES]-(:Item)
+}
+RETURN r.id, r.title ORDER BY r.id
+
+// Full traceability chain: requirement → design → implementation → test
+MATCH path = (r:Item {role: 'requirement'})<-[:RELATES]-(d:Item {role: 'design'})
+           -[:RELATES]->(i:Item {role: 'implementation'})<-[:RELATES]-(t:Item {role: 'test'})
+RETURN r.id, d.id, i.id, t.id
+
+// Impact analysis: what depends on REQ-001?
+MATCH (r:Item {id: 'REQ-001'})
+OPTIONAL MATCH (r)<-[:RELATES]-(d:Item {role: 'design'})
+OPTIONAL MATCH (d)-[:RELATES]->(i:Item {role: 'implementation'})
+RETURN r.id, collect(d.id) as designs, collect(i.id) as implementations
+----
+
+Each preset also ships with example Cypher queries in its documentation. View them with:
+
+[source,bash]
+----
+npx antora-req-trace preset show requirements-engineering
+----
+
+== Recipes & Patterns
+
+=== Common Setups
+
+*Requirements-driven development:*::
+  Use `requirements-engineering` preset. Define requirements first, then implementations, then tests. Each implementation `satisfies` a requirement; each test `verifies` a requirement.
+
+*Agile backlog traceability:*::
+  Use `agile` preset. Epics contain features, features break down into user stories, user stories break down into tasks. Tests verify stories; tasks fix bugs.
+
+*Regulatory compliance:*::
+  Use `medical-iec62304` preset. System requirements drive software requirements, which are implemented by software items and verified by tests. Risk controls trace to software requirements.
+
+*Just getting started:*::
+  Use `minimal` preset. Requirements and tests only. Add more roles as your traceability needs grow.
+
+=== Multi-Component Projects
+
+If your Antora site has multiple components, each with its own `.adoc` files, items are aggregated across all components automatically. Use consistent ID conventions across components to ensure relationships resolve correctly.
+
+=== Incremental Adoption
+
+. Start with `minimal` — two roles, one matrix
+. Add roles as you identify new traceability needs
+. Graduate to `requirements-engineering` or `agile` when your model stabilizes
+. Customize via `preset init` when you need domain-specific adjustments
+
+=== Troubleshooting
+
+*Items not appearing in matrices*::
+  Check that the item's `role` matches a row or column in your configured matrices. Items with roles not referenced in any matrix still exist in the graph but won't appear in matrix output.
+
+*Relationships not showing up*::
+  Verify the relation type is listed in `coverageRelations` for the relevant column. Only relations matching those types count as coverage.
+
+*"Relation not allowed" errors*::
+  Your configuration doesn't permit that relation type between those roles. Check `traceability.yml` `relations` section. Add the missing type or use an allowed type.
+
+*"Unknown role" warnings*::
+  The item's `role` attribute doesn't match any role in your configuration. Either add the role to `traceability.yml` or correct the `role` attribute on the item.
+
+*Build completes but no traceability output*::
+  Verify `enabled: true` in your playbook config. Check that your `.adoc` files are in the Antora content catalog (have page family). Enable verbose Antora logging for more detail.
