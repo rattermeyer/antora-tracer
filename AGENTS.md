@@ -1,0 +1,82 @@
+# AGENTS.md
+
+## Project
+
+Antora Tracer — a role-based requirements traceability extension for Antora/AsciiDoc. Single `[item]` macro with configurable roles, relations, and matrices. Ships with built-in presets, Neo4j export, and CLI.
+
+- **Version**: 0.7.0
+- **Language**: TypeScript (strict mode, ESM)
+- **Runtime**: Node.js 20+
+- **Tests**: 194 passing (Mocha + Chai)
+- **Package**: `antora-tracer` on npm
+
+## Development
+
+```bash
+npm install
+npm run build      # compile src/ → lib/
+npm test           # compile + run 194 tests
+npm run lint       # biome check
+npm run format     # biome format --write
+```
+
+Two tsconfigs:
+- `tsconfig.json` — production build (`src/` → `lib/`)
+- `tsconfig.test.json` — test build (`src/` + `test/` → `lib/`)
+
+Pre-commit hooks: biome lint + format via `pre-commit`.
+
+## Spec-Driven Development
+
+This project uses https://openspec.dev[OpenSpec] for spec-driven development.
+All features, fixes, and refactors start as proposals with specs, design, and tasks.
+
+```bash
+openspec list                         # active changes
+openspec new change "<name>"         # create proposal
+/opsx-apply                           # implement tasks
+/opsx-archive                         # archive completed change
+```
+
+Archived changes: `openspec/changes/archive/`
+
+Skills: `.pi/skills/` — `update-example-site` refreshes the self-traceability example after archiving.
+
+## Architecture
+
+```
+src/
+├── index.ts                 RequirementsTraceabilityExtension (orchestrator)
+├── types.ts                 Item, ItemRelationship interfaces
+├── TraceabilityGraph.ts     In-memory graph with query + validation
+├── DocumentParser.ts        Regex-based AsciiDoc parser
+├── MatrixGenerator.ts       Config-driven matrix generation
+├── Neo4jExporter.ts         Neo4j CSV + Cypher export
+├── TemplateRenderer.ts      Mustache template loading + rendering
+├── antora-extension.ts      Antora extension (events: contentClassified, sitePublished)
+├── cli.ts                   Commander CLI (process, matrix, validate, export, stats, preset)
+└── config/
+    └── TraceabilityConfig.ts ConfigLoader, types, presets
+```
+
+**Item syntax**: `[#REQ-001, item, role=requirement, title="Title"]`
+
+**ContentClassified Pass 2** (in antora-extension.ts):
+1. `substituteRelationshipLinks` — replace `addresses:REQ-001[]` with Asciidoctor xrefs
+2. `injectTitleIds` — prepend ID to title attribute for visible display
+
+## Example Site
+
+`examples/modules/ROOT/pages/` — self-traceability site built with Antora.
+`antora-playbook.yml` at project root. Requires UI bundle (cached from GitLab).
+
+```bash
+npx antora antora-playbook.yml    # build full site
+node examples/run-example.js      # generate matrices via CLI
+```
+
+## CI
+
+GitHub Actions:
+- `.github/workflows/ci.yml` — build + test + lint on push/PR
+- `.github/workflows/pages.yml` — deploy example site to GitHub Pages
