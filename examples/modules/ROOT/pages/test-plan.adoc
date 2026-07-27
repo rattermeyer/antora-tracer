@@ -18,7 +18,7 @@ verifies:REQ-005[]
 verifies:REQ-029[]
 verifies:REQ-030[]
 verifies:REQ-034[]
-
+====
 
 [item, id=TST-002, role=test, title="Antora Extension Tests"]
 ====
@@ -27,7 +27,7 @@ Test file: `test/antora-extension.test.ts`
 Tests the `AntoraTraceabilityExtension` — initialization with default config, preset, config path, and disabled state. Tests event handler registration, content processing via `contentClassified` event, matrix generation via `sitePublished` event, and API access patterns.
 
 verifies:REQ-035[]
-
+====
 
 [item, id=TST-003, role=test, title="CLI Tests"]
 ====
@@ -39,7 +39,7 @@ verifies:REQ-009[]
 verifies:REQ-010[]
 verifies:REQ-026[]
 verifies:REQ-036[]
-
+====
 
 [item, id=TST-004, role=test, title="ConfigLoader Tests"]
 ====
@@ -59,7 +59,7 @@ verifies:REQ-020[]
 verifies:REQ-021[]
 verifies:REQ-022[]
 verifies:REQ-023[]
-
+====
 
 [item, id=TST-005, role=test, title="Graph and API Tests"]
 ====
@@ -75,7 +75,7 @@ verifies:REQ-017[]
 verifies:REQ-031[]
 verifies:REQ-032[]
 verifies:REQ-033[]
-
+====
 
 [item, id=TST-006, role=test, title="MatrixGenerator Tests"]
 ====
@@ -85,7 +85,7 @@ Tests the `MatrixGenerator` — basic matrix generation with empty graph, matrix
 
 verifies:REQ-008[]
 verifies:REQ-029[]
-
+====
 
 [item, id=TST-007, role=test, title="Neo4jExporter Tests"]
 ====
@@ -97,7 +97,7 @@ verifies:REQ-024[]
 verifies:REQ-025[]
 verifies:REQ-027[]
 verifies:REQ-028[]
-
+====
 
 [item, id=TST-008, role=test, title="Relationship Link Substitution Tests"]
 ====
@@ -106,4 +106,4 @@ Test file: `test/relationship-link-substitution.test.ts`
 Tests the in-memory regex substitution that replaces relationship macros with Asciidoctor xrefs. Covers same-page xref generation, cross-page xref generation with basename path resolution, orphan reference handling, non-relationship text preservation, hyphenated/dotted IDs, missing sourceFile fallback, and surrounding text preservation.
 
 verifies:REQ-010[]
-
+====
