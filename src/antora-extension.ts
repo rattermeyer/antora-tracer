@@ -183,11 +183,8 @@ export class AntoraTraceabilityExtension {
       const content = contentsBuffer.toString('utf8');
       const sourceFile = file.src?.path || file.path || 'unknown';
 
-      // Pass 2a: Substitute relationship macros with xrefs
+      // Pass 2: Substitute relationship macros with xrefs
       let modifiedContent = this.substituteRelationshipLinks(content, sourceFile);
-
-      // Pass 2b: Inject item ID headings and anchors
-      modifiedContent = this.injectItemHeadings(modifiedContent);
 
       if (modifiedContent !== content) {
         const buf = Buffer.from(modifiedContent, 'utf8');
@@ -206,36 +203,6 @@ export class AntoraTraceabilityExtension {
    *
    * The .adoc file on disk is never modified — only the in-memory content buffer.
    */
-  private injectItemHeadings(content: string): string {
-    if (!this.traceability) return content;
-
-    // Match [item, id=XXX, ...] followed by ==== or -- block delimiter
-    const itemRegex = /^(\[item,[^\]]*\b(?:id=([^,\]]+))[^\]]*\]\s*\n\s*(?:={4,}|-{2,}))\n/gm;
-
-    return content.replace(itemRegex, (match: string, itemLine: string, idAttr: string) => {
-      const id = idAttr?.trim() || '';
-      if (!id) return match;
-
-      const item = this.traceability!.graph.getItem(id);
-      const title = item?.title && item.title !== item.id ? item.title : '';
-      const hasTitleAttr = itemLine.includes('title=');
-
-      // Inject [[ID]] anchor and prepend ID to the title attribute
-      // so it's visible in the rendered output.
-      if (hasTitleAttr) {
-        // itemLine contains "[item,...]\n====" — replace title attr, keep the ====
-        const newItemLine = itemLine.replace(/title="([^"]*)"/, `title="${id} \u2014 $1"`);
-        return `[[${id}]]\n${newItemLine}\n`;
-      }
-
-      const heading = title
-        ? `*${id} \u2014 ${title}*`
-        : `*${id}*`;
-
-      return `[[${id}]]\n${itemLine}\n${heading}\n`;
-    });
-  }
-
   /**
    * Substitute inline relationship macros with Asciidoctor xrefs.
    * Replaces "addresses:REQ-001[]" with "addresses: xref:#REQ-001[REQ-001]"

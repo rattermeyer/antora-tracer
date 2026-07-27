@@ -291,11 +291,11 @@ describe('RequirementsTraceabilityExtension - API Methods', () => {
       const result = extension.processFiles([
         {
           path: 'reqs.adoc',
-          content: `\n[item, id=REQ-001, role=requirement, title="Req 1"]\n====\nReq 1 content\n====\n`,
+          content: `\n[#REQ-001, item, role=requirement, title="Req 1"]\n====\nReq 1 content\n====\n`,
         },
         {
           path: 'design.adoc',
-          content: `\n[item, id=DES-001, role=design, title="Design 1"]\n====\nDesign 1 content\n====\n`,
+          content: `\n[#DES-001, item, role=design, title="Design 1"]\n====\nDesign 1 content\n====\n`,
         },
       ]);
 
@@ -309,11 +309,11 @@ describe('RequirementsTraceabilityExtension - API Methods', () => {
       const result = extension.processFiles([
         {
           path: 'reqs.adoc',
-          content: `\n[item, id=REQ-001, role=requirement]\n====\nReq 1\n====\n\n[item, id=REQ-002, role=requirement]\n====\nReq 2\n====\n`,
+          content: `\n[#REQ-001, item, role=requirement]\n====\nReq 1\n====\n\n[#REQ-002, item, role=requirement]\n====\nReq 2\n====\n`,
         },
         {
           path: 'design.adoc',
-          content: `\n[item, id=DES-001, role=design]\n====\nDesign 1\n\naddresses:REQ-001[]\n====\n`,
+          content: `\n[#DES-001, item, role=design]\n====\nDesign 1\n\naddresses:REQ-001[]\n====\n`,
         },
       ]);
 
@@ -354,7 +354,7 @@ describe('RequirementsTraceabilityExtension - API Methods', () => {
   describe('getItemsByRole()', () => {
     it('should return empty array for unknown role', () => {
       const extension = new RequirementsTraceabilityExtension();
-      processContent(extension, `\n[item, id=REQ-001, role=requirement]\n====\nReq 1\n====\n`);
+      processContent(extension, `\n[#REQ-001, item, role=requirement]\n====\nReq 1\n====\n`);
 
       const items = extension.getItemsByRole('nonexistent');
       expect(items).to.be.an('array').that.is.empty;
@@ -365,7 +365,7 @@ describe('RequirementsTraceabilityExtension - API Methods', () => {
   describe('getRelationships() with type filter', () => {
     it('should filter relationships by type', () => {
       const extension = new RequirementsTraceabilityExtension();
-      processContent(extension, `\n[item, id=REQ-001, role=requirement]\n====\nReq 1\n====\n\n[item, id=DES-001, role=design]\n====\nDesign 1\n\naddresses:REQ-001[]\n====\n\n[item, id=IMP-001, role=implementation]\n====\nImpl 1\n\nimplements:DES-001[]\n====\n`);
+      processContent(extension, `\n[#REQ-001, item, role=requirement]\n====\nReq 1\n====\n\n[#DES-001, item, role=design]\n====\nDesign 1\n\naddresses:REQ-001[]\n====\n\n[#IMP-001, item, role=implementation]\n====\nImpl 1\n\nimplements:DES-001[]\n====\n`);
 
       const implementsRels = extension.getRelationships('IMP-001', 'implements');
       expect(implementsRels).to.have.lengthOf(1);
@@ -376,7 +376,7 @@ describe('RequirementsTraceabilityExtension - API Methods', () => {
 
     it('should return empty array for item without relationships', () => {
       const extension = new RequirementsTraceabilityExtension();
-      processContent(extension, `\n[item, id=REQ-001, role=requirement]\n====\nReq 1\n====\n`);
+      processContent(extension, `\n[#REQ-001, item, role=requirement]\n====\nReq 1\n====\n`);
 
       const rels = extension.getRelationships('REQ-001');
       expect(rels).to.be.an('array').that.is.empty;
@@ -387,7 +387,7 @@ describe('RequirementsTraceabilityExtension - API Methods', () => {
   describe('getRelatedItems()', () => {
     it('should return empty array for item without outgoing relationships', () => {
       const extension = new RequirementsTraceabilityExtension();
-      processContent(extension, `\n[item, id=REQ-001, role=requirement]\n====\nReq 1\n====\n`);
+      processContent(extension, `\n[#REQ-001, item, role=requirement]\n====\nReq 1\n====\n`);
 
       const related = extension.getRelatedItems('REQ-001');
       expect(related).to.be.an('array').that.is.empty;
@@ -465,7 +465,7 @@ describe('RequirementsTraceabilityExtension - API Methods', () => {
   describe('exportToNeo4jCSV()', () => {
     it('should export graph with items and relationships', () => {
       const extension = new RequirementsTraceabilityExtension();
-      processContent(extension, `\n[item, id=REQ-001, role=requirement]\n====\nReq 1\n====\n\n[item, id=DES-001, role=design]\n====\nDesign 1\n\naddresses:REQ-001[]\n====\n`);
+      processContent(extension, `\n[#REQ-001, item, role=requirement]\n====\nReq 1\n====\n\n[#DES-001, item, role=design]\n====\nDesign 1\n\naddresses:REQ-001[]\n====\n`);
 
       const result = extension.exportToNeo4jCSV({
         outputDir: tempDir,
@@ -497,7 +497,7 @@ describe('RequirementsTraceabilityExtension - API Methods', () => {
   describe('getCoverageReport()', () => {
     it('should return role statistics when no configLoader is set', () => {
       const extension = new RequirementsTraceabilityExtension();
-      processContent(extension, `\n[item, id=REQ-001, role=requirement]\n====\nReq 1\n====\n\n[item, id=DES-001, role=design]\n====\nDesign 1\n====\n`);
+      processContent(extension, `\n[#REQ-001, item, role=requirement]\n====\nReq 1\n====\n\n[#DES-001, item, role=design]\n====\nDesign 1\n====\n`);
 
       const report = extension.getCoverageReport();
       expect(report.requirement).to.equal(1);
@@ -506,7 +506,7 @@ describe('RequirementsTraceabilityExtension - API Methods', () => {
 
     it('should include matrix-specific coverage when configLoader is set', async () => {
       const extension = await RequirementsTraceabilityExtension.createWithPreset('requirements-engineering');
-      processContent(extension, `\n[item, id=REQ-001, role=requirement]\n====\nReq 1\n====\n`);
+      processContent(extension, `\n[#REQ-001, item, role=requirement]\n====\nReq 1\n====\n`);
 
       const report = extension.getCoverageReport();
       expect(report.requirement).to.equal(1);
@@ -620,7 +620,7 @@ describe('RequirementsTraceabilityExtension - API Methods', () => {
   describe('clear()', () => {
     it('should clear all items and relationships', () => {
       const extension = new RequirementsTraceabilityExtension();
-      processContent(extension, `\n[item, id=REQ-001, role=requirement]\n====\nReq 1\n====\n\n[item, id=DES-001, role=design]\n====\nDesign 1\n\naddresses:REQ-001[]\n====\n`);
+      processContent(extension, `\n[#REQ-001, item, role=requirement]\n====\nReq 1\n====\n\n[#DES-001, item, role=design]\n====\nDesign 1\n\naddresses:REQ-001[]\n====\n`);
 
       expect(extension.getAllItems()).to.have.lengthOf(2);
       expect(extension.getAllRelationships()).to.have.lengthOf(1);

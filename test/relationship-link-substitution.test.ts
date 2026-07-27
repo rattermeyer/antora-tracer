@@ -119,7 +119,7 @@ describe('Relationship Link Substitution', () => {
     it('should not modify item block delimiters', () => {
       const graph = new TraceabilityGraph();
 
-      const content = '[item, id=ARC-001, role=architecture]\n====\nSome content\n====';
+      const content = '[#ARC-001, item, role=architecture]\n====\nSome content\n====';
       const result = substituteRelationshipLinks(content, 'architecture.adoc', graph);
       expect(result).to.equal(content);
     });

@@ -1,40 +1,40 @@
 Row ID,Row Title,test
-REQ-001,Single `item` macro replaces all block macros,TST-001: Core Extension Tests
-REQ-002,`item` macro accepts role attribute,TST-001: Core Extension Tests
-REQ-003,`item` macro maintains existing attributes,TST-001: Core Extension Tests
-REQ-004,`item` macro supports block content,TST-001: Core Extension Tests
-REQ-005,Old macro syntax generates deprecation error,TST-001: Core Extension Tests
-REQ-006,Configuration defines roles,TST-004: ConfigLoader Tests
-REQ-007,Configuration defines relations,TST-004: ConfigLoader Tests
-REQ-008,Configuration defines matrices,TST-004: ConfigLoader Tests; TST-006: MatrixGenerator Tests
-REQ-009,Configuration is required for validation,TST-003: CLI Tests
-REQ-010,Configuration file location,TST-003: CLI Tests; TST-004: ConfigLoader Tests; TST-008: Relationship Link Substitution Tests
-REQ-011,Configuration validation,TST-004: ConfigLoader Tests
-REQ-012,Configuration can extend presets,TST-004: ConfigLoader Tests
-REQ-013,Role-based relation validation,TST-005: Graph and API Tests
-REQ-014,Directional relation checking,TST-005: Graph and API Tests
-REQ-015,Error messages list allowed relations,TST-005: Graph and API Tests
-REQ-016,Warnings for unknown roles,TST-005: Graph and API Tests
-REQ-017,Graceful degradation for unknown roles,TST-005: Graph and API Tests
-REQ-018,Built-in preset configurations,TST-004: ConfigLoader Tests
-REQ-019,Each preset contains complete configuration,TST-004: ConfigLoader Tests
-REQ-020,Each preset includes documentation,TST-004: ConfigLoader Tests
-REQ-021,Each preset includes Neo4j Cypher queries,TST-004: ConfigLoader Tests
-REQ-022,Presets have independent versioning,TST-004: ConfigLoader Tests
-REQ-023,Users can define custom presets,TST-004: ConfigLoader Tests
-REQ-024,Neo4j CSV export,TST-007: Neo4jExporter Tests
-REQ-025,Neo4j Cypher export,TST-007: Neo4jExporter Tests
-REQ-026,Export command in CLI,TST-003: CLI Tests
-REQ-027,Export includes all item attributes,TST-007: Neo4jExporter Tests
-REQ-028,Export is optional,TST-007: Neo4jExporter Tests
-REQ-029,Configurable matrix generation with coverage calculations,TST-001: Core Extension Tests; TST-006: MatrixGenerator Tests
-REQ-030,Role statistics reporting,TST-001: Core Extension Tests
-REQ-031,Graph path finding,TST-005: Graph and API Tests
-REQ-032,Impact analysis,TST-005: Graph and API Tests
-REQ-033,Graph merge,TST-005: Graph and API Tests
-REQ-034,Mustache template rendering,TST-001: Core Extension Tests
-REQ-035,Antora extension integration,TST-002: Antora Extension Tests
-REQ-036,CLI commands,TST-003: CLI Tests
+REQ-001,REQ-001 — Single `item` macro replaces all block macros,TST-001: TST-001 — Core Extension Tests
+REQ-002,REQ-002 — `item` macro accepts role attribute,TST-001: TST-001 — Core Extension Tests
+REQ-003,REQ-003 — `item` macro maintains existing attributes,TST-001: TST-001 — Core Extension Tests
+REQ-004,REQ-004 — `item` macro supports block content,TST-001: TST-001 — Core Extension Tests
+REQ-005,REQ-005 — Old macro syntax generates deprecation error,TST-001: TST-001 — Core Extension Tests
+REQ-006,REQ-006 — Configuration defines roles,TST-004: TST-004 — ConfigLoader Tests
+REQ-007,REQ-007 — Configuration defines relations,TST-004: TST-004 — ConfigLoader Tests
+REQ-008,REQ-008 — Configuration defines matrices,TST-004: TST-004 — ConfigLoader Tests; TST-006: TST-006 — MatrixGenerator Tests
+REQ-009,REQ-009 — Configuration is required for validation,TST-003: TST-003 — CLI Tests
+REQ-010,REQ-010 — Configuration file location,TST-003: TST-003 — CLI Tests; TST-004: TST-004 — ConfigLoader Tests; TST-008: TST-008 — Relationship Link Substitution Tests
+REQ-011,REQ-011 — Configuration validation,TST-004: TST-004 — ConfigLoader Tests
+REQ-012,REQ-012 — Configuration can extend presets,TST-004: TST-004 — ConfigLoader Tests
+REQ-013,REQ-013 — Role-based relation validation,TST-005: TST-005 — Graph and API Tests
+REQ-014,REQ-014 — Directional relation checking,TST-005: TST-005 — Graph and API Tests
+REQ-015,REQ-015 — Error messages list allowed relations,TST-005: TST-005 — Graph and API Tests
+REQ-016,REQ-016 — Warnings for unknown roles,TST-005: TST-005 — Graph and API Tests
+REQ-017,REQ-017 — Graceful degradation for unknown roles,TST-005: TST-005 — Graph and API Tests
+REQ-018,REQ-018 — Built-in preset configurations,TST-004: TST-004 — ConfigLoader Tests
+REQ-019,REQ-019 — Each preset contains complete configuration,TST-004: TST-004 — ConfigLoader Tests
+REQ-020,REQ-020 — Each preset includes documentation,TST-004: TST-004 — ConfigLoader Tests
+REQ-021,REQ-021 — Each preset includes Neo4j Cypher queries,TST-004: TST-004 — ConfigLoader Tests
+REQ-022,REQ-022 — Presets have independent versioning,TST-004: TST-004 — ConfigLoader Tests
+REQ-023,REQ-023 — Users can define custom presets,TST-004: TST-004 — ConfigLoader Tests
+REQ-024,REQ-024 — Neo4j CSV export,TST-007: TST-007 — Neo4jExporter Tests
+REQ-025,REQ-025 — Neo4j Cypher export,TST-007: TST-007 — Neo4jExporter Tests
+REQ-026,REQ-026 — Export command in CLI,TST-003: TST-003 — CLI Tests
+REQ-027,REQ-027 — Export includes all item attributes,TST-007: TST-007 — Neo4jExporter Tests
+REQ-028,REQ-028 — Export is optional,TST-007: TST-007 — Neo4jExporter Tests
+REQ-029,REQ-029 — Configurable matrix generation with coverage calculations,TST-001: TST-001 — Core Extension Tests; TST-006: TST-006 — MatrixGenerator Tests
+REQ-030,REQ-030 — Role statistics reporting,TST-001: TST-001 — Core Extension Tests
+REQ-031,REQ-031 — Graph path finding,TST-005: TST-005 — Graph and API Tests
+REQ-032,REQ-032 — Impact analysis,TST-005: TST-005 — Graph and API Tests
+REQ-033,REQ-033 — Graph merge,TST-005: TST-005 — Graph and API Tests
+REQ-034,REQ-034 — Mustache template rendering,TST-001: TST-001 — Core Extension Tests
+REQ-035,REQ-035 — Antora extension integration,TST-002: TST-002 — Antora Extension Tests
+REQ-036,REQ-036 — CLI commands,TST-003: TST-003 — CLI Tests
 
 Total 36 rows
 Coverage: 100.0%

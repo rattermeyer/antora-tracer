@@ -32,12 +32,12 @@ function cleanupTempFile(filePath: string): void {
 
 // Sample AsciiDoc content for testing
 const sampleContent = `
-[item, id=REQ-001, role=requirement, title="Test Requirement"]
+[#REQ-001, item, role=requirement, title="Test Requirement"]
 ====
 This is a test requirement.
 ====
 
-[item, id=DES-001, role=design, title="Test Design"]
+[#DES-001, item, role=design, title="Test Design"]
 ====
 This is a test design.
 
@@ -91,17 +91,17 @@ describe('CLI Module', () => {
 
     it('should handle content with multiple items', async () => {
       const multiContent = `
-[item, id=REQ-001, role=requirement, title="Req 1"]
+[#REQ-001, item, role=requirement, title="Req 1"]
 ====
 Requirement 1
 ====
 
-[item, id=REQ-002, role=requirement, title="Req 2"]
+[#REQ-002, item, role=requirement, title="Req 2"]
 ====
 Requirement 2
 ====
 
-[item, id=REQ-003, role=requirement, title="Req 3"]
+[#REQ-003, item, role=requirement, title="Req 3"]
 ====
 Requirement 3
 ====
@@ -122,19 +122,19 @@ Requirement 3
 
     it('should handle content with multiple relationships', async () => {
       const multiRelContent = `
-[item, id=REQ-001, role=requirement, title="Requirement"]
+[#REQ-001, item, role=requirement, title="Requirement"]
 ====
 A requirement
 ====
 
-[item, id=DES-001, role=design, title="Design"]
+[#DES-001, item, role=design, title="Design"]
 ====
 A design
 
 addresses:REQ-001[]
 ====
 
-[item, id=IMP-001, role=implementation, title="Implementation"]
+[#IMP-001, item, role=implementation, title="Implementation"]
 ====
 An implementation
 
@@ -503,12 +503,12 @@ Bad syntax.
 
       // Process content with relations to nonexistent targets
       const invalidContent = `
-[item, id=REQ-001, role=requirement, title="Lonely Req"]
+[#REQ-001, item, role=requirement, title="Lonely Req"]
 ====
 A requirement with no implementations.
 ====
 
-[item, id=IMP-001, role=implementation, title="Orphan Impl"]
+[#IMP-001, item, role=implementation, title="Orphan Impl"]
 ====
 An implementation that satisfies nothing.
 

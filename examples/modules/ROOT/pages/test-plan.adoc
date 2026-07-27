@@ -4,7 +4,7 @@ This document maps the test suite to the requirements it verifies. Each test fil
 
 == Test Coverage
 
-[item, id=TST-001, role=test, title="Core Extension Tests"]
+[#TST-001, item, role=test, title="Core Extension Tests"]
 --
 Test file: `test/v2-unified-item-architecture.test.ts`
 
@@ -20,7 +20,7 @@ verifies:REQ-030[]
 verifies:REQ-034[]
 --
 
-[item, id=TST-002, role=test, title="Antora Extension Tests"]
+[#TST-002, item, role=test, title="Antora Extension Tests"]
 --
 Test file: `test/antora-extension.test.ts`
 
@@ -29,7 +29,7 @@ Tests the `AntoraTraceabilityExtension` — initialization with default config, 
 verifies:REQ-035[]
 --
 
-[item, id=TST-003, role=test, title="CLI Tests"]
+[#TST-003, item, role=test, title="CLI Tests"]
 --
 Test file: `test/cli.test.ts`
 
@@ -41,7 +41,7 @@ verifies:REQ-026[]
 verifies:REQ-036[]
 --
 
-[item, id=TST-004, role=test, title="ConfigLoader Tests"]
+[#TST-004, item, role=test, title="ConfigLoader Tests"]
 --
 Test file: `test/config-loader.test.ts`
 
@@ -61,7 +61,7 @@ verifies:REQ-022[]
 verifies:REQ-023[]
 --
 
-[item, id=TST-005, role=test, title="Graph and API Tests"]
+[#TST-005, item, role=test, title="Graph and API Tests"]
 --
 Test file: `test/graph-and-api.test.ts`
 
@@ -77,7 +77,7 @@ verifies:REQ-032[]
 verifies:REQ-033[]
 --
 
-[item, id=TST-006, role=test, title="MatrixGenerator Tests"]
+[#TST-006, item, role=test, title="MatrixGenerator Tests"]
 --
 Test file: `test/matrix-generator.test.ts`
 
@@ -87,7 +87,7 @@ verifies:REQ-008[]
 verifies:REQ-029[]
 --
 
-[item, id=TST-007, role=test, title="Neo4jExporter Tests"]
+[#TST-007, item, role=test, title="Neo4jExporter Tests"]
 --
 Test file: `test/neo4j-exporter.test.ts`
 
@@ -99,7 +99,7 @@ verifies:REQ-027[]
 verifies:REQ-028[]
 --
 
-[item, id=TST-008, role=test, title="Relationship Link Substitution Tests"]
+[#TST-008, item, role=test, title="Relationship Link Substitution Tests"]
 --
 Test file: `test/relationship-link-substitution.test.ts`
 

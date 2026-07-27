@@ -167,22 +167,23 @@ export class DocumentParser {
     seen: Set<string>,
     result: ParserResult,
   ): void {
-    // Parse items with explicit IDs: [item, id=XXX, role=YYY]
-    // Only match [item at line start to avoid matching inline backtick references
-    const itemRegex = /^\[item,([^\]]*)\]/gm;
+    // Parse items with Asciidoctor native ID syntax: [#ID, item, role=XXX, title="..."]
+    // Only match at line start to avoid matching inline backtick references
+    const itemRegex = /^\[#([^,\]]+),\s*item,?([^\]]*)\]/gm;
     let match: RegExpExecArray | null;
 
     while ((match = itemRegex.exec(content)) !== null) {
-      const attributesStr = match[1];
+      let id = match[1].trim();
+      const attributesStr = match[2];
       const startPosition = match.index;
       const line = this.lineAt(content, startPosition);
 
-      // Extract block content (between ==== delimiters)
+      // Extract block content (between ==== or -- delimiters)
       const block = this.extractBlock(content, startPosition);
       if (!block) {
         this.warnings.push({
           type: 'invalid_attribute',
-          message: `Item block macro at line ${line} has no content block (missing ====)`,
+          message: `Item block macro at line ${line} has no content block (missing delimiter)`,
           file: sourceFile,
           line,
           position: startPosition,
@@ -193,8 +194,8 @@ export class DocumentParser {
       // Parse attributes
       const attributes = this.parseAttributes(attributesStr);
 
-      // Extract ID
-      let id = attributes.id;
+      // ID comes from the [#ID] prefix
+      attributes.id = id;
       if (!id) {
         // Generate auto ID
         id = this.generateId('ITEM');
@@ -246,8 +247,9 @@ export class DocumentParser {
         }
       }
 
-      // Extract title
-      const title = attributes.title || `Item ${id}`;
+      // Extract title — prepend ID for visible identification in output
+      let title = attributes.title;
+      title = title ? `${id} \u2014 ${title}` : id;
 
       // Extract status
       const status = attributes.status;
