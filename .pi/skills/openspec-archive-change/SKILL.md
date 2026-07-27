@@ -107,6 +107,10 @@ Archive a completed change in the experimental workflow.
 All artifacts complete. All tasks complete.
 ```
 
+**7. Offer to update the example site**
+
+After archiving, if the project has a self-traceability example site (`examples/modules/ROOT/pages/`), ask the user if they want to refresh it to reflect the current as-is state. If yes, invoke the `update-example-site` skill.
+
 **Guardrails**
 - Always prompt for change selection if not provided
 - Use artifact graph (openspec status --json) for completion checking
