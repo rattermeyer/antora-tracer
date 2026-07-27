@@ -1,0 +1,375 @@
+= Antora Requirements Traceability Extension
+:toc: macro
+:badge-license: image:https://img.shields.io/badge/License-MIT-yellow.svg[License: MIT, link="https://opensource.org/licenses/MIT"]
+:badge-ts: image:https://img.shields.io/badge/TypeScript-5.x-blue.svg[TypeScript]
+:badge-esm: image:https://img.shields.io/badge/Module-ESM-red.svg[ESM]
+
+{badge-license} {badge-ts} {badge-esm}
+
+A role-based traceability extension for Antora. Define traceability items with a single `[item]` macro, configure your own roles and relations, and let Antora generate matrices, coverage reports, and Neo4j exports — all driven by your domain model, not ours.
+
+toc::[]
+
+---
+
+== How It Works
+
+[listing]
+....
+                            ┌───────────────────────┐
+                            │   traceability.yml     │
+                            │  (your domain model)   │
+  .adoc files               │                       │          Generated artifacts
+ ┌──────────────────┐       │  roles:               │       ┌──────────────────────────┐
+ │ [item, id=REQ-001,│       │  relations:           │       │  traceability/            │
+ │  role=requirement]│──────▶│  matrices:            │──────▶│    matrix-*.html          │
+ │ ====              │       └───────────┬───────────┘       │    matrix-*.csv           │
+ │ Req content       │                   │                   │    coverage.html          │
+ │ ====              │                   │                   │    neo4j/nodes.csv        │
+ │                    │       ┌───────────▼───────────┐       │    neo4j/relationships.csv│
+ │ [item, id=IMP-001,│       │    Antora Extension    │       └──────────────────────────┘
+ │  role=impl]        │       │                        │
+ │ ====              │       │  parse → validate      │
+ │ impl:REQ-001[]    │───▶   │  → graph → generate    │
+ │ ====              │       │                        │
+ └──────────────────┘       └────────────────────────┘
+....
+
+Your AsciiDoc files use the `[item]` macro. The Antora extension picks them up during `contentClassified`, processes them against your traceability configuration (roles, relations, matrices), and generates matrices, coverage reports, and optional Neo4j CSV exports into your site's `traceability/` directory.
+
+---
+
+== Quick Start
+
+Already have an Antora site? Skip to step 2.
+
+[arabic]
+. Install
++
+[source,bash]
+----
+npm install antora-requirements-traceability --save-dev
+----
+
+. Add to `antora.yml`
++
+[source,yaml]
+----
+antora:
+  extensions:
+    - require: antora-requirements-traceability/antora-extension
+      config:
+        preset: requirements-engineering
+----
+
+. Write `[item]` macros in your `.adoc` files
++
+[source,asciidoc]
+----
+[item, id=REQ-001, role=requirement]
+====
+User Authentication
+
+The system shall require authentication for all protected endpoints.
+====
+
+[item, id=IMP-001, role=implementation]
+====
+Auth Service
+
+JWT-based authentication with token refresh.
+
+satisfies:REQ-001[]
+====
+
+[item, id=TEST-001, role=test]
+====
+Authentication Tests
+
+Unit and integration tests for the auth service.
+
+verifies:REQ-001[]
+tests:IMP-001[]
+====
+----
+
+. Build
++
+[source,bash]
+----
+npx antora antora-playbook.yml
+----
+
+Open `_site/traceability/index.html` — you'll find matrices and a coverage report.
+
+---
+
+== The `[item]` Macro
+
+Everything starts with a single macro:
+
+[source,asciidoc]
+----
+[item, id=TYPE-XXX, role=<role>, title="Optional Title", status="draft"]
+====
+Item description and content.
+
+<relation-type>:TARGET-ID[]
+====
+----
+
+=== Attributes
+
+[width=100%, cols="25,10,65"]
+|===
+| Attribute | Required | Description
+
+| `id`
+| Yes
+| Unique identifier across all items
+
+| `role`
+| Yes
+| Must match a role defined in your configuration
+
+| `title`
+| No
+| Display title (defaults to the id)
+
+| `status`
+| No
+| Free-form status: `draft`, `reviewed`, `approved`, etc.
+
+| `priority`
+| No
+| Free-form priority: `high`, `medium`, `low`
+|===
+
+=== Inline Relationships
+
+Inline relationships use the pattern `<type>:<TARGET-ID>[]` anywhere inside the block:
+
+[source,asciidoc]
+----
+satisfies:REQ-001[]
+implements:DES-001[]
+verifies:REQ-001[]
+tests:IMP-001[]
+----
+
+The valid relation types and which roles they're allowed between are defined in your traceability configuration.
+
+---
+
+== Configuration
+
+=== Using a Preset
+
+The simplest path. Pick a preset and go:
+
+[source,yaml]
+----
+antora:
+  extensions:
+    - require: antora-requirements-traceability/antora-extension
+      config:
+        preset: requirements-engineering
+----
+
+=== Custom Configuration
+
+Point to a traceability YAML file for full control:
+
+[source,yaml]
+----
+antora:
+  extensions:
+    - require: antora-requirements-traceability/antora-extension
+      config:
+        configPath: ./config/traceability.yml
+----
+
+=== Playbook Options
+
+[width=100%, cols="25,15,30,30"]
+|===
+| Option | Type | Default | Description
+
+| `enabled`
+| boolean
+| `true`
+| Enable/disable the extension
+
+| `preset`
+| string
+| `requirements-engineering`
+| Built-in preset name
+
+| `configPath`
+| string
+| —
+| Path to a custom traceability YAML file
+
+| `outputDir`
+| string
+| `traceability`
+| Output directory under site root
+
+| `generateMatrices`
+| boolean
+| `true`
+| Generate traceability matrices
+
+| `matrixFormats`
+| string[]
+| `['html','csv']`
+| Output formats
+
+| `includeInNavigation`
+| boolean
+| `true`
+| Add traceability pages to site navigation
+|===
+
+=== Traceability YAML Structure
+
+[source,yaml]
+----
+traceability:
+  roles:
+    - requirement
+    - design
+    - implementation
+    - test
+
+  relations:
+    requirement:
+      design: [addresses]
+    design:
+      requirement: [implements]
+    implementation:
+      requirement: [satisfies]
+      design: [implements]
+    test:
+      requirement: [verifies]
+      implementation: [tests]
+
+  matrices:
+    - name: requirements-traceability
+      rows: requirement
+      columns: [design, implementation, test]
+      coverageRelations:
+        design: [addresses, implements]
+        implementation: [satisfies, implements]
+        test: [verifies, tests]
+----
+
+Each relation is directional: `source → target` with an allowed set of types. The extension validates every relationship at processing time — if you write `verifies:REQ-001[]` from a `document` but your config only allows `impl → requirement` with `[satisfies]`, you'll get a clear error message.
+
+---
+
+== CLI
+
+The extension also works standalone outside of Antora:
+
+[source,bash]
+----
+# Process AsciiDoc files and populate the graph
+npx antora-req-trace process -i docs/ --preset requirements-engineering
+
+# Generate traceability matrices
+npx antora-req-trace matrix -t requirements-traceability -f html -o matrix.html
+
+# Validate traceability completeness
+npx antora-req-trace validate
+----
+
+Additional commands: `export neo4j` (CSV/Cypher), `stats` (role statistics), `preset` (list/show/init).
+
+---
+
+== Presets
+
+Four built-in presets ship with the extension:
+
+[width=100%, cols="30,50,20"]
+|===
+| Preset | Roles | Best For
+
+| `requirements-engineering`
+| requirement, design, implementation, test, document
+| Systems & software engineering
+
+| `agile`
+| user_story, task, test, epic
+| Agile/Scrum teams
+
+| `medical-iec62304`
+| requirement, design, unit, integration, risk_control
+| Medical device software (IEC 62304)
+
+| `minimal`
+| requirement, test
+| Getting started, simple projects
+|===
+
+List available presets: `npx antora-req-trace preset list`
+
+Initialize a config from one: `npx antora-req-trace preset init --name medical-iec62304 -o ./config/`
+
+---
+
+== Generated Artifacts
+
+After a build, you'll find in `<site-output>/traceability/`:
+
+[width=100%, cols="35,65"]
+|===
+| File | Description
+
+| `index.html`
+| Traceability index page
+
+| `matrix-<name>.html`
+| One HTML matrix per configured matrix
+
+| `matrix-<name>.csv`
+| One CSV matrix per configured matrix
+
+| `coverage.html`
+| Coverage report with status badges and per-role breakdown
+
+| `neo4j/nodes.csv`
+| Neo4j CSV node export
+
+| `neo4j/relationships.csv`
+| Neo4j CSV relationship export
+|===
+
+*Coverage* is calculated per-matrix based on `coverageRelations` in your config. Each row item gets a status badge: ✓ Complete (100%), ◐ Partial, or ✗ Missing (0%).
+
+---
+
+== Documentation
+
+* link:docs/user-guide.adoc[User Guide] — Full reference: macros, relations, CLI, presets
+* link:docs/developer-guide.adoc[Developer Guide] — API, architecture, contributing, testing
+
+---
+
+== Contributing
+
+Contributions are welcome. See the link:docs/developer-guide.adoc[Developer Guide] for setup, code style, and testing.
+
+[source,bash]
+----
+git clone <repo-url>
+npm install
+npm test        # 181 tests
+----
+
+---
+
+== License
+
+MIT — see link:LICENSE[LICENSE].
