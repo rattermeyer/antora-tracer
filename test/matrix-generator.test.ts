@@ -124,8 +124,8 @@ matrices:
       // Find REQ-001 row
       const req1Row = matrix.rows.find(r => r.rowId === 'REQ-001');
       if (req1Row) {
-        // Should have at least one cell with content
-        const nonEmptyCells = req1Row.cells.filter(c => c.itemId !== '');
+        // Should have at least one cell with items
+        const nonEmptyCells = req1Row.cells.filter(c => c.items.length > 0);
         expect(nonEmptyCells.length).to.be.at.least(1);
       }
     });
@@ -230,11 +230,11 @@ matrices:
 
         // Architecture cell should have ARC-001
         const archCell = req1Row!.cells.find(c => c.role === 'architecture');
-        expect(archCell?.itemId).to.equal('ARC-001');
+        expect(archCell?.items[0]?.itemId).to.equal('ARC-001');
 
         // Test cell should have TST-001
         const testCell = req1Row!.cells.find(c => c.role === 'test');
-        expect(testCell?.itemId).to.equal('TST-001');
+        expect(testCell?.items[0]?.itemId).to.equal('TST-001');
 
         // REQ-001 should be 100% covered (both columns have relationships)
         expect(req1Row!.coverage).to.equal(100);

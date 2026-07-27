@@ -103,16 +103,18 @@
                     <td>{{rowId}}</td>
                     <td>{{rowTitle}}</td>
                     {{#cells}}
-                    <td{{#itemId}} class="role-{{role}}"{{/itemId}}>
-                        {{#itemId}}
-                            <strong>{{itemId}}</strong>: {{itemTitle}}
-                        {{/itemId}}
-                        {{^itemId}}
+                    <td{{#hasItems}} class="role-{{role}}"{{/hasItems}}>
+                        {{#hasItems}}
+                            {{#items}}
+                            <div><strong>{{itemId}}</strong>: {{itemTitle}}</div>
+                            {{/items}}
+                        {{/hasItems}}
+                        {{^hasItems}}
                             <span class="empty-cell">-</span>
-                        {{/itemId}}
+                        {{/hasItems}}
                     </td>
                     {{/cells}}
-                    <td>{{coverage.toFixed 1}}%</td>
+                    <td>{{coverageFormatted}}%</td>
                     <td><span class="coverage-badge coverage-{{status}}">{{status}}</span></td>
                 </tr>
                 {{/rows}}

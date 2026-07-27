@@ -22,10 +22,8 @@ const DEFAULT_TEMPLATE_DIR = path.join(__dirname, 'templates');
  * Matrix cell data
  */
 export interface MatrixCell {
-  itemId: string;
-  itemTitle: string;
+  items: { itemId: string; itemTitle: string; role: string; sourceFile?: string }[];
   role: string;
-  sourceFile?: string;
 }
 
 /**
@@ -146,27 +144,23 @@ export class MatrixGenerator {
       const totalColumns = columnRoles.length;
 
       for (const colRole of columnRoles) {
-        // Find items in this column that are related to the row item
+        // Collect all related items for this column
         const relatedItems = this.findRelatedItems(rowItem.id, colRole, config);
+        const cellItems = relatedItems.map(rel => ({
+          itemId: rel.id,
+          itemTitle: rel.title,
+          role: rel.role,
+          sourceFile: rel.sourceFile,
+        }));
 
-        if (relatedItems.length > 0) {
+        if (cellItems.length > 0) {
           coveredCount++;
-          for (const related of relatedItems) {
-            cells.push({
-              itemId: related.id,
-              itemTitle: related.title,
-              role: related.role,
-              sourceFile: related.sourceFile,
-            });
-          }
-        } else {
-          // Empty cell
-          cells.push({
-            itemId: '',
-            itemTitle: '',
-            role: colRole,
-          });
         }
+
+        cells.push({
+          items: cellItems,
+          role: colRole,
+        });
       }
 
       const coverage = (coveredCount / totalColumns) * 100;
@@ -287,8 +281,7 @@ export class MatrixGenerator {
         const colItems = columnItems.get(colRole) || [];
         const colItemIds = new Set(colItems.map(i => i.id));
 
-        // Find relationships connecting row item to this column (both directions)
-        const relatedItems: Item[] = [];
+        const relatedItems: { itemId: string; itemTitle: string; role: string; sourceFile?: string }[] = [];
         const seenIds = new Set<string>();
 
         // Forward: row item → column item
@@ -297,7 +290,12 @@ export class MatrixGenerator {
             const target = this.graph.getItem(rel.targetId);
             if (target && !seenIds.has(target.id)) {
               seenIds.add(target.id);
-              relatedItems.push(target);
+              relatedItems.push({
+                itemId: target.id,
+                itemTitle: target.title,
+                role: target.role,
+                sourceFile: target.sourceFile,
+              });
             }
           }
         }
@@ -308,28 +306,24 @@ export class MatrixGenerator {
             const source = this.graph.getItem(rel.fromId);
             if (source && !seenIds.has(source.id)) {
               seenIds.add(source.id);
-              relatedItems.push(source);
+              relatedItems.push({
+                itemId: source.id,
+                itemTitle: source.title,
+                role: source.role,
+                sourceFile: source.sourceFile,
+              });
             }
           }
         }
 
         if (relatedItems.length > 0) {
           coveredCount++;
-          for (const related of relatedItems) {
-            cells.push({
-              itemId: related.id,
-              itemTitle: related.title,
-              role: related.role,
-              sourceFile: related.sourceFile,
-            });
-          }
-        } else {
-          cells.push({
-            itemId: '',
-            itemTitle: '',
-            role: colRole,
-          });
         }
+
+        cells.push({
+          items: relatedItems,
+          role: colRole,
+        });
       }
 
       const coverage = (coveredCount / totalColumns) * 100;
@@ -443,8 +437,12 @@ export class MatrixGenerator {
       ];
 
       // Add cell values
-      for (const cell of row.cells) {
-        rowValues.push(cell.itemId ? `${cell.itemId}: ${cell.itemTitle}` : '');
+      const cellValues = row.cells.map(cell => {
+        if (cell.items.length === 0) return '';
+        return cell.items.map(item => `${item.itemId}: ${item.itemTitle}`).join('; ');
+      });
+      for (const val of cellValues) {
+        rowValues.push(val);
       }
 
       lines.push(rowValues.map(v => this.escapeCSV(v)).join(','));
@@ -488,11 +486,16 @@ export class MatrixGenerator {
       rowTitle: this.escapeHtml(row.rowTitle),
       rowRole: this.escapeHtml(row.rowRole),
       cells: row.cells.map(cell => ({
-        itemId: this.escapeHtml(cell.itemId),
-        itemTitle: this.escapeHtml(cell.itemTitle),
+        hasItems: cell.items.length > 0,
+        items: cell.items.map(item => ({
+          itemId: this.escapeHtml(item.itemId),
+          itemTitle: this.escapeHtml(item.itemTitle),
+          role: this.escapeHtml(item.role),
+        })),
         role: this.escapeHtml(cell.role),
       })),
       coverage: row.coverage,
+      coverageFormatted: row.coverage.toFixed(1),
       status: row.status,
       statusClass: `status-${row.status}`,
     };
