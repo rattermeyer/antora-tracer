@@ -21,10 +21,10 @@ _Not needed — GitHub Pages deploys `public/`, not the `docs/` source directory
 
 ## 4. Package Metadata
 
-- [ ] 4.1 Add `repository` field to `package.json`
-- [ ] 4.2 Add `bugs` field to `package.json`
-- [ ] 4.3 Add `homepage` field to `package.json` (points to GitHub Pages URL)
-- [ ] 4.4 Add `author` with name and email to `package.json`
+- [x] 4.1 Add `repository` field to `package.json`
+- [x] 4.2 Add `bugs` field to `package.json`
+- [x] 4.3 Add `homepage` field to `package.json` (points to GitHub Pages URL)
+- [x] 4.4 Add `author` with name and email to `package.json`
 
 ## 5. Verification
 
