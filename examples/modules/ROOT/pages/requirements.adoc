@@ -268,3 +268,54 @@ The system SHALL provide a Commander-based CLI with six subcommands: `process` (
 
 Source: CLI implementation
 --
+
+== Matrix Item Linking
+
+[#REQ-037, item, role=requirement, title="Matrix row items are clickable links"]
+--
+The system SHALL render row item IDs as hyperlinks that navigate to the item's definition in the rendered HTML documentation.
+
+Source: openspec/specs/matrix-item-linking/spec.md
+--
+
+[#REQ-038, item, role=requirement, title="Matrix cell items are clickable links"]
+--
+The system SHALL render cell item IDs as hyperlinks that navigate to the item's definition in the rendered HTML documentation. Multiple items in a cell SHALL each render as separate clickable links.
+
+Source: openspec/specs/matrix-item-linking/spec.md
+--
+
+[#REQ-039, item, role=requirement, title="Source file tooltips on matrix links"]
+--
+The system SHALL display the source file name as a tooltip when users hover over item links in the matrix.
+
+Source: openspec/specs/matrix-item-linking/spec.md
+--
+
+[#REQ-040, item, role=requirement, title="Context-aware link generation"]
+--
+The system SHALL generate consistent relative link paths (\`../../\`) from matrix output to component root, regardless of execution context. The LinkResolver SHALL accept a configurable \`relativePathPrefix\` option.
+
+Source: openspec/specs/matrix-item-linking/spec.md
+--
+
+[#REQ-041, item, role=requirement, title="Source file path normalization"]
+--
+The system SHALL normalize item \`sourceFile\` paths by stripping any \`pages/\` prefix and \`.adoc\` extension at link resolution time, producing clean HTML paths.
+
+Source: openspec/specs/matrix-item-linking/spec.md
+--
+
+[#REQ-042, item, role=requirement, title="Backward compatibility without LinkResolver"]
+--
+The system SHALL maintain existing matrix rendering behavior when no \`LinkResolver\` is provided. Items SHALL render as plain text without links, and existing matrix HTML structure SHALL be preserved.
+
+Source: openspec/specs/matrix-item-linking/spec.md
+--
+
+[#REQ-043, item, role=requirement, title="Non-HTML matrix outputs unchanged"]
+--
+The system SHALL NOT modify CSV and JSON matrix outputs to include links. CSV and JSON output SHALL contain item data as before.
+
+Source: openspec/specs/matrix-item-linking/spec.md
+--

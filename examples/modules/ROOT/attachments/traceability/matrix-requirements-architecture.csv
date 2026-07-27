@@ -35,6 +35,13 @@ REQ-033,REQ-033 — Graph merge,
 REQ-034,REQ-034 — Mustache template rendering,ARC-002: ARC-002 — Component-level architecture; ARC-004: ARC-004 — Key architectural decisions and their rationale
 REQ-035,REQ-035 — Antora extension integration,ARC-001: ARC-001 — Project scope and architectural goals; ARC-003: ARC-003 — Processing flow during Antora build
 REQ-036,REQ-036 — CLI commands,ARC-001: ARC-001 — Project scope and architectural goals
+REQ-037,REQ-037 — Matrix row items are clickable links,
+REQ-038,REQ-038 — Matrix cell items are clickable links,
+REQ-039,REQ-039 — Source file tooltips on matrix links,
+REQ-040,REQ-040 — Context-aware link generation,
+REQ-041,REQ-041 — Source file path normalization,
+REQ-042,REQ-042 — Backward compatibility without LinkResolver,
+REQ-043,REQ-043 — Non-HTML matrix outputs unchanged,
 
-Total 36 rows
-Coverage: 66.7%
+Total 43 rows
+Coverage: 55.8%

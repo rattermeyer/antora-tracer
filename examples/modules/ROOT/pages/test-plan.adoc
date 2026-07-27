@@ -27,6 +27,7 @@ Test file: `test/antora-extension.test.ts`
 Tests the `AntoraTraceabilityExtension` — initialization with default config, preset, config path, and disabled state. Tests event handler registration, content processing via `contentClassified` event, matrix generation via `sitePublished` event, and API access patterns.
 
 verifies:REQ-035[]
+verifies:REQ-040[]
 --
 
 [#TST-003, item, role=test, title="CLI Tests"]
@@ -85,6 +86,11 @@ Tests the `MatrixGenerator` — basic matrix generation with empty graph, matrix
 
 verifies:REQ-008[]
 verifies:REQ-029[]
+verifies:REQ-037[]
+verifies:REQ-038[]
+verifies:REQ-039[]
+verifies:REQ-042[]
+verifies:REQ-043[]
 --
 
 [#TST-007, item, role=test, title="Neo4jExporter Tests"]

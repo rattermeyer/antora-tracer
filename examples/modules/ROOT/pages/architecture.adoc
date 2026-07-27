@@ -51,6 +51,7 @@ package "Core" {
 package "Generation" {
   [MatrixGenerator] as matrix
   [TemplateRenderer] as templates
+  [LinkResolver] as linkresolver
 }
 
 package "Export" {
@@ -100,6 +101,9 @@ config --> graph : provides validation rules
 
 | `TemplateRenderer`
 | Mustache wrapper. Loads templates from `src/templates/`, supports custom template directories with fallback to built-ins.
+
+| `LinkResolver`
+| Path resolution for matrix-to-item deep links. Strips \`pages/\` prefix and \`.adoc\` extension from sourceFile values, generates \`../../component/page.html#ID\` links using a configurable \`relativePathPrefix\`.
 
 | `Neo4jExporter`
 | Graph-to-Neo4j export. Produces `nodes.csv`, `relationships.csv`, and `import.cypher`. Properly escapes special characters.
@@ -263,6 +267,10 @@ This section captures the design decisions from `openspec/changes/unified-item-a
 | In-memory source substitution for clickable links
 | After processing, replace `addresses:REQ-001[]` with Asciidoctor xrefs in the content catalog buffer. Two-pass approach ensures cross-file targets are resolved. No disk writes.
 | HTML post-processing (PDF-incompatible), Asciidoctor inline macro extension (API dependency)
+
+| Dedicated LinkResolver component
+| Separates path resolution from matrix generation, makes link generation configurable and testable in isolation. Robust `itemToHtmlPath` strips `pages/` prefix and `.adoc` extension from any sourceFile format.
+| Link generation in MatrixGenerator (mixes concerns), template-level logic (Mustache cannot do complex path manipulation)
 |===
 
 addresses:REQ-010[]
