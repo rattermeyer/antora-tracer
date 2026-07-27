@@ -186,6 +186,9 @@ export class AntoraTraceabilityExtension {
       // Pass 2: Substitute relationship macros with xrefs
       let modifiedContent = this.substituteRelationshipLinks(content, sourceFile);
 
+      // Pass 2b: Prepend item IDs to title attributes for visible display
+      modifiedContent = this.injectTitleIds(modifiedContent);
+
       if (modifiedContent !== content) {
         const buf = Buffer.from(modifiedContent, 'utf8');
         if (file.contents) file.contents = buf;
@@ -194,6 +197,21 @@ export class AntoraTraceabilityExtension {
     } catch (error: any) {
       this.logger.warn(`Error substituting links in ${file.src?.path}: ${error.message}`);
     }
+  }
+
+  /**
+   * Prepend item IDs to title attributes so they appear in rendered block titles.
+   */
+  private injectTitleIds(content: string): string {
+    if (!this.traceability) return content;
+
+    return content.replace(
+      /^(\[#([^,\]]+),\s*item[^\]]*title=")([^"]+)(")/gm,
+      (_match: string, prefix: string, id: string, title: string, suffix: string) => {
+        if (title.startsWith(`${id} \u2014 `)) return _match;
+        return `${prefix}${id} \u2014 ${title}${suffix}`;
+      }
+    );
   }
 
   /**
