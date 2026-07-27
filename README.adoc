@@ -23,15 +23,15 @@ toc::[]
  ┌──────────────────┐       │  roles:               │       ┌──────────────────────────┐
  │ [#REQ-001, item, │       │  relations:           │       │  traceability/            │
  │  role=requirement]│──────▶│  matrices:            │──────▶│    matrix-*.html          │
- │ ====              │       └───────────┬───────────┘       │    matrix-*.csv           │
- │ Req content       │                   │                   │    coverage.html          │
- │ ====              │                   │                   │    neo4j/nodes.csv        │
- │                    │       ┌───────────▼───────────┐       │    neo4j/relationships.csv│
+ │ --               │       └───────────┬───────────┘       │    matrix-*.csv           │
+ │ Req content      │                   │                   │    coverage.html          │
+ │ --               │                   │                   │    neo4j/nodes.csv        │
+ │                  │       ┌───────────▼───────────┐       │    neo4j/relationships.csv│
  │ [#IMP-001, item, │       │    Antora Extension    │       └──────────────────────────┘
- │  role=impl]        │       │                        │
- │ ====              │       │  parse → validate      │
- │ impl:REQ-001[]    │───▶   │  → graph → generate    │
- │ ====              │       │                        │
+ │  role=impl]      │       │                        │
+ │ --               │       │  parse → validate     │
+ │ impl:REQ-001[]   │──────▶│  → graph → generate   │
+ │ --               │       │                        │
  └──────────────────┘       └────────────────────────┘
 ....
 
