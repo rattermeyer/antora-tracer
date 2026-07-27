@@ -45,43 +45,43 @@
 
 ## 4. Graph Query Tests (Priority: Medium - Currently 51.88% coverage)
 
-- [ ] 4.1 Add tests to test/v2-unified-item-architecture.test.ts for merge() method
-- [ ] 4.2 Add tests for getRelatedItems() with various graph structures
-- [ ] 4.3 Add tests for getItemsWithRelationTo() with various graph structures
-- [ ] 4.4 Add tests for getRelationshipsByRoles() with different role combinations
-- [ ] 4.5 Add tests for findPath() with connected items
-- [ ] 4.6 Add tests for findPath() with disconnected items
-- [ ] 4.7 Add tests for findPath() with maxDepth parameter
-- [ ] 4.8 Add tests for getImpactAnalysis()
-- [ ] 4.9 Verify Graph tests pass
+- [x] 4.1 Add tests to test/graph-and-api.test.ts for merge() method
+- [x] 4.2 Add tests for getRelatedItems() with various graph structures
+- [x] 4.3 Add tests for getItemsWithRelationTo() with various graph structures
+- [x] 4.4 Add tests for getRelationshipsByRoles() with different role combinations
+- [x] 4.5 Add tests for findPath() with connected items
+- [x] 4.6 Add tests for findPath() with disconnected items
+- [x] 4.7 Add tests for findPath() with maxDepth parameter
+- [x] 4.8 Add tests for getImpactAnalysis()
+- [x] 4.9 Verify Graph tests pass
 
-## 5. API Methods Tests (Priority: Medium - Currently 64.93% coverage)
+## 5. API Methods Tests (Priority: Medium - Now covered)
 
-- [ ] 5.1 Add tests to test/v2-unified-item-architecture.test.ts for processFiles() method
-- [ ] 5.2 Add tests for getAllItems() method
-- [ ] 5.3 Add tests for getAllRelationships() method
-- [ ] 5.4 Add tests for getItemsByRole() method
-- [ ] 5.5 Add tests for getRelationships() method with and without type filter
-- [ ] 5.6 Add tests for getRelatedItems() method
-- [ ] 5.7 Add tests for getRoleStatistics() method
-- [ ] 5.8 Add tests for validate() method
-- [ ] 5.9 Add tests for getConfigErrors() method
-- [ ] 5.10 Add tests for createNeo4jExporter() method
-- [ ] 5.11 Add tests for exportToNeo4jCSV() method
-- [ ] 5.12 Add tests for getCoverageReport() method
-- [ ] 5.13 Add tests for getMatrixDefinitions() method
-- [ ] 5.14 Add tests for isKnownRole() method
-- [ ] 5.15 Add tests for isRelationAllowed() method
-- [ ] 5.16 Add tests for getAllowedRelations() method
-- [ ] 5.17 Add tests for listPresets() method
-- [ ] 5.18 Add tests for getPreset() method
-- [ ] 5.19 Add tests for clear() method
-- [ ] 5.20 Add tests for resetWithConfig() method
-- [ ] 5.21 Verify all API tests pass
+- [x] 5.1 Add tests to test/graph-and-api.test.ts for processFiles() method
+- [x] 5.2 Add tests for getAllItems() method
+- [x] 5.3 Add tests for getAllRelationships() method
+- [x] 5.4 Add tests for getItemsByRole() method
+- [x] 5.5 Add tests for getRelationships() method with and without type filter
+- [x] 5.6 Add tests for getRelatedItems() method
+- [x] 5.7 Add tests for getRoleStatistics() method
+- [x] 5.8 Add tests for validate() method
+- [x] 5.9 Add tests for getConfigErrors() method
+- [x] 5.10 Add tests for createNeo4jExporter() method
+- [x] 5.11 Add tests for exportToNeo4jCSV() method
+- [x] 5.12 Add tests for getCoverageReport() method
+- [x] 5.13 Add tests for getMatrixDefinitions() method
+- [x] 5.14 Add tests for isKnownRole() method
+- [x] 5.15 Add tests for isRelationAllowed() method
+- [x] 5.16 Add tests for getAllowedRelations() method
+- [x] 5.17 Add tests for listPresets() method
+- [x] 5.18 Add tests for getPreset() method
+- [x] 5.19 Add tests for clear() method
+- [x] 5.20 Add tests for resetWithConfig() method
+- [x] 5.21 Verify all API tests pass
 
 ## 6. Verification
 
-- [ ] 6.1 Run full test suite (all existing + new tests)
+- [x] 6.1 Run full test suite (181 all passing)
 - [ ] 6.2 Run coverage report and verify improvement
 - [ ] 6.3 Verify overall coverage >= 70%
 - [ ] 6.4 Verify antora-extension.js coverage >= 80%
