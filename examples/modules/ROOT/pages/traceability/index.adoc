@@ -1,0 +1,15 @@
+= Traceability
+
+Generated traceability artifacts for the Antora Tracer project.
+
+* link:attachment$traceability/matrix-requirements-coverage.html[Requirements Coverage Matrix] — Cross-references all 36 requirements against architecture sections and test files
+* link:attachment$traceability/matrix-requirements-coverage.csv[Requirements Coverage CSV] — Same data in CSV format
+
+[NOTE]
+====
+These files are pre-generated. To regenerate after content changes:
+
+ node examples/run-example.js
+
+This produces 48 items, 82 relationships, 0 validation errors.
+====

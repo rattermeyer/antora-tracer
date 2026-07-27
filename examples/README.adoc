@@ -1,13 +1,26 @@
 # Self-Traceability Example
 
-This example demonstrates the Antora Tracer extension tracing its own requirements, architecture, and tests using the standalone CLI.
+This example demonstrates the Antora Tracer extension tracing its own requirements, architecture, and tests.
 
 ## What's Here
 
-- `requirements.adoc` — 36 requirements extracted from the OpenSpec specifications
-- `architecture.adoc` — arc42-style architecture documentation with PlantUML diagrams
-- `test-plan.adoc` — test coverage mapping (which test files verify which requirements)
-- `traceability.yml` — custom configuration defining the domain model
+| File | Content | Items |
+|------|---------|-------|
+| `requirements.adoc` | 36 requirements extracted from OpenSpec specs | 36 `[item, role=requirement]` |
+| `architecture.adoc` | arc42-style architecture with PlantUML diagrams | 4 `[item, role=architecture]` |
+| `test-plan.adoc` | Test coverage mapping to REQ-IDs | 7 `[item, role=test]` |
+| `traceability.yml` | Custom domain model: requirement, architecture, test | — |
+| `traceability/` | Pre-generated matrices and Neo4j export | — |
+
+## Pre-generated Output
+
+The `traceability/` directory contains pre-generated output from `run-example.js`:
+
+- `matrix-requirements-coverage.html` — Requirements × Architecture × Test matrix
+- `matrix-requirements-coverage.csv` — Same data in CSV format
+- `nodes.csv`, `relationships.csv` — Neo4j CSV export
+
+These files are included as static pages in the Antora site and linked from the navigation.
 
 ## How to Run
 
@@ -15,75 +28,61 @@ This example demonstrates the Antora Tracer extension tracing its own requiremen
 ----
 cd antora-asciidoc-tracing
 npm run build
-
-# Process all example files
-npx antora-req-trace process \
-  -i examples/modules/ROOT/pages/requirements.adoc \
-  -i examples/modules/ROOT/pages/architecture.adoc \
-  -i examples/modules/ROOT/pages/test-plan.adoc \
-  --config examples/traceability.yml
-
-# Wait - process currently handles one file at a time. Use the library instead:
-
-# Generate the traceability matrix
-npx antora-req-trace matrix \
-  -i examples/modules/ROOT/pages/ \
-  -t requirements-coverage \
-  -f html \
-  -o examples/output/matrix-requirements-coverage.html
-
-# Generate CSV matrix
-npx antora-req-trace matrix \
-  -i examples/modules/ROOT/pages/ \
-  -t requirements-coverage \
-  -f csv \
-  -o examples/output/matrix-requirements-coverage.csv
-
-# View role statistics
-npx antora-req-trace stats \
-  -i examples/modules/ROOT/pages/ \
-  --config examples/traceability.yml
-
-# Validate the traceability graph
-npx antora-req-trace validate \
-  -i examples/modules/ROOT/pages/ \
-  --config examples/traceability.yml
+node examples/run-example.js
 ----
 
-## What Gets Generated
+This processes all three content files together, generating:
+- 48 items (36 requirements, 4 architecture, 7 tests)
+- 82 relationships (43 architecture→requirement, 39 test→requirement)
+- 0 validation errors
 
-The matrix `requirements-coverage` cross-references:
-
-| Row (requirement) | Column (architecture) | Column (test) |
-|-------------------|----------------------|---------------|
-| Each of the 36 REQ-XXX items | Which ARC items address it | Which TST items verify it |
-
-With `coverageRelations.architecture: [addresses]` and `coverageRelations.test: [verifies]`, each requirement cell shows which architecture sections address it and which test files verify it.
+Output is written to `examples/modules/ROOT/pages/traceability/`.
 
 ## Domain Model
 
 Three roles with directed relations:
 
-```
+[source]
+----
   architecture ──addresses──▶ requirement
   test ──────────verifies───▶ requirement
   test ──────────validates──▶ architecture
-```
+----
 
-One matrix: `requirements-coverage` with `rows: requirement`, `columns: [architecture, test]`.
+One matrix: `requirements-coverage` (rows: requirement, columns: architecture + test).
 
-## To render diagrams (PlantUML via kroki)
+## Antora Site
 
-Install asciidoctor-kroki globally or add to your Antora playbook:
+To build the full Antora site with navigation, you need a UI bundle.
+The playbook references the default Antora UI from GitLab.
+
+First, cache the UI bundle (one-time download):
+
+[source,bash]
+----
+npx antora antora-playbook.yml --ui-bundle-url https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable
+----
+
+Then build:
+
+[source,bash]
+----
+npx antora antora-playbook.yml
+----
+
+Or, if the GitLab URL doesn't work, download the bundle manually and
+update the `ui.bundle.url` in `antora-playbook.yml` to a local path.
+
+The built site (`public/`) includes the traceability matrix accessible
+from the navigation under "Traceability Matrix".
+
+## To render PlantUML diagrams
+
+Install asciidoctor-kroki:
 
 [source,bash]
 ----
 npm install asciidoctor-kroki
 ----
 
-Then process the architecture document through Asciidoctor directly:
-
-[source,bash]
-----
-asciidoctor -r asciidoctor-kroki examples/modules/ROOT/pages/architecture.adoc
-----
+The architecture diagrams require a Kroki server (default: https://kroki.io).

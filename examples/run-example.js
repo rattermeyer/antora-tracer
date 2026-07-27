@@ -13,7 +13,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pagesDir = resolve(__dirname, 'modules/ROOT/pages');
-const outputDir = resolve(__dirname, 'output');
+const outputDir = resolve(__dirname, 'modules/ROOT/attachments/traceability');
 
 // Load custom config
 const configLoader = new ConfigLoader();

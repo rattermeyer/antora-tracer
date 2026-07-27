@@ -9,6 +9,9 @@ content:
       start_path: examples
       branches: HEAD
 
+# To enable live traceability generation during Antora builds,
+# uncomment the extension and run `npm run build` first:
+#
 antora:
   extensions:
     - require: ./lib/src/antora-extension.js
@@ -16,9 +19,13 @@ antora:
         configPath: ./examples/traceability.yml
         outputDir: traceability
         generateMatrices: true
-        matrixFormats:
-          - html
-          - csv
+        matrixFormats: [html, csv]
+        includeInNavigation: true
+
+ui:
+  bundle:
+    url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable
+    snapshot: true
 
 output:
   dir: ./public
