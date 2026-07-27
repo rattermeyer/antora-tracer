@@ -1,6 +1,74 @@
 # Release Notes: Antora Requirements Traceability Extension
 
-## v0.2.0 (Unreleased)
+## v0.7.0 (Unreleased)
+
+**Status**: In Development
+**Git Commit**: [See Git History]
+
+### What's New
+
+This is the first stable release of the extension, introducing a complete role-based traceability architecture.
+
+#### Unified [item] Macro
+
+A single `[item, id=X, role=Y]` block macro replaces all previous role-specific macros. Users define their own roles through configuration — no hardcoded requirement/implementation/test/document types.
+
+#### Configuration System
+
+Traceability domains are defined in YAML configuration files. Each config specifies roles, allowed relations between roles, and matrices to generate. The extension validates every relationship against the configuration at processing time.
+
+#### Built-in Presets
+
+Four presets ship with the extension:
+- `requirements-engineering` — Systems & software engineering (5 roles, 4 matrices)
+- `agile` — Agile/Scrum teams (8 roles: epics, features, stories, tasks, tests, etc.)
+- `medical-iec62304` — Medical device software per IEC 62304 (5 roles with risk control)
+- `minimal` — Two roles for getting started
+
+#### Neo4j Export
+
+Export the traceability graph to Neo4j-compatible CSV (nodes + relationships) or Cypher (CREATE statements). Each preset includes example Cypher queries for common traceability patterns.
+
+#### Enhanced Matrix Generation
+
+- Config-driven: define which roles go on rows, which on columns, and which relation types count as coverage
+- Both forward and reverse relationship directions checked for coverage
+- Mustache templates for HTML output (customizable)
+- CSV export with summary statistics
+
+#### CLI Commands
+
+Six subcommands: `process`, `matrix`, `validate`, `export neo4j`, `stats`, `preset` (list/show/init). All commands support `--config` and `--preset` global options.
+
+#### Documentation
+
+- README with pipeline diagram and quick start
+- User Guide: 10 sections from Getting Started to Troubleshooting
+- Developer Guide: 8 sections covering architecture, components, configuration, and contributing
+- Self-traceability example site with 36 requirements, arc42 architecture, and test plan
+
+#### Test Coverage
+
+183 tests covering all components: DocumentParser, TraceabilityGraph, MatrixGenerator, Neo4jExporter, ConfigLoader, Antora extension, and CLI.
+
+### Breaking Changes from Pre-Release
+
+- Removed `[req]`, `[imp]`, `[test]`, `[doc]` block macros — replaced by `[item, role=...]`
+- Removed hardcoded relation types — all relations are user-defined in configuration
+- Removed hardcoded matrix types (req-impl, req-test, full) — matrices are config-driven
+- CLI no longer has `--v2` flag — unified architecture is the only mode
+- antora-extension.ts uses unified API
+- `RequirementsTraceabilityExtensionV2` renamed to `RequirementsTraceabilityExtension`
+
+### Bug Fixes Since Pre-Release
+
+- Fixed `isRelationAllowed()` — `||` fallback replaced with `??` to preserve `false` returns
+- Fixed matrix coverage: now checks reverse-direction relationships (column→row), not just forward
+- Fixed HTML matrix cell rendering: multiple items per column render as a list inside one cell
+
+---
+
+## v0.2.0 (Unreleased — Pre-Unified Architecture)
 
 **Status**: In Development
 **Git Commit**: [See Git History]
