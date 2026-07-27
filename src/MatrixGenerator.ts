@@ -50,6 +50,13 @@ export interface MatrixConfig {
 }
 
 /**
+ * Options for MatrixGenerator constructor
+ */
+export interface MatrixGeneratorOptions {
+  templateDir?: string;
+}
+
+/**
  * Generated matrix
  */
 export interface GeneratedMatrix {
@@ -72,7 +79,7 @@ export class MatrixGenerator {
   constructor(
     graph: TraceabilityGraph,
     configLoader?: ConfigLoader,
-    options: { templateDir?: string } = {}
+    options: MatrixGeneratorOptions = {}
   ) {
     this.graph = graph;
     this.configLoader = configLoader;
@@ -129,13 +136,26 @@ export class MatrixGenerator {
       };
     }
 
-    const rows: MatrixRow[] = [];
-    const columnItems = new Map<string, Item[]>();
-
-    // Group items by column role
-    for (const colRole of columnRoles) {
-      columnItems.set(colRole, this.graph.getItemsByRole(colRole));
+    // Pre-compute: role -> Set of item IDs for fast lookup
+    const roleItemIds = new Map<string, Set<string>>();
+    for (const role of [rowRole, ...columnRoles]) {
+      const items = this.graph.getItemsByRole(role);
+      roleItemIds.set(role, new Set(items.map(i => i.id)));
     }
+
+    // Pre-compute: item ID -> item for fast lookup
+    const itemById = new Map<string, Item>();
+    for (const item of this.graph.getAllItems()) {
+      itemById.set(item.id, item);
+    }
+
+    // Pre-compute coverage relations per column
+    const coverageRelsByColumn = new Map<string, string[]>();
+    for (const colRole of columnRoles) {
+      coverageRelsByColumn.set(colRole, config.coverageRelations?.[colRole] || []);
+    }
+
+    const rows: MatrixRow[] = [];
 
     // Build rows
     for (const rowItem of rowItems) {
@@ -144,8 +164,19 @@ export class MatrixGenerator {
       const totalColumns = columnRoles.length;
 
       for (const colRole of columnRoles) {
+        // Use pre-computed data for faster lookup
+        const colItemIds = roleItemIds.get(colRole) || new Set();
+        const coverageRels = coverageRelsByColumn.get(colRole) || [];
+        const hasCoverageFilter = coverageRels.length > 0;
+
         // Collect all related items for this column
-        const relatedItems = this.findRelatedItems(rowItem.id, colRole, config);
+        const relatedItems = this.findRelatedItemsWithCache(
+          rowItem.id,
+          colItemIds,
+          coverageRels,
+          hasCoverageFilter,
+          itemById
+        );
         const cellItems = relatedItems.map(rel => ({
           itemId: rel.id,
           itemTitle: rel.title,
@@ -199,18 +230,18 @@ export class MatrixGenerator {
   }
 
   /**
-   * Find items related to a row item in a specific column role.
-   * Checks both forward (row → column) and reverse (column → row) directions.
+   * Find items related to a row item in a specific column role using pre-computed caches.
+   * This is an optimized version that avoids repeated calls to getItemsByRole() and getItem().
    */
-  private findRelatedItems(rowId: string, columnRole: string, config: MatrixConfig): Item[] {
+  private findRelatedItemsWithCache(
+    rowId: string,
+    colItemIds: Set<string>,
+    coverageRels: string[],
+    hasCoverageFilter: boolean,
+    itemById: Map<string, Item>
+  ): Item[] {
     const result: Item[] = [];
-    const colItems = this.graph.getItemsByRole(columnRole);
-    const colItemIds = new Set(colItems.map(i => i.id));
     const seen = new Set<string>();
-
-    // Check coverage relations for this column
-    const coverageRels = config.coverageRelations?.[columnRole] || [];
-    const hasCoverageFilter = coverageRels.length > 0;
 
     // Forward direction: row item → column item
     const forwardRels = this.graph.getRelationships(rowId);
@@ -219,7 +250,7 @@ export class MatrixGenerator {
         if (hasCoverageFilter && !coverageRels.includes(rel.type)) {
           continue;
         }
-        const target = this.graph.getItem(rel.targetId);
+        const target = itemById.get(rel.targetId);
         if (target && !seen.has(target.id)) {
           seen.add(target.id);
           result.push(target);
@@ -234,7 +265,7 @@ export class MatrixGenerator {
         if (hasCoverageFilter && !coverageRels.includes(rel.type)) {
           continue;
         }
-        const source = this.graph.getItem(rel.fromId);
+        const source = itemById.get(rel.fromId);
         if (source && !seen.has(source.id)) {
           seen.add(source.id);
           result.push(source);
