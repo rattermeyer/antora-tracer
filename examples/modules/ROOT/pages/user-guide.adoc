@@ -147,12 +147,22 @@ antora:
 
 Four built-in presets are available:
 
-| Preset | Best For |
-|--------|----------|
-| `requirements-engineering` | Systems & software engineering |
-| `agile` | Agile/Scrum teams with user stories |
-| `medical-iec62304` | Medical device software (IEC 62304) |
-| `minimal` | Getting started, simple projects |
+[width=100%, cols="30,70"]
+|===
+| Preset | Best For
+
+| `requirements-engineering`
+| Systems & software engineering
+
+| `agile`
+| Agile/Scrum teams with user stories
+
+| `medical-iec62304`
+| Medical device software (IEC 62304)
+
+| `minimal`
+| Getting started, simple projects
+|===
 
 See <<Presets Reference>> for the full breakdown of each preset.
 
@@ -372,11 +382,22 @@ Warnings don't block processing; errors do. Unknown roles generate warnings (gra
 
 While any unique string works, a consistent convention helps readability:
 
-| Pattern | Example | Convention |
-|---------|---------|------------|
-| Role prefix | `REQ-001`, `IMP-042`, `TEST-099` | Two-to-four uppercase letters, hyphen, number |
-| Hierarchical | `SYS.SEC.AUTH-001` | Dotted namespace |
-| Domain prefix | `PROJ-REQ-001` | Project prefix |
+[width=100%, cols="30,40,30"]
+|===
+| Pattern | Example | Convention
+
+| Role prefix
+| `REQ-001`, `IMP-042`, `TEST-099`
+| Two-to-four uppercase letters, hyphen, number
+
+| Hierarchical
+| `SYS.SEC.AUTH-001`
+| Dotted namespace
+
+| Domain prefix
+| `PROJ-REQ-001`
+| Project prefix
+|===
 
 === Sharing Items Across Files
 
@@ -409,11 +430,19 @@ Each matrix row shows one item (from the `rows` role) and its related items per 
 
 Status badges in the HTML output:
 
-| Badge | Meaning |
-|--------|---------|
-| ✓ Complete | At least one relationship in every column |
-| ◐ Partial | Relationships in some columns but not all |
-| ✗ Missing | No relationships at all |
+[width=100%, cols="25,75"]
+|===
+| Badge | Meaning
+
+| ✓ Complete
+| At least one relationship in every column
+
+| ◐ Partial
+| Relationships in some columns but not all
+
+| ✗ Missing
+| No relationships at all
+|===
 
 *Matrix filenames use the matrix `name` from your config.* With the `requirements-engineering` preset, you'll see files like `matrix-requirements-traceability.html` and `matrix-design-verification.html`.
 
