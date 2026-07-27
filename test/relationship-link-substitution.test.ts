@@ -27,7 +27,7 @@ function substituteRelationshipLinks(
     if (target.sourceFile === currentFile) {
       return `${relType}: xref:#${targetId}[${targetId}]`;
     } else if (target.sourceFile) {
-      const targetPage = target.sourceFile.replace(/\.adoc$/, '.adoc');
+      const targetPage = target.sourceFile.split('/').pop()!;
       return `${relType}: xref:${targetPage}#${targetId}[${targetId}]`;
     }
 

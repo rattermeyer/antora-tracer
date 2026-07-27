@@ -6,7 +6,7 @@ This document describes the architecture of the Antora Tracer extension using se
 == Introduction and Goals
 
 [item, id=ARC-001, role=architecture]
-====
+--
 *Project scope and architectural goals*
 
 The Antora Tracer is an Antora extension that adds role-based requirements traceability to AsciiDoc documentation. It replaces fixed macro types with a single configurable `[item]` macro.
@@ -27,7 +27,7 @@ addresses:REQ-018[]
 addresses:REQ-024[]
 addresses:REQ-035[]
 addresses:REQ-036[]
-====
+--
 
 == Building Block View
 

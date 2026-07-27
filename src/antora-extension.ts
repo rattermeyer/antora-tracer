@@ -75,10 +75,14 @@ export class AntoraTraceabilityExtension {
   }
 
   private async initializeAsync(): Promise<void> {
-    this.traceability = await this.createTraceabilityExtension();
+    // Register event handlers FIRST (synchronously) before awaiting anything.
+    // These handlers guard with `if (!this.traceability)` until the extension loads.
     this.registerContentClassifier();
     this.registerPageProcessor();
     this.registerNavigationEnhancer();
+
+    // Load the traceability extension (may involve async preset loading)
+    this.traceability = await this.createTraceabilityExtension();
   }
 
   private async createTraceabilityExtension(): Promise<RequirementsTraceabilityExtension> {
@@ -128,40 +132,57 @@ export class AntoraTraceabilityExtension {
       const files = contentCatalog.findBy({ family: 'page' }) || [];
       const adocFiles = files.filter((file: any) => file.src && file.src.path && file.src.path.endsWith('.adoc'));
 
+      // Pass 1: Process all files to populate the traceability graph
       for (const file of adocFiles) {
         this.processAsciiDocFile(file);
+      }
+
+      // Pass 2: Substitute relationship macros with xrefs now that the graph is complete
+      for (const file of adocFiles) {
+        this.substituteLinksInFile(file);
       }
     });
   }
 
   private processAsciiDocFile(file: any): void {
     if (!this.traceability) {
-      this.logger.warn('Traceability extension not initialized, skipping file processing');
       return;
     }
     try {
       const contentsBuffer = file.contents || file.src?.contents;
       if (!contentsBuffer) {
-        this.logger.debug(`Skipping file without contents: ${file.src?.path || 'unknown'}`);
         return;
       }
-
-      let content = contentsBuffer.toString('utf8');
+      const content = contentsBuffer.toString('utf8');
       const sourceFile = file.src?.path || file.path || 'unknown';
-      const result = this.traceability.process(content, { sourceFile });
-      this.logger.debug(`Processed ${sourceFile}: ${result.items.length} items, ${result.relationships.length} relationships`);
-
-      // Substitute relationship macros with Asciidoctor xrefs for clickable links
-      content = this.substituteRelationshipLinks(content, sourceFile);
-
-      // Write modified content back to the buffer (in-memory only, .adoc file unchanged)
-      contentsBuffer.write(content);
-      // Reset the buffer position if it has a position tracker
-      if (typeof contentsBuffer.rewind === 'function') {
-        contentsBuffer.rewind();
-      }
+      this.traceability.process(content, { sourceFile });
     } catch (error: any) {
       this.logger.warn(`Error processing ${file.src?.path}: ${error.message}`);
+    }
+  }
+
+  /**
+   * Substitute relationship macros with Asciidoctor xrefs in the file's
+   * in-memory content buffer. Must be called AFTER all files have been processed
+   * so the graph contains all target items.
+   */
+  private substituteLinksInFile(file: any): void {
+    if (!this.traceability) return;
+    try {
+      const contentsBuffer = file.contents || file.src?.contents;
+      if (!contentsBuffer) return;
+
+      const content = contentsBuffer.toString('utf8');
+      const sourceFile = file.src?.path || file.path || 'unknown';
+      const modifiedContent = this.substituteRelationshipLinks(content, sourceFile);
+
+      if (modifiedContent !== content) {
+        const buf = Buffer.from(modifiedContent, 'utf8');
+        if (file.contents) file.contents = buf;
+        if (file.src?.contents) file.src.contents = buf;
+      }
+    } catch (error: any) {
+      this.logger.warn(`Error substituting links in ${file.src?.path}: ${error.message}`);
     }
   }
 
@@ -175,7 +196,6 @@ export class AntoraTraceabilityExtension {
   private substituteRelationshipLinks(content: string, currentFile: string): string {
     if (!this.traceability) return content;
 
-    // Match "word:ID[]" patterns — ID is alphanumeric with hyphens, dots, underscores
     const relRegex = /\b(\w+):([\w][-.\w]*)\[\]/g;
 
     return content.replace(relRegex, (_match: string, _relType: string, targetId: string) => {
@@ -183,20 +203,19 @@ export class AntoraTraceabilityExtension {
       const target = this.traceability!.graph.getItem(targetId);
 
       if (!target) {
-        // Orphan reference — leave text unchanged
         return _match;
       }
 
       if (target.sourceFile === currentFile) {
-        // Same-page: use fragment-only xref
         return `${relType}: xref:#${targetId}[${targetId}]`;
       } else if (target.sourceFile) {
-        // Cross-page: use page-relative xref
-        const targetPage = target.sourceFile.replace(/\.adoc$/, '.adoc');
+        // Use just the filename (basename) for cross-page xrefs.
+        // Antora resolves page-to-page xrefs within the same component
+        // by the page's resource ID, which includes the filename stem.
+        const targetPage = target.sourceFile.split('/').pop()!;
         return `${relType}: xref:${targetPage}#${targetId}[${targetId}]`;
       }
 
-      // Target exists but has no sourceFile — fall back to fragment xref
       return `${relType}: xref:#${targetId}[${targetId}]`;
     });
   }
