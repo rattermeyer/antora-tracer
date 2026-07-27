@@ -1,0 +1,89 @@
+# Self-Traceability Example
+
+This example demonstrates the Antora Tracer extension tracing its own requirements, architecture, and tests using the standalone CLI.
+
+## What's Here
+
+- `requirements.adoc` — 36 requirements extracted from the OpenSpec specifications
+- `architecture.adoc` — arc42-style architecture documentation with PlantUML diagrams
+- `test-plan.adoc` — test coverage mapping (which test files verify which requirements)
+- `traceability.yml` — custom configuration defining the domain model
+
+## How to Run
+
+[source,bash]
+----
+cd antora-asciidoc-tracing
+npm run build
+
+# Process all example files
+npx antora-req-trace process \
+  -i examples/modules/ROOT/pages/requirements.adoc \
+  -i examples/modules/ROOT/pages/architecture.adoc \
+  -i examples/modules/ROOT/pages/test-plan.adoc \
+  --config examples/traceability.yml
+
+# Wait - process currently handles one file at a time. Use the library instead:
+
+# Generate the traceability matrix
+npx antora-req-trace matrix \
+  -i examples/modules/ROOT/pages/ \
+  -t requirements-coverage \
+  -f html \
+  -o examples/output/matrix-requirements-coverage.html
+
+# Generate CSV matrix
+npx antora-req-trace matrix \
+  -i examples/modules/ROOT/pages/ \
+  -t requirements-coverage \
+  -f csv \
+  -o examples/output/matrix-requirements-coverage.csv
+
+# View role statistics
+npx antora-req-trace stats \
+  -i examples/modules/ROOT/pages/ \
+  --config examples/traceability.yml
+
+# Validate the traceability graph
+npx antora-req-trace validate \
+  -i examples/modules/ROOT/pages/ \
+  --config examples/traceability.yml
+----
+
+## What Gets Generated
+
+The matrix `requirements-coverage` cross-references:
+
+| Row (requirement) | Column (architecture) | Column (test) |
+|-------------------|----------------------|---------------|
+| Each of the 36 REQ-XXX items | Which ARC items address it | Which TST items verify it |
+
+With `coverageRelations.architecture: [addresses]` and `coverageRelations.test: [verifies]`, each requirement cell shows which architecture sections address it and which test files verify it.
+
+## Domain Model
+
+Three roles with directed relations:
+
+```
+  architecture ──addresses──▶ requirement
+  test ──────────verifies───▶ requirement
+  test ──────────validates──▶ architecture
+```
+
+One matrix: `requirements-coverage` with `rows: requirement`, `columns: [architecture, test]`.
+
+## To render diagrams (PlantUML via kroki)
+
+Install asciidoctor-kroki globally or add to your Antora playbook:
+
+[source,bash]
+----
+npm install asciidoctor-kroki
+----
+
+Then process the architecture document through Asciidoctor directly:
+
+[source,bash]
+----
+asciidoctor -r asciidoctor-kroki examples/modules/ROOT/pages/architecture.adoc
+----

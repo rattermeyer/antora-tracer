@@ -1,0 +1,4 @@
+name: tracer
+title: Antora Tracer
+version: 0.7.0
+start_page: index.adoc

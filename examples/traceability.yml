@@ -1,0 +1,28 @@
+# Self-Traceability Configuration
+# Domain model for tracing the antora-tracer extension itself
+
+roles:
+  - requirement
+  - architecture
+  - test
+
+relations:
+  requirement:
+    requirement: [refines, depends_on]
+
+  architecture:
+    requirement: [addresses]
+    architecture: [composed_of]
+
+  test:
+    requirement: [verifies]
+    architecture: [validates]
+
+matrices:
+  - name: requirements-coverage
+    description: "Requirements traced to architecture and tests"
+    rows: requirement
+    columns: [architecture, test]
+    coverageRelations:
+      architecture: [addresses]
+      test: [verifies]

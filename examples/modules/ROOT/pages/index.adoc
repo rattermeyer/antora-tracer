@@ -1,0 +1,26 @@
+= Antora Tracer — Self-Traceability Example
+
+Welcome to the self-traceability site for the *Antora Tracer* extension. This site demonstrates the extension tracing its own requirements, architecture, and tests.
+
+== What's Here
+
+* xref:requirements.adoc[Requirements] — 36 requirements extracted from the OpenSpec specifications, defined as `[item]` macros
+* xref:architecture.adoc[Architecture] — arc42-style architecture documentation with component and runtime diagrams, each section tracing back to the requirements it addresses
+* xref:test-plan.adoc[Test Plan] — test coverage mapping, showing which test files verify which requirements
+
+== Generated Traceability
+
+After building this site with `npx antora antora-playbook.yml`, the extension generates:
+
+* `traceability/matrix-requirements-coverage.html` — Requirements-to-architecture-and-test traceability matrix
+* `traceability/coverage.html` — Coverage report showing which requirements are addressed by architecture and verified by tests
+
+== How To Build
+
+[source,bash]
+----
+cd antora-asciidoc-tracing
+npm run build
+npx antora antora-playbook.yml
+open public/traceability/index.html
+----

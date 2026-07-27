@@ -1,0 +1,25 @@
+site:
+  title: Antora Tracer — Self-Traceability Example
+  url: http://localhost:8080
+  start_page: tracer::index.adoc
+
+content:
+  sources:
+    - url: .
+      start_path: examples
+      branches: HEAD
+
+antora:
+  extensions:
+    - require: ./lib/src/antora-extension.js
+      config:
+        configPath: ./examples/traceability.yml
+        outputDir: traceability
+        generateMatrices: true
+        matrixFormats:
+          - html
+          - csv
+
+output:
+  dir: ./public
+  clean: true

@@ -1,0 +1,114 @@
+= Test Plan
+
+This document maps the test suite to the requirements it verifies. Each test file is a traceable `[item]` referencing the requirements it covers.
+
+== Test Coverage
+
+[item, id=TST-001, role=test]
+====
+*Core Extension Tests*
+
+Test file: `test/v2-unified-item-architecture.test.ts`
+
+Tests the `RequirementsTraceabilityExtension` orchestrator — initialization, processing, query methods, role statistics, lifecycle. Covers the public API surface of the main extension class.
+
+verifies:REQ-001[]
+verifies:REQ-002[]
+verifies:REQ-003[]
+verifies:REQ-004[]
+verifies:REQ-005[]
+verifies:REQ-029[]
+verifies:REQ-030[]
+verifies:REQ-034[]
+====
+
+[item, id=TST-002, role=test]
+====
+*Antora Extension Tests*
+
+Test file: `test/antora-extension.test.ts`
+
+Tests the `AntoraTraceabilityExtension` — initialization with default config, preset, config path, and disabled state. Tests event handler registration, content processing via `contentClassified` event, matrix generation via `sitePublished` event, and API access patterns.
+
+verifies:REQ-035[]
+====
+
+[item, id=TST-003, role=test]
+====
+*CLI Tests*
+
+Test file: `test/cli.test.ts`
+
+Tests the Commander-based CLI — process command (valid content, empty content, invalid paths, malformed macros), matrix command (generation, empty graph), validate command (invalid graph state), export command (empty graph), stats command (empty statistics), preset commands (invalid names, init, listing), and help command.
+
+verifies:REQ-009[]
+verifies:REQ-010[]
+verifies:REQ-026[]
+verifies:REQ-036[]
+====
+
+[item, id=TST-004, role=test]
+====
+*ConfigLoader Tests*
+
+Test file: `test/config-loader.test.ts`
+
+Tests the `ConfigLoader` — initialization, built-in preset listing and loading, preset structure validation, configuration loading from file, missing file handling, invalid YAML handling, role and relation validation, matrix definition retrieval, configuration merging, and error messages for invalid configurations and preset names.
+
+verifies:REQ-006[]
+verifies:REQ-007[]
+verifies:REQ-008[]
+verifies:REQ-010[]
+verifies:REQ-011[]
+verifies:REQ-012[]
+verifies:REQ-018[]
+verifies:REQ-019[]
+verifies:REQ-020[]
+verifies:REQ-021[]
+verifies:REQ-022[]
+verifies:REQ-023[]
+====
+
+[item, id=TST-005, role=test]
+====
+*Graph and API Tests*
+
+Test file: `test/graph-and-api.test.ts`
+
+Tests the `TraceabilityGraph` (Section 4 — extended queries: merge, getRelatedItems, getItemsWithRelationTo, getRelationshipsByRoles, findPath, getImpactAnalysis) and `RequirementsTraceabilityExtension` API methods (Section 5 — processFiles, validate, export, coverage, config access, preset management, lifecycle).
+
+verifies:REQ-013[]
+verifies:REQ-014[]
+verifies:REQ-015[]
+verifies:REQ-016[]
+verifies:REQ-017[]
+verifies:REQ-031[]
+verifies:REQ-032[]
+verifies:REQ-033[]
+====
+
+[item, id=TST-006, role=test]
+====
+*MatrixGenerator Tests*
+
+Test file: `test/matrix-generator.test.ts`
+
+Tests the `MatrixGenerator` — basic matrix generation with empty graph, matrix generation with default and named configurations, role-based matrix rows and columns, coverage percentage calculation and status determination, coverage relation filtering, CSV export, HTML export, JSON export, coverage report generation, and edge cases (no matching items, missing titles, missing source files, unknown matrix names).
+
+verifies:REQ-008[]
+verifies:REQ-029[]
+====
+
+[item, id=TST-007, role=test]
+====
+*Neo4jExporter Tests*
+
+Test file: `test/neo4j-exporter.test.ts`
+
+Tests the `Neo4jExporter` — empty graph CSV export, items and relationships in CSV, all attributes in export, special character escaping, empty graph Cypher export, items and relationships in Cypher, `includeContent` option, `includeAllAttributes` option, output directory creation, multiple role types, and export result counts and file paths.
+
+verifies:REQ-024[]
+verifies:REQ-025[]
+verifies:REQ-027[]
+verifies:REQ-028[]
+====
