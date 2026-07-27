@@ -10,14 +10,14 @@
 
 ## 2. Redirect Stubs in docs/
 
-- [ ] 2.1 Replace `docs/user-guide.adoc` with a stub pointing to the deployed site
-- [ ] 2.2 Replace `docs/developer-guide.adoc` with a stub pointing to the deployed site
+_Not needed — GitHub Pages deploys `public/`, not the `docs/` source directory._
 
 ## 3. GitHub Pages Deployment
 
-- [ ] 3.1 Add `.github/workflows/pages.yml` to deploy `public/` to GitHub Pages on push to main
-- [ ] 3.2 Configure the workflow to build the Antora site with the extension and UI bundle
-- [ ] 3.3 Verify the deployed site is accessible and matrices render correctly
+- [ ] 3.1 Add `.github/workflows/pages.yml` with steps: checkout, setup-node, npm ci, npm run build, antora build, upload-pages-artifact, deploy-pages
+- [ ] 3.2 Pin UI bundle to a specific commit hash in `antora-playbook.yml` for CI reliability (instead of `HEAD`)
+- [ ] 3.3 Configure GitHub Pages source to "GitHub Actions" in repository settings
+- [ ] 3.4 Verify the deployed site is accessible at `<username>.github.io/<repo>/`
 
 ## 4. Package Metadata
 
