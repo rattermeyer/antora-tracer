@@ -146,13 +146,59 @@ export class AntoraTraceabilityExtension {
         return;
       }
 
-      const content = contentsBuffer.toString('utf8');
+      let content = contentsBuffer.toString('utf8');
       const sourceFile = file.src?.path || file.path || 'unknown';
       const result = this.traceability.process(content, { sourceFile });
       this.logger.debug(`Processed ${sourceFile}: ${result.items.length} items, ${result.relationships.length} relationships`);
+
+      // Substitute relationship macros with Asciidoctor xrefs for clickable links
+      content = this.substituteRelationshipLinks(content, sourceFile);
+
+      // Write modified content back to the buffer (in-memory only, .adoc file unchanged)
+      contentsBuffer.write(content);
+      // Reset the buffer position if it has a position tracker
+      if (typeof contentsBuffer.rewind === 'function') {
+        contentsBuffer.rewind();
+      }
     } catch (error: any) {
       this.logger.warn(`Error processing ${file.src?.path}: ${error.message}`);
     }
+  }
+
+  /**
+   * Substitute inline relationship macros with Asciidoctor xrefs.
+   * Replaces "addresses:REQ-001[]" with "addresses: xref:#REQ-001[REQ-001]"
+   * (same page) or "addresses: xref:other.adoc#REQ-001[REQ-001]" (cross-page).
+   *
+   * The .adoc file on disk is never modified — only the in-memory content buffer.
+   */
+  private substituteRelationshipLinks(content: string, currentFile: string): string {
+    if (!this.traceability) return content;
+
+    // Match "word:ID[]" patterns — ID is alphanumeric with hyphens, dots, underscores
+    const relRegex = /\b(\w+):([\w][-.\w]*)\[\]/g;
+
+    return content.replace(relRegex, (_match: string, _relType: string, targetId: string) => {
+      const relType = _relType;
+      const target = this.traceability!.graph.getItem(targetId);
+
+      if (!target) {
+        // Orphan reference — leave text unchanged
+        return _match;
+      }
+
+      if (target.sourceFile === currentFile) {
+        // Same-page: use fragment-only xref
+        return `${relType}: xref:#${targetId}[${targetId}]`;
+      } else if (target.sourceFile) {
+        // Cross-page: use page-relative xref
+        const targetPage = target.sourceFile.replace(/\.adoc$/, '.adoc');
+        return `${relType}: xref:${targetPage}#${targetId}[${targetId}]`;
+      }
+
+      // Target exists but has no sourceFile — fall back to fragment xref
+      return `${relType}: xref:#${targetId}[${targetId}]`;
+    });
   }
 
   private registerPageProcessor(): void {

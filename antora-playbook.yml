@@ -21,6 +21,7 @@ antora:
         generateMatrices: true
         matrixFormats: [html, csv]
         includeInNavigation: true
+    - asciidoctor-kroki
 
 ui:
   bundle:
