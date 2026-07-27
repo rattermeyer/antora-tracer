@@ -2,7 +2,7 @@
 
 import { program } from 'commander';
 import { createWriteStream, writeFileSync, mkdirSync } from 'fs';
-import { readFileSync, existsSync } from 'fs';
+import { readFileSync, existsSync, readdirSync, statSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import chalk from 'chalk';
@@ -55,6 +55,40 @@ function ensureDirectory(dir: string) {
   }
 }
 
+/**
+ * Collect AsciiDoc files from a path (file or directory).
+ * Returns array of { path, content } for use with processFiles().
+ */
+function collectAdocFiles(inputPath: string): { path: string; content: string }[] {
+  const resolvedPath = resolve(process.cwd(), inputPath);
+  if (!existsSync(resolvedPath)) {
+    console.error(chalk.red(`Error: Input not found: ${inputPath}`));
+    process.exit(1);
+  }
+
+  const stat = statSync(resolvedPath);
+  if (stat.isDirectory()) {
+    const files: { path: string; content: string }[] = [];
+    const entries = readdirSync(resolvedPath, { recursive: true }) as string[];
+    for (const entry of entries) {
+      const fullPath = resolve(resolvedPath, entry as string);
+      if (statSync(fullPath).isFile() && (entry as string).endsWith('.adoc')) {
+        files.push({
+          path: entry as string,
+          content: readFileSync(fullPath, 'utf8'),
+        });
+      }
+    }
+    return files;
+  }
+
+  // Single file
+  return [{
+    path: inputPath,
+    content: readFileSync(resolvedPath, 'utf8'),
+  }];
+}
+
 program.command('process')
   .description('Process AsciiDoc files for requirements traceability')
   .option('-i, --input <path>', 'Input file or directory (required)')
@@ -68,28 +102,24 @@ program.command('process')
     }
     const extension = await createExtension(options);
     try {
-      const inputPath = resolve(process.cwd(), options.input);
-      if (!existsSync(inputPath)) {
-        console.error(chalk.red(`Error: Input file not found: ${inputPath}`));
-        process.exit(1);
-      }
-      const content = readFileSync(inputPath, 'utf8');
-      const result = extension.process(content, { sourceFile: options.input });
-      console.log(chalk.green(`Processed: ${result.items.length} items, ${result.relationships.length} relationships`));
+      const adocFiles = collectAdocFiles(options.input);
+      const result = extension.processFiles(adocFiles);
+
+      console.log(chalk.green(`Processed ${adocFiles.length} file(s): ${result.result.items.length} items, ${result.result.relationships.length} relationships`));
       let output: string;
       if (options.format === 'json') {
-        output = JSON.stringify({ items: result.items, relationships: result.relationships, statistics: result.graph.getRoleStatistics() }, null, 2);
+        output = JSON.stringify({ items: result.result.items, relationships: result.result.relationships, statistics: extension.graph.getRoleStatistics() }, null, 2);
       } else if (options.format === 'csv') {
         const lines = ['id,role,title'];
-        for (const item of result.items) {
+        for (const item of result.result.items) {
           const escapedTitle = item.title.includes(',') ? `"${item.title}"` : item.title;
           lines.push([item.id, item.role, escapedTitle].join(','));
         }
         output = lines.join('\n');
       } else {
         output = '<!DOCTYPE html><html><head><title>Traceability Report</title></head><body><h1>Traceability Report</h1>';
-        output += `<p>Items: ${result.items.length}, Relationships: ${result.relationships.length}</p><h2>Items</h2><table border="1"><tr><th>ID</th><th>Role</th><th>Title</th></tr>`;
-        for (const item of result.items) {
+        output += `<p>Items: ${result.result.items.length}, Relationships: ${result.result.relationships.length}</p><h2>Items</h2><table border="1"><tr><th>ID</th><th>Role</th><th>Title</th></tr>`;
+        for (const item of result.result.items) {
           output += `<tr><td>${item.id}</td><td>${item.role}</td><td>${item.title}</td></tr>`;
         }
         output += '</table></body></html>';
@@ -119,13 +149,8 @@ program.command('matrix')
       let output: string;
 
       if (options.input) {
-        const inputPath = resolve(process.cwd(), options.input);
-        if (!existsSync(inputPath)) {
-          console.error(chalk.red(`Error: Input file not found: ${inputPath}`));
-          process.exit(1);
-        }
-        const content = readFileSync(inputPath, 'utf8');
-        extension.process(content, { sourceFile: options.input });
+        const adocFiles = collectAdocFiles(options.input);
+        extension.processFiles(adocFiles);
       }
 
       if (!extension.graph.size()) {
@@ -167,13 +192,8 @@ program.command('validate')
     const extension = await createExtension(options);
     try {
       if (options.input) {
-        const inputPath = resolve(process.cwd(), options.input);
-        if (!existsSync(inputPath)) {
-          console.error(chalk.red(`Error: Input file not found: ${inputPath}`));
-          process.exit(1);
-        }
-        const content = readFileSync(inputPath, 'utf8');
-        const result = extension.process(content, { sourceFile: options.input });
+        const adocFiles = collectAdocFiles(options.input);
+        extension.processFiles(adocFiles);
         const validation = extension.graph.validate();
         if (validation.errors.length > 0) {
           console.log(chalk.red(`Validation Errors (${validation.errors.length}):`));
@@ -190,7 +210,7 @@ program.command('validate')
             console.log(chalk.yellow(`  - ${warning.message}`));
           }
         }
-        console.log(chalk.green(`Summary: ${result.items.length} items, ${result.relationships.length} relationships`));
+        console.log(chalk.green(`Summary: ${extension.getAllItems().length} items, ${extension.getAllRelationships().length} relationships`));
       } else {
         console.log(chalk.yellow('No input specified, validating current graph...'));
         console.log(chalk.yellow('Note: Graph is empty without processing files first'));
@@ -414,15 +434,12 @@ program.command('export neo4j')
     }
     const extension = await createExtension(options);
     try {
-      const inputPath = resolve(process.cwd(), options.input);
-      if (!existsSync(inputPath)) {
-        console.error(chalk.red(`Error: Input file not found: ${inputPath}`));
-        process.exit(1);
+      if (options.input) {
+        const adocFiles = collectAdocFiles(options.input);
+        extension.processFiles(adocFiles);
       }
-      const content = readFileSync(inputPath, 'utf8');
       ensureDirectory(options.output);
       const outputDir = resolve(process.cwd(), options.output);
-      extension.process(content, { sourceFile: options.input });
       const { Neo4jExporter } = await import('./Neo4jExporter.js');
       const exporter = new Neo4jExporter(extension.graph);
       const result = exporter.export({
@@ -454,22 +471,19 @@ program.command('stats')
     }
     const extension = await createExtension(options);
     try {
-      const inputPath = resolve(process.cwd(), options.input);
-      if (!existsSync(inputPath)) {
-        console.error(chalk.red(`Error: Input file not found: ${inputPath}`));
-        process.exit(1);
+      if (options.input) {
+        const adocFiles = collectAdocFiles(options.input);
+        extension.processFiles(adocFiles);
       }
-      const content = readFileSync(inputPath, 'utf8');
-      const result = extension.process(content, { sourceFile: options.input });
       console.log('');
       console.log(chalk.green('Items by Role:'));
-      const stats = result.graph.getRoleStatistics();
+      const stats = extension.graph.getRoleStatistics();
       for (const [role, count] of Object.entries(stats)) {
         console.log(`  ${role}: ${count}`);
       }
       console.log('');
       console.log(chalk.green('Relationships:'));
-      const allRels = result.graph.getAllRelationships();
+      const allRels = extension.graph.getAllRelationships();
       console.log(`  Total: ${allRels.length}`);
       const relStats: Record<string, number> = {};
       for (const rel of allRels) {
@@ -480,7 +494,7 @@ program.command('stats')
       }
       console.log('');
       console.log(chalk.green('Coverage:'));
-      const coverage = result.graph.getRoleStatistics();
+      const coverage = extension.graph.getRoleStatistics();
       for (const [key, value] of Object.entries(coverage)) {
         if (typeof value === 'object') {
           const v = value as any;
