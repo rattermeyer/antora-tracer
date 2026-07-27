@@ -100,12 +100,12 @@
 
 ## 11. Build & Release
 
-- [ ] 11.1 Update package.json version to 0.7.0
+- [x] 11.1 Update package.json version to 0.7.0
 - [x] 11.2 Update dependencies if needed — mustache added, dependencies current
 - [x] 11.3 Run full build and verify no errors — build clean, 183 tests pass
-- [ ] 11.4 Update RELEASE-NOTES.md with 0.7.0 changes
-- [ ] 11.5 Update CHANGELOG.md
-- [ ] 11.6 Test installation and basic usage
+- [x] 11.4 Update RELEASE-NOTES.md with 0.7.0 changes
+- [x] 11.5 Update CHANGELOG.md
+- [x] 11.6 Test installation and basic usage — npm pack verified (49 files, clean)
 - [x] 11.7 Test with example projects — self-traceability example site works
 
 ## 12. Extended Testing (completed via add-coverage-tests change)
