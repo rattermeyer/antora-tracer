@@ -16,6 +16,7 @@
 import { RequirementsTraceabilityExtension } from './index.js';
 import { ConfigLoader } from './config/TraceabilityConfig.js';
 import { MatrixGenerator } from './MatrixGenerator.js';
+import { LinkResolver } from './LinkResolver.js';
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
@@ -131,6 +132,17 @@ export class AntoraTraceabilityExtension {
     }
   }
 
+  /**
+   * Normalize source file path to be relative to pages/ directory.
+   * Strips path prefix up to /pages/ and removes .adoc extension.
+   */
+  private normalizeSourceFile(sourceFile: string): string {
+    let result = sourceFile.replace(/\\/g, '/');
+    result = result.replace(/\\.adoc$/, '');
+    result = result.replace(/^.*[\\/]pages[\\/]/, '');
+    return result;
+  }
+
   private registerContentClassifier(): void {
     this.context.on('contentClassified', (event: any) => {
       const contentCatalog = event.contentCatalog;
@@ -166,7 +178,8 @@ export class AntoraTraceabilityExtension {
         return;
       }
       const content = contentsBuffer.toString('utf8');
-      const sourceFile = file.src?.path || file.path || 'unknown';
+      let sourceFile = file.src?.path || file.path || 'unknown';
+      sourceFile = this.normalizeSourceFile(sourceFile);
       this.traceability.process(content, { sourceFile });
     } catch (error: any) {
       this.logger.warn(`Error processing ${file.src?.path}: ${error.message}`);
@@ -287,7 +300,8 @@ export class AntoraTraceabilityExtension {
         ? matrices.map((m: any) => m.name)
         : this.generateDefaultMatrixNames(this.traceability.graph.getAllRoles());
 
-      const generator = new MatrixGenerator(this.traceability.graph, this.traceability.configLoader);
+      const linkResolver = new LinkResolver({ relativePathPrefix: '../../' });
+      const generator = new MatrixGenerator(this.traceability.graph, this.traceability.configLoader, { linkResolver });
 
       for (const matrixName of matrixNames) {
         for (const format of this.config.matrixFormats) {

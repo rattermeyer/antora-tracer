@@ -1,0 +1,93 @@
+/**
+ * LinkResolver - Generates navigation links from matrix items to their source definitions
+ *
+ * This component handles path resolution for different contexts (Antora build vs. CLI)
+ * and generates clickable deep links to item blocks in rendered HTML.
+ */
+
+import type { Item } from './types.js';
+
+/**
+ * Options for LinkResolver
+ */
+export interface LinkResolverOptions {
+  /**
+   * Relative path prefix from matrix output directory to pages directory.
+   * - Antora: '../../' (from _attachments/traceability/ to component root)
+   * - CLI: '../../pages/' (from attachments/traceability/ to pages/)
+   */
+  relativePathPrefix: string;
+}
+
+/**
+ * LinkResolver generates URLs for navigating from matrix items to their source definitions.
+ *
+ * The resolver uses a configurable prefix to handle different output directory structures
+ * between Antora builds (where matrices go to _attachments/) and CLI usage.
+ */
+export class LinkResolver {
+  private readonly options: LinkResolverOptions;
+
+  constructor(options: LinkResolverOptions) {
+    this.options = options;
+  }
+
+  /**
+   * Generate a full HTML link (href) for an item.
+   *
+   * @param item - The item to generate a link for
+   * @returns Full URL path including fragment identifier, e.g., "../../architecture.html#ARC-001"
+   */
+  generateItemLink(item: Item): string {
+    const htmlPath = this.itemToHtmlPath(item);
+    return this.options.relativePathPrefix + htmlPath + '#' + item.id;
+  }
+
+  /**
+   * Generate just the anchor/fragment for an item.
+   *
+   * @param item - The item to generate an anchor for
+   * @returns Fragment identifier, e.g., "#ARC-001"
+   */
+  generateItemAnchor(item: Item): string {
+    return '#' + item.id;
+  }
+
+  /**
+   * Convert an item's sourceFile to an HTML path.
+   *
+   * Handles all possible sourceFile formats:
+   *  - "architecture"           -> "architecture.html"
+   *  - "architecture.adoc"      -> "architecture.html"
+   *  - "pages/architecture"     -> "architecture.html"
+   *  - "pages/architecture.adoc" -> "architecture.html"
+   *  - "modules/ROOT/pages/architecture.adoc" -> "architecture.html"
+   *  - "traceability/index"     -> "traceability/index.html"
+   *
+   * @param item - The item to generate a path for
+   * @returns Clean HTML path, e.g., "architecture.html"
+   */
+  private itemToHtmlPath(item: Item): string {
+    let sourceFile = item.sourceFile || item.id;
+
+    // Normalize path separators
+    sourceFile = sourceFile.replace(/\\/g, '/');
+
+    // Strip everything up to and including '/pages/' or 'pages/'
+    sourceFile = sourceFile.replace(/^.*[\/]pages[\/]/, '');
+    sourceFile = sourceFile.replace(/^pages[\/]/, '');
+
+    // Remove .adoc extension if present
+    if (sourceFile.endsWith('.adoc')) {
+      sourceFile = sourceFile.slice(0, -5);
+    }
+
+    // Remove .html extension if present (will be re-added)
+    if (sourceFile.endsWith('.html')) {
+      sourceFile = sourceFile.slice(0, -5);
+    }
+
+    // Add .html extension
+    return sourceFile + '.html';
+  }
+}

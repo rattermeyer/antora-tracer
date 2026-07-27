@@ -50,10 +50,13 @@ console.log(`\nValidation: ${validation.errors.length} errors, ${validation.warn
 // Generate matrix and exports
 const { MatrixGenerator } = await import('../lib/src/MatrixGenerator.js');
 const { Neo4jExporter } = await import('../lib/src/Neo4jExporter.js');
+const { LinkResolver } = await import('../lib/src/LinkResolver.js');
 
 mkdirSync(outputDir, { recursive: true });
 
-const matrixGen = new MatrixGenerator(extension.graph, configLoader);
+// Create LinkResolver for Antora output context (matrices in _attachments/, pages at component root)
+const linkResolver = new LinkResolver({ relativePathPrefix: '../../' });
+const matrixGen = new MatrixGenerator(extension.graph, configLoader, { linkResolver });
 
 for (const matrixName of ['requirements-architecture', 'requirements-tests']) {
   const matrix = matrixGen.generateMatrix(matrixName);

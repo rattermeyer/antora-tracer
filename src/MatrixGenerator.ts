@@ -11,6 +11,7 @@
 import type { TraceabilityGraph } from './TraceabilityGraph.js';
 import type { ConfigLoader } from './config/TraceabilityConfig.js';
 import type { Item, ItemRelationship } from './types.js';
+import type { LinkResolver } from './LinkResolver.js';
 import { TemplateRenderer } from './TemplateRenderer.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -54,6 +55,7 @@ export interface MatrixConfig {
  */
 export interface MatrixGeneratorOptions {
   templateDir?: string;
+  linkResolver?: LinkResolver;
 }
 
 /**
@@ -75,6 +77,7 @@ export class MatrixGenerator {
   private readonly graph: TraceabilityGraph;
   private readonly configLoader?: ConfigLoader;
   private readonly templateRenderer: TemplateRenderer;
+  private readonly linkResolver?: LinkResolver;
 
   constructor(
     graph: TraceabilityGraph,
@@ -85,6 +88,7 @@ export class MatrixGenerator {
     this.configLoader = configLoader;
     const templateDir = options.templateDir || DEFAULT_TEMPLATE_DIR;
     this.templateRenderer = new TemplateRenderer(templateDir);
+    this.linkResolver = options.linkResolver;
   }
 
   // ========================================================================
@@ -512,17 +516,29 @@ export class MatrixGenerator {
    * Prepare a row for template rendering
    */
   private prepareRowForTemplate(row: MatrixRow): any {
-    return {
+    const result: any = {
       rowId: this.escapeHtml(row.rowId),
       rowTitle: this.escapeHtml(row.rowTitle),
       rowRole: this.escapeHtml(row.rowRole),
       cells: row.cells.map(cell => ({
         hasItems: cell.items.length > 0,
-        items: cell.items.map(item => ({
-          itemId: this.escapeHtml(item.itemId),
-          itemTitle: this.escapeHtml(item.itemTitle),
-          role: this.escapeHtml(item.role),
-        })),
+        items: cell.items.map(item => {
+          const base: any = {
+            itemId: this.escapeHtml(item.itemId),
+            itemTitle: this.escapeHtml(item.itemTitle),
+            role: this.escapeHtml(item.role),
+          };
+          if (this.linkResolver) {
+            const cellItem = this.graph.getItem(item.itemId);
+            if (cellItem) {
+              base.itemHref = this.linkResolver.generateItemLink(cellItem);
+            }
+          }
+          if (item.sourceFile) {
+            base.sourceFile = this.escapeHtml(item.sourceFile);
+          }
+          return base;
+        }),
         role: this.escapeHtml(cell.role),
       })),
       coverage: row.coverage,
@@ -530,6 +546,13 @@ export class MatrixGenerator {
       status: row.status,
       statusClass: `status-${row.status}`,
     };
+    if (this.linkResolver) {
+      const rowItem = this.graph.getItem(row.rowId);
+      if (rowItem) {
+        result.rowHref = this.linkResolver.generateItemLink(rowItem);
+      }
+    }
+    return result;
   }
 
   /**
