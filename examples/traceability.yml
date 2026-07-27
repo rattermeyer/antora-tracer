@@ -19,10 +19,16 @@ relations:
     architecture: [validates]
 
 matrices:
-  - name: requirements-coverage
-    description: "Requirements traced to architecture and tests"
+  - name: requirements-architecture
+    description: "Requirements traced to architecture sections"
     rows: requirement
-    columns: [architecture, test]
+    columns: [architecture]
     coverageRelations:
       architecture: [addresses]
+
+  - name: requirements-tests
+    description: "Requirements traced to test files"
+    rows: requirement
+    columns: [test]
+    coverageRelations:
       test: [verifies]

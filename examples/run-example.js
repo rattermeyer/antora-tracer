@@ -54,20 +54,23 @@ const { Neo4jExporter } = await import('../lib/src/Neo4jExporter.js');
 mkdirSync(outputDir, { recursive: true });
 
 const matrixGen = new MatrixGenerator(extension.graph, configLoader);
-const matrix = matrixGen.generateMatrix('requirements-coverage');
 
-// CSV
-writeFileSync(resolve(outputDir, 'matrix-requirements-coverage.csv'), matrixGen.exportToCSV(matrix));
-console.log(`\nCSV:  output/matrix-requirements-coverage.csv`);
+for (const matrixName of ['requirements-architecture', 'requirements-tests']) {
+  const matrix = matrixGen.generateMatrix(matrixName);
 
-// HTML
-const html = matrixGen.exportToHTML(matrix);
-writeFileSync(resolve(outputDir, 'matrix-requirements-coverage.html'), html);
-console.log(`HTML:  output/matrix-requirements-coverage.html`);
+  // CSV
+  writeFileSync(resolve(outputDir, `matrix-${matrixName}.csv`), matrixGen.exportToCSV(matrix));
+  console.log(`CSV:  output/matrix-${matrixName}.csv`);
 
-// Coverage
-const cov = matrix.coverage;
-console.log(`\nCoverage: ${cov.overall}% overall (${cov.complete} complete, ${cov.partial} partial, ${cov.missing} missing)`);
+  // HTML
+  const html = matrixGen.exportToHTML(matrix);
+  writeFileSync(resolve(outputDir, `matrix-${matrixName}.html`), html);
+  console.log(`HTML:  output/matrix-${matrixName}.html`);
+
+  // Coverage
+  const cov = matrix.coverage;
+  console.log(`${matrixName}: ${cov.overall.toFixed(1)}% overall (${cov.complete} complete, ${cov.partial} partial, ${cov.missing} missing)`);
+}
 
 // Neo4j
 const neo4j = new Neo4jExporter(extension.graph);
