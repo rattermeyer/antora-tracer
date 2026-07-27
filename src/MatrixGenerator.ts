@@ -205,30 +205,45 @@ export class MatrixGenerator {
   }
 
   /**
-   * Find items related to a row item in a specific column role
+   * Find items related to a row item in a specific column role.
+   * Checks both forward (row → column) and reverse (column → row) directions.
    */
   private findRelatedItems(rowId: string, columnRole: string, config: MatrixConfig): Item[] {
     const result: Item[] = [];
     const colItems = this.graph.getItemsByRole(columnRole);
     const colItemIds = new Set(colItems.map(i => i.id));
-
-    // Get all relationships from the row item
-    const relationships = this.graph.getRelationships(rowId);
+    const seen = new Set<string>();
 
     // Check coverage relations for this column
     const coverageRels = config.coverageRelations?.[columnRole] || [];
+    const hasCoverageFilter = coverageRels.length > 0;
 
-    for (const rel of relationships) {
-      // Check if the target is in the column role
+    // Forward direction: row item → column item
+    const forwardRels = this.graph.getRelationships(rowId);
+    for (const rel of forwardRels) {
       if (colItemIds.has(rel.targetId)) {
-        // If coverage relations are specified, only include matching relation types
-        if (coverageRels.length > 0 && !coverageRels.includes(rel.type)) {
+        if (hasCoverageFilter && !coverageRels.includes(rel.type)) {
           continue;
         }
-
         const target = this.graph.getItem(rel.targetId);
-        if (target) {
+        if (target && !seen.has(target.id)) {
+          seen.add(target.id);
           result.push(target);
+        }
+      }
+    }
+
+    // Reverse direction: column item → row item
+    const reverseRels = this.graph.getReverseRelationships(rowId);
+    for (const rel of reverseRels) {
+      if (colItemIds.has(rel.fromId)) {
+        if (hasCoverageFilter && !coverageRels.includes(rel.type)) {
+          continue;
+        }
+        const source = this.graph.getItem(rel.fromId);
+        if (source && !seen.has(source.id)) {
+          seen.add(source.id);
+          result.push(source);
         }
       }
     }
@@ -272,13 +287,28 @@ export class MatrixGenerator {
         const colItems = columnItems.get(colRole) || [];
         const colItemIds = new Set(colItems.map(i => i.id));
 
-        // Find relationships from row item to this column
+        // Find relationships connecting row item to this column (both directions)
         const relatedItems: Item[] = [];
+        const seenIds = new Set<string>();
+
+        // Forward: row item → column item
         for (const rel of this.graph.getRelationships(rowItem.id)) {
           if (colItemIds.has(rel.targetId)) {
             const target = this.graph.getItem(rel.targetId);
-            if (target) {
+            if (target && !seenIds.has(target.id)) {
+              seenIds.add(target.id);
               relatedItems.push(target);
+            }
+          }
+        }
+
+        // Reverse: column item → row item
+        for (const rel of this.graph.getReverseRelationships(rowItem.id)) {
+          if (colItemIds.has(rel.fromId)) {
+            const source = this.graph.getItem(rel.fromId);
+            if (source && !seenIds.has(source.id)) {
+              seenIds.add(source.id);
+              relatedItems.push(source);
             }
           }
         }
