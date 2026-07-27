@@ -6,23 +6,23 @@
 
 - [x] 2.1 Create test/cli.test.ts with Mocha/Chai setup
 - [x] 2.2 Test CLI process command with valid input file
-- [ ] 2.3 Test CLI process command with missing input
-- [ ] 2.4 Test CLI process command with invalid file path
+- [x] 2.3 Test CLI process command with missing input
+- [x] 2.4 Test CLI process command with invalid file path
 - [x] 2.5 Test CLI matrix command with valid input
 - [x] 2.6 Test CLI matrix command with different output formats (csv, html, json)
-- [ ] 2.7 Test CLI matrix command without input
+- [x] 2.7 Test CLI matrix command without input
 - [x] 2.8 Test CLI validate command with valid input
-- [ ] 2.9 Test CLI validate command with invalid input
+- [x] 2.9 Test CLI validate command with invalid input
 - [x] 2.10 Test CLI export neo4j command with CSV format
 - [x] 2.11 Test CLI export neo4j command with Cypher format
-- [ ] 2.12 Test CLI export neo4j command without input
+- [x] 2.12 Test CLI export neo4j command without input
 - [x] 2.13 Test CLI stats command with valid input
-- [ ] 2.14 Test CLI stats command without input
+- [x] 2.14 Test CLI stats command without input
 - [x] 2.15 Test CLI preset list command
 - [x] 2.16 Test CLI preset show command with valid preset
-- [ ] 2.17 Test CLI preset show command with invalid preset
-- [ ] 2.18 Test CLI preset init command
-- [ ] 2.19 Test CLI help command
+- [x] 2.17 Test CLI preset show command with invalid preset
+- [x] 2.18 Test CLI preset init command
+- [x] 2.19 Test CLI help command
 - [x] 2.20 Verify all CLI tests pass
 
 ## 3. Antora Extension Tests (Priority: High - Now covered)
