@@ -1,36 +1,40 @@
 Row ID,Row Title,architecture
-REQ-005,Old macro syntax generates deprecation error,
-REQ-006,Configuration defines roles,ARC-001: Project scope and architectural goals; ARC-004: Key architectural decisions and their rationale
-REQ-007,Configuration defines relations,ARC-004: Key architectural decisions and their rationale
-REQ-008,Configuration defines matrices,ARC-004: Key architectural decisions and their rationale
+REQ-001,Single `item` macro replaces all block macros,ARC-001: Project scope and architectural goals; ARC-002: Component-level architecture; ARC-003: Processing flow during Antora build; ARC-004: Key architectural decisions and their rationale
+REQ-002,`item` macro accepts role attribute,ARC-002: Component-level architecture; ARC-003: Processing flow during Antora build
+REQ-003,`item` macro maintains existing attributes,ARC-002: Component-level architecture
+REQ-004,`item` macro supports block content,ARC-002: Component-level architecture; ARC-003: Processing flow during Antora build
+REQ-005,Old macro syntax generates deprecation error,ARC-003: Processing flow during Antora build
+REQ-006,Configuration defines roles,ARC-001: Project scope and architectural goals; ARC-002: Component-level architecture; ARC-004: Key architectural decisions and their rationale
+REQ-007,Configuration defines relations,ARC-002: Component-level architecture; ARC-004: Key architectural decisions and their rationale
+REQ-008,Configuration defines matrices,ARC-002: Component-level architecture; ARC-004: Key architectural decisions and their rationale
 REQ-009,Configuration is required for validation,ARC-001: Project scope and architectural goals
 REQ-010,Configuration file location,ARC-004: Key architectural decisions and their rationale
-REQ-011,Configuration validation,
+REQ-011,Configuration validation,ARC-002: Component-level architecture
 REQ-012,Configuration can extend presets,
-REQ-013,Role-based relation validation,ARC-001: Project scope and architectural goals; ARC-004: Key architectural decisions and their rationale
-REQ-014,Directional relation checking,
+REQ-013,Role-based relation validation,ARC-001: Project scope and architectural goals; ARC-003: Processing flow during Antora build; ARC-004: Key architectural decisions and their rationale
+REQ-014,Directional relation checking,ARC-003: Processing flow during Antora build
 REQ-015,Error messages list allowed relations,ARC-004: Key architectural decisions and their rationale
-REQ-016,Warnings for unknown roles,
-REQ-017,Graceful degradation for unknown roles,
+REQ-016,Warnings for unknown roles,ARC-003: Processing flow during Antora build
+REQ-017,Graceful degradation for unknown roles,ARC-003: Processing flow during Antora build
 REQ-018,Built-in preset configurations,ARC-001: Project scope and architectural goals; ARC-004: Key architectural decisions and their rationale
 REQ-019,Each preset contains complete configuration,
 REQ-020,Each preset includes documentation,
 REQ-021,Each preset includes Neo4j Cypher queries,
 REQ-022,Presets have independent versioning,
 REQ-023,Users can define custom presets,
-REQ-024,Neo4j CSV export,ARC-001: Project scope and architectural goals; ARC-004: Key architectural decisions and their rationale
-REQ-025,Neo4j Cypher export,
+REQ-024,Neo4j CSV export,ARC-001: Project scope and architectural goals; ARC-002: Component-level architecture; ARC-004: Key architectural decisions and their rationale
+REQ-025,Neo4j Cypher export,ARC-002: Component-level architecture
 REQ-026,Export command in CLI,
 REQ-027,Export includes all item attributes,
 REQ-028,Export is optional,ARC-004: Key architectural decisions and their rationale
-REQ-029,Configurable matrix generation with coverage calculations,ARC-004: Key architectural decisions and their rationale
+REQ-029,Configurable matrix generation with coverage calculations,ARC-002: Component-level architecture; ARC-003: Processing flow during Antora build; ARC-004: Key architectural decisions and their rationale
 REQ-030,Role statistics reporting,
 REQ-031,Graph path finding,
 REQ-032,Impact analysis,
 REQ-033,Graph merge,
-REQ-034,Mustache template rendering,ARC-004: Key architectural decisions and their rationale
-REQ-035,Antora extension integration,ARC-001: Project scope and architectural goals
+REQ-034,Mustache template rendering,ARC-002: Component-level architecture; ARC-004: Key architectural decisions and their rationale
+REQ-035,Antora extension integration,ARC-001: Project scope and architectural goals; ARC-003: Processing flow during Antora build
 REQ-036,CLI commands,ARC-001: Project scope and architectural goals
 
-Total 32 rows
-Coverage: 43.8%
+Total 36 rows
+Coverage: 66.7%

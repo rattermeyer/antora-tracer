@@ -1,4 +1,16 @@
 id,title,role,status,sourceFile,content
+REQ-001,Single `item` macro replaces all block macros,requirement,,requirements.adoc,"""The system SHALL use a single `[item]` block macro to define all traceable artifacts, replacing the previous role-specific macros.
+
+Related specs: `unified-item-macro/spec.md`
+
+Source: OpenSpec specification — Scenario: Define a requirement using `[item, id=REQ-001, role=requirement]`"""
+REQ-002,`item` macro accepts role attribute,requirement,,requirements.adoc,"""The `[item]` macro SHALL accept a `role` attribute that specifies the type of traceable artifact. Items without a `role` attribute receive the default role `unknown` with a warning.
+
+Related specs: `unified-item-macro/spec.md`"""
+REQ-003,`item` macro maintains existing attributes,requirement,,requirements.adoc,"""The `[item]` macro SHALL support the attributes `id`, `title`, `status`, and any custom attributes. The `title` defaults to the item's `id` if omitted. The `status` field is free-form.
+
+Related specs: `unified-item-macro/spec.md`"""
+REQ-004,`item` macro supports block content,requirement,,requirements.adoc,====
 REQ-005,Old macro syntax generates deprecation error,requirement,,requirements.adoc,"""The system SHALL detect and report the old macro syntax (`[req]`, `[imp]`, `[test]`, `[doc]`) as a deprecation error, suggesting the equivalent `[item, role=...]` syntax.
 
 Related specs: `unified-item-macro/spec.md`"""
@@ -14,7 +26,9 @@ Related specs: `configuration-system/spec.md`"""
 REQ-009,Configuration is required for validation,requirement,,requirements.adoc,"""The system SHALL require a valid configuration to perform role-based relation validation. Without a ConfigLoader, all relations are allowed (unguarded mode).
 
 Related specs: `configuration-system/spec.md`"""
-REQ-010,Configuration file location,requirement,,requirements.adoc,The system SHALL search for `traceability.yml` or `traceability.yaml` in common locations. A custom path SHALL be specifiable via `
+REQ-010,Configuration file location,requirement,,requirements.adoc,"""The system SHALL search for `traceability.yml` or `traceability.yaml` in common locations. A custom path SHALL be specifiable via `--config` CLI flag or `configPath` playbook option.
+
+Related specs: `configuration-system/spec.md`"""
 REQ-011,Configuration validation,requirement,,requirements.adoc,"""The system SHALL validate the configuration structure: roles must be non-empty strings, relation source/target roles must be in the roles list, matrix row/column roles must be in the roles list, and relation types must be arrays. Invalid configurations produce clear error messages.
 
 Related specs: `configuration-system/spec.md`"""
@@ -60,7 +74,9 @@ Related specs: `neo4j-export/spec.md`"""
 REQ-025,Neo4j Cypher export,requirement,,requirements.adoc,"""The system SHALL export the traceability graph as `import.cypher` containing CREATE statements for all nodes (with `:Item` and role-specific labels) and relationships (with type-specific labels). Special characters SHALL be properly escaped.
 
 Related specs: `neo4j-export/spec.md`"""
-REQ-026,Export command in CLI,requirement,,requirements.adoc,The system SHALL provide an `export neo4j` CLI command supporting `
+REQ-026,Export command in CLI,requirement,,requirements.adoc,"""The system SHALL provide an `export neo4j` CLI command supporting `--format csv` and `--format cypher` options, with configurable input and output directories.
+
+Related specs: `neo4j-export/spec.md`"""
 REQ-027,Export includes all item attributes,requirement,,requirements.adoc,"""Neo4j exports SHALL include all item attributes (id, role, title, content, status, custom attributes) as node properties. Special characters in attribute values SHALL be properly escaped.
 
 Related specs: `neo4j-export/spec.md`"""
@@ -88,7 +104,9 @@ Source: Design Decision 4 — Mustache Templates"""
 REQ-035,Antora extension integration,requirement,,requirements.adoc,"""The system SHALL integrate with Antora via `AntoraTraceabilityExtension`, registering for `contentClassified` (parse items) and `sitePublished` (generate matrices and coverage). Configuration SHALL be read from the Antora playbook's extension config. Disabled extensions SHALL skip initialization.
 
 Source: Antora Extension implementation"""
-REQ-036,CLI commands,requirement,,requirements.adoc,"""The system SHALL provide a Commander-based CLI with six subcommands: `process` (parse items), `matrix` (generate matrices), `validate` (check graph integrity), `export neo4j` (CSV/Cypher export), `stats` (role statistics), and `preset` (list/show/init). Global `"""
+REQ-036,CLI commands,requirement,,requirements.adoc,"""The system SHALL provide a Commander-based CLI with six subcommands: `process` (parse items), `matrix` (generate matrices), `validate` (check graph integrity), `export neo4j` (CSV/Cypher export), `stats` (role statistics), and `preset` (list/show/init). Global `--config` and `--preset` flags SHALL apply to all commands.
+
+Source: CLI implementation"""
 ARC-001,Project scope and architectural goals,architecture,,architecture.adoc,"""*Project scope and architectural goals*
 
 The Antora Tracer is an Antora extension that adds role-based requirements traceability to AsciiDoc documentation. It replaces fixed macro types with a single configurable `[item]` macro.
@@ -138,7 +156,64 @@ package """"Configuration"""" {
   database """"Presets"""" as presets
 }
 
-antora_ext"""
+antora_ext --> main_ext : orchestrates
+main_ext --> parser : delegates parsing
+main_ext --> graph : owns
+main_ext --> matrix : delegates generation
+main_ext --> neo4j : delegates export
+main_ext --> config : loads configuration
+
+parser --> graph : populates items & relationships
+matrix --> graph : queries for coverage
+matrix --> templates : renders HTML
+neo4j --> graph : exports nodes & relationships
+
+config --> presets : loads built-in presets
+config --> graph : provides validation rules
+@enduml
+....
+
+[width=100%, cols=""""25,75""""]
+|===
+| Component | Responsibility
+
+| `AntoraTraceabilityExtension`
+| Antora entry point. Registers event handlers, creates `RequirementsTraceabilityExtension`, reads playbook config.
+
+| `RequirementsTraceabilityExtension`
+| Orchestrator. Owns the graph, delegates to parser, matrix generator, and Neo4j exporter. Public API for programmatic use.
+
+| `DocumentParser`
+| Regex-based AsciiDoc parser. Two-pass: extracts `[item]` blocks, then scans for inline `relation:TARGET[]` macros.
+
+| `TraceabilityGraph`
+| In-memory directed graph. Items stored as `Map<string, Item>`, relationships as `Map<string, ItemRelationship>`. Provides query, validation, path finding, and impact analysis.
+
+| `MatrixGenerator`
+| Config-driven matrix generation. Reads matrix definitions from configuration, queries the graph, computes coverage, produces CSV output. Delegates HTML to TemplateRenderer.
+
+| `TemplateRenderer`
+| Mustache wrapper. Loads templates from `src/templates/`, supports custom template directories with fallback to built-ins.
+
+| `Neo4jExporter`
+| Graph-to-Neo4j export. Produces `nodes.csv`, `relationships.csv`, and `import.cypher`. Properly escapes special characters.
+
+| `ConfigLoader`
+| YAML configuration loader. Loads and validates config, merges with presets, provides role/relation validation queries to the graph.
+|===
+
+addresses:REQ-001[]
+addresses:REQ-002[]
+addresses:REQ-003[]
+addresses:REQ-004[]
+addresses:REQ-006[]
+addresses:REQ-007[]
+addresses:REQ-008[]
+addresses:REQ-011[]
+addresses:REQ-024[]
+addresses:REQ-025[]
+addresses:REQ-029[]
+addresses:REQ-034[]"""
 ARC-003,Processing flow during Antora build,architecture,,architecture.adoc,"""The following sequence shows how an AsciiDoc file flows through the system during an Antora build:
 
 [plantuml, format=svg]
@@ -170,7 +245,57 @@ loop for each .adoc file
   main_ext -> parser : parse(content, sourceFile)
   parser -> parser : extract [item] blocks
   parser -> parser : extract relation:TARGET[] macros
-  parser"""
+  parser --> main_ext : ParserResult { items, relationships }
+  main_ext -> graph : addItem() for each item
+  main_ext -> graph : addRelationship() for each relationship
+  graph -> graph : validate relation (ConfigLoader.isRelationAllowed)
+end
+
+== Pass 2: Substitute links ==
+loop for each .adoc file
+  antora_ext -> antora_ext : substituteRelationshipLinks(content)
+  antora_ext -> graph : getItem(targetId) for each macro match
+  graph --> antora_ext : target item (sourceFile)
+  antora_ext -> antora_ext : replace macro with xref#ID or xref:page.adoc#ID
+  antora_ext -> antora_ext : write modified content to in-memory buffer
+end
+
+== Matrix Generation ==
+antora -> antora_ext : sitePublished event
+antora_ext -> main_ext : getMatrixDefinitions()
+loop for each matrix definition
+  main_ext -> matrix : generateMatrix(name)
+  matrix -> graph : query items, relationships, coverage
+  matrix -> templates : render(matrix data)
+  templates --> matrix : HTML string
+  matrix --> main_ext : GeneratedMatrix
+  main_ext -> antora_ext : write to outputDir
+end
+
+== Neo4j Export (optional) ==
+antora_ext -> main_ext : createNeo4jExporter()
+main_ext -> neo4j : export({ outputDir, format })
+neo4j -> graph : getAllItems(), getAllRelationships()
+neo4j --> main_ext : ExportResult { nodeCount, relationshipCount, files }
+@enduml
+....
+
+Key timing characteristics:
+
+- *Fire-and-forget async init*: `AntoraTraceabilityExtension` constructor starts `initializeAsync()` without awaiting it. Event handlers are registered after config loads. In practice, the Antora build pipeline provides sufficient latency.
+- *Single-pass processing*: `process()` call does both parsing and graph population in one call. No separate relationship processing pass needed.
+- *Lazy rendering*: Templates are loaded and compiled on first use, cached thereafter.
+
+addresses:REQ-001[]
+addresses:REQ-002[]
+addresses:REQ-004[]
+addresses:REQ-005[]
+addresses:REQ-013[]
+addresses:REQ-014[]
+addresses:REQ-016[]
+addresses:REQ-017[]
+addresses:REQ-029[]
+addresses:REQ-035[]"""
 ARC-004,Key architectural decisions and their rationale,architecture,,architecture.adoc,"""This section captures the design decisions from `openspec/changes/unified-item-architecture/design.md`.
 
 [width=100%, cols=""""20,50,30""""]

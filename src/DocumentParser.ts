@@ -429,17 +429,14 @@ export class DocumentParser {
   }
 
   private extractBlock(content: string, startIndex: number): string | null {
-    // Find opening delimiter: ==== or --
-    let blockStart = content.indexOf('====', startIndex);
-    let delimiter = '====';
-    if (blockStart === -1) {
-      blockStart = content.indexOf('--', startIndex);
-      delimiter = '--';
-    }
-    if (blockStart === -1) return null;
-    const blockEnd = content.indexOf(delimiter, blockStart + delimiter.length);
+    // Find opening delimiter: ==== or -- (must be alone on a line)
+    let m = content.slice(startIndex).match(/\n(====|--)\n/);
+    if (!m || m.index === undefined) return null;
+    const blockStart = startIndex + m.index! + 1;
+    const delimiter = m[1];
+    const blockEnd = content.indexOf(`\n${delimiter}\n`, blockStart + delimiter.length + 1);
     if (blockEnd === -1) return null;
-    return content.substring(startIndex, blockEnd + delimiter.length);
+    return content.substring(startIndex, blockEnd + delimiter.length + 2);
   }
 
   private extractBody(block: string): string {

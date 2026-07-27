@@ -69,16 +69,16 @@
 </head>
 <body>
     <h1>requirements-architecture</h1>
-    <p class="metadata">Type: requirement-architecture | Generated: 2026-07-27T17:05:20.256Z</p>
+    <p class="metadata">Type: requirement-architecture | Generated: 2026-07-27T17:06:30.467Z</p>
 
     <div class="coverage-summary">
         <h3>Coverage Summary</h3>
         <p>
-            <span class="coverage-badge coverage-complete">Complete: 14 / 32</span>
+            <span class="coverage-badge coverage-complete">Complete: 24 / 36</span>
             <span class="coverage-badge coverage-partial">Partial: 0</span>
-            <span class="coverage-badge coverage-missing">Missing: 18</span>
+            <span class="coverage-badge coverage-missing">Missing: 12</span>
             <br>
-            <strong>Overall Coverage: 43.8%</strong>
+            <strong>Overall Coverage: 66.7%</strong>
         </p>
     </div>
 
@@ -94,20 +94,62 @@
                 </tr>
             </thead>
             <tbody>
-                <tr class="status-missing role-requirement">
+                <tr class="status-complete role-requirement">
+                    <td>REQ-001</td>
+                    <td>Single &#x60;item&#x60; macro replaces all block macros</td>
+                    <td class="role-architecture">
+                            <div><strong>ARC-001</strong>: Project scope and architectural goals</div>
+                            <div><strong>ARC-002</strong>: Component-level architecture</div>
+                            <div><strong>ARC-003</strong>: Processing flow during Antora build</div>
+                            <div><strong>ARC-004</strong>: Key architectural decisions and their rationale</div>
+                    </td>
+                    <td>100.0%</td>
+                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                </tr>
+                <tr class="status-complete role-requirement">
+                    <td>REQ-002</td>
+                    <td>&#x60;item&#x60; macro accepts role attribute</td>
+                    <td class="role-architecture">
+                            <div><strong>ARC-002</strong>: Component-level architecture</div>
+                            <div><strong>ARC-003</strong>: Processing flow during Antora build</div>
+                    </td>
+                    <td>100.0%</td>
+                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                </tr>
+                <tr class="status-complete role-requirement">
+                    <td>REQ-003</td>
+                    <td>&#x60;item&#x60; macro maintains existing attributes</td>
+                    <td class="role-architecture">
+                            <div><strong>ARC-002</strong>: Component-level architecture</div>
+                    </td>
+                    <td>100.0%</td>
+                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                </tr>
+                <tr class="status-complete role-requirement">
+                    <td>REQ-004</td>
+                    <td>&#x60;item&#x60; macro supports block content</td>
+                    <td class="role-architecture">
+                            <div><strong>ARC-002</strong>: Component-level architecture</div>
+                            <div><strong>ARC-003</strong>: Processing flow during Antora build</div>
+                    </td>
+                    <td>100.0%</td>
+                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                </tr>
+                <tr class="status-complete role-requirement">
                     <td>REQ-005</td>
                     <td>Old macro syntax generates deprecation error</td>
-                    <td>
-                            <span class="empty-cell">-</span>
+                    <td class="role-architecture">
+                            <div><strong>ARC-003</strong>: Processing flow during Antora build</div>
                     </td>
-                    <td>0.0%</td>
-                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                    <td>100.0%</td>
+                    <td><span class="coverage-badge coverage-complete">complete</span></td>
                 </tr>
                 <tr class="status-complete role-requirement">
                     <td>REQ-006</td>
                     <td>Configuration defines roles</td>
                     <td class="role-architecture">
                             <div><strong>ARC-001</strong>: Project scope and architectural goals</div>
+                            <div><strong>ARC-002</strong>: Component-level architecture</div>
                             <div><strong>ARC-004</strong>: Key architectural decisions and their rationale</div>
                     </td>
                     <td>100.0%</td>
@@ -117,6 +159,7 @@
                     <td>REQ-007</td>
                     <td>Configuration defines relations</td>
                     <td class="role-architecture">
+                            <div><strong>ARC-002</strong>: Component-level architecture</div>
                             <div><strong>ARC-004</strong>: Key architectural decisions and their rationale</div>
                     </td>
                     <td>100.0%</td>
@@ -126,6 +169,7 @@
                     <td>REQ-008</td>
                     <td>Configuration defines matrices</td>
                     <td class="role-architecture">
+                            <div><strong>ARC-002</strong>: Component-level architecture</div>
                             <div><strong>ARC-004</strong>: Key architectural decisions and their rationale</div>
                     </td>
                     <td>100.0%</td>
@@ -149,14 +193,14 @@
                     <td>100.0%</td>
                     <td><span class="coverage-badge coverage-complete">complete</span></td>
                 </tr>
-                <tr class="status-missing role-requirement">
+                <tr class="status-complete role-requirement">
                     <td>REQ-011</td>
                     <td>Configuration validation</td>
-                    <td>
-                            <span class="empty-cell">-</span>
+                    <td class="role-architecture">
+                            <div><strong>ARC-002</strong>: Component-level architecture</div>
                     </td>
-                    <td>0.0%</td>
-                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                    <td>100.0%</td>
+                    <td><span class="coverage-badge coverage-complete">complete</span></td>
                 </tr>
                 <tr class="status-missing role-requirement">
                     <td>REQ-012</td>
@@ -172,19 +216,20 @@
                     <td>Role-based relation validation</td>
                     <td class="role-architecture">
                             <div><strong>ARC-001</strong>: Project scope and architectural goals</div>
+                            <div><strong>ARC-003</strong>: Processing flow during Antora build</div>
                             <div><strong>ARC-004</strong>: Key architectural decisions and their rationale</div>
                     </td>
                     <td>100.0%</td>
                     <td><span class="coverage-badge coverage-complete">complete</span></td>
                 </tr>
-                <tr class="status-missing role-requirement">
+                <tr class="status-complete role-requirement">
                     <td>REQ-014</td>
                     <td>Directional relation checking</td>
-                    <td>
-                            <span class="empty-cell">-</span>
+                    <td class="role-architecture">
+                            <div><strong>ARC-003</strong>: Processing flow during Antora build</div>
                     </td>
-                    <td>0.0%</td>
-                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                    <td>100.0%</td>
+                    <td><span class="coverage-badge coverage-complete">complete</span></td>
                 </tr>
                 <tr class="status-complete role-requirement">
                     <td>REQ-015</td>
@@ -195,23 +240,23 @@
                     <td>100.0%</td>
                     <td><span class="coverage-badge coverage-complete">complete</span></td>
                 </tr>
-                <tr class="status-missing role-requirement">
+                <tr class="status-complete role-requirement">
                     <td>REQ-016</td>
                     <td>Warnings for unknown roles</td>
-                    <td>
-                            <span class="empty-cell">-</span>
+                    <td class="role-architecture">
+                            <div><strong>ARC-003</strong>: Processing flow during Antora build</div>
                     </td>
-                    <td>0.0%</td>
-                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                    <td>100.0%</td>
+                    <td><span class="coverage-badge coverage-complete">complete</span></td>
                 </tr>
-                <tr class="status-missing role-requirement">
+                <tr class="status-complete role-requirement">
                     <td>REQ-017</td>
                     <td>Graceful degradation for unknown roles</td>
-                    <td>
-                            <span class="empty-cell">-</span>
+                    <td class="role-architecture">
+                            <div><strong>ARC-003</strong>: Processing flow during Antora build</div>
                     </td>
-                    <td>0.0%</td>
-                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                    <td>100.0%</td>
+                    <td><span class="coverage-badge coverage-complete">complete</span></td>
                 </tr>
                 <tr class="status-complete role-requirement">
                     <td>REQ-018</td>
@@ -273,19 +318,20 @@
                     <td>Neo4j CSV export</td>
                     <td class="role-architecture">
                             <div><strong>ARC-001</strong>: Project scope and architectural goals</div>
+                            <div><strong>ARC-002</strong>: Component-level architecture</div>
                             <div><strong>ARC-004</strong>: Key architectural decisions and their rationale</div>
                     </td>
                     <td>100.0%</td>
                     <td><span class="coverage-badge coverage-complete">complete</span></td>
                 </tr>
-                <tr class="status-missing role-requirement">
+                <tr class="status-complete role-requirement">
                     <td>REQ-025</td>
                     <td>Neo4j Cypher export</td>
-                    <td>
-                            <span class="empty-cell">-</span>
+                    <td class="role-architecture">
+                            <div><strong>ARC-002</strong>: Component-level architecture</div>
                     </td>
-                    <td>0.0%</td>
-                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                    <td>100.0%</td>
+                    <td><span class="coverage-badge coverage-complete">complete</span></td>
                 </tr>
                 <tr class="status-missing role-requirement">
                     <td>REQ-026</td>
@@ -318,6 +364,8 @@
                     <td>REQ-029</td>
                     <td>Configurable matrix generation with coverage calculations</td>
                     <td class="role-architecture">
+                            <div><strong>ARC-002</strong>: Component-level architecture</div>
+                            <div><strong>ARC-003</strong>: Processing flow during Antora build</div>
                             <div><strong>ARC-004</strong>: Key architectural decisions and their rationale</div>
                     </td>
                     <td>100.0%</td>
@@ -363,6 +411,7 @@
                     <td>REQ-034</td>
                     <td>Mustache template rendering</td>
                     <td class="role-architecture">
+                            <div><strong>ARC-002</strong>: Component-level architecture</div>
                             <div><strong>ARC-004</strong>: Key architectural decisions and their rationale</div>
                     </td>
                     <td>100.0%</td>
@@ -373,6 +422,7 @@
                     <td>Antora extension integration</td>
                     <td class="role-architecture">
                             <div><strong>ARC-001</strong>: Project scope and architectural goals</div>
+                            <div><strong>ARC-003</strong>: Processing flow during Antora build</div>
                     </td>
                     <td>100.0%</td>
                     <td><span class="coverage-badge coverage-complete">complete</span></td>
