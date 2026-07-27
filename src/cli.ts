@@ -24,7 +24,8 @@ program
   .description('Antora Requirements Traceability Extension - Trace requirements, designs, implementations, and tests using role-based traceability')
   .version(packageJson.version)
   .option('--config <path>', 'Path to traceability configuration YAML file')
-  .option('--preset <name>', 'Use a built-in preset configuration: ' + BUILT_IN_PRESETS.join(', ') + '\n  (default: requirements-engineering)', 'requirements-engineering');
+  .option('--preset <name>', 'Use a built-in preset configuration: ' + BUILT_IN_PRESETS.join(', ') + '\n  (default: requirements-engineering)', 'requirements-engineering')
+  .option('--dry-run', 'Preview actions without writing files or making changes');
 
 // Helper to create the extension
 async function createExtension(options: any) {
@@ -45,6 +46,12 @@ async function createExtension(options: any) {
     console.error(chalk.red('Error creating extension:', error.message));
     process.exit(1);
   }
+}
+
+// Helper to check if dry-run mode is enabled
+function isDryRun(options: any): boolean {
+  const globalOpts = program.opts();
+  return options.dryRun || globalOpts.dryRun || false;
 }
 
 function ensureDirectory(dir: string) {
@@ -126,7 +133,14 @@ program.command('process')
     const extension = await createExtension(options);
     try {
       const adocFiles = collectAdocFiles(options.input);
+
+      // Show progress indicator
+      if (adocFiles.length > 1) {
+        console.log(chalk.cyan(`Found ${adocFiles.length} AsciiDoc files to process...`));
+      }
+
       const result = extension.processFiles(adocFiles);
+      console.log(chalk.green(`Processed ${adocFiles.length} file(s): ${result.result.items.length} items, ${result.result.relationships.length} relationships`));
 
       console.log(chalk.green(`Processed ${adocFiles.length} file(s): ${result.result.items.length} items, ${result.result.relationships.length} relationships`));
       let output: string;
@@ -147,12 +161,16 @@ program.command('process')
         }
         output += '</table></body></html>';
       }
-      ensureDirectory(options.output);
-      const outputPath = resolve(options.output, 'traceability.' + options.format);
-      const stream = createWriteStream(outputPath);
-      stream.write(output);
-      stream.end();
-      console.log(chalk.green(`Output written to: ${outputPath}`));
+      if (isDryRun(options)) {
+        console.log(chalk.yellow(`[DRY RUN] Would write output to: ${resolve(options.output, 'traceability.' + options.format)}`));
+      } else {
+        ensureDirectory(options.output);
+        const outputPath = resolve(options.output, 'traceability.' + options.format);
+        const stream = createWriteStream(outputPath);
+        stream.write(output);
+        stream.end();
+        console.log(chalk.green(`Output written to: ${outputPath}`));
+      }
     } catch (error: any) {
       console.error(chalk.red('Processing error:', error.message));
       process.exit(1);
@@ -165,6 +183,7 @@ program.command('matrix')
   .option('-t, --type <type>', 'Matrix type or name (uses configuration from preset/config)')
   .option('-f, --format <format>', 'Output format: csv, html, or json', 'csv')
   .option('-o, --output <path>', 'Output file path (defaults to stdout)')
+  .option('--templates <path>', 'Custom templates directory')
   .action(async (options) => {
     console.log(chalk.blue('Generating traceability matrix...'));
     const extension = await createExtension(options);
@@ -183,7 +202,9 @@ program.command('matrix')
 
       const matrixName = options.type || 'default';
       const { MatrixGenerator } = await import('./MatrixGenerator.js');
-      const generator = new MatrixGenerator(extension.graph, extension.configLoader);
+      const generator = new MatrixGenerator(extension.graph, extension.configLoader, {
+        templateDir: options.templates,
+      });
       const matrix = generator.generateMatrix(matrixName);
       if (options.format === 'html') {
         output = generator.exportToHTML(matrix);
@@ -193,13 +214,21 @@ program.command('matrix')
         output = generator.exportToCSV(matrix);
       }
       if (options.output) {
-        ensureDirectory(dirname(options.output));
-        const stream = createWriteStream(options.output);
-        stream.write(output);
-        stream.end();
-        console.log(chalk.green(`Matrix written to: ${options.output}`));
+        if (isDryRun(options)) {
+          console.log(chalk.yellow(`[DRY RUN] Would write matrix to: ${options.output}`));
+        } else {
+          ensureDirectory(dirname(options.output));
+          const stream = createWriteStream(options.output);
+          stream.write(output);
+          stream.end();
+          console.log(chalk.green(`Matrix written to: ${options.output}`));
+        }
       } else {
-        console.log(output);
+        if (!isDryRun(options)) {
+          console.log(output);
+        } else {
+          console.log(chalk.yellow('[DRY RUN] Would output matrix to stdout'));
+        }
       }
     } catch (error: any) {
       console.error(chalk.red('Matrix generation error:', error.message));
@@ -342,9 +371,17 @@ presetProgram.command('init')
     try {
       const configLoader = new ConfigLoader();
       const preset = configLoader.loadPreset(name);
-      ensureDirectory(options.output);
-      const configPath = resolve(process.cwd(), options.output, 'traceability.yml');
-      const configContent = `# Traceability Configuration
+      if (isDryRun(options)) {
+        console.log(chalk.yellow('[DRY RUN] Would initialize from preset:'));
+        console.log(chalk.yellow(`  Preset: ${name}`));
+        console.log(chalk.yellow(`  Output directory: ${options.output || '.'}`));
+        console.log(chalk.yellow('  Files would be created:'));
+        console.log(chalk.yellow(`    - traceability.yml`));
+        console.log(chalk.yellow(`    - requirements.adoc`));
+      } else {
+        ensureDirectory(options.output);
+        const configPath = resolve(process.cwd(), options.output, 'traceability.yml');
+        const configContent = `# Traceability Configuration
 # Generated from preset: ${preset.name}
 # Version: ${preset.version}
 # ${preset.description || ''}
@@ -373,9 +410,9 @@ ${(preset.traceability.matrices || []).map(matrix => {
     columns: [${matrix.columns.join(', ')}]`;
 }).join('\n')}
 `;
-      writeFileSync(configPath, configContent);
-      console.log(chalk.green(`Configuration written to: ${configPath}`));
-      const samplePath = resolve(process.cwd(), options.output, 'requirements.adoc');
+        writeFileSync(configPath, configContent);
+        console.log(chalk.green(`Configuration written to: ${configPath}`));
+        const samplePath = resolve(process.cwd(), options.output, 'requirements.adoc');
       const sampleContent = `= Requirements Example
 
 This file demonstrates the traceability syntax.
@@ -430,16 +467,55 @@ verifies:REQ-001[]
 tests:IMP-001[]
 ====
 `;
-      writeFileSync(samplePath, sampleContent);
-      console.log(chalk.green(`Sample file written to: ${samplePath}`));
-      console.log('');
-      console.log(chalk.cyan('Next steps:'));
-      console.log(chalk.cyan(`  1. Process: antora-req-trace process -i ${samplePath} --config traceability.yml`));
-      console.log(chalk.cyan(`  2. Generate matrix: antora-req-trace matrix --config traceability.yml -o matrix.html -f html`));
-      console.log(chalk.cyan(`  3. Validate: antora-req-trace validate -i ${samplePath} --config traceability.yml`));
+        writeFileSync(samplePath, sampleContent);
+        console.log(chalk.green(`Sample file written to: ${samplePath}`));
+        console.log('');
+        console.log(chalk.cyan('Next steps:'));
+        console.log(chalk.cyan(`  1. Process: antora-req-trace process -i ${samplePath} --config traceability.yml`));
+        console.log(chalk.cyan(`  2. Generate matrix: antora-req-trace matrix --config traceability.yml -o matrix.html -f html`));
+        console.log(chalk.cyan(`  3. Validate: antora-req-trace validate -i ${samplePath} --config traceability.yml`));
+      }
     } catch (error: any) {
       console.error(chalk.red(`Error: Preset '${name}' not found`));
       console.error(chalk.yellow(`Available presets: ${BUILT_IN_PRESETS.join(', ')}`));
+      process.exit(1);
+    }
+  });
+
+// Config validation command
+program.command('config validate')
+  .description('Validate traceability configuration file')
+  .option('-c, --config <path>', 'Path to config file (default: auto-discovered)')
+  .action(async (options) => {
+    console.log(chalk.blue('Validating traceability configuration...'));
+    try {
+      const configLoader = new ConfigLoader();
+      const configPath = options.config || configLoader.getConfigPath();
+
+      if (!configPath) {
+        console.error(chalk.red('Error: No configuration file found'));
+        console.log(chalk.yellow('Try: antora-req-trace config validate --config traceability.yml'));
+        console.log(chalk.yellow('Or: antora-req-trace config validate -c /path/to/config.yml'));
+        process.exit(1);
+      }
+
+      const config = configLoader.load(configPath);
+      console.log(chalk.green('✓ Configuration is valid'));
+      console.log('');
+      console.log(chalk.cyan('Configuration Summary:'));
+      console.log(chalk.cyan(`  Name: ${config.metadata?.name || 'unnamed'}`));
+      console.log(chalk.cyan(`  Roles: ${config.roles.length}`));
+      if (config.roles.length > 0) {
+        console.log(chalk.cyan(`    ${config.roles.join(', ')}`));
+      }
+      console.log(chalk.cyan(`  Matrices: ${config.matrices?.length || 0}`));
+      if (config.matrices && config.matrices.length > 0) {
+        console.log(chalk.cyan(`    ${config.matrices.map(m => m.name).join(', ')}`));
+      }
+      console.log(chalk.cyan(`  Relations: ${Object.keys(config.relations || {}).length} source roles`));
+    } catch (error: any) {
+      console.error(chalk.red('✗ Configuration validation failed:'));
+      console.error(chalk.red(error.message));
       process.exit(1);
     }
   });
@@ -461,22 +537,28 @@ program.command('export neo4j')
         const adocFiles = collectAdocFiles(options.input);
         extension.processFiles(adocFiles);
       }
-      ensureDirectory(options.output);
-      const outputDir = resolve(process.cwd(), options.output);
-      const { Neo4jExporter } = await import('./Neo4jExporter.js');
-      const exporter = new Neo4jExporter(extension.graph);
-      const result = exporter.export({
-        outputDir: outputDir,
-        format: options.format as 'csv' | 'cypher',
-        includeContent: true,
-        includeAllAttributes: true,
-      });
-      console.log(chalk.green(`Exported to Neo4j ${options.format} format`));
-      console.log(chalk.green(`  Nodes: ${result.nodeCount}`));
-      console.log(chalk.green(`  Relationships: ${result.relationshipCount}`));
-      if (result.nodesFile) console.log(chalk.green(`  Nodes file: ${result.nodesFile}`));
-      if (result.relationshipsFile) console.log(chalk.green(`  Relationships file: ${result.relationshipsFile}`));
-      if (result.cypherFile) console.log(chalk.green(`  Cypher file: ${result.cypherFile}`));
+      if (isDryRun(options)) {
+        console.log(chalk.yellow('[DRY RUN] Would export to Neo4j'));
+        console.log(chalk.yellow(`  Format: ${options.format}`));
+        console.log(chalk.yellow(`  Output directory: ${resolve(process.cwd(), options.output)}`));
+      } else {
+        ensureDirectory(options.output);
+        const outputDir = resolve(process.cwd(), options.output);
+        const { Neo4jExporter } = await import('./Neo4jExporter.js');
+        const exporter = new Neo4jExporter(extension.graph);
+        const result = exporter.export({
+          outputDir: outputDir,
+          format: options.format as 'csv' | 'cypher',
+          includeContent: true,
+          includeAllAttributes: true,
+        });
+        console.log(chalk.green(`Exported to Neo4j ${options.format} format`));
+        console.log(chalk.green(`  Nodes: ${result.nodeCount}`));
+        console.log(chalk.green(`  Relationships: ${result.relationshipCount}`));
+        if (result.nodesFile) console.log(chalk.green(`  Nodes file: ${result.nodesFile}`));
+        if (result.relationshipsFile) console.log(chalk.green(`  Relationships file: ${result.relationshipsFile}`));
+        if (result.cypherFile) console.log(chalk.green(`  Cypher file: ${result.cypherFile}`));
+      }
     } catch (error: any) {
       console.error(chalk.red('Export error:', error.message));
       process.exit(1);

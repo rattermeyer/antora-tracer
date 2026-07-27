@@ -469,5 +469,8 @@ export type { Item, ItemRelationship } from './types.js';
 // Exporters
 export { Neo4jExporter, type Neo4jExportOptions, type Neo4jExportResult } from './Neo4jExporter.js';
 
+// Matrix Generator
+export { MatrixGenerator, type MatrixGeneratorOptions, type MatrixConfig, type GeneratedMatrix, type MatrixRow, type MatrixCell } from './MatrixGenerator.js';
+
 // Config loader
 export { ConfigLoader, loadConfig } from './config/TraceabilityConfig.js';

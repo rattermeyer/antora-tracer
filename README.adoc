@@ -105,6 +105,118 @@ npx antora antora-playbook.yml
 
 Open `_site/traceability/index.html` — you'll find matrices and a coverage report.
 
+'''
+
+== Complete Example
+
+Here's a complete traceability example showing requirements, design, implementation, and tests:
+
+[source,asciidoc]
+----
+= My Project Documentation
+
+== Requirements
+
+[#REQ-001, item, role=requirement, title="User Authentication"]
+----
+The system SHALL authenticate users via secure credentials.
+
+Authentication MUST support:
+- Username/password
+- Multi-factor authentication
+- Session management with timeout
+----
+
+[#REQ-002, item, role=requirement, title="Password Recovery"]
+----
+The system SHALL allow users to recover forgotten passwords.
+
+Password recovery MUST:
+- Send secure email with time-limited link
+- Require current password for email changes
+- Log all recovery attempts
+----
+
+== Design
+
+[#DES-001, item, role=design, title="Authentication Architecture"]
+----
+JWT-based authentication with Redis session store.
+
+addresses:REQ-001[]
+----
+
+== Implementation
+
+[#IMP-001, item, role=implementation, title="AuthService Class"]
+----
+TypeScript implementation of the authentication service.
+
+implements:DES-001[]
+----
+
+[#IMP-002, item, role=implementation, title="PasswordResetService"]
+----
+Handles password recovery workflow.
+
+implements:DES-001[]
+addresses:REQ-002[]
+----
+
+== Tests
+
+[#TEST-001, item, role=test, title="Authentication Unit Tests"]
+----
+Jest unit tests for AuthService.
+
+verifies:REQ-001[]
+tests:IMP-001[]
+----
+
+[#TEST-002, item, role=test, title="Password Recovery Integration Tests"]
+----
+Integration tests for password recovery flow.
+
+verifies:REQ-002[]
+tests:IMP-002[]
+----
+----
+
+This generates a traceability matrix showing which requirements are addressed by designs, implemented by code, and tested.
+
+'''
+
+== Features
+
+[cols="1,2,5", options="header"]
+|===
+| Feature | Category | Description
+
+| Single Macro | Syntax | One `[item]` macro for all traceable artifacts (requirements, designs, implementations, tests, etc.)
+
+| Role-Based | Architecture | Define your own roles instead of being limited to predefined types
+
+| Configurable | Relations | Specify which relationship types are valid between roles
+
+| Matrix Generation | Output | Generate HTML, CSV, or JSON traceability matrices
+
+| Coverage Reports | Output | Visual coverage reports showing traceability completeness
+
+| Neo4j Export | Integration | Export to Neo4j CSV or Cypher format for graph analysis
+
+| Preset System | Configuration | Built-in presets for common domains (requirements engineering, agile, medical IEC 62304)
+
+| Antora Integration | Integration | Seamless integration with Antora documentation pipeline
+
+| CLI Tool | Tooling | Command-line interface for processing, validation, and export
+
+| Validation | Quality | Validate traceability graph for orphaned items, missing coverage, circular references
+
+| Path Finding | Analysis | Find paths between items in the traceability graph
+
+| Impact Analysis | Analysis | Determine all items affected by a change (forward and reverse)
+
+|===
 
 '''
 

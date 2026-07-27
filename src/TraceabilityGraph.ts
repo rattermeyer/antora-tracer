@@ -527,27 +527,41 @@ export class TraceabilityGraph {
   // ========================================================================
 
   /**
-   * Finds a path between two item IDs using depth-limited DFS
+   * Finds a path between two item IDs using depth-limited DFS (iterative)
+   * Uses iterative approach with explicit stack to avoid recursion limits
    */
   findPath(fromId: string, toId: string, maxDepth: number = 5): string[] | null {
-    return this.findPathRecursive(fromId, toId, [], maxDepth);
-  }
+    if (fromId === toId) return [fromId];
+    if (maxDepth < 0) return null;
 
-  private findPathRecursive(
-    currentId: string,
-    targetId: string,
-    visited: string[],
-    maxDepth: number,
-  ): string[] | null {
-    if (visited.length > maxDepth || visited.includes(currentId)) return null;
+    // Stack entries: { currentId, path, depth }
+    const stack: { currentId: string; path: string[]; depth: number }[] = [
+      { currentId: fromId, path: [fromId], depth: 0 }
+    ];
+    const visited = new Set<string>([fromId]);
 
-    const path = [...visited, currentId];
-    if (currentId === targetId) return path;
+    while (stack.length > 0) {
+      const { currentId, path, depth } = stack.pop()!;
 
-    for (const rel of this.getRelationships(currentId)) {
-      const found = this.findPathRecursive(rel.targetId, targetId, path, maxDepth);
-      if (found) return found;
+      if (depth > maxDepth) continue;
+
+      if (currentId === toId) return path;
+
+      // Push neighbors in reverse order to maintain DFS order (last relationship first)
+      const relationships = this.getRelationships(currentId);
+      for (let i = relationships.length - 1; i >= 0; i--) {
+        const rel = relationships[i];
+        if (!visited.has(rel.targetId)) {
+          visited.add(rel.targetId);
+          stack.push({
+            currentId: rel.targetId,
+            path: [...path, rel.targetId],
+            depth: depth + 1
+          });
+        }
+      }
     }
+
     return null;
   }
 
