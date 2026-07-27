@@ -8,36 +8,39 @@
 
 A role-based traceability extension for Antora. Define traceability items with a single `[item]` macro, configure your own roles and relations, and let Antora generate matrices, coverage reports, and Neo4j exports — all driven by your domain model, not ours.
 
+I am still experimenting with some aspects, so use at your own risk until it reaches 1.0.
+But I am very much intersted in your feedback and ideas.
+
 toc::[]
 
----
+'''
 
 == How It Works
 
 [listing]
 ....
-                            ┌───────────────────────┐
-                            │   traceability.yml     │
-                            │  (your domain model)   │
-  .adoc files               │                       │          Generated artifacts
- ┌──────────────────┐       │  roles:               │       ┌──────────────────────────┐
- │ [#REQ-001, item, │       │  relations:           │       │  traceability/            │
- │  role=requirement]│──────▶│  matrices:            │──────▶│    matrix-*.html          │
- │ --               │       └───────────┬───────────┘       │    matrix-*.csv           │
- │ Req content      │                   │                   │    coverage.html          │
- │ --               │                   │                   │    neo4j/nodes.csv        │
- │                  │       ┌───────────▼───────────┐       │    neo4j/relationships.csv│
- │ [#IMP-001, item, │       │    Antora Extension    │       └──────────────────────────┘
- │  role=impl]      │       │                        │
- │ --               │       │  parse → validate     │
- │ impl:REQ-001[]   │──────▶│  → graph → generate   │
- │ --               │       │                        │
- └──────────────────┘       └────────────────────────┘
+                             ┌────────────────────────┐
+                             │   traceability.yml     │
+                             │  (your domain model)   │
+  .adoc files                │                        │          Generated artifacts
+ ┌───────────────────┐       │  roles:                │       ┌───────────────────────────┐
+ │ [#REQ-001, item,  │       │  relations:            │       │  traceability/            │
+ │  role=requirement]│──────▶│  matrices:             │──────▶│    matrix-*.html          │
+ │ --                │       └───────────┬────────────┘       │    matrix-*.csv           │
+ │ Req content       │                   │                    │    coverage.html          │
+ │ --                │                   │                    │    neo4j/nodes.csv        │
+ │                   │       ┌───────────▼───────────┐        │    neo4j/relationships.csv│
+ │ [#IMP-001, item,  │       │    Antora Extension   │        └───────────────────────────┘
+ │  role=impl]       │       │                       │
+ │ --                │       │  parse → validate     │
+ │ impl:REQ-001[]    │──────▶│  → graph → generate   │
+ │ --                │       │                       │
+ └───────────────────┘       └───────────────────────┘
 ....
 
 Your AsciiDoc files use the `[item]` macro. The Antora extension picks them up during `contentClassified`, processes them against your traceability configuration (roles, relations, matrices), and generates matrices, coverage reports, and optional Neo4j CSV exports into your site's `traceability/` directory.
 
----
+'''
 
 == Quick Start
 
@@ -102,7 +105,8 @@ npx antora antora-playbook.yml
 
 Open `_site/traceability/index.html` — you'll find matrices and a coverage report.
 
----
+
+'''
 
 == The `[item]` Macro
 
@@ -159,7 +163,7 @@ tests:IMP-001[]
 
 The valid relation types and which roles they're allowed between are defined in your traceability configuration.
 
----
+'''
 
 == Configuration
 
@@ -266,7 +270,7 @@ traceability:
 
 Each relation is directional: `source → target` with an allowed set of types. The extension validates every relationship at processing time — if you write `verifies:REQ-001[]` from a `document` but your config only allows `impl → requirement` with `[satisfies]`, you'll get a clear error message.
 
----
+'''
 
 == CLI
 
@@ -286,7 +290,7 @@ npx antora-req-trace validate
 
 Additional commands: `export neo4j` (CSV/Cypher), `stats` (role statistics), `preset` (list/show/init).
 
----
+'''
 
 == Presets
 
@@ -317,7 +321,7 @@ List available presets: `npx antora-req-trace preset list`
 
 Initialize a config from one: `npx antora-req-trace preset init --name medical-iec62304 -o ./config/`
 
----
+'''
 
 == Generated Artifacts
 
@@ -348,14 +352,14 @@ After a build, you'll find in `<site-output>/traceability/`:
 
 *Coverage* is calculated per-matrix based on `coverageRelations` in your config. Each row item gets a status badge: ✓ Complete (100%), ◐ Partial, or ✗ Missing (0%).
 
----
+'''
 
 == Documentation
 
 * https://rattermeyer.github.io/antora-tracer[User Guide] — Full reference: macros, relations, CLI, presets
 * https://rattermeyer.github.io/antora-tracer[Developer Guide] — API, architecture, contributing, testing
 
----
+'''
 
 == Development
 
@@ -363,7 +367,7 @@ This project is developed using *spec-driven development* with https://openspec.
 
 Every feature, fix, and refactor starts as a proposal with specs, design, and tasks in the `openspec/changes/` directory. The archive at `openspec/changes/archive/` preserves the complete history of every change.
 
----
+'''
 
 == Contributing
 
@@ -376,7 +380,7 @@ npm install
 npm test        # 194 tests
 ----
 
----
+'''
 
 == License
 
