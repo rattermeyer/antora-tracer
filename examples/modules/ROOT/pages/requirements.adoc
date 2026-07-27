@@ -13,7 +13,7 @@ Related specs: `unified-item-macro/spec.md`
 
 Source: OpenSpec specification — Scenario: Define a requirement using `[item, id=REQ-001, role=requirement]`
 --
-
+{empty}
 [item, id=REQ-002, role=requirement, title="`item` macro accepts role attribute"]
 --
 The `[item]` macro SHALL accept a `role` attribute that specifies the type of traceable artifact. Items without a `role` attribute receive the default role `unknown` with a warning.
