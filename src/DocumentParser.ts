@@ -429,16 +429,25 @@ export class DocumentParser {
   }
 
   private extractBlock(content: string, startIndex: number): string | null {
-    const blockStart = content.indexOf('====', startIndex);
+    // Find opening delimiter: ==== or --
+    let blockStart = content.indexOf('====', startIndex);
+    let delimiter = '====';
+    if (blockStart === -1) {
+      blockStart = content.indexOf('--', startIndex);
+      delimiter = '--';
+    }
     if (blockStart === -1) return null;
-    const blockEnd = content.indexOf('====', blockStart + 4);
+    const blockEnd = content.indexOf(delimiter, blockStart + delimiter.length);
     if (blockEnd === -1) return null;
-    return content.substring(startIndex, blockEnd + 4);
+    return content.substring(startIndex, blockEnd + delimiter.length);
   }
 
   private extractBody(block: string): string {
-    const start = block.indexOf('====') + 4;
-    const end = block.lastIndexOf('====');
+    // Find the delimiter: either ==== or --
+    const hasEquals = block.includes('====');
+    const delimiter = hasEquals ? '====' : '--';
+    const start = block.indexOf(delimiter) + delimiter.length;
+    const end = block.lastIndexOf(delimiter);
     return block.substring(start, end).trim();
   }
 
