@@ -602,6 +602,8 @@ export class TraceabilityGraph {
    * Merge another graph into this one
    */
   merge(other: TraceabilityGraph): void {
+    this._allItemsCache = null;
+    this._allRelationshipsCache = null;
     for (const item of other.getAllItems()) {
       this.addItem({ ...item });
     }

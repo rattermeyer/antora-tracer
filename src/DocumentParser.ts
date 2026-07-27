@@ -76,9 +76,12 @@ export class DocumentParser {
    * Returns items with roles and relationships.
    */
   parse(content: string, sourceFile?: string): ParserResult {
-    if (sourceFile) {
-      this.currentFile = sourceFile;
+    // Validate input
+    if (typeof content !== 'string') {
+      throw new TypeError('Content must be a string');
     }
+
+    this.currentFile = sourceFile?.trim() || 'unknown';
 
     this.warnings = [];
     this.errors = [];

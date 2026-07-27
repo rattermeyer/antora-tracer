@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 
 import { program } from 'commander';
-import { createWriteStream, writeFileSync, mkdirSync } from 'fs';
-import { readFileSync, existsSync, readdirSync, statSync } from 'fs';
-import { resolve, dirname } from 'path';
+import { createWriteStream, writeFileSync, mkdirSync, readFileSync, existsSync, readdirSync, statSync } from 'fs';
+import { resolve, dirname, sep } from 'path';
 import { fileURLToPath } from 'url';
 import chalk from 'chalk';
 
@@ -50,6 +49,18 @@ async function createExtension(options: any) {
 
 function ensureDirectory(dir: string) {
   const fullPath = resolve(process.cwd(), dir);
+
+  // Validate path is within project directory
+  const projectRoot = process.cwd();
+  const normalizedPath = resolve(fullPath);
+  const normalizedProjectRoot = resolve(projectRoot);
+
+  if (!normalizedPath.startsWith(normalizedProjectRoot + sep) &&
+      normalizedPath !== normalizedProjectRoot) {
+    console.error(chalk.red(`Error: Output path escapes project directory: ${dir}`));
+    process.exit(1);
+  }
+
   if (!existsSync(fullPath)) {
     mkdirSync(fullPath, { recursive: true });
   }
@@ -61,6 +72,18 @@ function ensureDirectory(dir: string) {
  */
 function collectAdocFiles(inputPath: string): { path: string; content: string }[] {
   const resolvedPath = resolve(process.cwd(), inputPath);
+
+  // Validate path is within project directory to prevent path traversal
+  const projectRoot = process.cwd();
+  const normalizedPath = resolve(resolvedPath);
+  const normalizedProjectRoot = resolve(projectRoot);
+
+  if (!normalizedPath.startsWith(normalizedProjectRoot + sep) &&
+      normalizedPath !== normalizedProjectRoot) {
+    console.error(chalk.red(`Error: Path escapes project directory: ${inputPath}`));
+    process.exit(1);
+  }
+
   if (!existsSync(resolvedPath)) {
     console.error(chalk.red(`Error: Input not found: ${inputPath}`));
     process.exit(1);

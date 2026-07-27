@@ -177,7 +177,7 @@ export class ConfigLoader {
     }
 
     // Validate the final configuration
-    this.validateConfig(this.config);
+    this.validateConfig(this.config, this.configPath || 'configuration');
 
     return this.config;
   }
@@ -290,7 +290,7 @@ export class ConfigLoader {
   /**
    * Validate configuration structure
    */
-  private validateConfig(config: CompleteConfig): void {
+  private validateConfig(config: CompleteConfig, context: string = 'configuration'): void {
     const errors: string[] = [];
 
     // Must have at least one role
@@ -363,8 +363,9 @@ export class ConfigLoader {
     }
 
     if (errors.length > 0) {
+      const prefix = context ? `Configuration '${context}':` : 'Configuration';
       throw new Error(
-        `Invalid traceability configuration:\n${errors.map(e => `  - ${e}`).join('\n')}`
+        `${prefix}\n${errors.map(e => `  - ${e}`).join('\n')}`
       );
     }
   }
@@ -449,7 +450,7 @@ export class ConfigLoader {
 
     // Validate the traceability config within the preset
     try {
-      this.validateConfig(p.traceability as CompleteConfig);
+      this.validateConfig(p.traceability as CompleteConfig, `preset '${p.name}'`);
     } catch (error: unknown) {
       const err = error as Error;
       throw new Error(`Invalid preset '${p.name}' configuration: ${err.message}`);
