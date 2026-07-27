@@ -61,7 +61,6 @@ export class AntoraTraceabilityExtension {
   private traceability: RequirementsTraceabilityExtension | null = null;
   private config: Required<AntoraTraceabilityConfig>;
   private readonly logger: ReturnType<AntoraExtensionContext['getLogger']>;
-  private itemsWithLinksMacro = new Set<string>();
 
   constructor(private readonly context: AntoraExtensionContext) {
     this.logger = context.getLogger('requirements-traceability');
@@ -217,8 +216,6 @@ export class AntoraTraceabilityExtension {
           replacements.push({ start: macroStart, end: macroEnd, text: '' });
           continue;
         }
-        this.itemsWithLinksMacro.add(itemId);
-
         const rels = this.traceability.graph.getRelationships(itemId);
         if (rels.length === 0) {
           replacements.push({ start: macroStart, end: macroEnd, text: '' });
@@ -328,7 +325,6 @@ export class AntoraTraceabilityExtension {
       }
 
       // Pass 2: Expand traceability:links[] macros
-      this.itemsWithLinksMacro.clear();
       for (const file of adocFiles) {
         this.expandLinksMacros(file);
       }
@@ -423,29 +419,18 @@ export class AntoraTraceabilityExtension {
 
     const docAttrs = this.parseDocAttributes(content);
     const linksEnabled = this.isLinksEnabled(docAttrs);
-    const suppressItems = this.itemsWithLinksMacro;
-
     const relRegex = /\b(\w+):([\w][-.\w]*)\[\]/g;
 
-    return content.replace(relRegex, (_match: string, _relType: string, targetId: string, matchPos: number) => {
+    return content.replace(relRegex, (_match: string, _relType: string, targetId: string) => {
+      // When :traceability-links: is enabled, inline macros are invisible —
+      // they are pure data markers. traceability:links[] is the only renderer.
+      if (linksEnabled) return '';
+
       const relType = _relType;
       const target = this.traceability!.graph.getItem(targetId);
 
       if (!target) {
         return _match;
-      }
-
-      // If links macro is active, suppress inline macros inside items that have traceability:links[]
-      if (linksEnabled && suppressItems.size > 0) {
-        const before = content.slice(0, matchPos);
-        const itemMatch = before.match(/\[#([^,\]]+),\s*item[^\]]*\]/g);
-        if (itemMatch) {
-          const lastItem = itemMatch[itemMatch.length - 1];
-          const idMatch = lastItem.match(/\[#([^,\]]+),/);
-          if (idMatch && suppressItems.has(idMatch[1])) {
-            return '';
-          }
-        }
       }
 
       if (target.sourceFile === currentFile) {
