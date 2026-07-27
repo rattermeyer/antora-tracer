@@ -2,8 +2,8 @@
 
 Generated traceability artifacts for the Antora Tracer project.
 
-* link:attachment$traceability/matrix-requirements-coverage.html[Requirements Coverage Matrix] — Cross-references all 36 requirements against architecture sections and test files
-* link:attachment$traceability/matrix-requirements-coverage.csv[Requirements Coverage CSV] — Same data in CSV format
+* link:../_attachments/traceability/matrix-requirements-coverage.html[Requirements Coverage Matrix] — Cross-references all 36 requirements against architecture sections and test files
+* link:../_attachments/traceability/matrix-requirements-coverage.csv[Requirements Coverage CSV] — Same data in CSV format
 
 [NOTE]
 ====
