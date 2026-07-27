@@ -2,69 +2,84 @@
 
 ## Context
 
-The `DocumentParser` extracts inline relationship macros (`addresses:REQ-001[]`) from `[item]` block content and stores them as `ItemRelationship` objects in the `TraceabilityGraph`. Asciidoctor renders the macro text as-is — it has no knowledge of the traceability graph. The result is plain text in the HTML output.
+The `DocumentParser` extracts inline relationship macros (`addresses:REQ-001[]`) from `[item]` block content and stores them as `ItemRelationship` objects in the `TraceabilityGraph`. Asciidoctor renders the macro text as-is — it has no knowledge of the traceability graph.
 
-We need to bridge the gap: make the rendered text clickable without modifying Asciidoctor's rendering pipeline.
+We need to make the rendered text navigable. The approach must work for both HTML output (via Antora's default site generator) and PDF output (via `@antora/pdf-extension`).
 
 ## Goals / Non-Goals
 
 **Goals:**
-- Render `<relation-type>:<TARGET-ID>[]` as clickable links in Antora page HTML
-- Links navigate to the target item's source page with an anchor id
+- Render `addresses:REQ-001[]` as clickable links in HTML and PDF
+- Links navigate to the target item within the same page or to the target item's source page
 - Work within the existing Antora extension event pipeline
+- No changes to on-disk `.adoc` files
 - No changes to the parser, graph, or configuration system
 
 **Non-Goals:**
 - Asciidoctor inline macro registration (project moved away from Asciidoctor.js extension API)
-- Multi-target syntax (`addresses:REQ-001,REQ-002[]`) — handle as future enhancement
 - Cross-component linking (items in different Antora components)
-- Styling the links (leave to the UI theme)
+- Multi-target syntax (`addresses:REQ-001,REQ-002[]`) — handle as future enhancement
 
-## Decision: HTML Post-Processing in Page Processor
+## Decision: In-Memory Source Substitution Before Rendering
 
-**Decision**: After Asciidoctor renders each `.adoc` page to HTML, regex-replace relationship text patterns with anchor links using data from the `TraceabilityGraph`.
+**Decision**: Modify the Antora content catalog entries in-memory during `contentClassified`, replacing relationship macro text with Asciidoctor cross-references before the page is rendered by either the HTML or PDF pipeline.
 
-**Where**: `AntoraTraceabilityExtension.registerPageProcessor()` — this is the existing hook that runs after page rendering.
+**Where**: `AntoraTraceabilityExtension` — in the `contentClassified` event handler, after the parser extracts relationships but before Asciidoctor renders.
 
-**When**: After the page is rendered but before it's written to the site output. The `contentClassified` event has already populated the graph with items and their `sourceFile` paths, so the data is available.
+**When**: `contentClassified` fires after the content catalog is populated but before pages are rendered. This is the same event where we currently process items. We add a substitution step after processing.
 
 **How**:
 
 ```
-Page render pipeline:
-  AsciiDoc content
-    → Asciidoctor renders to HTML
-    → Page processor hook
-      → Post-process HTML: regex replace relationship patterns with <a> links
-    → Final HTML written to output
+contentClassified event
+  │
+  ├─ Extension finds all .adoc pages in content catalog
+  │
+  ├─ For each page:
+  │    ├─ DocumentParser.process(content) → graph
+  │    ├─ For each item in the page:
+  │    │    └─ Scan item content for "word:TARGET-ID[]" patterns
+  │    │       Replace with Asciidoctor anchor xref
+  │    │
+  │    └─ Update content catalog entry with modified content
+  │         (in-memory only, .adoc file unchanged)
+  │
+  ▼
+Asciidoctor renders modified content
+  ├─ HTML: xref → <a href="page.html#REQ-001">REQ-001</a>
+  └─ PDF:  xref → internal link to target element
 ```
 
-**Regex pattern to match**: `/addresses:([A-Z]+-\d+)\[\]/g` — captures the relation type and target ID. Generalized: `/(\w+):([A-Za-z]+[-.\w]*)\[\]/g`
+**Substitution format**:
 
-**Replacement**: Look up the target item in the graph via `graph.getItem(targetId)`. If found and has a `sourceFile`, construct a relative URL: `<sourceFile-without-.adoc>.html#<targetId>`. If not found (orphan reference), leave the text unchanged.
+Since the target item may be on a different page, we use an Asciidoctor xref with an anchor. When the target item IS on the same page, a fragment-only xref suffices:
 
-**Link HTML**:
-```html
-<a href="requirements.html#REQ-001" class="traceability-link">REQ-001</a>
-```
+- Same page: `xref:#REQ-001[REQ-001]`
+- Different page: `xref:requirements.adoc#REQ-001[REQ-001]`
 
-The `<em>` tags Asciidoctor wraps around the relation type text are preserved; only the `TARGET-ID[]` portion becomes a link.
+The xref references the item's `id` as an anchor. Asciidoctor needs an anchor for the xref to resolve. Each `[item]` block rendered by Asciidoctor produces a block with `id="REQ-001"` in the HTML. For PDF, Asciidoctor resolves the xref to a page number or internal link.
+
+**Anchor handling**: The `[item]` macro renders as an Asciidoctor block (`====`) which automatically gets an `id` attribute. Asciidoctor treats `xref:#id[...]` as a cross-reference to a block with that id. When the item is on a different page, the xref includes the page path.
+
+If the target item is not in the graph (orphan reference), leave the text unchanged.
 
 **Rationale**:
-- Lightest touch — no new parser, no Asciidoctor extension API
-- Works within existing event pipeline
-- Graph data is already available (populated by `contentClassified` before page processing)
-- Fallback safe: if a target can't be resolved, text is left unchanged
+- Works for both HTML and PDF — source-level transformation is format-agnostic
+- No disk writes — modifications are in-memory
+- Lightest touch — no new parser, no Asciidoctor extension API, no post-processing
+- Uses existing event pipeline (contentClassified already processes content)
 
 **Alternatives Considered**:
-- **Asciidoctor inline macro extension**: Cleaner semantics but requires Asciidoctor.js extension API which the project deliberately moved away from (manual parsing is simpler and version-independent)
-- **DocumentParser pre-processing**: Replace macros with AsciiDoc xrefs before Asciidoctor renders. Requires knowing page-to-item mappings at parse time and modifying item content before rendering
-- **Client-side JavaScript**: Doesn't require backend changes but adds JS dependency and breaks without JS enabled
+- **HTML post-processing** (rejected): Would not work for PDF output. The PDF pipeline has no HTML step to hook into.
+- **Asciidoctor inline macro extension**: Cleaner semantics but requires Asciidoctor.js extension API which the project moved away from (manual parsing is simpler and version-independent)
+- **Client-side JavaScript**: Doesn't require backend changes but adds JS dependency, breaks without JS, and doesn't work for PDF
 
 ## Risks / Trade-offs
 
-**[Risk] Regex false positives** — a user might write `addresses:XYZ-001[]` in a paragraph that isn't a traceability item. Mitigation: only post-process within `[item]` blocks. The page processor can target item content specifically.
+**[Risk] Xref resolution failure** — if the target item's page is not in the content catalog or the xref format is wrong, Asciidoctor will log a warning and render the text as-is. Mitigation: test with the example site which has known cross-page references.
 
-**[Risk] Source file path resolution** — the `sourceFile` field contains the file path as recorded during processing. In Antora, this might be a virtual path that needs mapping to an output URL. Mitigation: use the page's component context to construct the correct URL.
+**[Risk] Content catalog modification side effects** — modifying content entries in-memory could affect subsequent processing steps. Mitigation: only modify item content within known `[item]` blocks, not arbitrary page content.
 
-**[Trade-off] Post-processing vs inline macro** — Post-processing is simpler but less semantically clean than a real Asciidoctor inline macro. The trade-off is pragmatic: we get working links without depending on Asciidoctor.js extension API.
+**[Risk] Anchor naming** — the item `id` must match the HTML element `id` produced by Asciidoctor. The `[item]` macro's `id` attribute becomes the target of `xref:#id[]`. Verify this mapping is correct.
+
+**[Trade-off] In-memory mutation vs immutability** — the content catalog is modified in-place rather than through a clean transformation pipeline. This is pragmatic: the Antora extension API provides catalog access but not a pure content transformation hook.

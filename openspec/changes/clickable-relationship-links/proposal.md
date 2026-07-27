@@ -2,32 +2,40 @@
 
 ## Why
 
-Inline relationship macros (`addresses:REQ-001[]`, `verifies:REQ-001[]`) appear as plain text in the rendered Antora site. Users reading architecture documents or test plans can't click through to see the referenced requirement. The traceability graph knows all the relationships, but the rendered HTML doesn't connect them.
+Inline relationship macros (`addresses:REQ-001[]`, `verifies:REQ-001[]`) appear as plain text in the rendered Antora site and PDF output. Users reading architecture documents or test plans can't click through to see the referenced requirement. The traceability graph knows all the relationships, but the rendered output doesn't connect them.
 
-This makes the example site less useful as a demonstration and prevents users from navigating traceability links in their own documentation.
+This makes the example site less useful as a demonstration and prevents users from navigating traceability links in their own documentation — whether browsing HTML or reading a PDF.
 
 ## What Changes
 
-- **New**: Render inline relationship macros as clickable HTML links during the Antora extension's page processing
-- **New**: Links navigate to the target item's source page with an anchor (e.g., `<a href="requirements.html#REQ-001">REQ-001</a>`)
-- **Modified**: `AntoraTraceabilityExtension` page processor to post-process rendered HTML and replace relationship text with links
+- **New**: Transform inline relationship macros into Asciidoctor xrefs in-memory during the Antora extension pipeline
+- **New**: `addresses:REQ-001[]` becomes `xref:REQ-001[]` (or equivalent) before Asciidoctor renders the page
+- **Modified**: `AntoraTraceabilityExtension` to add a content substitution step after parsing but before rendering
 
 ### How It Works
 
-The extension already processes every `.adoc` page during `contentClassified`. After the page is rendered to HTML, a post-processing step scans for `<em>addresses</em>:REQ-001[]<em></em>` patterns (how Asciidoctor renders inline text) and replaces them with anchor links to the target item's page.
+The extension already processes every `.adoc` page during `contentClassified`. After extracting relationships from item content, it modifies the in-memory content catalog entry — replacing relationship macros with Asciidoctor cross-references. The `.adoc` file on disk is never touched.
 
-The DocumentParser already stores `sourceFile` on every item during `contentClassified`, so the target page URL is known:
+Because the transformation happens at the source level (before rendering), it works for both HTML and PDF output:
 
 ```
-addresses:REQ-001[]  →  graph.getItem('REQ-001').sourceFile
-                       →  "requirements.adoc"
-                       →  <a href="requirements.html#REQ-001" class="traceability-link">REQ-001</a>
+Content Classified event
+  │
+  ├─ DocumentParser extracts relationships → graph
+  ├─ Replace "addresses:REQ-001[]" with "xref:#REQ-001[REQ-001]" in-memory
+  │
+  ▼
+Asciidoctor renders modified source
+  ├─ HTML: xref → <a href="requirements.html#REQ-001">REQ-001</a>
+  └─ PDF:  xref → internal link / page number
 ```
+
+The DocumentParser already stores the relationship in the graph. The substitution is cosmetic — it only affects how Asciidoctor renders the text, not the traceability data.
 
 ### Impact
 
-- **Code**: Light touch — add HTML post-processing in the page processor
-- **API**: No breaking changes to public API
-- **Dependencies**: No new dependencies
-- **Files**: Modified `src/antora-extension.ts`, new post-processor logic
-- **User Impact**: Better navigation in Antora sites using the extension
+- **Code**: Light touch — content substitution in `AntoraTraceabilityExtension`
+- **API**: No breaking changes
+- **Dependencies**: None
+- **Files**: Modified `src/antora-extension.ts`
+- **User Impact**: Clickable traceability links in both HTML and PDF output
