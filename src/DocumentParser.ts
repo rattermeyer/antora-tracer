@@ -168,8 +168,8 @@ export class DocumentParser {
     result: ParserResult,
   ): void {
     // Parse items with explicit IDs: [item, id=XXX, role=YYY]
-    // This regex matches [item, ...] with various attributes
-    const itemRegex = /\[item,([^\]]*)\]/g;
+    // Only match [item at line start to avoid matching inline backtick references
+    const itemRegex = /^\[item,([^\]]*)\]/gm;
     let match: RegExpExecArray | null;
 
     while ((match = itemRegex.exec(content)) !== null) {
