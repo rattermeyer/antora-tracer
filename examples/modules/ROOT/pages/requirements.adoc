@@ -1,4 +1,8 @@
 = Requirements
+:traceability-links: true
+:traceability-style: list
+:traceability-order: target-id
+:traceability-collapsible: true
 :req-id-prefix: REQ
 
 This document lists the traceability requirements for the Antora Tracer extension. Each requirement is extracted from the OpenSpec specifications under `openspec/changes/unified-item-architecture/specs/`.
@@ -12,6 +16,10 @@ The system SHALL use a single `[item]` block macro to define all traceable artif
 Related specs: `unified-item-macro/spec.md`
 
 Source: OpenSpec specification — Scenario: Define a requirement using `[#REQ-001, item, role=requirement]`
+
+traceability:outgoing[]
+
+traceability:incoming[]
 --
 {empty}
 [#REQ-002, item, role=requirement, title="`item` macro accepts role attribute"]
@@ -19,6 +27,9 @@ Source: OpenSpec specification — Scenario: Define a requirement using `[#REQ-0
 The `[item]` macro SHALL accept a `role` attribute that specifies the type of traceable artifact. Items without a `role` attribute receive the default role `unknown` with a warning.
 
 Related specs: `unified-item-macro/spec.md`
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-003, item, role=requirement, title="`item` macro maintains existing attributes"]
@@ -26,6 +37,9 @@ Related specs: `unified-item-macro/spec.md`
 The `[item]` macro SHALL support the attributes `id`, `title`, `status`, and any custom attributes. The `title` defaults to the item's `id` if omitted. The `status` field is free-form.
 
 Related specs: `unified-item-macro/spec.md`
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-004, item, role=requirement, title="`item` macro supports block content"]
@@ -33,6 +47,9 @@ Related specs: `unified-item-macro/spec.md`
 The `[item]` macro SHALL accept block content between `====` delimiters as the artifact description. Multi-line content and AsciiDoc formatting within the block SHALL be preserved.
 
 Related specs: `unified-item-macro/spec.md`
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-005, item, role=requirement, title="Old macro syntax generates deprecation error"]
@@ -49,6 +66,9 @@ Related specs: `unified-item-macro/spec.md`
 The system SHALL read roles from a YAML configuration file. Items with roles not in this list receive warnings. An empty roles list generates an error.
 
 Related specs: `configuration-system/spec.md`
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-007, item, role=requirement, title="Configuration defines relations"]
@@ -56,6 +76,9 @@ Related specs: `configuration-system/spec.md`
 The system SHALL read relation definitions from configuration as a nested structure: `source_role → target_role → [allowed_types]`. Each entry defines which relation types are valid from one role to another.
 
 Related specs: `configuration-system/spec.md`
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-008, item, role=requirement, title="Configuration defines matrices"]
@@ -63,6 +86,9 @@ Related specs: `configuration-system/spec.md`
 The system SHALL read matrix definitions from configuration. Each matrix specifies a `name`, `rows` role, `columns` roles, and `coverageRelations` mapping column roles to relation types that count as coverage.
 
 Related specs: `configuration-system/spec.md`
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-009, item, role=requirement, title="Configuration is required for validation"]
@@ -70,6 +96,9 @@ Related specs: `configuration-system/spec.md`
 The system SHALL require a valid configuration to perform role-based relation validation. Without a ConfigLoader, all relations are allowed (unguarded mode).
 
 Related specs: `configuration-system/spec.md`
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-010, item, role=requirement, title="Configuration file location"]
@@ -77,6 +106,9 @@ Related specs: `configuration-system/spec.md`
 The system SHALL search for `traceability.yml` or `traceability.yaml` in common locations. A custom path SHALL be specifiable via `--config` CLI flag or `configPath` playbook option.
 
 Related specs: `configuration-system/spec.md`
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-011, item, role=requirement, title="Configuration validation"]
@@ -84,6 +116,9 @@ Related specs: `configuration-system/spec.md`
 The system SHALL validate the configuration structure: roles must be non-empty strings, relation source/target roles must be in the roles list, matrix row/column roles must be in the roles list, and relation types must be arrays. Invalid configurations produce clear error messages.
 
 Related specs: `configuration-system/spec.md`
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-012, item, role=requirement, title="Configuration can extend presets"]
@@ -100,6 +135,9 @@ Related specs: `configuration-system/spec.md`
 The system SHALL validate that relations between items are allowed based on their roles as defined in configuration. Valid relations are accepted; invalid relations generate errors listing the allowed types.
 
 Related specs: `role-based-validation/spec.md`
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-014, item, role=requirement, title="Directional relation checking"]
@@ -107,6 +145,9 @@ Related specs: `role-based-validation/spec.md`
 Validation SHALL be directional: the system checks the source item's role against the target item's role. The same relation type may be valid in one direction but not the reverse.
 
 Related specs: `role-based-validation/spec.md`
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-015, item, role=requirement, title="Error messages list allowed relations"]
@@ -114,6 +155,9 @@ Related specs: `role-based-validation/spec.md`
 Error messages for invalid relations SHALL include the relation type, source role, target role, and the list of allowed relation types between those roles.
 
 Related specs: `role-based-validation/spec.md`
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-016, item, role=requirement, title="Warnings for unknown roles"]
@@ -121,6 +165,9 @@ Related specs: `role-based-validation/spec.md`
 The system SHALL generate warnings (not errors) when relations involve items with unknown roles. This enables graceful degradation and incremental role adoption.
 
 Related specs: `role-based-validation/spec.md`
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-017, item, role=requirement, title="Graceful degradation for unknown roles"]
@@ -137,6 +184,9 @@ Related specs: `role-based-validation/spec.md`
 The system SHALL ship with built-in preset configurations: `requirements-engineering`, `agile`, `medical-iec62304`, and `minimal`. Users SHALL be able to list and inspect presets via CLI.
 
 Related specs: `preset-system/spec.md`
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-019, item, role=requirement, title="Each preset contains complete configuration"]
@@ -144,6 +194,9 @@ Related specs: `preset-system/spec.md`
 Each preset SHALL contain `roles`, `relations`, and `matrices` definitions that form a valid, loadable configuration. Presets with invalid configuration are rejected at load time.
 
 Related specs: `preset-system/spec.md`
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-020, item, role=requirement, title="Each preset includes documentation"]
@@ -151,6 +204,9 @@ Related specs: `preset-system/spec.md`
 Each preset SHALL include a human-readable description, domain explanation, and example AsciiDoc snippets demonstrating typical usage.
 
 Related specs: `preset-system/spec.md`
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-021, item, role=requirement, title="Each preset includes Neo4j Cypher queries"]
@@ -158,6 +214,9 @@ Related specs: `preset-system/spec.md`
 Each preset SHALL include a `neo4j.queries` section with named Cypher queries relevant to the domain, such as uncovered requirements, coverage summaries, and traceability chains.
 
 Related specs: `preset-system/spec.md`
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-022, item, role=requirement, title="Presets have independent versioning"]
@@ -165,6 +224,9 @@ Related specs: `preset-system/spec.md`
 Presets SHALL have version numbers independent of the extension version, following semantic versioning. A `minExtensionVersion` compatibility field SHALL indicate the minimum extension version required.
 
 Related specs: `preset-system/spec.md`
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-023, item, role=requirement, title="Users can define custom presets"]
@@ -181,6 +243,9 @@ Related specs: `preset-system/spec.md`
 The system SHALL export the traceability graph as `nodes.csv` and `relationships.csv` files with proper headers, comma delimiters, and escaped special characters. Files SHALL be importable via Neo4j's `LOAD CSV` command.
 
 Related specs: `neo4j-export/spec.md`
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-025, item, role=requirement, title="Neo4j Cypher export"]
@@ -188,6 +253,9 @@ Related specs: `neo4j-export/spec.md`
 The system SHALL export the traceability graph as `import.cypher` containing CREATE statements for all nodes (with `:Item` and role-specific labels) and relationships (with type-specific labels). Special characters SHALL be properly escaped.
 
 Related specs: `neo4j-export/spec.md`
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-026, item, role=requirement, title="Export command in CLI"]
@@ -195,6 +263,9 @@ Related specs: `neo4j-export/spec.md`
 The system SHALL provide an `export neo4j` CLI command supporting `--format csv` and `--format cypher` options, with configurable input and output directories.
 
 Related specs: `neo4j-export/spec.md`
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-027, item, role=requirement, title="Export includes all item attributes"]
@@ -202,6 +273,9 @@ Related specs: `neo4j-export/spec.md`
 Neo4j exports SHALL include all item attributes (id, role, title, content, status, custom attributes) as node properties. Special characters in attribute values SHALL be properly escaped.
 
 Related specs: `neo4j-export/spec.md`
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-028, item, role=requirement, title="Export is optional"]
@@ -218,6 +292,9 @@ Related specs: `neo4j-export/spec.md`
 The system SHALL generate matrices from configuration definitions, computing per-item coverage based on `coverageRelations`. Each cell SHALL show related item IDs or `—` for no relationships. Coverage SHALL be expressed as overall, complete, partial, and missing counts.
 
 Source: Design Decision 2 — Configuration-Based Roles and Relations
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-030, item, role=requirement, title="Role statistics reporting"]
@@ -225,6 +302,9 @@ Source: Design Decision 2 — Configuration-Based Roles and Relations
 The system SHALL provide `getRoleStatistics()` returning item counts per role and total relationship counts, enabling quick inspection of the traceability graph.
 
 Source: RequirementsTraceabilityExtension API
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-031, item, role=requirement, title="Graph path finding"]
@@ -232,6 +312,9 @@ Source: RequirementsTraceabilityExtension API
 The system SHALL provide BFS-based path finding between any two items in the graph via `findPath(fromId, toId, maxDepth?)`. Connected items return the path; disconnected items return null. Depth is capped by `maxDepth` (default: 5).
 
 Source: TraceabilityGraph API
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-032, item, role=requirement, title="Impact analysis"]
@@ -239,6 +322,9 @@ Source: TraceabilityGraph API
 The system SHALL provide `getImpactAnalysis(itemId)` returning all reachable items in both directions (forward and reverse relationships), excluding the source item from results.
 
 Source: TraceabilityGraph API
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-033, item, role=requirement, title="Graph merge"]
@@ -246,6 +332,9 @@ Source: TraceabilityGraph API
 The system SHALL support merging another TraceabilityGraph into the current graph via `merge()`. Items not already present are added; existing items are not duplicated. Relationships from the source graph are copied if both endpoints exist in the target graph.
 
 Source: TraceabilityGraph API
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-034, item, role=requirement, title="Mustache template rendering"]
@@ -253,6 +342,9 @@ Source: TraceabilityGraph API
 The system SHALL use Mustache templates for HTML matrix output via `TemplateRenderer`. Built-in templates SHALL be shipped; custom template directories SHALL be supported with fallback to built-ins for missing files.
 
 Source: Design Decision 4 — Mustache Templates
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-035, item, role=requirement, title="Antora extension integration"]
@@ -260,6 +352,9 @@ Source: Design Decision 4 — Mustache Templates
 The system SHALL integrate with Antora via `AntoraTraceabilityExtension`, registering for `contentClassified` (parse items) and `sitePublished` (generate matrices and coverage). Configuration SHALL be read from the Antora playbook's extension config. Disabled extensions SHALL skip initialization.
 
 Source: Antora Extension implementation
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-036, item, role=requirement, title="CLI commands"]
@@ -267,6 +362,9 @@ Source: Antora Extension implementation
 The system SHALL provide a Commander-based CLI with six subcommands: `process` (parse items), `matrix` (generate matrices), `validate` (check graph integrity), `export neo4j` (CSV/Cypher export), `stats` (role statistics), and `preset` (list/show/init). Global `--config` and `--preset` flags SHALL apply to all commands.
 
 Source: CLI implementation
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 == Matrix Item Linking
@@ -276,6 +374,9 @@ Source: CLI implementation
 The system SHALL render row item IDs as hyperlinks that navigate to the item's definition in the rendered HTML documentation.
 
 Source: openspec/specs/matrix-item-linking/spec.md
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-038, item, role=requirement, title="Matrix cell items are clickable links"]
@@ -283,6 +384,9 @@ Source: openspec/specs/matrix-item-linking/spec.md
 The system SHALL render cell item IDs as hyperlinks that navigate to the item's definition in the rendered HTML documentation. Multiple items in a cell SHALL each render as separate clickable links.
 
 Source: openspec/specs/matrix-item-linking/spec.md
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-039, item, role=requirement, title="Source file tooltips on matrix links"]
@@ -290,6 +394,9 @@ Source: openspec/specs/matrix-item-linking/spec.md
 The system SHALL display the source file name as a tooltip when users hover over item links in the matrix.
 
 Source: openspec/specs/matrix-item-linking/spec.md
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-040, item, role=requirement, title="Context-aware link generation"]
@@ -297,6 +404,9 @@ Source: openspec/specs/matrix-item-linking/spec.md
 The system SHALL generate consistent relative link paths (\`../../\`) from matrix output to component root, regardless of execution context. The LinkResolver SHALL accept a configurable \`relativePathPrefix\` option.
 
 Source: openspec/specs/matrix-item-linking/spec.md
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-041, item, role=requirement, title="Source file path normalization"]
@@ -304,6 +414,9 @@ Source: openspec/specs/matrix-item-linking/spec.md
 The system SHALL normalize item \`sourceFile\` paths by stripping any \`pages/\` prefix and \`.adoc\` extension at link resolution time, producing clean HTML paths.
 
 Source: openspec/specs/matrix-item-linking/spec.md
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-042, item, role=requirement, title="Backward compatibility without LinkResolver"]
@@ -311,6 +424,9 @@ Source: openspec/specs/matrix-item-linking/spec.md
 The system SHALL maintain existing matrix rendering behavior when no \`LinkResolver\` is provided. Items SHALL render as plain text without links, and existing matrix HTML structure SHALL be preserved.
 
 Source: openspec/specs/matrix-item-linking/spec.md
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-043, item, role=requirement, title="Non-HTML matrix outputs unchanged"]
@@ -318,29 +434,51 @@ Source: openspec/specs/matrix-item-linking/spec.md
 The system SHALL NOT modify CSV and JSON matrix outputs to include links. CSV and JSON output SHALL contain item data as before.
 
 Source: openspec/specs/matrix-item-linking/spec.md
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
-== traceability:links[] Rendering Macro
+== traceability:outgoing[] and traceability:incoming[] Rendering Macros
 
-[#REQ-044, item, role=requirement, title="traceability:links[] renders outgoing links"]
+[#REQ-044, item, role=requirement, title="traceability:outgoing[] renders outgoing links"]
 --
-The system SHALL provide a \`traceability:links[]\` macro that expands to a formatted list of all outgoing relationships for the enclosing item. Relationships SHALL be grouped by type and rendered using standard AsciiDoc constructs (lists, tables, inline xrefs).
+The system SHALL provide a \`traceability:outgoing[]\` macro that expands to a formatted list of all outgoing relationships for the enclosing item. Relationships SHALL be grouped by type and rendered using standard AsciiDoc constructs (lists, tables, inline xrefs).
 
 Source: openspec/specs/traceability-links-macro/spec.md
+
+traceability:outgoing[]
+traceability:incoming[]
+--
+
+[#REQ-044b, item, role=requirement, title="traceability:incoming[] renders incoming links"]
+--
+The system SHALL provide a \`traceability:incoming[]\` macro that expands to a formatted list of all incoming relationships pointing to the enclosing item. Relationships SHALL be grouped by inverse relation type (e.g., \`addresses\` displays as \`Addressed by\`) and rendered using standard AsciiDoc constructs.
+
+Source: openspec/specs/incoming-links-macro/spec.md
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-045, item, role=requirement, title="Opt-in via AsciiDoc attribute"]
 --
-The system SHALL only expand \`traceability:links[]\` when the \`:traceability-links:\` document attribute is set to a truthy value. Without the attribute, the macro text SHALL be stripped from output.
+The system SHALL only expand \`traceability:outgoing[]\` and \`traceability:incoming[]\` when the \`:traceability-links:\` document attribute is set to a truthy value. Without the attribute, the macro text SHALL be stripped from output.
 
 Source: openspec/specs/traceability-links-macro/spec.md
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-046, item, role=requirement, title="Inline macros are pure data markers"]
 --
-Inline relationship macros (\`addresses:REQ-001[]\`) SHALL always be invisible in rendered output. They are pure data markers stored in the traceability graph. \`traceability:links[]\` is the sole mechanism for rendering relationships.
+Inline relationship macros (\`addresses:REQ-001[]\`) SHALL always be invisible in rendered output. They are pure data markers stored in the traceability graph. \`traceability:outgoing[]\` and \`traceability:incoming[]\` are the sole mechanisms for rendering relationships.
 
 Source: openspec/specs/traceability-links-macro/spec.md
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-047, item, role=requirement, title="Configurable display style"]
@@ -348,6 +486,9 @@ Source: openspec/specs/traceability-links-macro/spec.md
 The system SHALL support configurable display styles via the \`:traceability-style:\` document attribute: \`list\` (default, bulleted list), \`table\` (AsciiDoc table), or \`inline\` (comma-separated).
 
 Source: openspec/specs/traceability-links-macro/spec.md
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-048, item, role=requirement, title="Configurable sort order"]
@@ -355,13 +496,19 @@ Source: openspec/specs/traceability-links-macro/spec.md
 The system SHALL support configurable sort order via \`:traceability-order:\`: \`target-id\` (default), \`target-title\`, or \`relation-type\`.
 
 Source: openspec/specs/traceability-links-macro/spec.md
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-049, item, role=requirement, title="PDF compatibility"]
 --
-Generated output from \`traceability:links[]\` SHALL be standard AsciiDoc constructs — not raw HTML — ensuring compatibility with both HTML and PDF backends.
+Generated output from \`traceability:outgoing[]\` and \`traceability:incoming[]\` SHALL be standard AsciiDoc constructs — not raw HTML — ensuring compatibility with both HTML and PDF backends.
 
 Source: openspec/specs/traceability-links-macro/spec.md
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#REQ-050, item, role=requirement, title="Source files never modified"]
@@ -369,4 +516,7 @@ Source: openspec/specs/traceability-links-macro/spec.md
 The system SHALL NOT modify \`.adoc\` source files on disk. All macro expansion and content substitution SHALL occur in the in-memory content buffer during Antora's \`contentClassified\` event.
 
 Source: openspec/specs/traceability-links-macro/spec.md
+
+traceability:outgoing[]
+traceability:incoming[]
 --

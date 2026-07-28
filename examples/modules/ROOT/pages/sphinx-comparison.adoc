@@ -99,7 +99,7 @@ This page maps concepts from https://sphinx-needs.readthedocs.io/[Sphinx Needs] 
 
 | Link rendering
 | Inline via directives
-| `traceability:links[]` macro with configurable style (list, table, inline)
+| `traceability:outgoing[]` and `traceability:incoming[]` macros with configurable style (list, table, inline)
 | Antora Tracer separates data (inline macros) from rendering (links macro)
 
 | Matrix navigation

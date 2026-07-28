@@ -370,14 +370,14 @@ Relationship syntax:
 
 [IMPORTANT]
 ====
-Inline relationship macros (`addresses:REQ-001[]`) are *always invisible* in rendered output. They are pure data markers stored in the traceability graph. To display relationships in your documentation, use the `traceability:links[]` macro described below.
+Inline relationship macros (`addresses:REQ-001[]`) are *always invisible* in rendered output. They are pure data markers stored in the traceability graph. To display relationships in your documentation, use the `traceability:outgoing[]` and `traceability:incoming[]` macros described below.
 
-This keeps your source clean — type the relationship once, let the macro handle display.
+This keeps your source clean — type the relationship once, let the macros handle display.
 ====
 
-=== The `traceability:links[]` Macro
+=== The `traceability:outgoing[]` Macro
 
-Place `traceability:links[]` inside an item block to render all outgoing relationships as a formatted list:
+Place `traceability:outgoing[]` inside an item block to render all outgoing relationships as a formatted list:
 
 [source,asciidoc]
 ----
@@ -389,11 +389,27 @@ addresses:REQ-001[]
 addresses:REQ-006[]
 addresses:REQ-009[]
 
-traceability:links[]
+traceability:outgoing[]
 ====
 ----
 
 The macro queries the traceability graph at build time and generates AsciiDoc output — lists, tables, or inline xrefs — showing each relationship with the target's full title.
+
+=== The `traceability:incoming[]` Macro
+
+Place `traceability:incoming[]` inside an item block to render all incoming relationships — items that reference this item from elsewhere:
+
+[source,asciidoc]
+----
+[#REQ-001, item, role=requirement, title="System shall..."]
+====
+Requirement description...
+
+traceability:incoming[]
+====
+----
+
+The macro displays relationships pointing TO this item, with inverse relation type labels (e.g., `addresses` becomes `Addressed by`). This is useful for seeing which architecture components, designs, or tests reference a given requirement.
 
 *Opt-in per page via document attributes:*
 
@@ -410,7 +426,7 @@ The macro queries the traceability graph at build time and generates AsciiDoc ou
 | Attribute | Effect
 
 | `:traceability-links:`
-| `true` to enable the macro. Without it, `traceability:links[]` text is stripped.
+| `true` to enable the macros. Without it, `traceability:outgoing[]` and `traceability:incoming[]` text is stripped.
 
 | `:traceability-style:`
 | `list` (default, bulleted list), `table` (AsciiDoc table), or `inline` (comma-separated)

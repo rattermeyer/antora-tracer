@@ -10,7 +10,7 @@ import type { Item, ItemRelationship } from "./types.js";
  * Warning type for parser warnings
  */
 export interface ParserWarning {
-  type: "old_macro" | "missing_role" | "unknown_role" | "invalid_attribute";
+  type: "old_macro" | "missing_role" | "unknown_role" | "invalid_attribute" | "unmatched_fence";
   message: string;
   file: string;
   line?: number;
@@ -86,6 +86,9 @@ export class DocumentParser {
     this.warnings = [];
     this.errors = [];
 
+    // Pre-scan: identify verbatim block ranges to skip during parsing
+    const verbatimRanges = this.findVerbatimRanges(content);
+
     const result: ParserResult = {
       items: [],
       relationships: [],
@@ -96,10 +99,10 @@ export class DocumentParser {
     const seen = new Set<string>();
 
     // First pass: Check for old macro syntax and generate errors
-    this.checkForOldMacros(content, result);
+    this.checkForOldMacros(content, result, verbatimRanges);
 
     // Second pass: Parse all [item] block macros
-    this.parseItemMacros(content, sourceFile || this.currentFile, seen, result);
+    this.parseItemMacros(content, sourceFile || this.currentFile, seen, result, verbatimRanges);
 
     // Third pass: Parse inline relationship macros from item content
     this.parseInlineMacrosFromItems(
@@ -118,7 +121,11 @@ export class DocumentParser {
   /**
    * Check for old macro syntax and generate errors
    */
-  private checkForOldMacros(content: string, _result: ParserResult): void {
+  private checkForOldMacros(
+    content: string,
+    _result: ParserResult,
+    verbatimRanges: Array<{ start: number; end: number }>,
+  ): void {
     const oldMacros = ["req", "imp", "test", "doc", "design"];
 
     for (const macro of oldMacros) {
@@ -126,6 +133,14 @@ export class DocumentParser {
       let match: RegExpExecArray | null;
 
       while ((match = regex.exec(content)) !== null) {
+        // Skip matches inside verbatim blocks (example code)
+        if (
+          verbatimRanges.some(
+            (r) => match!.index >= r.start && match!.index < r.end,
+          )
+        ) {
+          continue;
+        }
         const line = this.lineAt(content, match.index);
         const error: ParserError = {
           type: "syntax_error",
@@ -173,6 +188,7 @@ export class DocumentParser {
     sourceFile: string,
     seen: Set<string>,
     result: ParserResult,
+    verbatimRanges: Array<{ start: number; end: number }>,
   ): void {
     // Parse items with Asciidoctor native ID syntax: [#ID, item, role=XXX, title="..."]
     // Only match at line start to avoid matching inline backtick references
@@ -184,6 +200,15 @@ export class DocumentParser {
       const attributesStr = match[2];
       const startPosition = match.index;
       const line = this.lineAt(content, startPosition);
+
+      // Skip items inside verbatim blocks (example code, not real data)
+      if (
+        verbatimRanges.some(
+          (r) => startPosition >= r.start && startPosition < r.end,
+        )
+      ) {
+        continue;
+      }
 
       // Extract block content (between ==== or -- delimiters)
       const block = this.extractBlock(content, startPosition);
@@ -413,6 +438,53 @@ export class DocumentParser {
         );
       }
     }
+  }
+
+  /**
+   * Find verbatim block ranges (---- and .... fences) to exclude from parsing.
+   * Returns an array of {start, end} positions. Content within these ranges
+   * is example code, not real traceability data.
+   */
+  private findVerbatimRanges(
+    content: string,
+  ): Array<{ start: number; end: number }> {
+    const ranges: Array<{ start: number; end: number }> = [];
+
+    // Match opening fence: ---- or .... (4 chars) on its own line, optional trailing whitespace
+    const fenceRegex = /(?:^|\n)(----|\.\.\.\.)[ \t]*\r?\n/g;
+    let match: RegExpExecArray | null;
+
+    while ((match = fenceRegex.exec(content)) !== null) {
+      const fence = match[1];
+      const openEnd = match.index + match[0].length;
+
+      // Find matching closing fence: same delimiter, on its own line
+      const closePattern =
+        fence === "----" ? "\\r?\\n----[ \\t]*(?:\\r?\\n|$)" : "\\r?\\n\\.\\.\\.\\.[ \\t]*(?:\\r?\\n|$)";
+      const closeRegex = new RegExp(closePattern, "g");
+      closeRegex.lastIndex = openEnd;
+      const closeMatch = closeRegex.exec(content);
+
+      if (closeMatch) {
+        const rangeEnd = closeMatch.index + closeMatch[0].length;
+        ranges.push({ start: match.index, end: rangeEnd });
+        fenceRegex.lastIndex = rangeEnd;
+      } else {
+        // Unmatched fence — treat rest of file as verbatim
+        const rangeEnd = content.length;
+        ranges.push({ start: match.index, end: rangeEnd });
+        this.warnings.push({
+          type: "unmatched_fence",
+          message: `Unmatched verbatim fence '${fence}' at line ${this.lineAt(content, match.index)} — treating remainder of file as verbatim`,
+          file: this.currentFile,
+          line: this.lineAt(content, match.index),
+          position: match.index,
+        });
+        break;
+      }
+    }
+
+    return ranges;
   }
 
   private extractBlock(content: string, startIndex: number): string | null {
