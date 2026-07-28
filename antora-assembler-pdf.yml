@@ -1,5 +1,5 @@
 build:
-  command: bundle exec asciidoctor-pdf -r asciidoctor-kroki -a chapter-label= -a kroki-default-format=png -a allow-uri-read -a kroki-max-uri-length=8000 --sourcemap
+  command: bundle exec asciidoctor-pdf -r asciidoctor-kroki -a chapter-signifier= -a kroki-default-format=png -a allow-uri-read -a kroki-max-uri-length=8000 --sourcemap
   publish: true
   keepSource: true
 assembly:
