@@ -288,7 +288,7 @@ Source: openspec/specs/traceability-links-macro/spec.md
 
 traceability:outgoing[]
 traceability:incoming[]"""
-ARC-001,ARC-001 — Project scope and architectural goals,design,,architecture.adoc,"""*Project scope and architectural goals*
+ARC-001,ARC-001 — Project scope and architectural goals,architecture,,architecture.adoc,"""*Project scope and architectural goals*
 
 The Antora Tracer is an Antora extension that adds role-based requirements traceability to AsciiDoc documentation. It replaces fixed macro types with a single configurable `[item]` macro.
 
@@ -312,9 +312,9 @@ addresses:REQ-036[]
 traceability:outgoing[]
 
 traceability:incoming[]"""
-ARC-002,ARC-002 — Component-level architecture,design,,architecture.adoc,"""The extension is composed of eight modules organized in a layered architecture:
+ARC-002,ARC-002 — Component-level architecture,architecture,,architecture.adoc,"""The extension is composed of eight modules organized in a layered architecture:
 
-[plantuml, format=svg]
+[plantuml]
 ....
 @startuml
 package """"Antora Pipeline"""" {
@@ -405,9 +405,9 @@ addresses:REQ-029[]
 addresses:REQ-034[]
 
 traceability:outgoing[]"""
-ARC-003,ARC-003 — Processing flow during Antora build,design,,architecture.adoc,"""The following sequence shows how an AsciiDoc file flows through the system during an Antora build:
+ARC-003,ARC-003 — Processing flow during Antora build,architecture,,architecture.adoc,"""The following sequence shows how an AsciiDoc file flows through the system during an Antora build:
 
-[plantuml, format=svg]
+[plantuml]
 ----
 include::example$sequence-diagram.puml[]
 ----
@@ -428,7 +428,7 @@ addresses:REQ-016[]
 addresses:REQ-017[]
 addresses:REQ-029[]
 addresses:REQ-035[]"""
-ARC-004,ARC-004 — Key architectural decisions and their rationale,design,,architecture.adoc,"""This section captures the design decisions from `openspec/changes/unified-item-architecture/design.md`.
+ARC-004,ARC-004 — Key architectural decisions and their rationale,architecture,,architecture.adoc,"""This section captures the design decisions from `openspec/changes/unified-item-architecture/design.md`.
 
 [width=100%, cols=""""20,50,30""""]
 |===
@@ -475,7 +475,7 @@ ARC-004,ARC-004 — Key architectural decisions and their rationale,design,,arch
 | Hardcoded matrix types (req-impl, req-test, full) — inflexible for domain models with different roles
 
 | In-memory source substitution for clickable links
-| After processing, replace `addresses\:REQ-001[]` with Asciidoctor xrefs in the content catalog buffer. Two-pass approach ensures cross-file targets are resolved. No disk writes.
+| After processing, replace `addresses:REQ-001[]` with Asciidoctor xrefs in the content catalog buffer. Two-pass approach ensures cross-file targets are resolved. No disk writes.
 | HTML post-processing (PDF-incompatible), Asciidoctor inline macro extension (API dependency)
 
 | Dedicated LinkResolver component
@@ -485,7 +485,6 @@ ARC-004,ARC-004 — Key architectural decisions and their rationale,design,,arch
 
 addresses:REQ-010[]
 
-addresses:REQ-001[]
 addresses:REQ-006[]
 addresses:REQ-007[]
 addresses:REQ-008[]

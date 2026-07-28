@@ -98,7 +98,7 @@ config --> graph : provides validation rules
 | Orchestrator. Owns the graph, delegates to parser, matrix generator, and Neo4j exporter. Public API for programmatic use.
 
 | `DocumentParser`
-| Regex-based AsciiDoc parser. Two-pass: extracts `[item]` blocks, then scans for inline `relation:TARGET[]` macros.
+| Regex-based AsciiDoc parser. Two-pass: extracts `[item]` blocks, then scans for inline `relation\:TARGET[]` macros.
 
 | `TraceabilityGraph`
 | In-memory directed graph. Items stored as `Map<string, Item>`, relationships as `Map<string, ItemRelationship>`. Provides query, validation, path finding, and impact analysis.
@@ -225,7 +225,6 @@ This section captures the design decisions from `openspec/changes/unified-item-a
 
 addresses:REQ-010[]
 
-addresses:REQ-001[]
 addresses:REQ-006[]
 addresses:REQ-007[]
 addresses:REQ-008[]

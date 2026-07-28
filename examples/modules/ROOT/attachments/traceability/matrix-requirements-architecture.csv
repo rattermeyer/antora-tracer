@@ -1,40 +1,40 @@
 Row ID,Row Title,architecture
-REQ-001,REQ-001 — Single `item` macro replaces all block macros,
-REQ-002,REQ-002 — `item` macro accepts role attribute,
-REQ-003,REQ-003 — `item` macro maintains existing attributes,
-REQ-004,REQ-004 — `item` macro supports block content,
-REQ-005,REQ-005 — Old macro syntax generates deprecation error,
-REQ-006,REQ-006 — Configuration defines roles,
-REQ-007,REQ-007 — Configuration defines relations,
-REQ-008,REQ-008 — Configuration defines matrices,
-REQ-009,REQ-009 — Configuration is required for validation,
-REQ-010,REQ-010 — Configuration file location,
-REQ-011,REQ-011 — Configuration validation,
+REQ-001,REQ-001 — Single `item` macro replaces all block macros,ARC-001: ARC-001 — Project scope and architectural goals; ARC-002: ARC-002 — Component-level architecture; ARC-003: ARC-003 — Processing flow during Antora build; ARC-004: ARC-004 — Key architectural decisions and their rationale
+REQ-002,REQ-002 — `item` macro accepts role attribute,ARC-002: ARC-002 — Component-level architecture; ARC-003: ARC-003 — Processing flow during Antora build
+REQ-003,REQ-003 — `item` macro maintains existing attributes,ARC-002: ARC-002 — Component-level architecture
+REQ-004,REQ-004 — `item` macro supports block content,ARC-002: ARC-002 — Component-level architecture; ARC-003: ARC-003 — Processing flow during Antora build
+REQ-005,REQ-005 — Old macro syntax generates deprecation error,ARC-003: ARC-003 — Processing flow during Antora build
+REQ-006,REQ-006 — Configuration defines roles,ARC-001: ARC-001 — Project scope and architectural goals; ARC-002: ARC-002 — Component-level architecture; ARC-004: ARC-004 — Key architectural decisions and their rationale
+REQ-007,REQ-007 — Configuration defines relations,ARC-002: ARC-002 — Component-level architecture; ARC-004: ARC-004 — Key architectural decisions and their rationale
+REQ-008,REQ-008 — Configuration defines matrices,ARC-002: ARC-002 — Component-level architecture; ARC-004: ARC-004 — Key architectural decisions and their rationale
+REQ-009,REQ-009 — Configuration is required for validation,ARC-001: ARC-001 — Project scope and architectural goals
+REQ-010,REQ-010 — Configuration file location,ARC-004: ARC-004 — Key architectural decisions and their rationale
+REQ-011,REQ-011 — Configuration validation,ARC-002: ARC-002 — Component-level architecture
 REQ-012,REQ-012 — Configuration can extend presets,
-REQ-013,REQ-013 — Role-based relation validation,
-REQ-014,REQ-014 — Directional relation checking,
-REQ-015,REQ-015 — Error messages list allowed relations,
-REQ-016,REQ-016 — Warnings for unknown roles,
-REQ-017,REQ-017 — Graceful degradation for unknown roles,
-REQ-018,REQ-018 — Built-in preset configurations,
+REQ-013,REQ-013 — Role-based relation validation,ARC-001: ARC-001 — Project scope and architectural goals; ARC-003: ARC-003 — Processing flow during Antora build; ARC-004: ARC-004 — Key architectural decisions and their rationale
+REQ-014,REQ-014 — Directional relation checking,ARC-003: ARC-003 — Processing flow during Antora build
+REQ-015,REQ-015 — Error messages list allowed relations,ARC-004: ARC-004 — Key architectural decisions and their rationale
+REQ-016,REQ-016 — Warnings for unknown roles,ARC-003: ARC-003 — Processing flow during Antora build
+REQ-017,REQ-017 — Graceful degradation for unknown roles,ARC-003: ARC-003 — Processing flow during Antora build
+REQ-018,REQ-018 — Built-in preset configurations,ARC-001: ARC-001 — Project scope and architectural goals; ARC-004: ARC-004 — Key architectural decisions and their rationale
 REQ-019,REQ-019 — Each preset contains complete configuration,
 REQ-020,REQ-020 — Each preset includes documentation,
 REQ-021,REQ-021 — Each preset includes Neo4j Cypher queries,
 REQ-022,REQ-022 — Presets have independent versioning,
 REQ-023,REQ-023 — Users can define custom presets,
-REQ-024,REQ-024 — Neo4j CSV export,
-REQ-025,REQ-025 — Neo4j Cypher export,
+REQ-024,REQ-024 — Neo4j CSV export,ARC-001: ARC-001 — Project scope and architectural goals; ARC-002: ARC-002 — Component-level architecture; ARC-004: ARC-004 — Key architectural decisions and their rationale
+REQ-025,REQ-025 — Neo4j Cypher export,ARC-002: ARC-002 — Component-level architecture
 REQ-026,REQ-026 — Export command in CLI,
 REQ-027,REQ-027 — Export includes all item attributes,
-REQ-028,REQ-028 — Export is optional,
-REQ-029,REQ-029 — Configurable matrix generation with coverage calculations,
+REQ-028,REQ-028 — Export is optional,ARC-004: ARC-004 — Key architectural decisions and their rationale
+REQ-029,REQ-029 — Configurable matrix generation with coverage calculations,ARC-002: ARC-002 — Component-level architecture; ARC-003: ARC-003 — Processing flow during Antora build; ARC-004: ARC-004 — Key architectural decisions and their rationale
 REQ-030,REQ-030 — Role statistics reporting,
 REQ-031,REQ-031 — Graph path finding,
 REQ-032,REQ-032 — Impact analysis,
 REQ-033,REQ-033 — Graph merge,
-REQ-034,REQ-034 — Mustache template rendering,
-REQ-035,REQ-035 — Antora extension integration,
-REQ-036,REQ-036 — CLI commands,
+REQ-034,REQ-034 — Mustache template rendering,ARC-002: ARC-002 — Component-level architecture; ARC-004: ARC-004 — Key architectural decisions and their rationale
+REQ-035,REQ-035 — Antora extension integration,ARC-001: ARC-001 — Project scope and architectural goals; ARC-003: ARC-003 — Processing flow during Antora build
+REQ-036,REQ-036 — CLI commands,ARC-001: ARC-001 — Project scope and architectural goals
 REQ-037,REQ-037 — Matrix row items are clickable links,
 REQ-038,REQ-038 — Matrix cell items are clickable links,
 REQ-039,REQ-039 — Source file tooltips on matrix links,
@@ -52,4 +52,4 @@ REQ-049,REQ-049 — PDF compatibility,
 REQ-050,REQ-050 — Source files never modified,
 
 Total 51 rows
-Coverage: 0.0%
+Coverage: 47.1%
