@@ -1,0 +1,74 @@
+@startuml
+actor "Antora Build" as antora
+participant "AntoraTraceabilityExtension" as antora_ext
+participant "RequirementsTraceabilityExtension" as main_ext
+participant "DocumentParser" as parser
+participant "TraceabilityGraph" as graph
+participant "MatrixGenerator" as matrix
+participant "TemplateRenderer" as templates
+participant "Neo4jExporter" as neo4j
+
+== Initialization ==
+antora -> antora_ext : register(context)
+antora_ext -> antora_ext : loadConfig() from playbook
+antora_ext -> main_ext : createWithPreset() or createWithConfig()
+antora_ext -> antora_ext : registerContentClassifier()
+antora_ext -> antora_ext : registerPageProcessor()
+
+== Content Processing ==
+antora -> antora_ext : contentClassified event
+antora_ext -> antora_ext : find all .adoc files in contentCatalog
+
+== Pass 1: Populate graph ==
+loop for each .adoc file
+  antora_ext -> main_ext : process(content, { sourceFile })
+  main_ext -> parser : parse(content, sourceFile)
+  parser -> parser : extract [item] blocks
+  parser -> parser : extract relation:TARGET[] macros
+  parser --> main_ext : ParserResult { items, relationships }
+  main_ext -> graph : addItem() for each item
+  main_ext -> graph : addRelationship() for each relationship
+  graph -> graph : validate relation (ConfigLoader.isRelationAllowed)
+end
+
+== Pass 2: Expand traceability:outgoing[] and traceability:incoming[] macros ==
+loop for each .adoc file
+  antora_ext -> antora_ext : expandOutgoingMacros(content)
+  antora_ext -> antora_ext : find traceability:outgoing[] and enclosing item ID
+  antora_ext -> graph : getRelationships(itemId)
+  graph --> antora_ext : outgoing relationships
+  antora_ext -> antora_ext : generate AsciiDoc list/table/inline
+  antora_ext -> antora_ext : replace macro with generated content
+  antora_ext -> antora_ext : expandIncomingMacros(content)
+  antora_ext -> antora_ext : find traceability:incoming[] and enclosing item ID
+  antora_ext -> graph : getReverseRelationships(itemId)
+  graph --> antora_ext : incoming relationships
+  antora_ext -> antora_ext : generate AsciiDoc with inverse labels
+  antora_ext -> antora_ext : replace macro with generated content
+end
+
+== Pass 3: Strip inline macros ==
+loop for each .adoc file
+  antora_ext -> antora_ext : substituteRelationshipLinks(content)
+  note right: inline macros always stripped\n(traceability:outgoing[] / traceability:incoming[] render)
+  antora_ext -> antora_ext : write modified content to in-memory buffer
+end
+
+== Matrix Generation ==
+antora -> antora_ext : sitePublished event
+antora_ext -> main_ext : getMatrixDefinitions()
+loop for each matrix definition
+  main_ext -> matrix : generateMatrix(name)
+  matrix -> graph : query items, relationships, coverage
+  matrix -> templates : render(matrix data)
+  templates --> matrix : HTML string
+  matrix --> main_ext : GeneratedMatrix
+  main_ext -> antora_ext : write to outputDir
+end
+
+== Neo4j Export (optional) ==
+antora_ext -> main_ext : createNeo4jExporter()
+main_ext -> neo4j : export({ outputDir, format })
+neo4j -> graph : getAllItems(), getAllRelationships()
+neo4j --> main_ext : ExportResult { nodeCount, relationshipCount, files }
+@enduml

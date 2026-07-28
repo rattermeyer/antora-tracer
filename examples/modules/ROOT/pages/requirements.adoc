@@ -473,7 +473,7 @@ traceability:incoming[]
 
 [#REQ-046, item, role=requirement, title="Inline macros are pure data markers"]
 --
-Inline relationship macros (\`addresses:REQ-001[]\`) SHALL always be invisible in rendered output. They are pure data markers stored in the traceability graph. \`traceability:outgoing[]\` and \`traceability:incoming[]\` are the sole mechanisms for rendering relationships.
+Inline relationship macros (\`addresses\:REQ-001[]\`) SHALL always be invisible in rendered output. They are pure data markers stored in the traceability graph. \`traceability:outgoing[]\` and \`traceability:incoming[]\` are the sole mechanisms for rendering relationships.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 

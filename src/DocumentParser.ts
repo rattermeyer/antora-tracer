@@ -191,14 +191,53 @@ export class DocumentParser {
     verbatimRanges: Array<{ start: number; end: number }>,
   ): void {
     // Parse items with Asciidoctor native ID syntax: [#ID, item, role=XXX, title="..."]
-    // Only match at line start to avoid matching inline backtick references
-    const itemRegex = /^\[#([^,\]]+),\s*item,?([^\]]*)\]/gm;
+    // Only match at line start to avoid matching inline backtick references.
+    // Use a quote-aware scanner to find the closing ']' so that ']' inside
+    // quoted attribute values (e.g. title="traceability:outgoing[]") doesn't
+    // prematurely terminate the macro.
+    const itemStartRegex = /^[ \t]*\[#([^,\]]+),\s*item,?/gm;
     let match: RegExpExecArray | null;
 
-    while ((match = itemRegex.exec(content)) !== null) {
+    while ((match = itemStartRegex.exec(content)) !== null) {
       let id = match[1].trim();
-      const attributesStr = match[2];
       const startPosition = match.index;
+      const attrStart = startPosition + match[0].length;
+
+      // Scan forward to find the closing ']' outside quoted strings
+      let macroEnd = -1;
+      let inQuotes = false;
+      let quoteChar = "";
+      for (let i = attrStart; i < content.length; i++) {
+        const ch = content[i];
+        if (
+          (ch === '"' || ch === "'") &&
+          (i === 0 || content[i - 1] !== "\\")
+        ) {
+          if (!inQuotes) {
+            inQuotes = true;
+            quoteChar = ch;
+          } else if (ch === quoteChar) {
+            inQuotes = false;
+            quoteChar = "";
+          }
+        } else if (ch === "]" && !inQuotes) {
+          macroEnd = i;
+          break;
+        }
+      }
+
+      if (macroEnd === -1) {
+        this.warnings.push({
+          type: "invalid_attribute",
+          message: `Item macro at line ${this.lineAt(content, startPosition)} has no closing ']'`,
+          file: sourceFile,
+          line: this.lineAt(content, startPosition),
+          position: startPosition,
+        });
+        continue;
+      }
+
+      const attributesStr = content.slice(attrStart, macroEnd).trim();
       const line = this.lineAt(content, startPosition);
 
       // Skip items inside verbatim blocks (example code, not real data)
@@ -403,7 +442,8 @@ export class DocumentParser {
 
       // Parse inline relationship macros: relationType:targetId[]
       // Example: satisfies:REQ-001[], addresses:DES-001[], implemented_by:IMP-001[]
-      const inlineMacroRegex = /([a-zA-Z][a-zA-Z0-9_-]*:[A-Z0-9_-]+)\[/g;
+      // Escape with backslash before the colon: relation\:TARGET[] is ignored
+      const inlineMacroRegex = /(?<!\\)([a-zA-Z][a-zA-Z0-9_-]*:[A-Z0-9_-]+)\[/g;
       let match: RegExpExecArray | null;
 
       while ((match = inlineMacroRegex.exec(itemContent)) !== null) {
@@ -433,9 +473,6 @@ export class DocumentParser {
         // Note: Relation validation is deferred to the extension level where the full graph is available.
         // The parser only extracts relationships; it doesn't validate them against config.
         result.relationships.push(relationship);
-        console.log(
-          `Inline relationship found: ${item.id} ${relationType} ${targetId}`,
-        );
       }
     }
   }

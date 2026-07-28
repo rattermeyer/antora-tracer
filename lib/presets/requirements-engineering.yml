@@ -23,17 +23,15 @@ traceability:
     - document
 
   relations:
-    # Requirement relations
+    # Requirement relations — only requirement-to-requirement.
+    # Downstream roles (design, implementation, test, document) declare their own
+    # relations back to requirements using active voice.
     requirement:
       requirement: [refines, depends_on, conflicts_with]
-      design: [addresses, satisfied_by]
-      implementation: [implemented_by]
-      test: [verified_by]
-      document: [derived_from]
 
     # Design relations
     design:
-      requirement: [implements]
+      requirement: [addresses, satisfies]
       design: [depends_on, composed_of, refined_by]
       implementation: [realized_by]
       test: [validated_by]
@@ -63,17 +61,17 @@ traceability:
       rows: requirement
       columns: [design, implementation, test, document]
       coverageRelations:
-        design: [addresses, satisfied_by, implements]
-        implementation: [implemented_by, satisfies]
-        test: [verified_by, covers, verifies, tests, validates]
-        document: [derived_from, contains, describes]
+        design: [addresses, satisfies]
+        implementation: [satisfies, implements]
+        test: [covers, verifies, tests, validates]
+        document: [contains, describes]
 
     - name: design-verification
       description: "Verification of design elements"
       rows: design
       columns: [requirement, implementation, test, document]
       coverageRelations:
-        requirement: [addresses, satisfied_by, implements]
+        requirement: [addresses, satisfies]
         implementation: [realized_by, implements]
         test: [validated_by, validates, tests]
         document: [documented_by, describes]
@@ -103,7 +101,7 @@ neo4j:
         cypher: |
           MATCH (r:Item {role: 'requirement'})
           WHERE NOT EXISTS {
-            MATCH (r)<-[:ADDRESSES|SATISFIED_BY|IMPLEMENTED_BY|IMPLEMENTS|VERIFIED_BY|COVERS|VERIFIES]-(:Item)
+            MATCH (r)<-[:ADDRESSES|SATISFIES|IMPLEMENTS|COVERS|VERIFIES|TESTS|VALIDATES]-(:Item)
           }
           RETURN r.id, r.title ORDER BY r.id
 
@@ -111,7 +109,7 @@ neo4j:
         description: "Design elements and their requirement/test coverage"
         cypher: |
           MATCH (d:Item {role: 'design'})
-          OPTIONAL MATCH (d)-[:ADDRESSES|SATISFIED_BY|IMPLEMENTS]->(r:Item {role: 'requirement'})
+          OPTIONAL MATCH (d)-[:ADDRESSES|SATISFIES]->(r:Item {role: 'requirement'})
           OPTIONAL MATCH (d)-[:VALIDATED_BY|VALIDATES|TESTS]->(t:Item {role: 'test'})
           RETURN d.id, d.title, count(r) as requirements, count(t) as tests
           ORDER BY requirements DESC, tests DESC
@@ -119,7 +117,7 @@ neo4j:
       - name: traceability-chain
         description: "Full traceability chain from requirement to implementation to test"
         cypher: |
-          MATCH path = (r:Item {role: 'requirement'})-[:ADDRESSES|SATISFIED_BY]->(d:Item {role: 'design'})
+          MATCH path = (r:Item {role: 'requirement'})<-[:ADDRESSES|SATISFIES]-(d:Item {role: 'design'})
                      -[:IMPLEMENTS|REALIZED_BY]->(i:Item {role: 'implementation'})
                      -[:TESTED_BY|TESTS]->(t:Item {role: 'test'})
           RETURN r.id as requirement, d.id as design, i.id as implementation, t.id as test
@@ -129,9 +127,9 @@ neo4j:
         description: "What would be affected by changing a requirement?"
         cypher: |
           MATCH (r:Item {id: $requirementId, role: 'requirement'})
-          OPTIONAL MATCH (r)<-[:ADDRESSES|SATISFIED_BY|IMPLEMENTS]-(d:Item {role: 'design'})
+          OPTIONAL MATCH (r)<-[:ADDRESSES|SATISFIES]-(d:Item {role: 'design'})
           OPTIONAL MATCH (d)-[:IMPLEMENTS|REALIZED_BY]->(i:Item {role: 'implementation'})
-          OPTIONAL MATCH (r)<-[:VERIFIED_BY|COVERS|VERIFIES]-(t:Item {role: 'test'})
+          OPTIONAL MATCH (r)<-[:COVERS|VERIFIES]-(t:Item {role: 'test'})
           RETURN r.id as requirement, collect(d.id) as designs, collect(i.id) as implementations, collect(t.id) as tests
 
       - name: circular-dependencies

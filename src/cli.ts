@@ -346,7 +346,11 @@ program
             chalk.yellow(`Warnings (${validation.warnings.length}):`),
           );
           for (const warning of validation.warnings) {
-            console.log(chalk.yellow(`  - ${warning.message}`));
+            const loc =
+              warning.file
+                ? ` (${warning.file}${warning.line !== undefined ? `:${warning.line}` : ""})`
+                : "";
+            console.log(chalk.yellow(`  - ${warning.message}${loc}`));
           }
         }
         console.log(

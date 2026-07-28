@@ -26,6 +26,21 @@ Two tsconfigs:
 
 Pre-commit hooks: biome lint + format via `pre-commit`.
 
+## Commit Convention
+
+This project follows https://www.conventionalcommits.org/[Conventional Commits].
+All commit messages must use the format:
+
+```
+<type>(<scope>): <description>
+```
+
+Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `ci`, `perf`
+
+Common scopes: `parser`, `cli`, `preset`, `matrix`, `neo4j`, `antora`, `config`, `graph`
+
+Examples: `feat(parser): support escaped inline macros`, `fix(cli): show file location in validation errors`
+
 ## Spec-Driven Development
 
 This project uses https://openspec.dev[OpenSpec] for spec-driven development.
