@@ -1,9 +1,7 @@
 build:
-  command: bundle exec asciidoctor-pdf -r asciidoctor-kroki -a kroki-default-format=png --sourcemap
+  command: bundle exec asciidoctor-pdf -r asciidoctor-kroki -a kroki-default-format=png -a allow-uri-read -a kroki-max-uri-length=8000 --sourcemap
   publish: true
+  keepSource: true
 assembly:
   rootLevel: 0
   sectionMergeStrategy: discrete
-  attributes:
-    allow-uri-read: true
-    kroki-default-format: png
