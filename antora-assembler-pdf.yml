@@ -1,0 +1,6 @@
+build:
+  command: bundle exec asciidoctor-pdf
+  publish: true
+assembly:
+  rootLevel: 0
+  sectionMergeStrategy: discrete

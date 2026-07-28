@@ -24,7 +24,7 @@ antora:
       generateMatrices: true
       matrixFormats: [html, csv]
       includeInNavigation: true
-    - require: '@antora/pdf-extension'
+    - require: ./antora-pdf-extension.cjs
 
 output:
   dir: ./public/pdf

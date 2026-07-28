@@ -1,9 +1,53 @@
 {
   "lockfile_version": "1",
   "packages": {
+    "bundler": {
+      "resolved": "github:NixOS/nixpkgs/59682e0069f0ed0a452e2179a7f4c1f247027b9e?narHash=sha256-x8i%2BHYAulduMlM63oxWJj5tAm%2BSc%2FW756wUzcV5p24w%3D#bundler",
+      "source": "nixpkg",
+      "systems": {
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "path": "/nix/store/br1vpqmmx8zvvhcvkxlh9cxf3p5vv468-bundler-2.7.2",
+              "default": true
+            }
+          ]
+        }
+      }
+    },
     "github:NixOS/nixpkgs/nixpkgs-unstable": {
-      "last_modified": "2026-07-16T14:07:54Z",
-      "resolved": "github:NixOS/nixpkgs/59682e0069f0ed0a452e2179a7f4c1f247027b9e?lastModified=1784210874&narHash=sha256-x8i%2BHYAulduMlM63oxWJj5tAm%2BSc%2FW756wUzcV5p24w%3D"
+      "last_modified": "2026-07-27T08:35:34Z",
+      "resolved": "github:NixOS/nixpkgs/38a4887411571457d700c51c64a6e49ead2ed5ab?lastModified=1785141334&narHash=sha256-kh35kIx7el4Jk8Ki3BH9%2FPn1eZYSYLJ6LMALos0zOy0%3D"
+    },
+    "nodejs": {
+      "plugin_version": "0.0.2",
+      "resolved": "github:NixOS/nixpkgs/59682e0069f0ed0a452e2179a7f4c1f247027b9e?narHash=sha256-x8i%2BHYAulduMlM63oxWJj5tAm%2BSc%2FW756wUzcV5p24w%3D#nodejs",
+      "source": "nixpkg",
+      "systems": {
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "path": "/nix/store/lnfxdsvvm1srsa9kk94s7jqw06yq1h2d-nodejs-24.18.0",
+              "default": true
+            }
+          ]
+        }
+      }
+    },
+    "ruby": {
+      "plugin_version": "0.0.2",
+      "resolved": "github:NixOS/nixpkgs/59682e0069f0ed0a452e2179a7f4c1f247027b9e?narHash=sha256-x8i%2BHYAulduMlM63oxWJj5tAm%2BSc%2FW756wUzcV5p24w%3D#ruby",
+      "source": "nixpkg",
+      "systems": {
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "path": "/nix/store/k5zrvznvg3h4b7spivvflxsb1xxw1i0k-ruby-3.4.9",
+              "default": true
+            }
+          ]
+        }
+      }
     }
   }
 }
