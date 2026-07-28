@@ -22,6 +22,8 @@
     "format": "biome format --write .",
     "start": "node lib/cli.js",
     "dev": "nodemon --watch src --exec \"npm run build && node lib/index.js\"",
+    "prepublishOnly": "node scripts/prepublish",
+    "postpublish": "node scripts/postpublish",
     "tsc": "tsc",
     "tsc:watch": "tsc --watch"
   },
@@ -50,6 +52,7 @@
     "chai": "^5.1.1",
     "chalk": "^5.3.0",
     "commander": "^12.1.0",
+    "downdoc": "^1.1.0-stable",
     "mocha": "^10.4.0",
     "nyc": "^18.0.0",
     "ts-mocha": "^11.1.0",
@@ -67,7 +70,6 @@
     "!lib/coverage",
     "!lib/src/coverage",
     "package.json",
-    "README.adoc",
     "LICENSE"
   ],
   "repository": {
