@@ -471,7 +471,7 @@ describe("RequirementsTraceabilityExtension - API Methods", () => {
 
       const validation = extension.validate();
       expect(validation.errors.length).to.be.greaterThan(0);
-      expect(validation.errors.some((e) => e.includes("not found"))).to.be.true;
+      expect(validation.errors.some((e) => e.includes("does not exist"))).to.be.true;
     });
   });
 
@@ -633,7 +633,7 @@ describe("RequirementsTraceabilityExtension - API Methods", () => {
         await RequirementsTraceabilityExtension.createWithPreset(
           "requirements-engineering",
         );
-      expect(extension.isRelationAllowed("design", "requirement", "implements"))
+      expect(extension.isRelationAllowed("design", "requirement", "addresses"))
         .to.be.true;
     });
 
@@ -642,7 +642,7 @@ describe("RequirementsTraceabilityExtension - API Methods", () => {
         await RequirementsTraceabilityExtension.createWithPreset(
           "requirements-engineering",
         );
-      expect(extension.isRelationAllowed("design", "requirement", "implements"))
+      expect(extension.isRelationAllowed("design", "requirement", "addresses"))
         .to.be.true;
       expect(
         extension.isRelationAllowed("design", "requirement", "verified_by"),
@@ -664,7 +664,7 @@ describe("RequirementsTraceabilityExtension - API Methods", () => {
           "requirements-engineering",
         );
       const allowed = extension.getAllowedRelations("design", "requirement");
-      expect(allowed).to.include("implements");
+      expect(allowed).to.include("addresses");
     });
   });
 
