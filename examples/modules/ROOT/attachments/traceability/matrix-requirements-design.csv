@@ -1,4 +1,4 @@
-Row ID,Row Title,architecture
+Row ID,Row Title,design
 REQ-001,REQ-001 — Single `item` macro replaces all block macros,ARC-001: ARC-001 — Project scope and architectural goals; ARC-002: ARC-002 — Component-level architecture; ARC-003: ARC-003 — Processing flow during Antora build; ARC-004: ARC-004 — Key architectural decisions and their rationale
 REQ-002,REQ-002 — `item` macro accepts role attribute,ARC-002: ARC-002 — Component-level architecture; ARC-003: ARC-003 — Processing flow during Antora build
 REQ-003,REQ-003 — `item` macro maintains existing attributes,ARC-002: ARC-002 — Component-level architecture

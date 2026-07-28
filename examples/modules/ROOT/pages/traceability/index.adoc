@@ -2,8 +2,8 @@
 
 Generated traceability artifacts for the Antora Tracer project.
 
-* xref:attachment$traceability/matrix-requirements-architecture.html[Requirements → Architecture] — Which architecture sections address each of the 36 requirements
-* xref:attachment$traceability/matrix-requirements-architecture.csv[CSV] — Same data for spreadsheet import
+* xref:attachment$traceability/matrix-requirements-design.html[Requirements → Architecture] — Which architecture sections address each of the 36 requirements
+* xref:attachment$traceability/matrix-requirements-design.csv[CSV] — Same data for spreadsheet import
 
 * xref:attachment$traceability/matrix-requirements-tests.html[Requirements → Tests] — Which test files verify each of the 36 requirements
 * xref:attachment$traceability/matrix-requirements-tests.csv[CSV] — Same data for spreadsheet import

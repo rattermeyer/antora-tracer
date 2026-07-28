@@ -312,7 +312,7 @@ Source: openspec/specs/graph-visualization/spec.md
 
 traceability:outgoing[]
 traceability:incoming[]"""
-ARC-001,ARC-001 — Project scope and architectural goals,architecture,,architecture.adoc,"""*Project scope and architectural goals*
+ARC-001,ARC-001 — Project scope and architectural goals,design,,architecture.adoc,"""*Project scope and architectural goals*
 
 The Antora Tracer is an Antora extension that adds role-based requirements traceability to AsciiDoc documentation. It replaces fixed macro types with a single configurable `[item]` macro.
 
@@ -338,7 +338,7 @@ traceability:outgoing[]
 traceability:incoming[]
 
 traceability:graph[]"""
-ARC-002,ARC-002 — Component-level architecture,architecture,,architecture.adoc,"""The extension is composed of eight modules organized in a layered architecture:
+ARC-002,ARC-002 — Component-level architecture,design,,architecture.adoc,"""The extension is composed of eight modules organized in a layered architecture:
 
 [plantuml]
 ....
@@ -431,7 +431,7 @@ addresses:REQ-029[]
 addresses:REQ-034[]
 
 traceability:outgoing[]"""
-ARC-003,ARC-003 — Processing flow during Antora build,architecture,,architecture.adoc,"""The following sequence shows how an AsciiDoc file flows through the system during an Antora build:
+ARC-003,ARC-003 — Processing flow during Antora build,design,,architecture.adoc,"""The following sequence shows how an AsciiDoc file flows through the system during an Antora build:
 
 [plantuml]
 ----
@@ -454,7 +454,7 @@ addresses:REQ-016[]
 addresses:REQ-017[]
 addresses:REQ-029[]
 addresses:REQ-035[]"""
-ARC-004,ARC-004 — Key architectural decisions and their rationale,architecture,,architecture.adoc,"""This section captures the design decisions from `openspec/changes/unified-item-architecture/design.md`.
+ARC-004,ARC-004 — Key architectural decisions and their rationale,design,,architecture.adoc,"""This section captures the design decisions from `openspec/changes/unified-item-architecture/design.md`.
 
 [width=100%, cols=""""20,50,30""""]
 |===

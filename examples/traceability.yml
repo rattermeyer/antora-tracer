@@ -3,28 +3,28 @@
 
 roles:
   - requirement
-  - architecture
+  - design
   - test
 
 relations:
   requirement:
     requirement: [refines, depends_on]
 
-  architecture:
+  design:
     requirement: [addresses]
-    architecture: [composed_of]
+    design: [composed_of]
 
   test:
     requirement: [verifies]
-    architecture: [validates]
+    design: [validates]
 
 matrices:
-  - name: requirements-architecture
-    description: "Requirements traced to architecture sections"
+  - name: requirements-design
+    description: "Requirements traced to design sections"
     rows: requirement
-    columns: [architecture]
+    columns: [design]
     coverageRelations:
-      architecture: [addresses]
+      design: [addresses]
 
   - name: requirements-tests
     description: "Requirements traced to test files"
