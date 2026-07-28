@@ -20,12 +20,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: '20'
           cache: 'npm'
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
 
       - run: npm ci
 
@@ -34,6 +39,17 @@ jobs:
 
       - name: Build site
         run: npx antora antora-playbook.yml
+
+      - name: Build PDF
+        run: npx antora antora-playbook-pdf.yml
+
+      - name: Copy PDFs for deployment
+        run: |
+          mkdir -p public/pdf
+          build_dir="build/assembler/pdf/tracer/0.7.0/_exports"
+          cp "$build_dir/requirements.pdf" public/pdf/
+          cp "$build_dir/architecture.pdf" public/pdf/
+          cp "$build_dir/test-plan.pdf" public/pdf/
 
       - name: Copy landing page
         run: cp -r landing/* public/
