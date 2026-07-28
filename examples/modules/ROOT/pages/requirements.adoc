@@ -522,3 +522,13 @@ Source: openspec/specs/traceability-links-macro/spec.md
 traceability:outgoing[]
 traceability:incoming[]
 --
+
+ifdef::assembler-backend-pdf[]
+== Changelog
+[cols="1,2,2,3"]
+|===
+| Version | Date | Author | Change
+
+| 0.7.0 | 2026-07-28 | Team | Initial PDF release
+|===
+endif::[]
