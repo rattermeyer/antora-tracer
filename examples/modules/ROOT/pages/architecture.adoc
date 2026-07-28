@@ -237,3 +237,13 @@ addresses:REQ-028[]
 addresses:REQ-029[]
 addresses:REQ-034[]
 --
+
+ifdef::ssembler-backend-pdf[]
+== Changelog
+[cols="1,2,2,3"]
+|===
+| Version | Date | Author | Change
+
+| 0.7.0 | 2026-07-28 | Team | Initial PDF release
+|===
+endif::[]

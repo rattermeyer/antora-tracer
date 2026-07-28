@@ -141,3 +141,13 @@ verifies:REQ-010[]
 traceability:outgoing[]
 traceability:incoming[]
 --
+
+ifdef::ssembler-backend-pdf[]
+== Changelog
+[cols="1,2,2,3"]
+|===
+| Version | Date | Author | Change
+
+| 0.7.0 | 2026-07-28 | Team | Initial PDF release
+|===
+endif::[]
