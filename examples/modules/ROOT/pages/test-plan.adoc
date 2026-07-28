@@ -1,5 +1,6 @@
 = Test Plan
 :traceability-links: true
+:traceability-graph: true
 :traceability-style: table
 :traceability-order: target-id
 :traceability-collapsible: true
@@ -25,6 +26,8 @@ verifies:REQ-034[]
 
 traceability:outgoing[]
 traceability:incoming[]
+
+traceability:graph[]
 --
 
 [#TST-002, item, role=test, title="Antora Extension Tests"]
