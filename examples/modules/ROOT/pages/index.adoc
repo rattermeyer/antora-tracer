@@ -17,9 +17,9 @@ Welcome to the project site for the *Antora Tracer* extension — a role-based t
 
 Download the traceability documents as PDF:
 
-* link:../../pdf/requirements.pdf[Requirements (PDF)]
-* link:../../pdf/architecture.pdf[Architecture (PDF)]
-* link:../../pdf/test-plan.pdf[Test Plan (PDF)]
+* link:../../../pdf/requirements.pdf[Requirements (PDF)]
+* link:../../../pdf/architecture.pdf[Architecture (PDF)]
+* link:../../../pdf/test-plan.pdf[Test Plan (PDF)]
 
 == Generated Traceability
 
