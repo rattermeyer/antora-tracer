@@ -4,7 +4,11 @@ build:
   keepSource: true
 assembly:
   root_level: 1
-  sectionMergeStrategy: discrete
+  sectionMergeStrategy: fuse
+  doctype: book
   attributes:
-    toclevels: 3
-    toc: auto
+    pdf-theme: ./pdf-theme.yml
+    sectnums: ""
+    xrefstyle: full
+    outlinelevels: '2'
+    toclevels: '3'

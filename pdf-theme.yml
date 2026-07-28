@@ -1,0 +1,2 @@
+extends: default
+heading_chapter_title_content: '{chapter-number}. {chapter-title}'
