@@ -1,6 +1,8 @@
 build:
-  command: bundle exec asciidoctor-pdf
+  command: bundle exec asciidoctor-pdf -r asciidoctor-kroki --sourcemap
   publish: true
 assembly:
   rootLevel: 0
   sectionMergeStrategy: discrete
+  attributes:
+    allow-uri-read: true
