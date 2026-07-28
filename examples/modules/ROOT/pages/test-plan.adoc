@@ -1,4 +1,8 @@
 = Test Plan
+:traceability-links: true
+:traceability-style: table
+:traceability-order: target-id
+:traceability-collapsible: true
 
 This document maps the test suite to the requirements it verifies. Each test file is a traceable `[item]` referencing the requirements it covers.
 
@@ -18,6 +22,9 @@ verifies:REQ-005[]
 verifies:REQ-029[]
 verifies:REQ-030[]
 verifies:REQ-034[]
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#TST-002, item, role=test, title="Antora Extension Tests"]
@@ -28,6 +35,9 @@ Tests the `AntoraTraceabilityExtension` — initialization with default config, 
 
 verifies:REQ-035[]
 verifies:REQ-040[]
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#TST-003, item, role=test, title="CLI Tests"]
@@ -40,6 +50,9 @@ verifies:REQ-009[]
 verifies:REQ-010[]
 verifies:REQ-026[]
 verifies:REQ-036[]
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#TST-004, item, role=test, title="ConfigLoader Tests"]
@@ -60,6 +73,9 @@ verifies:REQ-020[]
 verifies:REQ-021[]
 verifies:REQ-022[]
 verifies:REQ-023[]
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#TST-005, item, role=test, title="Graph and API Tests"]
@@ -76,6 +92,9 @@ verifies:REQ-017[]
 verifies:REQ-031[]
 verifies:REQ-032[]
 verifies:REQ-033[]
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#TST-006, item, role=test, title="MatrixGenerator Tests"]
@@ -91,6 +110,9 @@ verifies:REQ-038[]
 verifies:REQ-039[]
 verifies:REQ-042[]
 verifies:REQ-043[]
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#TST-007, item, role=test, title="Neo4jExporter Tests"]
@@ -103,6 +125,9 @@ verifies:REQ-024[]
 verifies:REQ-025[]
 verifies:REQ-027[]
 verifies:REQ-028[]
+
+traceability:outgoing[]
+traceability:incoming[]
 --
 
 [#TST-008, item, role=test, title="Relationship Link Substitution Tests"]
@@ -112,4 +137,7 @@ Test file: `test/relationship-link-substitution.test.ts`
 Tests the in-memory regex substitution that replaces relationship macros with Asciidoctor xrefs. Covers same-page xref generation, cross-page xref generation with basename path resolution, orphan reference handling, non-relationship text preservation, hyphenated/dotted IDs, missing sourceFile fallback, and surrounding text preservation.
 
 verifies:REQ-010[]
+
+traceability:outgoing[]
+traceability:incoming[]
 --

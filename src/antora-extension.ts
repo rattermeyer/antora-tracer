@@ -19,6 +19,7 @@ import { ConfigLoader } from "./config/TraceabilityConfig.js";
 import { RequirementsTraceabilityExtension } from "./index.js";
 import { LinkResolver } from "./LinkResolver.js";
 import { MatrixGenerator } from "./MatrixGenerator.js";
+import { INVERSE_MAP } from "./types.js";
 
 /**
  * Antora Extension Configuration
@@ -61,7 +62,8 @@ export class AntoraTraceabilityExtension {
   private traceability: RequirementsTraceabilityExtension | null = null;
   private config: Required<AntoraTraceabilityConfig>;
   private readonly logger: ReturnType<AntoraExtensionContext["getLogger"]>;
-  private itemsWithLinksMacro = new Set<string>();
+  private itemsWithOutgoingMacro = new Set<string>();
+  private itemsWithIncomingMacro = new Set<string>();
 
   constructor(private readonly context: AntoraExtensionContext) {
     this.logger = context.getLogger("requirements-traceability");
@@ -191,10 +193,15 @@ export class AntoraTraceabilityExtension {
     return "target-id";
   }
 
+  private getCollapsible(attrs: Record<string, string>): boolean {
+    const val = (attrs["traceability-collapsible"] || "").toLowerCase();
+    return val === "true" || val === "yes" || val === "1";
+  }
+
   /**
-   * Expand traceability:links[] macros.
+   * Expand traceability:outgoing[] macros.
    */
-  private expandLinksMacros(file: any): void {
+  private expandOutgoingMacros(file: any): void {
     if (!this.traceability) return;
     try {
       const contentsBuffer = file.contents || file.src?.contents;
@@ -202,76 +209,90 @@ export class AntoraTraceabilityExtension {
       const content = contentsBuffer.toString("utf8");
       const docAttrs = this.parseDocAttributes(content);
       const linksEnabled = this.isLinksEnabled(docAttrs);
-      if (!content.includes("traceability:links[]")) return;
+      if (!content.includes("traceability:outgoing[]")) return;
 
       const style = this.getLinksStyle(docAttrs);
       const order = this.getLinksOrder(docAttrs);
+      const collapsible = this.getCollapsible(docAttrs);
       const sourceFile = file.src?.path || file.path || "unknown";
-      const macroRegex = /traceability:links\[\]/g;
-      let match: RegExpExecArray | null;
+      const currentFile = this.normalizeSourceFile(sourceFile);
       const replacements: Array<{ start: number; end: number; text: string }> =
         [];
 
-      while ((match = macroRegex.exec(content)) !== null) {
-        const macroStart = match.index;
-        const macroEnd = macroStart + match[0].length;
-        const before = content.slice(0, macroStart);
-        const itemMatch = before.match(/\[#([^,\]]+),\s*item[^\]]*\]/g);
-        if (!itemMatch) {
-          this.logger.warn(
-            `traceability:links[] found outside an item block in ${sourceFile}`,
+      // Find item blocks and scan for macros only within block bodies.
+      // This avoids matching the macro name in prose/documentation text.
+      const itemBlockRegex =
+        /\[#([^,\]]+),\s*item[^\]]*\][ \t]*\r?\n--\r?\n([\s\S]*?)\r?\n--/g;
+      let blockMatch: RegExpExecArray | null;
+
+      while ((blockMatch = itemBlockRegex.exec(content)) !== null) {
+        const itemId = blockMatch[1];
+        const bodyContent = blockMatch[2];
+
+        // Find the absolute offset of body content within the file
+        const openerMatch = blockMatch[0].match(/\r?\n--\r?\n/);
+        if (!openerMatch || openerMatch.index === undefined) continue;
+        const bodyStart =
+          blockMatch.index + openerMatch.index + openerMatch[0].length;
+
+        // Scan for macros within this body
+        const macroRegex = /traceability:outgoing\[\]/g;
+        let macroMatch: RegExpExecArray | null;
+        while ((macroMatch = macroRegex.exec(bodyContent)) !== null) {
+          const macroStart = bodyStart + macroMatch.index;
+          const macroEnd = macroStart + macroMatch[0].length;
+
+          if (!linksEnabled) {
+            replacements.push({ start: macroStart, end: macroEnd, text: "" });
+            continue;
+          }
+          this.itemsWithOutgoingMacro.add(itemId);
+
+          const rels = this.traceability.graph.getRelationships(itemId);
+          if (rels.length === 0) {
+            replacements.push({ start: macroStart, end: macroEnd, text: "" });
+            continue;
+          }
+
+          const grouped = new Map<
+            string,
+            Array<{ id: string; title: string; sourceFile?: string }>
+          >();
+          for (const rel of rels) {
+            const target = this.traceability.graph.getItem(rel.targetId);
+            if (!target) continue;
+            if (!grouped.has(rel.type)) grouped.set(rel.type, []);
+            grouped
+              .get(rel.type)
+              ?.push({ id: target.id, title: target.title || target.id, sourceFile: target.sourceFile });
+          }
+          if (grouped.size === 0) {
+            replacements.push({ start: macroStart, end: macroEnd, text: "" });
+            continue;
+          }
+
+          let groupEntries = Array.from(grouped.entries());
+          if (order === "relation-type")
+            groupEntries.sort((a, b) => a[0].localeCompare(b[0]));
+          for (const [, items] of groupEntries) {
+            if (order === "target-id")
+              items.sort((a, b) => a.id.localeCompare(b.id));
+            else if (order === "target-title")
+              items.sort((a, b) => a.title.localeCompare(b.title));
+          }
+
+          const generated = this.generateLinksAsciiDoc(
+            groupEntries,
+            style,
+            currentFile,
+            collapsible,
           );
-          continue;
+          replacements.push({
+            start: macroStart,
+            end: macroEnd,
+            text: generated,
+          });
         }
-        const lastItem = itemMatch[itemMatch.length - 1];
-        const idMatch = lastItem.match(/\[#([^,\]]+),/);
-        if (!idMatch) continue;
-        const itemId = idMatch[1];
-        if (!linksEnabled) {
-          replacements.push({ start: macroStart, end: macroEnd, text: "" });
-          continue;
-        }
-        this.itemsWithLinksMacro.add(itemId);
-
-        const rels = this.traceability.graph.getRelationships(itemId);
-        if (rels.length === 0) {
-          replacements.push({ start: macroStart, end: macroEnd, text: "" });
-          continue;
-        }
-
-        const grouped = new Map<string, Array<{ id: string; title: string }>>();
-        for (const rel of rels) {
-          const target = this.traceability.graph.getItem(rel.targetId);
-          if (!target) continue;
-          if (!grouped.has(rel.type)) grouped.set(rel.type, []);
-          grouped
-            .get(rel.type)?.push({ id: target.id, title: target.title || target.id });
-        }
-        if (grouped.size === 0) {
-          replacements.push({ start: macroStart, end: macroEnd, text: "" });
-          continue;
-        }
-
-        let groupEntries = Array.from(grouped.entries());
-        if (order === "relation-type")
-          groupEntries.sort((a, b) => a[0].localeCompare(b[0]));
-        for (const [, items] of groupEntries) {
-          if (order === "target-id")
-            items.sort((a, b) => a.id.localeCompare(b.id));
-          else if (order === "target-title")
-            items.sort((a, b) => a.title.localeCompare(b.title));
-        }
-
-        const generated = this.generateLinksAsciiDoc(
-          groupEntries,
-          style,
-          sourceFile,
-        );
-        replacements.push({
-          start: macroStart,
-          end: macroEnd,
-          text: generated,
-        });
       }
 
       if (replacements.length > 0) {
@@ -294,49 +315,200 @@ export class AntoraTraceabilityExtension {
     }
   }
 
+  /**
+   * Expand traceability:incoming[] macros.
+   */
+  private expandIncomingMacros(file: any): void {
+    if (!this.traceability) return;
+    try {
+      const contentsBuffer = file.contents || file.src?.contents;
+      if (!contentsBuffer) return;
+      const content = contentsBuffer.toString("utf8");
+      const docAttrs = this.parseDocAttributes(content);
+      const linksEnabled = this.isLinksEnabled(docAttrs);
+      if (!content.includes("traceability:incoming[]")) return;
+
+      const style = this.getLinksStyle(docAttrs);
+      const order = this.getLinksOrder(docAttrs);
+      const collapsible = this.getCollapsible(docAttrs);
+      const sourceFile = file.src?.path || file.path || "unknown";
+      const currentFile = this.normalizeSourceFile(sourceFile);
+      const replacements: Array<{ start: number; end: number; text: string }> =
+        [];
+
+      // Find item blocks and scan for macros only within block bodies.
+      // This avoids matching the macro name in prose/documentation text.
+      const itemBlockRegex =
+        /\[#([^,\]]+),\s*item[^\]]*\][ \t]*\r?\n--\r?\n([\s\S]*?)\r?\n--/g;
+      let blockMatch: RegExpExecArray | null;
+
+      while ((blockMatch = itemBlockRegex.exec(content)) !== null) {
+        const itemId = blockMatch[1];
+        const bodyContent = blockMatch[2];
+
+        // Find the absolute offset of body content within the file
+        const openerMatch = blockMatch[0].match(/\r?\n--\r?\n/);
+        if (!openerMatch || openerMatch.index === undefined) continue;
+        const bodyStart =
+          blockMatch.index + openerMatch.index + openerMatch[0].length;
+
+        // Scan for macros within this body
+        const macroRegex = /traceability:incoming\[\]/g;
+        let macroMatch: RegExpExecArray | null;
+        while ((macroMatch = macroRegex.exec(bodyContent)) !== null) {
+          const macroStart = bodyStart + macroMatch.index;
+          const macroEnd = macroStart + macroMatch[0].length;
+
+          if (!linksEnabled) {
+            replacements.push({ start: macroStart, end: macroEnd, text: "" });
+            continue;
+          }
+          this.itemsWithIncomingMacro.add(itemId);
+
+          const rels =
+            this.traceability.graph.getReverseRelationships(itemId);
+          if (rels.length === 0) {
+            replacements.push({ start: macroStart, end: macroEnd, text: "" });
+            continue;
+          }
+
+          const grouped = new Map<
+            string,
+            Array<{ id: string; title: string; sourceFile?: string }>
+          >();
+          for (const rel of rels) {
+            const source = this.traceability.graph.getItem(rel.fromId);
+            if (!source) continue;
+            // Transform relation type to inverse label for incoming display
+            const inverseType =
+              INVERSE_MAP[rel.type as keyof typeof INVERSE_MAP] || rel.type;
+            if (!grouped.has(inverseType)) grouped.set(inverseType, []);
+            grouped
+              .get(inverseType)
+              ?.push({ id: source.id, title: source.title || source.id, sourceFile: source.sourceFile });
+          }
+          if (grouped.size === 0) {
+            replacements.push({ start: macroStart, end: macroEnd, text: "" });
+            continue;
+          }
+
+          let groupEntries = Array.from(grouped.entries());
+          if (order === "relation-type")
+            groupEntries.sort((a, b) => a[0].localeCompare(b[0]));
+          for (const [, items] of groupEntries) {
+            if (order === "target-id")
+              items.sort((a, b) => a.id.localeCompare(b.id));
+            else if (order === "target-title")
+              items.sort((a, b) => a.title.localeCompare(b.title));
+          }
+
+          const generated = this.generateLinksAsciiDoc(
+            groupEntries,
+            style,
+            currentFile,
+            collapsible,
+          );
+          replacements.push({
+            start: macroStart,
+            end: macroEnd,
+            text: generated,
+          });
+        }
+      }
+
+      if (replacements.length > 0) {
+        let modifiedContent = content;
+        for (let i = replacements.length - 1; i >= 0; i--) {
+          const r = replacements[i];
+          modifiedContent =
+            modifiedContent.slice(0, r.start) +
+            r.text +
+            modifiedContent.slice(r.end);
+        }
+        const buf = Buffer.from(modifiedContent, "utf8");
+        if (file.contents) file.contents = buf;
+        if (file.src?.contents) file.src.contents = buf;
+      }
+    } catch (error: any) {
+      this.logger.warn(
+        `Error expanding incoming links in ${file.src?.path}: ${error.message}`,
+      );
+    }
+  }
+
   private generateLinksAsciiDoc(
-    grouped: Array<[string, Array<{ id: string; title: string }>]>,
+    grouped: Array<
+      [string, Array<{ id: string; title: string; sourceFile?: string }>]
+    >,
     style: "list" | "table" | "inline",
-    _sourceFile: string,
+    currentFile: string,
+    collapsible: boolean,
   ): string {
     if (grouped.length === 0) return "";
-    if (style === "table") return this.generateTableStyle(grouped);
-    if (style === "inline") return this.generateInlineStyle(grouped);
-    return this.generateListStyle(grouped);
+    if (style === "table") return this.generateTableStyle(grouped, currentFile);
+    if (style === "inline") return this.generateInlineStyle(grouped, currentFile);
+    return this.generateListStyle(grouped, currentFile, collapsible);
+  }
+
+  private buildXref(
+    item: { id: string; title: string; sourceFile?: string },
+    currentFile: string,
+    displayText: string,
+  ): string {
+    if (item.sourceFile && item.sourceFile !== currentFile) {
+      return `xref:${item.sourceFile}#${item.id}[${displayText}]`;
+    }
+    return `xref:#${item.id}[${displayText}]`;
   }
 
   private generateListStyle(
-    grouped: Array<[string, Array<{ id: string; title: string }>]>,
+    grouped: Array<
+      [string, Array<{ id: string; title: string; sourceFile?: string }>]
+    >,
+    currentFile: string,
+    collapsible: boolean,
   ): string {
     const lines: string[] = [];
     for (const [relType, items] of grouped) {
-      lines.push(`\n.${this.capitalize(relType)}`);
+      const title = this.capitalize(relType);
+      if (collapsible) {
+        lines.push(`\n[%collapsible]`);
+        lines.push(`.${title}`);
+        lines.push(`====`);
+      } else {
+        lines.push(`\n.${title}`);
+      }
       for (const item of items) {
         const safeTitle = item.title
           .replace(/&/g, "&amp;")
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;");
-        lines.push(`* xref:#${item.id}[${safeTitle}]`);
+        lines.push(`* ${this.buildXref(item, currentFile, safeTitle)}`);
+      }
+      if (collapsible) {
+        lines.push(`====`);
       }
     }
     return `${lines.join("\n")}\n`;
   }
 
   private generateTableStyle(
-    grouped: Array<[string, Array<{ id: string; title: string }>]>,
+    grouped: Array<
+      [string, Array<{ id: string; title: string; sourceFile?: string }>]
+    >,
+    currentFile: string,
   ): string {
     const lines: string[] = ['\n[cols="15,15,70"]', "|==="];
     lines.push("| Relation | ID | Title");
     for (const [relType, items] of grouped) {
       for (const item of items) {
+        const xref = this.buildXref(item, currentFile, item.id);
         lines.push(
           "| " +
             relType +
-            " | xref:#" +
-            item.id +
-            "[" +
-            item.id +
-            "] | " +
+            "| " +
+            xref +
+            " | " +
             item.title.replace(/\|/g, "\\\\|").replace(/&/g, "&amp;"),
         );
       }
@@ -346,7 +518,10 @@ export class AntoraTraceabilityExtension {
   }
 
   private generateInlineStyle(
-    grouped: Array<[string, Array<{ id: string; title: string }>]>,
+    grouped: Array<
+      [string, Array<{ id: string; title: string; sourceFile?: string }>]
+    >,
+    currentFile: string,
   ): string {
     const lines: string[] = [];
     for (const [relType, items] of grouped) {
@@ -354,7 +529,9 @@ export class AntoraTraceabilityExtension {
         "\n" +
           this.capitalize(relType) +
           ": " +
-          items.map((i) => `xref:#${i.id}[${i.id}]`).join(", "),
+          items
+            .map((i) => this.buildXref(i, currentFile, i.id))
+            .join(", "),
       );
     }
     return `${lines.join("\n")}\n`;
@@ -384,10 +561,12 @@ export class AntoraTraceabilityExtension {
         this.processAsciiDocFile(file);
       }
 
-      // Pass 2: Expand traceability:links[] macros
-      this.itemsWithLinksMacro.clear();
+      // Pass 2: Expand traceability:outgoing[] and traceability:incoming[] macros
+      this.itemsWithOutgoingMacro.clear();
+      this.itemsWithIncomingMacro.clear();
       for (const file of adocFiles) {
-        this.expandLinksMacros(file);
+        this.expandOutgoingMacros(file);
+        this.expandIncomingMacros(file);
       }
 
       // Pass 3: Substitute relationship macros with xrefs now that the graph is complete
@@ -469,24 +648,71 @@ export class AntoraTraceabilityExtension {
   }
 
   /**
-   * Substitute inline relationship macros with Asciidoctor xrefs.
-   * Replaces "addresses:REQ-001[]" with "addresses: xref:#REQ-001[REQ-001]"
-   * (same page) or "addresses: xref:other.adoc#REQ-001[REQ-001]" (cross-page).
-   *
-   * The .adoc file on disk is never modified — only the in-memory content buffer.
-   */
-  /**
-   * Substitute inline relationship macros with Asciidoctor xrefs.
-   * Replaces "addresses:REQ-001[]" with "addresses: xref:#REQ-001[REQ-001]"
-   * (same page) or "addresses: xref:other.adoc#REQ-001[REQ-001]" (cross-page).
-   *
-   * The .adoc file on disk is never modified — only the in-memory content buffer.
+   * Substitute inline relationship macros with Asciidoctor xrefs in the
+   * in-memory content buffer. Inline macros (e.g., addresses:REQ-001[]) are
+   * always invisible — pure data markers stored in the traceability graph.
+   * traceability:outgoing[] and traceability:incoming[] are excluded from
+   * this pass (they are handled in expandOutgoingMacros/expandIncomingMacros).
    */
   private substituteRelationshipLinks(content: string): string {
     // Inline macros are always invisible — pure data markers.
-    // Exclude traceability:links[] (the rendering macro itself).
+    // Exclude traceability:outgoing[] and traceability:incoming[] (the rendering macros).
     const relRegex = /\b(?!traceability:)(\w+):([\w][-.\w]*)\[\]/g;
-    return content.replace(relRegex, "");
+
+    // Find verbatim block ranges so we can preserve example code inside them
+    const ranges = this.findVerbatimRanges(content);
+
+    if (ranges.length === 0) {
+      return content.replace(relRegex, "");
+    }
+
+    // Segment-based processing: strip macros from non-verbatim parts,
+    // preserve verbatim blocks as-is (they are example/documentation code)
+    let result = "";
+    let pos = 0;
+    for (const range of ranges) {
+      result += content.slice(pos, range.start).replace(relRegex, "");
+      result += content.slice(range.start, range.end);
+      pos = range.end;
+    }
+    result += content.slice(pos).replace(relRegex, "");
+    return result;
+  }
+
+  /**
+   * Find verbatim block ranges (---- and .... fences) for content preservation.
+   * Mirrors DocumentParser.findVerbatimRanges — these are example code blocks
+   * whose content should not be stripped or parsed.
+   */
+  private findVerbatimRanges(
+    content: string,
+  ): Array<{ start: number; end: number }> {
+    const ranges: Array<{ start: number; end: number }> = [];
+    const fenceRegex = /(?:^|\n)(----|\.\.\.\.)[ \t]*\r?\n/g;
+    let match: RegExpExecArray | null;
+
+    while ((match = fenceRegex.exec(content)) !== null) {
+      const fence = match[1];
+      const openEnd = match.index + match[0].length;
+      const closePattern =
+        fence === "----"
+          ? "\\r?\\n----[ \\t]*(?:\\r?\\n|$)"
+          : "\\r?\\n\\.\\.\\.\\.[ \\t]*(?:\\r?\\n|$)";
+      const closeRegex = new RegExp(closePattern, "g");
+      closeRegex.lastIndex = openEnd;
+      const closeMatch = closeRegex.exec(content);
+
+      if (closeMatch) {
+        const rangeEnd = closeMatch.index + closeMatch[0].length;
+        ranges.push({ start: match.index, end: rangeEnd });
+        fenceRegex.lastIndex = rangeEnd;
+      } else {
+        ranges.push({ start: match.index, end: content.length });
+        break;
+      }
+    }
+
+    return ranges;
   }
 
   private registerPageProcessor(): void {

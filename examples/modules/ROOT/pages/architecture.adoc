@@ -31,7 +31,9 @@ addresses:REQ-024[]
 addresses:REQ-035[]
 addresses:REQ-036[]
 
-traceability:links[]
+traceability:outgoing[]
+
+traceability:incoming[]
 --
 
 == Building Block View
@@ -130,7 +132,7 @@ addresses:REQ-025[]
 addresses:REQ-029[]
 addresses:REQ-034[]
 
-traceability:links[]
+traceability:outgoing[]
 --
 
 == Runtime View
@@ -174,20 +176,26 @@ loop for each .adoc file
   graph -> graph : validate relation (ConfigLoader.isRelationAllowed)
 end
 
-== Pass 2: Expand traceability:links[] macros ==
+== Pass 2: Expand traceability:outgoing[] and traceability:incoming[] macros ==
 loop for each .adoc file
-  antora_ext -> antora_ext : expandLinksMacros(content)
-  antora_ext -> antora_ext : find traceability:links[] and enclosing item ID
+  antora_ext -> antora_ext : expandOutgoingMacros(content)
+  antora_ext -> antora_ext : find traceability:outgoing[] and enclosing item ID
   antora_ext -> graph : getRelationships(itemId)
   graph --> antora_ext : outgoing relationships
   antora_ext -> antora_ext : generate AsciiDoc list/table/inline
+  antora_ext -> antora_ext : replace macro with generated content
+  antora_ext -> antora_ext : expandIncomingMacros(content)
+  antora_ext -> antora_ext : find traceability:incoming[] and enclosing item ID
+  antora_ext -> graph : getReverseRelationships(itemId)
+  graph --> antora_ext : incoming relationships
+  antora_ext -> antora_ext : generate AsciiDoc with inverse labels
   antora_ext -> antora_ext : replace macro with generated content
 end
 
 == Pass 3: Strip inline macros ==
 loop for each .adoc file
   antora_ext -> antora_ext : substituteRelationshipLinks(content)
-  note right: inline macros always stripped\n(traceability:links[] is sole renderer)
+  note right: inline macros always stripped\n(traceability:outgoing[] / traceability:incoming[] render)
   antora_ext -> antora_ext : write modified content to in-memory buffer
 end
 

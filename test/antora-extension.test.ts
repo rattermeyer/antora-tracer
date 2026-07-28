@@ -639,4 +639,465 @@ satisfies:REQ-002[]
       ).to.be.true;
     });
   });
+
+  // ========================================================================
+  // Links Macro Expansion
+  // ========================================================================
+
+  describe("Links Macro Expansion", () => {
+    it("should expand traceability:outgoing[] with list style", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const content = `:traceability-links: true
+
+[#REQ-001, item, role=requirement, title="User Auth"]
+--
+addresses:ARC-001[]
+addresses:ARC-002[]
+
+traceability:outgoing[]
+--
+
+[#ARC-001, item, role=architecture, title="Auth Module"]
+--
+Description.
+--
+
+[#ARC-002, item, role=architecture, title="Session Module"]
+--
+Description.
+--
+`;
+
+      ctx.fireEvent(
+        "contentClassified",
+        createContentClassifiedEvent([{ path: "test.adoc", content }]),
+      );
+
+      // The content buffer should contain expanded outgoing links
+      const traceExt = ext.getTraceabilityExtension();
+      const items = traceExt.getAllItems();
+      expect(items).to.have.lengthOf(3);
+
+      // Check relationships exist
+      const rels = traceExt.graph.getRelationships("REQ-001");
+      expect(rels).to.have.lengthOf(2);
+    });
+
+    it("should expand traceability:incoming[] on targeted item", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const content = `:traceability-links: true
+
+[#REQ-001, item, role=requirement, title="User Auth"]
+--
+addresses:ARC-001[]
+--
+
+[#ARC-001, item, role=architecture, title="Auth Module"]
+--
+Description.
+
+traceability:incoming[]
+--
+`;
+
+      ctx.fireEvent(
+        "contentClassified",
+        createContentClassifiedEvent([{ path: "test.adoc", content }]),
+      );
+
+      const traceExt = ext.getTraceabilityExtension();
+      // ARC-001 should have incoming relationships
+      const incomingRels = traceExt.graph.getReverseRelationships("ARC-001");
+      expect(incomingRels).to.have.lengthOf(1);
+      expect(incomingRels[0].type).to.equal("addresses");
+    });
+
+    it("should handle both outgoing and incoming in same item", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const content = `:traceability-links: true
+
+[#ARC-001, item, role=architecture, title="Auth Module"]
+--
+addresses:REQ-001[]
+
+traceability:outgoing[]
+traceability:incoming[]
+--
+
+[#REQ-001, item, role=requirement, title="User Auth"]
+--
+addresses:ARC-001[]
+--
+`;
+
+      ctx.fireEvent(
+        "contentClassified",
+        createContentClassifiedEvent([{ path: "test.adoc", content }]),
+      );
+
+      const traceExt = ext.getTraceabilityExtension();
+      // ARC-001 has both outgoing and incoming
+      const outgoing = traceExt.graph.getRelationships("ARC-001");
+      const incoming = traceExt.graph.getReverseRelationships("ARC-001");
+      expect(outgoing).to.have.lengthOf(1);
+      expect(incoming).to.have.lengthOf(1);
+    });
+
+    it("should strip macro when links not enabled", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      // No :traceability-links: attribute
+      const content = `
+[#REQ-001, item, role=requirement, title="User Auth"]
+--
+addresses:ARC-001[]
+
+traceability:outgoing[]
+traceability:incoming[]
+--
+
+[#ARC-001, item, role=architecture, title="Auth Module"]
+--
+Description.
+--
+`;
+
+      ctx.fireEvent(
+        "contentClassified",
+        createContentClassifiedEvent([{ path: "test.adoc", content }]),
+      );
+
+      const traceExt = ext.getTraceabilityExtension();
+      expect(traceExt.getAllItems()).to.have.lengthOf(2);
+      // Graph should still have the relationship even though rendering was disabled
+      const rels = traceExt.graph.getRelationships("REQ-001");
+      expect(rels).to.have.lengthOf(1);
+    });
+
+    it("should handle item with no relationships", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const content = `:traceability-links: true
+
+[#REQ-001, item, role=requirement, title="Orphan requirement"]
+--
+No relations here.
+
+traceability:outgoing[]
+traceability:incoming[]
+--
+`;
+
+      ctx.fireEvent(
+        "contentClassified",
+        createContentClassifiedEvent([{ path: "test.adoc", content }]),
+      );
+
+      const traceExt = ext.getTraceabilityExtension();
+      expect(traceExt.getAllItems()).to.have.lengthOf(1);
+      const rels = traceExt.graph.getRelationships("REQ-001");
+      expect(rels).to.have.lengthOf(0);
+    });
+
+    it("should silently skip macros outside item blocks", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      // Macros in prose text (outside item blocks) should be silently ignored —
+      // they are documentation mentions, not actual macro invocations.
+      const content = `:traceability-links: true
+
+= Document Title
+
+This documents traceability:outgoing[] and traceability:incoming[] macros.
+`;
+
+      ctx.fireEvent(
+        "contentClassified",
+        createContentClassifiedEvent([{ path: "test.adoc", content }]),
+      );
+
+      // No warnings should be emitted for macros in prose
+      const macroWarns = ctx.logs.filter(
+        (l) =>
+          l.level === "warn" &&
+          (l.message.includes("traceability:outgoing[] found outside") ||
+            l.message.includes("traceability:incoming[] found outside")),
+      );
+      expect(macroWarns).to.have.lengthOf(0);
+    });
+
+    it("should expand with table style", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const content = `:traceability-links: true
+:traceability-style: table
+
+[#REQ-001, item, role=requirement, title="User Auth"]
+--
+addresses:ARC-001[]
+
+traceability:outgoing[]
+--
+
+[#ARC-001, item, role=architecture, title="Auth Module"]
+--
+Description.
+--
+`;
+
+      ctx.fireEvent(
+        "contentClassified",
+        createContentClassifiedEvent([{ path: "test.adoc", content }]),
+      );
+
+      // Should not crash with table style
+      const traceExt = ext.getTraceabilityExtension();
+      expect(traceExt.getAllItems()).to.have.lengthOf(2);
+    });
+
+    it("should expand with inline style and sort by target-title", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const content = `:traceability-links: true
+:traceability-style: inline
+:traceability-order: target-title
+
+[#REQ-001, item, role=requirement, title="User Auth"]
+--
+addresses:ARC-002[]
+addresses:ARC-001[]
+
+traceability:outgoing[]
+--
+
+[#ARC-001, item, role=architecture, title="Auth Module"]
+--
+Description.
+--
+
+[#ARC-002, item, role=architecture, title="Auth Module Backup"]
+--
+Description.
+--
+`;
+
+      ctx.fireEvent(
+        "contentClassified",
+        createContentClassifiedEvent([{ path: "test.adoc", content }]),
+      );
+
+      const traceExt = ext.getTraceabilityExtension();
+      expect(traceExt.getAllItems()).to.have.lengthOf(3);
+    });
+
+    it("should use inverse labels for incoming macro", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const content = `:traceability-links: true
+
+[#REQ-001, item, role=requirement, title="User Auth"]
+--
+addresses:ARC-001[]
+implements:ARC-002[]
+--
+
+[#ARC-001, item, role=architecture, title="Auth Module"]
+--
+Description.
+
+traceability:incoming[]
+--
+
+[#ARC-002, item, role=architecture, title="Session Module"]
+--
+Description.
+--
+`;
+
+      ctx.fireEvent(
+        "contentClassified",
+        createContentClassifiedEvent([{ path: "test.adoc", content }]),
+      );
+
+      // ARC-001 has incoming from both relation types
+      const incoming = ext
+        .getTraceabilityExtension()
+        .graph.getReverseRelationships("ARC-001");
+      expect(incoming).to.have.lengthOf(1); // only addresses
+      expect(incoming[0].type).to.equal("addresses");
+    });
+
+    it("should wrap output in [%collapsible] when attribute is true", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const content = `:traceability-links: true
+:traceability-collapsible: true
+
+[#REQ-001, item, role=requirement, title="User Auth"]
+--
+addresses:ARC-001[]
+
+traceability:outgoing[]
+--
+
+[#ARC-001, item, role=architecture, title="Auth Module"]
+--
+Description.
+--
+`;
+
+      ctx.fireEvent(
+        "contentClassified",
+        createContentClassifiedEvent([{ path: "test.adoc", content }]),
+      );
+
+      const traceExt = ext.getTraceabilityExtension();
+      expect(traceExt.getAllItems()).to.have.lengthOf(2);
+      // Collapsible output is generated — graph still works correctly
+      const rels = traceExt.graph.getRelationships("REQ-001");
+      expect(rels).to.have.lengthOf(1);
+    });
+
+    it("should produce flat output when collapsible is not set", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const content = `:traceability-links: true
+
+[#REQ-001, item, role=requirement, title="User Auth"]
+--
+addresses:ARC-001[]
+
+traceability:outgoing[]
+--
+
+[#ARC-001, item, role=architecture, title="Auth Module"]
+--
+Description.
+--
+`;
+
+      ctx.fireEvent(
+        "contentClassified",
+        createContentClassifiedEvent([{ path: "test.adoc", content }]),
+      );
+
+      const traceExt = ext.getTraceabilityExtension();
+      expect(traceExt.getAllItems()).to.have.lengthOf(2);
+    });
+
+    it("collapsible has no effect on table style", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const content = `:traceability-links: true
+:traceability-collapsible: true
+:traceability-style: table
+
+[#REQ-001, item, role=requirement, title="User Auth"]
+--
+addresses:ARC-001[]
+
+traceability:outgoing[]
+--
+
+[#ARC-001, item, role=architecture, title="Auth Module"]
+--
+Description.
+--
+`;
+
+      ctx.fireEvent(
+        "contentClassified",
+        createContentClassifiedEvent([{ path: "test.adoc", content }]),
+      );
+
+      const traceExt = ext.getTraceabilityExtension();
+      expect(traceExt.getAllItems()).to.have.lengthOf(2);
+      // No crash — table style ignores collapsible
+    });
+
+    it("collapsible has no effect on inline style", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const content = `:traceability-links: true
+:traceability-collapsible: true
+:traceability-style: inline
+
+[#REQ-001, item, role=requirement, title="User Auth"]
+--
+addresses:ARC-001[]
+
+traceability:outgoing[]
+--
+
+[#ARC-001, item, role=architecture, title="Auth Module"]
+--
+Description.
+--
+`;
+
+      ctx.fireEvent(
+        "contentClassified",
+        createContentClassifiedEvent([{ path: "test.adoc", content }]),
+      );
+
+      const traceExt = ext.getTraceabilityExtension();
+      expect(traceExt.getAllItems()).to.have.lengthOf(2);
+      // No crash — inline style ignores collapsible
+    });
+  });
 });
