@@ -655,7 +655,7 @@ export class AntoraTraceabilityExtension {
           replacements.push({
             start: macroStart,
             end: macroEnd,
-            text: `\nimage:${url}[Relationship graph for ${itemId}]\n`,
+            text: `\nimage::${url}[Relationship graph for ${itemId}]\n`,
           });
         }
       }
@@ -693,7 +693,7 @@ export class AntoraTraceabilityExtension {
         replacements.push({
           start: matchStart,
           end: macroEnd,
-          text: `\nimage:${url}[Relationship graph for ${targetId}]\n`,
+          text: `\nimage::${url}[Relationship graph for ${targetId}]\n`,
         });
       }
 
@@ -758,7 +758,7 @@ export class AntoraTraceabilityExtension {
           replacements.push({
             start: macroStart,
             end: macroEnd,
-            text: `\nimage:${url}[Coverage chart for ${itemId}]\n`,
+            text: `\nimage::${url}[Coverage chart for ${itemId}]\n`,
           });
         }
       }
@@ -803,7 +803,7 @@ export class AntoraTraceabilityExtension {
         replacements.push({
           start: matchStart,
           end: macroEnd,
-          text: `\nimage:${url}[Global coverage chart]\n`,
+          text: `\nimage::${url}[Global coverage chart]\n`,
         });
       }
 
