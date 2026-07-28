@@ -1,12 +1,11 @@
 * xref:index.adoc[Overview]
 * xref:user-guide.adoc[User Guide]
 * xref:developer-guide.adoc[Developer Guide]
-* Example
-** xref:requirements.adoc[Requirements]
-** xref:architecture.adoc[Architecture]
-** xref:test-plan.adoc[Test Plan]
-** Traceability
-*** xref:traceability/index.adoc[Overview]
-*** xref:attachment$traceability/matrix-requirements-architecture.html[Req → Architecture]
-*** xref:attachment$traceability/matrix-requirements-tests.html[Req → Tests]
+* xref:requirements.adoc[Requirements]
+* xref:architecture.adoc[Architecture]
+* xref:test-plan.adoc[Test Plan]
 * xref:sphinx-comparison.adoc[Comparison with Sphinx Needs]
+* Traceability
+** xref:traceability/index.adoc[Overview]
+** xref:attachment$traceability/matrix-requirements-architecture.html[Req → Architecture]
+** xref:attachment$traceability/matrix-requirements-tests.html[Req → Tests]

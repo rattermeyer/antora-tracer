@@ -3,5 +3,5 @@ build:
   publish: true
   keepSource: true
 assembly:
-  rootLevel: 0
+  root_level: 1
   sectionMergeStrategy: discrete
