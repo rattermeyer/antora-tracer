@@ -42,7 +42,7 @@ traceability:incoming[]
 --
 The extension is composed of eight modules organized in a layered architecture:
 
-[plantuml, format=svg]
+[plantuml]
 ....
 @startuml
 package "Antora Pipeline" {
@@ -141,7 +141,7 @@ traceability:outgoing[]
 --
 The following sequence shows how an AsciiDoc file flows through the system during an Antora build:
 
-[plantuml, format=svg]
+[plantuml]
 ....
 @startuml
 actor "Antora Build" as antora
