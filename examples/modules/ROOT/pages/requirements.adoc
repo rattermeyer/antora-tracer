@@ -6,7 +6,6 @@
 :req-id-prefix: REQ
 :toclevels: 3
 :outlinelevels: 2
-:chapter-label!:
 
 This document lists the traceability requirements for the Antora Tracer extension. Each requirement is extracted from the OpenSpec specifications under `openspec/changes/unified-item-architecture/specs/`.
 

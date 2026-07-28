@@ -11,4 +11,5 @@ assembly:
     sectnums: ""
     xrefstyle: full
     outlinelevels: '2'
+    chapter-label: ''
     toclevels: '3'
