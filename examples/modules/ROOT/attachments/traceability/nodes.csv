@@ -288,6 +288,30 @@ Source: openspec/specs/traceability-links-macro/spec.md
 
 traceability:outgoing[]
 traceability:incoming[]"""
+REQ-051,REQ-051 — Relationship graph via traceability:graph[] macro,requirement,,requirements.adoc,"""The system SHALL provide a \`traceability:graph[]\` inline macro that renders a GraphViz relationship graph for the enclosing item. The graph SHALL show the item and its direct relationships as labeled nodes and edges, colored by role. An optional depth parameter SHALL control the number of hops.
+
+Source: openspec/specs/graph-visualization/spec.md
+
+traceability:outgoing[]
+traceability:incoming[]"""
+REQ-052,REQ-052 — Coverage chart via traceability:graph-coverage[] macro,requirement,,requirements.adoc,"""The system SHALL provide a \`traceability:graph-coverage[]\` inline macro that renders a Vega-Lite bar chart showing coverage. When used inside an item block, it SHALL show per-relationship-type coverage for that item. When used outside an item block, it SHALL show global coverage by role.
+
+Source: openspec/specs/graph-visualization/spec.md
+
+traceability:outgoing[]
+traceability:incoming[]"""
+REQ-053,REQ-053 — Graph visualization methods on TraceabilityGraph,requirement,,requirements.adoc,"""The \`TraceabilityGraph\` SHALL provide \`toDot(fromId, depth?)\` returning a GraphViz DOT source string, and \`toVegaLite(itemId?)\` returning a Vega-Lite JSON specification.
+
+Source: openspec/specs/graph-visualization/spec.md
+
+traceability:outgoing[]
+traceability:incoming[]"""
+REQ-054,REQ-054 — Dashboard page in example site,requirement,,requirements.adoc,"""The example site SHALL include a dashboard page with a global coverage chart and select per-item relationship graphs, gated by the \`:traceability-graph:\` attribute.
+
+Source: openspec/specs/graph-visualization/spec.md
+
+traceability:outgoing[]
+traceability:incoming[]"""
 ARC-001,ARC-001 — Project scope and architectural goals,architecture,,architecture.adoc,"""*Project scope and architectural goals*
 
 The Antora Tracer is an Antora extension that adds role-based requirements traceability to AsciiDoc documentation. It replaces fixed macro types with a single configurable `[item]` macro.
@@ -311,7 +335,9 @@ addresses:REQ-036[]
 
 traceability:outgoing[]
 
-traceability:incoming[]"""
+traceability:incoming[]
+
+traceability:graph[]"""
 ARC-002,ARC-002 — Component-level architecture,architecture,,architecture.adoc,"""The extension is composed of eight modules organized in a layered architecture:
 
 [plantuml]
@@ -509,7 +535,9 @@ verifies:REQ-030[]
 verifies:REQ-034[]
 
 traceability:outgoing[]
-traceability:incoming[]"""
+traceability:incoming[]
+
+traceability:graph[]"""
 TST-002,TST-002 — Antora Extension Tests,test,,test-plan.adoc,"""Test file: `test/antora-extension.test.ts`
 
 Tests the `AntoraTraceabilityExtension` — initialization with default config, preset, config path, and disabled state. Tests event handler registration, content processing via `contentClassified` event, matrix generation via `sitePublished` event, and API access patterns.

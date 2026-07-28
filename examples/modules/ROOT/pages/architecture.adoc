@@ -9,7 +9,7 @@ This document describes the architecture of the Antora Tracer extension using se
 
 == Introduction and Goals
 
-[#ARC-001, item, role=design, title="Project scope and architectural goals"]
+[#ARC-001, item, role=architecture, title="Project scope and architectural goals"]
 --
 *Project scope and architectural goals*
 
@@ -41,7 +41,7 @@ traceability:graph[]
 
 == Building Block View
 
-[#ARC-002, item, role=design, title="Component-level architecture"]
+[#ARC-002, item, role=architecture, title="Component-level architecture"]
 --
 The extension is composed of eight modules organized in a layered architecture:
 
@@ -140,7 +140,7 @@ traceability:outgoing[]
 
 == Runtime View
 
-[#ARC-003, item, role=design, title="Processing flow during Antora build"]
+[#ARC-003, item, role=architecture, title="Processing flow during Antora build"]
 --
 The following sequence shows how an AsciiDoc file flows through the system during an Antora build:
 
@@ -169,7 +169,7 @@ addresses:REQ-035[]
 
 == Architecture Decisions
 
-[#ARC-004, item, role=design, title="Key architectural decisions and their rationale"]
+[#ARC-004, item, role=architecture, title="Key architectural decisions and their rationale"]
 --
 This section captures the design decisions from `openspec/changes/unified-item-architecture/design.md`.
 
