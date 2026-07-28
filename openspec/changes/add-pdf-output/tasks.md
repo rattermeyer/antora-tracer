@@ -2,12 +2,12 @@
 
 - [x] 1.1 Update `devbox.json` — add `nodejs`, `ruby`, `bundler` packages
 - [x] 1.2 Add init hook: `npm install && bundle install`
-- [ ] 1.3 Verify `devbox shell` provides `ruby --version`, `bundle --version`, `node --version`
+- [x] 1.3 Verify `devbox shell` provides `ruby --version`, `bundle --version`, `node --version`
 
 ## 2. Ruby Gemfile
 
 - [x] 2.1 Create `Gemfile` with `gem 'asciidoctor-pdf'` and `gem 'asciidoctor-kroki'`
-- [ ] 2.2 Run `bundle install` to generate `Gemfile.lock`
+- [x] 2.2 Run `bundle install` to generate `Gemfile.lock`
 
 ## 3. NPM dependency
 
@@ -23,9 +23,9 @@
 
 ## 5. Verify PDF output
 
-- [ ] 5.1 Run `npx antora antora-playbook-pdf.yml` and confirm PDF is generated in `public/pdf/`
-- [ ] 5.2 Verify PDF contains requirements, architecture, and test plan content
-- [ ] 5.3 Verify PlantUML diagrams render (uses kroki.io)
+- [x] 5.1 Run `npx antora antora-playbook-pdf.yml` and confirm PDF is generated in `public/pdf/`
+- [x] 5.2 Verify PDF contains requirements, architecture, and test plan content
+- [x] 5.3 Verify PlantUML diagrams render (uses kroki.io)
 - [x] 5.4 Verify HTML site build still works unchanged via `npx antora antora-playbook.yml`
 
 ## 6. Documentation
