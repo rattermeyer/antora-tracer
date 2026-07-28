@@ -22,8 +22,6 @@
     "format": "biome format --write .",
     "start": "node lib/cli.js",
     "dev": "nodemon --watch src --exec \"npm run build && node lib/index.js\"",
-    "prepublishOnly": "node scripts/prepublish",
-    "postpublish": "node scripts/postpublish",
     "tsc": "tsc",
     "tsc:watch": "tsc --watch"
   },
