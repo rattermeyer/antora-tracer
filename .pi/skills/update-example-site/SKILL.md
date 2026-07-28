@@ -45,7 +45,7 @@ Group items by capability area (matching the spec's parent directory name).
 
 ### 3. Update `architecture.adoc`
 
-The file is at `examples/modules/ROOT/pages/architecture.adoc`. It uses arc42 sections as `[item, id=ARC-XXX, role=architecture]`.
+The file is at `examples/modules/ROOT/pages/architecture.adoc`. It uses arc42 sections as `[item, id=ARC-XXX, role=design]`.
 
 **Scan design decisions:**
 

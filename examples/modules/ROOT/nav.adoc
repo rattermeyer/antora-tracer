@@ -4,6 +4,7 @@
 * xref:requirements.adoc[Requirements]
 * xref:architecture.adoc[Architecture]
 * xref:test-plan.adoc[Test Plan]
+* xref:dashboard.adoc[Dashboard]
 * xref:sphinx-comparison.adoc[Comparison with Sphinx Needs]
 * Traceability
 ** xref:traceability/index.adoc[Overview]

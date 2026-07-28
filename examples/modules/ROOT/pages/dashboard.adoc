@@ -1,0 +1,22 @@
+= Traceability Dashboard
+:traceability-graph: true
+
+This page provides visual overviews of the Antora Tracer traceability data.
+
+== Global Coverage
+
+traceability:graph-coverage[]
+
+== Key Requirement Graphs
+
+=== REQ-001 — Single item macro
+
+traceability:graph[REQ-001]
+
+=== ARC-002 — Component Architecture
+
+traceability:graph[ARC-002, 2]
+
+=== ARC-004 — Architecture Decisions
+
+traceability:graph[ARC-004, 2]

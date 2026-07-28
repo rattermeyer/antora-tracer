@@ -15,6 +15,7 @@
 
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { deflateSync } from "node:zlib";
 import { ConfigLoader } from "./config/TraceabilityConfig.js";
 import { RequirementsTraceabilityExtension } from "./index.js";
 import { LinkResolver } from "./LinkResolver.js";
@@ -596,6 +597,236 @@ export class AntoraTraceabilityExtension {
     return s.charAt(0).toUpperCase() + s.slice(1);
   }
 
+  private isGraphEnabled(attrs: Record<string, string>): boolean {
+    const val = (attrs["traceability-graph"] || "").toLowerCase();
+    return val === "true" || val === "yes" || val === "1";
+  }
+
+  /**
+   * Encode source text as a Kroki URL for the given diagram type.
+   * Uses deflate + base64url encoding.
+   */
+  private krokiUrl(type: string, source: string, format = "svg"): string {
+    const compressed = deflateSync(Buffer.from(source, "utf-8"));
+    const encoded = Buffer.from(compressed).toString("base64url");
+    return `https://kroki.io/${type}/${format}/${encoded}`;
+  }
+
+  /**
+   * Expand traceability:graph[] macros into Kroki GraphViz images.
+   */
+  private expandGraphMacros(file: any): void {
+    if (!this.traceability) return;
+    try {
+      const contentsBuffer = file.contents || file.src?.contents;
+      if (!contentsBuffer) return;
+      const content = contentsBuffer.toString("utf8");
+      const docAttrs = this.parseDocAttributes(content);
+      if (!content.includes("traceability:graph[")) return;
+
+      const graphEnabled = this.isGraphEnabled(docAttrs);
+      const blocks = this.findItemBlocks(content);
+      const replacements: Array<{ start: number; end: number; text: string }> = [];
+
+      for (const { itemId, bodyStart } of blocks) {
+        const bodyEnd = content.indexOf("\n--\n", bodyStart);
+        const bodyContent = content.slice(bodyStart, bodyEnd >= 0 ? bodyEnd : undefined);
+
+        const macroRegex = /traceability:graph\[([A-Z][A-Z0-9-]*)?(?:,\s*(\d+))?\]/g;
+        let macroMatch: RegExpExecArray | null;
+        while ((macroMatch = macroRegex.exec(bodyContent)) !== null) {
+          const macroStart = bodyStart + macroMatch.index;
+          const macroEnd = macroStart + macroMatch[0].length;
+
+          if (!graphEnabled) {
+            replacements.push({ start: macroStart, end: macroEnd, text: "" });
+            continue;
+          }
+
+          const targetId = macroMatch[1] || itemId;
+          const depth = macroMatch[2] ? parseInt(macroMatch[2], 10) : 1;
+          const dotSource = this.traceability.graph.toDot(targetId, depth);
+          if (!dotSource) {
+            replacements.push({ start: macroStart, end: macroEnd, text: "" });
+            continue;
+          }
+
+          const url = this.krokiUrl("graphviz", dotSource);
+          replacements.push({
+            start: macroStart,
+            end: macroEnd,
+            text: `\nimage:${url}[Relationship graph for ${itemId}]\n`,
+          });
+        }
+      }
+
+      // Handle graph macros outside item blocks: traceability:graph[ID]
+      const externalRegex = /traceability:graph\[([A-Z][A-Z0-9-]*)(?:,\s*(\d+))?\]/g;
+      let externalMatch: RegExpExecArray | null;
+      const bodyRanges = blocks.map((b) => ({
+        start: b.bodyStart,
+        end: content.indexOf("\n--\n", b.bodyStart),
+      }));
+
+      while ((externalMatch = externalRegex.exec(content)) !== null) {
+        const matchStart = externalMatch.index;
+        const insideBody = bodyRanges.some(
+          (r) => matchStart >= r.start && (r.end < 0 || matchStart <= r.end),
+        );
+        if (insideBody) continue;
+
+        const macroEnd = matchStart + externalMatch[0].length;
+        if (!graphEnabled) {
+          replacements.push({ start: matchStart, end: macroEnd, text: "" });
+          continue;
+        }
+
+        const targetId = externalMatch[1];
+        const depth = externalMatch[2] ? parseInt(externalMatch[2], 10) : 1;
+        const dotSource = this.traceability.graph.toDot(targetId, depth);
+        if (!dotSource) {
+          replacements.push({ start: matchStart, end: macroEnd, text: "" });
+          continue;
+        }
+
+        const url = this.krokiUrl("graphviz", dotSource);
+        replacements.push({
+          start: matchStart,
+          end: macroEnd,
+          text: `\nimage:${url}[Relationship graph for ${targetId}]\n`,
+        });
+      }
+
+      if (replacements.length > 0) {
+        let modifiedContent = content;
+        for (let i = replacements.length - 1; i >= 0; i--) {
+          const r = replacements[i];
+          modifiedContent =
+            modifiedContent.slice(0, r.start) +
+            r.text +
+            modifiedContent.slice(r.end);
+        }
+        const buf = Buffer.from(modifiedContent, "utf8");
+        if (file.contents) file.contents = buf;
+        if (file.src?.contents) file.src.contents = buf;
+      }
+    } catch (error: any) {
+      this.logger.warn(
+        `Error expanding graphs in ${file.src?.path}: ${error.message}`,
+      );
+    }
+  }
+
+  /**
+   * Expand traceability:graph-coverage[] macros into Kroki Vega-Lite images.
+   */
+  private expandCoverageMacros(file: any): void {
+    if (!this.traceability) return;
+    try {
+      const contentsBuffer = file.contents || file.src?.contents;
+      if (!contentsBuffer) return;
+      const content = contentsBuffer.toString("utf8");
+      const docAttrs = this.parseDocAttributes(content);
+      if (!content.includes("traceability:graph-coverage[")) return;
+
+      const graphEnabled = this.isGraphEnabled(docAttrs);
+      const blocks = this.findItemBlocks(content);
+      const replacements: Array<{ start: number; end: number; text: string }> = [];
+
+      for (const { itemId, bodyStart } of blocks) {
+        const bodyEnd = content.indexOf("\n--\n", bodyStart);
+        const bodyContent = content.slice(bodyStart, bodyEnd >= 0 ? bodyEnd : undefined);
+
+        const macroRegex = /traceability:graph-coverage\[\]/g;
+        let macroMatch: RegExpExecArray | null;
+        while ((macroMatch = macroRegex.exec(bodyContent)) !== null) {
+          const macroStart = bodyStart + macroMatch.index;
+          const macroEnd = macroStart + macroMatch[0].length;
+
+          if (!graphEnabled) {
+            replacements.push({ start: macroStart, end: macroEnd, text: "" });
+            continue;
+          }
+
+          const vegaSource = this.traceability.graph.toVegaLite(itemId);
+          if (!vegaSource) {
+            replacements.push({ start: macroStart, end: macroEnd, text: "" });
+            continue;
+          }
+
+          const url = this.krokiUrl("vegalite", vegaSource);
+          replacements.push({
+            start: macroStart,
+            end: macroEnd,
+            text: `\nimage:${url}[Coverage chart for ${itemId}]\n`,
+          });
+        }
+      }
+
+      // Handle global coverage (outside item blocks)
+      const globalRegex = /traceability:graph-coverage\[\]/g;
+      let globalMatch: RegExpExecArray | null;
+      const processedRanges = new Set<number>();
+      // Track body ranges we already processed to avoid double-replacing
+      for (const { bodyStart } of blocks) {
+        const bodyEnd = content.indexOf("\n--\n", bodyStart);
+        processedRanges.add(bodyStart);
+        if (bodyEnd >= 0) processedRanges.add(bodyEnd);
+      }
+
+      while ((globalMatch = globalRegex.exec(content)) !== null) {
+        const matchStart = globalMatch.index;
+        // Skip if inside an already-processed item body
+        let insideBody = false;
+        for (const { bodyStart } of blocks) {
+          const bodyEnd = content.indexOf("\n--\n", bodyStart);
+          if (matchStart >= bodyStart && (bodyEnd < 0 || matchStart <= bodyEnd)) {
+            insideBody = true;
+            break;
+          }
+        }
+        if (insideBody) continue;
+
+        const macroEnd = matchStart + globalMatch[0].length;
+        if (!graphEnabled) {
+          replacements.push({ start: matchStart, end: macroEnd, text: "" });
+          continue;
+        }
+
+        const vegaSource = this.traceability.graph.toVegaLite();
+        if (!vegaSource) {
+          replacements.push({ start: matchStart, end: macroEnd, text: "" });
+          continue;
+        }
+
+        const url = this.krokiUrl("vegalite", vegaSource);
+        replacements.push({
+          start: matchStart,
+          end: macroEnd,
+          text: `\nimage:${url}[Global coverage chart]\n`,
+        });
+      }
+
+      if (replacements.length > 0) {
+        let modifiedContent = content;
+        for (let i = replacements.length - 1; i >= 0; i--) {
+          const r = replacements[i];
+          modifiedContent =
+            modifiedContent.slice(0, r.start) +
+            r.text +
+            modifiedContent.slice(r.end);
+        }
+        const buf = Buffer.from(modifiedContent, "utf8");
+        if (file.contents) file.contents = buf;
+        if (file.src?.contents) file.src.contents = buf;
+      }
+    } catch (error: any) {
+      this.logger.warn(
+        `Error expanding coverage in ${file.src?.path}: ${error.message}`,
+      );
+    }
+  }
+
   private registerContentClassifier(): void {
     this.context.on("contentClassified", (event: any) => {
       const contentCatalog = event.contentCatalog;
@@ -622,6 +853,12 @@ export class AntoraTraceabilityExtension {
       for (const file of adocFiles) {
         this.expandOutgoingMacros(file);
         this.expandIncomingMacros(file);
+      }
+
+      // Pass 2b: Expand traceability:graph[] and traceability:graph-coverage[] macros
+      for (const file of adocFiles) {
+        this.expandGraphMacros(file);
+        this.expandCoverageMacros(file);
       }
 
       // Pass 3: Substitute relationship macros with xrefs now that the graph is complete
