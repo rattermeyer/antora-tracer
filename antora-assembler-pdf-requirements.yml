@@ -1,0 +1,8 @@
+build:
+  command: bundle exec asciidoctor-pdf -r asciidoctor-kroki -a kroki-default-format=png -a allow-uri-read -a kroki-max-uri-length=8000 --sourcemap
+  publish: false
+  keepSource: true
+assembly:
+  profile: pdf-requirements
+  rootLevel: 0
+  sectionMergeStrategy: discrete
