@@ -1,6 +1,6 @@
 site:
   title: Antora Tracer — Self-Traceability Example
-  url: http://localhost:8080
+  url: https://rattermeyer.github.io/antora-tracer/docs
   start_page: tracer::index.adoc
 
 content:
@@ -29,5 +29,5 @@ ui:
     snapshot: true
 
 output:
-  dir: ./public
+  dir: ./public/docs
   clean: true

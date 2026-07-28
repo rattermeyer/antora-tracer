@@ -1,0 +1,73 @@
+/* antora-tracer Landing Page — Custom Styles */
+
+/* Inter font via Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Smooth scroll for anchor links */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Flow diagram styling */
+.flow-step {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.flow-step:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+.flow-arrow {
+  color: #6366f1;
+}
+
+/* Feature card hover */
+.feature-card {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.feature-card:hover {
+  border-color: #818cf8;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.1);
+}
+
+/* Section dividers */
+.section-gradient {
+  background: linear-gradient(135deg, #0f0d2e 0%, #1e1b4b 50%, #312e81 100%);
+}
+
+/* Code block styling */
+.code-block {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+}
+
+/* Stat numbers */
+.stat-number {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Gradient text for accents */
+.gradient-text {
+  background: linear-gradient(135deg, #818cf8, #6366f1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Subtle background pattern for dark sections */
+.hero-pattern {
+  background-image:
+    radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(129, 140, 248, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 60% 80%, rgba(99, 102, 241, 0.04) 0%, transparent 50%);
+}
+
+/* Navbar blur effect */
+.nav-blur {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
