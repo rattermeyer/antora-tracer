@@ -5,3 +5,6 @@ build:
 assembly:
   root_level: 1
   sectionMergeStrategy: discrete
+  attributes:
+    toclevels: 3
+    toc: auto
