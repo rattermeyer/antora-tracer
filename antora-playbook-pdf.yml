@@ -1,0 +1,36 @@
+site:
+  title: Antora Tracer — Self-Traceability Example (PDF)
+  url: https://rattermeyer.github.io/antora-tracer/docs
+  start_page: tracer::index.adoc
+
+content:
+  sources:
+    - url: .
+      start_path: examples
+      branches: HEAD
+
+asciidoc:
+  attributes:
+    pdf-theme: default
+  extensions:
+    - asciidoctor-kroki
+
+antora:
+  extensions:
+    - require: ./lib/src/antora-extension.js
+      preset: self-traceability
+      configPath: ./examples/traceability.yml
+      outputDir: traceability
+      generateMatrices: true
+      matrixFormats: [html, csv]
+      includeInNavigation: true
+    - require: '@antora/pdf-extension'
+
+output:
+  dir: ./public/pdf
+  clean: true
+
+ui:
+  bundle:
+    url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable
+    snapshot: true

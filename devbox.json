@@ -1,10 +1,19 @@
 {
   "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.17.2/.schema/devbox.schema.json",
-  "packages": [],
+  "packages": [
+    "nodejs",
+    "ruby",
+    "bundler"
+  ],
   "shell": {
-    "init_hook": ["echo 'Welcome to devbox!' > /dev/null"],
+    "init_hook": [
+      "npm install",
+      "bundle install"
+    ],
     "scripts": {
-      "test": ["echo \"Error: no test specified\" && exit 1"]
+      "build:html": "npx antora antora-playbook.yml",
+      "build:pdf": "npx antora antora-playbook-pdf.yml",
+      "test": "npm test"
     }
   }
 }

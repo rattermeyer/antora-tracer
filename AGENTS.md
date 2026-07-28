@@ -86,8 +86,27 @@ src/
 `antora-playbook.yml` at project root. Requires UI bundle (cached from GitLab).
 
 ```bash
-npx antora antora-playbook.yml    # build full site
-node examples/run-example.js      # generate matrices via CLI
+npx antora antora-playbook.yml       # build HTML site
+npx antora antora-playbook-pdf.yml   # build PDF (requires Ruby)
+node examples/run-example.js         # generate matrices via CLI
+```
+
+### PDF Output
+
+PDF generation uses the `@antora/pdf-extension` with Ruby's `asciidoctor-pdf` gem.
+Easiest setup is via devbox:
+
+```bash
+devbox shell                        # installs Node.js + Ruby + deps
+npx antora antora-playbook-pdf.yml  # output → public/pdf/
+```
+
+Without devbox, install Ruby 3.x and run:
+
+```bash
+bundle install                      # install asciidoctor-pdf gem
+npm install
+npx antora antora-playbook-pdf.yml
 ```
 
 ## CI
