@@ -14,26 +14,26 @@ This guide covers the internal architecture, APIs, and contribution workflow for
 
 == Architecture
 
-[listing]
-....
-  ┌─────────────────────────────────────────────────────────┐
-  │                    Antora Pipeline                       │
-  │                                                         │
-  │  contentClassified ──▶ AntoraTraceabilityExtension      │
-  │  sitePublished     ──▶   │                              │
-  │                          │ register, on(), generate     │
-  │                          ▼                              │
-  │               RequirementsTraceabilityExtension         │
-  │                 │         │         │         │         │
-  │                 ▼         ▼         ▼         ▼         │
-  │         DocumentParser  Graph   MatrixGen  Neo4jExport  │
-  │                 │         │         │         │         │
-  │                 └─────────┴────┬────┴─────────┘         │
-  │                                │                        │
-  │                     ConfigLoader + Presets             │
-  │                     TemplateRenderer (Mustache)         │
-  └─────────────────────────────────────────────────────────┘
-....
+[ditaa]
+----
+  +---------------------------------------------------------+
+  |                    Antora Pipeline                      |
+  |                                                         |
+  |  contentClassified --> AntoraTraceabilityExtension      |
+  |  sitePublished     -->   |                              |
+  |                          | register, on(), generate     |
+  |                          v                              |
+  |               RequirementsTraceabilityExtension         |
+  |                 |         |         |         |         |
+  |                 v         v         v         v         |
+  |         DocumentParser  Graph   MatrixGen  Neo4jExport  |
+  |                 |         |         |         |         |
+  |                 +---------+---------+---------+         |
+  |                                |                        |
+  |                     ConfigLoader + Presets              |
+  |                     TemplateRenderer (Mustache)         |
+  +---------------------------------------------------------+
+----
 
 The extension sits inside Antora's event pipeline. `AntoraTraceabilityExtension` registers for `contentClassified` (process items from AsciiDoc) and `sitePublished` (generate matrices and coverage). It delegates to `RequirementsTraceabilityExtension` which orchestrates the core components. Configuration flows in through `ConfigLoader` — either from a built-in preset or a user-provided YAML file.
 
@@ -387,18 +387,19 @@ The extension reads its config from the Antora playbook's `extensions` array, ma
 
 *Lifecycle:*
 
-```
-register() → constructor → initializeAsync() [fire-and-forget]
-                              │
-                              ├─ loadConfig()     (from playbook)
-                              ├─ createExtension() (with preset or config)
-                              ├─ registerContentClassifier()
-                              ├─ registerPageProcessor()
-                              ├─ registerNavigationEnhancer()
-                              │
-                              ▼
+[ditaa]
+----
+register() → constructor → initializeAsync() [fire and forget]
+                              |
+                              +─ loadConfig()     (from playbook)
+                              +─ createExtension() (with preset or config)
+                              +─ registerContentClassifier()
+                              +─ registerPageProcessor()
+                              +─ registerNavigationEnhancer()
+                              |
+                              v
                          Event handlers active
-```
+----
 
 Since `initializeAsync` is fire-and-forget, event handlers may not be registered for the first microtask. In tests and Antora, the build pipeline provides enough latency that handlers are always registered before events fire.
 

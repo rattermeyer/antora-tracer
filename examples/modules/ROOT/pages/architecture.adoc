@@ -46,49 +46,9 @@ traceability:graph[]
 The extension is composed of eight modules organized in a layered architecture:
 
 [plantuml]
-....
-@startuml
-package "Antora Pipeline" {
-  [AntoraTraceabilityExtension] as antora_ext
-}
-
-package "Core" {
-  [RequirementsTraceabilityExtension] as main_ext
-  [DocumentParser] as parser
-  [TraceabilityGraph] as graph
-}
-
-package "Generation" {
-  [MatrixGenerator] as matrix
-  [TemplateRenderer] as templates
-  [LinkResolver] as linkresolver
-}
-
-package "Export" {
-  [Neo4jExporter] as neo4j
-}
-
-package "Configuration" {
-  [ConfigLoader] as config
-  database "Presets" as presets
-}
-
-antora_ext --> main_ext : orchestrates
-main_ext --> parser : delegates parsing
-main_ext --> graph : owns
-main_ext --> matrix : delegates generation
-main_ext --> neo4j : delegates export
-main_ext --> config : loads configuration
-
-parser --> graph : populates items & relationships
-matrix --> graph : queries for coverage
-matrix --> templates : renders HTML
-neo4j --> graph : exports nodes & relationships
-
-config --> presets : loads built-in presets
-config --> graph : provides validation rules
-@enduml
-....
+----
+include::example$bb-overview.puml[]
+----
 
 [width=100%, cols="25,75"]
 |===
