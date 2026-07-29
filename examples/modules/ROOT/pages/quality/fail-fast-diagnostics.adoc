@@ -1,0 +1,23 @@
+= Fail-Fast with Clear Diagnostics
+
+== Context
+
+A user writes a relationship `adresses:REQ-001[]` (typo: missing second 's') from a design item to a requirement. The config allows `addresses` from design to requirement, but not `adresses`. Without clear diagnostics, the user would not discover the typo and the relationship would be silently accepted, corrupting traceability data.
+
+== Trigger
+
+The Antora build processes the file containing the invalid relationship, or the CLI `validate` command runs against processed files.
+
+== Acceptance Criteria
+
+Invalid relation detection::
+  Every relationship type is validated against the configured `relations` for the source-target role pair; source: `TraceabilityGraph.validate()` output; horizon: every build.
+
+Cross-file validation::
+  Relationships referencing items in other files (not yet processed at parse time) are re-validated after all files are loaded; source: `validate()` includes a post-hoc relation type check; horizon: every build.
+
+Diagnostic quality::
+  Error messages include: file path, line number, source item ID (with role), target item ID (with role), the invalid relation type, and the list of allowed relation types for that role pair; source: error message inspection; horizon: every error.
+
+Typo-friendly::
+  A relation type not found in any config entry for the given role pair generates an error listing the allowed alternatives — making typos immediately obvious; source: error message content; horizon: every validation error.

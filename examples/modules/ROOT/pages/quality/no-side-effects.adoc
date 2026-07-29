@@ -1,0 +1,20 @@
+= No Side Effects on Source Files
+
+== Context
+
+The extension processes `.adoc` files during the Antora build — parsing items, expanding macros, and substituting inline relationship links. The user's source files are under version control and must never be modified by the build process.
+
+== Trigger
+
+The Antora `contentClassified` event fires, triggering the extension's content processing pipeline.
+
+== Acceptance Criteria
+
+In-memory only::
+  All content transformations (macro expansion, link substitution, title injection) occur on the in-memory content buffer — no `.adoc` file on disk is written to; source: `strace` / filesystem audit during build; horizon: every build.
+
+Idempotent re-processing::
+  Processing the same file twice produces the same in-memory result and does not modify the graph state (warns on duplicate IDs but does not crash); source: `process()` called twice on same content; horizon: every build.
+
+Read-only file safety::
+  The build succeeds even if `.adoc` files are read-only on the filesystem; source: integration test with `chmod -w`; horizon: every release.

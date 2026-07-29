@@ -1,0 +1,23 @@
+= Zero Operational Overhead
+
+== Context
+
+A documentation engineer adds the extension to their Antora playbook. The extension must parse AsciiDoc files, validate traceability relationships, and generate matrices — without requiring any external services, database installations, or configuration beyond the traceability YAML file already in their project.
+
+== Trigger
+
+`npx antora antora-playbook.yml` is executed with the extension registered in the playbook's `antora.extensions` list.
+
+== Acceptance Criteria
+
+Startup latency::
+  Extension initialization (config loading, preset resolution, event handler registration) completes in <= 200 ms; source: `performance.now()` instrumentation; horizon: every build.
+
+No external services::
+  The extension operates without requiring any running services (database, message queue, HTTP server); source: architecture review — all data flows are in-process; horizon: every release.
+
+Degraded mode::
+  If the optional Neo4j export is not configured, the extension runs normally with no warnings or errors related to missing Neo4j; source: build log analysis; horizon: every build with `generateMatrices: true`.
+
+Dependency ceiling::
+  The production dependency tree (excluding dev dependencies) contains <= 5 packages; source: `npm ls --production`; horizon: every release.

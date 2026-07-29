@@ -1,0 +1,23 @@
+= Configurable Without Code Changes
+
+== Context
+
+A user needs to define a custom traceability domain model — roles, allowed relations between roles, and matrices — for a project with unique requirements (e.g., aerospace with ARP4754A). The extension ships with built-in presets, but the user's domain differs from all of them.
+
+== Trigger
+
+The user creates a `traceability.yml` file defining their custom roles, relations, and matrices, and references it in the Antora playbook via `configPath` (or initializes it from a preset via `antora-tracer preset init`).
+
+== Acceptance Criteria
+
+YAML-only configuration::
+  Roles, relations, and matrices are defined entirely in YAML — no TypeScript or JavaScript code required; source: configuration documentation review; horizon: every release.
+
+Preset extensibility::
+  Built-in presets can be overridden by user configuration via the `extends` mechanism; source: `ConfigLoader.merge()` unit tests; horizon: every release.
+
+Unknown role tolerance::
+  Items with roles not (yet) listed in the configuration generate warnings, not errors — enabling incremental role adoption; source: validation output log; horizon: every validation run.
+
+Matrix coverage configuration::
+  Each matrix row-column pair's coverage is defined by which relation types count as "covered" (`coverageRelations` key); source: matrix generation output; horizon: every matrix generation.

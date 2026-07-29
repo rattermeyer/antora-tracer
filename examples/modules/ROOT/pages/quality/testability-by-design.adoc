@@ -1,0 +1,23 @@
+= Testability by Design
+
+== Context
+
+The extension is composed of 8 modules with distinct responsibilities (parsing, graph storage, validation, matrix generation, export, rendering, configuration, CLI). Each module needs to be testable in isolation without requiring a full Antora build pipeline.
+
+== Trigger
+
+A developer runs `npm test` to execute the test suite.
+
+== Acceptance Criteria
+
+Dependency injection::
+  Every module accepts its dependencies via constructor parameters (e.g., `TraceabilityGraph` receives `ConfigLoader`, `MatrixGenerator` receives `TraceabilityGraph` and `ConfigLoader`); source: module API signatures; horizon: every code review.
+
+Isolated test files::
+  Each module has a dedicated test file (`test/<module-name>.test.ts`) with no cross-module test dependencies; source: test file listing; horizon: every test run.
+
+Graph introspection::
+  The `TraceabilityGraph` exposes internal state (`_items`, `_relationships`, `_warnings`) for test access without requiring public API surface for every query; source: `_items.delete()` pattern in orphaned-relationship tests; horizon: every test run.
+
+Fast feedback::
+  The full test suite (200+ tests) completes in under 500 ms on a developer machine; source: Mocha test runner timing output; horizon: every `npm test` execution.
