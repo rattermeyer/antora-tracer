@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Impressum — Antora Tracer</title>
+  <link rel="stylesheet" href="css/landing.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 300: '#a5b4fc',
+              400: '#818cf8', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca',
+              800: '#3730a3', 900: '#312e81', 950: '#1e1b4b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-screen bg-white">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">Impressum</h1>
+
+    <div class="prose prose-gray max-w-none space-y-6">
+      <p class="text-lg font-semibold">Richard Attermeyer</p>
+      <p>
+        Pater-Dietrich-Ring 49<br>
+        46286 Dorsten
+      </p>
+
+      <h2 class="text-xl font-semibold text-gray-900 mt-8">Kontakt</h2>
+      <p>
+        Telefon: +49 173 727 9004<br>
+        E-Mail: richard.attermeyer@gmail.com
+      </p>
+
+      <h2 class="text-xl font-semibold text-gray-900 mt-8">Inhaltlich verantwortlich i.S.v. § 18 Abs. 2 MStV</h2>
+      <p>
+        Richard Attermeyer<br>
+        Pater-Dietrich-Ring 49<br>
+        46286 Dorsten
+      </p>
+    </div>
+
+    <div class="mt-12 pt-8 border-t border-gray-200">
+      <a href="index.html" class="text-brand-600 hover:text-brand-700 font-medium transition-colors">← Zurück</a>
+    </div>
+  </div>
+</body>
+</html>
