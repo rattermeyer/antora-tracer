@@ -188,6 +188,8 @@ addresses:REQ-034[]
 traceability:outgoing[]
 --
 
+== Configuration
+
 [#ARC-012, item, role=design, title="Preset YAML schema"]
 --
 Presets are YAML files following a defined structure. Each preset is a self-contained,
@@ -247,6 +249,8 @@ addresses:REQ-020[]
 addresses:REQ-021[]
 addresses:REQ-022[]
 addresses:REQ-023[]
+
+traceability:outgoing[]
 --
 
 == Runtime View
