@@ -379,7 +379,7 @@ After a build, you’ll find in `<site-output>/traceability/`:
 ## Documentation
 
 * [User Guide](https://antora-tracer.conemso.de/docs/tracer/latest/user-guide.html) — Full reference: macros, relations, CLI, presets
-* [Developer Guide](https://antora-trace.conemso.de/docs/tracer/latest/developer-guide.html) — API, architecture, contributing, testing
+* [Developer Guide](https://antora-tracer.conemso.de/docs/tracer/latest/developer-guide.html) — API, architecture, contributing, testing
 
 ---
 
@@ -393,7 +393,7 @@ Every feature, fix, and refactor starts as a proposal with specs, design, and ta
 
 ## Contributing
 
-Contributions are welcome. See the [Developer Guide](https://antora-trace.conemso.de/docs/tracer/latest/developer-guide.html) for setup, code style, and testing.
+Contributions are welcome. See the [Developer Guide](https://antora-tracer.conemso.de/docs/tracer/latest/developer-guide.html) for setup, code style, and testing.
 
 ```bash
 git clone <repo-url>
