@@ -110,7 +110,12 @@ Already have an Antora site? Skip to step 2.
    npx antora antora-playbook.yml
    ```
 
-Open `_site/traceability/index.html` — you’ll find matrices and a coverage report.
+Open `_site/traceability/index.html` — you'll find matrices and a coverage report.
+
+For a complete working project that uses the published npm package, see the
+https://github.com/rattermeyer/antora-tracer-demo[antora-tracer-demo] repository.
+It includes the example site from this project and additional demos for querying
+the traceability graph in Neo4j.
 
 ---
 
