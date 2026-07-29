@@ -3,10 +3,10 @@
  * Tests the CLI module exports and basic functionality
  */
 
-import { expect } from "chai";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
+import { expect } from "chai";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

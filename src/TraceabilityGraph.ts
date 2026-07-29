@@ -162,7 +162,10 @@ export class TraceabilityGraph {
    * Check if a role has any items
    */
   hasRole(role: string): boolean {
-    return this._itemsByRole.has(role) && (this._itemsByRole.get(role)?.size ?? 0) > 0;
+    return (
+      this._itemsByRole.has(role) &&
+      (this._itemsByRole.get(role)?.size ?? 0) > 0
+    );
   }
 
   // ========================================================================
@@ -479,9 +482,13 @@ export class TraceabilityGraph {
     const warnings: GraphWarning[] = this._warnings.filter((w) => {
       if (w.type !== "unknown_role") return true;
       // Keep only if the item in the message still doesn't exist
-      const targetMatch = w.message.match(/^Target item not found: ([A-Z0-9_-]+)/);
+      const targetMatch = w.message.match(
+        /^Target item not found: ([A-Z0-9_-]+)/,
+      );
       if (targetMatch) return !this.getItem(targetMatch[1]);
-      const sourceMatch = w.message.match(/^Source item not found: ([A-Z0-9_-]+)/);
+      const sourceMatch = w.message.match(
+        /^Source item not found: ([A-Z0-9_-]+)/,
+      );
       if (sourceMatch) return !this.getItem(sourceMatch[1]);
       return true;
     });
@@ -493,9 +500,7 @@ export class TraceabilityGraph {
         : "";
       if (!this.getItem(rel.fromId)) {
         const targetItem = this.getItem(rel.targetId);
-        const targetDetail = targetItem
-          ? ` (role: ${targetItem.role})`
-          : "";
+        const targetDetail = targetItem ? ` (role: ${targetItem.role})` : "";
         errors.push(
           `Orphaned relationship${location}: '${rel.fromId}' declares ${rel.type} -> '${rel.targetId}'${targetDetail} but source '${rel.fromId}' does not exist.`,
         );
@@ -768,7 +773,9 @@ export class TraceabilityGraph {
 
     const visited = new Set<string>();
     const edges: Array<{ from: string; to: string; label: string }> = [];
-    const queue: Array<{ id: string; dist: number }> = [{ id: fromId, dist: 0 }];
+    const queue: Array<{ id: string; dist: number }> = [
+      { id: fromId, dist: 0 },
+    ];
     visited.add(fromId);
 
     while (queue.length > 0) {
@@ -800,8 +807,7 @@ export class TraceabilityGraph {
     for (const id of visited) {
       const nodeItem = this.getItem(id);
       if (!nodeItem) continue;
-      const color =
-        TraceabilityGraph.ROLE_COLORS[nodeItem.role] || "#AAAAAA";
+      const color = TraceabilityGraph.ROLE_COLORS[nodeItem.role] || "#AAAAAA";
       const label = `${nodeItem.id}\\n${(nodeItem.title || "").substring(0, 40)}`;
       lines.push(
         `  "${id}" [fillcolor="${color}", fontcolor=white, label="${label}"];`,
@@ -855,29 +861,34 @@ export class TraceabilityGraph {
     }
 
     const allTypes =
-      expectedTypes.length > 0
-        ? expectedTypes
-        : [...satisfiedTypes];
+      expectedTypes.length > 0 ? expectedTypes : [...satisfiedTypes];
     const values = allTypes.map((t) => ({
       "Relation Type": t,
       Status: satisfiedTypes.has(t) ? "Satisfied" : "Missing",
     }));
 
-    return JSON.stringify({
-      $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-      title: `Coverage: ${itemId}`,
-      data: { values },
-      mark: "bar",
-      encoding: {
-        x: { field: "Relation Type", type: "nominal" },
-        y: { aggregate: "count", type: "quantitative" },
-        color: {
-          field: "Status",
-          type: "nominal",
-          scale: { domain: ["Satisfied", "Missing"], range: ["#50B86C", "#D94A4A"] },
+    return JSON.stringify(
+      {
+        $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+        title: `Coverage: ${itemId}`,
+        data: { values },
+        mark: "bar",
+        encoding: {
+          x: { field: "Relation Type", type: "nominal" },
+          y: { aggregate: "count", type: "quantitative" },
+          color: {
+            field: "Status",
+            type: "nominal",
+            scale: {
+              domain: ["Satisfied", "Missing"],
+              range: ["#50B86C", "#D94A4A"],
+            },
+          },
         },
       },
-    }, null, 2);
+      null,
+      2,
+    );
   }
 
   private _globalVegaLite(): string {
@@ -889,17 +900,21 @@ export class TraceabilityGraph {
       }
     }
 
-    return JSON.stringify({
-      $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-      title: "Items by Role",
-      data: { values },
-      mark: "bar",
-      encoding: {
-        x: { field: "Role", type: "nominal" },
-        y: { field: "Count", type: "quantitative" },
-        color: { field: "Role", type: "nominal" },
+    return JSON.stringify(
+      {
+        $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+        title: "Items by Role",
+        data: { values },
+        mark: "bar",
+        encoding: {
+          x: { field: "Role", type: "nominal" },
+          y: { field: "Count", type: "quantitative" },
+          color: { field: "Role", type: "nominal" },
+        },
       },
-    }, null, 2);
+      null,
+      2,
+    );
   }
 
   // ========================================================================

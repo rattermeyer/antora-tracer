@@ -1,6 +1,6 @@
 import fs from "node:fs";
-import mustache from "mustache";
 import path from "node:path";
+import mustache from "mustache";
 
 /**
  * Renders Mustache templates with support for partials.

@@ -205,9 +205,7 @@ export class AntoraTraceabilityExtension {
    * Returns array of { itemId, headerEnd, bodyStart, bodyEnd } where
    * bodyStart..bodyEnd is the body content between -- delimiters.
    */
-  private findItemBlocks(
-    content: string,
-  ): Array<{
+  private findItemBlocks(content: string): Array<{
     itemId: string;
     headerEnd: number;
     bodyStart: number;
@@ -324,9 +322,11 @@ export class AntoraTraceabilityExtension {
             const target = this.traceability.graph.getItem(rel.targetId);
             if (!target) continue;
             if (!grouped.has(rel.type)) grouped.set(rel.type, []);
-            grouped
-              .get(rel.type)
-              ?.push({ id: target.id, title: target.title || target.id, sourceFile: target.sourceFile });
+            grouped.get(rel.type)?.push({
+              id: target.id,
+              title: target.title || target.id,
+              sourceFile: target.sourceFile,
+            });
           }
           if (grouped.size === 0) {
             replacements.push({ start: macroStart, end: macroEnd, text: "" });
@@ -421,8 +421,7 @@ export class AntoraTraceabilityExtension {
           }
           this.itemsWithIncomingMacro.add(itemId);
 
-          const rels =
-            this.traceability.graph.getReverseRelationships(itemId);
+          const rels = this.traceability.graph.getReverseRelationships(itemId);
           if (rels.length === 0) {
             replacements.push({ start: macroStart, end: macroEnd, text: "" });
             continue;
@@ -439,9 +438,11 @@ export class AntoraTraceabilityExtension {
             const inverseType =
               INVERSE_MAP[rel.type as keyof typeof INVERSE_MAP] || rel.type;
             if (!grouped.has(inverseType)) grouped.set(inverseType, []);
-            grouped
-              .get(inverseType)
-              ?.push({ id: source.id, title: source.title || source.id, sourceFile: source.sourceFile });
+            grouped.get(inverseType)?.push({
+              id: source.id,
+              title: source.title || source.id,
+              sourceFile: source.sourceFile,
+            });
           }
           if (grouped.size === 0) {
             replacements.push({ start: macroStart, end: macroEnd, text: "" });
@@ -502,7 +503,8 @@ export class AntoraTraceabilityExtension {
   ): string {
     if (grouped.length === 0) return "";
     if (style === "table") return this.generateTableStyle(grouped, currentFile);
-    if (style === "inline") return this.generateInlineStyle(grouped, currentFile);
+    if (style === "inline")
+      return this.generateInlineStyle(grouped, currentFile);
     return this.generateListStyle(grouped, currentFile, collapsible);
   }
 
@@ -585,9 +587,7 @@ export class AntoraTraceabilityExtension {
         "\n" +
           this.capitalize(relType) +
           ": " +
-          items
-            .map((i) => this.buildXref(i, currentFile, i.id))
-            .join(", "),
+          items.map((i) => this.buildXref(i, currentFile, i.id)).join(", "),
       );
     }
     return `${lines.join("\n")}\n`;
@@ -626,13 +626,18 @@ export class AntoraTraceabilityExtension {
 
       const graphEnabled = this.isGraphEnabled(docAttrs);
       const blocks = this.findItemBlocks(content);
-      const replacements: Array<{ start: number; end: number; text: string }> = [];
+      const replacements: Array<{ start: number; end: number; text: string }> =
+        [];
 
       for (const { itemId, bodyStart } of blocks) {
         const bodyEnd = content.indexOf("\n--\n", bodyStart);
-        const bodyContent = content.slice(bodyStart, bodyEnd >= 0 ? bodyEnd : undefined);
+        const bodyContent = content.slice(
+          bodyStart,
+          bodyEnd >= 0 ? bodyEnd : undefined,
+        );
 
-        const macroRegex = /traceability:graph\[([A-Z][A-Z0-9-]*)?(?:,\s*(\d+))?\]/g;
+        const macroRegex =
+          /traceability:graph\[([A-Z][A-Z0-9-]*)?(?:,\s*(\d+))?\]/g;
         let macroMatch: RegExpExecArray | null;
         while ((macroMatch = macroRegex.exec(bodyContent)) !== null) {
           const macroStart = bodyStart + macroMatch.index;
@@ -661,7 +666,8 @@ export class AntoraTraceabilityExtension {
       }
 
       // Handle graph macros outside item blocks: traceability:graph[ID]
-      const externalRegex = /traceability:graph\[([A-Z][A-Z0-9-]*)(?:,\s*(\d+))?\]/g;
+      const externalRegex =
+        /traceability:graph\[([A-Z][A-Z0-9-]*)(?:,\s*(\d+))?\]/g;
       let externalMatch: RegExpExecArray | null;
       const bodyRanges = blocks.map((b) => ({
         start: b.bodyStart,
@@ -731,11 +737,15 @@ export class AntoraTraceabilityExtension {
 
       const graphEnabled = this.isGraphEnabled(docAttrs);
       const blocks = this.findItemBlocks(content);
-      const replacements: Array<{ start: number; end: number; text: string }> = [];
+      const replacements: Array<{ start: number; end: number; text: string }> =
+        [];
 
       for (const { itemId, bodyStart } of blocks) {
         const bodyEnd = content.indexOf("\n--\n", bodyStart);
-        const bodyContent = content.slice(bodyStart, bodyEnd >= 0 ? bodyEnd : undefined);
+        const bodyContent = content.slice(
+          bodyStart,
+          bodyEnd >= 0 ? bodyEnd : undefined,
+        );
 
         const macroRegex = /traceability:graph-coverage\[\]/g;
         let macroMatch: RegExpExecArray | null;
@@ -780,7 +790,10 @@ export class AntoraTraceabilityExtension {
         let insideBody = false;
         for (const { bodyStart } of blocks) {
           const bodyEnd = content.indexOf("\n--\n", bodyStart);
-          if (matchStart >= bodyStart && (bodyEnd < 0 || matchStart <= bodyEnd)) {
+          if (
+            matchStart >= bodyStart &&
+            (bodyEnd < 0 || matchStart <= bodyEnd)
+          ) {
             insideBody = true;
             break;
           }
@@ -837,9 +850,8 @@ export class AntoraTraceabilityExtension {
 
       this.logger.info("Processing content for traceability");
       const files = contentCatalog.findBy({ family: "page" }) || [];
-      const adocFiles = files.filter(
-        (file: any) =>
-          file.src?.path?.endsWith(".adoc"),
+      const adocFiles = files.filter((file: any) =>
+        file.src?.path?.endsWith(".adoc"),
       );
 
       // Pass 1: Process all files to populate the traceability graph

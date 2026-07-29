@@ -5,7 +5,7 @@
 A role-based traceability extension for Antora. Define traceability items with a single `[item]` macro, configure your own roles and relations, and let Antora generate matrices, coverage reports, and Neo4j exports — all driven by your domain model, not ours.
 
 I am still experimenting with some aspects, so use at your own risk until it reaches 1.0.
-But I am very much intersted in your feedback and ideas.
+But I am very much interested in your feedback and ideas.
 
 ## Why Traceability for AsciiDoc?
 

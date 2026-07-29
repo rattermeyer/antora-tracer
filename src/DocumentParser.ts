@@ -10,7 +10,12 @@ import type { Item, ItemRelationship } from "./types.js";
  * Warning type for parser warnings
  */
 export interface ParserWarning {
-  type: "old_macro" | "missing_role" | "unknown_role" | "invalid_attribute" | "unmatched_fence";
+  type:
+    | "old_macro"
+    | "missing_role"
+    | "unknown_role"
+    | "invalid_attribute"
+    | "unmatched_fence";
   message: string;
   file: string;
   line?: number;
@@ -102,7 +107,13 @@ export class DocumentParser {
     this.checkForOldMacros(content, result, verbatimRanges);
 
     // Second pass: Parse all [item] block macros
-    this.parseItemMacros(content, sourceFile || this.currentFile, seen, result, verbatimRanges);
+    this.parseItemMacros(
+      content,
+      sourceFile || this.currentFile,
+      seen,
+      result,
+      verbatimRanges,
+    );
 
     // Third pass: Parse inline relationship macros from item content
     this.parseInlineMacrosFromItems(
@@ -497,7 +508,9 @@ export class DocumentParser {
 
       // Find matching closing fence: same delimiter, on its own line
       const closePattern =
-        fence === "----" ? "\\r?\\n----[ \\t]*(?:\\r?\\n|$)" : "\\r?\\n\\.\\.\\.\\.[ \\t]*(?:\\r?\\n|$)";
+        fence === "----"
+          ? "\\r?\\n----[ \\t]*(?:\\r?\\n|$)"
+          : "\\r?\\n\\.\\.\\.\\.[ \\t]*(?:\\r?\\n|$)";
       const closeRegex = new RegExp(closePattern, "g");
       closeRegex.lastIndex = openEnd;
       const closeMatch = closeRegex.exec(content);

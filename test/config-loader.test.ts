@@ -2,10 +2,10 @@
  * Tests for ConfigLoader - Configuration loading and validation
  */
 
-import { expect } from "chai";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
+import { expect } from "chai";
 import { ConfigLoader, loadConfig } from "../src/config/TraceabilityConfig.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

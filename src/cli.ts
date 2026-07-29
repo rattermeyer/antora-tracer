@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-import chalk from "chalk";
-import { program } from "commander";
 import {
   createWriteStream,
   existsSync,
@@ -13,6 +11,8 @@ import {
 } from "node:fs";
 import { dirname, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import chalk from "chalk";
+import { program } from "commander";
 
 // Import extension
 import {
@@ -346,10 +346,9 @@ program
             chalk.yellow(`Warnings (${validation.warnings.length}):`),
           );
           for (const warning of validation.warnings) {
-            const loc =
-              warning.file
-                ? ` (${warning.file}${warning.line !== undefined ? `:${warning.line}` : ""})`
-                : "";
+            const loc = warning.file
+              ? ` (${warning.file}${warning.line !== undefined ? `:${warning.line}` : ""})`
+              : "";
             console.log(chalk.yellow(`  - ${warning.message}${loc}`));
           }
         }
@@ -447,10 +446,7 @@ presetProgram
         }
         console.log("");
       }
-      if (
-        preset.neo4j?.queries &&
-        preset.neo4j.queries.length > 0
-      ) {
+      if (preset.neo4j?.queries && preset.neo4j.queries.length > 0) {
         console.log(chalk.green("Neo4j Queries:"));
         for (const query of preset.neo4j.queries) {
           console.log(`  - ${query.name}: ${query.description}`);

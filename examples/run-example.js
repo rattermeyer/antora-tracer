@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 /**
  * Self-traceability example runner
  * Processes all example files together and generates traceability output
@@ -6,13 +9,9 @@
  * Usage: node examples/run-example.js
  */
 import {
-  RequirementsTraceabilityExtension,
   ConfigLoader,
+  RequirementsTraceabilityExtension,
 } from "../lib/src/index.js";
-import { writeFileSync, mkdirSync } from "node:fs";
-import { readFileSync } from "node:fs";
-import { resolve, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pagesDir = resolve(__dirname, "modules/ROOT/pages");

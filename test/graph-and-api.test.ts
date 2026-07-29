@@ -6,10 +6,10 @@
  * config access, lifecycle).
  */
 
-import { expect } from "chai";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { expect } from "chai";
 import {
   ConfigLoader,
   RequirementsTraceabilityExtension,
@@ -471,7 +471,8 @@ describe("RequirementsTraceabilityExtension - API Methods", () => {
 
       const validation = extension.validate();
       expect(validation.errors.length).to.be.greaterThan(0);
-      expect(validation.errors.some((e) => e.includes("does not exist"))).to.be.true;
+      expect(validation.errors.some((e) => e.includes("does not exist"))).to.be
+        .true;
     });
   });
 

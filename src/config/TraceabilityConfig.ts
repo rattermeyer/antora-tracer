@@ -5,8 +5,8 @@
  */
 
 import * as fs from "node:fs";
-import { load as yamlLoad } from "js-yaml";
 import * as path from "node:path";
+import { load as yamlLoad } from "js-yaml";
 
 // ============================================================================
 // Configuration Interfaces

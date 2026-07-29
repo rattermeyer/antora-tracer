@@ -11,10 +11,16 @@
  * - Wait for async init via setImmediate (one microtask)
  */
 
-import { expect } from "chai";
-import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
+import {
+  existsSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { expect } from "chai";
 import { AntoraTraceabilityExtension } from "../src/antora-extension.js";
 
 // ============================================================================
