@@ -424,6 +424,63 @@ on mutation, and BFS path finding with configurable `maxDepth`.
 
 addresses:REQ-031[]
 addresses:REQ-032[]"""
+ARC-012,ARC-012 — Preset YAML schema,design,,architecture.adoc,"""Presets are YAML files following a defined structure. Each preset is a self-contained,
+versioned configuration that users can extend or override.
+
+[width=100%, cols=""""20,30,50""""]
+|===
+| Key | Type | Description
+
+| `name`
+| string
+| Unique preset identifier (e.g., `requirements-engineering`). Used by `--preset` CLI flag and `preset` playbook option.
+
+| `description`
+| multiline string
+| Human-readable explanation of the preset's domain, roles, and intended use.
+
+| `version`
+| semver string
+| Independent version number for the preset, separate from the extension version.
+
+| `author`
+| string
+| Preset author or organization.
+
+| `tags`
+| string[]
+| Keywords for categorisation (e.g., `[software, ieee, medical]`).
+
+| `compatibility`
+| object
+| `minExtensionVersion`: minimum extension version required. Ensures the preset doesn't load on incompatible versions.
+
+| `traceability.roles`
+| string[]
+| Ordered list of valid role names. Items must use one of these roles.
+
+| `traceability.relations`
+| map
+| `sourceRole → targetRole → [relationTypes]`. Defines which relation types are valid between roles. Used for validation.
+
+| `traceability.matrices`
+| object[]
+| Array of matrix definitions. Each has `name`, `rows` (role), `columns` (role[]), and `coverageRelations` (map column role to coverage relation types).
+
+| `neo4j.queries`
+| object[]
+| Optional array of named Cypher queries (`name`, `description`, `cypher`). Shipped with the preset and usable post-export.
+
+| `documentation`
+| object
+| `description` (markdown string), `examples` (string[]). Inline documentation explaining the preset's domain and usage.
+|===
+
+addresses:REQ-019[]
+addresses:REQ-020[]
+addresses:REQ-021[]
+addresses:REQ-022[]
+addresses:REQ-023[]"""
 ARC-002,ARC-002 — Component-level architecture,design,,architecture.adoc,"""The extension is composed of eight modules organized in a layered architecture:
 
 [plantuml]

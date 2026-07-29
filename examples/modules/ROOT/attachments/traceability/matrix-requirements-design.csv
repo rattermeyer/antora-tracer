@@ -17,11 +17,11 @@ REQ-015,REQ-015 — Error messages list allowed relations,ARC-007: ARC-007 — F
 REQ-016,REQ-016 — Warnings for unknown roles,ARC-003: ARC-003 — Processing flow during Antora build
 REQ-017,REQ-017 — Graceful degradation for unknown roles,ARC-003: ARC-003 — Processing flow during Antora build
 REQ-018,REQ-018 — Built-in preset configurations,ARC-001: ARC-001 — Project scope and architectural goals; ARC-004: ARC-004 — Key architectural decisions and their rationale
-REQ-019,REQ-019 — Each preset contains complete configuration,
-REQ-020,REQ-020 — Each preset includes documentation,
-REQ-021,REQ-021 — Each preset includes Neo4j Cypher queries,
-REQ-022,REQ-022 — Presets have independent versioning,
-REQ-023,REQ-023 — Users can define custom presets,
+REQ-019,REQ-019 — Each preset contains complete configuration,ARC-012: ARC-012 — Preset YAML schema
+REQ-020,REQ-020 — Each preset includes documentation,ARC-012: ARC-012 — Preset YAML schema
+REQ-021,REQ-021 — Each preset includes Neo4j Cypher queries,ARC-012: ARC-012 — Preset YAML schema
+REQ-022,REQ-022 — Presets have independent versioning,ARC-012: ARC-012 — Preset YAML schema
+REQ-023,REQ-023 — Users can define custom presets,ARC-012: ARC-012 — Preset YAML schema
 REQ-024,REQ-024 — Neo4j CSV export,ARC-001: ARC-001 — Project scope and architectural goals; ARC-002: ARC-002 — Component-level architecture; ARC-004: ARC-004 — Key architectural decisions and their rationale
 REQ-025,REQ-025 — Neo4j Cypher export,ARC-002: ARC-002 — Component-level architecture
 REQ-026,REQ-026 — Export command in CLI,
@@ -61,4 +61,4 @@ QA-058,QA-058 — No side effects on source files,ARC-008: ARC-008 — No side e
 QA-059,QA-059 — Testability by design,ARC-009: ARC-009 — Testability by design
 
 Total 60 rows
-Coverage: 53.3%
+Coverage: 61.7%
