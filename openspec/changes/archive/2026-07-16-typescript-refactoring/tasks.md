@@ -7,7 +7,7 @@ Each task is independently completable and leaves the test suite green. Run `npm
 ## Phase 1: Hygiene (no logic changes)
 
 ### - [x] Task 1: Remove stale files from src/
-**Spec**: REF-010  
+**Spec**: REF-010
 **Estimate**: 15 min
 
 - Delete `src/cli.js`
@@ -20,7 +20,7 @@ Each task is independently completable and leaves the test suite green. Run `npm
 ---
 
 ### - [x] Task 2: Remove dead code
-**Spec**: REF-009  
+**Spec**: REF-009
 **Estimate**: 15 min
 
 - Delete the `validateRequirementId` method from `src/index.ts`
@@ -30,7 +30,7 @@ Each task is independently completable and leaves the test suite green. Run `npm
 ---
 
 ### - [x] Task 3: Replace export = with named exports
-**Spec**: REF-011  
+**Spec**: REF-011
 **Estimate**: 15 min
 
 - Change `export = RequirementsTraceabilityExtension` to `export { RequirementsTraceabilityExtension }`
@@ -42,7 +42,7 @@ Each task is independently completable and leaves the test suite green. Run `npm
 ## Phase 2: Type improvements (no structural changes)
 
 ### - [x] Task 4: Introduce RelationshipType union
-**Spec**: REF-004  
+**Spec**: REF-004
 **Estimate**: 30 min
 
 - In `src/index.ts`, add `RelationshipType` union above the `Relationship` interface:
@@ -60,7 +60,7 @@ Each task is independently completable and leaves the test suite green. Run `npm
 ---
 
 ### - [x] Task 5: Introduce TraceableNode base interface
-**Spec**: REF-003  
+**Spec**: REF-003
 **Estimate**: 30 min
 
 - Add `TraceableNode` base interface in `src/index.ts`
@@ -73,7 +73,7 @@ Each task is independently completable and leaves the test suite green. Run `npm
 ---
 
 ### - [x] Task 6: Type matrix return values
-**Spec**: REF-007  
+**Spec**: REF-007
 **Estimate**: 45 min
 
 - Add `RequirementRow`, `RequirementDetail`, `ImplementationDetail`, `TestDetail`, `TraceabilityMatrix`, `DetailedTraceabilityMatrix` interfaces to `src/index.ts`
@@ -90,7 +90,7 @@ Each task is independently completable and leaves the test suite green. Run `npm
 ## Phase 3: Data model fix
 
 ### - [x] Task 7: Remove relationship data duplication
-**Spec**: REF-005  
+**Spec**: REF-005
 **Estimate**: 1 hour
 
 This is the most impactful data correctness fix.
@@ -108,7 +108,7 @@ This is the most impactful data correctness fix.
 ## Phase 4: processSync removal
 
 ### - [x] Task 8: Remove processSync, update tests to async
-**Spec**: REF-006  
+**Spec**: REF-006
 **Estimate**: 30 min
 
 - Delete the `processSync` method from `src/index.ts`
@@ -123,7 +123,7 @@ This is the most impactful data correctness fix.
 These tasks split the monolith into focused files. Do them in order — each extraction leaves a stable codebase before the next begins.
 
 ### - [x] Task 9: Extract types.ts
-**Spec**: REF-001, REF-003, REF-004  
+**Spec**: REF-001, REF-003, REF-004
 **Estimate**: 30 min
 
 - Create `src/types.ts`
@@ -141,7 +141,7 @@ These tasks split the monolith into focused files. Do them in order — each ext
 ---
 
 ### - [x] Task 10: Extract TraceabilityGraph class
-**Spec**: REF-001, REF-002, REF-008  
+**Spec**: REF-001, REF-002, REF-008
 **Estimate**: 2 hours
 
 This is the most structurally significant task.
@@ -167,7 +167,7 @@ This is the most structurally significant task.
 ---
 
 ### - [x] Task 11: Extract RequirementParser class
-**Spec**: REF-001  
+**Spec**: REF-001
 **Estimate**: 1 hour
 
 - Create `src/RequirementParser.ts`
@@ -185,7 +185,7 @@ This is the most structurally significant task.
 ---
 
 ### - [x] Task 12: Extract MatrixGenerator class
-**Spec**: REF-001  
+**Spec**: REF-001
 **Estimate**: 45 min
 
 - Create `src/MatrixGenerator.ts`
@@ -206,7 +206,7 @@ This is the most structurally significant task.
 ---
 
 ### - [x] Task 13: Extract AsciidoctorExtension class
-**Spec**: REF-001  
+**Spec**: REF-001
 **Estimate**: 45 min
 
 - Create `src/AsciidoctorExtension.ts`
@@ -225,7 +225,7 @@ This is the most structurally significant task.
 ---
 
 ### - [x] Task 14: Slim down index.ts
-**Spec**: REF-001, REF-011  
+**Spec**: REF-001, REF-011
 **Estimate**: 30 min
 
 After the extractions, `src/index.ts` should be a thin orchestrator. Verify:
@@ -241,7 +241,7 @@ After the extractions, `src/index.ts` should be a thin orchestrator. Verify:
 ## Phase 6: Test conversion
 
 ### - [x] Task 15: Convert tests to TypeScript
-**Spec**: REF-012  
+**Spec**: REF-012
 **Estimate**: 2 hours
 
 - Install `ts-mocha` and `ts-node` as dev dependencies

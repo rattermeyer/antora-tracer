@@ -2,7 +2,7 @@
 
 ## REF-001: Module Decomposition
 
-**Priority**: High  
+**Priority**: High
 **Rationale**: `src/index.ts` is 737 lines with no clear internal boundaries. Splitting it makes each concern independently navigable and testable.
 
 The source directory must contain exactly these TypeScript modules after refactoring:
@@ -22,7 +22,7 @@ The source directory must contain exactly these TypeScript modules after refacto
 
 ## REF-002: TraceabilityGraph as a Proper Class
 
-**Priority**: High  
+**Priority**: High
 **Rationale**: The current factory-object pattern aliases state between the parent class and the graph object, which caused the `targetId`/`toId` debugging mystery during development.
 
 The `TraceabilityGraph` must be a class with private internal state. Its Maps (`_requirements`, `_implementations`, `_tests`, `_documents`, `_relationships`) must not be publicly accessible.
@@ -36,7 +36,7 @@ The `TraceabilityGraph` must be a class with private internal state. Its Maps (`
 
 ## REF-003: TraceableNode Base Interface
 
-**Priority**: Medium  
+**Priority**: Medium
 **Rationale**: `Requirement`, `Implementation`, `Test`, and `Document` repeat 8 fields with only optionality differences. The duplication is noise.
 
 All four node interfaces must extend a common `TraceableNode` base. The shared fields are defined once on the base. `Requirement` overrides fields to make them required.
@@ -50,7 +50,7 @@ All four node interfaces must extend a common `TraceableNode` base. The shared f
 
 ## REF-004: RelationshipType Union Type
 
-**Priority**: Medium  
+**Priority**: Medium
 **Rationale**: Relationship types are currently unvalidated strings. A typo like `'implemens'` fails silently at runtime.
 
 The `RelationshipType` union must cover all valid relationship types. All methods that accept or return relationship types must use `RelationshipType`, not `string`.
@@ -65,7 +65,7 @@ The `RelationshipType` union must cover all valid relationship types. All method
 
 ## REF-005: Single Source of Truth for Relationships
 
-**Priority**: High  
+**Priority**: High
 **Rationale**: Relationships are stored twice — in the central Map and on each source node's `.relationships` array. This is a data consistency risk that was inherited from the JavaScript prototype.
 
 Relationships must be stored exactly once. The `relationships` array on `TraceableNode` must be removed. All traversal must query the graph's relationship Map.
@@ -79,7 +79,7 @@ Relationships must be stored exactly once. The `relationships` array on `Traceab
 
 ## REF-006: Remove processSync
 
-**Priority**: Medium  
+**Priority**: Medium
 **Rationale**: `processSync` is a near-identical duplicate of `process`. Asciidoctor.js v4 is inherently async; the sync version is broken and misleading.
 
 `processSync` must be removed. All callers — including tests — use `await process(...)`.
@@ -93,7 +93,7 @@ Relationships must be stored exactly once. The `relationships` array on `Traceab
 
 ## REF-007: Type Matrix Return Values
 
-**Priority**: Medium  
+**Priority**: Medium
 **Rationale**: `generateMatrix()` and related methods return `any`, losing type safety downstream.
 
 Matrix methods must return typed interfaces defined in `types.ts`.
@@ -108,7 +108,7 @@ Matrix methods must return typed interfaces defined in `types.ts`.
 
 ## REF-008: findPathRecursive is Private
 
-**Priority**: Low  
+**Priority**: Low
 **Rationale**: A recursive helper method is an implementation detail. Exposing it on the public interface invites misuse and clutters the API surface.
 
 **Acceptance criteria**:
@@ -119,7 +119,7 @@ Matrix methods must return typed interfaces defined in `types.ts`.
 
 ## REF-009: Remove Dead Code
 
-**Priority**: Low  
+**Priority**: Low
 **Rationale**: `validateRequirementId` is defined but never called. Dead code creates confusion about intent.
 
 **Acceptance criteria**:
@@ -129,7 +129,7 @@ Matrix methods must return typed interfaces defined in `types.ts`.
 
 ## REF-010: Remove Stale Files from src/
 
-**Priority**: Low  
+**Priority**: Low
 **Rationale**: Compiled `.js` files and a `.backup` file are present in `src/`, which is a source directory for TypeScript.
 
 **Acceptance criteria**:
@@ -142,7 +142,7 @@ Matrix methods must return typed interfaces defined in `types.ts`.
 
 ## REF-011: Named Exports Replace export =
 
-**Priority**: Low  
+**Priority**: Low
 **Rationale**: `export = ClassName` is the old CJS-interop style. Named exports are the modern convention and work better with tooling.
 
 **Acceptance criteria**:
@@ -153,7 +153,7 @@ Matrix methods must return typed interfaces defined in `types.ts`.
 
 ## REF-012: Convert Tests to TypeScript
 
-**Priority**: Medium  
+**Priority**: Medium
 **Rationale**: Test files in JavaScript get no type checking. Typos in test code and wrong API usage are silently accepted.
 
 **Acceptance criteria**:
