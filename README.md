@@ -378,8 +378,8 @@ After a build, you’ll find in `<site-output>/traceability/`:
 
 ## Documentation
 
-* [User Guide](https://rattermeyer.github.io/antora-tracer) — Full reference: macros, relations, CLI, presets
-* [Developer Guide](https://rattermeyer.github.io/antora-tracer) — API, architecture, contributing, testing
+* [User Guide](https://antora-tracer.conemso.de/docs) — Full reference: macros, relations, CLI, presets
+* [Developer Guide](https://antora-trace.conemso.de/docs) — API, architecture, contributing, testing
 
 ---
 
@@ -393,7 +393,7 @@ Every feature, fix, and refactor starts as a proposal with specs, design, and ta
 
 ## Contributing
 
-Contributions are welcome. See the [Developer Guide](https://rattermeyer.github.io/antora-tracer) for setup, code style, and testing.
+Contributions are welcome. See the [Developer Guide](https://antora-tracer.conemso.de/docs) for setup, code style, and testing.
 
 ```bash
 git clone <repo-url>

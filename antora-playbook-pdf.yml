@@ -1,6 +1,6 @@
 site:
   title: Antora Tracer — Self-Traceability Example (PDF)
-  url: https://rattermeyer.github.io/antora-tracer/docs
+  url: https://antora-tracer.conemso.de/docs
   start_page: tracer::index.adoc
 
 content:

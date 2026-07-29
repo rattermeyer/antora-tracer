@@ -1,6 +1,6 @@
 site:
   title: Antora Tracer — Self-Traceability Example
-  url: https://rattermeyer.github.io/antora-tracer/docs
+  url: https://antora-tracer.conemso.de/docs
   start_page: tracer::index.adoc
 
 content:
@@ -27,6 +27,12 @@ ui:
   bundle:
     url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable
     snapshot: true
+
+urls:
+  latest_version_segment: latest
+  redirect_facility: static
+  latest_prerelease_version_segment: unstable
+
 
 output:
   dir: ./public/docs
