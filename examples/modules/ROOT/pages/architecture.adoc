@@ -3,7 +3,7 @@
 :traceability-graph: true
 :traceability-style: list
 :traceability-order: target-id
-:arc42-sections: 1,5,6,9
+:arc42-sections: 1,4,5,6,9
 
 This document describes the architecture of the Antora Tracer extension using selected arc42 sections. Each section is a traceable `[item]` that references the requirements it addresses.
 
@@ -36,6 +36,56 @@ traceability:outgoing[]
 
 traceability:incoming[]
 
+traceability:graph[]
+--
+
+== Solution Strategy
+
+[#ARC-001b, item, role=design, title="Solution strategy — linking quality goals to architecture"]
+--
+The following table maps each quality goal to the architecture decisions and approaches that satisfy it. This establishes traceability from non-functional requirements to concrete design choices documented in the xref:adr/index.adoc[Architecture Decision Records].
+
+[width=100%, cols="25,35,40"]
+|===
+| Quality Goal | Architecture Approach | ADR / Component
+
+| Zero operational overhead
+| In-memory graph, no external services, minimal dependency tree
+| xref:adr/0003-in-memory-graph.adoc[ADR-003], xref:adr/0004-zero-framework.adoc[ADR-004]
+
+| Configurable without code changes
+| YAML-based roles/relations/matrices, preset system, `ConfigLoader` merge
+| xref:adr/0004-zero-framework.adoc[ADR-004], `TraceabilityConfig.ts`
+
+| Fail-fast with clear diagnostics
+| Role-based relation validation, post-hoc re-validation for cross-file refs, error messages with file/line/item-IDs
+| `TraceabilityGraph.validate()`, `ConfigLoader.isRelationAllowed()`
+
+| No side effects on source files
+| All transformations on in-memory buffers, read-only file access, idempotent processing
+| `antora-extension.ts` content pipeline, `DocumentParser` verbatim-block skip
+
+| Testability by design
+| Dependency injection via constructor, isolated test files per module, graph state exposed for test access
+| xref:adr/0002-regex-parser-over-ast.adoc[ADR-002], xref:adr/0005-typescript-strict-node20.adoc[ADR-005]
+
+| Future-proofness
+| ESM with `"type": "module"`, TypeScript strict mode, Node.js 20+ baseline, zero-framework policy
+| xref:adr/0001-esm-over-cjs.adoc[ADR-001], xref:adr/0005-typescript-strict-node20.adoc[ADR-005]
+
+| Performance
+| Forward/reverse/inverse relationship indexes (O(1) lookup), result caching, BFS depth limits
+| `TraceabilityGraph` indexes, `findPath()` with `maxDepth`
+|===
+
+addresses:REQ-001[]
+addresses:REQ-006[]
+addresses:REQ-007[]
+addresses:REQ-013[]
+addresses:REQ-015[]
+
+traceability:outgoing[]
+traceability:incoming[]
 traceability:graph[]
 --
 
