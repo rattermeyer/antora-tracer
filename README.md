@@ -9,23 +9,25 @@ But I am very much intersted in your feedback and ideas.
 
 ## Why Traceability for AsciiDoc?
 
-Technical documentation is more than prose — it contains requirements, design decisions, architecture
-descriptions, and test plans. These artifacts are deeply interconnected: a design addresses requirements,
-an implementation realizes a design, tests verify both. Without tooling, these relationships live in the
-author's head, scattered across documents, invisible to readers and impossible to verify.
+In regulated environments — medical devices (IEC 62304), automotive (ISO 26262), aerospace
+(DO-178C) — traceability is not optional. It's a compliance requirement. Auditors expect a
+complete chain from requirements through design and implementation to verification, with
+every link documented and verifiable. Gaps mean compliance findings, delayed certification,
+or worse.
 
-AsciiDoc is the leading markup language for structured technical documentation. It supports includes,
-cross-references, conditionals, and attributes — everything you need for complex multi-page doc sites.
-Paired with Antora, it produces rich HTML and native PDF from a single source. But it has no built-in
-way to define, validate, or visualize traceability relationships between artifacts.
+AsciiDoc is a mature markup language for structured technical documentation. Paired with
+Antora, it produces version-controlled, multi-component doc sites with rich cross-references
+and native PDF output. But neither AsciiDoc nor Antora provides a built-in way to formally
+define, validate, or audit traceability relationships between the requirements, designs,
+and tests embedded in the documentation.
 
-Other ecosystems have this covered. https://sphinx-needs.readthedocs.io/[Sphinx-Needs] provides
-traceability for reStructuredText with need types, linking, filtering, and visualization. Markdown-based
-tools offer various extensions. AsciiDoc was missing its equivalent.
+The reStructuredText ecosystem has https://sphinx-needs.readthedocs.io/[Sphinx-Needs] for
+this purpose. AsciiDoc had no equivalent.
 
-*antora-tracer* fills that gap: a single `[item]` macro with configurable roles, inline relationships,
-matrix generation, coverage tracking, graph visualization, and Neo4j export — all native to the
-AsciiDoc/Antora pipeline.
+*antora-tracer* fills that gap: a single `[item]` macro with configurable roles, inline
+relationships, matrix generation, coverage tracking, graph visualization, and Neo4j export.
+All native to the AsciiDoc/Antora pipeline. All driven by your domain model — not ours —
+so it fits whatever regulatory framework you work under.
 
 ---
 
