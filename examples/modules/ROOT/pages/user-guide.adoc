@@ -643,7 +643,7 @@ Systems and software engineering. Five roles with comprehensive relation coverag
 | Matrices | `requirements-traceability`, `design-verification`, `implementation-coverage`, `test-coverage`
 |===
 
-Key relations: `design → requirement [implements]`, `implementation → requirement [satisfies]`, `implementation → design [implements]`, `test → requirement [covers, verifies]`, `test → implementation [tests]`.
+Key relations: `design → requirement [addresses, satisfies]`, `implementation → requirement [satisfies]`, `implementation → design [implements]`, `test → requirement [covers, verifies]`, `test → implementation [tests]`. The `requirement` role defines only requirement-to-requirement relations (`refines`, `depends_on`, `conflicts_with`); downstream roles declare their own relations back to requirements.
 
 === agile
 
@@ -652,7 +652,7 @@ Agile/Scrum teams. Eight roles mapping the Scrum backlog.
 [width=100%, cols="20,80"]
 |===
 | Roles | `epic`, `feature`, `user_story`, `acceptance_criterion`, `task`, `spike`, `bug`, `test`
-| Matrices | `user-story-traceability`, `task-implementation`
+| Matrices | `epic-progress`, `story-completion`, `sprint-backlog`, `test-coverage`
 |===
 
 Key relations: `epic → feature [contains]`, `user_story → task [broken_down_into]`, `task → user_story [implements]`, `test → user_story [verified_by]`, `task → bug [fixes]`.
@@ -663,11 +663,11 @@ Medical device software compliant with IEC 62304. Five roles with safety classif
 
 [width=100%, cols="20,80"]
 |===
-| Roles | `system_requirement`, `software_requirement`, `software_item`, `test`, `risk_control`
-| Matrices | `software-traceability`, `risk-control-coverage`
+| Roles | `system_requirement`, `software_requirement`, `software_item`, `software_unit`, `risk`, `hazard`, `mitigation`
+| Matrices | `risk-mitigation`
 |===
 
-Key relations: `software_requirement → system_requirement [derived_from]`, `software_item → software_requirement [implements]`, `test → software_requirement [verifies]`, `risk_control → software_requirement [mitigates]`.
+Key relations: `system_requirement → software_requirement [allocated_to]`, `system_requirement → risk [mitigated_by]`, `software_requirement → software_requirement [refines, depends_on]`, `mitigation → risk [mitigates]`.
 
 === minimal
 
