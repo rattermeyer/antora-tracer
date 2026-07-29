@@ -1,0 +1,54 @@
+= ADR-001: Use ESM over CommonJS
+
+*Status*: accepted +
+*Deciders*: Richard Attermeyer +
+*Date*: 2025-07-01
+
+== Context and Problem Statement
+
+Node.js supports two module systems: CommonJS (CJS, `require`/`module.exports`) and ECMAScript Modules (ESM, `import`/`export`). The project needs to choose one as its primary module format. CJS is the legacy standard with the widest ecosystem compatibility. ESM is the forward-looking standard aligned with browser JavaScript and the ECMAScript specification. The decision affects tooling, dependency compatibility, and future maintenance burden.
+
+== Decision Drivers
+
+* Future-proofness: the choice should age well over the project's lifespan
+* Ecosystem compatibility: must work with Antora's extension system
+* Developer experience: module resolution, tooling support, debugging
+
+== Considered Options
+
+* ESM with `"type": "module"` in package.json
+* CommonJS (CJS) as default
+
+== Decision Outcome
+
+Chosen option: ESM with `"type": "module"`, because it aligns with the ECMAScript standard and Node.js's stated direction. CJS is in maintenance mode; ESM is where the ecosystem is heading.
+
+=== Positive Consequences
+
+* Modern import/export syntax, better static analysis, tree-shaking support
+* Aligned with browser JavaScript — reduces mental model switching
+* `node:` protocol for built-in imports makes dependencies explicit
+
+=== Negative Consequences
+
+* Some npm packages (notably `@antora/pdf-extension`) are CJS-only and require a `.cjs` wrapper to load
+* `__dirname` and `require` not available without workarounds
+* Stricter module resolution can surface edge cases in test runners
+
+== Pros and Cons of the Options
+
+=== ESM
+
+* Good, because forward-looking — CJS is in maintenance mode
+* Good, because modern syntax aligned with browser JavaScript
+* Bad, because some packages don't support it yet, requiring wrappers
+
+=== CommonJS
+
+* Good, because maximum ecosystem compatibility
+* Good, because no wrapper files needed
+* Bad, because legacy technology — long-term maintenance risk
+
+== Links
+
+* Supersedes implicit CJS default in early prototypes

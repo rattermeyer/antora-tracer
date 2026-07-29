@@ -1,0 +1,65 @@
+= ADR-003: In-memory graph over persisted database
+
+*Status*: accepted +
+*Deciders*: Richard Attermeyer +
+*Date*: 2025-07-20
+
+== Context and Problem Statement
+
+The traceability graph stores items (nodes) and relationships (edges) and needs to support queries, validation, path finding, and impact analysis. Two architectural options: an in-memory data structure (Maps with indexes), or a persisted database (embedded or external). The choice affects deployment complexity, performance, and data persistence between builds.
+
+== Decision Drivers
+
+* Zero operational overhead: users shouldn't need to run a database
+* Performance: graph operations must be fast during Antora builds
+* Simplicity: setup and teardown should be trivial
+* Export capability: external analysis tools (Neo4j) should be supported
+
+== Considered Options
+
+* In-memory graph with JavaScript Maps and manual indexes
+* Embedded database (SQLite, LevelDB)
+* External database (Neo4j as primary store)
+
+== Decision Outcome
+
+Chosen option: in-memory graph, because it has zero operational overhead and is fast enough for the workload. Neo4j is supported as an export target — the graph is populated in memory and then serialized to CSV/Cypher for external analysis. No database to install, configure, or migrate.
+
+=== Positive Consequences
+
+* Zero setup — works immediately after `npm install`
+* Fast queries via forward, reverse, and inverse relationship indexes
+* No schema migrations to maintain
+* Process isolation — no shared state between builds
+
+=== Negative Consequences
+
+* No persistence between builds — graph is rebuilt from source each time
+* Memory-bound for very large projects (practically, 10k+ items may be problematic)
+* No concurrent access or shared state across processes
+
+== Pros and Cons of the Options
+
+=== In-memory graph
+
+* Good, because zero operational overhead
+* Good, because fast — O(1) lookups via Map indexes
+* Bad, because no persistence between runs
+
+=== Embedded database
+
+* Good, because persistent — survives process restarts
+* Bad, because adds dependency (SQLite native bindings)
+* Bad, because schema design and migration overhead
+
+=== External Neo4j
+
+* Good, because powerful graph queries (Cypher)
+* Bad, because requires running Neo4j server
+* Bad, because adds deployment complexity
+* Good as export target — supported
+
+== Links
+
+* Neo4j export: `Neo4jExporter.ts` produces CSV and Cypher files
+* Graph API: `TraceabilityGraph.ts` with forward/reverse/inverse indexes

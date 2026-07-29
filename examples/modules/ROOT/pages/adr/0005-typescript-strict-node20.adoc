@@ -1,0 +1,62 @@
+= ADR-005: TypeScript strict mode and Node.js 20+ baseline
+
+*Status*: accepted +
+*Deciders*: Richard Attermeyer +
+*Date*: 2025-07-25
+
+== Context and Problem Statement
+
+The project needs a language and runtime baseline. TypeScript offers type safety but has varying strictness levels. Node.js versions introduce new APIs and drop support for older ones. The choices affect code quality, available language features, and user compatibility.
+
+== Decision Drivers
+
+* Type safety: catch errors at compile time, not runtime
+* Modern APIs: access to current Node.js features
+* User base: balance modernity with adoption friction
+
+== Considered Options
+
+* TypeScript with strict mode enabled, Node.js 20+ minimum
+* TypeScript with relaxed settings, Node.js 18+ minimum (LTS at time of decision)
+* Plain JavaScript, no TypeScript
+
+== Decision Outcome
+
+Chosen option: TypeScript strict mode with Node.js 20+, because strict mode catches more bugs and Node.js 20 is the active LTS with modern APIs (native `fetch`, `node:` protocol, ESM maturity). The `noUnusedVariables`, `noUnusedImports`, and `noUnusedPrivateClassMembers` checks are disabled — they're more noise than value in this codebase.
+
+=== Positive Consequences
+
+* Compile-time error detection — type mismatches, missing properties, null handling
+* Modern Node.js APIs — `node:fs`, `node:path`, `node:zlib` imports
+* ESM works reliably (significant improvements over Node 18)
+
+=== Negative Consequences
+
+* Users must have Node.js 20+ installed
+* TypeScript build step required before running (mitigated by `npm run build`)
+* Some Biome lint rules disabled to reduce noise
+
+== Pros and Cons of the Options
+
+=== TypeScript strict + Node 20+
+
+* Good, because strict type checking catches real bugs
+* Good, because modern APIs available
+* Bad, because Node 20+ requirement excludes some users
+
+=== TypeScript relaxed + Node 18+
+
+* Good, because wider compatibility
+* Bad, because fewer compile-time guarantees
+* Bad, because Node 18 ESM support is less mature
+
+=== Plain JavaScript
+
+* Good, because no build step needed
+* Bad, because no type checking — bugs found at runtime
+* Bad, because refactoring without types is riskier
+
+== Links
+
+* tsconfig.json: `"strict": true` with specific rule overrides
+* package.json: `"engines": { "node": ">=20.0.0" }`

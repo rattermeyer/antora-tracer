@@ -1,0 +1,56 @@
+= ADR-004: Zero framework dependencies
+
+*Status*: accepted +
+*Deciders*: Richard Attermeyer +
+*Date*: 2025-07-22
+
+== Context and Problem Statement
+
+The extension operates as an Antora plugin and a standalone CLI tool. It needs HTTP servers, HTML rendering, configuration loading, and CLI argument parsing. Frameworks (Express, React, NestJS, Yargs) could provide these, but introduce dependency chains and upgrade burdens. The project can instead use Node.js standard library and minimal, stable libraries.
+
+== Decision Drivers
+
+* Longevity: the extension should work with minimal maintenance over years
+* Bundle size: users installing the extension shouldn't pull in heavy dependency trees
+* Stability: dependencies shouldn't break on major version upgrades
+
+== Considered Options
+
+* Minimal dependencies (Node stdlib + targeted single-purpose libraries)
+* Full-featured frameworks (Express for serving, React for rendering)
+
+== Decision Outcome
+
+Chosen option: minimal dependencies, because it minimizes upgrade churn and keeps the dependency tree small. The extension uses `commander` for CLI (stable, widely used), `mustache` for HTML templates (logic-less, zero maintenance), and `chalk` for colored output. Everything else uses Node.js standard library (`fs`, `path`, `zlib`).
+
+=== Positive Consequences
+
+* Small dependency tree — fast installs, fewer security alerts
+* No framework upgrade cycles (Express 4→5, React 18→19, etc.)
+* Easy to understand — code uses standard patterns, not framework abstractions
+
+=== Negative Consequences
+
+* Manual dependency injection — no DI container, objects are wired by hand
+* No middleware pattern — request/response handling is procedural
+* Templates are logic-less — complex rendering requires pre-processing data
+
+== Pros and Cons of the Options
+
+=== Minimal dependencies
+
+* Good, because stable — selected libraries have mature APIs
+* Good, because small — fast `npm install`
+* Bad, because manual wiring — constructor injection, no DI magic
+
+=== Full-featured frameworks
+
+* Good, because rapid development with established patterns
+* Bad, because upgrade cycles — major version changes require rewrites
+* Bad, because heavy dependency trees
+
+== Links
+
+* Dependencies at time of writing: `@asciidoctor/core`, `chalk`, `commander`, `mustache`
+* CLI: `cli.ts` uses Commander with subcommands
+* Templates: `TemplateRenderer.ts` wraps Mustache

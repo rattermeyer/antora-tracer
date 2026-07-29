@@ -1,0 +1,59 @@
+= ADR-002: Regex-based AsciiDoc parsing over AST
+
+*Status*: accepted +
+*Deciders*: Richard Attermeyer +
+*Date*: 2025-07-15
+
+== Context and Problem Statement
+
+The extension needs to parse AsciiDoc files to extract `[item]` block macros and inline relationship macros (`addresses:REQ-001[]`). Two approaches exist: use a proper AsciiDoc parser (Asciidoctor.js API) to walk the document AST, or use regular expressions to match patterns directly in the source text. The choice affects accuracy, complexity, and maintainability.
+
+== Decision Drivers
+
+* Accuracy: must correctly extract items and relationships
+* Simplicity: the parser should be easy to understand and maintain
+* Independence: should not be tightly coupled to a specific Asciidoctor version
+* Performance: parsing should be fast enough for large documentation sites
+
+== Considered Options
+
+* Regex-based parser operating on raw AsciiDoc text
+* Asciidoctor.js AST walker (block processor or tree walker)
+
+== Decision Outcome
+
+Chosen option: regex-based parser, because it is simpler, version-independent, and easier to test. Known limitations (e.g., `]` inside quoted attribute values) have proven fixable and the pattern is well-understood.
+
+=== Positive Consequences
+
+* No dependency on Asciidoctor.js API stability
+* Fast — regex matching on source text
+* Easier to unit test — input is strings, output is structured data
+* Works standalone without an Asciidoctor runtime
+
+=== Negative Consequences
+
+* Fragile — each edge case requires a regex fix (e.g., `]` in titles, indented macros, escaped colons)
+* Cannot leverage Asciidoctor's built-in parsing for complex constructs
+* Verbatim block handling requires a separate pre-scan
+
+== Pros and Cons of the Options
+
+=== Regex-based parser
+
+* Good, because version-independent — doesn't break with Asciidoctor updates
+* Good, because simple to understand and debug
+* Good, because works in CLI context without Asciidoctor runtime
+* Bad, because fragile — edge cases require regex patches
+
+=== Asciidoctor.js AST walker
+
+* Good, because accurate — leverages tested AsciiDoc parser
+* Good, because handles all AsciiDoc syntax correctly
+* Bad, because tightly coupled to Asciidoctor.js version
+* Bad, because AST API changes between major versions
+* Bad, because requires Asciidoctor.js runtime for CLI usage
+
+== Links
+
+* Examples of parser fixes: indented macros, `]` in quoted titles, escaped inline macros, backslash-escaped colons
