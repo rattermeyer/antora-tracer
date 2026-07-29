@@ -54,6 +54,11 @@ REQ-051,REQ-051 — Relationship graph via traceability:graph[] macro,
 REQ-052,REQ-052 — Coverage chart via traceability:graph-coverage[] macro,
 REQ-053,REQ-053 — Graph visualization methods on TraceabilityGraph,
 REQ-054,REQ-054 — Dashboard page in example site,
+REQ-055,REQ-055 — Zero operational overhead,
+REQ-056,REQ-056 — Configurable without code changes,
+REQ-057,REQ-057 — Fail-fast with clear diagnostics,
+REQ-058,REQ-058 — No side effects on source files,
+REQ-059,REQ-059 — Testability by design,
 
-Total 55 rows
-Coverage: 76.4%
+Total 60 rows
+Coverage: 70.0%

@@ -312,6 +312,36 @@ Source: openspec/specs/graph-visualization/spec.md
 
 traceability:outgoing[]
 traceability:incoming[]"""
+REQ-055,REQ-055 — Zero operational overhead,requirement,,requirements.adoc,"""The extension SHALL operate without requiring external services, databases, or runtime dependencies beyond Node.js standard library and a minimal set of npm packages. Optional features such as Neo4j export SHALL degrade gracefully when not configured.
+
+Source: xref:quality/zero-operational-overhead.adoc[Quality Attribute: Zero Operational Overhead]
+
+traceability:outgoing[]
+traceability:incoming[]"""
+REQ-056,REQ-056 — Configurable without code changes,requirement,,requirements.adoc,"""The extension SHALL allow users to define roles, relations, and matrices entirely in YAML configuration. Built-in presets SHALL be overridable via the `extends` mechanism. Items with roles not yet in the configuration SHALL generate warnings rather than errors.
+
+Source: xref:quality/configurable-without-code.adoc[Quality Attribute: Configurable Without Code Changes]
+
+traceability:outgoing[]
+traceability:incoming[]"""
+REQ-057,REQ-057 — Fail-fast with clear diagnostics,requirement,,requirements.adoc,"""The extension SHALL validate every relationship against configured role-relation rules. Error messages SHALL include file path, line number, source and target item IDs with roles, the invalid relation type, and the list of allowed alternatives. Cross-file references SHALL be re-validated after all files are loaded.
+
+Source: xref:quality/fail-fast-diagnostics.adoc[Quality Attribute: Fail-Fast with Clear Diagnostics]
+
+traceability:outgoing[]
+traceability:incoming[]"""
+REQ-058,REQ-058 — No side effects on source files,requirement,,requirements.adoc,"""All content transformations SHALL operate on in-memory buffers. Source `.adoc` files SHALL never be modified by the extension. Processing the same file twice SHALL produce the same result.
+
+Source: xref:quality/no-side-effects.adoc[Quality Attribute: No Side Effects on Source Files]
+
+traceability:outgoing[]
+traceability:incoming[]"""
+REQ-059,REQ-059 — Testability by design,requirement,,requirements.adoc,"""Each module SHALL accept dependencies via constructor parameters. Each module SHALL have a dedicated test file. The traceability graph SHALL expose internal state for test access. The full test suite SHALL complete in under 500 ms.
+
+Source: xref:quality/testability-by-design.adoc[Quality Attribute: Testability by Design]
+
+traceability:outgoing[]
+traceability:incoming[]"""
 ARC-001,ARC-001 — Project scope and architectural goals,design,,architecture.adoc,"""*Project scope and architectural goals*
 
 The Antora Tracer is an Antora extension that adds role-based requirements traceability to AsciiDoc documentation. It replaces fixed macro types with a single configurable `[item]` macro.
@@ -344,6 +374,7 @@ no external services, and a minimal dependency tree
 (xref:adr/0004-zero-framework.adoc[ADR-004]).
 Optional features like Neo4j export degrade gracefully without warnings.
 
+addresses:REQ-055[]
 addresses:REQ-001[]"""
 ARC-006,ARC-006 — Configurable without code changes,design,,architecture.adoc,"""xref:quality/configurable-without-code.adoc[Configurable without code changes]
 is achieved through YAML-based roles, relations, and matrices via
@@ -351,6 +382,7 @@ is achieved through YAML-based roles, relations, and matrices via
 Items with unknown roles generate warnings, not errors — enabling
 incremental domain model adoption.
 
+addresses:REQ-056[]
 addresses:REQ-006[]
 addresses:REQ-007[]
 addresses:REQ-008[]"""
@@ -359,6 +391,7 @@ is achieved through role-based relation validation at processing time
 and post-hoc re-validation for cross-file references. Error messages
 include file, line, item IDs with roles, and allowed alternatives.
 
+addresses:REQ-057[]
 addresses:REQ-013[]
 addresses:REQ-014[]
 addresses:REQ-015[]"""
@@ -367,6 +400,7 @@ is achieved by performing all content transformations on in-memory
 buffers. Source `.adoc` files are never written to.
 Processing is idempotent.
 
+addresses:REQ-058[]
 addresses:REQ-050[]"""
 ARC-009,ARC-009 — Testability by design,design,,architecture.adoc,"""xref:quality/testability-by-design.adoc[Testability by design]
 is achieved through constructor-based dependency injection,
@@ -374,6 +408,7 @@ isolated test files per module, and graph state exposed for test access.
 The regex-based parser (xref:adr/0002-regex-parser-over-ast.adoc[ADR-002])
 is decoupled from Asciidoctor's API.
 
+addresses:REQ-059[]
 addresses:REQ-034[]"""
 ARC-010,ARC-010 — Future-proofness,design,,architecture.adoc,"""Future-proofness is achieved through ESM with `""""type"""": """"module""""`
 (xref:adr/0001-esm-over-cjs.adoc[ADR-001]), TypeScript strict mode,

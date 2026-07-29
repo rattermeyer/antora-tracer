@@ -565,6 +565,58 @@ traceability:outgoing[]
 traceability:incoming[]
 --
 
+== Quality Attributes
+
+[#REQ-055, item, role=requirement, title="Zero operational overhead"]
+--
+The extension SHALL operate without requiring external services, databases, or runtime dependencies beyond Node.js standard library and a minimal set of npm packages. Optional features such as Neo4j export SHALL degrade gracefully when not configured.
+
+Source: xref:quality/zero-operational-overhead.adoc[Quality Attribute: Zero Operational Overhead]
+
+traceability:outgoing[]
+traceability:incoming[]
+--
+
+[#REQ-056, item, role=requirement, title="Configurable without code changes"]
+--
+The extension SHALL allow users to define roles, relations, and matrices entirely in YAML configuration. Built-in presets SHALL be overridable via the `extends` mechanism. Items with roles not yet in the configuration SHALL generate warnings rather than errors.
+
+Source: xref:quality/configurable-without-code.adoc[Quality Attribute: Configurable Without Code Changes]
+
+traceability:outgoing[]
+traceability:incoming[]
+--
+
+[#REQ-057, item, role=requirement, title="Fail-fast with clear diagnostics"]
+--
+The extension SHALL validate every relationship against configured role-relation rules. Error messages SHALL include file path, line number, source and target item IDs with roles, the invalid relation type, and the list of allowed alternatives. Cross-file references SHALL be re-validated after all files are loaded.
+
+Source: xref:quality/fail-fast-diagnostics.adoc[Quality Attribute: Fail-Fast with Clear Diagnostics]
+
+traceability:outgoing[]
+traceability:incoming[]
+--
+
+[#REQ-058, item, role=requirement, title="No side effects on source files"]
+--
+All content transformations SHALL operate on in-memory buffers. Source `.adoc` files SHALL never be modified by the extension. Processing the same file twice SHALL produce the same result.
+
+Source: xref:quality/no-side-effects.adoc[Quality Attribute: No Side Effects on Source Files]
+
+traceability:outgoing[]
+traceability:incoming[]
+--
+
+[#REQ-059, item, role=requirement, title="Testability by design"]
+--
+Each module SHALL accept dependencies via constructor parameters. Each module SHALL have a dedicated test file. The traceability graph SHALL expose internal state for test access. The full test suite SHALL complete in under 500 ms.
+
+Source: xref:quality/testability-by-design.adoc[Quality Attribute: Testability by Design]
+
+traceability:outgoing[]
+traceability:incoming[]
+--
+
 ifdef::assembler-backend-pdf[]
 == Changelog
 [cols="1,2,2,3"]
