@@ -129,6 +129,65 @@ addresses:REQ-031[]
 addresses:REQ-032[]
 --
 
+== Building Block View
+
+[#ARC-002, item, role=design, title="Component-level architecture"]
+--
+The extension is composed of eight modules organized in a layered architecture:
+
+[plantuml]
+----
+include::example$bb-overview.puml[]
+----
+
+[width=100%, cols="25,75"]
+|===
+| Component | Responsibility
+
+| `AntoraTraceabilityExtension`
+| Antora entry point. Registers event handlers, creates `RequirementsTraceabilityExtension`, reads playbook config.
+
+| `RequirementsTraceabilityExtension`
+| Orchestrator. Owns the graph, delegates to parser, matrix generator, and Neo4j exporter. Public API for programmatic use.
+
+| `DocumentParser`
+| Regex-based AsciiDoc parser. Two-pass: extracts `[item]` blocks, then scans for inline `relation\:TARGET[]` macros.
+
+| `TraceabilityGraph`
+| In-memory directed graph. Items stored as `Map<string, Item>`, relationships as `Map<string, ItemRelationship>`. Provides query, validation, path finding, and impact analysis.
+
+| `MatrixGenerator`
+| Config-driven matrix generation. Reads matrix definitions from configuration, queries the graph, computes coverage, produces CSV output. Delegates HTML to TemplateRenderer.
+
+| `TemplateRenderer`
+| Mustache wrapper. Loads templates from `src/templates/`, supports custom template directories with fallback to built-ins.
+
+| `LinkResolver`
+| Path resolution for matrix-to-item deep links. Strips \`pages/\` prefix and \`.adoc\` extension from sourceFile values, generates \`../../component/page.html#ID\` links using a configurable \`relativePathPrefix\`.
+
+| `Neo4jExporter`
+| Graph-to-Neo4j export. Produces `nodes.csv`, `relationships.csv`, and `import.cypher`. Properly escapes special characters.
+
+| `ConfigLoader`
+| YAML configuration loader. Loads and validates config, merges with presets, provides role/relation validation queries to the graph.
+|===
+
+addresses:REQ-001[]
+addresses:REQ-002[]
+addresses:REQ-003[]
+addresses:REQ-004[]
+addresses:REQ-006[]
+addresses:REQ-007[]
+addresses:REQ-008[]
+addresses:REQ-011[]
+addresses:REQ-024[]
+addresses:REQ-025[]
+addresses:REQ-029[]
+addresses:REQ-034[]
+
+traceability:outgoing[]
+--
+
 [#ARC-012, item, role=design, title="Preset YAML schema"]
 --
 Presets are YAML files following a defined structure. Each preset is a self-contained,
@@ -188,65 +247,6 @@ addresses:REQ-020[]
 addresses:REQ-021[]
 addresses:REQ-022[]
 addresses:REQ-023[]
---
-
-== Building Block View
-
-[#ARC-002, item, role=design, title="Component-level architecture"]
---
-The extension is composed of eight modules organized in a layered architecture:
-
-[plantuml]
-----
-include::example$bb-overview.puml[]
-----
-
-[width=100%, cols="25,75"]
-|===
-| Component | Responsibility
-
-| `AntoraTraceabilityExtension`
-| Antora entry point. Registers event handlers, creates `RequirementsTraceabilityExtension`, reads playbook config.
-
-| `RequirementsTraceabilityExtension`
-| Orchestrator. Owns the graph, delegates to parser, matrix generator, and Neo4j exporter. Public API for programmatic use.
-
-| `DocumentParser`
-| Regex-based AsciiDoc parser. Two-pass: extracts `[item]` blocks, then scans for inline `relation\:TARGET[]` macros.
-
-| `TraceabilityGraph`
-| In-memory directed graph. Items stored as `Map<string, Item>`, relationships as `Map<string, ItemRelationship>`. Provides query, validation, path finding, and impact analysis.
-
-| `MatrixGenerator`
-| Config-driven matrix generation. Reads matrix definitions from configuration, queries the graph, computes coverage, produces CSV output. Delegates HTML to TemplateRenderer.
-
-| `TemplateRenderer`
-| Mustache wrapper. Loads templates from `src/templates/`, supports custom template directories with fallback to built-ins.
-
-| `LinkResolver`
-| Path resolution for matrix-to-item deep links. Strips \`pages/\` prefix and \`.adoc\` extension from sourceFile values, generates \`../../component/page.html#ID\` links using a configurable \`relativePathPrefix\`.
-
-| `Neo4jExporter`
-| Graph-to-Neo4j export. Produces `nodes.csv`, `relationships.csv`, and `import.cypher`. Properly escapes special characters.
-
-| `ConfigLoader`
-| YAML configuration loader. Loads and validates config, merges with presets, provides role/relation validation queries to the graph.
-|===
-
-addresses:REQ-001[]
-addresses:REQ-002[]
-addresses:REQ-003[]
-addresses:REQ-004[]
-addresses:REQ-006[]
-addresses:REQ-007[]
-addresses:REQ-008[]
-addresses:REQ-011[]
-addresses:REQ-024[]
-addresses:REQ-025[]
-addresses:REQ-029[]
-addresses:REQ-034[]
-
-traceability:outgoing[]
 --
 
 == Runtime View
