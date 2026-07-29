@@ -338,52 +338,63 @@ traceability:outgoing[]
 traceability:incoming[]
 
 traceability:graph[]"""
+ARC-005,ARC-005 — Zero operational overhead,design,,architecture.adoc,"""xref:quality/zero-operational-overhead.adoc[Zero operational overhead] is
+achieved through an in-memory graph (xref:adr/0003-in-memory-graph.adoc[ADR-003]),
+no external services, and a minimal dependency tree
+(xref:adr/0004-zero-framework.adoc[ADR-004]).
+Optional features like Neo4j export degrade gracefully without warnings.
+
+addresses:REQ-001[]"""
+ARC-006,ARC-006 — Configurable without code changes,design,,architecture.adoc,"""xref:quality/configurable-without-code.adoc[Configurable without code changes]
+is achieved through YAML-based roles, relations, and matrices via
+`ConfigLoader`. Built-in presets can be extended or overridden.
+Items with unknown roles generate warnings, not errors — enabling
+incremental domain model adoption.
+
+addresses:REQ-006[]
+addresses:REQ-007[]
+addresses:REQ-008[]"""
+ARC-007,ARC-007 — Fail-fast with clear diagnostics,design,,architecture.adoc,"""xref:quality/fail-fast-diagnostics.adoc[Fail-fast with clear diagnostics]
+is achieved through role-based relation validation at processing time
+and post-hoc re-validation for cross-file references. Error messages
+include file, line, item IDs with roles, and allowed alternatives.
+
+addresses:REQ-013[]
+addresses:REQ-014[]
+addresses:REQ-015[]"""
+ARC-008,ARC-008 — No side effects on source files,design,,architecture.adoc,"""xref:quality/no-side-effects.adoc[No side effects on source files]
+is achieved by performing all content transformations on in-memory
+buffers. Source `.adoc` files are never written to.
+Processing is idempotent.
+
+addresses:REQ-050[]"""
+ARC-009,ARC-009 — Testability by design,design,,architecture.adoc,"""xref:quality/testability-by-design.adoc[Testability by design]
+is achieved through constructor-based dependency injection,
+isolated test files per module, and graph state exposed for test access.
+The regex-based parser (xref:adr/0002-regex-parser-over-ast.adoc[ADR-002])
+is decoupled from Asciidoctor's API.
+
+addresses:REQ-034[]"""
+ARC-010,ARC-010 — Future-proofness,design,,architecture.adoc,"""Future-proofness is achieved through ESM with `""""type"""": """"module""""`
+(xref:adr/0001-esm-over-cjs.adoc[ADR-001]), TypeScript strict mode,
+and a Node.js 20+ baseline (xref:adr/0005-typescript-strict-node20.adoc[ADR-005]).
+The zero-framework policy avoids dependency on libraries with short upgrade cycles.
+
+addresses:REQ-001[]
+addresses:REQ-002[]
+addresses:REQ-004[]"""
+ARC-011,ARC-011 — Performance through indexing,design,,architecture.adoc,"""Performance is achieved through forward, reverse, and inverse
+relationship indexes (O(1) lookup), result caching with invalidation
+on mutation, and BFS path finding with configurable `maxDepth`.
+
+addresses:REQ-031[]
+addresses:REQ-032[]"""
 ARC-002,ARC-002 — Component-level architecture,design,,architecture.adoc,"""The extension is composed of eight modules organized in a layered architecture:
 
 [plantuml]
-....
-@startuml
-package """"Antora Pipeline"""" {
-  [AntoraTraceabilityExtension] as antora_ext
-}
-
-package """"Core"""" {
-  [RequirementsTraceabilityExtension] as main_ext
-  [DocumentParser] as parser
-  [TraceabilityGraph] as graph
-}
-
-package """"Generation"""" {
-  [MatrixGenerator] as matrix
-  [TemplateRenderer] as templates
-  [LinkResolver] as linkresolver
-}
-
-package """"Export"""" {
-  [Neo4jExporter] as neo4j
-}
-
-package """"Configuration"""" {
-  [ConfigLoader] as config
-  database """"Presets"""" as presets
-}
-
-antora_ext --> main_ext : orchestrates
-main_ext --> parser : delegates parsing
-main_ext --> graph : owns
-main_ext --> matrix : delegates generation
-main_ext --> neo4j : delegates export
-main_ext --> config : loads configuration
-
-parser --> graph : populates items & relationships
-matrix --> graph : queries for coverage
-matrix --> templates : renders HTML
-neo4j --> graph : exports nodes & relationships
-
-config --> presets : loads built-in presets
-config --> graph : provides validation rules
-@enduml
-....
+----
+include::example$bb-overview.puml[]
+----
 
 [width=100%, cols=""""25,75""""]
 |===

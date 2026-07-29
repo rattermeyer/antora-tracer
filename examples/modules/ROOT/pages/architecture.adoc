@@ -41,52 +41,87 @@ traceability:graph[]
 
 == Solution Strategy
 
-[#ARC-001b, item, role=design, title="Solution strategy — linking quality goals to architecture"]
+The following items describe how individual quality goals are addressed by
+architecture decisions documented in the xref:adr/index.adoc[ADRs] and quality
+acceptance criteria in the xref:quality/index.adoc[Quality Attributes].
+
+[#ARC-005, item, role=design, title="Zero operational overhead"]
 --
-The following table maps each quality goal to the architecture decisions and approaches that satisfy it. This establishes traceability from non-functional requirements to concrete design choices documented in the xref:adr/index.adoc[Architecture Decision Records].
-
-[width=100%, cols="25,35,40"]
-|===
-| Quality Goal | Architecture Approach | ADR / Component
-
-| Zero operational overhead
-| In-memory graph, no external services, minimal dependency tree
-| xref:adr/0003-in-memory-graph.adoc[ADR-003], xref:adr/0004-zero-framework.adoc[ADR-004]
-
-| Configurable without code changes
-| YAML-based roles/relations/matrices, preset system, `ConfigLoader` merge
-| xref:adr/0004-zero-framework.adoc[ADR-004], `TraceabilityConfig.ts`
-
-| Fail-fast with clear diagnostics
-| Role-based relation validation, post-hoc re-validation for cross-file refs, error messages with file/line/item-IDs
-| `TraceabilityGraph.validate()`, `ConfigLoader.isRelationAllowed()`
-
-| No side effects on source files
-| All transformations on in-memory buffers, read-only file access, idempotent processing
-| `antora-extension.ts` content pipeline, `DocumentParser` verbatim-block skip
-
-| Testability by design
-| Dependency injection via constructor, isolated test files per module, graph state exposed for test access
-| xref:adr/0002-regex-parser-over-ast.adoc[ADR-002], xref:adr/0005-typescript-strict-node20.adoc[ADR-005]
-
-| Future-proofness
-| ESM with `"type": "module"`, TypeScript strict mode, Node.js 20+ baseline, zero-framework policy
-| xref:adr/0001-esm-over-cjs.adoc[ADR-001], xref:adr/0005-typescript-strict-node20.adoc[ADR-005]
-
-| Performance
-| Forward/reverse/inverse relationship indexes (O(1) lookup), result caching, BFS depth limits
-| `TraceabilityGraph` indexes, `findPath()` with `maxDepth`
-|===
+xref:quality/zero-operational-overhead.adoc[Zero operational overhead] is
+achieved through an in-memory graph (xref:adr/0003-in-memory-graph.adoc[ADR-003]),
+no external services, and a minimal dependency tree
+(xref:adr/0004-zero-framework.adoc[ADR-004]).
+Optional features like Neo4j export degrade gracefully without warnings.
 
 addresses:REQ-001[]
+--
+
+[#ARC-006, item, role=design, title="Configurable without code changes"]
+--
+xref:quality/configurable-without-code.adoc[Configurable without code changes]
+is achieved through YAML-based roles, relations, and matrices via
+`ConfigLoader`. Built-in presets can be extended or overridden.
+Items with unknown roles generate warnings, not errors — enabling
+incremental domain model adoption.
+
 addresses:REQ-006[]
 addresses:REQ-007[]
-addresses:REQ-013[]
-addresses:REQ-015[]
+addresses:REQ-008[]
+--
 
-traceability:outgoing[]
-traceability:incoming[]
-traceability:graph[]
+[#ARC-007, item, role=design, title="Fail-fast with clear diagnostics"]
+--
+xref:quality/fail-fast-diagnostics.adoc[Fail-fast with clear diagnostics]
+is achieved through role-based relation validation at processing time
+and post-hoc re-validation for cross-file references. Error messages
+include file, line, item IDs with roles, and allowed alternatives.
+
+addresses:REQ-013[]
+addresses:REQ-014[]
+addresses:REQ-015[]
+--
+
+[#ARC-008, item, role=design, title="No side effects on source files"]
+--
+xref:quality/no-side-effects.adoc[No side effects on source files]
+is achieved by performing all content transformations on in-memory
+buffers. Source `.adoc` files are never written to.
+Processing is idempotent.
+
+addresses:REQ-050[]
+--
+
+[#ARC-009, item, role=design, title="Testability by design"]
+--
+xref:quality/testability-by-design.adoc[Testability by design]
+is achieved through constructor-based dependency injection,
+isolated test files per module, and graph state exposed for test access.
+The regex-based parser (xref:adr/0002-regex-parser-over-ast.adoc[ADR-002])
+is decoupled from Asciidoctor's API.
+
+addresses:REQ-034[]
+--
+
+[#ARC-010, item, role=design, title="Future-proofness"]
+--
+Future-proofness is achieved through ESM with `"type": "module"`
+(xref:adr/0001-esm-over-cjs.adoc[ADR-001]), TypeScript strict mode,
+and a Node.js 20+ baseline (xref:adr/0005-typescript-strict-node20.adoc[ADR-005]).
+The zero-framework policy avoids dependency on libraries with short upgrade cycles.
+
+addresses:REQ-001[]
+addresses:REQ-002[]
+addresses:REQ-004[]
+--
+
+[#ARC-011, item, role=design, title="Performance through indexing"]
+--
+Performance is achieved through forward, reverse, and inverse
+relationship indexes (O(1) lookup), result caching with invalidation
+on mutation, and BFS path finding with configurable `maxDepth`.
+
+addresses:REQ-031[]
+addresses:REQ-032[]
 --
 
 == Building Block View

@@ -11,7 +11,8 @@ Node.js supports two module systems: CommonJS (CJS, `require`/`module.exports`) 
 == Decision Drivers
 
 * Future-proofness: the choice should age well over the project's lifespan
-* Ecosystem compatibility: must work with Antora's extension system
+* Antora compatibility: the extension is loaded by Antora's `require()`, which expects CJS — ESM creates friction at the integration point
+* Ecosystem compatibility: npm packages used by the project (commander, chalk, mustache) must work
 * Developer experience: module resolution, tooling support, debugging
 
 == Considered Options
@@ -21,7 +22,7 @@ Node.js supports two module systems: CommonJS (CJS, `require`/`module.exports`) 
 
 == Decision Outcome
 
-Chosen option: ESM with `"type": "module"`, because it aligns with the ECMAScript standard and Node.js's stated direction. CJS is in maintenance mode; ESM is where the ecosystem is heading.
+Chosen option: ESM with `"type": "module"`, despite knowing it creates friction with Antora's CJS extension loader. The project accepted the cost of `.cjs` wrappers as a one-time investment in exchange for long-term alignment with the ECMAScript standard and Node.js's stated direction. CJS is in maintenance mode; ESM is where the ecosystem is heading.
 
 === Positive Consequences
 
@@ -31,9 +32,10 @@ Chosen option: ESM with `"type": "module"`, because it aligns with the ECMAScrip
 
 === Negative Consequences
 
-* Some npm packages (notably `@antora/pdf-extension`) are CJS-only and require a `.cjs` wrapper to load
-* `__dirname` and `require` not available without workarounds
-* Stricter module resolution can surface edge cases in test runners
+* Antora loads extensions via `require()` which expects CJS. Every ESM `.js` file that Antora's extension loader touches needs a `.cjs` wrapper — not just third-party packages. This is the primary integration friction: the project's own extension entry point must be wrapped.
+* Third-party CJS packages (`@antora/pdf-extension`) require additional `.cjs` wrappers, compounding the issue.
+* `__dirname` and `require` not available without workarounds in ESM modules.
+* Stricter module resolution can surface edge cases in test runners (e.g., Mocha + ESM needed `tsx` workaround).
 
 == Pros and Cons of the Options
 
@@ -41,13 +43,14 @@ Chosen option: ESM with `"type": "module"`, because it aligns with the ECMAScrip
 
 * Good, because forward-looking — CJS is in maintenance mode
 * Good, because modern syntax aligned with browser JavaScript
-* Bad, because some packages don't support it yet, requiring wrappers
+* Bad, because Antora's extension loader uses `require()`, forcing `.cjs` wrappers for every entry point
+* Bad, because some third-party packages also need wrappers
 
 === CommonJS
 
-* Good, because maximum ecosystem compatibility
-* Good, because no wrapper files needed
-* Bad, because legacy technology — long-term maintenance risk
+* Good, because seamless Antora integration — no wrapper files needed, `require()` works natively
+* Good, because maximum third-party package compatibility
+* Bad, because legacy technology — long-term maintenance risk as the Node.js ecosystem moves to ESM
 
 == Links
 
