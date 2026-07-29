@@ -53,7 +53,7 @@ no external services, and a minimal dependency tree
 (xref:adr/0004-zero-framework.adoc[ADR-004]).
 Optional features like Neo4j export degrade gracefully without warnings.
 
-addresses:REQ-055[]
+addresses:QA-055[]
 addresses:REQ-001[]
 --
 
@@ -65,7 +65,7 @@ is achieved through YAML-based roles, relations, and matrices via
 Items with unknown roles generate warnings, not errors — enabling
 incremental domain model adoption.
 
-addresses:REQ-056[]
+addresses:QA-056[]
 addresses:REQ-006[]
 addresses:REQ-007[]
 addresses:REQ-008[]
@@ -78,7 +78,7 @@ is achieved through role-based relation validation at processing time
 and post-hoc re-validation for cross-file references. Error messages
 include file, line, item IDs with roles, and allowed alternatives.
 
-addresses:REQ-057[]
+addresses:QA-057[]
 addresses:REQ-013[]
 addresses:REQ-014[]
 addresses:REQ-015[]
@@ -91,7 +91,7 @@ is achieved by performing all content transformations on in-memory
 buffers. Source `.adoc` files are never written to.
 Processing is idempotent.
 
-addresses:REQ-058[]
+addresses:QA-058[]
 addresses:REQ-050[]
 --
 
@@ -103,7 +103,7 @@ isolated test files per module, and graph state exposed for test access.
 The regex-based parser (xref:adr/0002-regex-parser-over-ast.adoc[ADR-002])
 is decoupled from Asciidoctor's API.
 
-addresses:REQ-059[]
+addresses:QA-059[]
 addresses:REQ-034[]
 --
 
