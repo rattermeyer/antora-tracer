@@ -28,7 +28,7 @@ const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8"));
 
 // Global options
 program
-  .name("antora-req-trace")
+  .name("antora-tracer")
   .description(
     "Antora Requirements Traceability Extension - Trace requirements, designs, implementations, and tests using role-based traceability",
   )
@@ -396,10 +396,10 @@ presetProgram
       console.log("");
     }
     console.log(
-      chalk.cyan("Usage: antora-req-trace process --preset <name> -i <file>"),
+      chalk.cyan("Usage: antora-tracer process --preset <name> -i <file>"),
     );
-    console.log(chalk.cyan("       antora-req-trace preset show <name>"));
-    console.log(chalk.cyan("       antora-req-trace preset init <name>"));
+    console.log(chalk.cyan("       antora-tracer preset show <name>"));
+    console.log(chalk.cyan("       antora-tracer preset init <name>"));
   });
 
 presetProgram
@@ -602,17 +602,17 @@ tests:IMP-001[]
         console.log(chalk.cyan("Next steps:"));
         console.log(
           chalk.cyan(
-            `  1. Process: antora-req-trace process -i ${samplePath} --config traceability.yml`,
+            `  1. Process: antora-tracer process -i ${samplePath} --config traceability.yml`,
           ),
         );
         console.log(
           chalk.cyan(
-            `  2. Generate matrix: antora-req-trace matrix --config traceability.yml -o matrix.html -f html`,
+            `  2. Generate matrix: antora-tracer matrix --config traceability.yml -o matrix.html -f html`,
           ),
         );
         console.log(
           chalk.cyan(
-            `  3. Validate: antora-req-trace validate -i ${samplePath} --config traceability.yml`,
+            `  3. Validate: antora-tracer validate -i ${samplePath} --config traceability.yml`,
           ),
         );
       }
@@ -643,12 +643,12 @@ program
         console.error(chalk.red("Error: No configuration file found"));
         console.log(
           chalk.yellow(
-            "Try: antora-req-trace config validate --config traceability.yml",
+            "Try: antora-tracer config validate --config traceability.yml",
           ),
         );
         console.log(
           chalk.yellow(
-            "Or: antora-req-trace config validate -c /path/to/config.yml",
+            "Or: antora-tracer config validate -c /path/to/config.yml",
           ),
         );
         process.exit(1);

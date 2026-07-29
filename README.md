@@ -64,14 +64,14 @@ Already have an Antora site? Skip to step 2.
 1. Install
 
    ```bash
-   npm install antora-requirements-traceability --save-dev
+   npm install antora-tracer --save-dev
    ```
 2. Add to `antora.yml`
 
    ```yaml
    antora:
      extensions:
-       - require: antora-requirements-traceability/antora-extension
+       - require: antora-tracer/antora-extension
          config:
            preset: requirements-engineering
    ```
@@ -258,7 +258,7 @@ The simplest path. Pick a preset and go:
 ```yaml
 antora:
   extensions:
-    - require: antora-requirements-traceability/antora-extension
+    - require: antora-tracer/antora-extension
       config:
         preset: requirements-engineering
 ```
@@ -270,7 +270,7 @@ Point to a traceability YAML file for full control:
 ```yaml
 antora:
   extensions:
-    - require: antora-requirements-traceability/antora-extension
+    - require: antora-tracer/antora-extension
       config:
         configPath: ./config/traceability.yml
 ```
@@ -329,13 +329,13 @@ The extension also works standalone outside of Antora:
 
 ```bash
 # Process AsciiDoc files and populate the graph
-npx antora-req-trace process -i docs/ --preset requirements-engineering
+npx antora-tracer process -i docs/ --preset requirements-engineering
 
 # Generate traceability matrices
-npx antora-req-trace matrix -t requirements-traceability -f html -o matrix.html
+npx antora-tracer matrix -t requirements-traceability -f html -o matrix.html
 
 # Validate traceability completeness
-npx antora-req-trace validate
+npx antora-tracer validate
 ```
 
 Additional commands: `export neo4j` (CSV/Cypher), `stats` (role statistics), `preset` (list/show/init).
@@ -353,9 +353,9 @@ Four built-in presets ship with the extension:
 | `medical-iec62304` | requirement, design, unit, integration, risk_control | Medical device software (IEC 62304) |
 | `minimal` | requirement, test | Getting started, simple projects |
 
-List available presets: `npx antora-req-trace preset list`
+List available presets: `npx antora-tracer preset list`
 
-Initialize a config from one: `npx antora-req-trace preset init --name medical-iec62304 -o ./config/`
+Initialize a config from one: `npx antora-tracer preset init --name medical-iec62304 -o ./config/`
 
 ---
 

@@ -62,7 +62,7 @@
     "typescript": "^7.0.2"
   },
   "bin": {
-    "antora-req-trace": "lib/cli.js"
+    "antora-tracer": "lib/cli.js"
   },
   "files": [
     "lib",

@@ -30,7 +30,7 @@ Already have an Antora site? Skip to step 2.
 +
 [source,bash]
 ----
-npm install antora-requirements-traceability --save-dev
+npm install antora-tracer --save-dev
 ----
 
 . Add it to your Antora playbook (`antora.yml`)
@@ -39,7 +39,7 @@ npm install antora-requirements-traceability --save-dev
 ----
 antora:
   extensions:
-    - require: antora-requirements-traceability/antora-extension
+    - require: antora-tracer/antora-extension
       config:
         preset: requirements-engineering
 ----
@@ -138,7 +138,7 @@ The simplest path. Pick a preset that matches your domain:
 ----
 antora:
   extensions:
-    - require: antora-requirements-traceability/antora-extension
+    - require: antora-tracer/antora-extension
       config:
         preset: requirements-engineering
 ----
@@ -172,7 +172,7 @@ For full control, point to a traceability YAML file:
 ----
 antora:
   extensions:
-    - require: antora-requirements-traceability/antora-extension
+    - require: antora-tracer/antora-extension
       config:
         configPath: ./config/traceability.yml
 ----
@@ -535,7 +535,7 @@ The extension provides a CLI for use outside Antora:
 [source,bash]
 ----
 # Display help
-npx antora-req-trace --help
+npx antora-tracer --help
 ----
 
 === process
@@ -544,8 +544,8 @@ Process AsciiDoc files to populate the traceability graph.
 
 [source,bash]
 ----
-npx antora-req-trace process -i docs/ --preset requirements-engineering
-npx antora-req-trace process -i requirements.adoc --config ./traceability.yml
+npx antora-tracer process -i docs/ --preset requirements-engineering
+npx antora-tracer process -i requirements.adoc --config ./traceability.yml
 ----
 
 Options:
@@ -561,8 +561,8 @@ Generate traceability matrices from processed items.
 
 [source,bash]
 ----
-npx antora-req-trace matrix -i docs/ -t requirements-traceability -f html
-npx antora-req-trace matrix -t requirements-traceability -f csv -o matrix.csv
+npx antora-tracer matrix -i docs/ -t requirements-traceability -f html
+npx antora-tracer matrix -t requirements-traceability -f csv -o matrix.csv
 ----
 
 Options:
@@ -577,7 +577,7 @@ Validate the traceability graph for orphaned items, missing targets, and invalid
 
 [source,bash]
 ----
-npx antora-req-trace validate -i docs/ --preset requirements-engineering
+npx antora-tracer validate -i docs/ --preset requirements-engineering
 ----
 
 Options:
@@ -593,8 +593,8 @@ Export the graph to Neo4j-compatible formats.
 
 [source,bash]
 ----
-npx antora-req-trace export neo4j -i docs/ --format csv -o ./neo4j-export/
-npx antora-req-trace export neo4j -i docs/ --format cypher -o ./neo4j-export/
+npx antora-tracer export neo4j -i docs/ --format csv -o ./neo4j-export/
+npx antora-tracer export neo4j -i docs/ --format cypher -o ./neo4j-export/
 ----
 
 Options:
@@ -608,7 +608,7 @@ Display role statistics for the current graph.
 
 [source,bash]
 ----
-npx antora-req-trace stats -i docs/ --preset requirements-engineering
+npx antora-tracer stats -i docs/ --preset requirements-engineering
 ----
 
 Output shows item counts per role and relationship counts.
@@ -619,9 +619,9 @@ Manage built-in presets.
 
 [source,bash]
 ----
-npx antora-req-trace preset list                          <1>
-npx antora-req-trace preset show requirements-engineering <2>
-npx antora-req-trace preset init -n medical-iec62304 -o ./config/  <3>
+npx antora-tracer preset list                          <1>
+npx antora-tracer preset show requirements-engineering <2>
+npx antora-tracer preset init -n medical-iec62304 -o ./config/  <3>
 ----
 <1> List all available presets with descriptions
 <2> Show a preset's configuration details
@@ -687,7 +687,7 @@ Start from a built-in preset, then customize:
 
 [source,bash]
 ----
-npx antora-req-trace preset init -n requirements-engineering -o ./config/
+npx antora-tracer preset init -n requirements-engineering -o ./config/
 ----
 
 This writes the preset's YAML to `./config/traceability.yml`. Edit it to add roles, change relations, or add matrices, then point your playbook at it with `configPath`.
@@ -746,7 +746,7 @@ Each preset also ships with example Cypher queries in its documentation. View th
 
 [source,bash]
 ----
-npx antora-req-trace preset show requirements-engineering
+npx antora-tracer preset show requirements-engineering
 ----
 
 == Recipes & Patterns
