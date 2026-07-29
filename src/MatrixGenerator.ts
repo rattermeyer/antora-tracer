@@ -140,7 +140,13 @@ export class MatrixGenerator {
         type: `${rowRole}-matrix`,
         rows: [],
         columns: columnRoles.map((role) => ({ name: role, role })),
-        coverage: {},
+        coverage: {
+          overall: 0,
+          complete: 0,
+          partial: 0,
+          missing: 0,
+          total: 0,
+        },
         generatedAt: new Date().toISOString(),
       };
     }
@@ -304,6 +310,23 @@ export class MatrixGenerator {
     }
 
     const rowItems = this.graph.getItemsByRole(rowRole);
+
+    if (rowItems.length === 0) {
+      return {
+        name: matrixName || `${rowRole}-matrix`,
+        type: `${rowRole}-${columnRoles.join("-")}`,
+        rows: [],
+        columns: columnRoles.map((role) => ({ name: role, role })),
+        coverage: {
+          overall: 0,
+          complete: 0,
+          partial: 0,
+          missing: 0,
+          total: 0,
+        },
+        generatedAt: new Date().toISOString(),
+      };
+    }
 
     const rows: MatrixRow[] = [];
     const columnItems = new Map<string, Item[]>();
@@ -500,7 +523,7 @@ export class MatrixGenerator {
     // Summary
     lines.push("");
     lines.push(`Total ${matrix.rows.length} rows`);
-    lines.push(`Coverage: ${matrix.coverage.overall.toFixed(1)}%`);
+    lines.push(`Coverage: ${(matrix.coverage.overall ?? 0).toFixed(1)}%`);
 
     return lines.join("\n");
   }
@@ -518,7 +541,7 @@ export class MatrixGenerator {
       columns: matrix.columns,
       coverage: {
         ...matrix.coverage,
-        overallFormatted: matrix.coverage.overall.toFixed(1),
+        overallFormatted: (matrix.coverage.overall ?? 0).toFixed(1),
       },
       generatedAt: matrix.generatedAt,
     };
@@ -556,7 +579,7 @@ export class MatrixGenerator {
         role: this.escapeHtml(cell.role),
       })),
       coverage: row.coverage,
-      coverageFormatted: row.coverage.toFixed(1),
+      coverageFormatted: (row.coverage ?? 0).toFixed(1),
       status: row.status,
       statusClass: `status-${row.status}`,
     };

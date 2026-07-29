@@ -14,7 +14,7 @@
  */
 
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { isAbsolute, join } from "node:path";
 import { deflateSync } from "node:zlib";
 import { ConfigLoader } from "./config/TraceabilityConfig.js";
 import { RequirementsTraceabilityExtension } from "./index.js";
@@ -66,9 +66,16 @@ export class AntoraTraceabilityExtension {
   private itemsWithOutgoingMacro = new Set<string>();
   private itemsWithIncomingMacro = new Set<string>();
 
-  constructor(private readonly context: AntoraExtensionContext) {
+  constructor(
+    private readonly context: AntoraExtensionContext,
+    antoraConfig?: { config?: Partial<AntoraTraceabilityConfig> },
+  ) {
     this.logger = context.getLogger("requirements-traceability");
-    this.config = { ...DEFAULT_CONFIG, ...this.loadConfig() };
+    this.config = {
+      ...DEFAULT_CONFIG,
+      ...this.loadConfig(),
+      ...antoraConfig?.config,
+    };
 
     // Fallback: if no configPath is set, try the example site config
     if (!this.config.configPath) {
@@ -105,9 +112,14 @@ export class AntoraTraceabilityExtension {
     if (this.config.configPath) {
       const configLoader = new ConfigLoader();
       try {
-        configLoader.load(this.config.configPath);
+        // Resolve config path relative to playbook dir, falling back to CWD
+        const playbookDir = this.context.playbook?.dir || process.cwd();
+        const resolvedPath = isAbsolute(this.config.configPath)
+          ? this.config.configPath
+          : join(playbookDir, this.config.configPath);
+        configLoader.load(resolvedPath);
         this.logger.info(
-          `Loaded configuration from: ${this.config.configPath}`,
+          `Loaded configuration from: ${resolvedPath}`,
         );
         return new RequirementsTraceabilityExtension(configLoader);
       } catch (error: any) {
@@ -135,10 +147,19 @@ export class AntoraTraceabilityExtension {
   private loadConfig(): Partial<AntoraTraceabilityConfig> {
     try {
       const playbook = this.context.playbook;
-      const extConfig = playbook.extensions?.find(
-        (e: any) => e.name === "antora-requirements-traceability",
+      // Extensions are under antora.extensions in the playbook schema
+      const extensions = playbook.antora?.extensions || playbook.extensions;
+      if (!extensions) return {};
+      const extEntry = extensions.find(
+        (e: any) =>
+          e.require === "antora-tracer/antora-extension" ||
+          e.require === "./lib/src/antora-extension.js" ||
+          e.require?.includes("antora-tracer") ||
+          e.name === "antora-requirements-traceability",
       );
-      return extConfig?.config ?? {};
+      if (!extEntry) return {};
+      // Support both formats: config nested under 'config' key, or directly on the entry
+      return extEntry.config ?? extEntry ?? {};
     } catch {
       return {};
     }
@@ -1385,14 +1406,18 @@ export class AntoraTraceabilityExtension {
   }
 }
 
-function register(context: AntoraExtensionContext): void {
-  new AntoraTraceabilityExtension(context);
+function register(
+  context: AntoraExtensionContext,
+  antoraConfig?: { config?: Partial<AntoraTraceabilityConfig> },
+): void {
+  new AntoraTraceabilityExtension(context, antoraConfig);
 }
 
 function createAntoraExtension(
   context: AntoraExtensionContext,
+  antoraConfig?: { config?: Partial<AntoraTraceabilityConfig> },
 ): AntoraTraceabilityExtension {
-  return new AntoraTraceabilityExtension(context);
+  return new AntoraTraceabilityExtension(context, antoraConfig);
 }
 
 export { createAntoraExtension, register };
