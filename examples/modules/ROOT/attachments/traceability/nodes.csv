@@ -312,6 +312,12 @@ Source: openspec/specs/graph-visualization/spec.md
 
 traceability:outgoing[]
 traceability:incoming[]"""
+REQ-055,REQ-055 — CLI next-id command returns next available ID,requirement,,requirements.adoc,"""The CLI SHALL provide a `next-id` command that accepts a `--prefix` and `-i/--input` and returns the next available sequential ID for items matching that prefix. The numeric suffix SHALL be auto-detected from existing IDs (e.g., if existing IDs use 3-digit padding, the next ID also uses 3-digit padding). When no existing IDs match the prefix, the default padding is 3 digits.
+
+Source: openspec/changes/add-next-id-cli/specs/next-id/spec.md
+
+traceability:outgoing[]
+traceability:incoming[]"""
 QA-055,QA-055 — Zero operational overhead,requirement,,requirements.adoc,"""The extension SHALL operate without requiring external services, databases, or runtime dependencies beyond Node.js standard library and a minimal set of npm packages. Optional features such as Neo4j export SHALL degrade gracefully when not configured.
 
 Source: xref:quality/zero-operational-overhead.adoc[Quality Attribute: Zero Operational Overhead]
@@ -543,7 +549,9 @@ references are re-validated after all files are loaded to catch late-resolved
 targets. Error messages include file path, line number, and allowed
 alternatives (see xref:adr/0004-zero-framework.adoc[ADR-004]).
 
-addresses:QA-057[]"""
+addresses:QA-057[]
+
+traceability:outgoing[]"""
 ARC-015,ARC-015 — In-memory processing with no side effects,design,,architecture.adoc,"""All content transformations — parsing, macro expansion, link substitution,
 title injection — operate on in-memory buffers. Source `.adoc` files are never
 written to. The Antora content catalog provides the text buffers; the extension
@@ -551,7 +559,8 @@ modifies them in place and writes them back to the catalog without touching disk
 This ensures idempotency and version-control safety (see
 xref:adr/0003-in-memory-graph.adoc[ADR-003]).
 
-addresses:QA-058[]"""
+addresses:QA-058[]
+traceability:outgoing[]"""
 ARC-016,ARC-016 — Event-driven Antora integration,design,,architecture.adoc,"""The extension hooks into Antora's event pipeline via `register()`:
 `contentClassified` triggers parsing and macro expansion; `sitePublished`
 triggers matrix generation and export. Each event handler is self-contained,
@@ -559,7 +568,8 @@ does not block the build pipeline, and receives the content catalog as a
 parameter. The same `RequirementsTraceabilityExtension` class is used by
 the CLI outside Antora, demonstrating the event handlers are optional.
 
-addresses:QA-055[]"""
+addresses:QA-055[]
+traceability:outgoing[]"""
 ARC-017,ARC-017 — Regex-based parsing,design,,architecture.adoc,"""AsciiDoc content is parsed using regular expressions rather than an
 Asciidoctor AST walker. This makes the parser independent of Asciidoctor
 API versions and testable with plain string inputs. Verbatim blocks
@@ -571,7 +581,8 @@ attribute values, indented macros) are handled with targeted fixes
 addresses:REQ-001[]
 addresses:REQ-002[]
 addresses:REQ-003[]
-addresses:REQ-004[]"""
+addresses:REQ-004[]
+traceability:outgoing[]"""
 ARC-019,ARC-019 — Config-driven matrix generation with coverage calculations,design,,architecture.adoc,"""The `MatrixGenerator` reads matrix definitions from configuration, queries the
 graph for items by role, and computes per-cell coverage based on
 `coverageRelations`. Each cell shows related item IDs or `—` for no
@@ -579,13 +590,15 @@ relationships. CSV output is direct; HTML output delegates to `TemplateRenderer`
 Coverage is calculated as overall, complete, partial, and missing counts.
 
 addresses:REQ-008[]
-addresses:REQ-029[]"""
+addresses:REQ-029[]
+traceability:outgoing[]"""
 ARC-020,ARC-020 — Mustache template rendering for HTML output,design,,architecture.adoc,"""The `TemplateRenderer` wraps Mustache for HTML matrix output. Built-in templates
 ship with the extension in `src/templates/`. Users can specify a custom template
 directory — the renderer falls back to built-in templates for any files not found
 in the custom directory.
 
-addresses:REQ-034[]"""
+addresses:REQ-034[]
+traceability:outgoing[]"""
 ARC-021,ARC-021 — Path resolution for matrix-to-item links,design,,architecture.adoc,"""The `LinkResolver` generates relative link paths from matrix output to component
 root. It normalizes `sourceFile` values by stripping the `pages/` prefix and
 `.adoc` extension, producing `../../component/page.html#ID` links. The
@@ -598,7 +611,8 @@ addresses:REQ-039[]
 addresses:REQ-040[]
 addresses:REQ-041[]
 addresses:REQ-042[]
-addresses:REQ-043[]"""
+addresses:REQ-043[]
+traceability:outgoing[]"""
 ARC-022,ARC-022 — Graph-to-Neo4j CSV and Cypher export,design,,architecture.adoc,"""The `Neo4jExporter` serializes the traceability graph into `nodes.csv` and
 `relationships.csv` with proper headers, comma delimiters, and escaped special
 characters — importable via Neo4j's `LOAD CSV`. The `import.cypher` format
@@ -609,7 +623,17 @@ no Neo4j runtime dependency.
 addresses:REQ-024[]
 addresses:REQ-025[]
 addresses:REQ-027[]
-addresses:REQ-028[]"""
+addresses:REQ-028[]
+traceability:outgoing[]"""
+ARC-023,ARC-023 — Commander-based CLI with subcommands,design,,architecture.adoc,"""The CLI is built on https://www.npmjs.com/package/commander[Commander] with
+subcommands for processing (`process`), matrix generation (`matrix`),
+validation (`validate`), Neo4j export (`export neo4j`), statistics
+(`stats`), preset management (`preset`), and ID allocation (`next-id`).
+Global `--config` and `--preset` flags apply to all commands. The CLI
+operates standalone — it does not require an Antora build pipeline.
+
+addresses:REQ-036[]
+addresses:REQ-055[]"""
 ARC-003,ARC-003 — Processing flow during Antora build,design,,architecture.adoc,"""The following sequence shows how an AsciiDoc file flows through the system during an Antora build:
 
 [plantuml]

@@ -263,6 +263,8 @@ targets. Error messages include file path, line number, and allowed
 alternatives (see xref:adr/0004-zero-framework.adoc[ADR-004]).
 
 addresses:QA-057[]
+
+traceability:outgoing[]
 --
 
 === TraceabilityGraph
@@ -277,6 +279,7 @@ This ensures idempotency and version-control safety (see
 xref:adr/0003-in-memory-graph.adoc[ADR-003]).
 
 addresses:QA-058[]
+traceability:outgoing[]
 --
 
 === AntoraTraceabilityExtension
@@ -291,6 +294,7 @@ parameter. The same `RequirementsTraceabilityExtension` class is used by
 the CLI outside Antora, demonstrating the event handlers are optional.
 
 addresses:QA-055[]
+traceability:outgoing[]
 --
 
 === DocumentParser
@@ -309,6 +313,7 @@ addresses:REQ-001[]
 addresses:REQ-002[]
 addresses:REQ-003[]
 addresses:REQ-004[]
+traceability:outgoing[]
 --
 
 === MatrixGenerator
@@ -323,6 +328,7 @@ Coverage is calculated as overall, complete, partial, and missing counts.
 
 addresses:REQ-008[]
 addresses:REQ-029[]
+traceability:outgoing[]
 --
 
 === TemplateRenderer
@@ -335,6 +341,7 @@ directory — the renderer falls back to built-in templates for any files not fo
 in the custom directory.
 
 addresses:REQ-034[]
+traceability:outgoing[]
 --
 
 === LinkResolver
@@ -354,6 +361,7 @@ addresses:REQ-040[]
 addresses:REQ-041[]
 addresses:REQ-042[]
 addresses:REQ-043[]
+traceability:outgoing[]
 --
 
 === Neo4jExporter
@@ -371,6 +379,22 @@ addresses:REQ-024[]
 addresses:REQ-025[]
 addresses:REQ-027[]
 addresses:REQ-028[]
+traceability:outgoing[]
+--
+
+=== CLI Tool
+
+[#ARC-023, item, role=design, title="Commander-based CLI with subcommands"]
+--
+The CLI is built on https://www.npmjs.com/package/commander[Commander] with
+subcommands for processing (`process`), matrix generation (`matrix`),
+validation (`validate`), Neo4j export (`export neo4j`), statistics
+(`stats`), preset management (`preset`), and ID allocation (`next-id`).
+Global `--config` and `--preset` flags apply to all commands. The CLI
+operates standalone — it does not require an Antora build pipeline.
+
+addresses:REQ-036[]
+addresses:REQ-055[]
 --
 
 == Runtime View

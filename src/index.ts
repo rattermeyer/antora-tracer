@@ -342,6 +342,14 @@ export class RequirementsTraceabilityExtension {
   }
 
   /**
+   * Get the next available ID for a prefix.
+   * See TraceabilityGraph.getNextId for details.
+   */
+  getNextId(prefix: string): string {
+    return this.graph.getNextId(prefix);
+  }
+
+  /**
    * Get relationships filtered by source and target roles
    */
   getRelationshipsByRoles(

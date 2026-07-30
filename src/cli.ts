@@ -796,6 +796,30 @@ program
     }
   });
 
+program
+  .command("next-id")
+  .description(
+    "Get the next available sequential ID for a given prefix",
+  )
+  .requiredOption("-p, --prefix <prefix>", "ID prefix (e.g., REQ, ARC, TST)")
+  .option("-i, --input <path>", "Input file or directory to scan for existing IDs")
+  .action(async (options) => {
+    if (!options.input) {
+      console.error(chalk.red("Error: Input file or directory is required"));
+      process.exit(1);
+    }
+    const extension = await createExtension(options);
+    try {
+      const adocFiles = collectAdocFiles(options.input);
+      extension.processFiles(adocFiles);
+      const nextId = extension.getNextId(options.prefix);
+      console.log(nextId);
+    } catch (error: any) {
+      console.error(chalk.red("Error:", error.message));
+      process.exit(1);
+    }
+  });
+
 if (process.argv.length <= 2) {
   program.help();
 }

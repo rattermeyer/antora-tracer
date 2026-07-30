@@ -565,6 +565,18 @@ traceability:outgoing[]
 traceability:incoming[]
 --
 
+== CLI: Next ID Command
+
+[#REQ-055, item, role=requirement, title="CLI next-id command returns next available ID"]
+--
+The CLI SHALL provide a `next-id` command that accepts a `--prefix` and `-i/--input` and returns the next available sequential ID for items matching that prefix. The numeric suffix SHALL be auto-detected from existing IDs (e.g., if existing IDs use 3-digit padding, the next ID also uses 3-digit padding). When no existing IDs match the prefix, the default padding is 3 digits.
+
+Source: openspec/changes/add-next-id-cli/specs/next-id/spec.md
+
+traceability:outgoing[]
+traceability:incoming[]
+--
+
 == Quality Attributes
 
 [#QA-055, item, role=requirement, title="Zero operational overhead"]
