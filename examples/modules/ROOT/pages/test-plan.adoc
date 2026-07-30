@@ -34,7 +34,7 @@ traceability:graph[]
 --
 Test file: `test/antora-extension.test.ts`
 
-Tests the `AntoraTraceabilityExtension` — initialization with default config, preset, config path, and disabled state. Tests event handler registration, content processing via `contentClassified` event, matrix generation via `sitePublished` event, and API access patterns. Also tests `traceability:outgoing[]` and `traceability:incoming[]` macro expansion with configurable display style, sort order, collapsible sections, and opt-in behavior. Tests `traceability:graph[]` and `traceability:graph-coverage[]` macro expansion with graph-enabled and graph-disabled modes, including global coverage, explicit target IDs, and header exclusion. Tests automatic matrix sync to component `_attachments` directories during `sitePublished`.
+Tests the `AntoraTraceabilityExtension` — initialization with default config, preset, config path, and disabled state. Tests event handler registration, content processing via `contentClassified` event (in-memory only, never touches disk), matrix generation via `sitePublished` event, and API access patterns. Also tests `traceability:outgoing[]` and `traceability:incoming[]` macro expansion with configurable display style, sort order, collapsible sections, and opt-in behavior. Tests `traceability:graph[]` and `traceability:graph-coverage[]` macro expansion with graph-enabled and graph-disabled modes, including global coverage, explicit target IDs, and header exclusion. Tests automatic matrix sync to component `_attachments` directories during `sitePublished`.
 
 verifies:REQ-035[]
 verifies:REQ-040[]
@@ -42,6 +42,7 @@ verifies:REQ-044[]
 verifies:REQ-045[]
 verifies:REQ-047[]
 verifies:REQ-048[]
+verifies:REQ-050[]
 verifies:REQ-051[]
 verifies:REQ-052[]
 verifies:REQ-055[]
