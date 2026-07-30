@@ -177,6 +177,10 @@ export class AntoraTraceabilityExtension {
    * Strips path prefix up to /pages/ and removes .adoc extension.
    */
   private normalizeSourceFile(sourceFile: string): string {
+    // If it's already a URL (e.g., edit URL for partials), return unchanged
+    if (/^https?:\/\//.test(sourceFile)) {
+      return sourceFile;
+    }
     let result = sourceFile.replace(/\\/g, "/");
     result = result.replace(/\\.adoc$/, "");
     result = result.replace(/^.*[\\/]pages[\\/]/, "");
@@ -548,6 +552,10 @@ export class AntoraTraceabilityExtension {
     displayText: string,
   ): string {
     if (item.sourceFile && item.sourceFile !== currentFile) {
+      // Partial items have edit URLs as sourceFile — use link: instead of xref:
+      if (/^https?:\/\//.test(item.sourceFile)) {
+        return `link:${item.sourceFile}#${item.id}[${displayText}]`;
+      }
       return `xref:${item.sourceFile}#${item.id}[${displayText}]`;
     }
     return `xref:#${item.id}[${displayText}]`;
@@ -884,8 +892,14 @@ export class AntoraTraceabilityExtension {
       }
 
       this.logger.info("Processing content for traceability");
-      const files = contentCatalog.findBy({ family: "page" }) || [];
-      const adocFiles = files.filter((file: any) =>
+      const pageFiles = contentCatalog.findBy({ family: "page" }) || [];
+      const adocFiles = pageFiles.filter((file: any) =>
+        file.src?.path?.endsWith(".adoc"),
+      );
+
+      // Also process partial files — items defined in partials need to be in the graph
+      const partialFiles = contentCatalog.findBy({ family: "partial" }) || [];
+      const adocPartials = partialFiles.filter((file: any) =>
         file.src?.path?.endsWith(".adoc"),
       );
 
@@ -893,8 +907,12 @@ export class AntoraTraceabilityExtension {
       for (const file of adocFiles) {
         this.processAsciiDocFile(file);
       }
+      for (const file of adocPartials) {
+        this.processAsciiDocFile(file, file.src?.editUrl);
+      }
 
       // Pass 2: Expand traceability:outgoing[] and traceability:incoming[] macros
+      // Only for page files — partials don't produce HTML output
       this.itemsWithOutgoingMacro.clear();
       this.itemsWithIncomingMacro.clear();
       for (const file of adocFiles) {
@@ -915,7 +933,7 @@ export class AntoraTraceabilityExtension {
     });
   }
 
-  private processAsciiDocFile(file: any): void {
+  private processAsciiDocFile(file: any, editUrl?: string): void {
     if (!this.traceability) {
       this.logger.debug("Extension not loaded yet, skipping file processing");
       return;
@@ -926,7 +944,7 @@ export class AntoraTraceabilityExtension {
         return;
       }
       const content = contentsBuffer.toString("utf8");
-      let sourceFile = file.src?.path || file.path || "unknown";
+      let sourceFile = editUrl || file.src?.path || file.path || "unknown";
       sourceFile = this.normalizeSourceFile(sourceFile);
       this.traceability.process(content, { sourceFile });
     } catch (error: any) {
