@@ -371,6 +371,8 @@ The system SHALL support merging another TraceabilityGraph into the current grap
 
 Source: TraceabilityGraph API
 
+NOTE: This method is not used internally by the extension — all files are processed into a single graph instance. It exists as a convenience for programmatic API consumers who may construct graphs independently and need to combine them.
+
 traceability:outgoing[]
 traceability:incoming[]
 --
