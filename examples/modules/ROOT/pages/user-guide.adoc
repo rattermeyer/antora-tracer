@@ -437,6 +437,65 @@ The macro displays relationships pointing TO this item, with inverse relation ty
 
 *PDF compatibility:* The macro generates standard AsciiDoc constructs (xrefs, lists, tables) — compatible with both HTML and PDF backends identically.
 
+=== The `traceability:graph[]` Macro
+
+Place `traceability:graph[]` inside an item block to render a relationship graph for that item. Requires the `:traceability-graph:` document attribute.
+
+[source,asciidoc]
+----
+= Dashboard
+:traceability-graph: true
+
+[#REQ-001, item, role=requirement, title="System shall..."]
+\--
+Requirement description...
+
+traceability:graph[]
+\--
+----
+
+The macro renders a Kroki-generated GraphViz DOT diagram showing the item and its direct relationships. Nodes are colored by role and edges are labeled with relation types.
+
+*Reference any item* by passing an explicit ID:
+
+[source,asciidoc]
+----
+traceability:graph[REQ-001]
+----
+
+Pass a depth parameter to control how many hops are shown (default `1`):
+
+[source,asciidoc]
+----
+traceability:graph[REQ-001, 2]
+----
+
+=== The `traceability:graph-coverage[]` Macro
+
+Place `traceability:graph-coverage[]` inside an item block to render a per-item coverage bar chart, or outside any item block for global role-based coverage. Requires the `:traceability-graph:` document attribute.
+
+*Inside an item* — shows per-relationship-type coverage for that item:
+
+[source,asciidoc]
+----
+[#REQ-001, item, role=requirement, title="System shall..."]
+\--
+traceability:graph-coverage[]
+\--
+----
+
+*Outside items* — shows global coverage by role:
+
+[source,asciidoc]
+----
+= Dashboard
+:traceability-graph: true
+
+traceability:graph-coverage[]
+----
+
+The macro renders a Kroki-generated Vega-Lite bar chart. Both macros auto-scale and have no additional attributes beyond `:traceability-graph:`.
+
 === Role-Based Validation
 
 The extension validates:
@@ -444,6 +503,7 @@ The extension validates:
 . **Role exists** — if `role=widget` and `widget` isn't in your config, you get a warning: `Unknown role "widget". Known roles: requirement, design, test.`
 . **Relation allowed** — if you write `verifies:REQ-001[]` from a `document` but your config only allows `document → requirement: [contains]`, you get an error listing the allowed types.
 . **Target exists** — if `TARGET-ID` doesn't exist, you get: `Target item not found: MISSING-001.`
+. **Circular references** — if a cycle exists in the relationship graph (e.g., `REQ-001 → REQ-002 → REQ-001`), you get: `Circular reference detected: REQ-001 -> REQ-002 -> REQ-001.` Self-referencing items are also detected.
 
 Warnings don't block processing; errors do. Unknown roles generate warnings (graceful degradation). Invalid relations generate errors.
 
@@ -573,7 +633,7 @@ Options:
 
 === validate
 
-Validate the traceability graph for orphaned items, missing targets, and invalid relations.
+Validate the traceability graph for orphaned items, missing targets, invalid relations, and circular references. A circular reference is a cycle in the directed relationship graph (e.g., A → B → A). The command reports cycles with the full path.
 
 [source,bash]
 ----
@@ -630,6 +690,22 @@ npx antora-tracer preset init -n medical-iec62304 -o ./config/  <3>
 Options (init):
 - `-n, --name <name>` — preset name (required)
 - `-o, --output <path>` — output directory (default: current directory)
+
+=== next-id
+
+Get the next available sequential ID for a given prefix. Useful when adding new items manually — ensures consistent numbering without scanning the whole document.
+
+[source,bash]
+----
+npx antora-tracer next-id --prefix REQ -i docs/
+npx antora-tracer next-id --prefix TST -i test-plan.adoc
+----
+
+Options:
+- `-p, --prefix <prefix>` — ID prefix, e.g. `REQ`, `TST`, `ARC` (required)
+- `-i, --input <path>` — input file or directory to scan for existing IDs (required)
+
+The command auto-detects padding from existing IDs. If you have `REQ-001` and `REQ-002`, it returns `REQ-003`. If you have `TST-0001`, it returns `TST-0002`. With no existing items matching the prefix, it defaults to 3-digit padding (`REQ-001`).
 
 == Presets Reference
 

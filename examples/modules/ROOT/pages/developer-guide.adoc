@@ -146,6 +146,7 @@ Delegate methods on the extension (forward to `graph`):
 - `findPath(from, to, maxDepth?)` — BFS path between items
 - `getImpactAnalysis(id)` — all reachable items in both directions
 - `getRelationshipsByRoles(src, tgt)` — relationships between two roles
+- `getNextId(prefix)` — next available sequential ID for a given prefix
 
 === TraceabilityGraph
 
@@ -181,10 +182,22 @@ export class TraceabilityGraph {
   // Validation
   validate(): ValidationResult;  // { errors: string[], warnings: string[] }
 
+  // Visualization
+  toDot(fromId: string, depth?: number): string;
+  toVegaLite(itemId?: string): string;
+
+  // ID generation
+  getNextId(prefix: string): string;
+
   // Lifecycle
   clear(): void;
   merge(other: TraceabilityGraph): void;
   setConfigLoader(configLoader: ConfigLoader): void;
+}
+
+interface ValidationResult {
+  errors: string[];
+  warnings: string[];
 }
 ----
 
@@ -193,7 +206,7 @@ Internally uses private maps: `_items`, `_relationships`. Maintains indexes for 
 . Target item exists
 . If ConfigLoader is set, relation is allowed between the two item roles
 
-Invalid relations are stored anyway (graceful degradation) with a warning logged.
+Invalid relations are stored anyway (graceful degradation) with a warning logged. The `validate()` method also runs `findCircularReferences()`, a DFS-based cycle detector that reports circular references with the full cycle path.
 
 === DocumentParser
 
@@ -488,6 +501,7 @@ Commands:
 | `process` | Process AsciiDoc files | `-i <path>`, `-o <path>`, `-f <fmt>`, `--preset`, `--config`
 | `matrix` | Generate matrices | `-i <path>`, `-t <name>`, `-f <fmt>`, `-o <path>`
 | `validate` | Validate traceability | `-i <path>`, `--preset`, `--config`
+| `next-id` | Next available ID for prefix | `-p <prefix>`, `-i <path>`
 | `export neo4j` | Neo4j CSV/Cypher export | `-i <path>`, `--format`, `-o <path>`
 | `stats` | Graph statistics | `-i <path>`, `--preset`, `--config`
 | `preset <sub>` | Preset management | `list`, `show <name>`, `init -n <name> -o <path>`
