@@ -73,7 +73,7 @@ export class LinkResolver {
   private itemToHtmlPath(item: Item): string {
     let sourceFile = item.sourceFile || item.id;
 
-    // If it's already a full URL (partial items have editUrl as sourceFile),
+    // If it's already a full URL (partial items use view URL as sourceFile),
     // return it as-is — no HTML conversion needed
     if (/^https?:\/\//.test(sourceFile)) {
       return sourceFile;
