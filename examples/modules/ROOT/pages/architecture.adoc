@@ -315,6 +315,7 @@ addresses:REQ-046[]
 addresses:REQ-047[]
 addresses:REQ-048[]
 addresses:REQ-055[]
+addresses:QA-060[]
 --
 
 === DocumentParser

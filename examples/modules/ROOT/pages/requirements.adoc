@@ -503,14 +503,6 @@ traceability:outgoing[]
 traceability:incoming[]
 --
 
-[#REQ-049, item, role=requirement, title="PDF compatibility"]
---
-Generated output from \`traceability:outgoing[]\` and \`traceability:incoming[]\` SHALL be standard AsciiDoc constructs — not raw HTML — ensuring compatibility with both HTML and PDF backends.
-
-Source: openspec/specs/traceability-links-macro/spec.md
-
-traceability:outgoing[]
-traceability:incoming[]
 --
 
 [#REQ-050, item, role=requirement, title="Source files never modified"]
@@ -624,6 +616,16 @@ traceability:incoming[]
 Each module SHALL accept dependencies via constructor parameters. Each module SHALL have a dedicated test file. The traceability graph SHALL expose internal state for test access. The full test suite SHALL complete in under 500 ms.
 
 Source: xref:quality/testability-by-design.adoc[Quality Attribute: Testability by Design]
+
+traceability:outgoing[]
+traceability:incoming[]
+--
+
+[#QA-060, item, role=requirement, title="PDF compatibility of generated output"]
+--
+Generated output from \`traceability:outgoing[]\` and \`traceability:incoming[]\` SHALL be standard AsciiDoc constructs — not raw HTML — ensuring compatibility with both HTML and PDF backends.
+
+Source: openspec/specs/traceability-links-macro/spec.md
 
 traceability:outgoing[]
 traceability:incoming[]

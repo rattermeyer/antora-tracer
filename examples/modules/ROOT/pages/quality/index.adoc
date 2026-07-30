@@ -6,4 +6,5 @@ This section documents the quality attributes (non-functional requirements) that
 * xref:quality/configurable-without-code.adoc[Configurable Without Code Changes] — Roles, relations, and matrices in YAML
 * xref:quality/fail-fast-diagnostics.adoc[Fail-Fast with Clear Diagnostics] — Typo detection, file/line/item-IDs in errors
 * xref:quality/no-side-effects.adoc[No Side Effects on Source Files] — All transformations in-memory, source files never modified
+* xref:quality/pdf-compatibility.adoc[PDF Compatibility of Generated Output] — Standard AsciiDoc output for cross-backend rendering
 * xref:quality/testability-by-design.adoc[Testability by Design] — Dependency injection, isolated test files, fast feedback

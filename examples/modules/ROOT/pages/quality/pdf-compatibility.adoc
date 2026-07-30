@@ -1,0 +1,20 @@
+= PDF Compatibility of Generated Output
+
+== Context
+
+The `traceability:outgoing[]` and `traceability:incoming[]` macros expand to relationship lists. If the macros generate raw HTML (e.g., `<div>` or `<span>` tags), the output works in the HTML site but breaks in the PDF build — asciidoctor-pdf cannot render raw HTML in AsciiDoc documents. The output must use standard AsciiDoc constructs that work identically across backends.
+
+== Trigger
+
+An Antora build is executed with `:traceability-links: true` enabled, and `traceability:outgoing[]` or `traceability:incoming[]` macros are expanded. The same source is also built via `antora-playbook-pdf.yml` for PDF output.
+
+== Acceptance Criteria
+
+Standard AsciiDoc only::
+  Generated output from link macros contains only standard AsciiDoc constructs (lists, tables, inline xrefs) — no raw HTML; source: inspection of the generated HTML and the assembly `.adoc` files in `build/assembler/pdf/`; horizon: every build.
+
+No backend-specific branching::
+  The macro expansion code uses the same `generateLinksAsciiDoc()` path for both HTML and PDF builds — there is no `if (pdf) { ... } else { ... }` logic; source: `antora-extension.ts` code review; horizon: every release.
+
+PDF rendering parity::
+  Relationships rendered in the PDF match those in the HTML site — same items, same grouping, same order; source: manual PDF-to-HTML comparison or automated screenshot diff; horizon: every major release.

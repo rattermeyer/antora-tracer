@@ -276,12 +276,6 @@ Source: openspec/specs/traceability-links-macro/spec.md
 
 traceability:outgoing[]
 traceability:incoming[]"""
-REQ-049,REQ-049 — PDF compatibility,requirement,,requirements.adoc,"""Generated output from \`traceability:outgoing[]\` and \`traceability:incoming[]\` SHALL be standard AsciiDoc constructs — not raw HTML — ensuring compatibility with both HTML and PDF backends.
-
-Source: openspec/specs/traceability-links-macro/spec.md
-
-traceability:outgoing[]
-traceability:incoming[]"""
 REQ-050,REQ-050 — Source files never modified,requirement,,requirements.adoc,"""The system SHALL NOT modify \`.adoc\` source files on disk. All macro expansion and content substitution SHALL occur in the in-memory content buffer during Antora's \`contentClassified\` event.
 
 Source: openspec/specs/traceability-links-macro/spec.md
@@ -345,6 +339,12 @@ traceability:incoming[]"""
 QA-059,QA-059 — Testability by design,requirement,,requirements.adoc,"""Each module SHALL accept dependencies via constructor parameters. Each module SHALL have a dedicated test file. The traceability graph SHALL expose internal state for test access. The full test suite SHALL complete in under 500 ms.
 
 Source: xref:quality/testability-by-design.adoc[Quality Attribute: Testability by Design]
+
+traceability:outgoing[]
+traceability:incoming[]"""
+QA-060,QA-060 — PDF compatibility of generated output,requirement,,requirements.adoc,"""Generated output from \`traceability:outgoing[]\` and \`traceability:incoming[]\` SHALL be standard AsciiDoc constructs — not raw HTML — ensuring compatibility with both HTML and PDF backends.
+
+Source: openspec/specs/traceability-links-macro/spec.md
 
 traceability:outgoing[]
 traceability:incoming[]"""
@@ -585,7 +585,8 @@ addresses:REQ-045[]
 addresses:REQ-046[]
 addresses:REQ-047[]
 addresses:REQ-048[]
-addresses:REQ-055[]"""
+addresses:REQ-055[]
+addresses:QA-060[]"""
 ARC-017,ARC-017 — Regex-based parsing,design,,architecture.adoc,"""AsciiDoc content is parsed using regular expressions rather than an
 Asciidoctor AST walker. This makes the parser independent of Asciidoctor
 API versions and testable with plain string inputs. Verbatim blocks
