@@ -174,3 +174,4 @@ ui-bundle.zip
 public/
 lib/src/test/
 build/
+**/diag-*-md5-*
