@@ -328,7 +328,9 @@ export class AntoraTraceabilityExtension {
         // Scan for macros within this body
         const macroRegex = /traceability:outgoing\[\]/g;
         let macroMatch: RegExpExecArray | null;
+        const bodyRanges = this.getInlineCodeRanges(bodyContent);
         while ((macroMatch = macroRegex.exec(bodyContent)) !== null) {
+          if (this.isInsideRange(macroMatch.index, bodyRanges)) continue;
           const macroStart = bodyStart + macroMatch.index;
           const macroEnd = macroStart + macroMatch[0].length;
 
@@ -441,7 +443,9 @@ export class AntoraTraceabilityExtension {
         // Scan for macros within this body
         const macroRegex = /traceability:incoming\[\]/g;
         let macroMatch: RegExpExecArray | null;
+        const bodyRanges = this.getInlineCodeRanges(bodyContent);
         while ((macroMatch = macroRegex.exec(bodyContent)) !== null) {
+          if (this.isInsideRange(macroMatch.index, bodyRanges)) continue;
           const macroStart = bodyStart + macroMatch.index;
           const macroEnd = macroStart + macroMatch[0].length;
 
@@ -669,7 +673,9 @@ export class AntoraTraceabilityExtension {
         const macroRegex =
           /traceability:graph\[([A-Z][A-Z0-9-]*)?(?:,\s*(\d+))?\]/g;
         let macroMatch: RegExpExecArray | null;
+        const bodyRanges = this.getInlineCodeRanges(bodyContent);
         while ((macroMatch = macroRegex.exec(bodyContent)) !== null) {
+          if (this.isInsideRange(macroMatch.index, bodyRanges)) continue;
           const macroStart = bodyStart + macroMatch.index;
           const macroEnd = macroStart + macroMatch[0].length;
 
@@ -783,7 +789,9 @@ export class AntoraTraceabilityExtension {
 
         const macroRegex = /traceability:graph-coverage\[\]/g;
         let macroMatch: RegExpExecArray | null;
+        const bodyRanges = this.getInlineCodeRanges(bodyContent);
         while ((macroMatch = macroRegex.exec(bodyContent)) !== null) {
+          if (this.isInsideRange(macroMatch.index, bodyRanges)) continue;
           const macroStart = bodyStart + macroMatch.index;
           const macroEnd = macroStart + macroMatch[0].length;
 
@@ -1155,6 +1163,34 @@ export class AntoraTraceabilityExtension {
     }
 
     return ranges;
+  }
+
+  /**
+   * Find inline code span ranges (backtick-enclosed text) in content.
+   * Returns start/end positions of each backtick code span so macro
+   * expansion can skip them.
+   */
+  private getInlineCodeRanges(
+    content: string,
+  ): Array<{ start: number; end: number }> {
+    const ranges: Array<{ start: number; end: number }> = [];
+    // Match single-backtick spans: `content`
+    const btRe = /`([^`]+)`/g;
+    let m: RegExpExecArray | null;
+    while ((m = btRe.exec(content)) !== null) {
+      ranges.push({ start: m.index, end: m.index + m[0].length });
+    }
+    return ranges;
+  }
+
+  /**
+   * Check if a position falls within any of the given ranges.
+   */
+  private isInsideRange(
+    pos: number,
+    ranges: Array<{ start: number; end: number }>,
+  ): boolean {
+    return ranges.some((r) => pos >= r.start && pos < r.end);
   }
 
   private registerPageProcessor(): void {
