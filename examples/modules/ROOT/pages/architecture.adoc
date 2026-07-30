@@ -324,15 +324,17 @@ traceability:outgoing[]
 
 [#ARC-024, item, role=design, title="traceability:outgoing[] and traceability:incoming[] link rendering"]
 --
-The `expandOutgoingMacros()` and `expandIncomingMacros()` methods replace
-`traceability:outgoing[]` and `traceability:incoming[]` placeholders with
-formatted AsciiDoc content showing the item's relationships. Rendering is
-opt-in via the `:traceability-links:` document attribute. Display style
-(list, table, inline), sort order (target ID, title, relation type), and
-collapsible sections are configurable via document attributes. Inline
-relationship macros (`addresses:REQ-001[]`) are always stripped from
-output — they are pure data markers; the link macros are the sole
-rendering mechanism.
+The `expandOutgoingMacros()` and `expandIncomingMacros()` methods in the
+Antora extension (not the DocumentParser) replace `traceability:outgoing[]`
+and `traceability:incoming[]` placeholders with formatted AsciiDoc content
+showing the item's relationships. The DocumentParser's inline macro regex
+excludes these via a `traceability:` namespace guard; they are NOT parsed as
+relationships. Rendering is opt-in via the `:traceability-links:` document
+attribute. Display style (list, table, inline), sort order (target ID,
+title, relation type), and collapsible sections are configurable via document
+attributes. Inline relationship macros (`addresses:REQ-001[]`) are always
+stripped from output — they are pure data markers; the link macros are the
+sole rendering mechanism.
 
 addresses:REQ-044[]
 addresses:REQ-045[]

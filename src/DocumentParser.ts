@@ -453,8 +453,9 @@ export class DocumentParser {
 
       // Parse inline relationship macros: relationType:targetId[]
       // Example: satisfies:REQ-001[], addresses:DES-001[], implemented_by:IMP-001[]
+      // Exclude traceability: namespace — those are link/rendering macros, not relationships
       // Escape with backslash before the colon: relation\:TARGET[] is ignored
-      const inlineMacroRegex = /(?<!\\)([a-zA-Z][a-zA-Z0-9_-]*:[A-Z0-9_-]+)\[/g;
+      const inlineMacroRegex = /(?<!\\)(?!traceability:)([a-zA-Z][a-zA-Z0-9_-]*:[A-Z0-9_-]+)\[/g;
       let match: RegExpExecArray | null;
 
       while ((match = inlineMacroRegex.exec(itemContent)) !== null) {
