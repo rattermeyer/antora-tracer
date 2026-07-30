@@ -2,7 +2,7 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
-## [0.10.0] — Unreleased
+## [0.10.0] — 2026-07-30
 
 ### Added
 - `traceability:graph[]` macro renders Kroki GraphViz relationship diagrams for items
