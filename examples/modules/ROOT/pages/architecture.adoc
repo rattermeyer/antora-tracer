@@ -188,7 +188,7 @@ addresses:REQ-034[]
 traceability:outgoing[]
 --
 
-== Configuration
+=== ConfigLoader
 
 [#ARC-012, item, role=design, title="Preset YAML schema"]
 --
@@ -253,8 +253,6 @@ addresses:REQ-023[]
 traceability:outgoing[]
 --
 
-=== Config-driven validation
-
 [#ARC-018, item, role=design, title="Config-driven validation"]
 --
 Relation validation is driven by the YAML configuration rather than hardcoded
@@ -267,7 +265,7 @@ alternatives (see xref:adr/0004-zero-framework.adoc[ADR-004]).
 addresses:QA-057[]
 --
 
-=== In-memory processing
+=== TraceabilityGraph
 
 [#ARC-015, item, role=design, title="In-memory processing with no side effects"]
 --
@@ -281,7 +279,7 @@ xref:adr/0003-in-memory-graph.adoc[ADR-003]).
 addresses:QA-058[]
 --
 
-=== Event-driven Antora integration
+=== AntoraTraceabilityExtension
 
 [#ARC-016, item, role=design, title="Event-driven Antora integration"]
 --
@@ -295,7 +293,7 @@ the CLI outside Antora, demonstrating the event handlers are optional.
 addresses:QA-055[]
 --
 
-=== Regex-based parsing
+=== DocumentParser
 
 [#ARC-017, item, role=design, title="Regex-based parsing"]
 --
@@ -311,31 +309,6 @@ addresses:REQ-001[]
 addresses:REQ-002[]
 addresses:REQ-003[]
 addresses:REQ-004[]
---
-
-== Concepts — Cross-cutting Concerns
-
-[#ARC-013, item, role=design, title="ESM module system"]
---
-ESM (`"type": "module"` in package.json) is used throughout the project. This
-choice enables modern `import`/`export` syntax, the `node:` protocol for built-in
-modules, and alignment with browser JavaScript. The tradeoff is that Antora's
-extension loader uses `require()`, requiring `.cjs` wrappers for integration
-points (see xref:adr/0001-esm-over-cjs.adoc[ADR-001]).
-
-addresses:QA-055[]
---
-
-[#ARC-014, item, role=design, title="Dependency injection by constructor"]
---
-All modules accept their dependencies via constructor parameters. There is no
-service locator, DI container, or global state. `TraceabilityGraph` receives
-`ConfigLoader`, `MatrixGenerator` receives `TraceabilityGraph` and `ConfigLoader`,
-and `DocumentParser` receives `ConfigLoader` optionally. This makes every
-component independently testable without mocking frameworks (see
-xref:adr/0004-zero-framework.adoc[ADR-004]).
-
-addresses:QA-059[]
 --
 
 == Runtime View
@@ -365,6 +338,31 @@ addresses:REQ-016[]
 addresses:REQ-017[]
 addresses:REQ-029[]
 addresses:REQ-035[]
+--
+
+== Concepts — Cross-cutting Concerns
+
+[#ARC-013, item, role=design, title="ESM module system"]
+--
+ESM (`"type": "module"` in package.json) is used throughout the project. This
+choice enables modern `import`/`export` syntax, the `node:` protocol for built-in
+modules, and alignment with browser JavaScript. The tradeoff is that Antora's
+extension loader uses `require()`, requiring `.cjs` wrappers for integration
+points (see xref:adr/0001-esm-over-cjs.adoc[ADR-001]).
+
+addresses:QA-055[]
+--
+
+[#ARC-014, item, role=design, title="Dependency injection by constructor"]
+--
+All modules accept their dependencies via constructor parameters. There is no
+service locator, DI container, or global state. `TraceabilityGraph` receives
+`ConfigLoader`, `MatrixGenerator` receives `TraceabilityGraph` and `ConfigLoader`,
+and `DocumentParser` receives `ConfigLoader` optionally. This makes every
+component independently testable without mocking frameworks (see
+xref:adr/0004-zero-framework.adoc[ADR-004]).
+
+addresses:QA-059[]
 --
 
 == Architecture Decisions

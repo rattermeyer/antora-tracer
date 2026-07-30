@@ -572,21 +572,6 @@ addresses:REQ-001[]
 addresses:REQ-002[]
 addresses:REQ-003[]
 addresses:REQ-004[]"""
-ARC-013,ARC-013 — ESM module system,design,,architecture.adoc,"""ESM (`""""type"""": """"module""""` in package.json) is used throughout the project. This
-choice enables modern `import`/`export` syntax, the `node:` protocol for built-in
-modules, and alignment with browser JavaScript. The tradeoff is that Antora's
-extension loader uses `require()`, requiring `.cjs` wrappers for integration
-points (see xref:adr/0001-esm-over-cjs.adoc[ADR-001]).
-
-addresses:QA-055[]"""
-ARC-014,ARC-014 — Dependency injection by constructor,design,,architecture.adoc,"""All modules accept their dependencies via constructor parameters. There is no
-service locator, DI container, or global state. `TraceabilityGraph` receives
-`ConfigLoader`, `MatrixGenerator` receives `TraceabilityGraph` and `ConfigLoader`,
-and `DocumentParser` receives `ConfigLoader` optionally. This makes every
-component independently testable without mocking frameworks (see
-xref:adr/0004-zero-framework.adoc[ADR-004]).
-
-addresses:QA-059[]"""
 ARC-003,ARC-003 — Processing flow during Antora build,design,,architecture.adoc,"""The following sequence shows how an AsciiDoc file flows through the system during an Antora build:
 
 [plantuml]
@@ -610,6 +595,21 @@ addresses:REQ-016[]
 addresses:REQ-017[]
 addresses:REQ-029[]
 addresses:REQ-035[]"""
+ARC-013,ARC-013 — ESM module system,design,,architecture.adoc,"""ESM (`""""type"""": """"module""""` in package.json) is used throughout the project. This
+choice enables modern `import`/`export` syntax, the `node:` protocol for built-in
+modules, and alignment with browser JavaScript. The tradeoff is that Antora's
+extension loader uses `require()`, requiring `.cjs` wrappers for integration
+points (see xref:adr/0001-esm-over-cjs.adoc[ADR-001]).
+
+addresses:QA-055[]"""
+ARC-014,ARC-014 — Dependency injection by constructor,design,,architecture.adoc,"""All modules accept their dependencies via constructor parameters. There is no
+service locator, DI container, or global state. `TraceabilityGraph` receives
+`ConfigLoader`, `MatrixGenerator` receives `TraceabilityGraph` and `ConfigLoader`,
+and `DocumentParser` receives `ConfigLoader` optionally. This makes every
+component independently testable without mocking frameworks (see
+xref:adr/0004-zero-framework.adoc[ADR-004]).
+
+addresses:QA-059[]"""
 ARC-004,ARC-004 — Key architectural decisions and their rationale,design,,architecture.adoc,"""This section captures the design decisions from `openspec/changes/unified-item-architecture/design.md`.
 
 [width=100%, cols=""""20,50,30""""]
