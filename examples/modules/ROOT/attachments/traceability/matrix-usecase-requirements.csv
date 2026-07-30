@@ -1,0 +1,9 @@
+Row ID,Row Title,requirement
+UC-001,UC-001 — Author writes traceable items in AsciiDoc,REQ-001: REQ-001 — Single `item` macro replaces all block macros; REQ-002: REQ-002 — `item` macro accepts role attribute; REQ-003: REQ-003 — `item` macro maintains existing attributes; REQ-004: REQ-004 — `item` macro supports block content
+UC-002,UC-002 — Author defines custom domain model via config,REQ-006: REQ-006 — Configuration defines roles; REQ-007: REQ-007 — Configuration defines relations; REQ-008: REQ-008 — Configuration defines matrices; REQ-012: REQ-012 — Configuration can extend presets
+UC-003,UC-003 — Author runs CLI to get next available ID,REQ-056: REQ-056 — CLI next-id command returns next available ID
+UC-004,UC-004 — Author organizes items in partial files,REQ-059: REQ-059 — Items defined in partials are processed
+UC-005,UC-005 — Reader browses traceability matrices for coverage,REQ-029: REQ-029 — Configurable matrix generation with coverage calculations; REQ-037: REQ-037 — Matrix row items are clickable links; REQ-038: REQ-038 — Matrix cell items are clickable links
+
+Total 5 rows
+Coverage: 100.0%

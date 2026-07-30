@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>usecase-requirements - Traceability Matrix</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        h1, h2, h3 { color: #333; }
+        .matrix-container { overflow-x: auto; margin: 20px 0; }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #4a5568;
+            color: white;
+            font-weight: 600;
+        }
+        tr:nth-child(even) { background-color: #f8f9fa; }
+        tr:hover { background-color: #e9ecef; }
+
+        /* Role-specific styling */
+        .role-requirement { background-color: #fff5f5; }
+        .role-design { background-color: #f0fff4; }
+        .role-implementation { background-color: #f0f8ff; }
+        .role-test { background-color: #fffaf0; }
+        .role-document { background-color: #f8f9fa; }
+
+        /* Status styling */
+        .status-complete { background-color: #d6f5d6; }
+        .status-partial { background-color: #fff9db; }
+        .status-missing { background-color: #ffdbdb; }
+
+        .coverage-summary {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .coverage-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .coverage-complete { background-color: #22c55e; color: white; }
+        .coverage-partial { background-color: #f59e0b; color: white; }
+        .coverage-missing { background-color: #ef4444; color: white; }
+        .coverage-low { background-color: #f97316; color: white; }
+
+        .metadata {
+            color: #666;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        .empty-cell { color: #999; font-style: italic; }
+
+        /* Item link styling */
+        .matrix-container a {
+            color: inherit;
+            text-decoration: none;
+        }
+        .matrix-container a:hover {
+            text-decoration: underline;
+        }
+        .source-ref {
+            color: #666;
+            font-size: 0.85em;
+            margin-left: 0.5em;
+        }
+    </style>
+</head>
+<body>
+    <h1>usecase-requirements</h1>
+    <p class="metadata">Type: use_case-requirement | Generated: 2026-07-30T20:55:46.581Z</p>
+
+    <div class="coverage-summary">
+        <h3>Coverage Summary</h3>
+        <p>
+            <span class="coverage-badge coverage-complete">Complete: 5 / 5</span>
+            <span class="coverage-badge coverage-partial">Partial: 0</span>
+            <span class="coverage-badge coverage-missing">Missing: 0</span>
+            <br>
+            <strong>Overall Coverage: 100.0%</strong>
+        </p>
+    </div>
+
+    <div class="matrix-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>requirement<br><small>requirement</small></th>
+                    <th>Coverage</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="status-complete role-use_case">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;use-cases.html#UC-001">UC-001</a>
+                    </td>
+                    <td>UC-001 — Author writes traceable items in AsciiDoc</td>
+                    <td class="role-requirement">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-001" title="Source: requirements.adoc"><strong>REQ-001</strong></a>
+                                : REQ-001 — Single &#x60;item&#x60; macro replaces all block macros
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-002" title="Source: requirements.adoc"><strong>REQ-002</strong></a>
+                                : REQ-002 — &#x60;item&#x60; macro accepts role attribute
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-003" title="Source: requirements.adoc"><strong>REQ-003</strong></a>
+                                : REQ-003 — &#x60;item&#x60; macro maintains existing attributes
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-004" title="Source: requirements.adoc"><strong>REQ-004</strong></a>
+                                : REQ-004 — &#x60;item&#x60; macro supports block content
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                    </td>
+                    <td>100.0%</td>
+                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                </tr>
+                <tr class="status-complete role-use_case">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;use-cases.html#UC-002">UC-002</a>
+                    </td>
+                    <td>UC-002 — Author defines custom domain model via config</td>
+                    <td class="role-requirement">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-006" title="Source: requirements.adoc"><strong>REQ-006</strong></a>
+                                : REQ-006 — Configuration defines roles
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-007" title="Source: requirements.adoc"><strong>REQ-007</strong></a>
+                                : REQ-007 — Configuration defines relations
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-008" title="Source: requirements.adoc"><strong>REQ-008</strong></a>
+                                : REQ-008 — Configuration defines matrices
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-012" title="Source: requirements.adoc"><strong>REQ-012</strong></a>
+                                : REQ-012 — Configuration can extend presets
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                    </td>
+                    <td>100.0%</td>
+                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                </tr>
+                <tr class="status-complete role-use_case">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;use-cases.html#UC-003">UC-003</a>
+                    </td>
+                    <td>UC-003 — Author runs CLI to get next available ID</td>
+                    <td class="role-requirement">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-056" title="Source: requirements.adoc"><strong>REQ-056</strong></a>
+                                : REQ-056 — CLI next-id command returns next available ID
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                    </td>
+                    <td>100.0%</td>
+                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                </tr>
+                <tr class="status-complete role-use_case">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;use-cases.html#UC-004">UC-004</a>
+                    </td>
+                    <td>UC-004 — Author organizes items in partial files</td>
+                    <td class="role-requirement">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-059" title="Source: requirements.adoc"><strong>REQ-059</strong></a>
+                                : REQ-059 — Items defined in partials are processed
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                    </td>
+                    <td>100.0%</td>
+                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                </tr>
+                <tr class="status-complete role-use_case">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;use-cases.html#UC-005">UC-005</a>
+                    </td>
+                    <td>UC-005 — Reader browses traceability matrices for coverage</td>
+                    <td class="role-requirement">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-029" title="Source: requirements.adoc"><strong>REQ-029</strong></a>
+                                : REQ-029 — Configurable matrix generation with coverage calculations
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-037" title="Source: requirements.adoc"><strong>REQ-037</strong></a>
+                                : REQ-037 — Matrix row items are clickable links
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-038" title="Source: requirements.adoc"><strong>REQ-038</strong></a>
+                                : REQ-038 — Matrix cell items are clickable links
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                    </td>
+                    <td>100.0%</td>
+                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <footer class="metadata">
+        <p>Generated by Antora Tracer Extension</p>
+    </footer>
+</body>
+</html>

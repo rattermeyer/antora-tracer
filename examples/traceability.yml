@@ -5,6 +5,7 @@ roles:
   - requirement
   - design
   - test
+  - use_case
 
 relations:
   requirement:
@@ -17,6 +18,9 @@ relations:
   test:
     requirement: [verifies]
     design: [validates]
+
+  use_case:
+    requirement: [leads_to]
 
 matrices:
   - name: requirements-design
@@ -32,3 +36,10 @@ matrices:
     columns: [test]
     coverageRelations:
       test: [verifies]
+
+  - name: usecase-requirements
+    description: "Use cases traced to requirements"
+    rows: use_case
+    columns: [requirement]
+    coverageRelations:
+      requirement: [leads_to]

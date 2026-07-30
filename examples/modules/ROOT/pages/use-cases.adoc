@@ -1,0 +1,78 @@
+= Use Cases
+:traceability-links: true
+
+This page captures the key user workflows for the Antora Tracer extension. Each use case traces into the requirements it motivates via `leads_to` relations — demonstrating how config extension adds domain-specific roles and relations beyond the built-in presets.
+
+[#UC-001, item, role=use_case, title="Author writes traceable items in AsciiDoc"]
+--
+As a documentation author, I want to insert `[#ID, item, role=XXX]` blocks into
+my `.adoc` pages so that the extension registers them in the traceability graph
+during the Antora build. I can use any role defined in my configuration —
+requirement, design, test, or even custom roles like stakeholder or use_case.
+
+leads_to:REQ-001[]
+leads_to:REQ-002[]
+leads_to:REQ-003[]
+leads_to:REQ-004[]
+
+traceability:outgoing[]
+traceability:incoming[]
+--
+
+[#UC-002, item, role=use_case, title="Author defines custom domain model via config"]
+--
+As a project lead, I want to define custom roles, relations, and matrices in
+a `traceability.yml` file that extends a built-in preset, so that the extension
+validates and traces items using my project's domain language. The config
+overrides and extends the preset — adding new roles, restricting relations,
+or defining custom matrices for my specific needs.
+
+leads_to:REQ-006[]
+leads_to:REQ-007[]
+leads_to:REQ-008[]
+leads_to:REQ-012[]
+
+traceability:outgoing[]
+traceability:incoming[]
+--
+
+[#UC-003, item, role=use_case, title="Author runs CLI to get next available ID"]
+--
+As an author adding new items to a page, I want to run
+`antora-tracer next-id --prefix REQ -i docs/` so that I get the next
+sequential ID without manually scanning existing items. The command
+auto-detects the padding convention from existing IDs.
+
+leads_to:REQ-056[]
+
+traceability:outgoing[]
+traceability:incoming[]
+--
+
+[#UC-004, item, role=use_case, title="Author organizes items in partial files"]
+--
+As a documentation architect, I want to define `[item]` blocks in AsciiDoc
+partials that are included into pages, so that related items stay together
+in small, focused files. The extension processes both pages and partials,
+linking partial items to the source repository.
+
+leads_to:REQ-059[]
+
+traceability:outgoing[]
+traceability:incoming[]
+--
+
+[#UC-005, item, role=use_case, title="Reader browses traceability matrices for coverage"]
+--
+As a reviewer or auditor, I want to open the traceability matrix pages from
+the navigation to verify that requirements are covered by design sections
+and tests. The matrices show clickable links back to the source items,
+and coverage percentages give an at-a-glance summary.
+
+leads_to:REQ-029[]
+leads_to:REQ-037[]
+leads_to:REQ-038[]
+
+traceability:outgoing[]
+traceability:incoming[]
+--
