@@ -1,6 +1,6 @@
 = Sphinx Needs Comparison
 
-This page maps concepts from https://sphinx-needs.readthedocs.io/[Sphinx Needs] to their equivalents in Antora Tracer. Both are documentation-tool extensions: Sphinx Needs integrates with the Sphinx documentation builder (Python-based), and Antora Tracer integrates with the Antora documentation site generator (Node.js-based). Neither restricts what kind of project you document with them — both work with C++, Java, Python, or any other language.
+This page maps concepts from https://sphinx-needs.readthedocs.io/[Sphinx Needs] to their equivalents in Antora Tracer. Both are language-agnostic documentation-tool extensions — they document projects written in any programming language. The key differences are in their markup languages and hosting platforms: Sphinx Needs uses reStructuredText (or Markdown via MyST) with the Sphinx builder (Python-based), while Antora Tracer uses AsciiDoc with the Antora site generator (Node.js-based).
 
 == Directive Mapping
 
@@ -128,4 +128,4 @@ If you're moving from Sphinx Needs to Antora Tracer:
 
 *Sphinx Needs* provides `needflow` for graph visualization. *Antora Tracer* exports to Neo4j for graph queries and visualization.
 
-*Sphinx Needs* is mature and well-established. *Antora Tracer* is newer but follows the same traceability principles with a more flexible, config-driven approach.
+*Sphinx Needs* is mature and well-established. *Antora Tracer* is newer but follows the same traceability principles with a more flexible, config-driven approach. Choose based on your documentation toolchain: Sphinx (reStructuredText/Markdown) or Antora (AsciiDoc).
