@@ -533,6 +533,42 @@ The extension processes partials during graph population on equal footing with p
 - ✖ Matrix links go to source repo, not rendered HTML
 - ✖ Do not use `xref:partial$...` to reference partial items — use inline relationship macros instead, or a plain `link:` URL
 
+==== Alternative: item definition in page, partial for body text
+
+When you want matrix links to point to rendered HTML pages (not the repo), keep the `[#ID, item, ...]` block in a page file and use a partial only for the descriptive body content:
+
+[source,asciidoc]
+----
+// architecture.adoc
+
+[#ARC-002, item, role=design, title="Component-level architecture"]
+--
+include::partial$building-block-overview.adoc[]
+
+addresses:REQ-001[]
+addresses:REQ-002[]
+addresses:REQ-003[]
+--
+----
+
+[source,asciidoc]
+----
+// partials/building-block-overview.adoc
+The system is organized into the following components...
+// Plain AsciiDoc content — no [item] blocks here
+----
+
+This pattern keeps the traceability structure (item ID, role, relationships) together in the page file where it can be easily audited, while the long-form descriptive text lives in a reusable partial. Matrix links resolve to the rendered page as usual, and the partial content appears inline in the HTML output.
+
+.Which pattern to choose?
+[width=100%, cols="30,35,35"]
+|===
+| Scenario | Pattern | Rationale
+| Self-contained design discussion (e.g., solution strategy) | Partial-defines-item | The partial is the authoritative source; links to the repo are appropriate
+| Long component descriptions with traceability links | Page-defines-item, partial-for-body | Keep relationships visible in the page; partial is just prose
+| Content reused across multiple pages | Page-defines-item, partial-for-body | Avoids duplicate-ID warnings
+|===
+
 === Role-Based Validation
 
 The extension validates:
