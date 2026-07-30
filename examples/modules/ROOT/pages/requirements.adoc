@@ -614,6 +614,16 @@ traceability:outgoing[]
 traceability:incoming[]
 --
 
+[#REQ-057, item, role=requirement, title="Matrix files synced to component _attachments"]
+--
+The system SHALL automatically sync generated matrix files (HTML and CSV) from the global traceability output directory to each component version's `_attachments/traceability/` directory during the `sitePublished` event. This SHALL ensure that `attachment$traceability/...` links in AsciiDoc nav resolve to the latest matrix output without manual copying. The sync SHALL resolve the correct version URL segment (e.g., `latest` instead of `0.7.0`) using the content catalog.
+
+Source: AntoraTraceabilityExtension.generateTraceabilityFiles() → syncMatricesToAttachments()
+
+traceability:outgoing[]
+traceability:incoming[]
+--
+
 == Quality Attributes
 
 Quality attributes are documented as `[item]` blocks in their respective

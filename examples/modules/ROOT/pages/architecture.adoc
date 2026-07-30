@@ -345,6 +345,20 @@ addresses:REQ-051[]
 addresses:REQ-052[]
 --
 
+[#ARC-027, item, role=design, title="Automatic matrix sync to component _attachments"]
+--
+The `syncMatricesToAttachments()` method, called from
+`generateTraceabilityFiles()` during the `sitePublished` event, copies all
+generated matrix files (HTML and CSV) to each component version's
+`_attachments/traceability/` subdirectory. This ensures that
+`attachment$traceability/...` nav links resolve to the latest matrix output
+without requiring manual file copies. The correct version URL segment (e.g.
+`latest` instead of `0.7.0`) is resolved by inspecting attachment file
+output paths from the Antora content catalog.
+
+addresses:REQ-057[]
+--
+
 === DocumentParser
 
 [#ARC-017, item, role=design, title="Regex-based parsing"]
