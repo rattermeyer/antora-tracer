@@ -1,38 +1,51 @@
-The extension is composed of eight modules organized in a layered architecture:
+The extension is composed of eleven components organized in four layers. Arrows indicate dependencies, with constructor-injected dependencies labeled explicitly.
 
 [plantuml]
 ----
 include::example$bb-overview.puml[]
 ----
 
-[width=100%, cols="25,75"]
+[width=100%, cols="25,40,35", options="header"]
 |===
-| Component | Responsibility
+| Component | Responsibility | Key dependencies
 
 | `AntoraTraceabilityExtension`
-| Antora entry point. Registers event handlers, creates `RequirementsTraceabilityExtension`, reads playbook config.
+| Antora entry point. Registers `contentClassified` and `sitePublished` event handlers, reads playbook config, creates and orchestrates the core extension.
+| `RequirementsTraceabilityExtension` (created at init)
+
+| CLI (`cli.ts`)
+| Standalone CLI. Same core extension as Antora but without event handlers. Commander-based subcommands for processing, matrices, validation, export, next-id.
+| `RequirementsTraceabilityExtension` (created per command)
 
 | `RequirementsTraceabilityExtension`
-| Orchestrator. Owns the graph, delegates to parser, matrix generator, and Neo4j exporter. Public API for programmatic use.
+| Orchestrator. Owns the `TraceabilityGraph`, delegates to `DocumentParser`, `MatrixGenerator`, `Neo4jExporter`. Public API for programmatic use.
+| `DocumentParser`, `TraceabilityGraph`, `MatrixGenerator`, `Neo4jExporter`, `ConfigLoader`
 
 | `DocumentParser`
-| Regex-based AsciiDoc parser. Two-pass: extracts `[item]` blocks, then scans for inline `relation\:TARGET[]` macros.
+| Regex-based AsciiDoc parser. Extracts `[#ID, item, role=XXX]` blocks and inline `relation:TARGET[]` macros. Excludes `traceability:` namespace. Verbatim blocks pre-scanned.
+| `ConfigLoader` (optional — for role validation)
 
 | `TraceabilityGraph`
-| In-memory directed graph. Items stored as `Map<string, Item>`, relationships as `Map<string, ItemRelationship>`. Provides query, validation, path finding, and impact analysis.
-
-| `MatrixGenerator`
-| Config-driven matrix generation. Reads matrix definitions from configuration, queries the graph, computes coverage, produces CSV output. Delegates HTML to TemplateRenderer.
-
-| `TemplateRenderer`
-| Mustache wrapper. Loads templates from `src/templates/`, supports custom template directories with fallback to built-ins.
-
-| `LinkResolver`
-| Path resolution for matrix-to-item deep links. Strips \`pages/\` prefix and \`.adoc\` extension from sourceFile values, generates \`../../component/page.html#ID\` links using a configurable \`relativePathPrefix\`.
-
-| `Neo4jExporter`
-| Graph-to-Neo4j export. Produces `nodes.csv`, `relationships.csv`, and `import.cypher`. Properly escapes special characters.
+| In-memory directed graph. Forward and reverse relationship indexes for O(1) lookups. Provides query methods (`findPath`, `getImpactAnalysis`), validation (orphaned refs, circular refs), visualization (`toDot`, `toVegaLite`), and ID allocation (`getNextId`).
+| `ConfigLoader` (optional — for relation validation)
 
 | `ConfigLoader`
-| YAML configuration loader. Loads and validates config, merges with presets, provides role/relation validation queries to the graph.
+| Loads built-in preset YAML, merges with user-provided config. Exposes `isRelationAllowed()`, `getMatrices()`, `listPresets()`, `getAllowedRelations()`. Validation queries used by graph and parser.
+| Built-in presets (`src/presets/`), user YAML config
+
+| `MatrixGenerator`
+| Config-driven matrix generation. Reads matrix definitions from config, queries graph for items by role, computes coverage with `coverageRelations` filter. Produces CSV output; delegates HTML to `TemplateRenderer`.
+| `TraceabilityGraph`, `ConfigLoader`, `TemplateRenderer`, optional `LinkResolver`
+
+| `TemplateRenderer`
+| Mustache wrapper. Loads templates from `src/templates/`. Supports custom template directories with fallback to built-ins.
+| Mustache templates
+
+| `LinkResolver`
+| Path resolution for matrix-to-item deep links. Normalizes `sourceFile` (strips `pages/` prefix, `.adoc` extension). Detects URL sourceFiles (partial items) and returns them unchanged. Generates `../../page.html#ID` links with configurable `relativePathPrefix`.
+| None (standalone utility)
+
+| `Neo4jExporter`
+| Graph-to-Neo4j CSV + Cypher export. Produces `nodes.csv`, `relationships.csv`, and `import.cypher` with proper escaping.
+| `TraceabilityGraph`, `ConfigLoader`
 |===

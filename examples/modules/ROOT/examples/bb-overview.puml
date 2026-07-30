@@ -1,41 +1,51 @@
 @startuml
+' Component architecture — who depends on whom, why, and whether via constructor injection
+
+skinparam packageBorderColor #888888
+skinparam componentBackgroundColor #F8F9FA
+
 package "Antora Pipeline" {
-  [AntoraTraceabilityExtension] as antora_ext
+  [AntoraTraceabilityExtension] as antora_ext #E8F5E9
+  [CLI\n(cli.ts)] as cli #FCE4EC
 }
 
 package "Core" {
-  [RequirementsTraceabilityExtension] as main_ext
-  [DocumentParser] as parser
-  [TraceabilityGraph] as graph
-}
-
-package "Generation" {
-  [MatrixGenerator] as matrix
-  [TemplateRenderer] as templates
-  [LinkResolver] as linkresolver
-}
-
-package "Export" {
-  [Neo4jExporter] as neo4j
+  [RequirementsTraceabilityExtension] as main_ext #BBDEFB
+  [DocumentParser] as parser #BBDEFB
+  [TraceabilityGraph] as graph #BBDEFB
 }
 
 package "Configuration" {
-  [ConfigLoader] as config
-  database "Presets" as presets
+  [ConfigLoader] as config #FFF3E0
+  database "Built-in\nPresets" as presets #FFF8E1
+  file "User\nYAML Config" as userconfig #FFF8E1
 }
 
-antora_ext --> main_ext : orchestrates
-main_ext --> parser : delegates parsing
-main_ext --> graph : owns
-main_ext --> matrix : delegates generation
-main_ext --> neo4j : delegates export
-main_ext --> config : loads configuration
+package "Output" {
+  [MatrixGenerator] as matrix #E8EAF6
+  [TemplateRenderer] as templates #E8EAF6
+  [LinkResolver] as linkresolver #E8EAF6
+  [Neo4jExporter] as neo4j #E8EAF6
+}
 
-parser --> graph : populates items & relationships
-matrix --> graph : queries for coverage
+' Constructor injection — arrow labels show the dependency
+antora_ext --> main_ext : creates, orchestrates
+cli --> main_ext : creates, orchestrates
+main_ext --> parser : delegates parsing\n(optional ConfigLoader)
+main_ext --> graph : owns\n(optional ConfigLoader)
+main_ext --> matrix : delegates generation\n(receives graph, config, optional LinkResolver)
+main_ext --> neo4j : delegates export\n(receives graph, config)
+main_ext --> config : loads preset + user config
+
+' Data flow
+parser --> graph : populates items\nand relationships
+matrix --> graph : queries items,\nrelations, coverage
 matrix --> templates : renders HTML
-neo4j --> graph : exports nodes & relationships
+neo4j --> graph : exports nodes\nand relationships
 
-config --> presets : loads built-in presets
-config --> graph : provides validation rules
+' Configuration flow
+config --> presets : loads built-in
+config --> userconfig : loads + merges overrides
+config --> graph : provides validation rules\n(isRelationAllowed)
+
 @enduml

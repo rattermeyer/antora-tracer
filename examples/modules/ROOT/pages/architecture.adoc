@@ -128,6 +128,35 @@ addresses:REQ-023[]
 traceability:outgoing[]
 --
 
+.Configuration resolution chain
+
+Built-in presets and user config are merged by `ConfigLoader`. The resolved configuration is memoized and consumed independently by each component.
+
+[plantuml]
+----
+include::example$config-resolution.puml[]
+----
+
+[width=100%, cols="30,70", options="header"]
+|===
+| Element | Description
+
+| Built-in presets
+| YAML files in `src/presets/` shipped with the extension. Define roles, relations, matrices, and optional Neo4j queries for common domains (`requirements-engineering`, `agile`, `medical-iec62304`, `minimal`). Selected via `--preset` flag or `preset` playbook config.
+
+| User config (`traceability.yml`)
+| Optional YAML file. Deep-merged on top of the preset. Overrides roles, adds custom matrices, extends relations. Path configured via `--config` flag or `configPath` playbook config.
+
+| `ConfigLoader`
+| Loads preset, deep-merges user config, memoizes the result. Exposes query methods: `isKnownRole()`, `isRelationAllowed()`, `getAllowedRelations()`, `getMatrices()`, `getNeo4jQueries()`. First consumer triggers resolution; subsequent calls hit the cache.
+
+| Resolved configuration
+| Memoized merge of preset + user overrides. Four sub-components: `roles` (validated by parser), `relations` (used for graph validation — both directions checked), `matrices` (consumed by MatrixGenerator), `neo4j.queries` (shipped with export).
+
+| Consumers
+| `DocumentParser` uses roles only. `TraceabilityGraph` uses roles + relations for `addRelationship()` validation. `MatrixGenerator` reads matrix definitions. `Neo4jExporter` reads named Cypher queries. Each consumer queries independently through `ConfigLoader` — no shared mutable state.
+|===
+
 [#ARC-018, item, role=design, title="Config-driven validation"]
 --
 Relation validation is driven by the YAML configuration rather than hardcoded
@@ -375,6 +404,69 @@ The following sequence shows how an AsciiDoc file flows through the system durin
 ----
 include::example$sequence-diagram.puml[]
 ----
+
+[width=100%, cols="25,75", options="header"]
+|===
+| Participant | Role in processing
+
+| Antora Build
+| Triggers `contentClassified` (per-page document processing) and `sitePublished` (matrix generation after all pages). Provides the content catalog.
+
+| `AntoraTraceabilityExtension`
+| Event handler registration. Orchestrates the three processing passes and matrix sync. Reads playbook config to determine preset, config path, output directory.
+
+| `RequirementsTraceabilityExtension`
+| Core API. Owns the graph, delegates to parser and generators. Same class used by CLI without Antora events.
+
+| `DocumentParser`
+| Regex-based extraction of `[item]` blocks and inline relationship macros from raw AsciiDoc content. Returns `ParserResult { items, relationships }`.
+
+| `TraceabilityGraph`
+| In-memory graph. Validates relationships against config rules (`isRelationAllowed`). Provides query methods used by macro expansion and matrix generation.
+
+| `MatrixGenerator`
+| Queries graph for items by role, computes per-cell coverage using `coverageRelations`, delegates HTML rendering to `TemplateRenderer`.
+
+| `TemplateRenderer`
+| Mustache-based HTML rendering. Built-in templates with custom template directory support.
+
+| `Neo4jExporter`
+| Optional export. Serializes graph to CSV (`nodes.csv`, `relationships.csv`) or Cypher (`import.cypher`) via `LOAD CSV` or `CREATE` statements.
+|===
+
+.Pass ordering within contentClassified
+
+The extension runs four passes inside `contentClassified`. The sequence diagram above shows the Antora-level flow; this diagram focuses on the internal pass structure.
+
+[plantuml]
+----
+include::example$pass-pipeline.puml[]
+----
+
+[width=100%, cols="15,40,15,30", options="header"]
+|===
+| Pass | What happens | Scope | Why ordering matters
+
+| Pass 1
+| `processAsciiDocFile()` — DocumentParser extracts items + relationships, populates TraceabilityGraph. Both pages and partials are processed.
+| Pages + partials
+| Graph must be complete before Pass 3 can resolve cross-file `addresses:TARGET[]` references. Partials are only processed here — they skip subsequent passes.
+
+| Pass 2
+| `expandOutgoingMacros()` + `expandIncomingMacros()` — replace `traceability:outgoing[]` and `traceability:incoming[]` with formatted relationship lists (grouped by type, configurable style/order).
+| Pages only
+| Depends on complete graph from Pass 1 to enumerate relationships. Opt-in via `:traceability-links:` document attribute.
+
+| Pass 2b
+| `expandGraphMacros()` + `expandCoverageMacros()` — replace `traceability:graph[]` and `traceability:graph-coverage[]` with Kroki image URLs (DOT and Vega-Lite).
+| Pages only
+| Uses `toDot()` / `toVegaLite()` on the graph. Opt-in via `:traceability-graph:` document attribute. Independent of Pass 2.
+
+| Pass 3
+| `substituteLinksInFile()` — replace `addresses:REQ-001[]` with `xref:page.html#ID` (pages) or `link:URL#ID` (partials). Also runs `injectTitleIds()` and `unindentItemMacros()`.
+| Pages only
+| Needs complete graph (all sourceFiles known) from Pass 1. This is why Pass 1 processes all files before any macro expansion.
+|===
 
 Key timing characteristics:
 

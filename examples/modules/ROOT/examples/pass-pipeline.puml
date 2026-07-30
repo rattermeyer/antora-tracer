@@ -1,0 +1,59 @@
+@startuml
+' Content processing pipeline — the four passes within contentClassified
+
+skinparam activityBackgroundColor #F8F9FA
+skinparam activityBorderColor #888888
+
+start
+
+partition "Pass 1 — Populate Graph" {
+  :processAsciiDocFile()\nfor each page file;
+  :processAsciiDocFile()\nfor each partial file;
+  :DocumentParser extracts\nitems + relationships;
+  note right
+    Pages + partials both processed.
+    Graph is complete after this pass —
+    all items and relationships known.
+  end note
+}
+
+partition "Pass 2 — Rendering Macros" #E8F5E9 {
+  :expandOutgoingMacros()\n→ relationship lists;
+  :expandIncomingMacros()\n→ reverse-relationship lists;
+  note right
+    Page files only.
+    Partials skipped — no HTML output.
+    Configurable via :traceability-links:,
+    :traceability-style:, :traceability-order:
+  end note
+}
+
+partition "Pass 2b — Visualization Macros" #E8F5E9 {
+  :expandGraphMacros()\n→ Kroki GraphViz DOT images;
+  :expandCoverageMacros()\n→ Kroki Vega-Lite charts;
+  note right
+    Page files only.
+    Opt-in via :traceability-graph:.
+    Uses toDot() / toVegaLite()
+    on TraceabilityGraph.
+  end note
+}
+
+partition "Pass 3 — Link Substitution" #FFF3E0 {
+  :substituteLinksInFile()\nfor each page file;
+  :addresses:REQ-001[]\n→ xref:page#ID or link:URL;
+  :injectTitleIds()\n→ prepend ID to title attribute;
+  :unindentItemMacros()\n→ fix literal block issues;
+  note right
+    Needs complete graph from Pass 1
+    to resolve cross-file targets.
+    URL sourceFiles (partials) use
+    link: instead of xref:.
+  end note
+}
+
+:Asciidoctor renders HTML;
+
+stop
+
+@enduml
