@@ -312,42 +312,6 @@ Source: openspec/changes/add-next-id-cli/specs/next-id/spec.md
 
 traceability:outgoing[]
 traceability:incoming[]"""
-QA-055,QA-055 — Zero operational overhead,requirement,,requirements.adoc,"""The extension SHALL operate without requiring external services, databases, or runtime dependencies beyond Node.js standard library and a minimal set of npm packages. Optional features such as Neo4j export SHALL degrade gracefully when not configured.
-
-Source: xref:quality/zero-operational-overhead.adoc[Quality Attribute: Zero Operational Overhead]
-
-traceability:outgoing[]
-traceability:incoming[]"""
-QA-056,QA-056 — Configurable without code changes,requirement,,requirements.adoc,"""The extension SHALL allow users to define roles, relations, and matrices entirely in YAML configuration. Built-in presets SHALL be overridable via the `extends` mechanism. Items with roles not yet in the configuration SHALL generate warnings rather than errors.
-
-Source: xref:quality/configurable-without-code.adoc[Quality Attribute: Configurable Without Code Changes]
-
-traceability:outgoing[]
-traceability:incoming[]"""
-QA-057,QA-057 — Fail-fast with clear diagnostics,requirement,,requirements.adoc,"""The extension SHALL validate every relationship against configured role-relation rules. Error messages SHALL include file path, line number, source and target item IDs with roles, the invalid relation type, and the list of allowed alternatives. Cross-file references SHALL be re-validated after all files are loaded.
-
-Source: xref:quality/fail-fast-diagnostics.adoc[Quality Attribute: Fail-Fast with Clear Diagnostics]
-
-traceability:outgoing[]
-traceability:incoming[]"""
-QA-058,QA-058 — No side effects on source files,requirement,,requirements.adoc,"""All content transformations SHALL operate on in-memory buffers. Source `.adoc` files SHALL never be modified by the extension. Processing the same file twice SHALL produce the same result.
-
-Source: xref:quality/no-side-effects.adoc[Quality Attribute: No Side Effects on Source Files]
-
-traceability:outgoing[]
-traceability:incoming[]"""
-QA-059,QA-059 — Testability by design,requirement,,requirements.adoc,"""Each module SHALL accept dependencies via constructor parameters. Each module SHALL have a dedicated test file. The traceability graph SHALL expose internal state for test access. The full test suite SHALL complete in under 500 ms.
-
-Source: xref:quality/testability-by-design.adoc[Quality Attribute: Testability by Design]
-
-traceability:outgoing[]
-traceability:incoming[]"""
-QA-060,QA-060 — PDF compatibility of generated output,requirement,,requirements.adoc,"""Generated output from \`traceability:outgoing[]\` and \`traceability:incoming[]\` SHALL be standard AsciiDoc constructs — not raw HTML — ensuring compatibility with both HTML and PDF backends.
-
-Source: openspec/specs/traceability-links-macro/spec.md
-
-traceability:outgoing[]
-traceability:incoming[]"""
 ARC-001,ARC-001 — Project scope and architectural goals,design,,architecture.adoc,"""*Project scope and architectural goals*
 
 The Antora Tracer is an Antora extension that adds role-based requirements traceability to AsciiDoc documentation. It replaces fixed macro types with a single configurable `[item]` macro.
@@ -861,3 +825,21 @@ verifies:REQ-010[]
 
 traceability:outgoing[]
 traceability:incoming[]"""
+QA-055,QA-055 — Zero operational overhead,requirement,,quality/zero-operational-overhead.adoc,"""The extension SHALL operate without requiring external services, databases, or runtime dependencies beyond Node.js standard library and a minimal set of npm packages. Optional features such as Neo4j export SHALL degrade gracefully when not configured.
+
+Source: openspec/changes/archive/2026-07-28-add-pdf-output/specs/pdf-output/spec.md"""
+QA-056,QA-056 — Configurable without code changes,requirement,,quality/configurable-without-code.adoc,"""The extension SHALL allow users to define roles, relations, and matrices entirely in YAML configuration. Built-in presets SHALL be overridable via the `extends` mechanism. Items with roles not yet in the configuration SHALL generate warnings rather than errors.
+
+Source: openspec/changes/archive/2026-07-28-add-pdf-output/specs/pdf-output/spec.md"""
+QA-057,QA-057 — Fail-fast with clear diagnostics,requirement,,quality/fail-fast-diagnostics.adoc,"""The extension SHALL validate every relationship against configured role-relation rules. Error messages SHALL include file path, line number, source and target item IDs with roles, the invalid relation type, and the list of allowed alternatives. Cross-file references SHALL be re-validated after all files are loaded.
+
+Source: openspec/changes/archive/2026-07-28-add-pdf-output/specs/pdf-output/spec.md"""
+QA-058,QA-058 — No side effects on source files,requirement,,quality/no-side-effects.adoc,"""All content transformations SHALL operate on in-memory buffers. Source `.adoc` files SHALL never be modified by the extension. Processing the same file twice SHALL produce the same result.
+
+Source: openspec/changes/archive/2026-07-28-add-pdf-output/specs/pdf-output/spec.md"""
+QA-059,QA-059 — Testability by design,requirement,,quality/testability-by-design.adoc,"""Each module SHALL accept dependencies via constructor parameters. Each module SHALL have a dedicated test file. The traceability graph SHALL expose internal state for test access. The full test suite SHALL complete in under 500 ms.
+
+Source: openspec/changes/archive/2026-07-28-add-pdf-output/specs/pdf-output/spec.md"""
+QA-060,QA-060 — PDF compatibility of generated output,requirement,,quality/pdf-compatibility.adoc,"""Generated output from \`traceability:outgoing[]\` and \`traceability:incoming[]\` SHALL be standard AsciiDoc constructs — not raw HTML — ensuring compatibility with both HTML and PDF backends.
+
+Source: openspec/specs/traceability-links-macro/spec.md"""

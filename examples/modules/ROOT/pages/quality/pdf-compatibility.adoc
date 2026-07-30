@@ -1,5 +1,12 @@
 = PDF Compatibility of Generated Output
 
+[#QA-060, item, role=requirement, title="PDF compatibility of generated output"]
+--
+Generated output from \`traceability:outgoing[]\` and \`traceability:incoming[]\` SHALL be standard AsciiDoc constructs — not raw HTML — ensuring compatibility with both HTML and PDF backends.
+
+Source: openspec/specs/traceability-links-macro/spec.md
+--
+
 == Context
 
 The `traceability:outgoing[]` and `traceability:incoming[]` macros expand to relationship lists. If the macros generate raw HTML (e.g., `<div>` or `<span>` tags), the output works in the HTML site but breaks in the PDF build — asciidoctor-pdf cannot render raw HTML in AsciiDoc documents. The output must use standard AsciiDoc constructs that work identically across backends.

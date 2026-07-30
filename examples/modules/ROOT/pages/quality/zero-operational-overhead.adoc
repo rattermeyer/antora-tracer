@@ -1,5 +1,12 @@
 = Zero Operational Overhead
 
+[#QA-055, item, role=requirement, title="Zero operational overhead"]
+--
+The extension SHALL operate without requiring external services, databases, or runtime dependencies beyond Node.js standard library and a minimal set of npm packages. Optional features such as Neo4j export SHALL degrade gracefully when not configured.
+
+Source: openspec/changes/archive/2026-07-28-add-pdf-output/specs/pdf-output/spec.md
+--
+
 == Context
 
 A documentation engineer adds the extension to their Antora playbook. The extension must parse AsciiDoc files, validate traceability relationships, and generate matrices — without requiring any external services, database installations, or configuration beyond the traceability YAML file already in their project.

@@ -1,5 +1,12 @@
 = No Side Effects on Source Files
 
+[#QA-058, item, role=requirement, title="No side effects on source files"]
+--
+All content transformations SHALL operate on in-memory buffers. Source `.adoc` files SHALL never be modified by the extension. Processing the same file twice SHALL produce the same result.
+
+Source: openspec/changes/archive/2026-07-28-add-pdf-output/specs/pdf-output/spec.md
+--
+
 == Context
 
 The extension processes `.adoc` files during the Antora build — parsing items, expanding macros, and substituting inline relationship links. The user's source files are under version control and must never be modified by the build process.

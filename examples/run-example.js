@@ -23,7 +23,7 @@ configLoader.load(resolve(__dirname, "traceability.yml"));
 
 // Process all example files
 const extension = new RequirementsTraceabilityExtension(configLoader);
-const files = ["requirements.adoc", "architecture.adoc", "test-plan.adoc"];
+const files = ["requirements.adoc", "architecture.adoc", "test-plan.adoc", "quality/zero-operational-overhead.adoc", "quality/configurable-without-code.adoc", "quality/fail-fast-diagnostics.adoc", "quality/no-side-effects.adoc", "quality/testability-by-design.adoc", "quality/pdf-compatibility.adoc"];
 const results = extension.processFiles(
   files.map((f) => ({
     path: f,
