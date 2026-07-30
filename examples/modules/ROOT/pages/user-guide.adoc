@@ -496,6 +496,43 @@ traceability:graph-coverage[]
 
 The macro renders a Kroki-generated Vega-Lite bar chart. Both macros auto-scale and have no additional attributes beyond `:traceability-graph:`.
 
+=== Items in Partials
+
+You can define `[item]` blocks in AsciiDoc partials — files in a `partials/` directory that are included into pages via `include::partial$...[]`. This is useful for keeping architectural decisions or shared requirements in standalone files that multiple pages can reference.
+
+[source,asciidoc]
+----
+// architecture.adoc
+= Architecture
+include::partial$04-solution-strategy.adoc[]
+----
+
+[source,asciidoc]
+----
+// partials/04-solution-strategy.adoc
+== Solution Strategy
+
+[#ARC-005, item, role=design, title="Zero operational overhead"]
+--
+Description of how zero operational overhead is achieved...
+
+addresses:REQ-001[]
+--
+----
+
+The extension processes partials during graph population on equal footing with page files. However, there is one important difference in how links work:
+
+*Page items* link to the rendered HTML page (e.g., `architecture.html#ARC-001`).
+
+*Partial items* link to the source file in your content repository (e.g., `https://github.com/.../blob/main/partials/04-solution-strategy.adoc#ARC-005`). This is because partials don't produce their own HTML pages — Antora only renders pages, not partials. The extension uses Antora's content source URL to build a view link into your repository.
+
+.Benefits and tradeoffs
+- ✔ Items stay organized in small, focused files — easier to maintain
+- ✔ Traceability matrix links are clickable (if your repo is public)
+- ✔ No duplicate-ID issues — a partial is one authoritative source
+- ✖ Matrix links go to source repo, not rendered HTML
+- ✖ Do not use `xref:partial$...` to reference partial items — use inline relationship macros instead, or a plain `link:` URL
+
 === Role-Based Validation
 
 The extension validates:
@@ -870,7 +907,7 @@ If your Antora site has multiple components, each with its own `.adoc` files, it
   Verify `enabled: true` in your playbook config. Check that your `.adoc` files are in the Antora content catalog (have page family). Enable verbose Antora logging for more detail.
 
 *Items defined in partials missing from matrices*::
-  Make sure the partial file has family `partial` (located in a `partials/` directory in your Antora module). The extension processes partials automatically — no configuration needed. Items from partials link to the source file in your repository rather than a rendered HTML page.
+  Verify the partial file is in a `partials/` directory within your Antora module. The extension processes `family: partial` automatically.
 
 *"target of xref not found" when referencing partial items*::
-  Do not use `xref:partial$...` to reference items in partials — partials don't produce HTML pages. The extension handles these links automatically via `link:` URLs. If you need to reference a partial item manually, use a plain `link:` macro pointing to the repository URL.
+  Partials don't produce HTML pages — use inline relationship macros instead of `xref:partial$...`. See <<Items in Partials>> for details.
