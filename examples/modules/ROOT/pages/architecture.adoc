@@ -151,7 +151,7 @@ include::example$config-resolution.puml[]
 | Loads preset, deep-merges user config, memoizes the result. Exposes query methods: `isKnownRole()`, `isRelationAllowed()`, `getAllowedRelations()`, `getMatrices()`, `getNeo4jQueries()`. First consumer triggers resolution; subsequent calls hit the cache.
 
 | Resolved configuration
-| Memoized merge of preset + user overrides. Four sub-components: `roles` (validated by parser), `relations` (used for graph validation — both directions checked), `matrices` (consumed by MatrixGenerator), `neo4j.queries` (shipped with export).
+| Memoized merge of preset + user overrides. Four sub-components: `roles` (validated by parser), `relations` (used for graph validation — both directions checked), `matrices` (consumed by MatrixGenerator), `neo4j queries` (shipped with export).
 
 | Consumers
 | `DocumentParser` uses roles only. `TraceabilityGraph` uses roles + relations for `addRelationship()` validation. `MatrixGenerator` reads matrix definitions. `Neo4jExporter` reads named Cypher queries. Each consumer queries independently through `ConfigLoader` — no shared mutable state.

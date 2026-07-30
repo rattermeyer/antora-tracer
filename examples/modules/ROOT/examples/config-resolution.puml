@@ -2,35 +2,32 @@
 ' Configuration resolution chain — preset → merge → validation queries
 
 skinparam componentBackgroundColor #F8F9FA
+skinparam packageBackgroundColor #FAFAFA
 
-database "Built-in\nPresets\n(requirements-engineering,\nmedical-iec62304, agile, minimal)" as presets
+database "Built-in\nPresets" as presets #FFF8E1
+file "User\nConfig\n(traceability.yml)" as userconfig #FFF8E1
 
-file "User\nConfig\n(traceability.yml)" as userconfig
+[ConfigLoader] as loader #E8EAF6
 
-[ConfigLoader] as loader
-
-rectangle "Resolved Configuration\n(memoized merge result)" as resolved {
+package "Resolved Configuration\n(memoized merge result)" as resolved #F3E5F5 {
   [roles] as roles
-  [relations\nsource→target→[types]] as relations
-  [matrices\nrow × column definitions] as matrices
-  [neo4j.queries\nnamed Cypher queries] as queries
+  [relations\nsource -> target -> types] as relations
+  [matrices\nrow x column definitions] as matrices
+  [neo4j queries\nnamed Cypher queries] as queries
 }
 
-' Consumers
-[DocumentParser] as parser
-[TraceabilityGraph] as graph
-[MatrixGenerator] as matrixgen
-[Neo4jExporter] as neo4j
+[DocumentParser] as parser #E8F5E9
+[TraceabilityGraph] as graph #E8F5E9
+[MatrixGenerator] as matrixgen #E8F5E9
+[Neo4jExporter] as neo4j #E8F5E9
 
-' Merge flow
 presets --> loader : load preset YAML
 userconfig --> loader : load + deep-merge overrides
 loader --> resolved : memoized merge
 
-' Consumers query resolved config
 roles --> parser : isKnownRole()
 roles --> graph : getItemsByRole()
-relations --> graph : isRelationAllowed()\n(both directions)
+relations --> graph : isRelationAllowed()\nboth directions
 matrices --> matrixgen : getMatrices()
 queries --> neo4j : getNeo4jQueries()
 
