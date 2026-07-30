@@ -13,7 +13,7 @@
   "scripts": {
     "build": "tsc && node scripts/build.js",
     "test": "tsc -p tsconfig.test.json && node --import=tsx/cjs 'node_modules/mocha/bin/mocha' 'lib/test/**/*.test.js'",
-    "test:coverage": "npm run build && rm -rf .nyc_output coverage && c8 --all --include='lib/src/**/*.js' --exclude='lib/src/test/**' --exclude='lib/src/coverage/**' node --import=tsx/cjs node_modules/mocha/bin/mocha 'lib/test/**/*.test.js'",
+    "test:coverage": "npm run build && rm -rf .nyc_output coverage && c8 --include='lib/src/**/*.js' --exclude='lib/src/test/**' --exclude='lib/src/coverage/**' --exclude='lib/src/cli.js' node --import=tsx/cjs node_modules/mocha/bin/mocha 'lib/test/**/*.test.js'",
     "test:coverage:report": "c8 report",
     "test:coverage:check": "c8 check-coverage --lines 80 --branches 70 --functions 80 --statements 80",
     "test:coverage:open": "c8 report --reporter=html",

@@ -429,6 +429,79 @@ describe("TraceabilityGraph - Extended Queries", () => {
       expect(globalSpec).to.not.equal(itemSpec);
     });
   });
+
+  // ========================================================================
+  // 4F: validate() — Circular Reference Detection
+  // ========================================================================
+
+  describe("validate() with circular references", () => {
+    it("should detect direct circular references", () => {
+      const graph = new TraceabilityGraph();
+      graph.addItem(createItem("REQ-001", "requirement", "A"));
+      graph.addItem(createItem("REQ-002", "requirement", "B"));
+      graph.addRelationship(
+        createRel("R1", "REQ-001", "REQ-002", "addresses"),
+      );
+      graph.addRelationship(
+        createRel("R2", "REQ-002", "REQ-001", "addresses"),
+      );
+
+      const result = graph.validate();
+      expect(result.errors).to.be.an("array");
+      expect(result.errors.some((e) => e.includes("Circular"))).to.be.true;
+    });
+
+    it("should detect indirect (3-node) circular references", () => {
+      const graph = new TraceabilityGraph();
+      graph.addItem(createItem("REQ-001", "requirement", "A"));
+      graph.addItem(createItem("REQ-002", "requirement", "B"));
+      graph.addItem(createItem("REQ-003", "requirement", "C"));
+      graph.addRelationship(
+        createRel("R1", "REQ-001", "REQ-002", "addresses"),
+      );
+      graph.addRelationship(
+        createRel("R2", "REQ-002", "REQ-003", "addresses"),
+      );
+      graph.addRelationship(
+        createRel("R3", "REQ-003", "REQ-001", "addresses"),
+      );
+
+      const result = graph.validate();
+      expect(result.errors.some((e) => e.includes("Circular"))).to.be.true;
+    });
+
+    it("should report valid for acyclic graph", () => {
+      const graph = new TraceabilityGraph();
+      graph.addItem(createItem("REQ-001", "requirement", "A"));
+      graph.addItem(createItem("REQ-002", "requirement", "B"));
+      graph.addItem(createItem("REQ-003", "requirement", "C"));
+      graph.addRelationship(
+        createRel("R1", "REQ-001", "REQ-002", "addresses"),
+      );
+      graph.addRelationship(
+        createRel("R2", "REQ-002", "REQ-003", "addresses"),
+      );
+
+      const result = graph.validate();
+      // Graph might not be "valid" due to other checks but shouldn't have
+      // circular reference errors
+      const circularErrors = result.errors.filter((e) =>
+        e.includes("Circular"),
+      );
+      expect(circularErrors).to.be.an("array").that.is.empty;
+    });
+
+    it("should detect self-referencing cycles", () => {
+      const graph = new TraceabilityGraph();
+      graph.addItem(createItem("REQ-001", "requirement", "A"));
+      graph.addRelationship(
+        createRel("R1", "REQ-001", "REQ-001", "addresses"),
+      );
+
+      const result = graph.validate();
+      expect(result.errors.some((e) => e.includes("Circular"))).to.be.true;
+    });
+  });
 });
 
 // ============================================================================
