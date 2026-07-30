@@ -34,7 +34,7 @@ traceability:graph[]
 --
 Test file: `test/antora-extension.test.ts`
 
-Tests the `AntoraTraceabilityExtension` — initialization with default config, preset, config path, and disabled state. Tests event handler registration, content processing via `contentClassified` event, matrix generation via `sitePublished` event, and API access patterns. Also tests `traceability:outgoing[]` and `traceability:incoming[]` macro expansion with configurable display style, sort order, collapsible sections, and opt-in behavior.
+Tests the `AntoraTraceabilityExtension` — initialization with default config, preset, config path, and disabled state. Tests event handler registration, content processing via `contentClassified` event, matrix generation via `sitePublished` event, and API access patterns. Also tests `traceability:outgoing[]` and `traceability:incoming[]` macro expansion with configurable display style, sort order, collapsible sections, and opt-in behavior. Tests `traceability:graph[]` and `traceability:graph-coverage[]` macro expansion with graph-enabled and graph-disabled modes, including global coverage, explicit target IDs, and header exclusion.
 
 verifies:REQ-035[]
 verifies:REQ-040[]
@@ -42,6 +42,8 @@ verifies:REQ-044[]
 verifies:REQ-045[]
 verifies:REQ-047[]
 verifies:REQ-048[]
+verifies:REQ-051[]
+verifies:REQ-052[]
 verifies:REQ-055[]
 
 traceability:outgoing[]
@@ -90,7 +92,7 @@ traceability:incoming[]
 --
 Test file: `test/graph-and-api.test.ts`
 
-Tests the `TraceabilityGraph` (Section 4 — extended queries: merge, getRelatedItems, getItemsWithRelationTo, getRelationshipsByRoles, findPath, getImpactAnalysis) and `RequirementsTraceabilityExtension` API methods (Section 5 — processFiles, validate, export, coverage, config access, preset management, lifecycle).
+Tests the `TraceabilityGraph` (Section 4 — extended queries: merge, getRelatedItems, getItemsWithRelationTo, getRelationshipsByRoles, findPath, getImpactAnalysis) and graph visualization methods (`toDot`, `toVegaLite`). Also tests `RequirementsTraceabilityExtension` API methods (Section 5 — processFiles, validate, export, coverage, config access, preset management, lifecycle).
 
 verifies:REQ-013[]
 verifies:REQ-014[]
@@ -100,6 +102,7 @@ verifies:REQ-017[]
 verifies:REQ-031[]
 verifies:REQ-032[]
 verifies:REQ-033[]
+verifies:REQ-053[]
 
 traceability:outgoing[]
 traceability:incoming[]
