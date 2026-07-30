@@ -246,7 +246,7 @@ Source: openspec/specs/traceability-links-macro/spec.md
 
 traceability:outgoing[]
 traceability:incoming[]"""
-REQ-044b,REQ-044b — traceability:incoming[] renders incoming links,requirement,,requirements.adoc,"""The system SHALL provide a \`traceability:incoming[]\` macro that expands to a formatted list of all incoming relationships pointing to the enclosing item. Relationships SHALL be grouped by inverse relation type (e.g., \`addresses\` displays as \`Addressed by\`) and rendered using standard AsciiDoc constructs.
+REQ-055,REQ-055 — traceability:incoming[] renders incoming links,requirement,,requirements.adoc,"""The system SHALL provide a \`traceability:incoming[]\` macro that expands to a formatted list of all incoming relationships pointing to the enclosing item. Relationships SHALL be grouped by inverse relation type (e.g., \`addresses\` displays as \`Addressed by\`) and rendered using standard AsciiDoc constructs.
 
 Source: openspec/specs/incoming-links-macro/spec.md
 
@@ -312,7 +312,7 @@ Source: openspec/specs/graph-visualization/spec.md
 
 traceability:outgoing[]
 traceability:incoming[]"""
-REQ-055,REQ-055 — CLI next-id command returns next available ID,requirement,,requirements.adoc,"""The CLI SHALL provide a `next-id` command that accepts a `--prefix` and `-i/--input` and returns the next available sequential ID for items matching that prefix. The numeric suffix SHALL be auto-detected from existing IDs (e.g., if existing IDs use 3-digit padding, the next ID also uses 3-digit padding). When no existing IDs match the prefix, the default padding is 3 digits.
+REQ-056,REQ-056 — CLI next-id command returns next available ID,requirement,,requirements.adoc,"""The CLI SHALL provide a `next-id` command that accepts a `--prefix` and `-i/--input` and returns the next available sequential ID for items matching that prefix. The numeric suffix SHALL be auto-detected from existing IDs (e.g., if existing IDs use 3-digit padding, the next ID also uses 3-digit padding). When no existing IDs match the prefix, the default padding is 3 digits.
 
 Source: openspec/changes/add-next-id-cli/specs/next-id/spec.md
 
@@ -632,8 +632,9 @@ validation (`validate`), Neo4j export (`export neo4j`), statistics
 Global `--config` and `--preset` flags apply to all commands. The CLI
 operates standalone — it does not require an Antora build pipeline.
 
+addresses:REQ-026[]
 addresses:REQ-036[]
-addresses:REQ-055[]"""
+addresses:REQ-056[]"""
 ARC-003,ARC-003 — Processing flow during Antora build,design,,architecture.adoc,"""The following sequence shows how an AsciiDoc file flows through the system during an Antora build:
 
 [plantuml]

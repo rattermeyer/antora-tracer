@@ -453,7 +453,7 @@ traceability:outgoing[]
 traceability:incoming[]
 --
 
-[#REQ-044b, item, role=requirement, title="traceability:incoming[] renders incoming links"]
+[#REQ-055, item, role=requirement, title="traceability:incoming[] renders incoming links"]
 --
 The system SHALL provide a \`traceability:incoming[]\` macro that expands to a formatted list of all incoming relationships pointing to the enclosing item. Relationships SHALL be grouped by inverse relation type (e.g., \`addresses\` displays as \`Addressed by\`) and rendered using standard AsciiDoc constructs.
 
@@ -567,7 +567,7 @@ traceability:incoming[]
 
 == CLI: Next ID Command
 
-[#REQ-055, item, role=requirement, title="CLI next-id command returns next available ID"]
+[#REQ-056, item, role=requirement, title="CLI next-id command returns next available ID"]
 --
 The CLI SHALL provide a `next-id` command that accepts a `--prefix` and `-i/--input` and returns the next available sequential ID for items matching that prefix. The numeric suffix SHALL be auto-detected from existing IDs (e.g., if existing IDs use 3-digit padding, the next ID also uses 3-digit padding). When no existing IDs match the prefix, the default padding is 3 digits.
 

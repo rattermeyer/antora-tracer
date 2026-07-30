@@ -393,8 +393,9 @@ validation (`validate`), Neo4j export (`export neo4j`), statistics
 Global `--config` and `--preset` flags apply to all commands. The CLI
 operates standalone — it does not require an Antora build pipeline.
 
+addresses:REQ-026[]
 addresses:REQ-036[]
-addresses:REQ-055[]
+addresses:REQ-056[]
 --
 
 == Runtime View

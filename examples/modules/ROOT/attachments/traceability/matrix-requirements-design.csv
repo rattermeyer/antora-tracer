@@ -24,7 +24,7 @@ REQ-022,REQ-022 — Presets have independent versioning,ARC-012: ARC-012 — Pre
 REQ-023,REQ-023 — Users can define custom presets,ARC-012: ARC-012 — Preset YAML schema
 REQ-024,REQ-024 — Neo4j CSV export,ARC-001: ARC-001 — Project scope and architectural goals; ARC-002: ARC-002 — Component-level architecture; ARC-022: ARC-022 — Graph-to-Neo4j CSV and Cypher export; ARC-004: ARC-004 — Key architectural decisions and their rationale
 REQ-025,REQ-025 — Neo4j Cypher export,ARC-002: ARC-002 — Component-level architecture; ARC-022: ARC-022 — Graph-to-Neo4j CSV and Cypher export
-REQ-026,REQ-026 — Export command in CLI,
+REQ-026,REQ-026 — Export command in CLI,ARC-023: ARC-023 — Commander-based CLI with subcommands
 REQ-027,REQ-027 — Export includes all item attributes,ARC-022: ARC-022 — Graph-to-Neo4j CSV and Cypher export
 REQ-028,REQ-028 — Export is optional,ARC-022: ARC-022 — Graph-to-Neo4j CSV and Cypher export; ARC-004: ARC-004 — Key architectural decisions and their rationale
 REQ-029,REQ-029 — Configurable matrix generation with coverage calculations,ARC-002: ARC-002 — Component-level architecture; ARC-019: ARC-019 — Config-driven matrix generation with coverage calculations; ARC-003: ARC-003 — Processing flow during Antora build; ARC-004: ARC-004 — Key architectural decisions and their rationale
@@ -43,7 +43,7 @@ REQ-041,REQ-041 — Source file path normalization,ARC-021: ARC-021 — Path res
 REQ-042,REQ-042 — Backward compatibility without LinkResolver,ARC-021: ARC-021 — Path resolution for matrix-to-item links
 REQ-043,REQ-043 — Non-HTML matrix outputs unchanged,ARC-021: ARC-021 — Path resolution for matrix-to-item links
 REQ-044,REQ-044 — traceability:outgoing[] renders outgoing links,
-REQ-044b,REQ-044b — traceability:incoming[] renders incoming links,
+REQ-055,REQ-055 — traceability:incoming[] renders incoming links,
 REQ-045,REQ-045 — Opt-in via AsciiDoc attribute,
 REQ-046,REQ-046 — Inline macros are pure data markers,
 REQ-047,REQ-047 — Configurable display style,
@@ -54,7 +54,7 @@ REQ-051,REQ-051 — Relationship graph via traceability:graph[] macro,
 REQ-052,REQ-052 — Coverage chart via traceability:graph-coverage[] macro,
 REQ-053,REQ-053 — Graph visualization methods on TraceabilityGraph,
 REQ-054,REQ-054 — Dashboard page in example site,
-REQ-055,REQ-055 — CLI next-id command returns next available ID,ARC-023: ARC-023 — Commander-based CLI with subcommands
+REQ-056,REQ-056 — CLI next-id command returns next available ID,ARC-023: ARC-023 — Commander-based CLI with subcommands
 QA-055,QA-055 — Zero operational overhead,ARC-005: ARC-005 — Zero operational overhead; ARC-016: ARC-016 — Event-driven Antora integration; ARC-013: ARC-013 — ESM module system
 QA-056,QA-056 — Configurable without code changes,ARC-006: ARC-006 — Configurable without code changes
 QA-057,QA-057 — Fail-fast with clear diagnostics,ARC-007: ARC-007 — Fail-fast with clear diagnostics; ARC-018: ARC-018 — Config-driven validation
@@ -62,4 +62,4 @@ QA-058,QA-058 — No side effects on source files,ARC-008: ARC-008 — No side e
 QA-059,QA-059 — Testability by design,ARC-009: ARC-009 — Testability by design; ARC-014: ARC-014 — Dependency injection by constructor
 
 Total 61 rows
-Coverage: 75.4%
+Coverage: 77.0%
