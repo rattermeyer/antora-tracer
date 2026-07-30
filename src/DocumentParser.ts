@@ -553,12 +553,16 @@ export class DocumentParser {
   }
 
   private extractBody(block: string): string {
-    // Find the delimiter: either ==== or --
-    const hasEquals = block.includes("====");
-    const delimiter = hasEquals ? "====" : "--";
-    const start = block.indexOf(delimiter) + delimiter.length;
-    const end = block.lastIndexOf(delimiter);
-    return block.substring(start, end).trim();
+    // Find the delimiter: either ==== or --.
+    // Check for ==== as a delimiter (line of its own), not just in body text.
+    const hasEqualsDelim = /\n====\r?\n/.test(block);
+    const delimiter = hasEqualsDelim ? "====" : "--";
+    const start = block.indexOf(`\n${delimiter}\n`);
+    if (start === -1) return "";
+    const bodyStart = start + delimiter.length + 2;
+    const end = block.lastIndexOf(`\n${delimiter}\n`);
+    const body = end > start ? block.substring(bodyStart, end).trim() : "";
+    return body;
   }
 
   private lineAt(content: string, position: number): number {
