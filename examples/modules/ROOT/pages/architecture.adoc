@@ -3,7 +3,7 @@
 :traceability-graph: true
 :traceability-style: list
 :traceability-order: target-id
-:arc42-sections: 1,4,5,6,9
+:arc42-sections: 1,4,5,6,8,9
 
 This document describes the architecture of the Antora Tracer extension using selected arc42 sections. Each section is a traceable `[item]` that references the requirements it addresses.
 
@@ -251,6 +251,83 @@ addresses:REQ-022[]
 addresses:REQ-023[]
 
 traceability:outgoing[]
+--
+
+== Concepts — Cross-cutting Concerns
+
+[#ARC-013, item, role=design, title="ESM module system"]
+--
+ESM (`"type": "module"` in package.json) is used throughout the project. This
+choice enables modern `import`/`export` syntax, the `node:` protocol for built-in
+modules, and alignment with browser JavaScript. The tradeoff is that Antora's
+extension loader uses `require()`, requiring `.cjs` wrappers for integration
+points (see xref:adr/0001-esm-over-cjs.adoc[ADR-001]).
+
+addresses:QA-055[]
+--
+
+[#ARC-014, item, role=design, title="Dependency injection by constructor"]
+--
+All modules accept their dependencies via constructor parameters. There is no
+service locator, DI container, or global state. `TraceabilityGraph` receives
+`ConfigLoader`, `MatrixGenerator` receives `TraceabilityGraph` and `ConfigLoader`,
+and `DocumentParser` receives `ConfigLoader` optionally. This makes every
+component independently testable without mocking frameworks (see
+xref:adr/0004-zero-framework.adoc[ADR-004]).
+
+addresses:QA-059[]
+--
+
+[#ARC-015, item, role=design, title="In-memory processing with no side effects"]
+--
+All content transformations — parsing, macro expansion, link substitution,
+title injection — operate on in-memory buffers. Source `.adoc` files are never
+written to. The Antora content catalog provides the text buffers; the extension
+modifies them in place and writes them back to the catalog without touching disk.
+This ensures idempotency and version-control safety (see
+xref:adr/0003-in-memory-graph.adoc[ADR-003]).
+
+addresses:QA-058[]
+--
+
+[#ARC-016, item, role=design, title="Event-driven Antora integration"]
+--
+The extension hooks into Antora's event pipeline via `register()`:
+`contentClassified` triggers parsing and macro expansion; `sitePublished`
+triggers matrix generation and export. Each event handler is self-contained,
+does not block the build pipeline, and receives the content catalog as a
+parameter. The same `RequirementsTraceabilityExtension` class is used by
+the CLI outside Antora, demonstrating the event handlers are optional.
+
+addresses:QA-055[]
+--
+
+[#ARC-017, item, role=design, title="Regex-based parsing"]
+--
+AsciiDoc content is parsed using regular expressions rather than an
+Asciidoctor AST walker. This makes the parser independent of Asciidoctor
+API versions and testable with plain string inputs. Verbatim blocks
+(`----` and `....` fences) are pre-scanned and excluded to avoid
+false positives from example code. Known limitations (`]` in quoted
+attribute values, indented macros) are handled with targeted fixes
+(see xref:adr/0002-regex-parser-over-ast.adoc[ADR-002]).
+
+addresses:REQ-001[]
+addresses:REQ-002[]
+addresses:REQ-003[]
+addresses:REQ-004[]
+--
+
+[#ARC-018, item, role=design, title="Config-driven validation"]
+--
+Relation validation is driven by the YAML configuration rather than hardcoded
+rules. `ConfigLoader.isRelationAllowed()` checks source role, target role,
+and relation type against the configured `relations` map. Cross-file
+references are re-validated after all files are loaded to catch late-resolved
+targets. Error messages include file path, line number, and allowed
+alternatives (see xref:adr/0004-zero-framework.adoc[ADR-004]).
+
+addresses:QA-057[]
 --
 
 == Runtime View

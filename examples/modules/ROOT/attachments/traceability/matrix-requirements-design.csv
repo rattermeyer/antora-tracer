@@ -1,8 +1,8 @@
 Row ID,Row Title,design
-REQ-001,REQ-001 — Single `item` macro replaces all block macros,ARC-001: ARC-001 — Project scope and architectural goals; ARC-005: ARC-005 — Zero operational overhead; ARC-010: ARC-010 — Future-proofness; ARC-002: ARC-002 — Component-level architecture; ARC-003: ARC-003 — Processing flow during Antora build; ARC-004: ARC-004 — Key architectural decisions and their rationale
-REQ-002,REQ-002 — `item` macro accepts role attribute,ARC-010: ARC-010 — Future-proofness; ARC-002: ARC-002 — Component-level architecture; ARC-003: ARC-003 — Processing flow during Antora build
-REQ-003,REQ-003 — `item` macro maintains existing attributes,ARC-002: ARC-002 — Component-level architecture
-REQ-004,REQ-004 — `item` macro supports block content,ARC-010: ARC-010 — Future-proofness; ARC-002: ARC-002 — Component-level architecture; ARC-003: ARC-003 — Processing flow during Antora build
+REQ-001,REQ-001 — Single `item` macro replaces all block macros,ARC-001: ARC-001 — Project scope and architectural goals; ARC-005: ARC-005 — Zero operational overhead; ARC-010: ARC-010 — Future-proofness; ARC-002: ARC-002 — Component-level architecture; ARC-017: ARC-017 — Regex-based parsing; ARC-003: ARC-003 — Processing flow during Antora build; ARC-004: ARC-004 — Key architectural decisions and their rationale
+REQ-002,REQ-002 — `item` macro accepts role attribute,ARC-010: ARC-010 — Future-proofness; ARC-002: ARC-002 — Component-level architecture; ARC-017: ARC-017 — Regex-based parsing; ARC-003: ARC-003 — Processing flow during Antora build
+REQ-003,REQ-003 — `item` macro maintains existing attributes,ARC-002: ARC-002 — Component-level architecture; ARC-017: ARC-017 — Regex-based parsing
+REQ-004,REQ-004 — `item` macro supports block content,ARC-010: ARC-010 — Future-proofness; ARC-002: ARC-002 — Component-level architecture; ARC-017: ARC-017 — Regex-based parsing; ARC-003: ARC-003 — Processing flow during Antora build
 REQ-005,REQ-005 — Old macro syntax generates deprecation error,ARC-003: ARC-003 — Processing flow during Antora build
 REQ-006,REQ-006 — Configuration defines roles,ARC-001: ARC-001 — Project scope and architectural goals; ARC-006: ARC-006 — Configurable without code changes; ARC-002: ARC-002 — Component-level architecture; ARC-004: ARC-004 — Key architectural decisions and their rationale
 REQ-007,REQ-007 — Configuration defines relations,ARC-006: ARC-006 — Configurable without code changes; ARC-002: ARC-002 — Component-level architecture; ARC-004: ARC-004 — Key architectural decisions and their rationale
@@ -54,11 +54,11 @@ REQ-051,REQ-051 — Relationship graph via traceability:graph[] macro,
 REQ-052,REQ-052 — Coverage chart via traceability:graph-coverage[] macro,
 REQ-053,REQ-053 — Graph visualization methods on TraceabilityGraph,
 REQ-054,REQ-054 — Dashboard page in example site,
-QA-055,QA-055 — Zero operational overhead,ARC-005: ARC-005 — Zero operational overhead
+QA-055,QA-055 — Zero operational overhead,ARC-005: ARC-005 — Zero operational overhead; ARC-013: ARC-013 — ESM module system; ARC-016: ARC-016 — Event-driven Antora integration
 QA-056,QA-056 — Configurable without code changes,ARC-006: ARC-006 — Configurable without code changes
-QA-057,QA-057 — Fail-fast with clear diagnostics,ARC-007: ARC-007 — Fail-fast with clear diagnostics
-QA-058,QA-058 — No side effects on source files,ARC-008: ARC-008 — No side effects on source files
-QA-059,QA-059 — Testability by design,ARC-009: ARC-009 — Testability by design
+QA-057,QA-057 — Fail-fast with clear diagnostics,ARC-007: ARC-007 — Fail-fast with clear diagnostics; ARC-018: ARC-018 — Config-driven validation
+QA-058,QA-058 — No side effects on source files,ARC-008: ARC-008 — No side effects on source files; ARC-015: ARC-015 — In-memory processing with no side effects
+QA-059,QA-059 — Testability by design,ARC-009: ARC-009 — Testability by design; ARC-014: ARC-014 — Dependency injection by constructor
 
 Total 60 rows
 Coverage: 61.7%
