@@ -228,12 +228,14 @@ export class AntoraTraceabilityExtension {
    */
   private findItemBlocks(content: string): Array<{
     itemId: string;
+    headerStart: number;
     headerEnd: number;
     bodyStart: number;
     bodyEnd: number;
   }> {
     const results: Array<{
       itemId: string;
+      headerStart: number;
       headerEnd: number;
       bodyStart: number;
       bodyEnd: number;
@@ -279,7 +281,7 @@ export class AntoraTraceabilityExtension {
       const bodyEnd = content.indexOf("\n--\n", bodyStart);
       if (bodyEnd === -1) continue;
 
-      results.push({ itemId, headerEnd: macroEnd + 1, bodyStart, bodyEnd });
+      results.push({ itemId, headerStart: m.index, headerEnd: macroEnd + 1, bodyStart, bodyEnd });
     }
 
     return results;
@@ -692,13 +694,10 @@ export class AntoraTraceabilityExtension {
       let externalMatch: RegExpExecArray | null;
 
       // Build ranges to exclude: item headers + item bodies
-      const graphExcludeRanges = blocks.map((b) => {
-        const bodyEnd = content.indexOf("\n--\n", b.bodyStart);
-        return {
-          start: b.headerEnd - b.itemId.length - 10,
-          end: bodyEnd >= 0 ? bodyEnd : content.length,
-        };
-      });
+      const graphExcludeRanges = blocks.map((b) => ({
+        start: b.headerStart,
+        end: b.bodyEnd,
+      }));
 
       while ((externalMatch = externalRegex.exec(content)) !== null) {
         const matchStart = externalMatch.index;
@@ -806,10 +805,10 @@ export class AntoraTraceabilityExtension {
       let globalMatch: RegExpExecArray | null;
 
       // Build ranges to exclude: item headers + item bodies
-      const excludeRanges = blocks.map((b) => {
-        const bodyEnd = content.indexOf("\n--\n", b.bodyStart);
-        return { start: b.headerEnd - b.itemId.length - 10, end: bodyEnd >= 0 ? bodyEnd : content.length };
-      });
+      const excludeRanges = blocks.map((b) => ({
+        start: b.headerStart,
+        end: b.bodyEnd,
+      }));
 
       while ((globalMatch = globalRegex.exec(content)) !== null) {
         const matchStart = globalMatch.index;

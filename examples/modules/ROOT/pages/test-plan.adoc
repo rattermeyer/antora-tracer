@@ -34,10 +34,15 @@ traceability:graph[]
 --
 Test file: `test/antora-extension.test.ts`
 
-Tests the `AntoraTraceabilityExtension` — initialization with default config, preset, config path, and disabled state. Tests event handler registration, content processing via `contentClassified` event, matrix generation via `sitePublished` event, and API access patterns.
+Tests the `AntoraTraceabilityExtension` — initialization with default config, preset, config path, and disabled state. Tests event handler registration, content processing via `contentClassified` event, matrix generation via `sitePublished` event, and API access patterns. Also tests `traceability:outgoing[]` and `traceability:incoming[]` macro expansion with configurable display style, sort order, collapsible sections, and opt-in behavior.
 
 verifies:REQ-035[]
 verifies:REQ-040[]
+verifies:REQ-044[]
+verifies:REQ-045[]
+verifies:REQ-047[]
+verifies:REQ-048[]
+verifies:REQ-055[]
 
 traceability:outgoing[]
 traceability:incoming[]
@@ -140,6 +145,7 @@ Test file: `test/relationship-link-substitution.test.ts`
 Tests the in-memory regex substitution that replaces relationship macros with Asciidoctor xrefs. Covers same-page xref generation, cross-page xref generation with basename path resolution, orphan reference handling, non-relationship text preservation, hyphenated/dotted IDs, missing sourceFile fallback, and surrounding text preservation.
 
 verifies:REQ-010[]
+verifies:REQ-046[]
 
 traceability:outgoing[]
 traceability:incoming[]
