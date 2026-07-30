@@ -297,6 +297,26 @@ addresses:QA-055[]
 traceability:outgoing[]
 --
 
+[#ARC-024, item, role=design, title="traceability:outgoing[] and traceability:incoming[] link rendering"]
+--
+The `expandOutgoingMacros()` and `expandIncomingMacros()` methods replace
+`traceability:outgoing[]` and `traceability:incoming[]` placeholders with
+formatted AsciiDoc content showing the item's relationships. Rendering is
+opt-in via the `:traceability-links:` document attribute. Display style
+(list, table, inline), sort order (target ID, title, relation type), and
+collapsible sections are configurable via document attributes. Inline
+relationship macros (`addresses:REQ-001[]`) are always stripped from
+output — they are pure data markers; the link macros are the sole
+rendering mechanism.
+
+addresses:REQ-044[]
+addresses:REQ-045[]
+addresses:REQ-046[]
+addresses:REQ-047[]
+addresses:REQ-048[]
+addresses:REQ-055[]
+--
+
 === DocumentParser
 
 [#ARC-017, item, role=design, title="Regex-based parsing"]

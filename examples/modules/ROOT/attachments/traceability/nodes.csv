@@ -570,6 +570,22 @@ the CLI outside Antora, demonstrating the event handlers are optional.
 
 addresses:QA-055[]
 traceability:outgoing[]"""
+ARC-024,ARC-024 — traceability:outgoing[] and traceability:incoming[] link rendering,design,,architecture.adoc,"""The `expandOutgoingMacros()` and `expandIncomingMacros()` methods replace
+`traceability:outgoing[]` and `traceability:incoming[]` placeholders with
+formatted AsciiDoc content showing the item's relationships. Rendering is
+opt-in via the `:traceability-links:` document attribute. Display style
+(list, table, inline), sort order (target ID, title, relation type), and
+collapsible sections are configurable via document attributes. Inline
+relationship macros (`addresses:REQ-001[]`) are always stripped from
+output — they are pure data markers; the link macros are the sole
+rendering mechanism.
+
+addresses:REQ-044[]
+addresses:REQ-045[]
+addresses:REQ-046[]
+addresses:REQ-047[]
+addresses:REQ-048[]
+addresses:REQ-055[]"""
 ARC-017,ARC-017 — Regex-based parsing,design,,architecture.adoc,"""AsciiDoc content is parsed using regular expressions rather than an
 Asciidoctor AST walker. This makes the parser independent of Asciidoctor
 API versions and testable with plain string inputs. Verbatim blocks
