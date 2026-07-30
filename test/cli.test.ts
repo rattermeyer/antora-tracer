@@ -728,4 +728,133 @@ ${preset.traceability.roles.map((r) => `  - ${r}`).join("\n")}
       }
     });
   });
+
+  // ========================================================================
+  // Next-ID Command Tests (REQ-056)
+  // ========================================================================
+
+  describe("Next-ID Command", () => {
+    it("should return AUTO-001 for empty graph with default padding", async () => {
+      const { RequirementsTraceabilityExtension } = await import(
+        "../src/index.js"
+      );
+      const extension = new RequirementsTraceabilityExtension();
+      const nextId = extension.getNextId("AUTO");
+      expect(nextId).to.equal("AUTO-001");
+    });
+
+    it("should return next sequential ID for existing items", async () => {
+      const { RequirementsTraceabilityExtension } = await import(
+        "../src/index.js"
+      );
+      const extension = new RequirementsTraceabilityExtension();
+
+      const content = `
+[#REQ-001, item, role=requirement, title="First"]
+--
+Content.
+--
+
+[#REQ-002, item, role=requirement, title="Second"]
+--
+Content.
+--
+
+[#REQ-003, item, role=requirement, title="Third"]
+--
+Content.
+--
+`;
+      extension.process(content, { sourceFile: "test.adoc" });
+      const nextId = extension.getNextId("REQ");
+      expect(nextId).to.equal("REQ-004");
+    });
+
+    it("should preserve existing padding width", async () => {
+      const { RequirementsTraceabilityExtension } = await import(
+        "../src/index.js"
+      );
+      const extension = new RequirementsTraceabilityExtension();
+
+      const content = `
+[#TEST-0001, item, role=test, title="First test"]
+--
+Content.
+--
+
+[#TEST-0002, item, role=test, title="Second test"]
+--
+Content.
+--
+`;
+      extension.process(content, { sourceFile: "test.adoc" });
+      const nextId = extension.getNextId("TEST");
+      expect(nextId).to.equal("TEST-0003");
+    });
+
+    it("should handle mixed padding and use highest-width padding", async () => {
+      const { RequirementsTraceabilityExtension } = await import(
+        "../src/index.js"
+      );
+      const extension = new RequirementsTraceabilityExtension();
+
+      const content = `
+[#TSK-1, item, role=requirement, title="Single digit"]
+--
+Content.
+--
+
+[#TSK-123, item, role=requirement, title="Three digits"]
+--
+Content.
+--
+`;
+      extension.process(content, { sourceFile: "test.adoc" });
+      // Last item processed has 3-digit padding
+      const nextId = extension.getNextId("TSK");
+      expect(nextId).to.equal("TSK-124");
+    });
+
+    it("should ignore non-matching prefixes", async () => {
+      const { RequirementsTraceabilityExtension } = await import(
+        "../src/index.js"
+      );
+      const extension = new RequirementsTraceabilityExtension();
+
+      const content = `
+[#REQ-001, item, role=requirement, title="Requirement"]
+--
+Content.
+--
+`;
+      extension.process(content, { sourceFile: "test.adoc" });
+      // ARC prefix doesn't match REQ items
+      const nextId = extension.getNextId("ARC");
+      expect(nextId).to.equal("ARC-001");
+    });
+
+    it("should handle items with no numeric suffix in prefix", async () => {
+      const { RequirementsTraceabilityExtension } = await import(
+        "../src/index.js"
+      );
+      const extension = new RequirementsTraceabilityExtension();
+
+      const content = `
+[#REQ-001, item, role=requirement, title="Requirement"]
+--
+Content.
+--
+
+[#ARC-005, item, role=architecture, title="Architecture"]
+--
+Content.
+--
+`;
+      extension.process(content, { sourceFile: "test.adoc" });
+      const nextReq = extension.getNextId("REQ");
+      expect(nextReq).to.equal("REQ-002");
+      const nextArc = extension.getNextId("ARC");
+      expect(nextArc).to.equal("ARC-006");
+    });
+  });
 });

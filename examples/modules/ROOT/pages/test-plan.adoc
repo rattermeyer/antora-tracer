@@ -34,7 +34,7 @@ traceability:graph[]
 --
 Test file: `test/antora-extension.test.ts`
 
-Tests the `AntoraTraceabilityExtension` — initialization with default config, preset, config path, and disabled state. Tests event handler registration, content processing via `contentClassified` event, matrix generation via `sitePublished` event, and API access patterns. Also tests `traceability:outgoing[]` and `traceability:incoming[]` macro expansion with configurable display style, sort order, collapsible sections, and opt-in behavior. Tests `traceability:graph[]` and `traceability:graph-coverage[]` macro expansion with graph-enabled and graph-disabled modes, including global coverage, explicit target IDs, and header exclusion.
+Tests the `AntoraTraceabilityExtension` — initialization with default config, preset, config path, and disabled state. Tests event handler registration, content processing via `contentClassified` event, matrix generation via `sitePublished` event, and API access patterns. Also tests `traceability:outgoing[]` and `traceability:incoming[]` macro expansion with configurable display style, sort order, collapsible sections, and opt-in behavior. Tests `traceability:graph[]` and `traceability:graph-coverage[]` macro expansion with graph-enabled and graph-disabled modes, including global coverage, explicit target IDs, and header exclusion. Tests automatic matrix sync to component `_attachments` directories during `sitePublished`.
 
 verifies:REQ-035[]
 verifies:REQ-040[]
@@ -45,6 +45,7 @@ verifies:REQ-048[]
 verifies:REQ-051[]
 verifies:REQ-052[]
 verifies:REQ-055[]
+verifies:REQ-057[]
 
 traceability:outgoing[]
 traceability:incoming[]
@@ -54,12 +55,13 @@ traceability:incoming[]
 --
 Test file: `test/cli.test.ts`
 
-Tests the Commander-based CLI — process command (valid content, empty content, invalid paths, malformed macros), matrix command (generation, empty graph), validate command (invalid graph state), export command (empty graph), stats command (empty statistics), preset commands (invalid names, init, listing), and help command.
+Tests the Commander-based CLI — process command (valid content, empty content, invalid paths, malformed macros), matrix command (generation, empty graph), validate command (invalid graph state), export command (empty graph), stats command (empty statistics), preset commands (invalid names, init, listing), help command, and next-id command (sequential ID generation, padding preservation, prefix matching).
 
 verifies:REQ-009[]
 verifies:REQ-010[]
 verifies:REQ-026[]
 verifies:REQ-036[]
+verifies:REQ-056[]
 
 traceability:outgoing[]
 traceability:incoming[]
