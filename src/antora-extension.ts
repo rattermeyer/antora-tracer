@@ -13,7 +13,14 @@
  * }
  */
 
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  writeFileSync,
+  readdirSync,
+  statSync,
+  copyFileSync,
+} from "node:fs";
 import { isAbsolute, join } from "node:path";
 import { deflateSync } from "node:zlib";
 import { ConfigLoader } from "./config/TraceabilityConfig.js";
@@ -1152,8 +1159,14 @@ export class AntoraTraceabilityExtension {
 
   private registerPageProcessor(): void {
     this.context.on("sitePublished", (event: any) => {
-      if (!this.config.generateMatrices) return;
-      this.generateTraceabilityFiles(event);
+      try {
+        if (!this.config.generateMatrices) return;
+        this.generateTraceabilityFiles(event);
+      } catch (error: any) {
+        this.logger.error(
+          `Error in sitePublished handler: ${error.message}`,
+        );
+      }
     });
   }
 
@@ -1228,9 +1241,88 @@ export class AntoraTraceabilityExtension {
       this.logger.info(
         `Traceability files written to ${this.config.outputDir}/`,
       );
+
+      // Also write matrices to each component version's _attachments/traceability/
+      // so that attachment$traceability/... links in nav resolve correctly.
+      this.syncMatricesToAttachments(event, traceabilityDir, outputDir);
     } catch (error: any) {
       this.logger.error(
         `Error generating traceability pages: ${error.message}`,
+      );
+    }
+  }
+
+  /**
+   * Sync generated matrix files from traceabilityDir to each component version's
+   * _attachments/traceability/ directory so that attachment$traceability/... links
+   * in AsciiDoc resolve to the latest matrix output.
+   *
+   * Uses contentCatalog to find component version output paths, resolving the
+   * correct version URL segment (e.g. "latest" instead of "0.7.0").
+   */
+  private syncMatricesToAttachments(
+    event: any,
+    traceabilityDir: string,
+    outputDir: string,
+  ): void {
+    try {
+      const contentCatalog = event.contentCatalog;
+      if (!contentCatalog) {
+        this.logger.warn("No contentCatalog, skipping attachment sync");
+        return;
+      }
+
+      // Get attachment files from the catalog to discover the correct version segment
+      const attachmentFiles = contentCatalog.findBy?.({ family: "attachment" }) || [];
+      const versionSegments = new Map<string, string>(); // component -> versionSegment
+      for (const file of attachmentFiles) {
+        if (file.src?.component && file.src?.version && !versionSegments.has(file.src.component)) {
+          // Extract version segment from the output path
+          // path is like: tracer/latest/_attachments/traceability/matrix-requirements-tests.html
+          const outPath = file.out?.path || file.out?.dirname || "";
+          const match = outPath.match(
+            /^([^/]+)\/([^/]+)\/_attachments\//,
+          );
+          if (match) {
+            versionSegments.set(match[1], match[2]);
+          }
+        }
+      }
+
+      if (versionSegments.size === 0) {
+        // Fallback: get components and try with their versions
+        const components = contentCatalog.getComponents();
+        if (components) {
+          for (const comp of components) {
+            for (const cv of comp.versions || []) {
+              if (cv.version) versionSegments.set(comp.name, cv.version);
+            }
+          }
+        }
+      }
+
+      const traceabilityFiles = readdirSync(traceabilityDir);
+      for (const [componentName, versionSegment] of versionSegments) {
+        const attachDir = join(
+          outputDir,
+          componentName,
+          versionSegment,
+          "_attachments",
+          "traceability",
+        );
+        mkdirSync(attachDir, { recursive: true });
+        for (const file of traceabilityFiles) {
+          const src = join(traceabilityDir, file);
+          if (!statSync(src).isFile()) continue;
+          copyFileSync(src, join(attachDir, file));
+        }
+        this.logger.info(
+          `Synced matrices to ${componentName}/${versionSegment}/_attachments/traceability/`,
+        );
+      }
+    } catch (error: any) {
+      this.logger.warn(
+        `Failed to sync matrices to attachments: ${error.message}`,
       );
     }
   }
