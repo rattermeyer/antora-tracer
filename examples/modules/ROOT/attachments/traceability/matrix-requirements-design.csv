@@ -6,7 +6,7 @@ REQ-004,REQ-004 — `item` macro supports block content,ARC-010: ARC-010 — Fut
 REQ-005,REQ-005 — Old macro syntax generates deprecation error,ARC-003: ARC-003 — Processing flow during Antora build
 REQ-006,REQ-006 — Configuration defines roles,ARC-001: ARC-001 — Project scope and architectural goals; ARC-006: ARC-006 — Configurable without code changes; ARC-002: ARC-002 — Component-level architecture; ARC-004: ARC-004 — Key architectural decisions and their rationale
 REQ-007,REQ-007 — Configuration defines relations,ARC-006: ARC-006 — Configurable without code changes; ARC-002: ARC-002 — Component-level architecture; ARC-004: ARC-004 — Key architectural decisions and their rationale
-REQ-008,REQ-008 — Configuration defines matrices,ARC-006: ARC-006 — Configurable without code changes; ARC-002: ARC-002 — Component-level architecture; ARC-004: ARC-004 — Key architectural decisions and their rationale
+REQ-008,REQ-008 — Configuration defines matrices,ARC-006: ARC-006 — Configurable without code changes; ARC-002: ARC-002 — Component-level architecture; ARC-019: ARC-019 — Config-driven matrix generation with coverage calculations; ARC-004: ARC-004 — Key architectural decisions and their rationale
 REQ-009,REQ-009 — Configuration is required for validation,ARC-001: ARC-001 — Project scope and architectural goals
 REQ-010,REQ-010 — Configuration file location,ARC-004: ARC-004 — Key architectural decisions and their rationale
 REQ-011,REQ-011 — Configuration validation,ARC-002: ARC-002 — Component-level architecture
@@ -22,26 +22,26 @@ REQ-020,REQ-020 — Each preset includes documentation,ARC-012: ARC-012 — Pres
 REQ-021,REQ-021 — Each preset includes Neo4j Cypher queries,ARC-012: ARC-012 — Preset YAML schema
 REQ-022,REQ-022 — Presets have independent versioning,ARC-012: ARC-012 — Preset YAML schema
 REQ-023,REQ-023 — Users can define custom presets,ARC-012: ARC-012 — Preset YAML schema
-REQ-024,REQ-024 — Neo4j CSV export,ARC-001: ARC-001 — Project scope and architectural goals; ARC-002: ARC-002 — Component-level architecture; ARC-004: ARC-004 — Key architectural decisions and their rationale
-REQ-025,REQ-025 — Neo4j Cypher export,ARC-002: ARC-002 — Component-level architecture
+REQ-024,REQ-024 — Neo4j CSV export,ARC-001: ARC-001 — Project scope and architectural goals; ARC-002: ARC-002 — Component-level architecture; ARC-022: ARC-022 — Graph-to-Neo4j CSV and Cypher export; ARC-004: ARC-004 — Key architectural decisions and their rationale
+REQ-025,REQ-025 — Neo4j Cypher export,ARC-002: ARC-002 — Component-level architecture; ARC-022: ARC-022 — Graph-to-Neo4j CSV and Cypher export
 REQ-026,REQ-026 — Export command in CLI,
-REQ-027,REQ-027 — Export includes all item attributes,
-REQ-028,REQ-028 — Export is optional,ARC-004: ARC-004 — Key architectural decisions and their rationale
-REQ-029,REQ-029 — Configurable matrix generation with coverage calculations,ARC-002: ARC-002 — Component-level architecture; ARC-003: ARC-003 — Processing flow during Antora build; ARC-004: ARC-004 — Key architectural decisions and their rationale
+REQ-027,REQ-027 — Export includes all item attributes,ARC-022: ARC-022 — Graph-to-Neo4j CSV and Cypher export
+REQ-028,REQ-028 — Export is optional,ARC-022: ARC-022 — Graph-to-Neo4j CSV and Cypher export; ARC-004: ARC-004 — Key architectural decisions and their rationale
+REQ-029,REQ-029 — Configurable matrix generation with coverage calculations,ARC-002: ARC-002 — Component-level architecture; ARC-019: ARC-019 — Config-driven matrix generation with coverage calculations; ARC-003: ARC-003 — Processing flow during Antora build; ARC-004: ARC-004 — Key architectural decisions and their rationale
 REQ-030,REQ-030 — Role statistics reporting,
 REQ-031,REQ-031 — Graph path finding,ARC-011: ARC-011 — Performance through indexing
 REQ-032,REQ-032 — Impact analysis,ARC-011: ARC-011 — Performance through indexing
 REQ-033,REQ-033 — Graph merge,
-REQ-034,REQ-034 — Mustache template rendering,ARC-009: ARC-009 — Testability by design; ARC-002: ARC-002 — Component-level architecture; ARC-004: ARC-004 — Key architectural decisions and their rationale
+REQ-034,REQ-034 — Mustache template rendering,ARC-009: ARC-009 — Testability by design; ARC-002: ARC-002 — Component-level architecture; ARC-020: ARC-020 — Mustache template rendering for HTML output; ARC-004: ARC-004 — Key architectural decisions and their rationale
 REQ-035,REQ-035 — Antora extension integration,ARC-001: ARC-001 — Project scope and architectural goals; ARC-003: ARC-003 — Processing flow during Antora build
 REQ-036,REQ-036 — CLI commands,ARC-001: ARC-001 — Project scope and architectural goals
-REQ-037,REQ-037 — Matrix row items are clickable links,
-REQ-038,REQ-038 — Matrix cell items are clickable links,
-REQ-039,REQ-039 — Source file tooltips on matrix links,
-REQ-040,REQ-040 — Context-aware link generation,
-REQ-041,REQ-041 — Source file path normalization,
-REQ-042,REQ-042 — Backward compatibility without LinkResolver,
-REQ-043,REQ-043 — Non-HTML matrix outputs unchanged,
+REQ-037,REQ-037 — Matrix row items are clickable links,ARC-021: ARC-021 — Path resolution for matrix-to-item links
+REQ-038,REQ-038 — Matrix cell items are clickable links,ARC-021: ARC-021 — Path resolution for matrix-to-item links
+REQ-039,REQ-039 — Source file tooltips on matrix links,ARC-021: ARC-021 — Path resolution for matrix-to-item links
+REQ-040,REQ-040 — Context-aware link generation,ARC-021: ARC-021 — Path resolution for matrix-to-item links
+REQ-041,REQ-041 — Source file path normalization,ARC-021: ARC-021 — Path resolution for matrix-to-item links
+REQ-042,REQ-042 — Backward compatibility without LinkResolver,ARC-021: ARC-021 — Path resolution for matrix-to-item links
+REQ-043,REQ-043 — Non-HTML matrix outputs unchanged,ARC-021: ARC-021 — Path resolution for matrix-to-item links
 REQ-044,REQ-044 — traceability:outgoing[] renders outgoing links,
 REQ-044b,REQ-044b — traceability:incoming[] renders incoming links,
 REQ-045,REQ-045 — Opt-in via AsciiDoc attribute,
@@ -61,4 +61,4 @@ QA-058,QA-058 — No side effects on source files,ARC-008: ARC-008 — No side e
 QA-059,QA-059 — Testability by design,ARC-009: ARC-009 — Testability by design; ARC-014: ARC-014 — Dependency injection by constructor
 
 Total 60 rows
-Coverage: 61.7%
+Coverage: 75.0%

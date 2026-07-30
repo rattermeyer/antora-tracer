@@ -311,6 +311,68 @@ addresses:REQ-003[]
 addresses:REQ-004[]
 --
 
+=== MatrixGenerator
+
+[#ARC-019, item, role=design, title="Config-driven matrix generation with coverage calculations"]
+--
+The `MatrixGenerator` reads matrix definitions from configuration, queries the
+graph for items by role, and computes per-cell coverage based on
+`coverageRelations`. Each cell shows related item IDs or `—` for no
+relationships. CSV output is direct; HTML output delegates to `TemplateRenderer`.
+Coverage is calculated as overall, complete, partial, and missing counts.
+
+addresses:REQ-008[]
+addresses:REQ-029[]
+--
+
+=== TemplateRenderer
+
+[#ARC-020, item, role=design, title="Mustache template rendering for HTML output"]
+--
+The `TemplateRenderer` wraps Mustache for HTML matrix output. Built-in templates
+ship with the extension in `src/templates/`. Users can specify a custom template
+directory — the renderer falls back to built-in templates for any files not found
+in the custom directory.
+
+addresses:REQ-034[]
+--
+
+=== LinkResolver
+
+[#ARC-021, item, role=design, title="Path resolution for matrix-to-item links"]
+--
+The `LinkResolver` generates relative link paths from matrix output to component
+root. It normalizes `sourceFile` values by stripping the `pages/` prefix and
+`.adoc` extension, producing `../../component/page.html#ID` links. The
+`relativePathPrefix` option allows configurable base paths. When no
+`LinkResolver` is provided, items render as plain text without links.
+
+addresses:REQ-037[]
+addresses:REQ-038[]
+addresses:REQ-039[]
+addresses:REQ-040[]
+addresses:REQ-041[]
+addresses:REQ-042[]
+addresses:REQ-043[]
+--
+
+=== Neo4jExporter
+
+[#ARC-022, item, role=design, title="Graph-to-Neo4j CSV and Cypher export"]
+--
+The `Neo4jExporter` serializes the traceability graph into `nodes.csv` and
+`relationships.csv` with proper headers, comma delimiters, and escaped special
+characters — importable via Neo4j's `LOAD CSV`. The `import.cypher` format
+produces CREATE statements with `:Item` and role-specific labels. All item
+attributes are included as node properties. The export is optional and requires
+no Neo4j runtime dependency.
+
+addresses:REQ-024[]
+addresses:REQ-025[]
+addresses:REQ-027[]
+addresses:REQ-028[]
+--
+
 == Runtime View
 
 [#ARC-003, item, role=design, title="Processing flow during Antora build"]

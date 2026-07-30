@@ -572,6 +572,44 @@ addresses:REQ-001[]
 addresses:REQ-002[]
 addresses:REQ-003[]
 addresses:REQ-004[]"""
+ARC-019,ARC-019 — Config-driven matrix generation with coverage calculations,design,,architecture.adoc,"""The `MatrixGenerator` reads matrix definitions from configuration, queries the
+graph for items by role, and computes per-cell coverage based on
+`coverageRelations`. Each cell shows related item IDs or `—` for no
+relationships. CSV output is direct; HTML output delegates to `TemplateRenderer`.
+Coverage is calculated as overall, complete, partial, and missing counts.
+
+addresses:REQ-008[]
+addresses:REQ-029[]"""
+ARC-020,ARC-020 — Mustache template rendering for HTML output,design,,architecture.adoc,"""The `TemplateRenderer` wraps Mustache for HTML matrix output. Built-in templates
+ship with the extension in `src/templates/`. Users can specify a custom template
+directory — the renderer falls back to built-in templates for any files not found
+in the custom directory.
+
+addresses:REQ-034[]"""
+ARC-021,ARC-021 — Path resolution for matrix-to-item links,design,,architecture.adoc,"""The `LinkResolver` generates relative link paths from matrix output to component
+root. It normalizes `sourceFile` values by stripping the `pages/` prefix and
+`.adoc` extension, producing `../../component/page.html#ID` links. The
+`relativePathPrefix` option allows configurable base paths. When no
+`LinkResolver` is provided, items render as plain text without links.
+
+addresses:REQ-037[]
+addresses:REQ-038[]
+addresses:REQ-039[]
+addresses:REQ-040[]
+addresses:REQ-041[]
+addresses:REQ-042[]
+addresses:REQ-043[]"""
+ARC-022,ARC-022 — Graph-to-Neo4j CSV and Cypher export,design,,architecture.adoc,"""The `Neo4jExporter` serializes the traceability graph into `nodes.csv` and
+`relationships.csv` with proper headers, comma delimiters, and escaped special
+characters — importable via Neo4j's `LOAD CSV`. The `import.cypher` format
+produces CREATE statements with `:Item` and role-specific labels. All item
+attributes are included as node properties. The export is optional and requires
+no Neo4j runtime dependency.
+
+addresses:REQ-024[]
+addresses:REQ-025[]
+addresses:REQ-027[]
+addresses:REQ-028[]"""
 ARC-003,ARC-003 — Processing flow during Antora build,design,,architecture.adoc,"""The following sequence shows how an AsciiDoc file flows through the system during an Antora build:
 
 [plantuml]
