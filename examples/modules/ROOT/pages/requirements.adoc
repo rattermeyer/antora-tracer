@@ -192,6 +192,16 @@ Items with unknown roles SHALL still be stored in the graph and appear in matric
 Related specs: `role-based-validation/spec.md`
 --
 
+[#REQ-058, item, role=requirement, title="Circular reference detection"]
+--
+The system SHALL detect circular references in the traceability graph during validation. A circular reference is a cycle in the directed relationship graph (e.g., A → B → A, or A → B → C → A). Circular references SHALL be reported as errors with the cycle path in human-readable form. Self-referencing relationships (A → A) SHALL also be detected as cycles.
+
+Source: TraceabilityGraph.validate() → findCircularReferences()
+
+traceability:outgoing[]
+traceability:incoming[]
+--
+
 == Preset System
 
 [#REQ-018, item, role=requirement, title="Built-in preset configurations"]

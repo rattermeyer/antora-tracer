@@ -267,6 +267,18 @@ addresses:QA-057[]
 traceability:outgoing[]
 --
 
+[#ARC-028, item, role=design, title="Circular reference detection in graph validation"]
+--
+The `validate()` method calls `findCircularReferences()`, a DFS-based cycle
+detector that traverses all items and their outgoing relationships. A path stack
+and recursion set track visited nodes; when a node is encountered twice in the
+same path, a circular reference error is reported with the full cycle path
+(e.g., "REQ-001 → REQ-002 → REQ-001"). Auto-generated inverse relationships
+are skipped to avoid false positives.
+
+addresses:REQ-058[]
+--
+
 === TraceabilityGraph
 
 [#ARC-015, item, role=design, title="In-memory processing with no side effects"]

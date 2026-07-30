@@ -94,7 +94,7 @@ traceability:incoming[]
 --
 Test file: `test/graph-and-api.test.ts`
 
-Tests the `TraceabilityGraph` (Section 4 — extended queries: merge, getRelatedItems, getItemsWithRelationTo, getRelationshipsByRoles, findPath, getImpactAnalysis) and graph visualization methods (`toDot`, `toVegaLite`). Also tests `RequirementsTraceabilityExtension` API methods (Section 5 — processFiles, validate, export, coverage, config access, preset management, lifecycle).
+Tests the `TraceabilityGraph` (Section 4 — extended queries: merge, getRelatedItems, getItemsWithRelationTo, getRelationshipsByRoles, findPath, getImpactAnalysis) and graph visualization methods (`toDot`, `toVegaLite`). Tests graph integrity validation including circular reference detection (direct, indirect, self-referencing cycles). Also tests `RequirementsTraceabilityExtension` API methods (Section 5 — processFiles, validate, export, coverage, config access, preset management, lifecycle).
 
 verifies:REQ-013[]
 verifies:REQ-014[]
@@ -105,6 +105,7 @@ verifies:REQ-031[]
 verifies:REQ-032[]
 verifies:REQ-033[]
 verifies:REQ-053[]
+verifies:REQ-058[]
 
 traceability:outgoing[]
 traceability:incoming[]
