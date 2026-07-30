@@ -282,6 +282,19 @@ addresses:QA-058[]
 traceability:outgoing[]
 --
 
+[#ARC-026, item, role=design, title="GraphViz DOT and Vega-Lite serialization methods"]
+--
+`toDot(fromId, depth?)` generates GraphViz DOT source for a relationship graph
+using BFS traversal from the given item. Nodes are colored by role using a
+hardcoded palette; edges are labeled with the relationship type. Depth limits
+hopping. `toVegaLite(itemId?)` generates a Vega-Lite JSON spec for coverage
+charts — per-relationship-type for a specific item, or global role counts
+when called without an item ID. Both methods produce source strings that are
+encoded into Kroki URLs for rendering.
+
+addresses:REQ-053[]
+--
+
 === AntoraTraceabilityExtension
 
 [#ARC-016, item, role=design, title="Event-driven Antora integration"]
@@ -316,6 +329,20 @@ addresses:REQ-047[]
 addresses:REQ-048[]
 addresses:REQ-055[]
 addresses:QA-060[]
+--
+
+[#ARC-025, item, role=design, title="traceability:graph[] and traceability:graph-coverage[] visualization macros"]
+--
+The `expandGraphMacros()` and `expandCoverageMacros()` methods replace
+`traceability:graph[]` and `traceability:graph-coverage[]` placeholders with
+Kroki-rendered images. `traceability:graph[]` generates a GraphViz DOT
+relationship graph for the enclosing item (or a specified item ID), colored
+by role with labeled edges. `traceability:graph-coverage[]` generates a
+Vega-Lite bar chart showing per-item or global coverage. Rendering is opt-in
+via the `:traceability-graph:` document attribute.
+
+addresses:REQ-051[]
+addresses:REQ-052[]
 --
 
 === DocumentParser
