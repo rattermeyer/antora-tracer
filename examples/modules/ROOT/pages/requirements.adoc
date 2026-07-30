@@ -579,7 +579,6 @@ traceability:outgoing[]
 traceability:incoming[]
 --
 
-
 [#REQ-052, item, role=requirement, title="Coverage chart via traceability:graph-coverage[] macro"]
 --
 The system SHALL provide a \`traceability:graph-coverage[]\` inline macro that renders a Vega-Lite bar chart showing coverage. When used inside an item block, it SHALL show per-relationship-type coverage for that item. When used outside an item block, it SHALL show global coverage by role.
@@ -629,6 +628,16 @@ traceability:incoming[]
 The system SHALL automatically sync generated matrix files (HTML and CSV) from the global traceability output directory to each component version's `_attachments/traceability/` directory during the `sitePublished` event. This SHALL ensure that `attachment$traceability/...` links in AsciiDoc nav resolve to the latest matrix output without manual copying. The sync SHALL resolve the correct version URL segment (e.g., `latest` instead of `0.7.0`) using the content catalog.
 
 Source: AntoraTraceabilityExtension.generateTraceabilityFiles() → syncMatricesToAttachments()
+
+traceability:outgoing[]
+traceability:incoming[]
+--
+
+[#REQ-059, item, role=requirement, title="Items defined in partials are processed"]
+--
+The system SHALL process items defined in AsciiDoc partial files (`family: partial`) during the `contentClassified` event, alongside page files. Items from partials SHALL use the file's view URL (from the Antora content source configuration) as their source file reference, enabling traceability matrix links to resolve to the source repository. Partial items SHALL be processed only for graph population (Pass 1); macro expansion and link substitution passes SHALL be skipped since partials do not produce rendered HTML output.
+
+Source: openspec/specs/partial-support/spec.md
 
 traceability:outgoing[]
 traceability:incoming[]

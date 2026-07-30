@@ -553,7 +553,7 @@ export class AntoraTraceabilityExtension {
   ): string {
     if (item.sourceFile && item.sourceFile !== currentFile) {
       // Partial items have view URLs as sourceFile — use link: instead of xref:
-      if (/^https?:\/\//.test(item.sourceFile)) {
+      if (item.sourceFile.includes("://")) {
         return `link:${item.sourceFile}#${item.id}[${displayText}]`;
       }
       return `xref:${item.sourceFile}#${item.id}[${displayText}]`;

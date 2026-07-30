@@ -41,7 +41,7 @@ export class LinkResolver {
   generateItemLink(item: Item): string {
     const htmlPath = this.itemToHtmlPath(item);
     // If the path is a full URL, return it directly with the fragment
-    if (/^https?:\/\//.test(htmlPath)) {
+    if (htmlPath.includes("://")) {
       return `${htmlPath}#${item.id}`;
     }
     return `${this.options.relativePathPrefix + htmlPath}#${item.id}`;
@@ -75,7 +75,7 @@ export class LinkResolver {
 
     // If it's already a full URL (partial items use view URL as sourceFile),
     // return it as-is — no HTML conversion needed
-    if (/^https?:\/\//.test(sourceFile)) {
+    if (sourceFile.includes("://")) {
       return sourceFile;
     }
 

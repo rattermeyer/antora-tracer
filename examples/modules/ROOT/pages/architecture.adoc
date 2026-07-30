@@ -191,6 +191,22 @@ are skipped to avoid false positives.
 addresses:REQ-058[]
 --
 
+[#ARC-029, item, role=design, title="Partial file processing with source-repo links"]
+--
+The `registerContentClassifier()` handler processes both `family: page` and
+`family: partial` files during Pass 1 (graph population). Partial items use
+Antora's pre-computed `fileUri` as their `sourceFile`, making traceability
+matrix links point directly to the partial source in the content repository
+(e.g., GitHub blob URL). The `LinkResolver` detects URL `sourceFile` values
+and returns them unchanged, skipping the HTML path conversion. In
+`buildXref()`, URL-based items use AsciiDoc's `link:` macro instead of
+`xref:` since Asciidoctor cannot resolve external URLs as cross-references.
+Partials are excluded from macro expansion and link substitution passes
+because they do not produce HTML pages.
+
+addresses:REQ-059[]
+--
+
 === TraceabilityGraph
 
 [#ARC-015, item, role=design, title="In-memory processing with no side effects"]

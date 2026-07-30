@@ -868,3 +868,9 @@ If your Antora site has multiple components, each with its own `.adoc` files, it
 
 *Build completes but no traceability output*::
   Verify `enabled: true` in your playbook config. Check that your `.adoc` files are in the Antora content catalog (have page family). Enable verbose Antora logging for more detail.
+
+*Items defined in partials missing from matrices*::
+  Make sure the partial file has family `partial` (located in a `partials/` directory in your Antora module). The extension processes partials automatically — no configuration needed. Items from partials link to the source file in your repository rather than a rendered HTML page.
+
+*"target of xref not found" when referencing partial items*::
+  Do not use `xref:partial$...` to reference items in partials — partials don't produce HTML pages. The extension handles these links automatically via `link:` URLs. If you need to reference a partial item manually, use a plain `link:` macro pointing to the repository URL.
