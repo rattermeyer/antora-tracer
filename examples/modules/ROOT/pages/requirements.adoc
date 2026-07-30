@@ -24,7 +24,6 @@ traceability:outgoing[]
 traceability:incoming[]
 --
 
-{empty}
 [#REQ-002, item, role=requirement, title="`item` macro accepts role attribute"]
 --
 The `[item]` macro SHALL accept a `role` attribute that specifies the type of traceable artifact. Items without a `role` attribute receive the default role `unknown` with a warning.
@@ -547,8 +546,6 @@ traceability:incoming[]
 --
 
 
---
-
 [#REQ-050, item, role=requirement, title="Source files never modified"]
 --
 The system SHALL NOT modify \`.adoc\` source files on disk. All macro expansion and content substitution SHALL occur in the in-memory content buffer during Antora's \`contentClassified\` event.
@@ -605,7 +602,6 @@ traceability:outgoing[]
 traceability:incoming[]
 --
 
-
 == CLI: Next ID Command
 
 [#REQ-056, item, role=requirement, title="CLI next-id command returns next available ID"]
@@ -617,8 +613,6 @@ Source: openspec/changes/add-next-id-cli/specs/next-id/spec.md
 traceability:outgoing[]
 traceability:incoming[]
 --
-
-
 
 == Quality Attributes
 
