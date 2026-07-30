@@ -543,7 +543,7 @@ When you want matrix links to point to rendered HTML pages (not the repo), keep 
 
 [#ARC-002, item, role=design, title="Component-level architecture"]
 --
-include::partial$building-block-overview.adoc[]
+\include::partial$building-block-overview.adoc[]
 
 addresses:REQ-001[]
 addresses:REQ-002[]
