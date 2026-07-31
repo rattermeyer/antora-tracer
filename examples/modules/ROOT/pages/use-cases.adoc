@@ -42,13 +42,35 @@ traceability:outgoing[]
 traceability:incoming[]
 --
 
-[#UC-002, item, role=use_case, title="Author defines custom domain model via config"]
---
-As a project lead, I want to define custom roles, relations, and matrices in
-a `traceability.yml` file that extends a built-in preset, so that the extension
-validates and traces items using my project's domain language. The config
-overrides and extends the preset — adding new roles, restricting relations,
-or defining custom matrices for my specific needs.
+[#UC-002, item, role=use_case, title="Requirements Engineer defines custom domain model via config"]
+
+.Use Case: Requirements Engineer defines custom domain model via config
+[width=100%, cols="25h,75a"]
+|===
+| ID | UC-002
+| Title | Requirements Engineer defines custom domain model via config
+| Goal | Requirements Engineer defines custom roles, relations, and matrices so that the project's traceability reflects its specific domain language rather than a generic template
+| Primary Actor | Requirements Engineer
+| Preconditions | The Antora Tracer extension is installed And a built-in preset exists that covers the baseline domain (e.g., `requirements-engineering`) And the Requirements Engineer has write access to the project's `traceability.yml` file
+| Trigger | Requirements Engineer determines that the built-in preset does not fully capture the project's domain — a missing role, an unneeded relation, or a custom matrix is needed
+| Basic Flow |
+. Requirements Engineer reviews the available built-in presets to identify the closest match
+. Requirements Engineer creates a `traceability.yml` file with `extends:` pointing to the chosen preset
+. Requirements Engineer adds roles not present in the preset (e.g., `use_case`, `stakeholder`)
+. Requirements Engineer defines relations for the new roles (e.g., `use_case → requirement: [leads_to]`)
+. Requirements Engineer adds custom matrices for the new role combinations
+. Requirements Engineer runs the Antora build to verify the extended config is valid
+. The extension merges the user config with the preset And items using the new roles are accepted
+| Alternate Flows |
+. *Requirements Engineer extends a preset that does not exist:* Extension reports an error listing available presets.
+. *Requirements Engineer adds a role already in the preset:* The duplicate is silently merged — the preset's definition takes precedence.
+. *Requirements Engineer defines a relation not allowed by the preset:* The extension warns but does not block processing. Items using the relation may fail validation.
+. *Requirements Engineer does not include `extends:` field:* The config is treated as standalone — the preset is not loaded.
+| Postconditions | The project's traceability domain model is configured And items using the new roles are accepted by the extension And custom matrices appear in the traceability output
+| Priority | High
+| Frequency | Once per project — updated infrequently as the domain model evolves
+| Notes | ⚠ Actor "Requirements Engineer" does not yet have a persona definition. The `extends:` mechanism is documented in REQ-012.
+|===
 
 leads_to:REQ-006[]
 leads_to:REQ-007[]
@@ -59,12 +81,33 @@ traceability:outgoing[]
 traceability:incoming[]
 --
 
-[#UC-003, item, role=use_case, title="Author runs CLI to get next available ID"]
---
-As an author adding new items to a page, I want to run
-`antora-tracer next-id --prefix REQ -i docs/` so that I get the next
-sequential ID without manually scanning existing items. The command
-auto-detects the padding convention from existing IDs.
+[#UC-003, item, role=use_case, title="Team member gets next available ID from CLI"]
+
+.Use Case: Team member gets next available ID from CLI
+[width=100%, cols="25h,75a"]
+|===
+| ID | UC-003
+| Title | Team member gets next available ID from CLI
+| Goal | Team members get the next available sequential ID so that they can assign consistent identifiers to new items without manually scanning existing documents
+| Primary Actor | Business Analyst, Architect, Lead Developer, Test Manager
+| Preconditions | The project uses consistent ID prefixes (e.g., `REQ`, `TST`, `ARC`) And the Antora Tracer CLI is available And existing `.adoc` files containing items with the target prefix are accessible on disk
+| Trigger | A team member needs to add a new item to a document and wants to assign it the next sequential ID
+| Basic Flow |
+. Team member runs `antora-tracer next-id --prefix <PREFIX> -i <path>` from the command line
+. The extension scans existing items matching `<PREFIX>-NNN` in the specified input path
+. The extension determines the highest numeric suffix and the padding convention
+. The next available ID is printed to stdout
+. Team member uses the returned ID in a new `[item]` block
+| Alternate Flows |
+. *No existing items match the prefix:* The extension defaults to 3-digit padding And outputs `<PREFIX>-001`.
+. *Existing items use 4-digit padding (e.g., `TST-0001`):* The extension preserves the width And outputs `TST-0002`.
+. *Input path does not exist:* The extension exits with an error message And code 1.
+. *Prefix is not provided:* The extension exits with an error message And code 1.
+| Postconditions | The next available sequential ID is displayed on stdout And the exit code is 0 And no files are modified on disk
+| Priority | Medium
+| Frequency | Multiple times per documentation session — once per new item
+| Notes | ⚠ Multiple actors — personas needed for Business Analyst, Architect, Lead Developer, and Test Manager. The command auto-detects padding; no manual configuration required.
+|===
 
 leads_to:REQ-056[]
 
@@ -72,12 +115,32 @@ traceability:outgoing[]
 traceability:incoming[]
 --
 
-[#UC-004, item, role=use_case, title="Author organizes items in partial files"]
---
-As a documentation architect, I want to define `[item]` blocks in AsciiDoc
-partials that are included into pages, so that related items stay together
-in small, focused files. The extension processes both pages and partials,
-linking partial items to the source repository.
+[#UC-004, item, role=use_case, title="Requirements Engineer organizes items in partial files"]
+
+.Use Case: Requirements Engineer organizes items in partial files
+[width=100%, cols="25h,75a"]
+|===
+| ID | UC-004
+| Title | Requirements Engineer organizes items in partial files
+| Goal | Requirements Engineer places related items in separate partial files so that the traceability structure stays modular, focused, and maintainable without cluttering the main page
+| Primary Actor | Requirements Engineer
+| Preconditions | The project uses Antora as its site generator And the Antora Tracer extension is installed And the project has a `partials/` directory in its Antora module And the Requirements Engineer has write access to both page and partial files
+| Trigger | Requirements Engineer notices that a page contains many item blocks or that a group of related items would benefit from being in a standalone file
+| Basic Flow |
+. Requirements Engineer creates a `.adoc` file in the `partials/` directory
+. Requirements Engineer moves related `[item]` blocks from a page into the partial file
+. Requirements Engineer replaces the moved items in the page with `include::partial$...[]` directives
+. Requirements Engineer commits the changes And triggers an Antora build
+. The extension processes both the page and the partial — items from the partial are registered in the graph And matrix links point to the partial's source location in the repository
+| Alternate Flows |
+. *Requirements Engineer includes a partial that defines no items:* The partial is included normally in the page output but contributes nothing to the traceability graph.
+. *Requirements Engineer includes a partial in multiple pages:* The partial's items are registered only once. Subsequent inclusions generate a duplicate-ID warning.
+. *Requirements Engineer references a partial item with `xref:`:* Asciidoctor reports "target of xref not found" — partials do not produce HTML pages. Use inline relationship macros or `link:` URLs instead.
+| Postconditions | The traceability graph contains the items from the partial And matrix links point to the partial's source file in the repository And the page content is rendered with the partial included
+| Priority | Medium
+| Frequency | During initial documentation setup and periodically as the item count grows
+| Notes | ⚠ Actor "Requirements Engineer" does not yet have a persona definition. The partial processing behavior is documented in REQ-059 and the User Guide section "Items in Partials".
+|===
 
 leads_to:REQ-059[]
 
@@ -85,12 +148,34 @@ traceability:outgoing[]
 traceability:incoming[]
 --
 
-[#UC-005, item, role=use_case, title="Reader browses traceability matrices for coverage"]
---
-As a reviewer or auditor, I want to open the traceability matrix pages from
-the navigation to verify that requirements are covered by design sections
-and tests. The matrices show clickable links back to the source items,
-and coverage percentages give an at-a-glance summary.
+[#UC-005, item, role=use_case, title="Reviewer browses traceability matrices for coverage"]
+
+.Use Case: Reviewer browses traceability matrices for coverage
+[width=100%, cols="25h,75a"]
+|===
+| ID | UC-005
+| Title | Reviewer browses traceability matrices for coverage
+| Goal | Reviewer inspects traceability matrices so that they can verify which requirements are covered by design decisions, tests, and other downstream artifacts
+| Primary Actor | Reviewer or Auditor
+| Preconditions | The Antora site has been built And traceability matrices have been generated during the `sitePublished` event And the site navigation includes links to the matrix pages And the Reviewer has access to the published site
+| Trigger | Reviewer needs to verify coverage — during a design review, a compliance audit, or a quality gate
+| Basic Flow |
+. Reviewer opens the published Antora site in a browser
+. Reviewer navigates to the Traceability section in the navigation
+. Reviewer opens the relevant matrix (e.g., Requirements → Architecture, Requirements → Tests, Use Cases → Requirements)
+. Reviewer scans rows to identify items with missing coverage (red "missing" badge, 0.0%)
+. Reviewer clicks on cell items to navigate to the source page where the relationship is defined
+. Reviewer clicks on row items to navigate to the requirement's definition
+. Reviewer notes gaps And either approves the coverage or requests additions
+| Alternate Flows |
+. *A matrix shows no items:* The corresponding roles have no items defined. The matrix renders with zero rows.
+. *A row shows partial coverage (yellow):* Some but not all expected relationships exist. Reviewer investigates the specific gap.
+. *Reviewer needs to see the source data in CSV:* Reviewer can open the `.csv` variant of the matrix for offline analysis.
+| Postconditions | Reviewer has assessed coverage completeness And identified any gaps And can navigate from the matrix to the source items for further investigation
+| Priority | High
+| Frequency | Periodically — at design reviews, before releases, during compliance audits
+| Notes | ⚠ Actor "Reviewer or Auditor" — two distinct roles with similar workflows. Consider splitting if their goals diverge significantly (internal review vs. external compliance). No persona defined for either.
+|===
 
 leads_to:REQ-029[]
 leads_to:REQ-037[]
