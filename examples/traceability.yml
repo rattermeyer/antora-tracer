@@ -1,6 +1,15 @@
 # Self-Traceability Configuration
 # Domain model for tracing the antora-tracer extension itself
 
+inverseLabels:
+  refines: "refined-by"
+  depends_on: "depends-on-by"
+  addresses: "addressed-by"
+  composed_of: "composed-of-by"
+  verifies: "verified-by"
+  validates: "validated-by"
+  leads_to: "led-by"
+
 roles:
   - requirement
   - design

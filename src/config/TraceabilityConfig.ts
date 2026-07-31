@@ -89,6 +89,13 @@ export interface TraceabilityConfig {
   matrices?: MatrixDefinition[];
 
   /**
+   * Inverse labels for relationship types (config-driven).
+   * Maps a relation type to its display label for incoming display.
+   * Falls back to types.ts INVERSE_MAP, then raw type name.
+   */
+  inverseLabels?: Record<string, string>;
+
+  /**
    * Extend from a preset
    */
   extends?: string;

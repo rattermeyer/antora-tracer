@@ -473,8 +473,13 @@ export class AntoraTraceabilityExtension {
             const source = this.traceability.graph.getItem(rel.fromId);
             if (!source) continue;
             // Transform relation type to inverse label for incoming display
+            // Lookup chain: config inverseLabels → types.ts INVERSE_MAP → raw type
+            const configInvLabels =
+              this.traceability.configLoader?.getConfig()?.inverseLabels;
             const inverseType =
-              INVERSE_MAP[rel.type as keyof typeof INVERSE_MAP] || rel.type;
+              configInvLabels?.[rel.type] ??
+              INVERSE_MAP[rel.type as keyof typeof INVERSE_MAP] ??
+              rel.type;
             if (!grouped.has(inverseType)) grouped.set(inverseType, []);
             grouped.get(inverseType)?.push({
               id: source.id,
