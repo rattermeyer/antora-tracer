@@ -13,6 +13,11 @@ compatibility:
   minExtensionVersion: 2.0.0
 
 traceability:
+  inverseLabels:
+    depends_on: "is-a-dependency-of"
+    verified_by: "verifying"
+    covers: "covered-by"
+
   roles:
     - requirement
     - test

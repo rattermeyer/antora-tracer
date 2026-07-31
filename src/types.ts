@@ -122,7 +122,7 @@ export type RelationshipType =
   | "required-by"
   | "addressed-by"
   | "part-of"
-  | "depends-on-by";
+  | "is-a-dependency-of";
 
 export type PrimaryRelationshipType =
   | "implements"
@@ -148,7 +148,7 @@ export type InverseRelationshipType =
   | "required-by"
   | "addressed-by"
   | "part-of"
-  | "depends-on-by"
+  | "is-a-dependency-of"
   | "refined-by"
   | "led-by";
 
@@ -182,7 +182,7 @@ export const INVERSE_MAP: Record<
   requires: "required-by",
   addresses: "addressed-by",
   "composed-of": "part-of",
-  "depends-on": "depends-on-by",
+  "depends-on": "is-a-dependency-of",
   refines: "refined-by",
   "leads-to": "led-by",
 };
@@ -200,7 +200,7 @@ export const PRIMARY_MAP: Record<
   "required-by": "requires",
   "addressed-by": "addresses",
   "part-of": "composed-of",
-  "depends-on-by": "depends-on",
+  "is-a-dependency-of": "depends-on",
   "refined-by": "refines",
   "led-by": "leads-to",
 } as const;

@@ -13,6 +13,28 @@ compatibility:
   minExtensionVersion: 2.0.0
 
 traceability:
+  inverseLabels:
+    contains: "contained-in"
+    validated_by: "validating"
+    broken_down_into: "broken-down-from"
+    verified_by: "verifying"
+    part_of: "containing"
+    has: "belongs-to"
+    requires: "required-by"
+    affected_by: "affecting"
+    belongs_to: "having"
+    implements: "implemented-by"
+    affects: "affected-by"
+    fixes: "fixed-by"
+    investigates: "investigated-by"
+    results_in: "result-of"
+    blocks: "blocked-by"
+    fixed_by: "fixing"
+    reproduced_by: "reproducing"
+    verifies: "verified-by"
+    validates: "validated-by"
+    tests: "tested-by"
+
   roles:
     - epic
     - feature

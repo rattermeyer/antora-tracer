@@ -15,6 +15,29 @@ compatibility:
   minExtensionVersion: 2.0.0
 
 traceability:
+  inverseLabels:
+    allocated_to: "allocated-from"
+    mitigated_by: "mitigating"
+    derived_from: "derived-into"
+    complies_with: "complied-with-by"
+    refines: "refined-by"
+    depends_on: "is-a-dependency-of"
+    implemented_by: "implementing"
+    addresses: "addressed-by"
+    verified_by: "verifying"
+    uses: "used-by"
+    satisfies: "satisfied-by"
+    composed_of: "composed-of-by"
+    validated_by: "validating"
+    implements: "implemented-by"
+    part_of: "containing"
+    tested_by: "testing"
+    caused_by: "causing"
+    requires: "required-by"
+    poses: "posed-by"
+    mitigates: "mitigated-by"
+    informs: "informed-by"
+
   roles:
     - system_requirement
     - software_requirement

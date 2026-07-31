@@ -17,7 +17,7 @@ compatibility:
 traceability:
   inverseLabels:
     refines: "refined-by"
-    depends_on: "depended-on-by"
+    depends_on: "is-a-dependency-of"
     conflicts_with: "conflicting-with"
     addresses: "addressed-by"
     satisfies: "satisfied-by"
