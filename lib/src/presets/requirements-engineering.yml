@@ -15,6 +15,26 @@ compatibility:
   minExtensionVersion: 2.0.0
 
 traceability:
+  inverseLabels:
+    refines: "refined-by"
+    depends_on: "depended-on-by"
+    conflicts_with: "conflicting-with"
+    addresses: "addressed-by"
+    satisfies: "satisfied-by"
+    refined_by: "refining"
+    realized_by: "realizing"
+    validated_by: "validating"
+    documented_by: "documenting"
+    implements: "implemented-by"
+    uses: "used-by"
+    tested_by: "testing"
+    covers: "covered-by"
+    verifies: "verified-by"
+    validates: "validated-by"
+    tests: "tested-by"
+    contains: "contained-in"
+    describes: "described-by"
+
   roles:
     - requirement
     - design
