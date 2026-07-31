@@ -641,7 +641,7 @@ export class AntoraTraceabilityExtension {
   }
 
   private capitalize(s: string): string {
-    return s.charAt(0).toUpperCase() + s.slice(1);
+    return s.charAt(0).toUpperCase() + s.slice(1).replace(/_/g, "-");
   }
 
   private isGraphEnabled(attrs: Record<string, string>): boolean {

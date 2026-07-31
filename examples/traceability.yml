@@ -8,7 +8,7 @@ roles:
 
 relations:
   use_case:
-    requirement: [leads_to]
+    requirement: ["leads_to"]
 
 matrices:
   - name: usecase-requirements
@@ -19,4 +19,4 @@ matrices:
       requirement: [leads_to]
 
 inverseLabels:
-  leads_to: "led-by"
+  leads_to: "is_derived_from"
