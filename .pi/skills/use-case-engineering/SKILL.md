@@ -20,7 +20,7 @@ Help the user create or review use case descriptions following the Karl Wiegers 
 
 **Do not guess.** When information is missing or ambiguous, ask the user:
 
-- Actor name unclear → "What persona performs this action? Is it defined somewhere?"
+- Actor name unclear or too generic → Challenge over-generalization. "Author", "User", or "Developer" are not specific enough. Ask: "Which specific role performs this — a Product Owner, Business Analyst, Requirements Engineer, Feature Owner, Technical Writer, QA Engineer? Does this person have a persona defined somewhere?" If no persona exists, offer to draft one before continuing.
 - Missing preconditions → "What must be true before this use case can start?"
 - Vague trigger → "What specific event starts this? A user action? A system event? A time?"
 - Incomplete alternate flows → "Are there error cases or edge conditions I should cover?"
@@ -39,16 +39,16 @@ antora-tracer next-id --prefix UC -i docs/
 
 ### Step 2: Define the Actor (Persona)
 
-Before writing the use case, check if the actor has a persona definition. Search the project for existing personas. If none exist, suggest creating one:
+**Before writing the use case, identify the actor.** Vague names like "Author", "User", or "Developer" are not acceptable — they hide assumptions about who performs the action and what context they work in.
 
-```asciidoc
-// Persona: Documentation Author
-// Role: Technical writer or developer documenting a project
-// Goals: Produce traceable documentation with minimal overhead
-// Context: Works in AsciiDoc within an Antora site pipeline
-```
+Ask the user: "Which specific role performs this — a Product Owner prioritizing features, a Business Analyst specifying requirements, a Requirements Engineer defining traceability, a Technical Writer documenting architecture? Is there an existing persona?"
 
-Ask the user: "Is this actor defined as a persona somewhere? If not, would you like me to draft one?"
+If no persona exists, offer to draft one with:
+- **Role name** (specific, e.g., "Requirements Engineer", not "Writer")
+- **Goals** (what they need to accomplish)
+- **Context** (what tools, constraints, and environment they work in)
+
+Only proceed to write the use case after the actor is precisely identified.
 
 ### Step 3: Write the Use Case
 
@@ -145,6 +145,7 @@ When asked to review a use case, check the following. Do NOT stop at formatting 
 
 ### Actor
 - [ ] Actor name matches a defined persona (ask if personas exist)
+- [ ] **Actor is not over-generalized** — "Author", "User", "Developer" are too vague. Push for specificity: Product Owner, Business Analyst, Requirements Engineer, Technical Writer, QA Engineer
 - [ ] If no personas exist, suggest creating one before the use case
 - [ ] Actor name is consistent across all use cases
 

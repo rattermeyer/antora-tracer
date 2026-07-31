@@ -4,11 +4,33 @@
 This page captures the key user workflows for the Antora Tracer extension. Each use case traces into the requirements it motivates via `leads_to` relations — demonstrating how config extension adds domain-specific roles and relations beyond the built-in presets.
 
 [#UC-001, item, role=use_case, title="Author writes traceable items in AsciiDoc"]
---
-As a documentation author, I want to insert `[#ID, item, role=XXX]` blocks into
-my `.adoc` pages so that the extension registers them in the traceability graph
-during the Antora build. I can use any role defined in my configuration —
-requirement, design, test, or even custom roles like stakeholder or use_case.
+
+.Use Case: Author writes traceable items in AsciiDoc
+[width=100%, cols="25h,75a"]
+|===
+| ID | UC-001
+| Title | Author writes traceable items in AsciiDoc
+| Primary Actor | Documentation Author
+| Preconditions | The project uses Antora as its site generator And the Antora Tracer extension is installed in the playbook And a `traceability.yml` config is loaded with at least one role defined And the author has write access to `.adoc` files in the pages or partials directories
+| Trigger | Author opens an `.adoc` file in their editor to add or update a traceable item
+| Basic Flow |
+. Author writes `[#ID, item, role=XXX, title="..."]` on its own line, followed by `--` to open the item block
+. Author writes the item description inside the `--` block
+. Author adds inline relationship macros (e.g., `leads_to:REQ-001[]`) to connect the item to other items in the graph
+. Author optionally adds `traceability:outgoing[]` and `traceability:incoming[]` placeholders for rendered relationship lists
+. Author closes the item block with `--` on its own line
+. Author commits the file And triggers an Antora build
+. The `contentClassified` event fires, the extension processes the page, And the item is registered in the traceability graph
+| Alternate Flows |
+. *Author uses a role not in config:* Extension registers the item with a warning "Unknown role". Processing continues.
+. *Author types a target ID that does not exist:* Extension stores the relationship with a warning "Target item not found". The matrix shows a partial link.
+. *Author omits the closing `--`:* Asciidoctor reports an unterminated block. The item and its content may not be registered correctly.
+. *Author includes `traceability:outgoing[]` but no relationships exist:* The placeholder is replaced with an empty section in the rendered output.
+| Postconditions | The traceability graph contains the new item And all inline relationships are registered And the rendered page shows "Leads-to" or "Addressed-by" sections if placeholders were included And the traceability matrix reflects updated coverage
+| Priority | High
+| Frequency | Per item — multiple times per documentation session
+| Notes | Assumes the author knows the `[item]` macro syntax. The User Guide documents the format. The `next-id` CLI command helps with consistent ID assignment. ⚠ Actor "Documentation Author" does not yet have a persona definition.
+|===
 
 leads_to:REQ-001[]
 leads_to:REQ-002[]
