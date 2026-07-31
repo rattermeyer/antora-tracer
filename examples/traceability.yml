@@ -1,54 +1,22 @@
 # Self-Traceability Configuration
-# Domain model for tracing the antora-tracer extension itself
+# Extends the requirements-engineering preset with use_case role for the example site
 
-inverseLabels:
-  refines: "refined-by"
-  depends_on: "depends-on-by"
-  addresses: "addressed-by"
-  composed_of: "composed-of-by"
-  verifies: "verified-by"
-  validates: "validated-by"
-  leads_to: "led-by"
+extends: requirements-engineering
 
 roles:
-  - requirement
-  - design
-  - test
   - use_case
 
 relations:
-  requirement:
-    requirement: [refines, depends_on]
-
-  design:
-    requirement: [addresses]
-    design: [composed_of]
-
-  test:
-    requirement: [verifies]
-    design: [validates]
-
   use_case:
     requirement: [leads_to]
 
 matrices:
-  - name: requirements-design
-    description: "Requirements traced to design sections"
-    rows: requirement
-    columns: [design]
-    coverageRelations:
-      design: [addresses]
-
-  - name: requirements-tests
-    description: "Requirements traced to test files"
-    rows: requirement
-    columns: [test]
-    coverageRelations:
-      test: [verifies]
-
   - name: usecase-requirements
     description: "Use cases traced to requirements"
     rows: use_case
     columns: [requirement]
     coverageRelations:
       requirement: [leads_to]
+
+inverseLabels:
+  leads_to: "led-by"
