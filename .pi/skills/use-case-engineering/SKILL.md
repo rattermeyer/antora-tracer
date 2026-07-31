@@ -58,7 +58,7 @@ Use the Karl Wiegers tabular template. The `[item]` block body contains a table 
 [#UC-NNN, item, role=use_case, title="<Actor> <action verb> <observable outcome>"]
 
 .Use Case: <title>
-[width=100%, cols="25,75"]
+[width=100%, cols="25h,75a"]
 |===
 | ID | UC-NNN
 | Title | <actor> <action> <outcome>
