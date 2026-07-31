@@ -532,6 +532,12 @@ export class ConfigLoader {
       result.matrices = Array.from(matrixMap.values());
     }
 
+    // Merge inverseLabels: user overrides preset values
+    result.inverseLabels = {
+      ...(base.inverseLabels || {}),
+      ...(override.inverseLabels || {}),
+    };
+
     return result;
   }
 
