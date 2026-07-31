@@ -3,13 +3,14 @@
 
 This page captures the key user workflows for the Antora Tracer extension. Each use case traces into the requirements it motivates via `leads_to` relations — demonstrating how config extension adds domain-specific roles and relations beyond the built-in presets.
 
-[#UC-001, item, role=use_case, title="Author writes traceable items in AsciiDoc"]
+[#UC-001, item, role=use_case, title="Business Analyst writes traceable items in AsciiDoc"]
 --
 .Use Case: Author writes traceable items in AsciiDoc
 [width=100%, cols="25h,75a"]
 |===
 | ID | UC-001
-| Title | Author writes traceable items in AsciiDoc
+| Title | Business Analyst writes traceable items in AsciiDoc
+| Goal | Business Analyst writes traceable items so that the project establishes complete end-to-end traceability across the software development lifecycle
 | Primary Actor | Business Analyst
 | Preconditions | The project uses Antora as its site generator And the Antora Tracer extension is installed in the playbook And a `traceability.yml` config is loaded with at least one role defined And the Business Analyst has write access to `.adoc` files in the pages or partials directories
 | Trigger | Business Analyst opens an `.adoc` file in their editor to add or update a traceable item

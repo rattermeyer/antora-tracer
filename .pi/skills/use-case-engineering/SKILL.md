@@ -63,6 +63,7 @@ Use the Karl Wiegers tabular template. The `[item]` block body contains a table 
 |===
 | ID | UC-NNN
 | Title | <actor> <action> <outcome>
+| Goal | <actor> does <action> so that <stakeholder benefit>
 | Primary Actor | <role from persona definition>
 | Preconditions | <past-tense testable statement>
 | Trigger | <event that initiates the use case>
@@ -146,7 +147,7 @@ When asked to review a use case, check the following. Do NOT stop at formatting 
 ### Structure
 - [ ] Uses `role=use_case` with padded UC-NNN ID
 - [ ] Title follows `<Actor> <action> <outcome>` pattern
-- [ ] Table has all required sections (ID, Title, Actor, Preconditions, Trigger, Basic Flow, Alternate Flows, Postconditions, Priority, Frequency)
+- [ ] Table has all required sections (ID, Title, Goal, Actor, Preconditions, Trigger, Basic Flow, Alternate Flows, Postconditions, Priority, Frequency)
 
 ### Actor
 - [ ] Actor name matches a defined persona (ask if personas exist)
