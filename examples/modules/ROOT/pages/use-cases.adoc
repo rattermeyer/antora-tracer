@@ -10,26 +10,26 @@ This page captures the key user workflows for the Antora Tracer extension. Each 
 |===
 | ID | UC-001
 | Title | Author writes traceable items in AsciiDoc
-| Primary Actor | Documentation Author
-| Preconditions | The project uses Antora as its site generator And the Antora Tracer extension is installed in the playbook And a `traceability.yml` config is loaded with at least one role defined And the author has write access to `.adoc` files in the pages or partials directories
-| Trigger | Author opens an `.adoc` file in their editor to add or update a traceable item
+| Primary Actor | Business Analyst
+| Preconditions | The project uses Antora as its site generator And the Antora Tracer extension is installed in the playbook And a `traceability.yml` config is loaded with at least one role defined And the Business Analyst has write access to `.adoc` files in the pages or partials directories
+| Trigger | Business Analyst opens an `.adoc` file in their editor to add or update a traceable item
 | Basic Flow |
-. Author writes `[#ID, item, role=XXX, title="..."]` on its own line, followed by `--` to open the item block
-. Author writes the item description inside the `--` block
-. Author adds inline relationship macros (e.g., `leads_to:REQ-001[]`) to connect the item to other items in the graph
-. Author optionally adds `traceability:outgoing[]` and `traceability:incoming[]` placeholders for rendered relationship lists
-. Author closes the item block with `--` on its own line
-. Author commits the file And triggers an Antora build
-. The `contentClassified` event fires, the extension processes the page, And the item is registered in the traceability graph
+. Business Analyst identifies a concept that needs to be traceable — a requirement, a stakeholder concern, a decision, or a dependency
+. Business Analyst assigns the concept to a role defined in the project's traceability domain model (requirement, design, test, use case, etc.)
+. Business Analyst writes a description of the concept in AsciiDoc format
+. Business Analyst links the concept to related items already in the traceability graph using inline relationship macros
+. Business Analyst includes rendering placeholders to display relationship lists in the output
+. Business Analyst commits the file And triggers an Antora build
+. The extension registers the item in the traceability graph And its relationships appear in the traceability matrix
 | Alternate Flows |
-. *Author uses a role not in config:* Extension registers the item with a warning "Unknown role". Processing continues.
-. *Author types a target ID that does not exist:* Extension stores the relationship with a warning "Target item not found". The matrix shows a partial link.
-. *Author omits the closing `--`:* Asciidoctor reports an unterminated block. The item and its content may not be registered correctly.
-. *Author includes `traceability:outgoing[]` but no relationships exist:* The placeholder is replaced with an empty section in the rendered output.
+. *Business Analyst uses a role not in config:* Extension registers the item with a warning. Processing continues.
+. *Business Analyst links to a target that does not exist:* Extension stores the relationship with a warning. The matrix shows a partial link.
+. *Business Analyst writes an incomplete item block:* The item may not register correctly in the traceability graph.
+. *Business Analyst includes rendering placeholders but no relationships exist:* The placeholder is replaced with an empty section in the rendered output.
 | Postconditions | The traceability graph contains the new item And all inline relationships are registered And the rendered page shows "Leads-to" or "Addressed-by" sections if placeholders were included And the traceability matrix reflects updated coverage
 | Priority | High
 | Frequency | Per item — multiple times per documentation session
-| Notes | Assumes the author knows the `[item]` macro syntax. The User Guide documents the format. The `next-id` CLI command helps with consistent ID assignment. ⚠ Actor "Documentation Author" does not yet have a persona definition.
+| Notes | ⚠ Actor "Business Analyst" does not yet have a persona definition. The `[item]` macro syntax is documented in the User Guide and owned by REQ-001 through REQ-004 — this use case does not specify the exact syntax.
 |===
 
 leads_to:REQ-001[]
