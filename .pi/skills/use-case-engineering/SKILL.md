@@ -26,6 +26,7 @@ Help the user create or review use case descriptions following the Karl Wiegers 
 - Incomplete alternate flows → "Are there error cases or edge conditions I should cover?"
 - Unclear priority → "Is this High (core workflow), Medium (important), or Low (nice-to-have)?"
 - Postcondition seems untestable → "What would a tester verify after this completes successfully?"
+- Steps contain implementation details (syntax, button names, field types) → Push back. "This reads like a design specification, not a use case. Would a Business Analyst describe it this way? Can we describe the goal rather than the mechanism?" Requirements own the details; use cases describe the interaction.
 
 Never fabricate actors, steps, conditions, or priorities. If the user cannot answer, mark the section with `TBD` and a note.
 
@@ -110,13 +111,17 @@ Multiple conditions use **"And"** or **"Or"** as conjunctive/disjunctive separat
 
 ### Basic Flow
 
-Numbered steps in present tense, active voice:
+Numbered steps in present tense, active voice. Each step should describe **one observable action or system response**.
 
-1. Author runs `antora-tracer next-id --prefix REQ -i docs/`
-2. Extension scans existing IDs for the REQ prefix
-3. Extension outputs the next available ID to stdout
+**Keep steps at the right abstraction level.** Detailed specifications — particularly design elements like syntax, button names, or field types — should not be in use cases unless there is a compelling reason. Requirements own the details; use cases describe the interaction.
 
-Each step should describe **one observable action or system response**.
+| Wrong (over-specified) | Right (business-level) |
+|---|---|
+| "Author writes `[#ID, item, role=XXX, title=\"...\"]` on its own line, followed by `--`" | "Author identifies a concept that needs to be traceable" |
+| "Author closes the item block with `--` on its own line" | "Author writes a description of the concept" |
+| "The `contentClassified` event fires" | "The extension registers the item" |
+
+Ask: "Would a Business Analyst or Product Owner describe it this way, or am I writing the implementation?"
 
 ### Alternate Flows
 
