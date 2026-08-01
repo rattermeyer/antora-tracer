@@ -43,7 +43,7 @@ traceability:incoming[]
 --
 
 [#UC-002, item, role=use_case, title="Requirements Engineer defines custom domain model via config"]
-
+--
 .Use Case: Requirements Engineer defines custom domain model via config
 [width=100%, cols="25h,75a"]
 |===
@@ -82,7 +82,7 @@ traceability:incoming[]
 --
 
 [#UC-003, item, role=use_case, title="Team member gets next available ID from CLI"]
-
+--
 .Use Case: Team member gets next available ID from CLI
 [width=100%, cols="25h,75a"]
 |===
@@ -116,7 +116,7 @@ traceability:incoming[]
 --
 
 [#UC-004, item, role=use_case, title="Requirements Engineer organizes items in partial files"]
-
+--
 .Use Case: Requirements Engineer organizes items in partial files
 [width=100%, cols="25h,75a"]
 |===
@@ -149,7 +149,7 @@ traceability:incoming[]
 --
 
 [#UC-005, item, role=use_case, title="Reviewer browses traceability matrices for coverage"]
-
+--
 .Use Case: Reviewer browses traceability matrices for coverage
 [width=100%, cols="25h,75a"]
 |===
