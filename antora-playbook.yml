@@ -21,11 +21,12 @@ antora:
       generateMatrices: true
       matrixFormats: [html, csv]
       includeInNavigation: true
+    - require: '@antora/lunr-extension'
+      index_by_heading: true
 
 ui:
   bundle:
-    url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable
-    snapshot: true
+    url: https://github.com/rattermeyer/antora-ui-conemso/releases/download/v1.0.0/ui-bundle.zip
 
 urls:
   latest_version_segment: latest

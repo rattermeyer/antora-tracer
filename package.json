@@ -11,6 +11,7 @@
     "./package.json": "./package.json"
   },
   "scripts": {
+    "postinstall": "patch-package",
     "build": "tsc && node scripts/build.js",
     "test": "tsc -p tsconfig.test.json && node --import=tsx/cjs 'node_modules/mocha/bin/mocha' 'lib/test/**/*.test.js'",
     "test:coverage": "npm run build && rm -rf .nyc_output coverage && c8 --include='lib/src/**/*.js' --exclude='lib/src/test/**' --exclude='lib/src/coverage/**' --exclude='lib/src/cli.js' node --import=tsx/cjs node_modules/mocha/bin/mocha 'lib/test/**/*.test.js'",
@@ -42,6 +43,7 @@
   },
   "devDependencies": {
     "@antora/cli": "3.1",
+    "@antora/lunr-extension": "^1.0.0-alpha.13",
     "@antora/pdf-extension": "^1.0.0-beta.20",
     "@antora/site-generator": "3.1",
     "@biomejs/biome": "^2.5.5",
