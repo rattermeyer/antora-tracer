@@ -20,6 +20,9 @@ jobs:
 
       - run: npm ci
 
+      - name: Apply patches
+        run: npx patch-package
+
       - name: Type Check
         run: npx tsc --noEmit
 
