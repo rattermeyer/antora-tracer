@@ -2,6 +2,28 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.11.0] — 2026-08-06
+
+### Added
+- `toDot` traverses relationships bidirectionally — `traceability:graph[]` now shows items connected via both outgoing and incoming edges
+- Lunr indexes item anchors — searching `REQ-002` in the docs links directly to `#REQ-002`
+- Landing page uses conemso teal color palette and Roboto font, matching the documentation UI theme
+- `use-case-engineering` skill for writing Wiegers-format use cases in AsciiDoc
+- Config-driven inverse relationship labels (`inverseLabels` in traceability.yml)
+- Relation type labels display underscores as dashes (e.g., `leads_to` → `leads-to`)
+- AGENTS.md Consistency section documents cross-layer verification expectations
+- Use case role (`use_case`) with `leads_to` relation in example site
+
+### Fixed
+- `traceability:graph[]` was missing items connected only via incoming edges
+- CI: `patch-package` moved from `postinstall` script to explicit CI step, fixing `npm ci` failures
+- Config: `inverseLabels` now correctly merge when extending a preset
+- Parser: line-aware delimiter detection in `extractBody`
+
+### Changed
+- Use cases UC-001 through UC-005 rewritten in Karl Wiegers tabular format with pre/post conditions
+- `traceability:graph[]` and `traceability:graph-coverage[]` documentation updated for clarity
+
 ## [0.10.0] — 2026-07-30
 
 ### Added
