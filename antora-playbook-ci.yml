@@ -7,7 +7,7 @@ content:
   sources:
     - url: .
       start_path: examples
-      branches: [HEAD, 'v0.11.x', 'v0.10.x']
+      branches: [HEAD, 'v0.11.x']
 
 asciidoc:
   extensions:
