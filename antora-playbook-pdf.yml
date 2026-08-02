@@ -25,6 +25,7 @@ antora:
       generateMatrices: true
       matrixFormats: [html, csv]
       includeInNavigation: true
+      krokiImageFormat: png
     - require: ./antora-pdf-extension.cjs
 
 output:

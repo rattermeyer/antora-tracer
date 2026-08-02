@@ -40,6 +40,7 @@ export interface AntoraTraceabilityConfig {
   includeInNavigation?: boolean;
   preset?: string;
   configPath?: string;
+  krokiImageFormat?: "svg" | "png";
 }
 
 const DEFAULT_CONFIG: Required<AntoraTraceabilityConfig> = {
@@ -50,6 +51,7 @@ const DEFAULT_CONFIG: Required<AntoraTraceabilityConfig> = {
   includeInNavigation: true,
   preset: "requirements-engineering",
   configPath: "",
+  krokiImageFormat: "svg",
 };
 
 export interface AntoraExtensionContext {
@@ -658,7 +660,8 @@ export class AntoraTraceabilityExtension {
    * Encode source text as a Kroki URL for the given diagram type.
    * Uses deflate + base64url encoding.
    */
-  private krokiUrl(type: string, source: string, format = "svg"): string {
+  private krokiUrl(type: string, source: string): string {
+    const format = this.config.krokiImageFormat || "svg";
     const compressed = deflateSync(Buffer.from(source, "utf-8"));
     const encoded = Buffer.from(compressed).toString("base64url");
     return `https://kroki.io/${type}/${format}/${encoded}`;
