@@ -49,7 +49,8 @@ jobs:
       - name: Copy PDFs for deployment
         run: |
           mkdir -p public/pdf
-          build_dir="build/assembler/pdf/tracer/0.7.0/_exports"
+          component_version=$(grep '^version:' examples/antora.yml | awk '{print $2}')
+          build_dir="build/assembler/pdf/tracer/${component_version}/_exports"
           cp "$build_dir/requirements.pdf" public/pdf/
           cp "$build_dir/architecture.pdf" public/pdf/
           cp "$build_dir/test-plan.pdf" public/pdf/
