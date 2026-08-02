@@ -14,10 +14,10 @@
 
 ## 4. Commit and tag
 
-- [ ] 4.1 Commit version bump and changelog: `chore: bump to 0.11.0, update changelog`
-- [ ] 4.2 Create annotated tag: `git tag -a v0.11.0 -m "v0.11.0"`
-- [ ] 4.3 Push commit and tag: `git push && git push --tags`
+- [x] 4.1 Commit version bump and changelog: `chore: bump to 0.11.0, update changelog`
+- [x] 4.2 Create annotated tag: `git tag -a v0.11.0 -m "v0.11.0"`
+- [x] 4.3 Push commit and tag: `git push && git push --tags`
 
 ## 5. Publish
 
-- [ ] 5.1 Run `npm publish` to publish to npm
+- [x] 5.1 Run `npm publish` to publish to npm

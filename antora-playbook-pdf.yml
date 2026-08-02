@@ -12,6 +12,7 @@ content:
 asciidoc:
   attributes:
     pdf-theme: default
+    kroki-default-format: png
   extensions:
     - asciidoctor-kroki
 
