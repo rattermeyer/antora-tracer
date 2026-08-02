@@ -1,0 +1,39 @@
+site:
+  title: Antora Tracer — Self-Traceability Example
+  url: https://antora-tracer.conemso.de/docs
+  start_page: tracer::index.adoc
+
+content:
+  sources:
+    - url: .
+      start_path: examples
+      branches: [HEAD]
+
+asciidoc:
+  extensions:
+    - asciidoctor-kroki
+
+antora:
+  extensions:
+    - require: ./lib/src/antora-extension.js
+      configPath: ./examples/traceability.yml
+      outputDir: traceability
+      generateMatrices: true
+      matrixFormats: [html, csv]
+      includeInNavigation: true
+    - require: '@antora/lunr-extension'
+      index_by_heading: true
+
+ui:
+  bundle:
+    url: https://github.com/rattermeyer/antora-ui-conemso/releases/download/v1.0.0/ui-bundle.zip
+
+urls:
+  latest_version_segment: latest
+  redirect_facility: static
+  latest_prerelease_version_segment: unstable
+
+
+output:
+  dir: ./public/docs
+  clean: true
