@@ -12,10 +12,10 @@ repos:
         files: ^(src|test|examples|scripts)/.*\.(ts|tsx|js)$
 
       - id: biome-format
-        name: biome format (Markdown/JSON/YAML)
+        name: biome format (JSON)
         entry: npx biome format --write
         language: node
-        files: \.(md|json|yaml|yml)$
+        files: \.(json)$
 
   # Ensure no large files are committed
   - repo: https://github.com/pre-commit/pre-commit-hooks
