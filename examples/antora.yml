@@ -1,6 +1,6 @@
 name: tracer
 title: Antora Tracer
-version: 0.11
+version: 0.12-WIP
 start_page: index.adoc
 nav:
   - modules/ROOT/nav.adoc
