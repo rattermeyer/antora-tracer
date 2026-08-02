@@ -2,6 +2,16 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.12.0] — 2026-08-06
+
+### Added
+- Kroki image format defaults to `svg` for HTML; `KROKI_IMAGE_FORMAT=png` env var for PDF builds
+
+### Fixed
+- Graph isolation per component version — items from one version no longer leak into another version's xref generation, preventing "target of xref not found" errors in multi-version builds
+- Partial item xrefs use anchor-only references when source file is a partial path
+- PDF build copies use dynamic component version from `examples/antora.yml` instead of hardcoded version
+
 ## [0.11.0] — 2026-08-06
 
 ### Added
