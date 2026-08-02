@@ -156,7 +156,6 @@ export class AntoraTraceabilityExtension {
   private loadConfig(): Partial<AntoraTraceabilityConfig> {
     try {
       const playbook = this.context.playbook;
-      // Extensions are under antora.extensions in the playbook schema
       const extensions = playbook.antora?.extensions || playbook.extensions;
       if (!extensions) return {};
       const extEntry = extensions.find(
@@ -167,7 +166,6 @@ export class AntoraTraceabilityExtension {
           e.name === "antora-requirements-traceability",
       );
       if (!extEntry) return {};
-      // Support both formats: config nested under 'config' key, or directly on the entry
       return extEntry.config ?? extEntry ?? {};
     } catch {
       return {};
@@ -661,7 +659,7 @@ export class AntoraTraceabilityExtension {
    * Uses deflate + base64url encoding.
    */
   private krokiUrl(type: string, source: string): string {
-    const format = this.config.krokiImageFormat || "svg";
+    const format = process.env.KROKI_IMAGE_FORMAT || this.config.krokiImageFormat || "svg";
     const compressed = deflateSync(Buffer.from(source, "utf-8"));
     const encoded = Buffer.from(compressed).toString("base64url");
     return `https://kroki.io/${type}/${format}/${encoded}`;

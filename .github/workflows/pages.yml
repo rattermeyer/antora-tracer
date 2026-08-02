@@ -44,7 +44,7 @@ jobs:
         run: npx antora antora-playbook-ci.yml
 
       - name: Build PDF
-        run: npx antora antora-playbook-pdf.yml
+        run: KROKI_IMAGE_FORMAT=png npx antora antora-playbook-pdf.yml
 
       - name: Copy PDFs for deployment
         run: |
