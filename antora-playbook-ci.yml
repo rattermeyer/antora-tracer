@@ -5,9 +5,9 @@ site:
 
 content:
   sources:
-    - url: .
+    - url: https://github.com/rattermeyer/antora-tracer.git
       start_path: examples
-      branches: [HEAD, 'v0.11.x']
+      branches: ['master', 'v0.10.x', 'v0.11.x']
 
 asciidoc:
   extensions:
