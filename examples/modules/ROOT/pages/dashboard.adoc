@@ -9,9 +9,12 @@ traceability:graph-coverage[]
 
 == Key Requirement Graphs
 
+=== UC-001 — Single item macro
+traceability:graph[UC-001, 2]
+
 === REQ-001 — Single item macro
 
-traceability:graph[REQ-001]
+traceability:graph[REQ-001, 2]
 
 === ARC-002 — Component Architecture
 

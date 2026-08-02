@@ -454,7 +454,7 @@ traceability:graph[]
 \--
 ----
 
-The macro renders a Kroki-generated GraphViz DOT diagram showing the item and its direct relationships. Nodes are colored by role and edges are labeled with relation types.
+The macro renders a Kroki-generated GraphViz DOT diagram showing the item and all directly related items — both outgoing and incoming relationships. Nodes are colored by role and edges are labeled with relation types.
 
 *Reference any item* by passing an explicit ID:
 

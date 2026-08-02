@@ -217,7 +217,7 @@ traceability:outgoing[]
 [#ARC-026, item, role=design, title="GraphViz DOT and Vega-Lite serialization methods"]
 --
 `toDot(fromId, depth?)` generates GraphViz DOT source for a relationship graph
-using BFS traversal from the given item. Nodes are colored by role using a
+using BFS traversal in both outgoing and incoming directions from the given item. Nodes are colored by role using a
 hardcoded palette; edges are labeled with the relationship type. Depth limits
 hopping. `toVegaLite(itemId?)` generates a Vega-Lite JSON spec for coverage
 charts — per-relationship-type for a specific item, or global role counts

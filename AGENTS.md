@@ -57,6 +57,23 @@ Archived changes: `openspec/changes/archive/`
 
 Skills: `.pi/skills/` — `update-example-site` refreshes the self-traceability example after archiving.
 
+## Consistency
+
+When code behavior changes, verify consistency across these layers before committing:
+
+| Layer | Check |
+|---|---|
+| **Tests** | Review test comments for stale workarounds describing old behavior. Update or add tests to cover the new behavior. |
+| **Requirements** | `examples/modules/ROOT/pages/requirements.adoc` — do REQ items need updating to match spec changes? |
+| **User Guide** | `examples/modules/ROOT/pages/user-guide.adoc` — does the macro/API description match the new behavior? |
+| **Architecture** | `examples/modules/ROOT/pages/architecture.adoc` — do ARC items describing components (e.g., toDot, graph macros) need updating? |
+| **Developer Guide** | `examples/modules/ROOT/pages/developer-guide.adoc` — does the API reference need changes? |
+| **Specs** | Sync delta specs to main specs (`/opsx-sync`) before archiving. |
+| **Example site** | Rebuild with `npx antora antora-playbook.yml` and regenerate matrices with `node examples/run-example.js` to verify self-traceability works. |
+
+After archiving a change, run the `update-example-site` skill to refresh requirements,
+architecture, and test-plan documents to reflect the complete current project state.
+
 ## Architecture
 
 ```

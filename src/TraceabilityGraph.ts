@@ -772,6 +772,7 @@ export class TraceabilityGraph {
     if (!item) return "";
 
     const visited = new Set<string>();
+    const seenEdges = new Set<string>();
     const edges: Array<{ from: string; to: string; label: string }> = [];
     const queue: Array<{ id: string; dist: number }> = [
       { id: fromId, dist: 0 },
@@ -782,15 +783,38 @@ export class TraceabilityGraph {
       const current = queue.shift()!;
       if (current.dist >= depth) continue;
 
+      // Outgoing relationships
       const rels = this._relationshipIndex.get(current.id);
-      if (!rels) continue;
+      if (rels) {
+        for (const [type, typeRels] of rels) {
+          for (const rel of typeRels) {
+            const edgeKey = `${current.id}|${rel.targetId}|${type}`;
+            if (!seenEdges.has(edgeKey)) {
+              edges.push({ from: current.id, to: rel.targetId, label: type });
+              seenEdges.add(edgeKey);
+            }
+            if (!visited.has(rel.targetId)) {
+              visited.add(rel.targetId);
+              queue.push({ id: rel.targetId, dist: current.dist + 1 });
+            }
+          }
+        }
+      }
 
-      for (const [type, typeRels] of rels) {
-        for (const rel of typeRels) {
-          edges.push({ from: current.id, to: rel.targetId, label: type });
-          if (!visited.has(rel.targetId)) {
-            visited.add(rel.targetId);
-            queue.push({ id: rel.targetId, dist: current.dist + 1 });
+      // Incoming relationships (reverse direction)
+      const reverseRels = this._reverseRelationshipIndex.get(current.id);
+      if (reverseRels) {
+        for (const [type, typeRels] of reverseRels) {
+          for (const rel of typeRels) {
+            const edgeKey = `${rel.fromId}|${current.id}|${type}`;
+            if (!seenEdges.has(edgeKey)) {
+              edges.push({ from: rel.fromId, to: current.id, label: type });
+              seenEdges.add(edgeKey);
+            }
+            if (!visited.has(rel.fromId)) {
+              visited.add(rel.fromId);
+              queue.push({ id: rel.fromId, dist: current.dist + 1 });
+            }
           }
         }
       }
