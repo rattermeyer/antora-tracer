@@ -9,6 +9,7 @@
 * xref:adr/index.adoc[Architecture Decisions]
 * xref:quality/index.adoc[Quality Attributes]
 * xref:sphinx-comparison.adoc[Comparison with Sphinx Needs]
+* xref:antora-vs-sphinx.adoc[Antora vs Sphinx — Pipelines]
 * Traceability
 ** xref:traceability/index.adoc[Overview]
 ** xref:attachment$traceability/matrix-usecase-requirements.html[UC → Req]

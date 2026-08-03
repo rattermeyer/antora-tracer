@@ -122,6 +122,8 @@ If you're moving from Sphinx Needs to Antora Tracer:
 
 == Key Differences
 
+For a comparison of Antora and Sphinx as *publishing platforms* (HTML, PDF, versioning, navigation), see xref:antora-vs-sphinx.adoc[].
+
 *Sphinx Needs* is tightly integrated with Sphinx. *Antora Tracer* is tightly integrated with Antora. Both are language-agnostic — they document projects written in any programming language.
 
 *Sphinx Needs* has fixed need types. *Antora Tracer* has user-defined roles — you define your own domain model.

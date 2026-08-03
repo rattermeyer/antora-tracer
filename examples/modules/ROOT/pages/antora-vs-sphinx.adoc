@@ -1,0 +1,473 @@
+= Antora vs Sphinx — Publishing Pipeline Comparison
+:toc: macro
+:toclevels: 2
+
+toc::[]
+
+[NOTE]
+====
+This is a *subjective* comparison based on experience with both tools in enterprise documentation projects. The focus is on publishing pipelines — how each platform handles HTML output, PDF generation, multi-version support, and large documentation collections. For a comparison of traceability features, see xref:sphinx-comparison.adoc[].
+====
+
+== Summary
+
+.Scoring: Antora vs MyST/Sphinx as Publishing Platforms
+[width=100%, cols="50,15,15"]
+|===
+| Capability | Antora | MyST/Sphinx
+
+| HTML output
+| ★★★★★
+| ★★★★☆
+
+| PDF output
+| ★★★★★
+| ★★★☆☆
+
+| Versioned documentation
+| ★★★★★
+| ★★☆☆☆
+
+| Multi-repository support
+| ★★★★★
+| ★★☆☆☆
+
+| Large documentation sets
+| ★★★★★
+| ★★★★☆
+
+| Navigation
+| ★★★★★
+| ★★★☆☆
+
+| Cross-references
+| ★★★★★
+| ★★★★★
+
+| Content reuse (partials/includes)
+| ★★★★★
+| ★★★★☆
+
+| Learning curve
+| Medium
+| Medium
+
+| Ecosystem
+| Documentation-focused
+| Python-focused
+|===
+
+== HTML Publishing
+
+This is Antora's strongest area. It was designed from the beginning for documentation websites consisting of:
+
+* many Git repositories
+* many products
+* many released versions
+* reusable content
+* shared navigation
+
+A multi-product structure like this is a first-class concept:
+
+....
+Platform
+    1.0
+    1.1
+    2.0
+
+SDK
+    3.0
+    3.1
+
+API
+    latest
+....
+
+Antora automatically discovers component versions from Git branches and tags and builds a version switcher. It also resolves cross-references across repositories and versions. For details, see https://antora.org/[the Antora documentation].
+
+Sphinx was originally designed to build *one documentation project*. Large projects like the Python documentation demonstrate that it scales well, but versioning is not built into Sphinx itself. Typically people rely on ReadTheDocs, `sphinx-multiversion`, or custom CI to generate separate versions. It works, but it feels like an extension rather than the core model.
+
+== PDF Generation
+
+This is where the biggest practical difference exists.
+
+AsciiDoc was originally designed for book publishing. The PDF pipeline is mature. With the Antora Assembler and PDF Extension, Antora can automatically merge a component's pages into a single book and render it with Asciidoctor PDF. For details, see the https://docs.antora.org/assembler/latest/[Antora Assembler documentation].
+
+The resulting PDFs support:
+
+* title pages
+* front and back matter
+* table of contents
+* index
+* running headers
+* themes
+* custom fonts
+* cross-references
+* syntax highlighting
+
+out of the box. See the https://docs.asciidoctor.org/pdf-converter/latest/features/[Asciidoctor PDF feature list] for a complete overview. This feels much closer to producing a professionally typeset manual than printing a website.
+
+Sphinx PDF generation is possible, but there are several routes: LaTeX → PDF, HTML → print, or MyST Book pipelines. The quality is good, but customization often means learning LaTeX. If your deliverable is a polished 600-page manual, you will probably spend more time tuning the output than with Asciidoctor PDF.
+
+== Multiple Versions
+
+This is probably the largest differentiator.
+
+In Antora, versioning is one of its defining features. A page reference like:
+
+[source,asciidoc]
+----
+xref:component@2.0:module:page.adoc[]
+----
+
+is completely normal. The generated site automatically provides:
+
+* version selector
+* version-aware navigation
+* cross-version linking
+* latest vs maintenance releases
+
+without additional tooling.
+
+Sphinx versioning is possible, but typically implemented through `sphinx-multiversion`, ReadTheDocs, or CI jobs. Each version is essentially another Sphinx build. It works well, but the publishing workflow is noticeably less integrated.
+
+== Large Documentation Collections
+
+Suppose you have a documentation set with multiple guides, an SDK reference, an API reference, architecture documentation, requirements, and operations manuals — all sharing common pages.
+
+Antora was built exactly for this. It understands:
+
+* reusable partials
+* shared images
+* shared examples
+* reusable modules
+* independent repositories
+
+without awkward workarounds.
+
+Sphinx can certainly reuse content (e.g., via MyST includes), but it generally lacks Antora's higher-level concepts of components, modules, and content aggregation.
+
+== Navigation
+
+Antora's navigation is explicit. A `nav.adoc` file defines the site's structure, meaning:
+
+* documentation architecture is intentional
+* ordering is stable
+* navigation is not inferred from filenames
+
+Sphinx relies more on `toctree`, which works well but tends to become distributed across many files as projects grow, making it harder to reason about the overall site structure.
+
+== Ecosystem
+
+[width=100%, cols="50,50"]
+|===
+| Antora shines when | Sphinx shines when
+
+| Writing product manuals
+| Documenting Python projects
+
+| Architecture documentation
+| Generating API docs with autodoc
+
+| Software documentation
+| Publishing Jupyter notebooks
+
+| Operations manuals
+| Working in scientific or research environments
+
+| Regulated documentation (IEC 62304, etc.)
+| Integrating with the Python scientific stack
+
+| Documentation-as-code workflows
+| Using MyST Markdown for authoring
+
+| Multiple released versions
+| Single-version project sites
+
+| Multiple repositories
+| ReadTheDocs hosting
+|===
+
+== Markup Language: Simple vs Rich Document Markup
+
+It's not useful to frame this as "Markdown vs AsciiDoc" in general. Rather, it's *simple markup vs rich document markup*. MyST extends Markdown considerably, but it still inherits many of Markdown's design principles.
+
+The decision usually depends on the *complexity of the documents* and the *publishing requirements*.
+
+.Documentation Type by Markup Fit
+[width=100%, cols="40,20,20"]
+|===
+| Documentation type | Markdown (incl. MyST) | AsciiDoc
+
+| README files
+| ★★★★★
+| ★★★☆☆
+
+| Developer guides
+| ★★★★★
+| ★★★★★
+
+| Product manuals
+| ★★★☆☆
+| ★★★★★
+
+| Architecture documentation
+| ★★★★☆
+| ★★★★★
+
+| Standards & specifications
+| ★★★☆☆
+| ★★★★★
+
+| Operations manuals
+| ★★★★☆
+| ★★★★★
+
+| Books
+| ★★★☆☆
+| ★★★★★
+
+| API documentation
+| ★★★★★
+| ★★★☆☆
+
+| Knowledge bases
+| ★★★★★
+| ★★★★☆
+
+| Regulated documentation
+| ★★★☆☆
+| ★★★★★
+|===
+
+=== Where Markdown shines
+
+Markdown was designed to be *easy to read and easy to write*.
+
+It excels when:
+
+* documents are relatively short
+* contributors are occasional writers
+* GitHub is the primary publishing platform
+* simplicity is valued over formatting flexibility
+
+Typical examples include:
+
+* GitHub README files
+* contribution guides
+* developer onboarding
+* project wikis
+* release notes
+* design proposals (RFCs/ADRs)
+* meeting notes
+
+A developer can learn the basics in about 15 minutes. That's a huge advantage for open-source projects.
+
+=== Where AsciiDoc shines
+
+AsciiDoc was designed as a *technical publishing language*.
+
+Once documents become more structured, it starts to pull ahead. For example, AsciiDoc natively supports:
+
+* reusable partials
+* conditional content
+* attributes and variables
+* callouts in source code
+* admonitions
+* bibliography
+* glossary
+* index terms
+* document metadata
+* sophisticated tables
+* sidebars
+* examples
+* appendices
+* front matter/back matter
+* book assembly
+
+These aren't extensions — they're part of the language.
+
+=== Content reuse
+
+This is one of the biggest differences.
+
+Markdown generally has no standard mechanism for conditional reuse. MyST adds includes, substitutions, and directives, but they are Sphinx-specific rather than universally supported.
+
+AsciiDoc, on the other hand, treats reuse as a core feature:
+
+[source,asciidoc]
+----
+include::partial$database.adoc[]
+
+ifdef::enterprise[]
+include::partial$enterprise-features.adoc[]
+endif::[]
+
+:version: 3.2
+
+Current version: \{version}
+----
+
+For product documentation with multiple editions or versions, these capabilities can significantly reduce duplication.
+
+=== Long technical manuals
+
+Imagine writing a 600-page administration guide.
+
+Soon you'll want features like:
+
+* automatic numbering
+* cross references
+* reusable warning blocks
+* appendices
+* index generation
+* PDF-ready layout
+* conditional chapters
+* shared snippets
+
+AsciiDoc provides these capabilities natively. Markdown projects can achieve many of them, but often through extensions or custom tooling.
+
+=== Complex tables
+
+Markdown tables intentionally stay simple.
+
+For example:
+
+[source,markdown]
+----
+| Name | Value |
+|------|-------|
+----
+
+Anything beyond that can become awkward.
+
+AsciiDoc supports:
+
+* merged rows/columns
+* column widths
+* cell styles
+* nested blocks
+* source code
+* images
+
+without switching formats.
+
+=== Conditional documentation
+
+Enterprise documentation often has variations:
+
+* Community vs Enterprise
+* Cloud vs On-Premises
+* Linux vs Windows
+* Version 5 vs Version 6
+
+AsciiDoc handles this naturally:
+
+[source,asciidoc]
+----
+ifdef::cloud[]
+
+Cloud instructions
+
+endif::[]
+----
+
+This capability is difficult to reproduce cleanly in plain Markdown.
+
+=== Technical writing
+
+AsciiDoc includes constructs that technical writers appreciate, such as:
+
+* example blocks
+* sidebars
+* formal definitions
+* source blocks with callouts
+* document attributes
+* reusable snippets
+
+These make large, structured documents easier to maintain.
+
+=== Learning curve
+
+Markdown is deliberately minimal. Most developers become productive with it almost immediately.
+
+AsciiDoc is larger. Authors who only write occasional documentation may use just a subset of the language, while technical writers and documentation architects can take advantage of many more advanced features. Learning those features takes longer, but they pay off as documentation grows in size and sophistication.
+
+=== When MyST changes the equation
+
+MyST narrows the gap considerably.
+
+It adds features such as:
+
+* directives
+* roles
+* substitutions
+* includes
+* cross references
+* figures
+* equations
+* notebooks
+* citations
+
+This makes it much more expressive than CommonMark.
+
+However, many of these capabilities come from the Sphinx ecosystem rather than Markdown itself. As a result, MyST documents are more tightly coupled to Sphinx than AsciiDoc documents are to a particular publishing tool.
+
+=== A practical rule of thumb
+
+Choose *Markdown (or MyST)* when:
+
+* your audience is primarily developers,
+* most content lives on GitHub,
+* documents are relatively independent,
+* API documentation is central,
+* or you're already invested in the Python/Sphinx ecosystem.
+
+Choose *AsciiDoc* when:
+
+* you're producing manuals, books, or formal documentation,
+* you publish both HTML and high-quality PDFs,
+* content reuse and conditional publishing are important,
+* you maintain multiple product or version variants,
+* or you expect the documentation to grow into a long-lived documentation set rather than a collection of individual pages.
+
+For the kinds of documentation discussed elsewhere on this site — arc42 architecture documentation, requirements traceability, Antora-based publishing, multiple product versions, and professional HTML/PDF output — AsciiDoc is particularly well aligned because those are exactly the scenarios its richer document model was designed to support.
+
+== For Enterprise Documentation
+
+If I were scoring them specifically for enterprise software documentation — 500 to 5,000 pages, multiple products, multiple released versions, both HTML and PDF deliverables — my ratings would be:
+
+[width=100%, cols="50,20,20"]
+|===
+| Criterion | Antora | MyST/Sphinx
+
+| Versioned documentation
+| 10/10
+| 6/10
+
+| PDF quality
+| 10/10
+| 7/10
+
+| Multi-repository documentation
+| 10/10
+| 6/10
+
+| Large documentation architecture
+| 10/10
+| 7/10
+
+| Technical writing ergonomics
+| 9/10
+| 8/10
+
+| Python ecosystem integration
+| 5/10
+| 10/10
+
+| *Overall fit for enterprise product docs*
+| *9.8/10*
+| *7.8/10*
+|===
+
+Based on these criteria, Antora is the stronger choice for enterprise product documentation — unless you have a strong Python-specific reason to adopt Sphinx (for example, heavy use of autodoc, Jupyter notebooks, or scientific publishing).
