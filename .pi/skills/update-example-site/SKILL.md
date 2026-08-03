@@ -13,17 +13,32 @@ After archiving a change with `openspec-archive-change`, run this skill to refre
 
 ## Process
 
-### 1. Scan All OpenSpec Specs
+### 1. Scan Main OpenSpec Specs
 
-Read every spec file across all changes (active + archived):
+Read spec files from `openspec/specs/` (the source of truth — not archived changes):
 
 ```bash
-find openspec/changes -path "*/specs/*.md" -o -path "*/archive/*/specs/*.md"
+ls openspec/specs/*/spec.md
 ```
 
 Each spec file contains requirements under `### Requirement:` headings with scenarios under `#### Scenario:`.
 
-### 2. Update `requirements.adoc`
+The **requirement heading text** is the canonical title for each `REQ-XXX` item. REQ item titles MUST match the spec requirement heading exactly — this makes diffing trivial.
+
+### 2. Diff requirements before updating
+
+Before modifying `requirements.adoc`, show what will change:
+
+1. Extract requirement titles from main specs (`### Requirement: ...`)
+2. Extract existing REQ item titles from `examples/modules/ROOT/pages/requirements.adoc`
+3. Compare the two sets:
+   - **New**: titles in specs but not in requirements.adoc
+   - **Removed**: titles in requirements.adoc but not in specs
+   - **Title mismatch**: same ID but different title text
+
+Present this diff to the user for confirmation before applying changes.
+
+### 3. Update `requirements.adoc`
 
 The file is at `examples/modules/ROOT/pages/requirements.adoc`. It contains `[item, id=REQ-XXX, role=requirement]` blocks.
 
@@ -37,13 +52,13 @@ The file is at `examples/modules/ROOT/pages/requirements.adoc`. It contains `[it
 Each item should have:
 - `id` — `REQ-NNN` (three-digit, zero-padded)
 - `role=requirement`
-- Title — the `### Requirement:` heading text
+- Title — the exact `### Requirement:` heading text from the spec (must match)
 - Content body — the spec description text
-- Source reference — which spec file it came from
+- Source reference — which spec file it came from (`Source: openspec/specs/<capability>/spec.md`)
 
 Group items by capability area (matching the spec's parent directory name).
 
-### 3. Update `architecture.adoc`
+### 4. Update `architecture.adoc`
 
 The file is at `examples/modules/ROOT/pages/architecture.adoc`. It uses arc42 sections as `[item, id=ARC-XXX, role=design]`.
 
@@ -65,7 +80,7 @@ Current sections:
 - Update the PlantUML component diagram to match current `src/` layout.
 - Update the runtime sequence diagram if the processing flow changed.
 
-### 4. Update `test-plan.adoc`
+### 5. Update `test-plan.adoc`
 
 The file is at `examples/modules/ROOT/pages/test-plan.adoc`. It contains `[item, id=TST-XXX, role=test]` blocks, one per test file.
 
@@ -85,7 +100,7 @@ ls test/*.test.ts
 - Remove items for test files that no longer exist.
 - Preserve existing IDs for stability.
 
-### 5. Update `traceability.yml` if needed
+### 6. Update `traceability.yml` if needed
 
 The file is at `examples/traceability.yml`. Check if the roles, relations, or matrix definitions need updating:
 
@@ -93,7 +108,20 @@ The file is at `examples/traceability.yml`. Check if the roles, relations, or ma
 - Relations should allow the `addresses` (architecture→requirement), `verifies` (test→requirement), and `validates` (test→architecture) patterns used in the documents.
 - Matrices should provide useful cross-references of requirements against architecture and tests.
 
-### 6. Regenerate traceability output
+### 7. Update `run-example.js`
+
+The script at `examples/run-example.js` generates matrices by name. Ensure it uses matrix names from the current config, not hardcoded names:
+
+```javascript
+const matrixNames = configLoader.getConfig().matrices.map(m => m.name);
+for (const matrixName of matrixNames) {
+  // generate matrix...
+}
+```
+
+If the script uses hardcoded matrix names, update them to match `traceability.yml`.
+
+### 8. Regenerate traceability output
 
 After all documents are updated, regenerate the matrices:
 
@@ -102,19 +130,17 @@ npm run build
 node examples/run-example.js
 ```
 
-This produces updated `matrix-requirements-architecture.*` and `matrix-requirements-tests.*` in `examples/modules/ROOT/attachments/traceability/`.
+This produces updated matrix files in `examples/modules/ROOT/attachments/traceability/`.
 
-### 7. Rebuild the Antora site (optional)
-
-If the Antora playbook is configured with a UI bundle:
+### 9. Rebuild the Antora site
 
 ```bash
-npx antora antora-playbook.yml
+npx antora generate antora-playbook.yml
 ```
 
 Verify no xref warnings and the matrices are navigable.
 
-### 8. Commit
+### 10. Commit
 
 Commit all updated files with a message like:
 
@@ -133,4 +159,5 @@ Matrices: regenerated
 - **As-is, not diff** — the documents describe the complete current state, not what changed.
 - **Grounded in specs** — every requirement must trace back to a spec file. Don't invent requirements.
 - **Grounded in code** — test items must match actual test files. Architecture must match actual source layout.
-- **Regenerate** — always run `run-example.js` after document changes to produce updated matrices.
+- **Title matching** — REQ item titles MUST match the spec's `### Requirement:` heading exactly. This makes diffing and future syncs trivial.
+- **Regenerate and verify** — always run `run-example.js` after document changes to produce updated matrices. Then rebuild the site and check for xref errors.
