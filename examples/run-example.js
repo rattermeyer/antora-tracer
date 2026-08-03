@@ -68,7 +68,7 @@ const matrixGen = new MatrixGenerator(extension.graph, configLoader, {
   linkResolver,
 });
 
-for (const matrixName of ["requirements-design", "requirements-tests"]) {
+for (const matrixName of ["requirements-traceability", "usecase-requirements"]) {
   const matrix = matrixGen.generateMatrix(matrixName);
 
   // CSV

@@ -12,18 +12,30 @@ REQ-002,REQ-002 — `item` macro accepts role attribute,requirement,,requirement
 
 Related specs: `unified-item-macro/spec.md`
 
+refines:REQ-001[]
+
 traceability:outgoing[]
 traceability:incoming[]"""
 REQ-003,REQ-003 — `item` macro maintains existing attributes,requirement,,requirements.adoc,"""The `[item]` macro SHALL support the attributes `id`, `title`, `status`, and any custom attributes. The `title` defaults to the item's `id` if omitted. The `status` field is free-form.
 
 Related specs: `unified-item-macro/spec.md`
 
+refines:REQ-001[]
+
 traceability:outgoing[]
 traceability:incoming[]"""
-REQ-004,REQ-004 — `item` macro supports block content,requirement,,requirements.adoc,====
+REQ-004,REQ-004 — `item` macro supports block content,requirement,,requirements.adoc,"""The `[item]` macro SHALL accept block content between `====` delimiters as the artifact description. Multi-line content and AsciiDoc formatting within the block SHALL be preserved.
+
+refines:REQ-001[]
+
+Related specs: `unified-item-macro/spec.md`
+
+traceability:outgoing[]
+traceability:incoming[]"""
 REQ-005,REQ-005 — Old macro syntax generates deprecation error,requirement,,requirements.adoc,"""The system SHALL detect and report the old macro syntax (`[req]`, `[imp]`, `[test]`, `[doc]`) as a deprecation error, suggesting the equivalent `[item, role=...]` syntax.
 
-Related specs: `unified-item-macro/spec.md`"""
+Related specs: `unified-item-macro/spec.md`
+refines:REQ-001[]"""
 REQ-006,REQ-006 — Configuration defines roles,requirement,,requirements.adoc,"""The system SHALL read roles from a YAML configuration file. Items with roles not in this list receive warnings. An empty roles list generates an error.
 
 Related specs: `configuration-system/spec.md`
@@ -34,11 +46,15 @@ REQ-007,REQ-007 — Configuration defines relations,requirement,,requirements.ad
 
 Related specs: `configuration-system/spec.md`
 
+refines:REQ-006[]
+
 traceability:outgoing[]
 traceability:incoming[]"""
 REQ-008,REQ-008 — Configuration defines matrices,requirement,,requirements.adoc,"""The system SHALL read matrix definitions from configuration. Each matrix specifies a `name`, `rows` role, `columns` roles, and `coverageRelations` mapping column roles to relation types that count as coverage.
 
 Related specs: `configuration-system/spec.md`
+
+refines:REQ-006[]
 
 traceability:outgoing[]
 traceability:incoming[]"""
@@ -46,11 +62,15 @@ REQ-009,REQ-009 — Configuration is required for validation,requirement,,requir
 
 Related specs: `configuration-system/spec.md`
 
+refines:REQ-006[]
+
 traceability:outgoing[]
 traceability:incoming[]"""
 REQ-010,REQ-010 — Configuration file location,requirement,,requirements.adoc,"""The system SHALL search for `traceability.yml` or `traceability.yaml` in common locations. A custom path SHALL be specifiable via `--config` CLI flag or `configPath` playbook option.
 
 Related specs: `configuration-system/spec.md`
+
+refines:REQ-006[]
 
 traceability:outgoing[]
 traceability:incoming[]"""
@@ -58,11 +78,14 @@ REQ-011,REQ-011 — Configuration validation,requirement,,requirements.adoc,"""T
 
 Related specs: `configuration-system/spec.md`
 
+refines:REQ-006[]
+
 traceability:outgoing[]
 traceability:incoming[]"""
 REQ-012,REQ-012 — Configuration can extend presets,requirement,,requirements.adoc,"""The system SHALL support the `extends` field in configuration to merge with a built-in preset. User configuration overrides preset values. Referencing a non-existent preset generates an error listing available presets.
 
-Related specs: `configuration-system/spec.md`"""
+Related specs: `configuration-system/spec.md`
+refines:REQ-006[]"""
 REQ-013,REQ-013 — Role-based relation validation,requirement,,requirements.adoc,"""The system SHALL validate that relations between items are allowed based on their roles as defined in configuration. Valid relations are accepted; invalid relations generate errors listing the allowed types.
 
 Related specs: `role-based-validation/spec.md`
@@ -73,11 +96,15 @@ REQ-014,REQ-014 — Directional relation checking,requirement,,requirements.adoc
 
 Related specs: `role-based-validation/spec.md`
 
+refines:REQ-013[]
+
 traceability:outgoing[]
 traceability:incoming[]"""
 REQ-015,REQ-015 — Error messages list allowed relations,requirement,,requirements.adoc,"""Error messages for invalid relations SHALL include the relation type, source role, target role, and the list of allowed relation types between those roles.
 
 Related specs: `role-based-validation/spec.md`
+
+refines:REQ-013[]
 
 traceability:outgoing[]
 traceability:incoming[]"""
@@ -85,11 +112,22 @@ REQ-016,REQ-016 — Warnings for unknown roles,requirement,,requirements.adoc,""
 
 Related specs: `role-based-validation/spec.md`
 
+refines:REQ-013[]
+
 traceability:outgoing[]
 traceability:incoming[]"""
 REQ-017,REQ-017 — Graceful degradation for unknown roles,requirement,,requirements.adoc,"""Items with unknown roles SHALL still be stored in the graph and appear in matrices. Relations involving unknown roles SHALL be stored but marked with warnings. Processing continues despite unknown roles.
 
-Related specs: `role-based-validation/spec.md`"""
+Related specs: `role-based-validation/spec.md`
+refines:REQ-013[]"""
+REQ-058,REQ-058 — Circular reference detection,requirement,,requirements.adoc,"""The system SHALL detect circular references in the traceability graph during validation. A circular reference is a cycle in the directed relationship graph (e.g., A → B → A, or A → B → C → A). Circular references SHALL be reported as errors with the cycle path in human-readable form. Self-referencing relationships (A → A) SHALL also be detected as cycles.
+
+Source: TraceabilityGraph.validate() → findCircularReferences()
+
+refines:REQ-013[]
+
+traceability:outgoing[]
+traceability:incoming[]"""
 REQ-018,REQ-018 — Built-in preset configurations,requirement,,requirements.adoc,"""The system SHALL ship with built-in preset configurations: `requirements-engineering`, `agile`, `medical-iec62304`, and `minimal`. Users SHALL be able to list and inspect presets via CLI.
 
 Related specs: `preset-system/spec.md`
@@ -100,11 +138,15 @@ REQ-019,REQ-019 — Each preset contains complete configuration,requirement,,req
 
 Related specs: `preset-system/spec.md`
 
+refines:REQ-018[]
+
 traceability:outgoing[]
 traceability:incoming[]"""
 REQ-020,REQ-020 — Each preset includes documentation,requirement,,requirements.adoc,"""Each preset SHALL include a human-readable description, domain explanation, and example AsciiDoc snippets demonstrating typical usage.
 
 Related specs: `preset-system/spec.md`
+
+refines:REQ-018[]
 
 traceability:outgoing[]
 traceability:incoming[]"""
@@ -112,17 +154,22 @@ REQ-021,REQ-021 — Each preset includes Neo4j Cypher queries,requirement,,requi
 
 Related specs: `preset-system/spec.md`
 
+refines:REQ-018[]
+
 traceability:outgoing[]
 traceability:incoming[]"""
 REQ-022,REQ-022 — Presets have independent versioning,requirement,,requirements.adoc,"""Presets SHALL have version numbers independent of the extension version, following semantic versioning. A `minExtensionVersion` compatibility field SHALL indicate the minimum extension version required.
 
 Related specs: `preset-system/spec.md`
 
+refines:REQ-018[]
+
 traceability:outgoing[]
 traceability:incoming[]"""
 REQ-023,REQ-023 — Users can define custom presets,requirement,,requirements.adoc,"""The system SHALL allow users to create their own preset YAML files. Custom presets are loaded and validated the same way as built-in presets. Invalid custom presets generate validation errors.
 
-Related specs: `preset-system/spec.md`"""
+Related specs: `preset-system/spec.md`
+refines:REQ-018[]"""
 REQ-024,REQ-024 — Neo4j CSV export,requirement,,requirements.adoc,"""The system SHALL export the traceability graph as `nodes.csv` and `relationships.csv` files with proper headers, comma delimiters, and escaped special characters. Files SHALL be importable via Neo4j's `LOAD CSV` command.
 
 Related specs: `neo4j-export/spec.md`
@@ -133,11 +180,15 @@ REQ-025,REQ-025 — Neo4j Cypher export,requirement,,requirements.adoc,"""The sy
 
 Related specs: `neo4j-export/spec.md`
 
+refines:REQ-024[]
+
 traceability:outgoing[]
 traceability:incoming[]"""
 REQ-026,REQ-026 — Export command in CLI,requirement,,requirements.adoc,"""The system SHALL provide an `export neo4j` CLI command supporting `--format csv` and `--format cypher` options, with configurable input and output directories.
 
 Related specs: `neo4j-export/spec.md`
+
+refines:REQ-024[]
 
 traceability:outgoing[]
 traceability:incoming[]"""
@@ -145,11 +196,14 @@ REQ-027,REQ-027 — Export includes all item attributes,requirement,,requirement
 
 Related specs: `neo4j-export/spec.md`
 
+refines:REQ-024[]
+
 traceability:outgoing[]
 traceability:incoming[]"""
 REQ-028,REQ-028 — Export is optional,requirement,,requirements.adoc,"""The Neo4j export functionality SHALL be completely optional. Normal extension operation (parsing, validation, matrix generation) SHALL not require any Neo4j runtime dependencies.
 
-Related specs: `neo4j-export/spec.md`"""
+Related specs: `neo4j-export/spec.md`
+refines:REQ-024[]"""
 REQ-029,REQ-029 — Configurable matrix generation with coverage calculations,requirement,,requirements.adoc,"""The system SHALL generate matrices from configuration definitions, computing per-item coverage based on `coverageRelations`. Each cell SHALL show related item IDs or `—` for no relationships. Coverage SHALL be expressed as overall, complete, partial, and missing counts.
 
 Source: Design Decision 2 — Configuration-Based Roles and Relations
@@ -159,6 +213,8 @@ traceability:incoming[]"""
 REQ-030,REQ-030 — Role statistics reporting,requirement,,requirements.adoc,"""The system SHALL provide `getRoleStatistics()` returning item counts per role and total relationship counts, enabling quick inspection of the traceability graph.
 
 Source: RequirementsTraceabilityExtension API
+
+refines:REQ-029[]
 
 traceability:outgoing[]
 traceability:incoming[]"""
@@ -178,11 +234,15 @@ REQ-033,REQ-033 — Graph merge,requirement,,requirements.adoc,"""The system SHA
 
 Source: TraceabilityGraph API
 
+NOTE: This method is not used internally by the extension — all files are processed into a single graph instance. It exists as a convenience for programmatic API consumers who may construct graphs independently and need to combine them.
+
 traceability:outgoing[]
 traceability:incoming[]"""
 REQ-034,REQ-034 — Mustache template rendering,requirement,,requirements.adoc,"""The system SHALL use Mustache templates for HTML matrix output via `TemplateRenderer`. Built-in templates SHALL be shipped; custom template directories SHALL be supported with fallback to built-ins for missing files.
 
 Source: Design Decision 4 — Mustache Templates
+
+refines:REQ-029[]
 
 traceability:outgoing[]
 traceability:incoming[]"""
@@ -202,11 +262,15 @@ REQ-037,REQ-037 — Matrix row items are clickable links,requirement,,requiremen
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
+refines:REQ-029[]
+
 traceability:outgoing[]
 traceability:incoming[]"""
 REQ-038,REQ-038 — Matrix cell items are clickable links,requirement,,requirements.adoc,"""The system SHALL render cell item IDs as hyperlinks that navigate to the item's definition in the rendered HTML documentation. Multiple items in a cell SHALL each render as separate clickable links.
 
 Source: openspec/specs/matrix-item-linking/spec.md
+
+refines:REQ-029[]
 
 traceability:outgoing[]
 traceability:incoming[]"""
@@ -214,11 +278,15 @@ REQ-039,REQ-039 — Source file tooltips on matrix links,requirement,,requiremen
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
+refines:REQ-029[]
+
 traceability:outgoing[]
 traceability:incoming[]"""
 REQ-040,REQ-040 — Context-aware link generation,requirement,,requirements.adoc,"""The system SHALL generate consistent relative link paths (\`../../\`) from matrix output to component root, regardless of execution context. The LinkResolver SHALL accept a configurable \`relativePathPrefix\` option.
 
 Source: openspec/specs/matrix-item-linking/spec.md
+
+refines:REQ-029[]
 
 traceability:outgoing[]
 traceability:incoming[]"""
@@ -226,17 +294,23 @@ REQ-041,REQ-041 — Source file path normalization,requirement,,requirements.ado
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
+refines:REQ-029[]
+
 traceability:outgoing[]
 traceability:incoming[]"""
 REQ-042,REQ-042 — Backward compatibility without LinkResolver,requirement,,requirements.adoc,"""The system SHALL maintain existing matrix rendering behavior when no \`LinkResolver\` is provided. Items SHALL render as plain text without links, and existing matrix HTML structure SHALL be preserved.
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
+refines:REQ-029[]
+
 traceability:outgoing[]
 traceability:incoming[]"""
 REQ-043,REQ-043 — Non-HTML matrix outputs unchanged,requirement,,requirements.adoc,"""The system SHALL NOT modify CSV and JSON matrix outputs to include links. CSV and JSON output SHALL contain item data as before.
 
 Source: openspec/specs/matrix-item-linking/spec.md
+
+refines:REQ-029[]
 
 traceability:outgoing[]
 traceability:incoming[]"""
@@ -250,15 +324,21 @@ REQ-055,REQ-055 — traceability:incoming[] renders incoming links,requirement,,
 
 Source: openspec/specs/incoming-links-macro/spec.md
 
+refines:REQ-044[]
+
 traceability:outgoing[]
 traceability:incoming[]"""
-REQ-045,REQ-045 — Opt-in via AsciiDoc attribute,requirement,,requirements.adoc,"""The system SHALL only expand \`traceability:outgoing[]\` and \`traceability:incoming[]\` when the \`:traceability-links:\` document attribute is set to a truthy value. Without the attribute, the macro text SHALL be stripped from output.
+REQ-045,REQ-045 — Opt-in via AsciiDoc attribute,requirement,,requirements.adoc,"""The system SHALL only expand \`refines:REQ-044[]
+
+traceability:outgoing[]\` and \`traceability:incoming[]\` when the \`:traceability-links:\` document attribute is set to a truthy value. Without the attribute, the macro text SHALL be stripped from output.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
 traceability:outgoing[]
 traceability:incoming[]"""
-REQ-046,REQ-046 — Inline macros are pure data markers,requirement,,requirements.adoc,"""Inline relationship macros (\`addresses\:REQ-001[]\`) SHALL always be invisible in rendered output. They are pure data markers stored in the traceability graph. \`traceability:outgoing[]\` and \`traceability:incoming[]\` are the sole mechanisms for rendering relationships.
+REQ-046,REQ-046 — Inline macros are pure data markers,requirement,,requirements.adoc,"""Inline relationship macros (\`addresses\:REQ-001[]\`) SHALL always be invisible in rendered output. They are pure data markers stored in the traceability graph. \`refines:REQ-044[]
+
+traceability:outgoing[]\` and \`traceability:incoming[]\` are the sole mechanisms for rendering relationships.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
@@ -268,11 +348,15 @@ REQ-047,REQ-047 — Configurable display style,requirement,,requirements.adoc,""
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
+refines:REQ-044[]
+
 traceability:outgoing[]
 traceability:incoming[]"""
 REQ-048,REQ-048 — Configurable sort order,requirement,,requirements.adoc,"""The system SHALL support configurable sort order via \`:traceability-order:\`: \`target-id\` (default), \`target-title\`, or \`relation-type\`.
 
 Source: openspec/specs/traceability-links-macro/spec.md
+
+refines:REQ-044[]
 
 traceability:outgoing[]
 traceability:incoming[]"""
@@ -280,17 +364,23 @@ REQ-050,REQ-050 — Source files never modified,requirement,,requirements.adoc,"
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
+refines:REQ-044[]
+
 traceability:outgoing[]
 traceability:incoming[]"""
 REQ-051,REQ-051 — Relationship graph via traceability:graph[] macro,requirement,,requirements.adoc,"""The system SHALL provide a \`traceability:graph[]\` inline macro that renders a GraphViz relationship graph for the enclosing item. The graph SHALL show the item and its direct relationships as labeled nodes and edges, colored by role. An optional depth parameter SHALL control the number of hops.
 
 Source: openspec/specs/graph-visualization/spec.md
 
+refines:REQ-053[]
+
 traceability:outgoing[]
 traceability:incoming[]"""
 REQ-052,REQ-052 — Coverage chart via traceability:graph-coverage[] macro,requirement,,requirements.adoc,"""The system SHALL provide a \`traceability:graph-coverage[]\` inline macro that renders a Vega-Lite bar chart showing coverage. When used inside an item block, it SHALL show per-relationship-type coverage for that item. When used outside an item block, it SHALL show global coverage by role.
 
 Source: openspec/specs/graph-visualization/spec.md
+
+refines:REQ-053[]
 
 traceability:outgoing[]
 traceability:incoming[]"""
@@ -304,11 +394,27 @@ REQ-054,REQ-054 — Dashboard page in example site,requirement,,requirements.ado
 
 Source: openspec/specs/graph-visualization/spec.md
 
+refines:REQ-053[]
+
 traceability:outgoing[]
 traceability:incoming[]"""
 REQ-056,REQ-056 — CLI next-id command returns next available ID,requirement,,requirements.adoc,"""The CLI SHALL provide a `next-id` command that accepts a `--prefix` and `-i/--input` and returns the next available sequential ID for items matching that prefix. The numeric suffix SHALL be auto-detected from existing IDs (e.g., if existing IDs use 3-digit padding, the next ID also uses 3-digit padding). When no existing IDs match the prefix, the default padding is 3 digits.
 
 Source: openspec/changes/add-next-id-cli/specs/next-id/spec.md
+
+refines:REQ-036[]
+
+traceability:outgoing[]
+traceability:incoming[]"""
+REQ-057,REQ-057 — Matrix files synced to component _attachments,requirement,,requirements.adoc,"""The system SHALL automatically sync generated matrix files (HTML and CSV) from the global traceability output directory to each component version's `_attachments/traceability/` directory during the `sitePublished` event. This SHALL ensure that `attachment$traceability/...` links in AsciiDoc nav resolve to the latest matrix output without manual copying. The sync SHALL resolve the correct version URL segment (e.g., `latest` instead of `0.7.0`) using the content catalog.
+
+Source: AntoraTraceabilityExtension.generateTraceabilityFiles() → syncMatricesToAttachments()
+
+traceability:outgoing[]
+traceability:incoming[]"""
+REQ-059,REQ-059 — Items defined in partials are processed,requirement,,requirements.adoc,"""The system SHALL process items defined in AsciiDoc partial files (`family: partial`) during the `contentClassified` event, alongside page files. Items from partials SHALL use the file's view URL (from the Antora content source configuration) as their source file reference, enabling traceability matrix links to resolve to the source repository. Partial items SHALL be processed only for graph population (Pass 1); macro expansion and link substitution passes SHALL be skipped since partials do not produce rendered HTML output.
+
+Source: openspec/specs/partial-support/spec.md
 
 traceability:outgoing[]
 traceability:incoming[]"""
@@ -338,100 +444,7 @@ traceability:outgoing[]
 traceability:incoming[]
 
 traceability:graph[]"""
-ARC-005,ARC-005 — Zero operational overhead,design,,architecture.adoc,"""xref:quality/zero-operational-overhead.adoc[Zero operational overhead] is
-achieved through an in-memory graph (xref:adr/0003-in-memory-graph.adoc[ADR-003]),
-no external services, and a minimal dependency tree
-(xref:adr/0004-zero-framework.adoc[ADR-004]).
-Optional features like Neo4j export degrade gracefully without warnings.
-
-addresses:QA-055[]
-addresses:REQ-001[]"""
-ARC-006,ARC-006 — Configurable without code changes,design,,architecture.adoc,"""xref:quality/configurable-without-code.adoc[Configurable without code changes]
-is achieved through YAML-based roles, relations, and matrices via
-`ConfigLoader`. Built-in presets can be extended or overridden.
-Items with unknown roles generate warnings, not errors — enabling
-incremental domain model adoption.
-
-addresses:QA-056[]
-addresses:REQ-006[]
-addresses:REQ-007[]
-addresses:REQ-008[]"""
-ARC-007,ARC-007 — Fail-fast with clear diagnostics,design,,architecture.adoc,"""xref:quality/fail-fast-diagnostics.adoc[Fail-fast with clear diagnostics]
-is achieved through role-based relation validation at processing time
-and post-hoc re-validation for cross-file references. Error messages
-include file, line, item IDs with roles, and allowed alternatives.
-
-addresses:QA-057[]
-addresses:REQ-013[]
-addresses:REQ-014[]
-addresses:REQ-015[]"""
-ARC-008,ARC-008 — No side effects on source files,design,,architecture.adoc,"""xref:quality/no-side-effects.adoc[No side effects on source files]
-is achieved by performing all content transformations on in-memory
-buffers. Source `.adoc` files are never written to.
-Processing is idempotent.
-
-addresses:QA-058[]
-addresses:REQ-050[]"""
-ARC-009,ARC-009 — Testability by design,design,,architecture.adoc,"""xref:quality/testability-by-design.adoc[Testability by design]
-is achieved through constructor-based dependency injection,
-isolated test files per module, and graph state exposed for test access.
-The regex-based parser (xref:adr/0002-regex-parser-over-ast.adoc[ADR-002])
-is decoupled from Asciidoctor's API.
-
-addresses:QA-059[]
-addresses:REQ-034[]"""
-ARC-010,ARC-010 — Future-proofness,design,,architecture.adoc,"""Future-proofness is achieved through ESM with `""""type"""": """"module""""`
-(xref:adr/0001-esm-over-cjs.adoc[ADR-001]), TypeScript strict mode,
-and a Node.js 20+ baseline (xref:adr/0005-typescript-strict-node20.adoc[ADR-005]).
-The zero-framework policy avoids dependency on libraries with short upgrade cycles.
-
-addresses:REQ-001[]
-addresses:REQ-002[]
-addresses:REQ-004[]"""
-ARC-011,ARC-011 — Performance through indexing,design,,architecture.adoc,"""Performance is achieved through forward, reverse, and inverse
-relationship indexes (O(1) lookup), result caching with invalidation
-on mutation, and BFS path finding with configurable `maxDepth`.
-
-addresses:REQ-031[]
-addresses:REQ-032[]"""
-ARC-002,ARC-002 — Component-level architecture,design,,architecture.adoc,"""The extension is composed of eight modules organized in a layered architecture:
-
-[plantuml]
-----
-include::example$bb-overview.puml[]
-----
-
-[width=100%, cols=""""25,75""""]
-|===
-| Component | Responsibility
-
-| `AntoraTraceabilityExtension`
-| Antora entry point. Registers event handlers, creates `RequirementsTraceabilityExtension`, reads playbook config.
-
-| `RequirementsTraceabilityExtension`
-| Orchestrator. Owns the graph, delegates to parser, matrix generator, and Neo4j exporter. Public API for programmatic use.
-
-| `DocumentParser`
-| Regex-based AsciiDoc parser. Two-pass: extracts `[item]` blocks, then scans for inline `relation\:TARGET[]` macros.
-
-| `TraceabilityGraph`
-| In-memory directed graph. Items stored as `Map<string, Item>`, relationships as `Map<string, ItemRelationship>`. Provides query, validation, path finding, and impact analysis.
-
-| `MatrixGenerator`
-| Config-driven matrix generation. Reads matrix definitions from configuration, queries the graph, computes coverage, produces CSV output. Delegates HTML to TemplateRenderer.
-
-| `TemplateRenderer`
-| Mustache wrapper. Loads templates from `src/templates/`, supports custom template directories with fallback to built-ins.
-
-| `LinkResolver`
-| Path resolution for matrix-to-item deep links. Strips \`pages/\` prefix and \`.adoc\` extension from sourceFile values, generates \`../../component/page.html#ID\` links using a configurable \`relativePathPrefix\`.
-
-| `Neo4jExporter`
-| Graph-to-Neo4j export. Produces `nodes.csv`, `relationships.csv`, and `import.cypher`. Properly escapes special characters.
-
-| `ConfigLoader`
-| YAML configuration loader. Loads and validates config, merges with presets, provides role/relation validation queries to the graph.
-|===
+ARC-002,ARC-002 — Component-level architecture,design,,architecture.adoc,"""include::partial$05-bb-overview.adoc[]
 
 addresses:REQ-001[]
 addresses:REQ-002[]
@@ -516,6 +529,26 @@ alternatives (see xref:adr/0004-zero-framework.adoc[ADR-004]).
 addresses:QA-057[]
 
 traceability:outgoing[]"""
+ARC-028,ARC-028 — Circular reference detection in graph validation,design,,architecture.adoc,"""The `validate()` method calls `findCircularReferences()`, a DFS-based cycle
+detector that traverses all items and their outgoing relationships. A path stack
+and recursion set track visited nodes; when a node is encountered twice in the
+same path, a circular reference error is reported with the full cycle path
+(e.g., """"REQ-001 → REQ-002 → REQ-001""""). Auto-generated inverse relationships
+are skipped to avoid false positives.
+
+addresses:REQ-058[]"""
+ARC-029,ARC-029 — Partial file processing with source-repo links,design,,architecture.adoc,"""The `registerContentClassifier()` handler processes both `family: page` and
+`family: partial` files during Pass 1 (graph population). Partial items use
+Antora's pre-computed `fileUri` as their `sourceFile`, making traceability
+matrix links point directly to the partial source in the content repository
+(e.g., GitHub blob URL). The `LinkResolver` detects URL `sourceFile` values
+and returns them unchanged, skipping the HTML path conversion. In
+`buildXref()`, URL-based items use AsciiDoc's `link:` macro instead of
+`xref:` since Asciidoctor cannot resolve external URLs as cross-references.
+Partials are excluded from macro expansion and link substitution passes
+because they do not produce HTML pages.
+
+addresses:REQ-059[]"""
 ARC-015,ARC-015 — In-memory processing with no side effects,design,,architecture.adoc,"""All content transformations — parsing, macro expansion, link substitution,
 title injection — operate on in-memory buffers. Source `.adoc` files are never
 written to. The Antora content catalog provides the text buffers; the extension
@@ -526,7 +559,7 @@ xref:adr/0003-in-memory-graph.adoc[ADR-003]).
 addresses:QA-058[]
 traceability:outgoing[]"""
 ARC-026,ARC-026 — GraphViz DOT and Vega-Lite serialization methods,design,,architecture.adoc,"""`toDot(fromId, depth?)` generates GraphViz DOT source for a relationship graph
-using BFS traversal from the given item. Nodes are colored by role using a
+using BFS traversal in both outgoing and incoming directions from the given item. Nodes are colored by role using a
 hardcoded palette; edges are labeled with the relationship type. Depth limits
 hopping. `toVegaLite(itemId?)` generates a Vega-Lite JSON spec for coverage
 charts — per-relationship-type for a specific item, or global role counts
@@ -543,15 +576,17 @@ the CLI outside Antora, demonstrating the event handlers are optional.
 
 addresses:QA-055[]
 traceability:outgoing[]"""
-ARC-024,ARC-024 — traceability:outgoing[] and traceability:incoming[] link rendering,design,,architecture.adoc,"""The `expandOutgoingMacros()` and `expandIncomingMacros()` methods replace
-`traceability:outgoing[]` and `traceability:incoming[]` placeholders with
-formatted AsciiDoc content showing the item's relationships. Rendering is
-opt-in via the `:traceability-links:` document attribute. Display style
-(list, table, inline), sort order (target ID, title, relation type), and
-collapsible sections are configurable via document attributes. Inline
-relationship macros (`addresses:REQ-001[]`) are always stripped from
-output — they are pure data markers; the link macros are the sole
-rendering mechanism.
+ARC-024,ARC-024 — traceability:outgoing[] and traceability:incoming[] link rendering,design,,architecture.adoc,"""The `expandOutgoingMacros()` and `expandIncomingMacros()` methods in the
+Antora extension (not the DocumentParser) replace `traceability:outgoing[]`
+and `traceability:incoming[]` placeholders with formatted AsciiDoc content
+showing the item's relationships. The DocumentParser's inline macro regex
+excludes these via a `traceability:` namespace guard; they are NOT parsed as
+relationships. Rendering is opt-in via the `:traceability-links:` document
+attribute. Display style (list, table, inline), sort order (target ID,
+title, relation type), and collapsible sections are configurable via document
+attributes. Inline relationship macros (`addresses:REQ-001[]`) are always
+stripped from output — they are pure data markers; the link macros are the
+sole rendering mechanism.
 
 addresses:REQ-044[]
 addresses:REQ-045[]
@@ -570,6 +605,16 @@ via the `:traceability-graph:` document attribute.
 
 addresses:REQ-051[]
 addresses:REQ-052[]"""
+ARC-027,ARC-027 — Automatic matrix sync to component _attachments,design,,architecture.adoc,"""The `syncMatricesToAttachments()` method, called from
+`generateTraceabilityFiles()` during the `sitePublished` event, copies all
+generated matrix files (HTML and CSV) to each component version's
+`_attachments/traceability/` subdirectory. This ensures that
+`attachment$traceability/...` nav links resolve to the latest matrix output
+without requiring manual file copies. The correct version URL segment (e.g.
+`latest` instead of `0.7.0`) is resolved by inspecting attachment file
+output paths from the Antora content catalog.
+
+addresses:REQ-057[]"""
 ARC-017,ARC-017 — Regex-based parsing,design,,architecture.adoc,"""AsciiDoc content is parsed using regular expressions rather than an
 Asciidoctor AST walker. This makes the parser independent of Asciidoctor
 API versions and testable with plain string inputs. Verbatim blocks
@@ -641,6 +686,69 @@ ARC-003,ARC-003 — Processing flow during Antora build,design,,architecture.ado
 ----
 include::example$sequence-diagram.puml[]
 ----
+
+[width=100%, cols=""""25,75"""", options=""""header""""]
+|===
+| Participant | Role in processing
+
+| Antora Build
+| Triggers `contentClassified` (per-page document processing) and `sitePublished` (matrix generation after all pages). Provides the content catalog.
+
+| `AntoraTraceabilityExtension`
+| Event handler registration. Orchestrates the three processing passes and matrix sync. Reads playbook config to determine preset, config path, output directory.
+
+| `RequirementsTraceabilityExtension`
+| Core API. Owns the graph, delegates to parser and generators. Same class used by CLI without Antora events.
+
+| `DocumentParser`
+| Regex-based extraction of `[item]` blocks and inline relationship macros from raw AsciiDoc content. Returns `ParserResult { items, relationships }`.
+
+| `TraceabilityGraph`
+| In-memory graph. Validates relationships against config rules (`isRelationAllowed`). Provides query methods used by macro expansion and matrix generation.
+
+| `MatrixGenerator`
+| Queries graph for items by role, computes per-cell coverage using `coverageRelations`, delegates HTML rendering to `TemplateRenderer`.
+
+| `TemplateRenderer`
+| Mustache-based HTML rendering. Built-in templates with custom template directory support.
+
+| `Neo4jExporter`
+| Optional export. Serializes graph to CSV (`nodes.csv`, `relationships.csv`) or Cypher (`import.cypher`) via `LOAD CSV` or `CREATE` statements.
+|===
+
+.Pass ordering within contentClassified
+
+The extension runs four passes inside `contentClassified`. The sequence diagram above shows the Antora-level flow; this diagram focuses on the internal pass structure.
+
+[plantuml]
+----
+include::example$pass-pipeline.puml[]
+----
+
+[width=100%, cols=""""15,40,15,30"""", options=""""header""""]
+|===
+| Pass | What happens | Scope | Why ordering matters
+
+| Pass 1
+| `processAsciiDocFile()` — DocumentParser extracts items + relationships, populates TraceabilityGraph. Both pages and partials are processed.
+| Pages + partials
+| Graph must be complete before Pass 3 can resolve cross-file `addresses:TARGET[]` references. Partials are only processed here — they skip subsequent passes.
+
+| Pass 2
+| `expandOutgoingMacros()` + `expandIncomingMacros()` — replace `traceability:outgoing[]` and `traceability:incoming[]` with formatted relationship lists (grouped by type, configurable style/order).
+| Pages only
+| Depends on complete graph from Pass 1 to enumerate relationships. Opt-in via `:traceability-links:` document attribute.
+
+| Pass 2b
+| `expandGraphMacros()` + `expandCoverageMacros()` — replace `traceability:graph[]` and `traceability:graph-coverage[]` with Kroki image URLs (DOT and Vega-Lite).
+| Pages only
+| Uses `toDot()` / `toVegaLite()` on the graph. Opt-in via `:traceability-graph:` document attribute. Independent of Pass 2.
+
+| Pass 3
+| `substituteLinksInFile()` — replace `addresses:REQ-001[]` with `xref:page.html#ID` (pages) or `link:URL#ID` (partials). Also runs `injectTitleIds()` and `unindentItemMacros()`.
+| Pages only
+| Needs complete graph (all sourceFiles known) from Pass 1. This is why Pass 1 processes all files before any macro expansion.
+|===
 
 Key timing characteristics:
 
@@ -759,21 +867,31 @@ traceability:incoming[]
 traceability:graph[]"""
 TST-002,TST-002 — Antora Extension Tests,test,,test-plan.adoc,"""Test file: `test/antora-extension.test.ts`
 
-Tests the `AntoraTraceabilityExtension` — initialization with default config, preset, config path, and disabled state. Tests event handler registration, content processing via `contentClassified` event, matrix generation via `sitePublished` event, and API access patterns.
+Tests the `AntoraTraceabilityExtension` — initialization with default config, preset, config path, and disabled state. Tests event handler registration, content processing via `contentClassified` event (in-memory only, never touches disk), matrix generation via `sitePublished` event, and API access patterns. Also tests `traceability:outgoing[]` and `traceability:incoming[]` macro expansion with configurable display style, sort order, collapsible sections, and opt-in behavior. Tests `traceability:graph[]` and `traceability:graph-coverage[]` macro expansion with graph-enabled and graph-disabled modes, including global coverage, explicit target IDs, and header exclusion. Tests automatic matrix sync to component `_attachments` directories during `sitePublished`.
 
 verifies:REQ-035[]
 verifies:REQ-040[]
+verifies:REQ-044[]
+verifies:REQ-045[]
+verifies:REQ-047[]
+verifies:REQ-048[]
+verifies:REQ-050[]
+verifies:REQ-051[]
+verifies:REQ-052[]
+verifies:REQ-055[]
+verifies:REQ-057[]
 
 traceability:outgoing[]
 traceability:incoming[]"""
 TST-003,TST-003 — CLI Tests,test,,test-plan.adoc,"""Test file: `test/cli.test.ts`
 
-Tests the Commander-based CLI — process command (valid content, empty content, invalid paths, malformed macros), matrix command (generation, empty graph), validate command (invalid graph state), export command (empty graph), stats command (empty statistics), preset commands (invalid names, init, listing), and help command.
+Tests the Commander-based CLI — process command (valid content, empty content, invalid paths, malformed macros), matrix command (generation, empty graph), validate command (invalid graph state), export command (empty graph), stats command (empty statistics), preset commands (invalid names, init, listing), help command, and next-id command (sequential ID generation, padding preservation, prefix matching).
 
 verifies:REQ-009[]
 verifies:REQ-010[]
 verifies:REQ-026[]
 verifies:REQ-036[]
+verifies:REQ-056[]
 
 traceability:outgoing[]
 traceability:incoming[]"""
@@ -798,7 +916,7 @@ traceability:outgoing[]
 traceability:incoming[]"""
 TST-005,TST-005 — Graph and API Tests,test,,test-plan.adoc,"""Test file: `test/graph-and-api.test.ts`
 
-Tests the `TraceabilityGraph` (Section 4 — extended queries: merge, getRelatedItems, getItemsWithRelationTo, getRelationshipsByRoles, findPath, getImpactAnalysis) and `RequirementsTraceabilityExtension` API methods (Section 5 — processFiles, validate, export, coverage, config access, preset management, lifecycle).
+Tests the `TraceabilityGraph` (Section 4 — extended queries: merge, getRelatedItems, getItemsWithRelationTo, getRelationshipsByRoles, findPath, getImpactAnalysis) and graph visualization methods (`toDot`, `toVegaLite`). Tests graph integrity validation including circular reference detection (direct, indirect, self-referencing cycles). Also tests `RequirementsTraceabilityExtension` API methods (Section 5 — processFiles, validate, export, coverage, config access, preset management, lifecycle).
 
 verifies:REQ-013[]
 verifies:REQ-014[]
@@ -808,6 +926,8 @@ verifies:REQ-017[]
 verifies:REQ-031[]
 verifies:REQ-032[]
 verifies:REQ-033[]
+verifies:REQ-053[]
+verifies:REQ-058[]
 
 traceability:outgoing[]
 traceability:incoming[]"""
@@ -841,6 +961,7 @@ TST-008,TST-008 — Relationship Link Substitution Tests,test,,test-plan.adoc,""
 Tests the in-memory regex substitution that replaces relationship macros with Asciidoctor xrefs. Covers same-page xref generation, cross-page xref generation with basename path resolution, orphan reference handling, non-relationship text preservation, hyphenated/dotted IDs, missing sourceFile fallback, and surrounding text preservation.
 
 verifies:REQ-010[]
+verifies:REQ-046[]
 
 traceability:outgoing[]
 traceability:incoming[]"""
