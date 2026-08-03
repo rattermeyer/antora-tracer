@@ -33,8 +33,6 @@ REQ-041-refines-REQ-029,REQ-041,REQ-029,refines,requirements.adoc
 REQ-042-refines-REQ-029,REQ-042,REQ-029,refines,requirements.adoc
 REQ-043-refines-REQ-029,REQ-043,REQ-029,refines,requirements.adoc
 REQ-055-refines-REQ-044,REQ-055,REQ-044,refines,requirements.adoc
-REQ-045-refines-REQ-044,REQ-045,REQ-044,refines,requirements.adoc
-REQ-046-refines-REQ-044,REQ-046,REQ-044,refines,requirements.adoc
 REQ-047-refines-REQ-044,REQ-047,REQ-044,refines,requirements.adoc
 REQ-048-refines-REQ-044,REQ-048,REQ-044,refines,requirements.adoc
 REQ-050-refines-REQ-044,REQ-050,REQ-044,refines,requirements.adoc
@@ -73,7 +71,6 @@ ARC-029-addresses-REQ-059,ARC-029,REQ-059,addresses,architecture.adoc
 ARC-015-addresses-QA-058,ARC-015,QA-058,addresses,architecture.adoc
 ARC-026-addresses-REQ-053,ARC-026,REQ-053,addresses,architecture.adoc
 ARC-016-addresses-QA-055,ARC-016,QA-055,addresses,architecture.adoc
-ARC-024-addresses-REQ-001,ARC-024,REQ-001,addresses,architecture.adoc
 ARC-024-addresses-REQ-044,ARC-024,REQ-044,addresses,architecture.adoc
 ARC-024-addresses-REQ-045,ARC-024,REQ-045,addresses,architecture.adoc
 ARC-024-addresses-REQ-046,ARC-024,REQ-046,addresses,architecture.adoc
@@ -105,7 +102,6 @@ ARC-022-addresses-REQ-028,ARC-022,REQ-028,addresses,architecture.adoc
 ARC-023-addresses-REQ-026,ARC-023,REQ-026,addresses,architecture.adoc
 ARC-023-addresses-REQ-036,ARC-023,REQ-036,addresses,architecture.adoc
 ARC-023-addresses-REQ-056,ARC-023,REQ-056,addresses,architecture.adoc
-ARC-003-addresses-TARGET,ARC-003,TARGET,addresses,architecture.adoc
 ARC-003-addresses-REQ-001,ARC-003,REQ-001,addresses,architecture.adoc
 ARC-003-addresses-REQ-002,ARC-003,REQ-002,addresses,architecture.adoc
 ARC-003-addresses-REQ-004,ARC-003,REQ-004,addresses,architecture.adoc
@@ -118,7 +114,6 @@ ARC-003-addresses-REQ-029,ARC-003,REQ-029,addresses,architecture.adoc
 ARC-003-addresses-REQ-035,ARC-003,REQ-035,addresses,architecture.adoc
 ARC-013-addresses-QA-055,ARC-013,QA-055,addresses,architecture.adoc
 ARC-014-addresses-QA-059,ARC-014,QA-059,addresses,architecture.adoc
-ARC-004-addresses-REQ-001,ARC-004,REQ-001,addresses,architecture.adoc
 ARC-004-addresses-REQ-010,ARC-004,REQ-010,addresses,architecture.adoc
 ARC-004-addresses-REQ-006,ARC-004,REQ-006,addresses,architecture.adoc
 ARC-004-addresses-REQ-007,ARC-004,REQ-007,addresses,architecture.adoc

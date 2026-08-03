@@ -535,4 +535,41 @@ This item is after an unmatched fence, should be skipped
     );
     expect(fenceWarnings).to.have.lengthOf(1);
   });
+
+  it("should skip inline macros inside backtick code spans", () => {
+    const parser = new DocumentParser();
+    const content = `[#REQ-001, item, role=requirement]
+====
+Item with documentation example: \`addresses:TARGET[]\` should not be parsed
+====
+`;
+    const result = parser.parse(content, "doc.adoc");
+    expect(result.items).to.have.lengthOf(1);
+    // addresses:TARGET[] inside backticks should NOT be parsed
+    const targetRels = result.relationships.filter(
+      (r) => r.targetId === "TARGET",
+    );
+    expect(targetRels).to.have.lengthOf(0);
+  });
+
+  it("should still parse macros outside backtick code spans", () => {
+    const parser = new DocumentParser();
+    const content = `[#REQ-001, item, role=requirement]
+====
+addresses:DES-001[] is real. \`addresses:TARGET[]\` is not.
+====
+`;
+    const result = parser.parse(content, "doc.adoc");
+    expect(result.items).to.have.lengthOf(1);
+    // Real macro outside backticks should be parsed
+    const realRels = result.relationships.filter(
+      (r) => r.targetId === "DES-001",
+    );
+    expect(realRels).to.have.lengthOf(1);
+    // Backtick-enclosed macro should NOT be parsed
+    const fakeRels = result.relationships.filter(
+      (r) => r.targetId === "TARGET",
+    );
+    expect(fakeRels).to.have.lengthOf(0);
+  });
 });

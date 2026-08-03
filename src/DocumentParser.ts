@@ -451,6 +451,9 @@ export class DocumentParser {
     for (const item of result.items) {
       const itemContent = item.content ?? "";
 
+      // Skip macros inside backtick code spans (documentation examples)
+      const backtickRanges = this.getBacktickRanges(itemContent);
+
       // Parse inline relationship macros: relationType:targetId[]
       // Example: satisfies:REQ-001[], addresses:DES-001[], implemented_by:IMP-001[]
       // Exclude traceability: namespace — those are link/rendering macros, not relationships
@@ -459,6 +462,9 @@ export class DocumentParser {
       let match: RegExpExecArray | null;
 
       while ((match = inlineMacroRegex.exec(itemContent)) !== null) {
+        // Skip macros inside backtick code spans
+        if (this.isInsideRange(match.index, backtickRanges)) continue;
+
         const macro = match[1];
         const line =
           this.lineAt(itemContent, match.index) + (item.sourceLine || 0);
@@ -571,6 +577,32 @@ export class DocumentParser {
 
   private generateId(prefix: string): string {
     return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+  }
+
+  /**
+   * Find backtick-enclosed code spans in content.
+   * Returns ranges that should be skipped when parsing inline macros.
+   */
+  private getBacktickRanges(
+    content: string,
+  ): Array<{ start: number; end: number }> {
+    const ranges: Array<{ start: number; end: number }> = [];
+    const btRe = /`([^`]+)`/g;
+    let m: RegExpExecArray | null;
+    while ((m = btRe.exec(content)) !== null) {
+      ranges.push({ start: m.index, end: m.index + m[0].length });
+    }
+    return ranges;
+  }
+
+  /**
+   * Check if a position falls within any of the given ranges.
+   */
+  private isInsideRange(
+    pos: number,
+    ranges: Array<{ start: number; end: number }>,
+  ): boolean {
+    return ranges.some((r) => pos >= r.start && pos < r.end);
   }
 
   /**
