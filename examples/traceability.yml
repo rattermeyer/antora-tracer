@@ -11,7 +11,7 @@ relations:
     requirement: ["leads_to"]
 
 matrices:
-  - name: usecase-requirements
+  - name: usecases-to-requirements
     description: "Use cases traced to requirements"
     rows: use_case
     columns: [requirement]

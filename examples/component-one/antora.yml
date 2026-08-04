@@ -1,0 +1,15 @@
+name: tracer
+title: Antora Tracer
+version: 0.13
+prerelease: '-wip'
+start_page: index.adoc
+nav:
+  - modules/ROOT/nav.adoc
+ext:
+  assembler:
+    - profile: pdf-architecture
+      nav:
+        - modules/ROOT/nav-architecture.adoc
+    - profile: pdf-test-plan
+      nav:
+        - modules/ROOT/nav-test-plan.adoc

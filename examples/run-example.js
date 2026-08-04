@@ -14,8 +14,8 @@ import {
 } from "../lib/src/index.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const pagesDir = resolve(__dirname, "modules/ROOT/pages");
-const outputDir = resolve(__dirname, "modules/ROOT/attachments/traceability");
+const pagesDir = resolve(__dirname, "component-one/modules/ROOT/pages");
+const outputDir = resolve(__dirname, "component-one/modules/ROOT/attachments/traceability");
 
 // Load custom config
 const configLoader = new ConfigLoader();
@@ -23,12 +23,20 @@ configLoader.load(resolve(__dirname, "traceability.yml"));
 
 // Process all example files
 const extension = new RequirementsTraceabilityExtension(configLoader);
-const files = ["requirements.adoc", "architecture.adoc", "test-plan.adoc", "quality/zero-operational-overhead.adoc", "quality/configurable-without-code.adoc", "quality/fail-fast-diagnostics.adoc", "quality/no-side-effects.adoc", "quality/testability-by-design.adoc", "quality/pdf-compatibility.adoc"];
+const files = [
+  { adoc: "requirements.adoc", realPath: resolve(__dirname, "component-one/modules/requirements/pages/index.adoc") },
+  "architecture.adoc", "test-plan.adoc",
+  "quality/zero-operational-overhead.adoc", "quality/configurable-without-code.adoc",
+  "quality/fail-fast-diagnostics.adoc", "quality/no-side-effects.adoc",
+  "quality/testability-by-design.adoc", "quality/pdf-compatibility.adoc"
+];
 const results = extension.processFiles(
-  files.map((f) => ({
-    path: f,
-    content: readFileSync(resolve(pagesDir, f), "utf8"),
-  })),
+  files.map((f) => {
+    if (typeof f === "string") {
+      return { path: f, content: readFileSync(resolve(pagesDir, f), "utf8") };
+    }
+    return { path: f.adoc, content: readFileSync(f.realPath, "utf8") };
+  }),
 );
 
 // Print summary

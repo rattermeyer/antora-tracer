@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>test-coverage - Traceability Matrix</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        h1, h2, h3 { color: #333; }
+        .matrix-container { overflow-x: auto; margin: 20px 0; }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #4a5568;
+            color: white;
+            font-weight: 600;
+        }
+        tr:nth-child(even) { background-color: #f8f9fa; }
+        tr:hover { background-color: #e9ecef; }
+
+        /* Role-specific styling */
+        .role-requirement { background-color: #fff5f5; }
+        .role-design { background-color: #f0fff4; }
+        .role-implementation { background-color: #f0f8ff; }
+        .role-test { background-color: #fffaf0; }
+        .role-document { background-color: #f8f9fa; }
+
+        /* Status styling */
+        .status-complete { background-color: #d6f5d6; }
+        .status-partial { background-color: #fff9db; }
+        .status-missing { background-color: #ffdbdb; }
+
+        .coverage-summary {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .coverage-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .coverage-complete { background-color: #22c55e; color: white; }
+        .coverage-partial { background-color: #f59e0b; color: white; }
+        .coverage-missing { background-color: #ef4444; color: white; }
+        .coverage-low { background-color: #f97316; color: white; }
+
+        .metadata {
+            color: #666;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        .empty-cell { color: #999; font-style: italic; }
+
+        /* Item link styling */
+        .matrix-container a {
+            color: inherit;
+            text-decoration: none;
+        }
+        .matrix-container a:hover {
+            text-decoration: underline;
+        }
+        .source-ref {
+            color: #666;
+            font-size: 0.85em;
+            margin-left: 0.5em;
+        }
+    </style>
+</head>
+<body>
+    <h1>test-coverage</h1>
+    <p class="metadata">Type: test-requirement-design-implementation | Generated: 2026-08-04T18:30:04.268Z</p>
+
+    <div class="coverage-summary">
+        <h3>Coverage Summary</h3>
+        <p>
+            <span class="coverage-badge coverage-complete">Complete: 0 / 8</span>
+            <span class="coverage-badge coverage-partial">Partial: 8</span>
+            <span class="coverage-badge coverage-missing">Missing: 0</span>
+            <br>
+            <strong>Overall Coverage: 0.0%</strong>
+        </p>
+    </div>
+
+    <div class="matrix-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>requirement<br><small>requirement</small></th>
+                    <th>design<br><small>design</small></th>
+                    <th>implementation<br><small>implementation</small></th>
+                    <th>Coverage</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="status-partial role-test">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;test-plan.html#TST-001">TST-001</a>
+                    </td>
+                    <td>TST-001 — Core Extension Tests</td>
+                    <td class="role-requirement">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-001" title="Source: requirements.adoc"><strong>REQ-001</strong></a>
+                                : REQ-001 — Single &#x60;item&#x60; macro replaces all block macros
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-002" title="Source: requirements.adoc"><strong>REQ-002</strong></a>
+                                : REQ-002 — &#x60;item&#x60; macro accepts role attribute
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-003" title="Source: requirements.adoc"><strong>REQ-003</strong></a>
+                                : REQ-003 — &#x60;item&#x60; macro maintains existing attributes
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-004" title="Source: requirements.adoc"><strong>REQ-004</strong></a>
+                                : REQ-004 — &#x60;item&#x60; macro supports block content
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-005" title="Source: requirements.adoc"><strong>REQ-005</strong></a>
+                                : REQ-005 — Old macro syntax generates deprecation error
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-029" title="Source: requirements.adoc"><strong>REQ-029</strong></a>
+                                : REQ-029 — Configurable matrix generation with coverage calculations
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-030" title="Source: requirements.adoc"><strong>REQ-030</strong></a>
+                                : REQ-030 — Role statistics reporting
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-034" title="Source: requirements.adoc"><strong>REQ-034</strong></a>
+                                : REQ-034 — Mustache template rendering
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>33.3%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-test">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;test-plan.html#TST-002">TST-002</a>
+                    </td>
+                    <td>TST-002 — Antora Extension Tests</td>
+                    <td class="role-requirement">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-035" title="Source: requirements.adoc"><strong>REQ-035</strong></a>
+                                : REQ-035 — Antora extension integration
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-040" title="Source: requirements.adoc"><strong>REQ-040</strong></a>
+                                : REQ-040 — Context-aware link generation
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-044" title="Source: requirements.adoc"><strong>REQ-044</strong></a>
+                                : REQ-044 — traceability:outgoing[] renders outgoing links
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-045" title="Source: requirements.adoc"><strong>REQ-045</strong></a>
+                                : REQ-045 — Opt-in via AsciiDoc attribute
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-047" title="Source: requirements.adoc"><strong>REQ-047</strong></a>
+                                : REQ-047 — Configurable display style
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-048" title="Source: requirements.adoc"><strong>REQ-048</strong></a>
+                                : REQ-048 — Configurable sort order
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-050" title="Source: requirements.adoc"><strong>REQ-050</strong></a>
+                                : REQ-050 — Source files never modified
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-051" title="Source: requirements.adoc"><strong>REQ-051</strong></a>
+                                : REQ-051 — Relationship graph via traceability:graph[] macro
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-052" title="Source: requirements.adoc"><strong>REQ-052</strong></a>
+                                : REQ-052 — Coverage chart via traceability:graph-coverage[] macro
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-055" title="Source: requirements.adoc"><strong>REQ-055</strong></a>
+                                : REQ-055 — traceability:incoming[] renders incoming links
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-057" title="Source: requirements.adoc"><strong>REQ-057</strong></a>
+                                : REQ-057 — Matrix files synced to component _attachments
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>33.3%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-test">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;test-plan.html#TST-003">TST-003</a>
+                    </td>
+                    <td>TST-003 — CLI Tests</td>
+                    <td class="role-requirement">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-009" title="Source: requirements.adoc"><strong>REQ-009</strong></a>
+                                : REQ-009 — Configuration is required for validation
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-010" title="Source: requirements.adoc"><strong>REQ-010</strong></a>
+                                : REQ-010 — Configuration file location
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-026" title="Source: requirements.adoc"><strong>REQ-026</strong></a>
+                                : REQ-026 — Export command in CLI
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-036" title="Source: requirements.adoc"><strong>REQ-036</strong></a>
+                                : REQ-036 — CLI commands
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-056" title="Source: requirements.adoc"><strong>REQ-056</strong></a>
+                                : REQ-056 — CLI next-id command returns next available ID
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>33.3%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-test">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;test-plan.html#TST-004">TST-004</a>
+                    </td>
+                    <td>TST-004 — ConfigLoader Tests</td>
+                    <td class="role-requirement">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-006" title="Source: requirements.adoc"><strong>REQ-006</strong></a>
+                                : REQ-006 — Configuration defines roles
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-007" title="Source: requirements.adoc"><strong>REQ-007</strong></a>
+                                : REQ-007 — Configuration defines relations
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-008" title="Source: requirements.adoc"><strong>REQ-008</strong></a>
+                                : REQ-008 — Configuration defines matrices
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-010" title="Source: requirements.adoc"><strong>REQ-010</strong></a>
+                                : REQ-010 — Configuration file location
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-011" title="Source: requirements.adoc"><strong>REQ-011</strong></a>
+                                : REQ-011 — Configuration validation
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-012" title="Source: requirements.adoc"><strong>REQ-012</strong></a>
+                                : REQ-012 — Configuration can extend presets
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-018" title="Source: requirements.adoc"><strong>REQ-018</strong></a>
+                                : REQ-018 — Built-in preset configurations
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-019" title="Source: requirements.adoc"><strong>REQ-019</strong></a>
+                                : REQ-019 — Each preset contains complete configuration
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-020" title="Source: requirements.adoc"><strong>REQ-020</strong></a>
+                                : REQ-020 — Each preset includes documentation
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-021" title="Source: requirements.adoc"><strong>REQ-021</strong></a>
+                                : REQ-021 — Each preset includes Neo4j Cypher queries
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-022" title="Source: requirements.adoc"><strong>REQ-022</strong></a>
+                                : REQ-022 — Presets have independent versioning
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-023" title="Source: requirements.adoc"><strong>REQ-023</strong></a>
+                                : REQ-023 — Users can define custom presets
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>33.3%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-test">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;test-plan.html#TST-005">TST-005</a>
+                    </td>
+                    <td>TST-005 — Graph and API Tests</td>
+                    <td class="role-requirement">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-013" title="Source: requirements.adoc"><strong>REQ-013</strong></a>
+                                : REQ-013 — Role-based relation validation
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-014" title="Source: requirements.adoc"><strong>REQ-014</strong></a>
+                                : REQ-014 — Directional relation checking
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-015" title="Source: requirements.adoc"><strong>REQ-015</strong></a>
+                                : REQ-015 — Error messages list allowed relations
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-016" title="Source: requirements.adoc"><strong>REQ-016</strong></a>
+                                : REQ-016 — Warnings for unknown roles
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-017" title="Source: requirements.adoc"><strong>REQ-017</strong></a>
+                                : REQ-017 — Graceful degradation for unknown roles
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-031" title="Source: requirements.adoc"><strong>REQ-031</strong></a>
+                                : REQ-031 — Graph path finding
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-032" title="Source: requirements.adoc"><strong>REQ-032</strong></a>
+                                : REQ-032 — Impact analysis
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-033" title="Source: requirements.adoc"><strong>REQ-033</strong></a>
+                                : REQ-033 — Graph merge
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-053" title="Source: requirements.adoc"><strong>REQ-053</strong></a>
+                                : REQ-053 — Graph visualization methods on TraceabilityGraph
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-058" title="Source: requirements.adoc"><strong>REQ-058</strong></a>
+                                : REQ-058 — Circular reference detection
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>33.3%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-test">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;test-plan.html#TST-006">TST-006</a>
+                    </td>
+                    <td>TST-006 — MatrixGenerator Tests</td>
+                    <td class="role-requirement">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-008" title="Source: requirements.adoc"><strong>REQ-008</strong></a>
+                                : REQ-008 — Configuration defines matrices
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-029" title="Source: requirements.adoc"><strong>REQ-029</strong></a>
+                                : REQ-029 — Configurable matrix generation with coverage calculations
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-037" title="Source: requirements.adoc"><strong>REQ-037</strong></a>
+                                : REQ-037 — Matrix row items are clickable links
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-038" title="Source: requirements.adoc"><strong>REQ-038</strong></a>
+                                : REQ-038 — Matrix cell items are clickable links
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-039" title="Source: requirements.adoc"><strong>REQ-039</strong></a>
+                                : REQ-039 — Source file tooltips on matrix links
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-042" title="Source: requirements.adoc"><strong>REQ-042</strong></a>
+                                : REQ-042 — Backward compatibility without LinkResolver
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-043" title="Source: requirements.adoc"><strong>REQ-043</strong></a>
+                                : REQ-043 — Non-HTML matrix outputs unchanged
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>33.3%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-test">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;test-plan.html#TST-007">TST-007</a>
+                    </td>
+                    <td>TST-007 — Neo4jExporter Tests</td>
+                    <td class="role-requirement">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-024" title="Source: requirements.adoc"><strong>REQ-024</strong></a>
+                                : REQ-024 — Neo4j CSV export
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-025" title="Source: requirements.adoc"><strong>REQ-025</strong></a>
+                                : REQ-025 — Neo4j Cypher export
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-027" title="Source: requirements.adoc"><strong>REQ-027</strong></a>
+                                : REQ-027 — Export includes all item attributes
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-028" title="Source: requirements.adoc"><strong>REQ-028</strong></a>
+                                : REQ-028 — Export is optional
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>33.3%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-test">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;test-plan.html#TST-008">TST-008</a>
+                    </td>
+                    <td>TST-008 — Relationship Link Substitution Tests</td>
+                    <td class="role-requirement">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-010" title="Source: requirements.adoc"><strong>REQ-010</strong></a>
+                                : REQ-010 — Configuration file location
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-046" title="Source: requirements.adoc"><strong>REQ-046</strong></a>
+                                : REQ-046 — Inline macros are pure data markers
+                                <small class="source-ref">[requirements.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>33.3%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <footer class="metadata">
+        <p>Generated by Antora Tracer Extension</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,2011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>requirements-traceability - Traceability Matrix</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        h1, h2, h3 { color: #333; }
+        .matrix-container { overflow-x: auto; margin: 20px 0; }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #4a5568;
+            color: white;
+            font-weight: 600;
+        }
+        tr:nth-child(even) { background-color: #f8f9fa; }
+        tr:hover { background-color: #e9ecef; }
+
+        /* Role-specific styling */
+        .role-requirement { background-color: #fff5f5; }
+        .role-design { background-color: #f0fff4; }
+        .role-implementation { background-color: #f0f8ff; }
+        .role-test { background-color: #fffaf0; }
+        .role-document { background-color: #f8f9fa; }
+
+        /* Status styling */
+        .status-complete { background-color: #d6f5d6; }
+        .status-partial { background-color: #fff9db; }
+        .status-missing { background-color: #ffdbdb; }
+
+        .coverage-summary {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .coverage-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .coverage-complete { background-color: #22c55e; color: white; }
+        .coverage-partial { background-color: #f59e0b; color: white; }
+        .coverage-missing { background-color: #ef4444; color: white; }
+        .coverage-low { background-color: #f97316; color: white; }
+
+        .metadata {
+            color: #666;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        .empty-cell { color: #999; font-style: italic; }
+
+        /* Item link styling */
+        .matrix-container a {
+            color: inherit;
+            text-decoration: none;
+        }
+        .matrix-container a:hover {
+            text-decoration: underline;
+        }
+        .source-ref {
+            color: #666;
+            font-size: 0.85em;
+            margin-left: 0.5em;
+        }
+    </style>
+</head>
+<body>
+    <h1>requirements-traceability</h1>
+    <p class="metadata">Type: requirement-design-implementation-test-document | Generated: 2026-08-04T18:30:04.260Z</p>
+
+    <div class="coverage-summary">
+        <h3>Coverage Summary</h3>
+        <p>
+            <span class="coverage-badge coverage-complete">Complete: 0 / 64</span>
+            <span class="coverage-badge coverage-partial">Partial: 62</span>
+            <span class="coverage-badge coverage-missing">Missing: 2</span>
+            <br>
+            <strong>Overall Coverage: 0.0%</strong>
+        </p>
+    </div>
+
+    <div class="matrix-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>design<br><small>design</small></th>
+                    <th>implementation<br><small>implementation</small></th>
+                    <th>test<br><small>test</small></th>
+                    <th>document<br><small>document</small></th>
+                    <th>Coverage</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-001">REQ-001</a>
+                    </td>
+                    <td>REQ-001 — Single &#x60;item&#x60; macro replaces all block macros</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-001" title="Source: architecture.adoc"><strong>ARC-001</strong></a>
+                                : ARC-001 — Project scope and architectural goals
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-002" title="Source: architecture.adoc"><strong>ARC-002</strong></a>
+                                : ARC-002 — Component-level architecture
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-017" title="Source: architecture.adoc"><strong>ARC-017</strong></a>
+                                : ARC-017 — Regex-based parsing
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-003" title="Source: architecture.adoc"><strong>ARC-003</strong></a>
+                                : ARC-003 — Processing flow during Antora build
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-001" title="Source: test-plan.adoc"><strong>TST-001</strong></a>
+                                : TST-001 — Core Extension Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-002">REQ-002</a>
+                    </td>
+                    <td>REQ-002 — &#x60;item&#x60; macro accepts role attribute</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-002" title="Source: architecture.adoc"><strong>ARC-002</strong></a>
+                                : ARC-002 — Component-level architecture
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-017" title="Source: architecture.adoc"><strong>ARC-017</strong></a>
+                                : ARC-017 — Regex-based parsing
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-003" title="Source: architecture.adoc"><strong>ARC-003</strong></a>
+                                : ARC-003 — Processing flow during Antora build
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-001" title="Source: test-plan.adoc"><strong>TST-001</strong></a>
+                                : TST-001 — Core Extension Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-003">REQ-003</a>
+                    </td>
+                    <td>REQ-003 — &#x60;item&#x60; macro maintains existing attributes</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-002" title="Source: architecture.adoc"><strong>ARC-002</strong></a>
+                                : ARC-002 — Component-level architecture
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-017" title="Source: architecture.adoc"><strong>ARC-017</strong></a>
+                                : ARC-017 — Regex-based parsing
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-001" title="Source: test-plan.adoc"><strong>TST-001</strong></a>
+                                : TST-001 — Core Extension Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-004">REQ-004</a>
+                    </td>
+                    <td>REQ-004 — &#x60;item&#x60; macro supports block content</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-002" title="Source: architecture.adoc"><strong>ARC-002</strong></a>
+                                : ARC-002 — Component-level architecture
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-017" title="Source: architecture.adoc"><strong>ARC-017</strong></a>
+                                : ARC-017 — Regex-based parsing
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-003" title="Source: architecture.adoc"><strong>ARC-003</strong></a>
+                                : ARC-003 — Processing flow during Antora build
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-001" title="Source: test-plan.adoc"><strong>TST-001</strong></a>
+                                : TST-001 — Core Extension Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-005">REQ-005</a>
+                    </td>
+                    <td>REQ-005 — Old macro syntax generates deprecation error</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-003" title="Source: architecture.adoc"><strong>ARC-003</strong></a>
+                                : ARC-003 — Processing flow during Antora build
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-001" title="Source: test-plan.adoc"><strong>TST-001</strong></a>
+                                : TST-001 — Core Extension Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-006">REQ-006</a>
+                    </td>
+                    <td>REQ-006 — Configuration defines roles</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-001" title="Source: architecture.adoc"><strong>ARC-001</strong></a>
+                                : ARC-001 — Project scope and architectural goals
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-002" title="Source: architecture.adoc"><strong>ARC-002</strong></a>
+                                : ARC-002 — Component-level architecture
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-004" title="Source: architecture.adoc"><strong>ARC-004</strong></a>
+                                : ARC-004 — Key architectural decisions and their rationale
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-004" title="Source: test-plan.adoc"><strong>TST-004</strong></a>
+                                : TST-004 — ConfigLoader Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-007">REQ-007</a>
+                    </td>
+                    <td>REQ-007 — Configuration defines relations</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-002" title="Source: architecture.adoc"><strong>ARC-002</strong></a>
+                                : ARC-002 — Component-level architecture
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-004" title="Source: architecture.adoc"><strong>ARC-004</strong></a>
+                                : ARC-004 — Key architectural decisions and their rationale
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-004" title="Source: test-plan.adoc"><strong>TST-004</strong></a>
+                                : TST-004 — ConfigLoader Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-008">REQ-008</a>
+                    </td>
+                    <td>REQ-008 — Configuration defines matrices</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-002" title="Source: architecture.adoc"><strong>ARC-002</strong></a>
+                                : ARC-002 — Component-level architecture
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-019" title="Source: architecture.adoc"><strong>ARC-019</strong></a>
+                                : ARC-019 — Config-driven matrix generation with coverage calculations
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-004" title="Source: architecture.adoc"><strong>ARC-004</strong></a>
+                                : ARC-004 — Key architectural decisions and their rationale
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-004" title="Source: test-plan.adoc"><strong>TST-004</strong></a>
+                                : TST-004 — ConfigLoader Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-006" title="Source: test-plan.adoc"><strong>TST-006</strong></a>
+                                : TST-006 — MatrixGenerator Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-009">REQ-009</a>
+                    </td>
+                    <td>REQ-009 — Configuration is required for validation</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-001" title="Source: architecture.adoc"><strong>ARC-001</strong></a>
+                                : ARC-001 — Project scope and architectural goals
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-003" title="Source: test-plan.adoc"><strong>TST-003</strong></a>
+                                : TST-003 — CLI Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-010">REQ-010</a>
+                    </td>
+                    <td>REQ-010 — Configuration file location</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-004" title="Source: architecture.adoc"><strong>ARC-004</strong></a>
+                                : ARC-004 — Key architectural decisions and their rationale
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-003" title="Source: test-plan.adoc"><strong>TST-003</strong></a>
+                                : TST-003 — CLI Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-004" title="Source: test-plan.adoc"><strong>TST-004</strong></a>
+                                : TST-004 — ConfigLoader Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-008" title="Source: test-plan.adoc"><strong>TST-008</strong></a>
+                                : TST-008 — Relationship Link Substitution Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-011">REQ-011</a>
+                    </td>
+                    <td>REQ-011 — Configuration validation</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-002" title="Source: architecture.adoc"><strong>ARC-002</strong></a>
+                                : ARC-002 — Component-level architecture
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-004" title="Source: test-plan.adoc"><strong>TST-004</strong></a>
+                                : TST-004 — ConfigLoader Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-012">REQ-012</a>
+                    </td>
+                    <td>REQ-012 — Configuration can extend presets</td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-004" title="Source: test-plan.adoc"><strong>TST-004</strong></a>
+                                : TST-004 — ConfigLoader Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>25.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-013">REQ-013</a>
+                    </td>
+                    <td>REQ-013 — Role-based relation validation</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-001" title="Source: architecture.adoc"><strong>ARC-001</strong></a>
+                                : ARC-001 — Project scope and architectural goals
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-003" title="Source: architecture.adoc"><strong>ARC-003</strong></a>
+                                : ARC-003 — Processing flow during Antora build
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-004" title="Source: architecture.adoc"><strong>ARC-004</strong></a>
+                                : ARC-004 — Key architectural decisions and their rationale
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-005" title="Source: test-plan.adoc"><strong>TST-005</strong></a>
+                                : TST-005 — Graph and API Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-014">REQ-014</a>
+                    </td>
+                    <td>REQ-014 — Directional relation checking</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-003" title="Source: architecture.adoc"><strong>ARC-003</strong></a>
+                                : ARC-003 — Processing flow during Antora build
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-005" title="Source: test-plan.adoc"><strong>TST-005</strong></a>
+                                : TST-005 — Graph and API Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-015">REQ-015</a>
+                    </td>
+                    <td>REQ-015 — Error messages list allowed relations</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-004" title="Source: architecture.adoc"><strong>ARC-004</strong></a>
+                                : ARC-004 — Key architectural decisions and their rationale
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-005" title="Source: test-plan.adoc"><strong>TST-005</strong></a>
+                                : TST-005 — Graph and API Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-016">REQ-016</a>
+                    </td>
+                    <td>REQ-016 — Warnings for unknown roles</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-003" title="Source: architecture.adoc"><strong>ARC-003</strong></a>
+                                : ARC-003 — Processing flow during Antora build
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-005" title="Source: test-plan.adoc"><strong>TST-005</strong></a>
+                                : TST-005 — Graph and API Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-017">REQ-017</a>
+                    </td>
+                    <td>REQ-017 — Graceful degradation for unknown roles</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-003" title="Source: architecture.adoc"><strong>ARC-003</strong></a>
+                                : ARC-003 — Processing flow during Antora build
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-005" title="Source: test-plan.adoc"><strong>TST-005</strong></a>
+                                : TST-005 — Graph and API Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-058">REQ-058</a>
+                    </td>
+                    <td>REQ-058 — Circular reference detection</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-028" title="Source: architecture.adoc"><strong>ARC-028</strong></a>
+                                : ARC-028 — Circular reference detection in graph validation
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-005" title="Source: test-plan.adoc"><strong>TST-005</strong></a>
+                                : TST-005 — Graph and API Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-018">REQ-018</a>
+                    </td>
+                    <td>REQ-018 — Built-in preset configurations</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-001" title="Source: architecture.adoc"><strong>ARC-001</strong></a>
+                                : ARC-001 — Project scope and architectural goals
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-004" title="Source: architecture.adoc"><strong>ARC-004</strong></a>
+                                : ARC-004 — Key architectural decisions and their rationale
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-004" title="Source: test-plan.adoc"><strong>TST-004</strong></a>
+                                : TST-004 — ConfigLoader Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-019">REQ-019</a>
+                    </td>
+                    <td>REQ-019 — Each preset contains complete configuration</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-012" title="Source: architecture.adoc"><strong>ARC-012</strong></a>
+                                : ARC-012 — Preset YAML schema
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-004" title="Source: test-plan.adoc"><strong>TST-004</strong></a>
+                                : TST-004 — ConfigLoader Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-020">REQ-020</a>
+                    </td>
+                    <td>REQ-020 — Each preset includes documentation</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-012" title="Source: architecture.adoc"><strong>ARC-012</strong></a>
+                                : ARC-012 — Preset YAML schema
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-004" title="Source: test-plan.adoc"><strong>TST-004</strong></a>
+                                : TST-004 — ConfigLoader Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-021">REQ-021</a>
+                    </td>
+                    <td>REQ-021 — Each preset includes Neo4j Cypher queries</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-012" title="Source: architecture.adoc"><strong>ARC-012</strong></a>
+                                : ARC-012 — Preset YAML schema
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-004" title="Source: test-plan.adoc"><strong>TST-004</strong></a>
+                                : TST-004 — ConfigLoader Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-022">REQ-022</a>
+                    </td>
+                    <td>REQ-022 — Presets have independent versioning</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-012" title="Source: architecture.adoc"><strong>ARC-012</strong></a>
+                                : ARC-012 — Preset YAML schema
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-004" title="Source: test-plan.adoc"><strong>TST-004</strong></a>
+                                : TST-004 — ConfigLoader Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-023">REQ-023</a>
+                    </td>
+                    <td>REQ-023 — Users can define custom presets</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-012" title="Source: architecture.adoc"><strong>ARC-012</strong></a>
+                                : ARC-012 — Preset YAML schema
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-004" title="Source: test-plan.adoc"><strong>TST-004</strong></a>
+                                : TST-004 — ConfigLoader Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-024">REQ-024</a>
+                    </td>
+                    <td>REQ-024 — Neo4j CSV export</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-001" title="Source: architecture.adoc"><strong>ARC-001</strong></a>
+                                : ARC-001 — Project scope and architectural goals
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-002" title="Source: architecture.adoc"><strong>ARC-002</strong></a>
+                                : ARC-002 — Component-level architecture
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-022" title="Source: architecture.adoc"><strong>ARC-022</strong></a>
+                                : ARC-022 — Graph-to-Neo4j CSV and Cypher export
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-004" title="Source: architecture.adoc"><strong>ARC-004</strong></a>
+                                : ARC-004 — Key architectural decisions and their rationale
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-007" title="Source: test-plan.adoc"><strong>TST-007</strong></a>
+                                : TST-007 — Neo4jExporter Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-025">REQ-025</a>
+                    </td>
+                    <td>REQ-025 — Neo4j Cypher export</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-002" title="Source: architecture.adoc"><strong>ARC-002</strong></a>
+                                : ARC-002 — Component-level architecture
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-022" title="Source: architecture.adoc"><strong>ARC-022</strong></a>
+                                : ARC-022 — Graph-to-Neo4j CSV and Cypher export
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-007" title="Source: test-plan.adoc"><strong>TST-007</strong></a>
+                                : TST-007 — Neo4jExporter Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-026">REQ-026</a>
+                    </td>
+                    <td>REQ-026 — Export command in CLI</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-023" title="Source: architecture.adoc"><strong>ARC-023</strong></a>
+                                : ARC-023 — Commander-based CLI with subcommands
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-003" title="Source: test-plan.adoc"><strong>TST-003</strong></a>
+                                : TST-003 — CLI Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-027">REQ-027</a>
+                    </td>
+                    <td>REQ-027 — Export includes all item attributes</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-022" title="Source: architecture.adoc"><strong>ARC-022</strong></a>
+                                : ARC-022 — Graph-to-Neo4j CSV and Cypher export
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-007" title="Source: test-plan.adoc"><strong>TST-007</strong></a>
+                                : TST-007 — Neo4jExporter Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-028">REQ-028</a>
+                    </td>
+                    <td>REQ-028 — Export is optional</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-022" title="Source: architecture.adoc"><strong>ARC-022</strong></a>
+                                : ARC-022 — Graph-to-Neo4j CSV and Cypher export
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-004" title="Source: architecture.adoc"><strong>ARC-004</strong></a>
+                                : ARC-004 — Key architectural decisions and their rationale
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-007" title="Source: test-plan.adoc"><strong>TST-007</strong></a>
+                                : TST-007 — Neo4jExporter Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-029">REQ-029</a>
+                    </td>
+                    <td>REQ-029 — Configurable matrix generation with coverage calculations</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-002" title="Source: architecture.adoc"><strong>ARC-002</strong></a>
+                                : ARC-002 — Component-level architecture
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-019" title="Source: architecture.adoc"><strong>ARC-019</strong></a>
+                                : ARC-019 — Config-driven matrix generation with coverage calculations
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-003" title="Source: architecture.adoc"><strong>ARC-003</strong></a>
+                                : ARC-003 — Processing flow during Antora build
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-004" title="Source: architecture.adoc"><strong>ARC-004</strong></a>
+                                : ARC-004 — Key architectural decisions and their rationale
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-001" title="Source: test-plan.adoc"><strong>TST-001</strong></a>
+                                : TST-001 — Core Extension Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-006" title="Source: test-plan.adoc"><strong>TST-006</strong></a>
+                                : TST-006 — MatrixGenerator Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-030">REQ-030</a>
+                    </td>
+                    <td>REQ-030 — Role statistics reporting</td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-001" title="Source: test-plan.adoc"><strong>TST-001</strong></a>
+                                : TST-001 — Core Extension Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>25.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-031">REQ-031</a>
+                    </td>
+                    <td>REQ-031 — Graph path finding</td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-005" title="Source: test-plan.adoc"><strong>TST-005</strong></a>
+                                : TST-005 — Graph and API Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>25.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-032">REQ-032</a>
+                    </td>
+                    <td>REQ-032 — Impact analysis</td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-005" title="Source: test-plan.adoc"><strong>TST-005</strong></a>
+                                : TST-005 — Graph and API Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>25.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-033">REQ-033</a>
+                    </td>
+                    <td>REQ-033 — Graph merge</td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-005" title="Source: test-plan.adoc"><strong>TST-005</strong></a>
+                                : TST-005 — Graph and API Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>25.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-034">REQ-034</a>
+                    </td>
+                    <td>REQ-034 — Mustache template rendering</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-002" title="Source: architecture.adoc"><strong>ARC-002</strong></a>
+                                : ARC-002 — Component-level architecture
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-020" title="Source: architecture.adoc"><strong>ARC-020</strong></a>
+                                : ARC-020 — Mustache template rendering for HTML output
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-004" title="Source: architecture.adoc"><strong>ARC-004</strong></a>
+                                : ARC-004 — Key architectural decisions and their rationale
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-001" title="Source: test-plan.adoc"><strong>TST-001</strong></a>
+                                : TST-001 — Core Extension Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-035">REQ-035</a>
+                    </td>
+                    <td>REQ-035 — Antora extension integration</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-001" title="Source: architecture.adoc"><strong>ARC-001</strong></a>
+                                : ARC-001 — Project scope and architectural goals
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-003" title="Source: architecture.adoc"><strong>ARC-003</strong></a>
+                                : ARC-003 — Processing flow during Antora build
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-002" title="Source: test-plan.adoc"><strong>TST-002</strong></a>
+                                : TST-002 — Antora Extension Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-036">REQ-036</a>
+                    </td>
+                    <td>REQ-036 — CLI commands</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-001" title="Source: architecture.adoc"><strong>ARC-001</strong></a>
+                                : ARC-001 — Project scope and architectural goals
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-023" title="Source: architecture.adoc"><strong>ARC-023</strong></a>
+                                : ARC-023 — Commander-based CLI with subcommands
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-003" title="Source: test-plan.adoc"><strong>TST-003</strong></a>
+                                : TST-003 — CLI Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-037">REQ-037</a>
+                    </td>
+                    <td>REQ-037 — Matrix row items are clickable links</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-021" title="Source: architecture.adoc"><strong>ARC-021</strong></a>
+                                : ARC-021 — Path resolution for matrix-to-item links
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-006" title="Source: test-plan.adoc"><strong>TST-006</strong></a>
+                                : TST-006 — MatrixGenerator Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-038">REQ-038</a>
+                    </td>
+                    <td>REQ-038 — Matrix cell items are clickable links</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-021" title="Source: architecture.adoc"><strong>ARC-021</strong></a>
+                                : ARC-021 — Path resolution for matrix-to-item links
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-006" title="Source: test-plan.adoc"><strong>TST-006</strong></a>
+                                : TST-006 — MatrixGenerator Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-039">REQ-039</a>
+                    </td>
+                    <td>REQ-039 — Source file tooltips on matrix links</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-021" title="Source: architecture.adoc"><strong>ARC-021</strong></a>
+                                : ARC-021 — Path resolution for matrix-to-item links
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-006" title="Source: test-plan.adoc"><strong>TST-006</strong></a>
+                                : TST-006 — MatrixGenerator Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-040">REQ-040</a>
+                    </td>
+                    <td>REQ-040 — Context-aware link generation</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-021" title="Source: architecture.adoc"><strong>ARC-021</strong></a>
+                                : ARC-021 — Path resolution for matrix-to-item links
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-002" title="Source: test-plan.adoc"><strong>TST-002</strong></a>
+                                : TST-002 — Antora Extension Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-041">REQ-041</a>
+                    </td>
+                    <td>REQ-041 — Source file path normalization</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-021" title="Source: architecture.adoc"><strong>ARC-021</strong></a>
+                                : ARC-021 — Path resolution for matrix-to-item links
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>25.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-042">REQ-042</a>
+                    </td>
+                    <td>REQ-042 — Backward compatibility without LinkResolver</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-021" title="Source: architecture.adoc"><strong>ARC-021</strong></a>
+                                : ARC-021 — Path resolution for matrix-to-item links
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-006" title="Source: test-plan.adoc"><strong>TST-006</strong></a>
+                                : TST-006 — MatrixGenerator Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-043">REQ-043</a>
+                    </td>
+                    <td>REQ-043 — Non-HTML matrix outputs unchanged</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-021" title="Source: architecture.adoc"><strong>ARC-021</strong></a>
+                                : ARC-021 — Path resolution for matrix-to-item links
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-006" title="Source: test-plan.adoc"><strong>TST-006</strong></a>
+                                : TST-006 — MatrixGenerator Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-044">REQ-044</a>
+                    </td>
+                    <td>REQ-044 — traceability:outgoing[] renders outgoing links</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-024" title="Source: architecture.adoc"><strong>ARC-024</strong></a>
+                                : ARC-024 — traceability:outgoing[] and traceability:incoming[] link rendering
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-002" title="Source: test-plan.adoc"><strong>TST-002</strong></a>
+                                : TST-002 — Antora Extension Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-055">REQ-055</a>
+                    </td>
+                    <td>REQ-055 — traceability:incoming[] renders incoming links</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-024" title="Source: architecture.adoc"><strong>ARC-024</strong></a>
+                                : ARC-024 — traceability:outgoing[] and traceability:incoming[] link rendering
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-002" title="Source: test-plan.adoc"><strong>TST-002</strong></a>
+                                : TST-002 — Antora Extension Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-045">REQ-045</a>
+                    </td>
+                    <td>REQ-045 — Opt-in via AsciiDoc attribute</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-024" title="Source: architecture.adoc"><strong>ARC-024</strong></a>
+                                : ARC-024 — traceability:outgoing[] and traceability:incoming[] link rendering
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-002" title="Source: test-plan.adoc"><strong>TST-002</strong></a>
+                                : TST-002 — Antora Extension Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-046">REQ-046</a>
+                    </td>
+                    <td>REQ-046 — Inline macros are pure data markers</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-024" title="Source: architecture.adoc"><strong>ARC-024</strong></a>
+                                : ARC-024 — traceability:outgoing[] and traceability:incoming[] link rendering
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-008" title="Source: test-plan.adoc"><strong>TST-008</strong></a>
+                                : TST-008 — Relationship Link Substitution Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-047">REQ-047</a>
+                    </td>
+                    <td>REQ-047 — Configurable display style</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-024" title="Source: architecture.adoc"><strong>ARC-024</strong></a>
+                                : ARC-024 — traceability:outgoing[] and traceability:incoming[] link rendering
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-002" title="Source: test-plan.adoc"><strong>TST-002</strong></a>
+                                : TST-002 — Antora Extension Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-048">REQ-048</a>
+                    </td>
+                    <td>REQ-048 — Configurable sort order</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-024" title="Source: architecture.adoc"><strong>ARC-024</strong></a>
+                                : ARC-024 — traceability:outgoing[] and traceability:incoming[] link rendering
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-002" title="Source: test-plan.adoc"><strong>TST-002</strong></a>
+                                : TST-002 — Antora Extension Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-050">REQ-050</a>
+                    </td>
+                    <td>REQ-050 — Source files never modified</td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-002" title="Source: test-plan.adoc"><strong>TST-002</strong></a>
+                                : TST-002 — Antora Extension Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>25.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-051">REQ-051</a>
+                    </td>
+                    <td>REQ-051 — Relationship graph via traceability:graph[] macro</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-025" title="Source: architecture.adoc"><strong>ARC-025</strong></a>
+                                : ARC-025 — traceability:graph[] and traceability:graph-coverage[] visualization macros
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-002" title="Source: test-plan.adoc"><strong>TST-002</strong></a>
+                                : TST-002 — Antora Extension Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-052">REQ-052</a>
+                    </td>
+                    <td>REQ-052 — Coverage chart via traceability:graph-coverage[] macro</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-025" title="Source: architecture.adoc"><strong>ARC-025</strong></a>
+                                : ARC-025 — traceability:graph[] and traceability:graph-coverage[] visualization macros
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-002" title="Source: test-plan.adoc"><strong>TST-002</strong></a>
+                                : TST-002 — Antora Extension Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-053">REQ-053</a>
+                    </td>
+                    <td>REQ-053 — Graph visualization methods on TraceabilityGraph</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-026" title="Source: architecture.adoc"><strong>ARC-026</strong></a>
+                                : ARC-026 — GraphViz DOT and Vega-Lite serialization methods
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-005" title="Source: test-plan.adoc"><strong>TST-005</strong></a>
+                                : TST-005 — Graph and API Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-missing role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-054">REQ-054</a>
+                    </td>
+                    <td>REQ-054 — Dashboard page in example site</td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>0.0%</td>
+                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-056">REQ-056</a>
+                    </td>
+                    <td>REQ-056 — CLI next-id command returns next available ID</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-023" title="Source: architecture.adoc"><strong>ARC-023</strong></a>
+                                : ARC-023 — Commander-based CLI with subcommands
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-003" title="Source: test-plan.adoc"><strong>TST-003</strong></a>
+                                : TST-003 — CLI Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-057">REQ-057</a>
+                    </td>
+                    <td>REQ-057 — Matrix files synced to component _attachments</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-027" title="Source: architecture.adoc"><strong>ARC-027</strong></a>
+                                : ARC-027 — Automatic matrix sync to component _attachments
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td class="role-test">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;test-plan.html#TST-002" title="Source: test-plan.adoc"><strong>TST-002</strong></a>
+                                : TST-002 — Antora Extension Tests
+                                <small class="source-ref">[test-plan.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>50.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-059">REQ-059</a>
+                    </td>
+                    <td>REQ-059 — Items defined in partials are processed</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-029" title="Source: architecture.adoc"><strong>ARC-029</strong></a>
+                                : ARC-029 — Partial file processing with source-repo links
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>25.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;quality&#x2F;zero-operational-overhead.html#QA-055">QA-055</a>
+                    </td>
+                    <td>QA-055 — Zero operational overhead</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-016" title="Source: architecture.adoc"><strong>ARC-016</strong></a>
+                                : ARC-016 — Event-driven Antora integration
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-013" title="Source: architecture.adoc"><strong>ARC-013</strong></a>
+                                : ARC-013 — ESM module system
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>25.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-missing role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;quality&#x2F;configurable-without-code.html#QA-056">QA-056</a>
+                    </td>
+                    <td>QA-056 — Configurable without code changes</td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>0.0%</td>
+                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;quality&#x2F;fail-fast-diagnostics.html#QA-057">QA-057</a>
+                    </td>
+                    <td>QA-057 — Fail-fast with clear diagnostics</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-018" title="Source: architecture.adoc"><strong>ARC-018</strong></a>
+                                : ARC-018 — Config-driven validation
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>25.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;quality&#x2F;no-side-effects.html#QA-058">QA-058</a>
+                    </td>
+                    <td>QA-058 — No side effects on source files</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-015" title="Source: architecture.adoc"><strong>ARC-015</strong></a>
+                                : ARC-015 — In-memory processing with no side effects
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>25.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;quality&#x2F;testability-by-design.html#QA-059">QA-059</a>
+                    </td>
+                    <td>QA-059 — Testability by design</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-014" title="Source: architecture.adoc"><strong>ARC-014</strong></a>
+                                : ARC-014 — Dependency injection by constructor
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>25.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+                <tr class="status-partial role-requirement">
+                    <td>
+                        <a href="..&#x2F;..&#x2F;quality&#x2F;pdf-compatibility.html#QA-060">QA-060</a>
+                    </td>
+                    <td>QA-060 — PDF compatibility of generated output</td>
+                    <td class="role-design">
+                            <div>
+                                <a href="..&#x2F;..&#x2F;architecture.html#ARC-024" title="Source: architecture.adoc"><strong>ARC-024</strong></a>
+                                : ARC-024 — traceability:outgoing[] and traceability:incoming[] link rendering
+                                <small class="source-ref">[architecture.adoc]</small>
+                            </div>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>
+                            <span class="empty-cell">-</span>
+                    </td>
+                    <td>25.0%</td>
+                    <td><span class="coverage-badge coverage-partial">partial</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <footer class="metadata">
+        <p>Generated by Antora Tracer Extension</p>
+    </footer>
+</body>
+</html>

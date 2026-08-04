@@ -76,43 +76,26 @@ traceability:
       design: [describes]
 
   matrices:
-    - name: requirements-traceability
-      description: "Traceability from requirements to design, implementation, and tests"
+    - name: requirements-to-design
+      description: "Forward traceability from requirements to design elements"
       rows: requirement
-      columns: [design, implementation, test, document]
+      columns: [design]
       coverageRelations:
         design: [addresses, satisfies]
-        implementation: [satisfies, implements]
-        test: [covers, verifies, tests, validates]
-        document: [contains, describes]
 
-    - name: design-verification
-      description: "Verification of design elements"
+    - name: design-to-implementation
+      description: "Forward traceability from design elements to their implementations"
       rows: design
-      columns: [requirement, implementation, test, document]
+      columns: [implementation]
       coverageRelations:
-        requirement: [addresses, satisfies]
-        implementation: [realized_by, implements]
-        test: [validated_by, validates, tests]
-        document: [documented_by, describes]
+        implementation: [implements, realized_by]
 
-    - name: implementation-coverage
-      description: "Implementation coverage of requirements and design"
-      rows: implementation
-      columns: [requirement, design, test]
+    - name: requirements-to-tests
+      description: "Direct traceability from requirements to their tests"
+      rows: requirement
+      columns: [test]
       coverageRelations:
-        requirement: [satisfies]
-        design: [implements, realized_by]
-        test: [tested_by, tests]
-
-    - name: test-coverage
-      description: "Test coverage of requirements, design, and implementation"
-      rows: test
-      columns: [requirement, design, implementation]
-      coverageRelations:
-        requirement: [covers, verifies]
-        design: [validates]
-        implementation: [tests]
+        test: [covers, verifies]
 
 neo4j:
     queries:
@@ -173,6 +156,22 @@ documentation:
     | implementation | Code or implementation artifact | Classes, functions, services |
     | test | A verification or validation procedure | Unit tests, integration tests, system tests |
     | document | External documentation or specification | Standards, specifications, design docs |
+
+    ## Pairwise Matrices
+
+    This preset generates focused, pairwise matrices — each maps exactly one source role to
+    one target role, following the forward traceability chain:
+
+    | Matrix | From | To | Coverage Relations |
+    |--------|------|----|-------------------|
+    | requirements-to-design | requirement | design | addresses, satisfies |
+    | design-to-implementation | design | implementation | implements, realized_by |
+    | requirements-to-tests | requirement | test | covers, verifies |
+
+    Use the CLI `matrix` command to generate matrices, or configure the Antora extension
+    with `generateMatrices: true` in your playbook. For backward traceability (which tests
+    cover a design? which requirements does an implementation address?), use the Neo4j
+    export or add custom matrices to your project's `traceability.yml`.
 
     ## Common Workflow
 

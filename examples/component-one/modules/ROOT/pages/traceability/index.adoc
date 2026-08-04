@@ -1,0 +1,19 @@
+= Traceability
+
+Generated traceability artifacts for the Antora Tracer project. All items extracted from OpenSpec specifications — numbers grow as the project evolves.
+
+* xref:attachment$traceability/matrix-usecases-to-requirements.html[Use Cases → Requirements] — Which requirements each use case leads to
+* xref:attachment$traceability/matrix-usecases-to-requirements.csv[CSV] — Same data for spreadsheet import
+
+* xref:attachment$traceability/matrix-requirements-to-design.html[Requirements → Design] — Which design items address each requirement
+* xref:attachment$traceability/matrix-requirements-to-design.csv[CSV] — Same data for spreadsheet import
+
+* xref:attachment$traceability/matrix-requirements-to-tests.html[Requirements → Tests] — Which tests cover each requirement
+* xref:attachment$traceability/matrix-requirements-to-tests.csv[CSV] — Same data for spreadsheet import
+
+[NOTE]
+====
+These files are pre-generated. To regenerate after content changes:
+
+ node examples/run-example.js
+====
