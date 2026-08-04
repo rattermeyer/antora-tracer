@@ -100,15 +100,57 @@ ls test/*.test.ts
 - Remove items for test files that no longer exist.
 - Preserve existing IDs for stability.
 
-### 6. Update `traceability.yml` if needed
+### 6. Review `use-cases.adoc` for coverage gaps
+
+The file is at `examples/modules/ROOT/pages/use-cases.adoc`. It contains `[item, id=UC-XXX, role=use_case]` blocks in Karl Wiegers tabular format.
+
+**Scan user-facing capabilities:**
+
+Read the user guide (`examples/modules/ROOT/pages/user-guide.adoc`) to identify all documented user-facing capabilities. The use cases should cover every major workflow the user guide describes.
+
+**Review each existing use case for quality:**
+
+1. **Actor scope** — does the actor name accurately describe who performs this workflow? A use case called "Business Analyst writes items" that applies equally to developers and test managers has a scope problem.
+2. **Goal scope** — is this a genuine user goal or a tool-invocation task? "Get next ID from CLI" is a sub-step of item creation, not a user goal. Each use case should describe a complete workflow that delivers value independently.
+3. **Preconditions** — are they testable? "The extension is installed" is testable; "the team understands traceability" is not.
+4. **Postconditions** — are they measurable? "The traceability graph contains the new item" is measurable; "coverage improves" is vague.
+5. **Alternate flows** — do they cover error scenarios the system actually handles? Each validation error, warning path, and edge case from the specs should have a corresponding alternate flow.
+
+**Identify missing use cases:**
+
+Cross-reference the user guide's capability sections against the existing use cases:
+
+| User Guide Section | Expected Use Case |
+|---|---|
+| Getting Started / Configuration | Project setup and bootstrap |
+| Writing Items | Item authoring (UC-001) |
+| Rendering Macros | Item authoring (UC-001 covers this) |
+| Items in Partials | Partial file organization (UC-004) |
+| Configuration (extends) | Domain model definition (UC-002) |
+| Matrices / Coverage Report | Coverage review (UC-005) |
+| CLI validate | CI validation |
+| Neo4j Export | Neo4j exploration |
+| Graph Visualization | Visual dependency exploration |
+| CLI matrix / stats | Covered by CLI validation (pipeline context) |
+
+**Present the review for confirmation:**
+
+1. List existing use cases with quality observations
+2. List identified gaps (user guide capabilities with no use case)
+3. Propose: merge too-narrow use cases, add new ones for gaps
+4. Present the proposed use case outline before writing (ID, actor, goal, key flows)
+
+Do not write new use cases until the user confirms the outline.
+
+### 7. Update `traceability.yml` if needed
 
 The file is at `examples/traceability.yml`. Check if the roles, relations, or matrix definitions need updating:
 
-- Roles should match the roles used in requirements, architecture, and test items.
-- Relations should allow the `addresses` (architecture→requirement), `verifies` (test→requirement), and `validates` (test→architecture) patterns used in the documents.
-- Matrices should provide useful cross-references of requirements against architecture and tests.
+- Roles should match the roles used in requirements, architecture, test, and use-case items.
+- Relations should allow the `addresses` (architecture→requirement), `verifies` (test→requirement), `validates` (test→architecture), and `leads_to` (use_case→requirement) patterns used in the documents.
+- Matrices should provide useful cross-references of requirements against architecture, tests, and use cases.
 
-### 7. Update `run-example.js`
+### 8. Update `run-example.js`
 
 The script at `examples/run-example.js` generates matrices by name. Ensure it uses matrix names from the current config, not hardcoded names:
 
@@ -121,7 +163,7 @@ for (const matrixName of matrixNames) {
 
 If the script uses hardcoded matrix names, update them to match `traceability.yml`.
 
-### 8. Regenerate traceability output
+### 9. Regenerate traceability output
 
 After all documents are updated, regenerate the matrices:
 
@@ -132,7 +174,7 @@ node examples/run-example.js
 
 This produces updated matrix files in `examples/modules/ROOT/attachments/traceability/`.
 
-### 9. Rebuild the Antora site
+### 10. Rebuild the Antora site
 
 ```bash
 npx antora generate antora-playbook.yml
@@ -140,7 +182,7 @@ npx antora generate antora-playbook.yml
 
 Verify no xref warnings and the matrices are navigable.
 
-### 10. Commit
+### 11. Commit
 
 Commit all updated files with a message like:
 
@@ -155,9 +197,10 @@ Matrices: regenerated
 
 ## Guardrails
 
-- **Preserve IDs** — never change an existing `REQ-XXX`, `ARC-XXX`, or `TST-XXX` id. Traceability links depend on stable IDs.
+- **Preserve IDs** — never change an existing `REQ-XXX`, `ARC-XXX`, `TST-XXX`, or `UC-XXX` id. Traceability links depend on stable IDs.
 - **As-is, not diff** — the documents describe the complete current state, not what changed.
 - **Grounded in specs** — every requirement must trace back to a spec file. Don't invent requirements.
 - **Grounded in code** — test items must match actual test files. Architecture must match actual source layout.
 - **Title matching** — REQ item titles MUST match the spec's `### Requirement:` heading exactly. This makes diffing and future syncs trivial.
+- **Use case quality** — each use case should describe a complete user goal, not a tool-invocation task. Verify actors, preconditions, postconditions, and alternate flows before writing. Cross-reference against the user guide to ensure all documented capabilities have use case coverage.
 - **Regenerate and verify** — always run `run-example.js` after document changes to produce updated matrices. Then rebuild the site and check for xref errors.
