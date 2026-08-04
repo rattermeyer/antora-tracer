@@ -17,10 +17,14 @@ ARC-020,ARC-020 — Mustache template rendering for HTML output,
 ARC-021,ARC-021 — Path resolution for matrix-to-item links,
 ARC-022,ARC-022 — Graph-to-Neo4j CSV and Cypher export,
 ARC-023,ARC-023 — Commander-based CLI with subcommands,
+ARC-030,ARC-030 — CI/CD PDF build and deployment pipeline,
+ARC-031,ARC-031 — Static landing page at GitHub Pages root,
+ARC-032,ARC-032 — Lunr search extension customization for item anchor indexing,
+ARC-033,ARC-033 — Example site: config extension and dashboard patterns,
 ARC-003,ARC-003 — Processing flow during Antora build,
 ARC-013,ARC-013 — ESM module system,
 ARC-014,ARC-014 — Dependency injection by constructor,
 ARC-004,ARC-004 — Key architectural decisions and their rationale,
 
-Total 22 rows
+Total 26 rows
 Coverage: 0.0%

@@ -6,6 +6,7 @@ REQ-089,REQ-089 — Old macros inside verbatim blocks do not trigger errors,TST-
 REQ-090,REQ-090 — Verbatim block detection handles standard AsciiDoc fences,TST-001: TST-001 — Core Extension Tests
 REQ-091,REQ-091 — Inline macros inside verbatim blocks are preserved in rendered output,TST-001: TST-001 — Core Extension Tests
 REQ-092,REQ-092 — Inline macros inside backtick code spans are not parsed,TST-001: TST-001 — Core Extension Tests
+REQ-110,REQ-110 — Items defined in partials are processed,TST-002: TST-002 — Antora Extension Tests
 REQ-037,REQ-037 — Matrix displays row items as clickable links,TST-006: TST-006 — MatrixGenerator Tests
 REQ-038,REQ-038 — Matrix displays cell items as clickable links,TST-006: TST-006 — MatrixGenerator Tests
 REQ-039,REQ-039 — Links include source file tooltip,TST-006: TST-006 — MatrixGenerator Tests
@@ -41,6 +42,7 @@ REQ-052,REQ-052 — Coverage chart via traceability:graph-coverage[] macro,TST-0
 REQ-053,REQ-053 — Graph visualization methods on TraceabilityGraph,TST-005: TST-005 — Graph and API Tests
 REQ-054,REQ-054 — Dashboard page in example site,
 REQ-063,REQ-063 — Configurable Kroki image format,TST-002: TST-002 — Antora Extension Tests
+REQ-109,REQ-109 — Circular reference detection in graph validation,TST-005: TST-005 — Graph and API Tests
 REQ-056,REQ-056 — CLI next-id command returns next available ID,TST-003: TST-003 — CLI Tests
 REQ-093,REQ-093 — Devbox provides Ruby and Node.js for PDF builds,
 REQ-094,REQ-094 — Gemfile locks asciidoctor-pdf version,
@@ -52,6 +54,7 @@ REQ-099,REQ-099 — Single-PDF output is preserved,
 REQ-060,REQ-060 — Pages workflow generates PDFs,
 REQ-061,REQ-061 — Site links to PDF downloads,
 REQ-062,REQ-062 — Local PDF workflow is unchanged,
+REQ-108,REQ-108 — Matrix files synced to component _attachments,TST-002: TST-002 — Antora Extension Tests
 REQ-072,REQ-072 — Landing page at GitHub Pages root,
 REQ-073,REQ-073 — Two-persona feature presentation,
 REQ-074,REQ-074 — Traceability visualization preview,
@@ -73,5 +76,5 @@ QA-058,QA-058 — No side effects on source files,
 QA-059,QA-059 — Testability by design,
 QA-060,QA-060 — PDF compatibility of generated output,
 
-Total 73 rows
-Coverage: 52.1%
+Total 76 rows
+Coverage: 53.9%

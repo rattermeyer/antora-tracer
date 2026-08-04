@@ -76,6 +76,17 @@ Source: openspec/specs/parser-verbatim-skip/spec.md
 traceability:links[]
 --
 
+== Partial File Processing
+
+[#REQ-110, item, role=requirement, title="Items defined in partials are processed"]
+--
+The system SHALL process items defined in AsciiDoc partial files (`family: partial`) during the `contentClassified` event, alongside page files. Items from partials SHALL use the file's view URL (from the Antora content source configuration) as their source file reference, enabling traceability matrix links to resolve to the source repository. Partial items SHALL be processed only for graph population (Pass 1 — parsing and registration); macro expansion and link substitution passes SHALL be skipped since partials do not produce rendered HTML output.
+
+Source: openspec/specs/partial-file-processing/spec.md
+
+traceability:links[]
+--
+
 == Matrix Item Linking
 
 [#REQ-037, item, role=requirement, title="Matrix displays row items as clickable links"]
@@ -403,6 +414,17 @@ Source: openspec/specs/graph-visualization/spec.md
 traceability:links[]
 --
 
+== Graph Validation
+
+[#REQ-109, item, role=requirement, title="Circular reference detection in graph validation"]
+--
+The system SHALL detect circular references in the traceability graph during validation via `validate()`. A circular reference is a cycle in the directed relationship graph (e.g., A → B → A, or A → B → C → A). Self-referencing relationships (A → A) SHALL also be detected as cycles. Auto-generated inverse relationships SHALL be skipped during cycle detection to avoid false positives.
+
+Source: openspec/specs/circular-reference-detection/spec.md
+
+traceability:links[]
+--
+
 == CLI Commands
 
 [#REQ-056, item, role=requirement, title="CLI next-id command returns next available ID"]
@@ -506,6 +528,17 @@ traceability:links[]
 The existing local PDF build workflow (`devbox shell` + `npx antora antora-playbook-pdf.yml`) SHALL continue to work unchanged.
 
 Source: openspec/specs/ci-pdf-deploy/spec.md
+
+traceability:links[]
+--
+
+== Matrix Sync
+
+[#REQ-108, item, role=requirement, title="Matrix files synced to component _attachments"]
+--
+The system SHALL automatically sync generated matrix files (HTML and CSV) from the global traceability output directory to each component version's `_attachments/traceability/` directory during the `sitePublished` event. The sync SHALL resolve the correct version URL segment (e.g., `latest` instead of `0.7.0`) using the content catalog.
+
+Source: openspec/specs/matrix-attachment-sync/spec.md
 
 traceability:links[]
 --

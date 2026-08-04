@@ -1,0 +1,53 @@
+= ADR-007: Partial files — graph population only (Pass 1)
+
+*Status*: accepted +
+*Deciders*: Richard Attermeyer +
+*Date*: 2026-08-04
+
+== Context and Problem Statement
+
+Antora partial files (`family: partial`) contain reusable AsciiDoc content included into pages via `include::partial$...[]`. Items defined in partials need to appear in the traceability graph so matrices show them and relationships to them resolve. But partials do not produce standalone HTML pages — they are assembly-time includes.
+
+The extension processes files in two passes during `contentClassified`:
+
+* *Pass 1*: Parse items and inline macros → populate the graph
+* *Pass 2*: Expand `traceability:outgoing[]`, `traceability:incoming[]`, and `traceability:links[]` macros → substitute inline macros with xrefs
+
+== Decision Drivers
+
+* Items in partials must be visible in the traceability graph and matrices
+* Partial items need resolvable source links (pointer to the source repository)
+* Macro expansion and xref generation are meaningless for files that never render as HTML
+* Must not interfere with Antora's content model (partials are not pages)
+
+== Considered Options
+
+* Process partials fully (Pass 1 + Pass 2) — would expand macros in files that never render
+* Skip partials entirely — items in partials become invisible to traceability
+* Generate stub pages for partials — violates Antora's content model
+* Process partials in Pass 1 only — register items, skip macro expansion
+
+== Decision Outcome
+
+Chosen option: Process partial files in Pass 1 only (graph population), because items need traceability visibility but partials produce no HTML output where macros would render.
+
+=== Implementation
+
+In the `contentClassified` handler, both `family: page` and `family: partial` files are filtered for `.adoc` content. Both are processed through `processAsciiDocFile()` for Pass 1. For Pass 2 (macro expansion), only page files are iterated.
+
+Partial items receive `sourceFile` values set to the partial's *view URL* (from the Antora content source), not a local file path. This enables matrix links to point to the source repository.
+
+In `buildXref()`, items with `sourceFile` containing `://` (view URLs) use AsciiDoc's `link:` macro. Items with `sourceFile` containing `/partials/` fall back to same-page anchors (`xref:#ID`) since partials do not produce HTML pages to xref to.
+
+=== Positive Consequences
+
+* Items in partials appear in matrices with repo-source links
+* Xrefs to partial items gracefully degrade to same-page anchors
+* No wasted macro expansion on non-rendering content
+* Respects Antora's partial-vs-page content distinction
+
+=== Negative Consequences
+
+* `traceability:outgoing[]` and `traceability:incoming[]` are not expanded in partials — users must place those macros in the including page
+* Xrefs from page A to a partial item in page B resolve to page B's anchor, even if the partial is included in multiple pages
+* Testing coverage for partial processing is lighter than for page processing
