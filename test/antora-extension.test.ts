@@ -1110,6 +1110,120 @@ Description.
       expect(traceExt.getAllItems()).to.have.lengthOf(2);
       // No crash — inline style ignores collapsible
     });
+
+    it("should expand traceability:links[] with both outgoing and incoming", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const content = `:traceability-links: true
+
+[#REQ-001, item, role=requirement, title="User Auth"]
+--
+addresses:ARC-001[]
+
+traceability:links[]
+--
+
+[#ARC-001, item, role=architecture, title="Auth Module"]
+--
+addresses:REQ-001[]
+--
+`;
+
+      ctx.fireEvent(
+        "contentClassified",
+        createContentClassifiedEvent([{ path: "test.adoc", content }]),
+      );
+
+      const traceExt = ext.getTraceabilityExtension();
+      const items = traceExt.getAllItems();
+      expect(items).to.have.lengthOf(2);
+
+      // Both directions should work
+      const outgoing = traceExt.graph.getRelationships("REQ-001");
+      expect(outgoing).to.have.lengthOf(1);
+      expect(outgoing[0].type).to.equal("addresses");
+
+      const incoming = traceExt.graph.getReverseRelationships("REQ-001");
+      expect(incoming).to.have.lengthOf(1);
+      expect(incoming[0].type).to.equal("addresses");
+    });
+
+    it("should expand traceability:links[] with only outgoing (no empty incoming section)", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const content = `:traceability-links: true
+
+[#REQ-001, item, role=requirement, title="User Auth"]
+--
+addresses:ARC-001[]
+
+traceability:links[]
+--
+
+[#ARC-001, item, role=architecture, title="Auth Module"]
+--
+Description.
+--
+`;
+
+      ctx.fireEvent(
+        "contentClassified",
+        createContentClassifiedEvent([{ path: "test.adoc", content }]),
+      );
+
+      const traceExt = ext.getTraceabilityExtension();
+      expect(traceExt.getAllItems()).to.have.lengthOf(2);
+
+      // Outgoing exists, no incoming — should not crash
+      const outgoing = traceExt.graph.getRelationships("REQ-001");
+      expect(outgoing).to.have.lengthOf(1);
+
+      const incoming = traceExt.graph.getReverseRelationships("REQ-001");
+      expect(incoming).to.have.lengthOf(0);
+    });
+
+    it("should not expand traceability:links[] when links disabled", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      // No :traceability-links: attribute
+      const content = `
+[#REQ-001, item, role=requirement, title="User Auth"]
+--
+addresses:ARC-001[]
+
+traceability:links[]
+--
+
+[#ARC-001, item, role=architecture, title="Auth Module"]
+--
+Description.
+--
+`;
+
+      ctx.fireEvent(
+        "contentClassified",
+        createContentClassifiedEvent([{ path: "test.adoc", content }]),
+      );
+
+      const traceExt = ext.getTraceabilityExtension();
+      expect(traceExt.getAllItems()).to.have.lengthOf(2);
+
+      // Relationships still exist, macro just not expanded
+      const outgoing = traceExt.graph.getRelationships("REQ-001");
+      expect(outgoing).to.have.lengthOf(1);
+    });
   });
 
   // ========================================================================

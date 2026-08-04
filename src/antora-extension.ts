@@ -676,6 +676,172 @@ export class AntoraTraceabilityExtension {
     return `${lines.join("\n")}\n`;
   }
 
+  /**
+   * Expand traceability:links[] macros — combined outgoing + incoming.
+   */
+  private expandLinksMacros(file: any): void {
+    if (!this.traceability) return;
+    try {
+      const contentsBuffer = file.contents || file.src?.contents;
+      if (!contentsBuffer) return;
+      const content = contentsBuffer.toString("utf8");
+      const docAttrs = this.parseDocAttributes(content);
+      const linksEnabled = this.isLinksEnabled(docAttrs);
+      if (!content.includes("traceability:links[]")) return;
+
+      const style = this.getLinksStyle(docAttrs);
+      const order = this.getLinksOrder(docAttrs);
+      const collapsible = this.getCollapsible(docAttrs);
+      const sourceFile = file.src?.path || file.path || "unknown";
+      const currentFile = this.normalizeSourceFile(sourceFile);
+      const currentComponent = file.src?.component || undefined;
+      const currentModule = file.src?.module || undefined;
+      const replacements: Array<{ start: number; end: number; text: string }> =
+        [];
+
+      const blocks = this.findItemBlocks(content);
+
+      for (const { itemId, bodyStart } of blocks) {
+        const bodyContent = content.slice(
+          bodyStart,
+          content.indexOf("\n--\n", bodyStart),
+        );
+
+        const macroRegex = /traceability:links\[\]/g;
+        let macroMatch: RegExpExecArray | null;
+        const bodyRanges = this.getInlineCodeRanges(bodyContent);
+        while ((macroMatch = macroRegex.exec(bodyContent)) !== null) {
+          if (this.isInsideRange(macroMatch.index, bodyRanges)) continue;
+          const macroStart = bodyStart + macroMatch.index;
+          const macroEnd = macroStart + macroMatch[0].length;
+
+          if (!linksEnabled) {
+            replacements.push({ start: macroStart, end: macroEnd, text: "" });
+            continue;
+          }
+
+          const outgoingParts: string[] = [];
+          const incomingParts: string[] = [];
+
+          // Build outgoing groups
+          const outgoingRels = this.traceability.graph.getRelationships(itemId);
+          if (outgoingRels.length > 0) {
+            const grouped = new Map<
+              string,
+              Array<{ id: string; title: string; sourceFile?: string; component?: string; module?: string }>
+            >();
+            for (const rel of outgoingRels) {
+              const target = this.traceability.graph.getItem(rel.targetId);
+              if (!target) continue;
+              if (!grouped.has(rel.type)) grouped.set(rel.type, []);
+              grouped.get(rel.type)?.push({
+                id: target.id,
+                title: target.title || target.id,
+                sourceFile: target.sourceFile,
+                component: target.component,
+                module: target.module,
+              });
+            }
+            if (grouped.size > 0) {
+              let groupEntries = Array.from(grouped.entries());
+              if (order === "relation-type")
+                groupEntries.sort((a, b) => a[0].localeCompare(b[0]));
+              for (const [, items] of groupEntries) {
+                if (order === "target-id")
+                  items.sort((a, b) => a.id.localeCompare(b.id));
+                else if (order === "target-title")
+                  items.sort((a, b) => a.title.localeCompare(b.title));
+              }
+              outgoingParts.push(
+                this.generateLinksAsciiDoc(
+                  groupEntries,
+                  style,
+                  currentFile,
+                  collapsible,
+                  currentComponent,
+                  currentModule,
+                ),
+              );
+            }
+          }
+
+          // Build incoming groups
+          const incomingRels = this.traceability.graph.getReverseRelationships(itemId);
+          if (incomingRels.length > 0) {
+            const grouped = new Map<
+              string,
+              Array<{ id: string; title: string; sourceFile?: string; component?: string; module?: string }>
+            >();
+            for (const rel of incomingRels) {
+              const source = this.traceability.graph.getItem(rel.fromId);
+              if (!source) continue;
+              const configInvLabels =
+                this.traceability.configLoader?.getConfig()?.inverseLabels;
+              const inverseType =
+                configInvLabels?.[rel.type] ??
+                INVERSE_MAP[rel.type as keyof typeof INVERSE_MAP] ??
+                rel.type;
+              if (!grouped.has(inverseType)) grouped.set(inverseType, []);
+              grouped.get(inverseType)?.push({
+                id: source.id,
+                title: source.title || source.id,
+                sourceFile: source.sourceFile,
+                component: source.component,
+                module: source.module,
+              });
+            }
+            if (grouped.size > 0) {
+              let groupEntries = Array.from(grouped.entries());
+              if (order === "relation-type")
+                groupEntries.sort((a, b) => a[0].localeCompare(b[0]));
+              for (const [, items] of groupEntries) {
+                if (order === "target-id")
+                  items.sort((a, b) => a.id.localeCompare(b.id));
+                else if (order === "target-title")
+                  items.sort((a, b) => a.title.localeCompare(b.title));
+              }
+              incomingParts.push(
+                this.generateLinksAsciiDoc(
+                  groupEntries,
+                  style,
+                  currentFile,
+                  collapsible,
+                  currentComponent,
+                  currentModule,
+                ),
+              );
+            }
+          }
+
+          const combined = [...outgoingParts, ...incomingParts].join("");
+          replacements.push({
+            start: macroStart,
+            end: macroEnd,
+            text: combined || "",
+          });
+        }
+      }
+
+      if (replacements.length > 0) {
+        let modifiedContent = content;
+        for (let i = replacements.length - 1; i >= 0; i--) {
+          const r = replacements[i];
+          modifiedContent =
+            modifiedContent.slice(0, r.start) +
+            r.text +
+            modifiedContent.slice(r.end);
+        }
+        const buf = Buffer.from(modifiedContent, "utf8");
+        if (file.contents) file.contents = buf;
+        if (file.src?.contents) file.src.contents = buf;
+      }
+    } catch (error: any) {
+      this.logger.warn(
+        `Error expanding links in ${file.src?.path}: ${error.message}`,
+      );
+    }
+  }
+
   private capitalize(s: string): string {
     return s.charAt(0).toUpperCase() + s.slice(1).replace(/_/g, "-");
   }
@@ -985,10 +1151,11 @@ export class AntoraTraceabilityExtension {
           this.processAsciiDocFile(file, file.src?.fileUri);
         }
 
-        // Expand traceability:outgoing[] and traceability:incoming[] macros
+        // Expand traceability:outgoing[], traceability:incoming[], and traceability:links[] macros
         for (const file of pageFilesForVersion) {
           this.expandOutgoingMacros(file);
           this.expandIncomingMacros(file);
+          this.expandLinksMacros(file);
         }
 
         // Expand traceability:graph[] and traceability:graph-coverage[] macros
