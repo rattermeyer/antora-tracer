@@ -27,6 +27,27 @@ import {
 import type { Item, ItemRelationship } from "./types.js";
 
 /**
+ * Minimal event logger used by the extension for operational output.
+ * Defaults to a no-op so the library is quiet when embedded (e.g. inside
+ * Antora); consumers may pass a real logger (CLI, tests, host app).
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export interface TracerLogger {
+  info(message: string, ...args: unknown[]): void;
+  warn(message: string, ...args: unknown[]): void;
+  error(message: string, ...args: unknown[]): void;
+  debug(message: string, ...args: unknown[]): void;
+}
+
+/** No-op logger used when no logger is provided. */
+const NOOP_LOGGER: TracerLogger = {
+  info() {},
+  warn() {},
+  error() {},
+  debug() {},
+};
+
+/**
  * Main extension class for unified item architecture
  *
  * This class:
@@ -39,13 +60,15 @@ export class RequirementsTraceabilityExtension {
   public readonly graph: TraceabilityGraph;
   public configLoader?: ConfigLoader;
   private readonly parser: DocumentParser;
+  private readonly logger: TracerLogger;
   public currentFile: string | null = null;
 
   /**
    * Create a new extension with optional configuration
    */
-  constructor(configLoader?: ConfigLoader) {
+  constructor(configLoader?: ConfigLoader, logger?: TracerLogger) {
     this.configLoader = configLoader;
+    this.logger = logger ?? NOOP_LOGGER;
     this.graph = new TraceabilityGraph(configLoader);
     this.parser = new DocumentParser({ configLoader });
   }
@@ -77,9 +100,9 @@ export class RequirementsTraceabilityExtension {
   /**
    * Create extension with preset
    */
-  static async createWithPreset(
+  static createWithPreset(
     presetName: BuiltInPresetName,
-  ): Promise<RequirementsTraceabilityExtension> {
+  ): RequirementsTraceabilityExtension {
     const configLoader = new ConfigLoader();
     const preset = configLoader.loadPreset(presetName);
 
@@ -114,7 +137,7 @@ export class RequirementsTraceabilityExtension {
     options: { sourceFile?: string; component?: string; module?: string } = {},
   ): ParserResult & { graph: TraceabilityGraph } {
     this.currentFile = options.sourceFile || "input";
-    console.log(`Processing: ${this.currentFile}`);
+    this.logger.debug(`Processing: ${this.currentFile}`);
 
     const startTime = Date.now();
 
@@ -124,21 +147,17 @@ export class RequirementsTraceabilityExtension {
     // Add parsed items to the graph
     for (const item of parsed.items) {
       this.graph.addItem(item);
-      console.log(
-        `Item registered: ${item.id} (role: ${item.role}) - ${item.title}`,
-      );
+      this.logger.debug(`Item registered: ${item.id} (role: ${item.role}) - ${item.title}`);
     }
 
     // Add parsed relationships to the graph
     for (const rel of parsed.relationships) {
       this.graph.addRelationship(rel);
-      console.log(
-        `Relationship added: ${rel.fromId} ${rel.type} ${rel.targetId}`,
-      );
+      this.logger.debug(`Relationship added: ${rel.fromId} ${rel.type} ${rel.targetId}`);
     }
 
     const elapsed = Date.now() - startTime;
-    console.log(
+    this.logger.debug(
       `Processing complete: ${parsed.items.length} items, ${parsed.relationships.length} relationships found (${elapsed}ms)`,
     );
 
@@ -176,7 +195,7 @@ export class RequirementsTraceabilityExtension {
     }[] = [];
 
     for (const file of files) {
-      console.log(`Processing file: ${file.path}`);
+      this.logger.debug(`Processing file: ${file.path}`);
       const result = this.parser.parse(file.content, file.path);
 
       allItems.push(...result.items);
@@ -222,9 +241,7 @@ export class RequirementsTraceabilityExtension {
    */
   addItem(item: Item): void {
     this.graph.addItem(item);
-    console.log(
-      `Item registered: ${item.id} (role: ${item.role}) - ${item.title}`,
-    );
+    this.logger.debug(`Item registered: ${item.id} (role: ${item.role}) - ${item.title}`);
   }
 
   /**
@@ -232,7 +249,7 @@ export class RequirementsTraceabilityExtension {
    */
   addRelationship(relationship: ItemRelationship): void {
     this.graph.addRelationship(relationship);
-    console.log(
+    this.logger.debug(
       `Relationship added: ${relationship.fromId} ${relationship.type} ${relationship.targetId}`,
     );
   }
@@ -520,9 +537,9 @@ export function createExtension(
 /**
  * Create a new extension with a specific preset
  */
-export async function createExtensionWithPreset(
+export function createExtensionWithPreset(
   presetName: BuiltInPresetName,
-): Promise<RequirementsTraceabilityExtension> {
+): RequirementsTraceabilityExtension {
   return RequirementsTraceabilityExtension.createWithPreset(presetName);
 }
 

@@ -69,12 +69,22 @@ export interface AntoraExtensionContext {
   playbook?: any;
 }
 
+/** A related item as surfaced in outgoing/incoming/links macro output. */
+type RelItem = {
+  id: string;
+  title: string;
+  sourceFile?: string;
+  component?: string;
+  module?: string;
+};
+/** Which relationship macros expand a given direction. */
+type RelationMacro = "outgoing" | "incoming" | "links";
+type RelationDirection = "outgoing" | "incoming";
+
 export class AntoraTraceabilityExtension {
   private traceability: RequirementsTraceabilityExtension | null = null;
   private config: Required<AntoraTraceabilityConfig>;
   private readonly logger: ReturnType<AntoraExtensionContext["getLogger"]>;
-  private itemsWithOutgoingMacro = new Set<string>();
-  private itemsWithIncomingMacro = new Set<string>();
 
   constructor(
     private readonly context: AntoraExtensionContext,
@@ -102,23 +112,20 @@ export class AntoraTraceabilityExtension {
 
     this.logger.info("Requirements traceability extension initialized");
 
-    // Register event handlers synchronously in constructor
-    // They will check if traceability is loaded before processing
+    // Load the extension synchronously so event handlers can rely on
+    // this.traceability being ready before any Antora event fires.
+    // Config and preset loading are synchronous file reads — no need for async.
+    this.traceability = this.createTraceabilityExtension();
+    this.logger.debug("Requirements traceability extension fully initialized");
+
+    // Register event handlers after initialization to avoid a race where
+    // an early event fires before traceability is ready.
     this.registerContentClassifier();
     this.registerPageProcessor();
     this.registerNavigationEnhancer();
-
-    // Load the extension asynchronously
-    this.initializeAsync();
   }
 
-  private async initializeAsync(): Promise<void> {
-    // Load the traceability extension (may involve async preset loading)
-    this.traceability = await this.createTraceabilityExtension();
-    this.logger.debug("Requirements traceability extension fully initialized");
-  }
-
-  private async createTraceabilityExtension(): Promise<RequirementsTraceabilityExtension> {
+  private createTraceabilityExtension(): RequirementsTraceabilityExtension {
     if (this.config.configPath) {
       const configLoader = new ConfigLoader();
       try {
@@ -131,7 +138,7 @@ export class AntoraTraceabilityExtension {
         this.logger.info(
           `Loaded configuration from: ${resolvedPath}`,
         );
-        return new RequirementsTraceabilityExtension(configLoader);
+        return new RequirementsTraceabilityExtension(configLoader, this.logger);
       } catch (error: any) {
         this.logger.warn(
           `Could not load configuration: ${error.message}. Using default.`,
@@ -141,7 +148,7 @@ export class AntoraTraceabilityExtension {
 
     if (this.config.preset) {
       try {
-        return await RequirementsTraceabilityExtension.createWithPreset(
+        return RequirementsTraceabilityExtension.createWithPreset(
           this.config.preset as any,
         );
       } catch (error: any) {
@@ -151,7 +158,7 @@ export class AntoraTraceabilityExtension {
       }
     }
 
-    return new RequirementsTraceabilityExtension();
+    return new RequirementsTraceabilityExtension(undefined, this.logger);
   }
 
   private loadConfig(): Partial<AntoraTraceabilityConfig> {
@@ -300,18 +307,21 @@ export class AntoraTraceabilityExtension {
   }
 
   /**
-   * Expand traceability:outgoing[] macros.
+   * Expand traceability:outgoing[], traceability:incoming[], or
+   * traceability:links[] macros within item block bodies. The three macro
+   * kinds share the same scan/expand/replace pipeline and differ only in
+   * which relationship directions they render.
    */
-  private expandOutgoingMacros(file: any): void {
+  private expandRelationMacros(file: any, macroName: RelationMacro): void {
     if (!this.traceability) return;
     try {
       const contentsBuffer = file.contents || file.src?.contents;
       if (!contentsBuffer) return;
       const content = contentsBuffer.toString("utf8");
+      if (!content.includes(`traceability:${macroName}[]`)) return;
+
       const docAttrs = this.parseDocAttributes(content);
       const linksEnabled = this.isLinksEnabled(docAttrs);
-      if (!content.includes("traceability:outgoing[]")) return;
-
       const style = this.getLinksStyle(docAttrs);
       const order = this.getLinksOrder(docAttrs);
       const collapsible = this.getCollapsible(docAttrs);
@@ -327,76 +337,33 @@ export class AntoraTraceabilityExtension {
       const blocks = this.findItemBlocks(content);
 
       for (const { itemId, bodyStart } of blocks) {
+        const bodyEnd = content.indexOf("\n--\n", bodyStart);
         const bodyContent = content.slice(
           bodyStart,
-          content.indexOf("\n--\n", bodyStart),
+          bodyEnd >= 0 ? bodyEnd : undefined,
         );
 
-        // Scan for macros within this body
-        const macroRegex = /traceability:outgoing\[\]/g;
-        let macroMatch: RegExpExecArray | null;
+        const macroRegex = new RegExp(`traceability:${macroName}\\[\\]`, "g");
         const bodyRanges = this.getInlineCodeRanges(bodyContent);
+        let macroMatch: RegExpExecArray | null;
         while ((macroMatch = macroRegex.exec(bodyContent)) !== null) {
           if (this.isInsideRange(macroMatch.index, bodyRanges)) continue;
           const macroStart = bodyStart + macroMatch.index;
           const macroEnd = macroStart + macroMatch[0].length;
 
-          if (!linksEnabled) {
-            replacements.push({ start: macroStart, end: macroEnd, text: "" });
-            continue;
-          }
-          this.itemsWithOutgoingMacro.add(itemId);
-
-          const rels = this.traceability.graph.getRelationships(itemId);
-          if (rels.length === 0) {
-            replacements.push({ start: macroStart, end: macroEnd, text: "" });
-            continue;
-          }
-
-          const grouped = new Map<
-            string,
-            Array<{ id: string; title: string; sourceFile?: string; component?: string; module?: string }>
-          >();
-          for (const rel of rels) {
-            const target = this.traceability.graph.getItem(rel.targetId);
-            if (!target) continue;
-            if (!grouped.has(rel.type)) grouped.set(rel.type, []);
-            grouped.get(rel.type)?.push({
-              id: target.id,
-              title: target.title || target.id,
-              sourceFile: target.sourceFile,
-              component: target.component,
-              module: target.module,
-            });
-          }
-          if (grouped.size === 0) {
-            replacements.push({ start: macroStart, end: macroEnd, text: "" });
-            continue;
-          }
-
-          let groupEntries = Array.from(grouped.entries());
-          if (order === "relation-type")
-            groupEntries.sort((a, b) => a[0].localeCompare(b[0]));
-          for (const [, items] of groupEntries) {
-            if (order === "target-id")
-              items.sort((a, b) => a.id.localeCompare(b.id));
-            else if (order === "target-title")
-              items.sort((a, b) => a.title.localeCompare(b.title));
-          }
-
-          const generated = this.generateLinksAsciiDoc(
-            groupEntries,
-            style,
-            currentFile,
-            collapsible,
-            currentComponent,
-            currentModule,
-          );
-          replacements.push({
-            start: macroStart,
-            end: macroEnd,
-            text: generated,
-          });
+          const text = linksEnabled
+            ? this.buildRelationMacroOutput(
+                itemId,
+                macroName,
+                style,
+                order,
+                currentFile,
+                collapsible,
+                currentComponent,
+                currentModule,
+              )
+            : "";
+          replacements.push({ start: macroStart, end: macroEnd, text });
         }
       }
 
@@ -415,138 +382,104 @@ export class AntoraTraceabilityExtension {
       }
     } catch (error: any) {
       this.logger.warn(
-        `Error expanding links in ${file.src?.path}: ${error.message}`,
+        `Error expanding ${macroName} links in ${file.src?.path}: ${error.message}`,
       );
     }
   }
 
   /**
-   * Expand traceability:incoming[] macros.
+   * Build the AsciiDoc output for a single relation macro occurrence.
+   *
+   * For `outgoing` only outgoing groups render; for `incoming` only incoming
+   * groups render; for `links` outgoing groups are followed by incoming groups.
    */
-  private expandIncomingMacros(file: any): void {
-    if (!this.traceability) return;
-    try {
-      const contentsBuffer = file.contents || file.src?.contents;
-      if (!contentsBuffer) return;
-      const content = contentsBuffer.toString("utf8");
-      const docAttrs = this.parseDocAttributes(content);
-      const linksEnabled = this.isLinksEnabled(docAttrs);
-      if (!content.includes("traceability:incoming[]")) return;
+  private buildRelationMacroOutput(
+    itemId: string,
+    macroName: RelationMacro,
+    style: "list" | "table" | "inline",
+    order: "target-id" | "target-title" | "relation-type",
+    currentFile: string,
+    collapsible: boolean,
+    currentComponent?: string,
+    currentModule?: string,
+  ): string {
+    const directions: RelationDirection[] =
+      macroName === "links"
+        ? ["outgoing", "incoming"]
+        : [macroName];
 
-      const style = this.getLinksStyle(docAttrs);
-      const order = this.getLinksOrder(docAttrs);
-      const collapsible = this.getCollapsible(docAttrs);
-      const sourceFile = file.src?.path || file.path || "unknown";
-      const currentFile = this.normalizeSourceFile(sourceFile);
-      const currentComponent = file.src?.component || undefined;
-      const currentModule = file.src?.module || undefined;
-      const replacements: Array<{ start: number; end: number; text: string }> =
-        [];
-
-      // Find item blocks and scan for macros only within block bodies.
-      // This avoids matching the macro name in prose/documentation text.
-      const blocks = this.findItemBlocks(content);
-
-      for (const { itemId, bodyStart } of blocks) {
-        const bodyContent = content.slice(
-          bodyStart,
-          content.indexOf("\n--\n", bodyStart),
-        );
-
-        // Scan for macros within this body
-        const macroRegex = /traceability:incoming\[\]/g;
-        let macroMatch: RegExpExecArray | null;
-        const bodyRanges = this.getInlineCodeRanges(bodyContent);
-        while ((macroMatch = macroRegex.exec(bodyContent)) !== null) {
-          if (this.isInsideRange(macroMatch.index, bodyRanges)) continue;
-          const macroStart = bodyStart + macroMatch.index;
-          const macroEnd = macroStart + macroMatch[0].length;
-
-          if (!linksEnabled) {
-            replacements.push({ start: macroStart, end: macroEnd, text: "" });
-            continue;
-          }
-          this.itemsWithIncomingMacro.add(itemId);
-
-          const rels = this.traceability.graph.getReverseRelationships(itemId);
-          if (rels.length === 0) {
-            replacements.push({ start: macroStart, end: macroEnd, text: "" });
-            continue;
-          }
-
-          const grouped = new Map<
-            string,
-            Array<{ id: string; title: string; sourceFile?: string; component?: string; module?: string }>
-          >();
-          for (const rel of rels) {
-            const source = this.traceability.graph.getItem(rel.fromId);
-            if (!source) continue;
-            // Transform relation type to inverse label for incoming display
-            // Lookup chain: config inverseLabels → types.ts INVERSE_MAP → raw type
-            const configInvLabels =
-              this.traceability.configLoader?.getConfig()?.inverseLabels;
-            const inverseType =
-              configInvLabels?.[rel.type] ??
-              INVERSE_MAP[rel.type as keyof typeof INVERSE_MAP] ??
-              rel.type;
-            if (!grouped.has(inverseType)) grouped.set(inverseType, []);
-            grouped.get(inverseType)?.push({
-              id: source.id,
-              title: source.title || source.id,
-              sourceFile: source.sourceFile,
-              component: source.component,
-              module: source.module,
-            });
-          }
-          if (grouped.size === 0) {
-            replacements.push({ start: macroStart, end: macroEnd, text: "" });
-            continue;
-          }
-
-          let groupEntries = Array.from(grouped.entries());
-          if (order === "relation-type")
-            groupEntries.sort((a, b) => a[0].localeCompare(b[0]));
-          for (const [, items] of groupEntries) {
-            if (order === "target-id")
-              items.sort((a, b) => a.id.localeCompare(b.id));
-            else if (order === "target-title")
-              items.sort((a, b) => a.title.localeCompare(b.title));
-          }
-
-          const generated = this.generateLinksAsciiDoc(
-            groupEntries,
+    const parts: string[] = [];
+    for (const direction of directions) {
+      const groups = this.buildRelationGroups(
+        itemId,
+        direction,
+        order,
+      );
+      if (groups.length > 0) {
+        parts.push(
+          this.generateLinksAsciiDoc(
+            groups,
             style,
             currentFile,
             collapsible,
             currentComponent,
             currentModule,
-          );
-          replacements.push({
-            start: macroStart,
-            end: macroEnd,
-            text: generated,
-          });
-        }
+          ),
+        );
       }
-
-      if (replacements.length > 0) {
-        let modifiedContent = content;
-        for (let i = replacements.length - 1; i >= 0; i--) {
-          const r = replacements[i];
-          modifiedContent =
-            modifiedContent.slice(0, r.start) +
-            r.text +
-            modifiedContent.slice(r.end);
-        }
-        const buf = Buffer.from(modifiedContent, "utf8");
-        if (file.contents) file.contents = buf;
-        if (file.src?.contents) file.src.contents = buf;
-      }
-    } catch (error: any) {
-      this.logger.warn(
-        `Error expanding incoming links in ${file.src?.path}: ${error.message}`,
-      );
     }
+    return parts.join("");
+  }
+
+  /**
+   * Collect and sort the relationships for a single direction as
+   * (relationType, RelItems) group entries.
+   */
+  private buildRelationGroups(
+    itemId: string,
+    direction: RelationDirection,
+    order: "target-id" | "target-title" | "relation-type",
+  ): Array<[string, RelItem[]]> {
+    const graph = this.traceability!.graph;
+    const isOutgoing = direction === "outgoing";
+    const rels = isOutgoing
+      ? graph.getRelationships(itemId)
+      : graph.getReverseRelationships(itemId);
+
+    const grouped = new Map<string, RelItem[]>();
+    for (const rel of rels) {
+      const targetId = isOutgoing ? rel.targetId : rel.fromId;
+      const related = graph.getItem(targetId);
+      if (!related) continue;
+
+      // Incoming display uses the inverse label of the relation type.
+      const groupKey = isOutgoing
+        ? rel.type
+        : (this.traceability!.configLoader?.getConfig()?.inverseLabels?.[rel.type] ??
+            INVERSE_MAP[rel.type as keyof typeof INVERSE_MAP] ??
+            rel.type);
+
+      if (!grouped.has(groupKey)) grouped.set(groupKey, []);
+      grouped.get(groupKey)?.push({
+        id: related.id,
+        title: related.title || related.id,
+        sourceFile: related.sourceFile,
+        component: related.component,
+        module: related.module,
+      });
+    }
+
+    if (grouped.size === 0) return [];
+
+    const groupEntries = Array.from(grouped.entries());
+    if (order === "relation-type")
+      groupEntries.sort((a, b) => a[0].localeCompare(b[0]));
+    for (const [, items] of groupEntries) {
+      if (order === "target-id") items.sort((a, b) => a.id.localeCompare(b.id));
+      else if (order === "target-title")
+        items.sort((a, b) => a.title.localeCompare(b.title));
+    }
+    return groupEntries;
   }
 
   private generateLinksAsciiDoc(
@@ -674,172 +607,6 @@ export class AntoraTraceabilityExtension {
       );
     }
     return `${lines.join("\n")}\n`;
-  }
-
-  /**
-   * Expand traceability:links[] macros — combined outgoing + incoming.
-   */
-  private expandLinksMacros(file: any): void {
-    if (!this.traceability) return;
-    try {
-      const contentsBuffer = file.contents || file.src?.contents;
-      if (!contentsBuffer) return;
-      const content = contentsBuffer.toString("utf8");
-      const docAttrs = this.parseDocAttributes(content);
-      const linksEnabled = this.isLinksEnabled(docAttrs);
-      if (!content.includes("traceability:links[]")) return;
-
-      const style = this.getLinksStyle(docAttrs);
-      const order = this.getLinksOrder(docAttrs);
-      const collapsible = this.getCollapsible(docAttrs);
-      const sourceFile = file.src?.path || file.path || "unknown";
-      const currentFile = this.normalizeSourceFile(sourceFile);
-      const currentComponent = file.src?.component || undefined;
-      const currentModule = file.src?.module || undefined;
-      const replacements: Array<{ start: number; end: number; text: string }> =
-        [];
-
-      const blocks = this.findItemBlocks(content);
-
-      for (const { itemId, bodyStart } of blocks) {
-        const bodyContent = content.slice(
-          bodyStart,
-          content.indexOf("\n--\n", bodyStart),
-        );
-
-        const macroRegex = /traceability:links\[\]/g;
-        let macroMatch: RegExpExecArray | null;
-        const bodyRanges = this.getInlineCodeRanges(bodyContent);
-        while ((macroMatch = macroRegex.exec(bodyContent)) !== null) {
-          if (this.isInsideRange(macroMatch.index, bodyRanges)) continue;
-          const macroStart = bodyStart + macroMatch.index;
-          const macroEnd = macroStart + macroMatch[0].length;
-
-          if (!linksEnabled) {
-            replacements.push({ start: macroStart, end: macroEnd, text: "" });
-            continue;
-          }
-
-          const outgoingParts: string[] = [];
-          const incomingParts: string[] = [];
-
-          // Build outgoing groups
-          const outgoingRels = this.traceability.graph.getRelationships(itemId);
-          if (outgoingRels.length > 0) {
-            const grouped = new Map<
-              string,
-              Array<{ id: string; title: string; sourceFile?: string; component?: string; module?: string }>
-            >();
-            for (const rel of outgoingRels) {
-              const target = this.traceability.graph.getItem(rel.targetId);
-              if (!target) continue;
-              if (!grouped.has(rel.type)) grouped.set(rel.type, []);
-              grouped.get(rel.type)?.push({
-                id: target.id,
-                title: target.title || target.id,
-                sourceFile: target.sourceFile,
-                component: target.component,
-                module: target.module,
-              });
-            }
-            if (grouped.size > 0) {
-              let groupEntries = Array.from(grouped.entries());
-              if (order === "relation-type")
-                groupEntries.sort((a, b) => a[0].localeCompare(b[0]));
-              for (const [, items] of groupEntries) {
-                if (order === "target-id")
-                  items.sort((a, b) => a.id.localeCompare(b.id));
-                else if (order === "target-title")
-                  items.sort((a, b) => a.title.localeCompare(b.title));
-              }
-              outgoingParts.push(
-                this.generateLinksAsciiDoc(
-                  groupEntries,
-                  style,
-                  currentFile,
-                  collapsible,
-                  currentComponent,
-                  currentModule,
-                ),
-              );
-            }
-          }
-
-          // Build incoming groups
-          const incomingRels = this.traceability.graph.getReverseRelationships(itemId);
-          if (incomingRels.length > 0) {
-            const grouped = new Map<
-              string,
-              Array<{ id: string; title: string; sourceFile?: string; component?: string; module?: string }>
-            >();
-            for (const rel of incomingRels) {
-              const source = this.traceability.graph.getItem(rel.fromId);
-              if (!source) continue;
-              const configInvLabels =
-                this.traceability.configLoader?.getConfig()?.inverseLabels;
-              const inverseType =
-                configInvLabels?.[rel.type] ??
-                INVERSE_MAP[rel.type as keyof typeof INVERSE_MAP] ??
-                rel.type;
-              if (!grouped.has(inverseType)) grouped.set(inverseType, []);
-              grouped.get(inverseType)?.push({
-                id: source.id,
-                title: source.title || source.id,
-                sourceFile: source.sourceFile,
-                component: source.component,
-                module: source.module,
-              });
-            }
-            if (grouped.size > 0) {
-              let groupEntries = Array.from(grouped.entries());
-              if (order === "relation-type")
-                groupEntries.sort((a, b) => a[0].localeCompare(b[0]));
-              for (const [, items] of groupEntries) {
-                if (order === "target-id")
-                  items.sort((a, b) => a.id.localeCompare(b.id));
-                else if (order === "target-title")
-                  items.sort((a, b) => a.title.localeCompare(b.title));
-              }
-              incomingParts.push(
-                this.generateLinksAsciiDoc(
-                  groupEntries,
-                  style,
-                  currentFile,
-                  collapsible,
-                  currentComponent,
-                  currentModule,
-                ),
-              );
-            }
-          }
-
-          const combined = [...outgoingParts, ...incomingParts].join("");
-          replacements.push({
-            start: macroStart,
-            end: macroEnd,
-            text: combined || "",
-          });
-        }
-      }
-
-      if (replacements.length > 0) {
-        let modifiedContent = content;
-        for (let i = replacements.length - 1; i >= 0; i--) {
-          const r = replacements[i];
-          modifiedContent =
-            modifiedContent.slice(0, r.start) +
-            r.text +
-            modifiedContent.slice(r.end);
-        }
-        const buf = Buffer.from(modifiedContent, "utf8");
-        if (file.contents) file.contents = buf;
-        if (file.src?.contents) file.src.contents = buf;
-      }
-    } catch (error: any) {
-      this.logger.warn(
-        `Error expanding links in ${file.src?.path}: ${error.message}`,
-      );
-    }
   }
 
   private capitalize(s: string): string {
@@ -1140,8 +907,6 @@ export class AntoraTraceabilityExtension {
         if (this.traceability) {
           this.traceability.graph.clear();
         }
-        this.itemsWithOutgoingMacro.clear();
-        this.itemsWithIncomingMacro.clear();
 
         // Process files to populate the traceability graph
         for (const file of pageFilesForVersion) {
@@ -1153,9 +918,9 @@ export class AntoraTraceabilityExtension {
 
         // Expand traceability:outgoing[], traceability:incoming[], and traceability:links[] macros
         for (const file of pageFilesForVersion) {
-          this.expandOutgoingMacros(file);
-          this.expandIncomingMacros(file);
-          this.expandLinksMacros(file);
+          this.expandRelationMacros(file, "outgoing");
+          this.expandRelationMacros(file, "incoming");
+          this.expandRelationMacros(file, "links");
         }
 
         // Expand traceability:graph[] and traceability:graph-coverage[] macros

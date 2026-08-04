@@ -53,7 +53,7 @@ async function createExtension(options: any) {
 
   try {
     if (mergedOptions.preset) {
-      return await RequirementsTraceabilityExtension.createWithPreset(
+      return RequirementsTraceabilityExtension.createWithPreset(
         mergedOptions.preset,
       );
     } else if (mergedOptions.config) {

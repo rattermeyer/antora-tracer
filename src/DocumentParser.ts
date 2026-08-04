@@ -148,7 +148,11 @@ export class DocumentParser {
     const oldMacros = ["req", "imp", "test", "doc", "design"];
 
     for (const macro of oldMacros) {
-      const regex = new RegExp(`[${macro}(,s*|s).?]`, "g");
+      // Match an attribute-style block prefix: '[' + macro keyword followed by
+      // a comma, whitespace, or closing ']' (e.g. [req, ...], [req ...], [req]).
+      // Use a real alternation instead of a character class so we don't match
+      // stray single characters in ordinary prose.
+      const regex = new RegExp(`\\[${macro}(?:,|\\s|\\])`, "g");
       let match: RegExpExecArray | null;
 
       while ((match = regex.exec(content)) !== null) {
