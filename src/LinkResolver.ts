@@ -96,8 +96,10 @@ export class LinkResolver {
       sourceFile = sourceFile.slice(0, -5);
     }
 
-    // Prepend module prefix when available (Antora pages are served under module dir)
-    if (item.module) {
+    // Prepend module prefix when available.
+    // Skip ROOT — Antora serves ROOT module pages directly under the
+    // component version directory without a module subdirectory.
+    if (item.module && item.module !== "ROOT") {
       sourceFile = `${item.module}/${sourceFile}`;
     }
 
