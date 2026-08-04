@@ -111,7 +111,7 @@ export class RequirementsTraceabilityExtension {
    */
   process(
     content: string,
-    options: { sourceFile?: string } = {},
+    options: { sourceFile?: string; component?: string; module?: string } = {},
   ): ParserResult & { graph: TraceabilityGraph } {
     this.currentFile = options.sourceFile || "input";
     console.log(`Processing: ${this.currentFile}`);
@@ -119,7 +119,7 @@ export class RequirementsTraceabilityExtension {
     const startTime = Date.now();
 
     // Parse the content
-    const parsed = this.parser.parse(content, this.currentFile);
+    const parsed = this.parser.parse(content, this.currentFile, options.component, options.module);
 
     // Add parsed items to the graph
     for (const item of parsed.items) {

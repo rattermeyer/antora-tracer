@@ -18,6 +18,7 @@ import {
   mkdirSync,
   writeFileSync,
   readdirSync,
+  rmSync,
   statSync,
   copyFileSync,
 } from "node:fs";
@@ -316,6 +317,8 @@ export class AntoraTraceabilityExtension {
       const collapsible = this.getCollapsible(docAttrs);
       const sourceFile = file.src?.path || file.path || "unknown";
       const currentFile = this.normalizeSourceFile(sourceFile);
+      const currentComponent = file.src?.component || undefined;
+      const currentModule = file.src?.module || undefined;
       const replacements: Array<{ start: number; end: number; text: string }> =
         [];
 
@@ -352,7 +355,7 @@ export class AntoraTraceabilityExtension {
 
           const grouped = new Map<
             string,
-            Array<{ id: string; title: string; sourceFile?: string }>
+            Array<{ id: string; title: string; sourceFile?: string; component?: string; module?: string }>
           >();
           for (const rel of rels) {
             const target = this.traceability.graph.getItem(rel.targetId);
@@ -362,6 +365,8 @@ export class AntoraTraceabilityExtension {
               id: target.id,
               title: target.title || target.id,
               sourceFile: target.sourceFile,
+              component: target.component,
+              module: target.module,
             });
           }
           if (grouped.size === 0) {
@@ -384,6 +389,8 @@ export class AntoraTraceabilityExtension {
             style,
             currentFile,
             collapsible,
+            currentComponent,
+            currentModule,
           );
           replacements.push({
             start: macroStart,
@@ -431,6 +438,8 @@ export class AntoraTraceabilityExtension {
       const collapsible = this.getCollapsible(docAttrs);
       const sourceFile = file.src?.path || file.path || "unknown";
       const currentFile = this.normalizeSourceFile(sourceFile);
+      const currentComponent = file.src?.component || undefined;
+      const currentModule = file.src?.module || undefined;
       const replacements: Array<{ start: number; end: number; text: string }> =
         [];
 
@@ -467,7 +476,7 @@ export class AntoraTraceabilityExtension {
 
           const grouped = new Map<
             string,
-            Array<{ id: string; title: string; sourceFile?: string }>
+            Array<{ id: string; title: string; sourceFile?: string; component?: string; module?: string }>
           >();
           for (const rel of rels) {
             const source = this.traceability.graph.getItem(rel.fromId);
@@ -485,6 +494,8 @@ export class AntoraTraceabilityExtension {
               id: source.id,
               title: source.title || source.id,
               sourceFile: source.sourceFile,
+              component: source.component,
+              module: source.module,
             });
           }
           if (grouped.size === 0) {
@@ -507,6 +518,8 @@ export class AntoraTraceabilityExtension {
             style,
             currentFile,
             collapsible,
+            currentComponent,
+            currentModule,
           );
           replacements.push({
             start: macroStart,
@@ -538,23 +551,27 @@ export class AntoraTraceabilityExtension {
 
   private generateLinksAsciiDoc(
     grouped: Array<
-      [string, Array<{ id: string; title: string; sourceFile?: string }>]
+      [string, Array<{ id: string; title: string; sourceFile?: string; component?: string; module?: string }>]
     >,
     style: "list" | "table" | "inline",
     currentFile: string,
     collapsible: boolean,
+    currentComponent?: string,
+    currentModule?: string,
   ): string {
     if (grouped.length === 0) return "";
-    if (style === "table") return this.generateTableStyle(grouped, currentFile);
+    if (style === "table") return this.generateTableStyle(grouped, currentFile, currentComponent, currentModule);
     if (style === "inline")
-      return this.generateInlineStyle(grouped, currentFile);
-    return this.generateListStyle(grouped, currentFile, collapsible);
+      return this.generateInlineStyle(grouped, currentFile, currentComponent, currentModule);
+    return this.generateListStyle(grouped, currentFile, collapsible, currentComponent, currentModule);
   }
 
   private buildXref(
-    item: { id: string; title: string; sourceFile?: string },
+    item: { id: string; title: string; sourceFile?: string; component?: string; module?: string },
     currentFile: string,
     displayText: string,
+    currentComponent?: string,
+    currentModule?: string,
   ): string {
     if (item.sourceFile && item.sourceFile !== currentFile) {
       // Partial items have view URLs as sourceFile — use link: instead of xref:
@@ -566,17 +583,27 @@ export class AntoraTraceabilityExtension {
       if (item.sourceFile.includes("/partials/")) {
         return `xref:#${item.id}[${displayText}]`;
       }
-      return `xref:${item.sourceFile}#${item.id}[${displayText}]`;
+      // Build the xref path with appropriate Antora prefix:
+      // cross-component → component:module:page, cross-module → module:page, same → page
+      let path = item.sourceFile;
+      if (item.component && currentComponent && item.component !== currentComponent) {
+        path = `${item.component}:${item.module || ""}:${item.sourceFile}`;
+      } else if (item.module && currentModule && item.module !== currentModule) {
+        path = `${item.module}:${item.sourceFile}`;
+      }
+      return `xref:${path}#${item.id}[${displayText}]`;
     }
     return `xref:#${item.id}[${displayText}]`;
   }
 
   private generateListStyle(
     grouped: Array<
-      [string, Array<{ id: string; title: string; sourceFile?: string }>]
+      [string, Array<{ id: string; title: string; sourceFile?: string; component?: string; module?: string }>]
     >,
     currentFile: string,
     collapsible: boolean,
+    currentComponent?: string,
+    currentModule?: string,
   ): string {
     const lines: string[] = [];
     for (const [relType, items] of grouped) {
@@ -593,7 +620,7 @@ export class AntoraTraceabilityExtension {
           .replace(/&/g, "&amp;")
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;");
-        lines.push(`* ${this.buildXref(item, currentFile, safeTitle)}`);
+        lines.push(`* ${this.buildXref(item, currentFile, safeTitle, currentComponent, currentModule)}`);
       }
       if (collapsible) {
         lines.push(`====`);
@@ -604,15 +631,17 @@ export class AntoraTraceabilityExtension {
 
   private generateTableStyle(
     grouped: Array<
-      [string, Array<{ id: string; title: string; sourceFile?: string }>]
+      [string, Array<{ id: string; title: string; sourceFile?: string; component?: string; module?: string }>]
     >,
     currentFile: string,
+    currentComponent?: string,
+    currentModule?: string,
   ): string {
     const lines: string[] = ['\n[cols="15,15,70"]', "|==="];
     lines.push("| Relation | ID | Title");
     for (const [relType, items] of grouped) {
       for (const item of items) {
-        const xref = this.buildXref(item, currentFile, item.id);
+        const xref = this.buildXref(item, currentFile, item.id, currentComponent, currentModule);
         lines.push(
           "| " +
             relType +
@@ -629,9 +658,11 @@ export class AntoraTraceabilityExtension {
 
   private generateInlineStyle(
     grouped: Array<
-      [string, Array<{ id: string; title: string; sourceFile?: string }>]
+      [string, Array<{ id: string; title: string; sourceFile?: string; component?: string; module?: string }>]
     >,
     currentFile: string,
+    currentComponent?: string,
+    currentModule?: string,
   ): string {
     const lines: string[] = [];
     for (const [relType, items] of grouped) {
@@ -639,7 +670,7 @@ export class AntoraTraceabilityExtension {
         "\n" +
           this.capitalize(relType) +
           ": " +
-          items.map((i) => this.buildXref(i, currentFile, i.id)).join(", "),
+          items.map((i) => this.buildXref(i, currentFile, i.id, currentComponent, currentModule)).join(", "),
       );
     }
     return `${lines.join("\n")}\n`;
@@ -987,7 +1018,9 @@ export class AntoraTraceabilityExtension {
       const content = contentsBuffer.toString("utf8");
       let sourceFile = viewUrl || file.src?.path || file.path || "unknown";
       sourceFile = this.normalizeSourceFile(sourceFile);
-      this.traceability.process(content, { sourceFile });
+      const component = file.src?.component || undefined;
+      const moduleName = file.src?.module || undefined;
+      this.traceability.process(content, { sourceFile, component, module: moduleName });
     } catch (error: any) {
       this.logger.warn(`Error processing ${file.src?.path}: ${error.message}`);
     }
@@ -1406,6 +1439,13 @@ export class AntoraTraceabilityExtension {
           "traceability",
         );
         mkdirSync(attachDir, { recursive: true });
+
+        // Clean stale files from previous builds so only current matrices remain
+        const existingFiles = readdirSync(attachDir);
+        for (const existing of existingFiles) {
+          rmSync(join(attachDir, existing), { force: true });
+        }
+
         for (const file of traceabilityFiles) {
           const src = join(traceabilityDir, file);
           if (!statSync(src).isFile()) continue;

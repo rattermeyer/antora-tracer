@@ -41,6 +41,10 @@ export interface ParserOptions {
   configLoader?: ConfigLoader;
   /** If true, generate errors for old macro syntax (default: true) */
   strictMode?: boolean;
+  /** Antora component name. Absent for CLI usage. */
+  component?: string;
+  /** Antora module name. Absent for CLI usage. */
+  module?: string;
 }
 
 /**
@@ -69,6 +73,8 @@ export class DocumentParser {
   private strictMode: boolean = true;
   private warnings: ParserWarning[] = [];
   private errors: ParserError[] = [];
+  private component?: string;
+  private module?: string;
 
   constructor(options: ParserOptions = {}) {
     this.currentFile = options.sourceFile || "";
@@ -80,13 +86,15 @@ export class DocumentParser {
    * Parse an AsciiDoc string and return all traceability elements found within it.
    * Returns items with roles and relationships.
    */
-  parse(content: string, sourceFile?: string): ParserResult {
+  parse(content: string, sourceFile?: string, component?: string, module?: string): ParserResult {
     // Validate input
     if (typeof content !== "string") {
       throw new TypeError("Content must be a string");
     }
 
     this.currentFile = sourceFile?.trim() || "unknown";
+    this.component = component;
+    this.module = module;
 
     this.warnings = [];
     this.errors = [];
@@ -353,6 +361,8 @@ export class DocumentParser {
         attributes: itemAttributes,
         sourceFile,
         sourceLine: line,
+        component: this.component,
+        module: this.module,
       };
 
       result.items.push(item);

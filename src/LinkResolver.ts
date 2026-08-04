@@ -96,6 +96,11 @@ export class LinkResolver {
       sourceFile = sourceFile.slice(0, -5);
     }
 
+    // Prepend module prefix when available (Antora pages are served under module dir)
+    if (item.module) {
+      sourceFile = `${item.module}/${sourceFile}`;
+    }
+
     // Add .html extension
     return `${sourceFile}.html`;
   }

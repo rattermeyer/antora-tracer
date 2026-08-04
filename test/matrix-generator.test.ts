@@ -7,6 +7,7 @@ import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 import { ConfigLoader } from "../src/config/TraceabilityConfig.js";
+import { LinkResolver } from "../src/LinkResolver.js";
 import { MatrixGenerator } from "../src/MatrixGenerator.js";
 import { TraceabilityGraph } from "../src/TraceabilityGraph.js";
 
@@ -730,6 +731,59 @@ matrices:
       // To test error handling, we'd need to mock the config loader
       // For now, just verify it doesn't crash
       expect(() => gen.generateMatrix("nonexistent")).to.not.throw;
+    });
+  });
+
+  // ========================================================================
+  // Module-Aware Link Generation
+  // ========================================================================
+
+  describe("Module-Aware Links", () => {
+    it("should include module in link when item.module is present", () => {
+      const resolver = new LinkResolver({ relativePathPrefix: "../../" });
+
+      const item = {
+        id: "REQ-001",
+        title: "Test",
+        role: "requirement",
+        attributes: {},
+        sourceFile: "index",
+        module: "requirements",
+      };
+
+      const link = resolver.generateItemLink(item);
+      expect(link).to.equal("../../requirements/index.html#REQ-001");
+    });
+
+    it("should not include module when module is absent", () => {
+      const resolver = new LinkResolver({ relativePathPrefix: "../../" });
+
+      const item = {
+        id: "ARC-001",
+        title: "Test",
+        role: "architecture",
+        attributes: {},
+        sourceFile: "architecture",
+      };
+
+      const link = resolver.generateItemLink(item);
+      expect(link).to.equal("../../architecture.html#ARC-001");
+    });
+
+    it("should handle subdirectory sourceFile with module", () => {
+      const resolver = new LinkResolver({ relativePathPrefix: "../../" });
+
+      const item = {
+        id: "REQ-035",
+        title: "Test",
+        role: "requirement",
+        attributes: {},
+        sourceFile: "traceability/index",
+        module: "ROOT",
+      };
+
+      const link = resolver.generateItemLink(item);
+      expect(link).to.equal("../../ROOT/traceability/index.html#REQ-035");
     });
   });
 });

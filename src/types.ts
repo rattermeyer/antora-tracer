@@ -20,6 +20,10 @@ export interface Item {
   attributes: Record<string, string>;
   sourceFile?: string;
   sourceLine?: number;
+  /** Antora component name (e.g., "tracer"). Absent for CLI usage. */
+  component?: string;
+  /** Antora module name (e.g., "ROOT", "requirements"). Absent for CLI usage. */
+  module?: string;
 }
 
 /**
