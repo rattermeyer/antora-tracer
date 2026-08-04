@@ -1126,7 +1126,7 @@ export class AntoraTraceabilityExtension {
    * in-memory content buffer. Inline macros (e.g., addresses:REQ-001[]) are
    * always invisible — pure data markers stored in the traceability graph.
    * traceability:outgoing[] and traceability:incoming[] are excluded from
-   * this pass (they are handled in expandOutgoingMacros/expandIncomingMacros).
+   * this pass (they are handled in expandRelationMacros).
    */
   private substituteRelationshipLinks(content: string): string {
     // Inline macros are always invisible — pure data markers.

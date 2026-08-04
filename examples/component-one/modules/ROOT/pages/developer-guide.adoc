@@ -41,7 +41,7 @@ Key architectural decisions:
 
 - *Manual regex parsing* over Asciidoctor.js block processors — simpler, version-independent, easier to test
 - *Config-driven roles and relations* — the graph doesn't know about "requirements" or "tests"; it knows about items with roles and validated relations
-- *Fire-and-forget async init* — the Antora extension constructor starts initialization asynchronously; event handlers are registered after config loads
+- *Synchronous init* — the Antora extension constructor initializes the traceability graph synchronously (config/preset loading is a synchronous file read) and registers event handlers only after the graph is ready, avoiding any race with the first `contentClassified` event
 - *Unknown roles = warnings* — graceful degradation for items with roles not yet in config
 
 == Project Structure
@@ -109,7 +109,7 @@ export class RequirementsTraceabilityExtension {
 
 // Factory methods
 RequirementsTraceabilityExtension.createWithConfig(configPath?: string): Promise<RequirementsTraceabilityExtension>;
-RequirementsTraceabilityExtension.createWithPreset(presetName: string): Promise<RequirementsTraceabilityExtension>;
+RequirementsTraceabilityExtension.createWithPreset(presetName: string): RequirementsTraceabilityExtension;
 ----
 
 Key methods:
@@ -390,8 +390,8 @@ export class AntoraTraceabilityExtension {
 *Registration flow:*
 
 . `register()` creates an instance and stores it in a global map keyed by playbook
-. Constructor calls `initializeAsync()` as fire-and-forget
-. `initializeAsync()` loads config (from playbook's extension config), creates `RequirementsTraceabilityExtension`, and registers event handlers
+. Constructor initializes `RequirementsTraceabilityExtension` synchronously (config/preset loading is a synchronous file read)
+. Event handlers are registered *after* initialization so the graph is always ready before any event fires
 . Event handlers registered: `contentClassified` (process items), `sitePublished` (generate matrices)
 
 *Playbook config resolution:*
@@ -402,19 +402,23 @@ The extension reads its config from the Antora playbook's `extensions` array, ma
 
 [ditaa]
 ----
-register() → constructor → initializeAsync() [fire and forget]
-                              |
-                              +─ loadConfig()     (from playbook)
-                              +─ createExtension() (with preset or config)
-                              +─ registerContentClassifier()
-                              +─ registerPageProcessor()
-                              +─ registerNavigationEnhancer()
-                              |
+register() → constructor ──loadConfig()             (from playbook)
+                 │        └─initializeExtension()    (sync: preset or config)
+                 ├─ create RequirementsTraceabilityExtension
+                 └─ register handlers (after init)
+                              │
+                              ├─ registerContentClassifier()
+                              ├─ registerPageProcessor()
+                              └─ registerNavigationEnhancer()
+                              │
                               v
                          Event handlers active
 ----
 
-Since `initializeAsync` is fire-and-forget, event handlers may not be registered for the first microtask. In tests and Antora, the build pipeline provides enough latency that handlers are always registered before events fire.
+Initialization is synchronous, so by the time the constructor returns, the
+traceability graph is fully loaded and all event handlers are registered.
+There is no race where a `contentClassified` event could fire before the
+graph is ready.
 
 === Access Pattern
 

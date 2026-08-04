@@ -31,19 +31,13 @@ loop for each .adoc file
   graph -> graph : validate relation (ConfigLoader.isRelationAllowed)
 end
 
-== Pass 2: Expand traceability:outgoing[] and traceability:incoming[] macros ==
+== Pass 2: Expand traceability:outgoing[], traceability:incoming[], traceability:links[] macros ==
 loop for each .adoc file
-  antora_ext -> antora_ext : expandOutgoingMacros(content)
-  antora_ext -> antora_ext : find traceability:outgoing[] and enclosing item ID
-  antora_ext -> graph : getRelationships(itemId)
-  graph --> antora_ext : outgoing relationships
-  antora_ext -> antora_ext : generate AsciiDoc list/table/inline
-  antora_ext -> antora_ext : replace macro with generated content
-  antora_ext -> antora_ext : expandIncomingMacros(content)
-  antora_ext -> antora_ext : find traceability:incoming[] and enclosing item ID
-  antora_ext -> graph : getReverseRelationships(itemId)
-  graph --> antora_ext : incoming relationships
-  antora_ext -> antora_ext : generate AsciiDoc with inverse labels
+  antora_ext -> antora_ext : expandRelationMacros(file, "outgoing") / "incoming" / "links"
+  antora_ext -> antora_ext : find macro and enclosing item ID
+  antora_ext -> graph : getRelationships(itemId) / getReverseRelationships(itemId)
+  graph --> antora_ext : relationships (outgoing, incoming, or both)
+  antora_ext -> antora_ext : generate AsciiDoc list/table/inline (inverse labels for incoming)
   antora_ext -> antora_ext : replace macro with generated content
 end
 

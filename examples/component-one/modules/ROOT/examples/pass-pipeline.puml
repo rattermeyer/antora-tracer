@@ -18,8 +18,9 @@ partition "Pass 1 — Populate Graph" {
 }
 
 partition "Pass 2 — Rendering Macros" #E8F5E9 {
-  :expandOutgoingMacros()\n→ relationship lists;
-  :expandIncomingMacros()\n→ reverse-relationship lists;
+  :expandRelationMacros(file, "outgoing")\n→ relationship lists;
+  :expandRelationMacros(file, "incoming")\n→ reverse-relationship lists;
+  :expandRelationMacros(file, "links")\n→ combined outgoing + incoming lists;
   note right
     Page files only.
     Partials skipped — no HTML output.

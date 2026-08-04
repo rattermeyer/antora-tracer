@@ -242,17 +242,19 @@ traceability:outgoing[]
 
 [#ARC-024, item, role=design, title="traceability:outgoing[] and traceability:incoming[] link rendering"]
 --
-The `expandOutgoingMacros()` and `expandIncomingMacros()` methods in the
-Antora extension (not the DocumentParser) replace `traceability:outgoing[]`
-and `traceability:incoming[]` placeholders with formatted AsciiDoc content
-showing the item's relationships. The DocumentParser's inline macro regex
-excludes these via a `traceability:` namespace guard; they are NOT parsed as
-relationships. Rendering is opt-in via the `:traceability-links:` document
-attribute. Display style (list, table, inline), sort order (target ID,
-title, relation type), and collapsible sections are configurable via document
-attributes. Inline relationship macros (`addresses:REQ-001[]`) are always
-stripped from output — they are pure data markers; the link macros are the
-sole rendering mechanism.
+The `expandRelationMacros()` method in the Antora extension (not the
+DocumentParser) replaces `traceability:outgoing[]` and
+`traceability:incoming[]` placeholders with formatted AsciiDoc content
+showing the item's relationships. All three rendering macros (`outgoing`,
+`incoming`, and `links`) share this single scan/render pipeline; only the
+relationship direction(s) they emit differ. The DocumentParser's inline
+macro regex excludes these via a `traceability:` namespace guard; they are
+NOT parsed as relationships. Rendering is opt-in via the
+`:traceability-links:` document attribute. Display style (list, table,
+inline), sort order (target ID, title, relation type), and collapsible
+sections are configurable via document attributes. Inline relationship
+macros (`addresses:REQ-001[]`) are always stripped from output — they are
+pure data markers; the link macros are the sole rendering mechanism.
 
 addresses:REQ-044[]
 addresses:REQ-045[]
@@ -451,7 +453,7 @@ include::example$pass-pipeline.puml[]
 | Graph must be complete before Pass 3 can resolve cross-file `addresses:TARGET[]` references. Partials are only processed here — they skip subsequent passes.
 
 | Pass 2
-| `expandOutgoingMacros()` + `expandIncomingMacros()` — replace `traceability:outgoing[]` and `traceability:incoming[]` with formatted relationship lists (grouped by type, configurable style/order).
+| `expandRelationMacros(file, macroName)` — replace `traceability:outgoing[]`, `traceability:incoming[]`, and `traceability:links[]` with formatted relationship lists (grouped by type, configurable style/order); macroName is `outgoing`, `incoming`, or `links`.
 | Pages only
 | Depends on complete graph from Pass 1 to enumerate relationships. Opt-in via `:traceability-links:` document attribute.
 
@@ -468,7 +470,7 @@ include::example$pass-pipeline.puml[]
 
 Key timing characteristics:
 
-- *Fire-and-forget async init*: `AntoraTraceabilityExtension` constructor starts `initializeAsync()` without awaiting it. Event handlers are registered after config loads. In practice, the Antora build pipeline provides sufficient latency.
+- *Synchronous init*: `AntoraTraceabilityExtension` constructor initializes the traceability graph synchronously (config/preset loading is a synchronous file read) before any event handler is registered. This eliminates the race where a `contentClassified` event could fire before the graph is ready.
 - *Single-pass processing*: `process()` call does both parsing and graph population in one call. No separate relationship processing pass needed.
 - *Lazy rendering*: Templates are loaded and compiled on first use, cached thereafter.
 
