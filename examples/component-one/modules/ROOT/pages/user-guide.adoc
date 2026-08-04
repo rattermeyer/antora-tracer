@@ -61,7 +61,6 @@ Auth Service
 
 JWT-based authentication with token refresh.
 
-satisfies:REQ-001[]
 ====
 
 [#TEST-001, item, role=test]
@@ -70,7 +69,6 @@ Authentication Tests
 
 Unit and integration tests for the auth service.
 
-verifies:REQ-001[]
 tests:IMP-001[]
 ====
 ----
@@ -109,7 +107,7 @@ A *relation* connects two items of specific roles. Relations are directional (`s
 ----
 [#IMP-001, item, role=implementation]
 ====
-satisfies:REQ-001[]     <1>
+     <1>
 implements:DES-001[]    <2>
 ====
 ----
@@ -247,7 +245,7 @@ When the extension processes your items, it validates every inline relationship 
 ----
 [#DES-001, item, role=design]
 ====
-verifies:REQ-001[]       <1>
+       <1>
 ====
 ----
 <1> `verifies` from `design` to `requirement` — is that allowed?
@@ -359,7 +357,6 @@ A relationship is expressed as `<relation-type>:<TARGET-ID>[]` anywhere inside t
 ====
 Auth Service
 
-satisfies:REQ-001[]
 implements:DES-001[]
 depends_on:IMP-002[]
 ====
@@ -375,7 +372,7 @@ Relationship syntax:
 
 [IMPORTANT]
 ====
-Inline relationship macros (`addresses:REQ-001[]`) are *always invisible* in rendered output. They are pure data markers stored in the traceability graph. To display relationships in your documentation, use the `traceability:outgoing[]` and `traceability:incoming[]` macros described below.
+Inline relationship macros (``) are *always invisible* in rendered output. They are pure data markers stored in the traceability graph. To display relationships in your documentation, use the `traceability:outgoing[]` and `traceability:incoming[]` macros described below.
 
 This keeps your source clean — type the relationship once, let the macros handle display.
 ====
@@ -389,10 +386,6 @@ Place `traceability:outgoing[]` inside an item block to render all outgoing rela
 [#ARC-001, item, role=architecture, title="Project Scope"]
 ====
 Project description...
-
-addresses:REQ-001[]
-addresses:REQ-006[]
-addresses:REQ-009[]
 
 traceability:outgoing[]
 ====
@@ -521,7 +514,6 @@ include::partial$04-solution-strategy.adoc[]
 --
 Description of how zero operational overhead is achieved...
 
-addresses:REQ-001[]
 --
 ----
 
@@ -550,9 +542,6 @@ When you want matrix links to point to rendered HTML pages (not the repo), keep 
 --
 \include::partial$building-block-overview.adoc[]
 
-addresses:REQ-001[]
-addresses:REQ-002[]
-addresses:REQ-003[]
 --
 ----
 
@@ -579,7 +568,7 @@ This pattern keeps the traceability structure (item ID, role, relationships) tog
 The extension validates:
 
 . **Role exists** — if `role=widget` and `widget` isn't in your config, you get a warning: `Unknown role "widget". Known roles: requirement, design, test.`
-. **Relation allowed** — if you write `verifies:REQ-001[]` from a `document` but your config only allows `document → requirement: [contains]`, you get an error listing the allowed types.
+. **Relation allowed** — if you write `` from a `document` but your config only allows `document → requirement: [contains]`, you get an error listing the allowed types.
 . **Target exists** — if `TARGET-ID` doesn't exist, you get: `Target item not found: MISSING-001.`
 . **Circular references** — if a cycle exists in the relationship graph (e.g., `REQ-001 → REQ-002 → REQ-001`), you get: `Circular reference detected: REQ-001 -> REQ-002 -> REQ-001.` Self-referencing items are also detected.
 

@@ -30,13 +30,8 @@ This page captures the key user workflows for the Antora Tracer extension. Each 
 | Postconditions | The traceability graph contains the new item And all inline relationships are registered And the rendered page shows "Leads-to" or "Addressed-by" sections if placeholders were included And the traceability matrix reflects updated coverage
 | Priority | High
 | Frequency | Per item — multiple times per documentation session
-| Notes | ⚠ Actor "Business Analyst" does not yet have a persona definition. The `[item]` macro syntax is documented in the User Guide and owned by REQ-001 through REQ-004 — this use case does not specify the exact syntax.
+| Notes | ⚠ Actor "Business Analyst" does not yet have a persona definition. The `[item]` macro syntax is documented in the User Guide — this use case does not specify the exact syntax.
 |===
-
-leads_to:REQ-001[]
-leads_to:REQ-002[]
-leads_to:REQ-003[]
-leads_to:REQ-004[]
 
 traceability:links[]
 --
@@ -68,13 +63,8 @@ traceability:links[]
 | Postconditions | The project's traceability domain model is configured And items using the new roles are accepted by the extension And custom matrices appear in the traceability output
 | Priority | High
 | Frequency | Once per project — updated infrequently as the domain model evolves
-| Notes | ⚠ Actor "Requirements Engineer" does not yet have a persona definition. The `extends:` mechanism is documented in REQ-012.
+| Notes | ⚠ Actor "Requirements Engineer" does not yet have a persona definition. The `extends:` mechanism is documented in the User Guide (Configuration section).
 |===
-
-leads_to:REQ-006[]
-leads_to:REQ-007[]
-leads_to:REQ-008[]
-leads_to:REQ-012[]
 
 traceability:links[]
 --
@@ -136,10 +126,8 @@ traceability:links[]
 | Postconditions | The traceability graph contains the items from the partial And matrix links point to the partial's source file in the repository And the page content is rendered with the partial included
 | Priority | Medium
 | Frequency | During initial documentation setup and periodically as the item count grows
-| Notes | ⚠ Actor "Requirements Engineer" does not yet have a persona definition. The partial processing behavior is documented in REQ-059 and the User Guide section "Items in Partials".
+| Notes | ⚠ Actor "Requirements Engineer" does not yet have a persona definition. The partial processing behavior is documented in the User Guide section "Items in Partials".
 |===
-
-leads_to:REQ-059[]
 
 traceability:links[]
 --
@@ -173,7 +161,6 @@ traceability:links[]
 | Notes | ⚠ Actor "Reviewer or Auditor" — two distinct roles with similar workflows. Consider splitting if their goals diverge significantly (internal review vs. external compliance). No persona defined for either.
 |===
 
-leads_to:REQ-029[]
 leads_to:REQ-037[]
 leads_to:REQ-038[]
 

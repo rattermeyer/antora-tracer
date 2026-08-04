@@ -621,10 +621,10 @@ The dual `lib/` and `lib/src/` structure exists for compatibility: `lib/` is the
 ----
 {
   "exports": {
-    ".": "./lib/index.js",
-    "./antora-extension": "./lib/src/antora-extension.js",
+    ".": "./lib/index.js"
+    "./antora-extension": "./lib/src/antora-extension.js"
     "./package.json": "./package.json"
-  },
+  }
   "bin": {
     "antora-req-trace": "./lib/cli.js"
   }

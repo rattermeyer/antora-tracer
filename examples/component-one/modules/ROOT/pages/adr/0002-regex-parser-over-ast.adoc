@@ -6,7 +6,7 @@
 
 == Context and Problem Statement
 
-The extension needs to parse AsciiDoc files to extract `[item]` block macros and inline relationship macros (`addresses:REQ-001[]`). Two approaches exist: use a proper AsciiDoc parser (Asciidoctor.js API) to walk the document AST, or use regular expressions to match patterns directly in the source text. The choice affects accuracy, complexity, and maintainability.
+The extension needs to parse AsciiDoc files to extract `[item]` block macros and inline relationship macros (``). Two approaches exist: use a proper AsciiDoc parser (Asciidoctor.js API) to walk the document AST, or use regular expressions to match patterns directly in the source text. The choice affects accuracy, complexity, and maintainability.
 
 == Decision Drivers
 

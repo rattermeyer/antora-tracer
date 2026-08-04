@@ -417,18 +417,18 @@ However, many of these capabilities come from the Sphinx ecosystem rather than M
 
 Choose *Markdown (or MyST)* when:
 
-* your audience is primarily developers,
-* most content lives on GitHub,
-* documents are relatively independent,
-* API documentation is central,
+* your audience is primarily developers
+* most content lives on GitHub
+* documents are relatively independent
+* API documentation is central
 * or you're already invested in the Python/Sphinx ecosystem.
 
 Choose *AsciiDoc* when:
 
-* you're producing manuals, books, or formal documentation,
-* you publish both HTML and high-quality PDFs,
-* content reuse and conditional publishing are important,
-* you maintain multiple product or version variants,
+* you're producing manuals, books, or formal documentation
+* you publish both HTML and high-quality PDFs
+* content reuse and conditional publishing are important
+* you maintain multiple product or version variants
 * or you expect the documentation to grow into a long-lived documentation set rather than a collection of individual pages.
 
 For the kinds of documentation discussed elsewhere on this site — arc42 architecture documentation, requirements traceability, Antora-based publishing, multiple product versions, and professional HTML/PDF output — AsciiDoc is particularly well aligned because those are exactly the scenarios its richer document model was designed to support.

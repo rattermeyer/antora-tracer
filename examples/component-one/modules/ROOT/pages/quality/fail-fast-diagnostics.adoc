@@ -9,7 +9,7 @@ Source: openspec/changes/archive/2026-07-28-add-pdf-output/specs/pdf-output/spec
 
 == Context
 
-A user writes a relationship `adresses:REQ-001[]` (typo: missing second 's') from a design item to a requirement. The config allows `addresses` from design to requirement, but not `adresses`. Without clear diagnostics, the user would not discover the typo and the relationship would be silently accepted, corrupting traceability data.
+A user writes a relationship `` (typo: missing second 's') from a design item to a requirement. The config allows `addresses` from design to requirement, but not `adresses`. Without clear diagnostics, the user would not discover the typo and the relationship would be silently accepted, corrupting traceability data.
 
 == Trigger
 

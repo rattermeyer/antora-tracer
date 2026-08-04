@@ -23,15 +23,6 @@ Architectural goals:
 - Integrate with Antora's event pipeline without imposing runtime dependencies on users who don't need specific features
 - Provide a standalone CLI for use outside Antora
 
-addresses:REQ-001[]
-addresses:REQ-006[]
-addresses:REQ-009[]
-addresses:REQ-013[]
-addresses:REQ-018[]
-addresses:REQ-024[]
-addresses:REQ-035[]
-addresses:REQ-036[]
-
 traceability:links[]
 
 traceability:graph[]
@@ -45,19 +36,6 @@ include::partial$04-solution-strategy.adoc[]
 --
 include::partial$05-bb-overview.adoc[]
 
-addresses:REQ-001[]
-addresses:REQ-002[]
-addresses:REQ-003[]
-addresses:REQ-004[]
-addresses:REQ-006[]
-addresses:REQ-007[]
-addresses:REQ-008[]
-addresses:REQ-011[]
-addresses:REQ-024[]
-addresses:REQ-025[]
-addresses:REQ-029[]
-addresses:REQ-034[]
-
 traceability:outgoing[]
 --
 
@@ -65,7 +43,7 @@ traceability:outgoing[]
 
 [#ARC-012, item, role=design, title="Preset YAML schema"]
 --
-Presets are YAML files following a defined structure. Each preset is a self-contained,
+Presets are YAML files following a defined structure. Each preset is a self-contained
 versioned configuration that users can extend or override.
 
 [width=100%, cols="20,30,50"]
@@ -117,12 +95,6 @@ versioned configuration that users can extend or override.
 | `description` (markdown string), `examples` (string[]). Inline documentation explaining the preset's domain and usage.
 |===
 
-addresses:REQ-019[]
-addresses:REQ-020[]
-addresses:REQ-021[]
-addresses:REQ-022[]
-addresses:REQ-023[]
-
 traceability:outgoing[]
 --
 
@@ -158,7 +130,7 @@ include::example$config-resolution.puml[]
 [#ARC-018, item, role=design, title="Config-driven validation"]
 --
 Relation validation is driven by the YAML configuration rather than hardcoded
-rules. `ConfigLoader.isRelationAllowed()` checks source role, target role,
+rules. `ConfigLoader.isRelationAllowed()` checks source role, target role
 and relation type against the configured `relations` map. Cross-file
 references are re-validated after all files are loaded to catch late-resolved
 targets. Error messages include file path, line number, and allowed
@@ -178,7 +150,6 @@ same path, a circular reference error is reported with the full cycle path
 (e.g., "REQ-001 → REQ-002 → REQ-001"). Auto-generated inverse relationships
 are skipped to avoid false positives.
 
-addresses:REQ-058[]
 --
 
 [#ARC-029, item, role=design, title="Partial file processing with source-repo links"]
@@ -194,14 +165,13 @@ and returns them unchanged, skipping the HTML path conversion. In
 Partials are excluded from macro expansion and link substitution passes
 because they do not produce HTML pages.
 
-addresses:REQ-059[]
 --
 
 === TraceabilityGraph
 
 [#ARC-015, item, role=design, title="In-memory processing with no side effects"]
 --
-All content transformations — parsing, macro expansion, link substitution,
+All content transformations — parsing, macro expansion, link substitution
 title injection — operate on in-memory buffers. Source `.adoc` files are never
 written to. The Antora content catalog provides the text buffers; the extension
 modifies them in place and writes them back to the catalog without touching disk.
@@ -231,7 +201,7 @@ addresses:REQ-053[]
 --
 The extension hooks into Antora's event pipeline via `register()`:
 `contentClassified` triggers parsing and macro expansion; `sitePublished`
-triggers matrix generation and export. Each event handler is self-contained,
+triggers matrix generation and export. Each event handler is self-contained
 does not block the build pipeline, and receives the content catalog as a
 parameter. The same `RequirementsTraceabilityExtension` class is used by
 the CLI outside Antora, demonstrating the event handlers are optional.
@@ -245,20 +215,20 @@ traceability:outgoing[]
 The `expandRelationMacros()` method in the Antora extension (not the
 DocumentParser) replaces `traceability:outgoing[]` and
 `traceability:incoming[]` placeholders with formatted AsciiDoc content
-showing the item's relationships. All three rendering macros (`outgoing`,
+showing the item's relationships. All three rendering macros (`outgoing`
 `incoming`, and `links`) share this single scan/render pipeline; only the
 relationship direction(s) they emit differ. The DocumentParser's inline
 macro regex excludes these via a `traceability:` namespace guard; they are
 NOT parsed as relationships. Rendering is opt-in via the
-`:traceability-links:` document attribute. Display style (list, table,
+`:traceability-links:` document attribute. Display style (list, table
 inline), sort order (target ID, title, relation type), and collapsible
 sections are configurable via document attributes. Inline relationship
-macros (`addresses:REQ-001[]`) are always stripped from output — they are
+macros (``) are always stripped from output — they are
 pure data markers; the link macros are the sole rendering mechanism.
 
 addresses:REQ-044[]
 addresses:REQ-045[]
-addresses:REQ-046[]
+
 addresses:REQ-047[]
 addresses:REQ-048[]
 addresses:REQ-055[]
@@ -290,7 +260,6 @@ without requiring manual file copies. The correct version URL segment (e.g.
 `latest` instead of `0.7.0`) is resolved by inspecting attachment file
 output paths from the Antora content catalog.
 
-addresses:REQ-057[]
 --
 
 === DocumentParser
@@ -305,10 +274,6 @@ false positives from example code. Known limitations (`]` in quoted
 attribute values, indented macros) are handled with targeted fixes
 (see xref:adr/0002-regex-parser-over-ast.adoc[ADR-002]).
 
-addresses:REQ-001[]
-addresses:REQ-002[]
-addresses:REQ-003[]
-addresses:REQ-004[]
 traceability:outgoing[]
 --
 
@@ -322,8 +287,6 @@ graph for items by role, and computes per-cell coverage based on
 relationships. CSV output is direct; HTML output delegates to `TemplateRenderer`.
 Coverage is calculated as overall, complete, partial, and missing counts.
 
-addresses:REQ-008[]
-addresses:REQ-029[]
 traceability:outgoing[]
 --
 
@@ -336,7 +299,6 @@ ship with the extension in `src/templates/`. Users can specify a custom template
 directory — the renderer falls back to built-in templates for any files not found
 in the custom directory.
 
-addresses:REQ-034[]
 traceability:outgoing[]
 --
 
@@ -371,10 +333,6 @@ produces CREATE statements with `:Item` and role-specific labels. All item
 attributes are included as node properties. The export is optional and requires
 no Neo4j runtime dependency.
 
-addresses:REQ-024[]
-addresses:REQ-025[]
-addresses:REQ-027[]
-addresses:REQ-028[]
 traceability:outgoing[]
 --
 
@@ -383,14 +341,12 @@ traceability:outgoing[]
 [#ARC-023, item, role=design, title="Commander-based CLI with subcommands"]
 --
 The CLI is built on https://www.npmjs.com/package/commander[Commander] with
-subcommands for processing (`process`), matrix generation (`matrix`),
+subcommands for processing (`process`), matrix generation (`matrix`)
 validation (`validate`), Neo4j export (`export neo4j`), statistics
 (`stats`), preset management (`preset`), and ID allocation (`next-id`).
 Global `--config` and `--preset` flags apply to all commands. The CLI
 operates standalone — it does not require an Antora build pipeline.
 
-addresses:REQ-026[]
-addresses:REQ-036[]
 addresses:REQ-056[]
 --
 
@@ -463,7 +419,7 @@ include::example$pass-pipeline.puml[]
 | Uses `toDot()` / `toVegaLite()` on the graph. Opt-in via `:traceability-graph:` document attribute. Independent of Pass 2.
 
 | Pass 3
-| `substituteLinksInFile()` — replace `addresses:REQ-001[]` with `xref:page.html#ID` (pages) or `link:URL#ID` (partials). Also runs `injectTitleIds()` and `unindentItemMacros()`.
+| `substituteLinksInFile()` — replace `` with `xref:page.html#ID` (pages) or `link:URL#ID` (partials). Also runs `injectTitleIds()` and `unindentItemMacros()`.
 | Pages only
 | Needs complete graph (all sourceFiles known) from Pass 1. This is why Pass 1 processes all files before any macro expansion.
 |===
@@ -474,16 +430,8 @@ Key timing characteristics:
 - *Single-pass processing*: `process()` call does both parsing and graph population in one call. No separate relationship processing pass needed.
 - *Lazy rendering*: Templates are loaded and compiled on first use, cached thereafter.
 
-addresses:REQ-001[]
-addresses:REQ-002[]
-addresses:REQ-004[]
 addresses:REQ-005[]
-addresses:REQ-013[]
-addresses:REQ-014[]
-addresses:REQ-016[]
-addresses:REQ-017[]
-addresses:REQ-029[]
-addresses:REQ-035[]
+
 --
 
 == Concepts — Cross-cutting Concerns
@@ -503,7 +451,7 @@ addresses:QA-055[]
 --
 All modules accept their dependencies via constructor parameters. There is no
 service locator, DI container, or global state. `TraceabilityGraph` receives
-`ConfigLoader`, `MatrixGenerator` receives `TraceabilityGraph` and `ConfigLoader`,
+`ConfigLoader`, `MatrixGenerator` receives `TraceabilityGraph` and `ConfigLoader`
 and `DocumentParser` receives `ConfigLoader` optionally. This makes every
 component independently testable without mocking frameworks (see
 xref:adr/0004-zero-framework.adoc[ADR-004]).
@@ -562,7 +510,7 @@ This section captures the design decisions from `openspec/changes/unified-item-a
 | Hardcoded matrix types (req-impl, req-test, full) — inflexible for domain models with different roles
 
 | In-memory source substitution for clickable links
-| After processing, replace `addresses:REQ-001[]` with Asciidoctor xrefs in the content catalog buffer. Two-pass approach ensures cross-file targets are resolved. No disk writes.
+| After processing, replace `` with Asciidoctor xrefs in the content catalog buffer. Two-pass approach ensures cross-file targets are resolved. No disk writes.
 | HTML post-processing (PDF-incompatible), Asciidoctor inline macro extension (API dependency)
 
 | Dedicated LinkResolver component
@@ -570,18 +518,6 @@ This section captures the design decisions from `openspec/changes/unified-item-a
 | Link generation in MatrixGenerator (mixes concerns), template-level logic (Mustache cannot do complex path manipulation)
 |===
 
-addresses:REQ-010[]
-
-addresses:REQ-006[]
-addresses:REQ-007[]
-addresses:REQ-008[]
-addresses:REQ-013[]
-addresses:REQ-015[]
-addresses:REQ-018[]
-addresses:REQ-024[]
-addresses:REQ-028[]
-addresses:REQ-029[]
-addresses:REQ-034[]
 --
 
 ifdef::ssembler-backend-pdf[]

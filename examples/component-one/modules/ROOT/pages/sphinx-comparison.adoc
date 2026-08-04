@@ -116,7 +116,7 @@ If you're moving from Sphinx Needs to Antora Tracer:
 . Replace `:need:\` with `[item, role=requirement]`, `:spec:\` with `[item, role=design]`, etc.
 . Move your needs types into `traceability.yml` `roles` field
 . Define allowed relations in `traceability.yml` `relations` section
-. Replace `:links:` with inline relationship macros (`satisfies:REQ-001[]`)
+. Replace `:links:` with inline relationship macros (``)
 . Replace `needtable` directives with matrix definitions in `traceability.yml`
 . Use `npx antora-req-trace process` instead of the Sphinx build for traceability
 

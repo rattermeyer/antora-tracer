@@ -13,16 +13,15 @@ This document maps the test suite to the requirements it verifies. Each test fil
 --
 Test file: `test/v2-unified-item-architecture.test.ts`
 
-Tests the `RequirementsTraceabilityExtension` orchestrator — initialization, processing, query methods, role statistics, lifecycle. Covers the public API surface of the main extension class.
+Tests the `RequirementsTraceabilityExtension` orchestrator — initialization, processing, query methods, role statistics, lifecycle. Covers the public API surface of the main extension class. Includes old-macro deprecation detection and verbatim block handling (listing, literal, and backtick code spans).
 
-verifies:REQ-001[]
-verifies:REQ-002[]
-verifies:REQ-003[]
-verifies:REQ-004[]
 verifies:REQ-005[]
-verifies:REQ-029[]
-verifies:REQ-030[]
-verifies:REQ-034[]
+verifies:REQ-087[]
+verifies:REQ-088[]
+verifies:REQ-089[]
+verifies:REQ-090[]
+verifies:REQ-091[]
+verifies:REQ-092[]
 
 traceability:links[]
 
@@ -33,9 +32,8 @@ traceability:graph[]
 --
 Test file: `test/antora-extension.test.ts`
 
-Tests the `AntoraTraceabilityExtension` — initialization with default config, preset, config path, and disabled state. Tests event handler registration, content processing via `contentClassified` event (in-memory only, never touches disk), matrix generation via `sitePublished` event, and API access patterns. Also tests `traceability:outgoing[]` and `traceability:incoming[]` macro expansion with configurable display style, sort order, collapsible sections, and opt-in behavior. Tests `traceability:graph[]` and `traceability:graph-coverage[]` macro expansion with graph-enabled and graph-disabled modes, including global coverage, explicit target IDs, and header exclusion. Tests automatic matrix sync to component `_attachments` directories during `sitePublished`.
+Tests the `AntoraTraceabilityExtension` — initialization with default config, preset, config path, and disabled state. Tests event handler registration, content processing via `contentClassified` event (in-memory only, never touches disk), matrix generation via `sitePublished` event, and API access patterns. Also tests `traceability:outgoing[]`, `traceability:incoming[]`, and `traceability:links[]` macro expansion with configurable display style, sort order, collapsible sections, and opt-in behavior. Tests incoming macro display styles, sort orders, inverse labels, PDF compatibility, and collapsible support. Tests `traceability:graph[]` and `traceability:graph-coverage[]` macro expansion with configurable Kroki image format, graph-enabled and graph-disabled modes, including global coverage, explicit target IDs, and header exclusion. Tests automatic matrix sync to component `_attachments` directories during `sitePublished`.
 
-verifies:REQ-035[]
 verifies:REQ-040[]
 verifies:REQ-044[]
 verifies:REQ-045[]
@@ -45,7 +43,17 @@ verifies:REQ-050[]
 verifies:REQ-051[]
 verifies:REQ-052[]
 verifies:REQ-055[]
-verifies:REQ-057[]
+verifies:REQ-063[]
+verifies:REQ-064[]
+verifies:REQ-065[]
+verifies:REQ-066[]
+verifies:REQ-067[]
+verifies:REQ-068[]
+verifies:REQ-069[]
+verifies:REQ-070[]
+verifies:REQ-100[]
+verifies:REQ-102[]
+verifies:REQ-104[]
 
 traceability:links[]
 --
@@ -56,10 +64,6 @@ Test file: `test/cli.test.ts`
 
 Tests the Commander-based CLI — process command (valid content, empty content, invalid paths, malformed macros), matrix command (generation, empty graph), validate command (invalid graph state), export command (empty graph), stats command (empty statistics), preset commands (invalid names, init, listing), help command, and next-id command (sequential ID generation, padding preservation, prefix matching).
 
-verifies:REQ-009[]
-verifies:REQ-010[]
-verifies:REQ-026[]
-verifies:REQ-036[]
 verifies:REQ-056[]
 
 traceability:links[]
@@ -69,20 +73,12 @@ traceability:links[]
 --
 Test file: `test/config-loader.test.ts`
 
-Tests the `ConfigLoader` — initialization, built-in preset listing and loading, preset structure validation, configuration loading from file, missing file handling, invalid YAML handling, role and relation validation, matrix definition retrieval, configuration merging, and error messages for invalid configurations and preset names.
+Tests the `ConfigLoader` — initialization, built-in preset listing and loading, preset structure validation (including pairwise matrix definitions), configuration loading from file, missing file handling, invalid YAML handling, role and relation validation, matrix definition retrieval, configuration merging (including inverse label overrides), and error messages for invalid configurations and preset names.
 
-verifies:REQ-006[]
-verifies:REQ-007[]
-verifies:REQ-008[]
-verifies:REQ-010[]
-verifies:REQ-011[]
-verifies:REQ-012[]
-verifies:REQ-018[]
-verifies:REQ-019[]
-verifies:REQ-020[]
-verifies:REQ-021[]
-verifies:REQ-022[]
-verifies:REQ-023[]
+verifies:REQ-083[]
+verifies:REQ-084[]
+verifies:REQ-085[]
+verifies:REQ-086[]
 
 traceability:links[]
 --
@@ -91,18 +87,9 @@ traceability:links[]
 --
 Test file: `test/graph-and-api.test.ts`
 
-Tests the `TraceabilityGraph` (Section 4 — extended queries: merge, getRelatedItems, getItemsWithRelationTo, getRelationshipsByRoles, findPath, getImpactAnalysis) and graph visualization methods (`toDot`, `toVegaLite`). Tests graph integrity validation including circular reference detection (direct, indirect, self-referencing cycles). Also tests `RequirementsTraceabilityExtension` API methods (Section 5 — processFiles, validate, export, coverage, config access, preset management, lifecycle).
+Tests the `TraceabilityGraph` (extended queries: merge, getRelatedItems, getItemsWithRelationTo, getRelationshipsByRoles, findPath, getImpactAnalysis) and graph visualization methods (`toDot`, `toVegaLite`). Tests graph integrity validation including circular reference detection (direct, indirect, self-referencing cycles). Also tests `RequirementsTraceabilityExtension` API methods (processFiles, validate, export, coverage, config access, preset management, lifecycle).
 
-verifies:REQ-013[]
-verifies:REQ-014[]
-verifies:REQ-015[]
-verifies:REQ-016[]
-verifies:REQ-017[]
-verifies:REQ-031[]
-verifies:REQ-032[]
-verifies:REQ-033[]
 verifies:REQ-053[]
-verifies:REQ-058[]
 
 traceability:links[]
 --
@@ -113,8 +100,6 @@ Test file: `test/matrix-generator.test.ts`
 
 Tests the `MatrixGenerator` — basic matrix generation with empty graph, matrix generation with default and named configurations, role-based matrix rows and columns, coverage percentage calculation and status determination, coverage relation filtering, CSV export, HTML export, JSON export, coverage report generation, and edge cases (no matching items, missing titles, missing source files, unknown matrix names).
 
-verifies:REQ-008[]
-verifies:REQ-029[]
 verifies:REQ-037[]
 verifies:REQ-038[]
 verifies:REQ-039[]
@@ -130,11 +115,6 @@ Test file: `test/neo4j-exporter.test.ts`
 
 Tests the `Neo4jExporter` — empty graph CSV export, items and relationships in CSV, all attributes in export, special character escaping, empty graph Cypher export, items and relationships in Cypher, `includeContent` option, `includeAllAttributes` option, output directory creation, multiple role types, and export result counts and file paths.
 
-verifies:REQ-024[]
-verifies:REQ-025[]
-verifies:REQ-027[]
-verifies:REQ-028[]
-
 traceability:links[]
 --
 
@@ -143,9 +123,6 @@ traceability:links[]
 Test file: `test/relationship-link-substitution.test.ts`
 
 Tests the in-memory regex substitution that replaces relationship macros with Asciidoctor xrefs. Covers same-page xref generation, cross-page xref generation with basename path resolution, orphan reference handling, non-relationship text preservation, hyphenated/dotted IDs, missing sourceFile fallback, and surrounding text preservation.
-
-verifies:REQ-010[]
-verifies:REQ-046[]
 
 traceability:links[]
 --
