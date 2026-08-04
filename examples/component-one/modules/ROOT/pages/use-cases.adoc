@@ -3,35 +3,40 @@
 
 This page captures the key user workflows for the Antora Tracer extension. Each use case traces into the requirements it motivates via `leads_to` relations — demonstrating how config extension adds domain-specific roles and relations beyond the built-in presets.
 
-[#UC-001, item, role=use_case, title="Business Analyst writes traceable items in AsciiDoc"]
+[#UC-001, item, role=use_case, title="Team member writes traceable items in AsciiDoc"]
 --
-.Use Case: Author writes traceable items in AsciiDoc
+.Use Case: Team member writes traceable items in AsciiDoc
 [width=100%, cols="25h,75a"]
 |===
 | ID | UC-001
-| Title | Business Analyst writes traceable items in AsciiDoc
-| Goal | Business Analyst writes traceable items so that the project establishes complete end-to-end traceability across the software development lifecycle
-| Primary Actor | Business Analyst
-| Preconditions | The project uses Antora as its site generator And the Antora Tracer extension is installed in the playbook And a `traceability.yml` config is loaded with at least one role defined And the Business Analyst has write access to `.adoc` files in the pages or partials directories
-| Trigger | Business Analyst opens an `.adoc` file in their editor to add or update a traceable item
+| Title | Team member writes traceable items in AsciiDoc
+| Goal | Team member writes traceable items so that the project establishes complete end-to-end traceability across the software development lifecycle
+| Primary Actor | Business Analyst, Architect, Developer, Test Manager — any team member who authors traceable content
+| Preconditions | The project uses Antora as its site generator And the Antora Tracer extension is installed in the playbook And a `traceability.yml` config is loaded with at least one role defined And the team member has write access to `.adoc` files in the pages or partials directories
+| Trigger | Team member opens an `.adoc` file in their editor to add or update a traceable item
 | Basic Flow |
-. Business Analyst identifies a concept that needs to be traceable — a requirement, a stakeholder concern, a decision, or a dependency
-. Business Analyst assigns the concept to a role defined in the project's traceability domain model (requirement, design, test, use case, etc.)
-. Business Analyst writes a description of the concept in AsciiDoc format
-. Business Analyst links the concept to related items already in the traceability graph using inline relationship macros
-. Business Analyst includes rendering placeholders to display relationship lists in the output
-. Business Analyst commits the file And triggers an Antora build
+. Team member identifies a concept that needs to be traceable — a requirement, a design decision, a test specification, or a dependency
+. Team member determines the next available ID for the item's prefix using the CLI: `antora-tracer next-id --prefix <PREFIX> -i <path>`
+. Team member assigns the concept to a role defined in the project's traceability domain model (requirement, design, test, etc.)
+. Team member writes the item using the `[#ID, item, role=...]` block macro with a description between `====` delimiters
+. Team member links the concept to related items already in the traceability graph using inline relationship macros (e.g., `addresses:REQ-001[]`)
+. Team member includes rendering macros (`traceability:links[]`, `traceability:outgoing[]`, `traceability:incoming[]`) to display relationship lists in the rendered output
+. Team member commits the file And triggers an Antora build
 . The extension registers the item in the traceability graph And its relationships appear in the traceability matrix
 | Alternate Flows |
-. *Business Analyst uses a role not in config:* Extension registers the item with a warning. Processing continues.
-. *Business Analyst links to a target that does not exist:* Extension stores the relationship with a warning. The matrix shows a partial link.
-. *Business Analyst writes an incomplete item block:* The item may not register correctly in the traceability graph.
-. *Business Analyst includes rendering placeholders but no relationships exist:* The placeholder is replaced with an empty section in the rendered output.
-| Postconditions | The traceability graph contains the new item And all inline relationships are registered And the rendered page shows "Leads-to" or "Addressed-by" sections if placeholders were included And the traceability matrix reflects updated coverage
+. *No existing items share the prefix:* The `next-id` command defaults to 3-digit padding and returns `<PREFIX>-001`.
+. *Team member uses a role not in config:* Extension registers the item with a warning. Processing continues.
+. *Team member links to a target that does not exist:* Extension stores the relationship with a warning. The matrix shows a partial link.
+. *Team member writes an incomplete item block:* The item may not register correctly in the traceability graph.
+. *Team member includes rendering macros but no relationships exist:* The placeholder is replaced with an empty section in the rendered output.
+. *Team member uses legacy macro syntax (e.g., `[req]`):* Extension reports a deprecation error with a suggestion to use `[item, role=requirement]`.
+| Postconditions | The traceability graph contains the new item with a consistent ID And all inline relationships are registered And the rendered page shows relationship lists if macros were included And the traceability matrix reflects updated coverage
 | Priority | High
 | Frequency | Per item — multiple times per documentation session
-| Notes | ⚠ Actor "Business Analyst" does not yet have a persona definition. The `[item]` macro syntax is documented in the User Guide — this use case does not specify the exact syntax.
+| Notes | The `[item]` macro syntax is documented in the User Guide — this use case describes the workflow, not the exact syntax. The `next-id` command auto-detects padding from existing IDs.
 |===
+
+leads_to:REQ-056[]
 
 traceability:links[]
 --
@@ -69,39 +74,6 @@ traceability:links[]
 traceability:links[]
 --
 
-[#UC-003, item, role=use_case, title="Team member gets next available ID from CLI"]
---
-.Use Case: Team member gets next available ID from CLI
-[width=100%, cols="25h,75a"]
-|===
-| ID | UC-003
-| Title | Team member gets next available ID from CLI
-| Goal | Team members get the next available sequential ID so that they can assign consistent identifiers to new items without manually scanning existing documents
-| Primary Actor | Business Analyst, Architect, Lead Developer, Test Manager
-| Preconditions | The project uses consistent ID prefixes (e.g., `REQ`, `TST`, `ARC`) And the Antora Tracer CLI is available And existing `.adoc` files containing items with the target prefix are accessible on disk
-| Trigger | A team member needs to add a new item to a document and wants to assign it the next sequential ID
-| Basic Flow |
-. Team member runs `antora-tracer next-id --prefix <PREFIX> -i <path>` from the command line
-. The extension scans existing items matching `<PREFIX>-NNN` in the specified input path
-. The extension determines the highest numeric suffix and the padding convention
-. The next available ID is printed to stdout
-. Team member uses the returned ID in a new `[item]` block
-| Alternate Flows |
-. *No existing items match the prefix:* The extension defaults to 3-digit padding And outputs `<PREFIX>-001`.
-. *Existing items use 4-digit padding (e.g., `TST-0001`):* The extension preserves the width And outputs `TST-0002`.
-. *Input path does not exist:* The extension exits with an error message And code 1.
-. *Prefix is not provided:* The extension exits with an error message And code 1.
-| Postconditions | The next available sequential ID is displayed on stdout And the exit code is 0 And no files are modified on disk
-| Priority | Medium
-| Frequency | Multiple times per documentation session — once per new item
-| Notes | ⚠ Multiple actors — personas needed for Business Analyst, Architect, Lead Developer, and Test Manager. The command auto-detects padding; no manual configuration required.
-|===
-
-leads_to:REQ-056[]
-
-traceability:links[]
---
-
 [#UC-004, item, role=use_case, title="Requirements Engineer organizes items in partial files"]
 --
 .Use Case: Requirements Engineer organizes items in partial files
@@ -129,6 +101,8 @@ traceability:links[]
 | Notes | ⚠ Actor "Requirements Engineer" does not yet have a persona definition. The partial processing behavior is documented in the User Guide section "Items in Partials".
 |===
 
+leads_to:REQ-110[]
+
 traceability:links[]
 --
 
@@ -155,6 +129,7 @@ traceability:links[]
 . *A matrix shows no items:* The corresponding roles have no items defined. The matrix renders with zero rows.
 . *A row shows partial coverage (yellow):* Some but not all expected relationships exist. Reviewer investigates the specific gap.
 . *Reviewer needs to see the source data in CSV:* Reviewer can open the `.csv` variant of the matrix for offline analysis.
+. *Reviewer needs coverage data for external tools:* Reviewer can export the graph to Neo4j CSV or Cypher format for import into graph databases or compliance reports.
 | Postconditions | Reviewer has assessed coverage completeness And identified any gaps And can navigate from the matrix to the source items for further investigation
 | Priority | High
 | Frequency | Periodically — at design reviews, before releases, during compliance audits
@@ -163,6 +138,158 @@ traceability:links[]
 
 leads_to:REQ-037[]
 leads_to:REQ-038[]
+
+traceability:links[]
+--
+
+[#UC-006, item, role=use_case, title="Project lead bootstraps traceability for a new project"]
+--
+.Use Case: Project lead bootstraps traceability for a new project
+[width=100%, cols="25h,75a"]
+|===
+| ID | UC-006
+| Title | Project lead bootstraps traceability for a new project
+| Goal | Project lead sets up the Antora Tracer extension for a new or existing Antora project so the team can begin writing traceable items with a domain model appropriate to their workflow
+| Primary Actor | Project Lead, Requirements Engineer, or Tech Lead
+| Preconditions | The project uses Antora as its site generator And the project lead has access to the Antora playbook and module directories
+| Trigger | The team decides to adopt traceability — a new project is starting, or an existing project wants to add traceability to its documentation
+| Basic Flow |
+. Project lead installs the extension: `npm install antora-tracer --save-dev`
+. Project lead reviews the built-in presets to find the closest match for the team's domain (requirements-engineering, agile, medical-iec62304, minimal)
+. Project lead adds the extension to the Antora playbook with the chosen preset:
++
+[source,yaml]
+----
+antora:
+  extensions:
+    - require: antora-tracer/antora-extension
+      config:
+        preset: requirements-engineering
+----
+. Project lead creates a `traceability.yml` file extending the preset with any project-specific roles, relations, or matrices
+. Project lead adds `:traceability-links:` document attributes to the pages where relationship macros should render
+. Project lead adds matrix links to the site navigation (e.g., `xref:attachment$traceability/matrix-requirements-to-design.html[]`)
+. Project lead runs a first Antora build to verify the extension initializes and matrices generate without errors
+. Project lead shares the setup with the team — team members can now write items in their AsciiDoc pages
+| Alternate Flows |
+. *The preset does not cover the team's domain at all:* Project lead uses `preset init` to bootstrap a custom preset from scratch and defines all roles, relations, and matrices manually.
+. *The project does not have a `partials/` directory yet:* Project lead creates one. The extension processes partials automatically.
+. *The first build shows zero items in matrices:* Expected — the team has not written any items yet. Matrices render with empty rows and 0% coverage.
+. *The team wants to adopt incrementally:* Project lead configures the extension with minimal roles first. Additional roles, relations, and matrices are added later via config extension.
+. *The project uses multiple Antora components:* Project lead configures the extension in each component's playbook or uses a shared config.
+| Postconditions | The Antora Tracer extension is installed and configured And at least one preset is active And the site navigation includes matrix links And matrices generate during builds with 0 errors And the team can begin writing traceable items
+| Priority | High
+| Frequency | Once per project — revisited when the domain model evolves
+| Notes | This use case covers the "Day 0" setup. For ongoing configuration changes, see UC-002. The `preset init` command creates a skeleton YAML file for a custom preset.
+|===
+
+leads_to:REQ-083[]
+leads_to:REQ-084[]
+leads_to:REQ-085[]
+
+traceability:links[]
+--
+
+[#UC-007, item, role=use_case, title="Developer validates traceability in CI pipeline"]
+--
+.Use Case: Developer validates traceability in CI pipeline
+[width=100%, cols="25h,75a"]
+|===
+| ID | UC-007
+| Title | Developer validates traceability in CI pipeline
+| Goal | Developer runs traceability validation in CI so that invalid relationships, circular references, and configuration errors are caught before they reach the published site
+| Primary Actor | Developer or DevOps Engineer
+| Preconditions | The Antora Tracer CLI is installed in the CI environment And the project's `.adoc` source files are checked out And a `traceability.yml` config is present And the CI pipeline has a step for traceability validation
+| Trigger | A pull request is opened or a commit is pushed — the CI pipeline triggers a traceability validation job
+| Basic Flow |
+. CI pipeline checks out the repository
+. CI pipeline runs `antora-tracer process -i <pages-dir> --config traceability.yml` to parse all items
+. CI pipeline runs `antora-tracer validate -i <pages-dir> --config traceability.yml` to check graph integrity
+. The validator reports errors (circular references, invalid relations) and warnings (unknown roles, missing targets)
+. If errors are found, the CI pipeline fails the build and the developer reviews the output
+. Developer fixes the issues — removes circular references, corrects relation types, or adds missing targets
+. Developer pushes the fix And CI re-runs validation
+. When validation passes (0 errors), the pipeline proceeds to build and deploy the Antora site
+| Alternate Flows |
+. *Validation finds only warnings (no errors):* The build continues. Warnings are logged for review but do not block deployment.
+. *Circular reference detected (e.g., A → B → A):* The validator reports the full cycle path. Developer must break the cycle by removing one of the relationships.
+. *Config file is missing or invalid:* The validator exits with an error describing the config problem. Developer fixes `traceability.yml`.
+. *No items found in the input directory:* The validator reports 0 items. This may be intentional (new project) or indicate a path misconfiguration.
+. *Developer wants to run validation locally before pushing:* Same commands work outside CI — `process` then `validate`.
+| Postconditions | The traceability graph is free of structural errors (0 circular references, 0 invalid relations) And the CI pipeline has verified the config is valid And the build can proceed to site generation
+| Priority | High
+| Frequency | On every push or pull request — continuous integration
+| Notes | The `process` step must run before `validate` — validation operates on the in-memory graph populated by processing. The CLI can also generate matrices (`matrix`) and export Neo4j data (`export neo4j`) in CI for artifact generation.
+|===
+
+leads_to:REQ-109[]
+
+traceability:links[]
+--
+
+[#UC-008, item, role=use_case, title="Data analyst explores traceability in Neo4j"]
+--
+.Use Case: Data analyst explores traceability in Neo4j
+[width=100%, cols="25h,75a"]
+|===
+| ID | UC-008
+| Title | Data analyst explores traceability in Neo4j
+| Goal | Data analyst exports the traceability graph to Neo4j so they can run complex graph queries, generate compliance reports, and discover patterns not visible in the matrix views
+| Primary Actor | Data Analyst, Compliance Officer, or Systems Engineer
+| Preconditions | The traceability graph has been populated with items and relationships And the Antora Tracer CLI is available And Neo4j is installed or accessible (Desktop, AuraDB, or Docker)
+| Trigger | Data analyst needs to answer a question that requires graph traversal — "show me all requirements with no test coverage," "trace the impact chain for this change," or "generate a compliance audit trail"
+| Basic Flow |
+. Data analyst runs `antora-tracer export neo4j -i <pages-dir> --format csv` to generate `nodes.csv` and `relationships.csv`
+. Data analyst imports the CSV files into Neo4j using `LOAD CSV` or the Neo4j Data Importer
+. Data analyst runs preset queries included with the config (e.g., "Uncovered Requirements," "Coverage Summary," "Traceability Chains")
+. Data analyst writes custom Cypher queries for project-specific questions
+. Data analyst shares findings — a coverage heatmap, a list of orphan items, or an impact analysis report
+| Alternate Flows |
+. *Data analyst prefers Cypher format:* Uses `--format cypher` to generate an `import.cypher` file with `CREATE` statements instead of CSV.
+. *Export contains items with special characters in titles:* The exporter properly escapes commas, quotes, and newlines so CSV imports cleanly.
+. *Data analyst wants to export only a subset:* Runs `export neo4j` after a CI validation step that has already populated the graph with only the items of interest.
+. *Neo4j is not available:* The analyst can inspect the CSV files directly in a spreadsheet or use the Cypher file as documentation of the graph structure.
+| Postconditions | The traceability graph is available in Neo4j And preset queries return results And the data analyst can run ad-hoc Cypher queries for deep analysis
+| Priority | Medium
+| Frequency | Periodically — before releases, during audits, or when investigating coverage gaps
+| Notes | The `cypher` format includes `:Item` and role-specific labels on nodes, and type-specific labels on relationships. The `includeContent` option controls whether item body text is included in the export.
+|===
+
+traceability:links[]
+--
+
+[#UC-009, item, role=use_case, title="Architect visualizes relationship dependencies"]
+--
+.Use Case: Architect visualizes relationship dependencies
+[width=100%, cols="25h,75a"]
+|===
+| ID | UC-009
+| Title | Architect visualizes relationship dependencies
+| Goal | Architect embeds relationship graphs and coverage charts in documentation pages so stakeholders can visually explore dependencies and coverage at a glance without leaving the documentation site
+| Primary Actor | Architect, Tech Lead, or Requirements Engineer
+| Preconditions | The Antora Tracer extension is installed And the `:traceability-graph:` document attribute is enabled on the target pages And Kroki is configured in the Antora playbook (for rendering GraphViz and Vega-Lite)
+| Trigger | Architect wants to provide visual context — showing how a key requirement connects to downstream artifacts, or displaying global coverage status on a dashboard page
+| Basic Flow |
+. Architect adds `:traceability-graph: true` to a page's document header
+. Architect embeds `traceability:graph[]` inside an item block to render a GraphViz diagram of that item's direct relationships (colored by role, with labeled edges)
+. Architect embeds `traceability:graph-coverage[]` inside or outside item blocks to render Vega-Lite bar charts showing coverage
+. Architect builds the Antora site — macros are replaced with Kroki image URLs (SVG by default, PNG configurable)
+. Stakeholders view the page — the diagram shows the item's dependency neighborhood and the bar chart shows coverage status
+. Stakeholders can click through from the diagram description to related items via xrefs
+| Alternate Flows |
+. *Architect uses `traceability:graph[ITEM-ID, 2]` with a depth of 2:* The graph shows two hops of relationships instead of one.
+. *Architect places `traceability:graph-coverage[]` outside an item block:* The chart shows global coverage by role instead of per-item coverage.
+. *The project builds PDFs:* Architect sets `krokiImageFormat: png` in the playbook config — PNG images render correctly in PDF output where SVGs do not.
+. *Kroki is unavailable or misconfigured:* The macros render as fallback text with the item IDs, still providing value.
+| Postconditions | The documentation page contains embedded relationship graphs and/or coverage charts And stakeholders can visually explore dependencies And the graphs are navigable via xrefs to related items
+| Priority | Medium
+| Frequency | Per key item — added to pages where visual context adds value (dashboard, architecture overview, key requirements)
+| Notes | The dashboard page (`dashboard.adoc`) demonstrates both macros in context. GraphViz diagrams are rendered server-side by Kroki; Vega-Lite is rendered client-side by the browser.
+|===
+
+leads_to:REQ-051[]
+leads_to:REQ-052[]
+leads_to:REQ-054[]
 
 traceability:links[]
 --
