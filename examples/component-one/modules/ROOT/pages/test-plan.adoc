@@ -24,8 +24,7 @@ verifies:REQ-029[]
 verifies:REQ-030[]
 verifies:REQ-034[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 
 traceability:graph[]
 --
@@ -48,8 +47,7 @@ verifies:REQ-052[]
 verifies:REQ-055[]
 verifies:REQ-057[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 [#TST-003, item, role=test, title="CLI Tests"]
@@ -64,8 +62,7 @@ verifies:REQ-026[]
 verifies:REQ-036[]
 verifies:REQ-056[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 [#TST-004, item, role=test, title="ConfigLoader Tests"]
@@ -87,8 +84,7 @@ verifies:REQ-021[]
 verifies:REQ-022[]
 verifies:REQ-023[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 [#TST-005, item, role=test, title="Graph and API Tests"]
@@ -108,8 +104,7 @@ verifies:REQ-033[]
 verifies:REQ-053[]
 verifies:REQ-058[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 [#TST-006, item, role=test, title="MatrixGenerator Tests"]
@@ -126,8 +121,7 @@ verifies:REQ-039[]
 verifies:REQ-042[]
 verifies:REQ-043[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 [#TST-007, item, role=test, title="Neo4jExporter Tests"]
@@ -141,8 +135,7 @@ verifies:REQ-025[]
 verifies:REQ-027[]
 verifies:REQ-028[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 [#TST-008, item, role=test, title="Relationship Link Substitution Tests"]
@@ -154,8 +147,7 @@ Tests the in-memory regex substitution that replaces relationship macros with As
 verifies:REQ-010[]
 verifies:REQ-046[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 ifdef::ssembler-backend-pdf[]

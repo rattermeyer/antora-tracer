@@ -38,8 +38,7 @@ leads_to:REQ-002[]
 leads_to:REQ-003[]
 leads_to:REQ-004[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 [#UC-002, item, role=use_case, title="Requirements Engineer defines custom domain model via config"]
@@ -77,8 +76,7 @@ leads_to:REQ-007[]
 leads_to:REQ-008[]
 leads_to:REQ-012[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 [#UC-003, item, role=use_case, title="Team member gets next available ID from CLI"]
@@ -111,8 +109,7 @@ traceability:incoming[]
 
 leads_to:REQ-056[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 [#UC-004, item, role=use_case, title="Requirements Engineer organizes items in partial files"]
@@ -144,8 +141,7 @@ traceability:incoming[]
 
 leads_to:REQ-059[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 [#UC-005, item, role=use_case, title="Reviewer browses traceability matrices for coverage"]
@@ -181,6 +177,5 @@ leads_to:REQ-029[]
 leads_to:REQ-037[]
 leads_to:REQ-038[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --

@@ -19,9 +19,7 @@ Related specs: `unified-item-macro/spec.md`
 
 Source: OpenSpec specification — Scenario: Define a requirement using `[#REQ-001, item, role=requirement]`
 
-traceability:outgoing[]
-
-traceability:incoming[]
+traceability:links[]
 --
 
 [#REQ-002, item, role=requirement, title="`item` macro accepts role attribute"]
@@ -32,8 +30,7 @@ Related specs: `unified-item-macro/spec.md`
 
 refines:REQ-001[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -45,8 +42,7 @@ Related specs: `unified-item-macro/spec.md`
 
 refines:REQ-001[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -58,8 +54,7 @@ refines:REQ-001[]
 
 Related specs: `unified-item-macro/spec.md`
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -80,8 +75,7 @@ The system SHALL read roles from a YAML configuration file. Items with roles not
 
 Related specs: `configuration-system/spec.md`
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -93,8 +87,7 @@ Related specs: `configuration-system/spec.md`
 
 refines:REQ-006[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -106,8 +99,7 @@ Related specs: `configuration-system/spec.md`
 
 refines:REQ-006[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -119,8 +111,7 @@ Related specs: `configuration-system/spec.md`
 
 refines:REQ-006[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -132,8 +123,7 @@ Related specs: `configuration-system/spec.md`
 
 refines:REQ-006[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -145,8 +135,7 @@ Related specs: `configuration-system/spec.md`
 
 refines:REQ-006[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -167,8 +156,7 @@ The system SHALL validate that relations between items are allowed based on thei
 
 Related specs: `role-based-validation/spec.md`
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -180,8 +168,7 @@ Related specs: `role-based-validation/spec.md`
 
 refines:REQ-013[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -193,8 +180,7 @@ Related specs: `role-based-validation/spec.md`
 
 refines:REQ-013[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -206,8 +192,7 @@ Related specs: `role-based-validation/spec.md`
 
 refines:REQ-013[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -228,8 +213,7 @@ Source: TraceabilityGraph.validate() → findCircularReferences()
 
 refines:REQ-013[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 == Preset System
@@ -240,8 +224,7 @@ The system SHALL ship with built-in preset configurations: `requirements-enginee
 
 Related specs: `preset-system/spec.md`
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -253,8 +236,7 @@ Related specs: `preset-system/spec.md`
 
 refines:REQ-018[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -266,8 +248,7 @@ Related specs: `preset-system/spec.md`
 
 refines:REQ-018[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -279,8 +260,7 @@ Related specs: `preset-system/spec.md`
 
 refines:REQ-018[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -292,8 +272,7 @@ Related specs: `preset-system/spec.md`
 
 refines:REQ-018[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -314,8 +293,7 @@ The system SHALL export the traceability graph as `nodes.csv` and `relationships
 
 Related specs: `neo4j-export/spec.md`
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -327,8 +305,7 @@ Related specs: `neo4j-export/spec.md`
 
 refines:REQ-024[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -340,8 +317,7 @@ Related specs: `neo4j-export/spec.md`
 
 refines:REQ-024[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -353,8 +329,7 @@ Related specs: `neo4j-export/spec.md`
 
 refines:REQ-024[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -375,8 +350,7 @@ The system SHALL generate matrices from configuration definitions, computing per
 
 Source: Design Decision 2 — Configuration-Based Roles and Relations
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -388,8 +362,7 @@ Source: RequirementsTraceabilityExtension API
 
 refines:REQ-029[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -399,8 +372,7 @@ The system SHALL provide BFS-based path finding between any two items in the gra
 
 Source: TraceabilityGraph API
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -410,8 +382,7 @@ The system SHALL provide `getImpactAnalysis(itemId)` returning all reachable ite
 
 Source: TraceabilityGraph API
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -423,8 +394,7 @@ Source: TraceabilityGraph API
 
 NOTE: This method is not used internally by the extension — all files are processed into a single graph instance. It exists as a convenience for programmatic API consumers who may construct graphs independently and need to combine them.
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -436,8 +406,7 @@ Source: Design Decision 4 — Mustache Templates
 
 refines:REQ-029[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -447,8 +416,7 @@ The system SHALL integrate with Antora via `AntoraTraceabilityExtension`, regist
 
 Source: Antora Extension implementation
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -458,8 +426,7 @@ The system SHALL provide a Commander-based CLI with six subcommands: `process` (
 
 Source: CLI implementation
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -473,8 +440,7 @@ Source: openspec/specs/matrix-item-linking/spec.md
 
 refines:REQ-029[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -486,8 +452,7 @@ Source: openspec/specs/matrix-item-linking/spec.md
 
 refines:REQ-029[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -499,8 +464,7 @@ Source: openspec/specs/matrix-item-linking/spec.md
 
 refines:REQ-029[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -512,8 +476,7 @@ Source: openspec/specs/matrix-item-linking/spec.md
 
 refines:REQ-029[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -525,8 +488,7 @@ Source: openspec/specs/matrix-item-linking/spec.md
 
 refines:REQ-029[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -538,8 +500,7 @@ Source: openspec/specs/matrix-item-linking/spec.md
 
 refines:REQ-029[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -551,8 +512,7 @@ Source: openspec/specs/matrix-item-linking/spec.md
 
 refines:REQ-029[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -564,8 +524,7 @@ The system SHALL provide a \`traceability:outgoing[]\` macro that expands to a f
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -577,8 +536,7 @@ Source: openspec/specs/incoming-links-macro/spec.md
 
 refines:REQ-044[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -590,8 +548,7 @@ traceability:outgoing[]\` and \`traceability:incoming[]\` when the \`:traceabili
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -603,8 +560,7 @@ traceability:outgoing[]\` and \`traceability:incoming[]\` are the sole mechanism
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -616,8 +572,7 @@ Source: openspec/specs/traceability-links-macro/spec.md
 
 refines:REQ-044[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -629,8 +584,7 @@ Source: openspec/specs/traceability-links-macro/spec.md
 
 refines:REQ-044[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -642,8 +596,7 @@ Source: openspec/specs/traceability-links-macro/spec.md
 
 refines:REQ-044[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -657,8 +610,7 @@ Source: openspec/specs/graph-visualization/spec.md
 
 refines:REQ-053[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 [#REQ-052, item, role=requirement, title="Coverage chart via traceability:graph-coverage[] macro"]
@@ -669,8 +621,7 @@ Source: openspec/specs/graph-visualization/spec.md
 
 refines:REQ-053[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -680,8 +631,7 @@ The \`TraceabilityGraph\` SHALL provide \`toDot(fromId, depth?)\` returning a Gr
 
 Source: openspec/specs/graph-visualization/spec.md
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 
@@ -693,8 +643,7 @@ Source: openspec/specs/graph-visualization/spec.md
 
 refines:REQ-053[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 == CLI: Next ID Command
@@ -707,8 +656,7 @@ Source: openspec/changes/add-next-id-cli/specs/next-id/spec.md
 
 refines:REQ-036[]
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 [#REQ-057, item, role=requirement, title="Matrix files synced to component _attachments"]
@@ -717,8 +665,7 @@ The system SHALL automatically sync generated matrix files (HTML and CSV) from t
 
 Source: AntoraTraceabilityExtension.generateTraceabilityFiles() → syncMatricesToAttachments()
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 [#REQ-059, item, role=requirement, title="Items defined in partials are processed"]
@@ -727,8 +674,7 @@ The system SHALL process items defined in AsciiDoc partial files (`family: parti
 
 Source: openspec/specs/partial-support/spec.md
 
-traceability:outgoing[]
-traceability:incoming[]
+traceability:links[]
 --
 
 == Quality Attributes

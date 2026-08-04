@@ -32,9 +32,7 @@ addresses:REQ-024[]
 addresses:REQ-035[]
 addresses:REQ-036[]
 
-traceability:outgoing[]
-
-traceability:incoming[]
+traceability:links[]
 
 traceability:graph[]
 --
