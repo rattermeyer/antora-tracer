@@ -2,16 +2,41 @@
 
 Welcome to the project site for the *Antora Tracer* extension — a role-based traceability extension for Antora/AsciiDoc.
 
-== Documentation
+== Where to start
 
-* xref:user-guide.adoc[User Guide] — Complete guide to using the extension
-* xref:developer-guide.adoc[Developer Guide] — API, architecture, and contributing
+Pick the section that matches what you need:
 
-== What's Here
+* xref:tutorial/getting-started.adoc[Tutorial: Getting Started] — follow a step-by-step guide from zero to a working traceability setup
+* xref:how-to/new-project-setup.adoc[How-to Guides] — solve a specific task (set up a project, define a custom domain model, export to Neo4j, troubleshoot issues)
+* xref:reference/item-macro.adoc[Reference] — look up macro syntax, CLI commands, configuration options, or the API
+* xref:explanation/traceability-model.adoc[Explanation] — understand the traceability model, processing pipeline, architecture, and design decisions
 
-* xref:requirements:index.adoc[Requirements] — 36 requirements extracted from the OpenSpec specifications, defined as `[item]` macros
-* xref:architecture.adoc[Architecture] — arc42-style architecture documentation with component and runtime diagrams, each section tracing back to the requirements it addresses
-* xref:test-plan.adoc[Test Plan] — test coverage mapping, showing which test files verify which requirements
+== What's here
+
+This site follows the https://diataxis.fr[Diátaxis] documentation framework:
+
+[width=100%, cols="25,40,35"]
+|===
+| Section | Answers the question | Example pages
+
+| Tutorial
+| "Can you teach me to…?"
+| Getting Started
+
+| How-to Guides
+| "How do I…?"
+| Set up a project, Define a domain model, Export to Neo4j
+
+| Reference
+| "What does X do?"
+| Item macro syntax, CLI commands, Configuration options, API
+
+| Explanation
+| "Why does it work that way?"
+| Traceability model, Processing pipeline, Architecture, ADRs
+|===
+
+A fifth section, *Self-Traceability*, demonstrates the extension applied to its own development — requirements, use cases, test plan, and dashboard — traced against each other using the same `[item]` macros.
 
 == Downloads
 
@@ -38,4 +63,4 @@ npm run build
 node examples/run-example.js
 ----
 
-This produces 48 items, 82 relationships, and 0 validation errors across the three content files.
+This produces 112 items, 118 relationships, and 0 validation errors across the content files.

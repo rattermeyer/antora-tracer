@@ -1,0 +1,98 @@
+= How to Contribute
+:description: Developer setup, workflow, testing, and conventions for contributing to the Antora Tracer extension
+:keywords: antora, traceability, contributing, development
+:toc: macro
+
+toc::[]
+
+== Setup
+
+[source,bash]
+----
+git clone <repo-url>
+cd antora-asciidoc-tracing
+npm install
+npm run build
+npm test
+----
+
+== Development workflow
+
+[source,bash]
+----
+npm run build          # Compile TypeScript (src/ → lib/)
+npm test               # Run all tests (compiles test files first)
+npm run test:coverage  # Run tests with c8 coverage
+npm run lint           # Run biome checks
+npm run format         # Auto-format with biome
+----
+
+Two TypeScript configurations:
+
+- `tsconfig.json` — production build: `src/` → `lib/`
+- `tsconfig.test.json` — test build: `src/` + `test/` → `lib/`
+
+The build script (`scripts/build.js`) copies templates, presets, and compiled files to `lib/` for npm distribution.
+
+Pre-commit hooks: biome lint + format via `pre-commit`.
+
+== Code style
+
+- TypeScript strict mode
+- ESM imports with `.js` extensions in import paths
+- JSDoc comments on public methods
+- No default exports (named exports only)
+- Biome for linting and formatting
+
+== Commit conventions
+
+This project follows https://www.conventionalcommits.org/[Conventional Commits]:
+
+```
+<type>(<scope>): <description>
+```
+
+Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `ci`, `perf`
+
+Common scopes: `parser`, `cli`, `preset`, `matrix`, `neo4j`, `antora`, `config`, `graph`
+
+== Testing
+
+Tests use Mocha + Chai, written in TypeScript, compiled with `tsconfig.test.json` to `lib/test/`. Write tests:
+
+[source,typescript]
+----
+import { expect } from 'chai';
+import { RequirementsTraceabilityExtension } from '../src/index.js';
+
+describe('MyFeature', () => {
+  it('should do something', () => {
+    const extension = new RequirementsTraceabilityExtension();
+    extension.process(`...[#X, item, role=requirement]...`, { sourceFile: 'test.adoc' });
+    expect(extension.getAllItems()).to.have.lengthOf(1);
+  });
+});
+----
+
+Run individual test files:
+
+[source,bash]
+----
+npx mocha 'lib/test/graph-and-api.test.js'
+----
+
+== Build and release
+
+[source,bash]
+----
+npm run build        # Compile
+npm test             # Verify all tests pass
+npm version 0.7.0    # Bump version
+npm publish          # Publish to npm
+----
+
+== Related
+
+- xref:reference/api.adoc[API Reference] — public API surface and data model
+- xref:explanation/processing-pipeline.adoc[Processing Pipeline] — how the extension works internally
+- xref:explanation/architecture.adoc[Architecture] — arc42 architecture documentation

@@ -1,0 +1,298 @@
+= API Reference
+:description: Public API surface of the Antora Tracer extension — RequirementsTraceabilityExtension, TraceabilityGraph, DocumentParser, and related classes
+:keywords: antora, traceability, api, reference, typescript
+:toc: macro
+
+toc::[]
+
+== RequirementsTraceabilityExtension
+
+`src/index.ts` — the orchestrator. Owns the `TraceabilityGraph`, delegates processing to `DocumentParser`, generation to `MatrixGenerator`, and export to `Neo4jExporter`.
+
+[source,typescript]
+----
+export class RequirementsTraceabilityExtension {
+  readonly graph: TraceabilityGraph;
+  configLoader?: ConfigLoader;
+  currentFile: string | null;
+}
+
+// Factory methods
+RequirementsTraceabilityExtension.createWithConfig(configPath?: string): Promise<RequirementsTraceabilityExtension>;
+RequirementsTraceabilityExtension.createWithPreset(presetName: string): RequirementsTraceabilityExtension;
+----
+
+=== Methods
+
+[width=100%, cols="35,65"]
+|===
+| Method | Description
+
+| `process(content, options)` | Parse AsciiDoc content, register items and relationships in the graph, return `ParserResult`
+| `processFiles(files)` | Process multiple files, return per-file results and aggregate
+| `getAllItems()` | All items in the graph
+| `getAllRelationships()` | All relationships in the graph
+| `getItemsByRole(role)` | Filter items by role
+| `getRelationships(id, type?)` | Relationships from an item, optionally filtered by type
+| `getRelatedItems(id, type?)` | Items targeted by relationships from an item
+| `getRoleStatistics()` | Item counts per role
+| `validate()` | Run graph validation (orphaned references, missing targets, circular references)
+| `getCoverageReport()` | Per-role item counts and matrix-specific coverage
+| `getConfigErrors()` | Configuration validation errors
+| `createNeo4jExporter()` | Create a Neo4jExporter for the current graph
+| `exportToNeo4jCSV(options)` | Export directly to CSV
+| `getMatrixDefinitions()` | Matrix definitions from loaded config
+| `isKnownRole(role)` | Check if a role is in the loaded config
+| `isRelationAllowed(src, tgt, type)` | Check if a relation is allowed by config
+| `getAllowedRelations(src, tgt)` | Get allowed relation types between roles
+| `listPresets()` | List all built-in presets
+| `getPreset(name)` | Get a specific preset
+| `clear()` | Clear graph and reset state
+| `resetWithConfig(configLoader)` | Set a new ConfigLoader and update graph
+|===
+
+=== Delegate methods
+
+Forwarded to `graph`:
+
+[width=100%, cols="35,65"]
+|===
+| `findPath(from, to, maxDepth?)` | BFS path between items
+| `getImpactAnalysis(id)` | All reachable items in both directions
+| `getRelationshipsByRoles(src, tgt)` | Relationships between two roles
+| `getNextId(prefix)` | Next available sequential ID for a given prefix
+|===
+
+== TraceabilityGraph
+
+`src/TraceabilityGraph.ts` — in-memory directed graph. Items stored in a `Map<string, Item>` keyed by id. Relationships stored in a `Map<string, ItemRelationship>` keyed by composite key `fromId-type-targetId`.
+
+[source,typescript]
+----
+export class TraceabilityGraph {
+  // Node management
+  addItem(item: Item): void;
+  getItem(id: string): Item | undefined;
+  getAllItems(): Item[];
+  getItemsByRole(role: string): Item[];
+  getAllRoles(): string[];
+
+  // Relationship management
+  addRelationship(relationship: ItemRelationship): void;
+  getRelationship(id: string): ItemRelationship | undefined;
+  getAllRelationships(): ItemRelationship[];
+  getRelationships(fromId: string, type?: string): ItemRelationship[];
+  getReverseRelationships(targetId: string, type?: string): ItemRelationship[];
+
+  // Query
+  getRelatedItems(itemId: string, relationType?: string): Item[];
+  getItemsWithRelationTo(itemId: string, relationType?: string): Item[];
+  getRelationshipsByRoles(sourceRole: string, targetRole: string): ItemRelationship[];
+  getRoleStatistics(): Record<string, number>;
+
+  // Graph algorithms
+  findPath(fromId: string, toId: string, maxDepth?: number): string[] | null;
+  getImpactAnalysis(itemId: string): string[];
+
+  // Validation
+  validate(): ValidationResult;  // { errors: string[], warnings: string[] }
+  findCircularReferences(): string[];
+
+  // Visualization
+  toDot(fromId: string, depth?: number): string;
+  toVegaLite(itemId?: string): string;
+
+  // ID generation
+  getNextId(prefix: string): string;
+
+  // Lifecycle
+  clear(): void;
+  merge(other: TraceabilityGraph): void;
+  setConfigLoader(configLoader: ConfigLoader): void;
+}
+
+interface ValidationResult {
+  errors: string[];
+  warnings: string[];
+}
+----
+
+`addRelationship` validates: source exists, target exists, relation is allowed (if ConfigLoader is set). Invalid relations are stored with a warning. `validate()` runs `findCircularReferences()`, a DFS-based cycle detector.
+
+== DocumentParser
+
+`src/DocumentParser.ts` — regex-based AsciiDoc parser.
+
+[source,typescript]
+----
+export interface ParserResult {
+  items: Item[];
+  relationships: ItemRelationship[];
+  warnings: ParserWarning[];
+  errors: ParserError[];
+}
+----
+
+Two-pass approach: find `[item]` block macros, then scan content for inline relationship macros (`<type>:<TARGET-ID>[]`). Supports verbatim block exclusion, old macro detection, source file and line tracking.
+
+== MatrixGenerator
+
+`src/MatrixGenerator.ts` — config-driven matrix generation.
+
+[source,typescript]
+----
+export class MatrixGenerator {
+  constructor(graph: TraceabilityGraph, configLoader?: ConfigLoader);
+
+  generateMatrix(name: string): GeneratedMatrix;
+  generateDefaultMatrix(): GeneratedMatrix;
+  generateCoverageReport(): CoverageReport;
+}
+
+export interface GeneratedMatrix {
+  name: string;
+  description?: string;
+  rows: MatrixRow[];
+  coverage: CoverageStats;
+  generatedAt: string;
+}
+----
+
+== Neo4jExporter
+
+`src/Neo4jExporter.ts` — exports the graph to Neo4j-compatible formats.
+
+[source,typescript]
+----
+export class Neo4jExporter {
+  constructor(graph: TraceabilityGraph);
+
+  export(options: Neo4jExportOptions): Neo4jExportResult;
+}
+
+export interface Neo4jExportOptions {
+  outputDir: string;
+  format: 'csv' | 'cypher';
+  includeContent?: boolean;       // default: true
+  includeAllAttributes?: boolean;  // default: true
+}
+
+export interface Neo4jExportResult {
+  format: 'csv' | 'cypher';
+  nodeCount: number;
+  relationshipCount: number;
+  files: string[];
+}
+----
+
+== TemplateRenderer
+
+`src/TemplateRenderer.ts` — Mustache template engine wrapper.
+
+[source,typescript]
+----
+export class TemplateRenderer {
+  constructor(templateDir?: string);
+
+  render(templateName: string, data: any): string;
+  renderMatrix(matrix: GeneratedMatrix, template?: string): string;
+}
+----
+
+Falls back to built-in templates when custom template directory is provided but specific files are missing.
+
+== ConfigLoader
+
+`src/config/TraceabilityConfig.ts` — loads, validates, and exposes configuration.
+
+[source,typescript]
+----
+export class ConfigLoader {
+  load(configPath?: string): CompleteConfig;
+  loadPreset(presetName: string): Preset;
+  getConfig(): CompleteConfig;
+  reload(): CompleteConfig;
+  listPresets(): { name: string; description: string; version: string }[];
+
+  isKnownRole(role: string): boolean;
+  isRelationAllowed(sourceRole, targetRole, relationType): boolean;
+  getAllowedRelations(sourceRole, targetRole): string[];
+  getMatrices(): MatrixDefinition[];
+  getMatrix(name: string): MatrixDefinition | undefined;
+}
+----
+
+== Data Model
+
+`src/types.ts`:
+
+[source,typescript]
+----
+export interface Item {
+  id: string;                        // Unique identifier
+  title: string;                     // Display title
+  content?: string;                  // Raw AsciiDoc content
+  role: string;                      // User-defined role
+  status?: string;                   // Free-form status
+  attributes: Record<string, string>; // Additional attributes
+  sourceFile?: string;               // Source AsciiDoc file
+  sourceLine?: number;               // Line number in source
+}
+
+export interface ItemRelationship {
+  id: string;                        // Composite: "fromId-type-targetId"
+  fromId: string;                    // Source item id
+  targetId: string;                  // Target item id
+  type: string;                      // User-defined relation type
+  sourceFile?: string;
+  line?: number;
+  autoGenerated?: boolean;
+  inverseOf?: string;
+}
+----
+
+== Configuration Types
+
+[source,typescript]
+----
+export interface TraceabilityConfig {
+  roles: string[];
+  relations: Record<string, Record<string, string[]>>;
+  matrices: MatrixDefinition[];
+  extends?: string;
+}
+
+export interface MatrixDefinition {
+  name: string;
+  description?: string;
+  rows: string;
+  columns: string[];
+  coverageRelations: Record<string, string[]>;
+}
+
+export interface Preset extends PresetMetadata {
+  traceability: TraceabilityConfig;
+  neo4j?: { queries: Neo4jQuery[] };
+  documentation?: { description: string };
+}
+----
+
+== Antora Integration
+
+`src/antora-extension.ts` — Antora extension entry point.
+
+[source,typescript]
+----
+export class AntoraTraceabilityExtension {
+  static register(context: AntoraExtensionContext): void;
+  getTraceabilityExtension(): RequirementsTraceabilityExtension;
+}
+----
+
+Event handlers: `contentClassified` (process items), `sitePublished` (generate matrices and export).
+
+== Related
+
+- xref:how-to/contribute.adoc[How to contribute] — development workflow and testing
+- xref:explanation/processing-pipeline.adoc[Processing Pipeline] — how components interact
+- xref:explanation/architecture.adoc[Architecture] — arc42 architecture

@@ -1,0 +1,114 @@
+= Item Macro Reference
+:description: Complete syntax reference for the [item] block macro, attributes, inline relationships, and validation rules
+:keywords: antora, asciidoc, traceability, item, macro, reference
+:toc: macro
+
+toc::[]
+
+== Syntax
+
+[source,asciidoc]
+----
+[#ID, item, role=<role>, title="Title", status="draft", priority="high"]
+====
+Item content. Can span multiple paragraphs.
+
+Inline relationships go anywhere inside the block:
+
+<relation-type>:TARGET-ID[]
+<relation-type>:TARGET-ID[]
+====
+----
+
+== Attributes
+
+[width=100%, cols="25,10,65"]
+|===
+| Attribute | Required | Description
+
+| `id`
+| Yes
+| Unique identifier. Must be unique across all items in the graph. Recommended format: `ROLE-NNN` (e.g., `REQ-001`, `STORY-042`)
+
+| `role`
+| Yes
+| Must match a role defined in your configuration. Case-insensitive. Unknown roles generate a warning but the item is still stored
+
+| `title`
+| No
+| Display title. Defaults to the `id` if omitted. Used in matrix cells, macro output, and Neo4j export
+
+| `status`
+| No
+| Free-form status: `draft`, `reviewed`, `approved`, `implemented`, `deprecated`
+
+| `priority`
+| No
+| Free-form priority: `high`, `medium`, `low`
+|===
+
+Any additional attributes are stored in the item's `attributes` map and exported to Neo4j as node properties.
+
+== Inline Relationship Macros
+
+A relationship is expressed as `<relation-type>:TARGET-ID[]` anywhere inside the item block:
+
+[source,asciidoc]
+----
+[#IMP-001, item, role=implementation]
+====
+Auth Service
+
+implements:DES-001[]
+depends_on:IMP-002[]
+----
+
+=== Syntax rules
+
+- Multiple targets per type: `satisfies:REQ-001,REQ-002,REQ-003[]`
+- Multiple types per item: write each on its own line
+- The `TARGET-ID` must match the `id` of another item in the graph
+- Missing targets generate a warning, not an error
+
+=== Visibility
+
+Inline relationship macros are *always invisible* in rendered output. They are pure data markers stored in the traceability graph. To display relationships in documentation, use:
+
+- `traceability:outgoing[]` — lists items this item points to
+- `traceability:incoming[]` — lists items that point to this item
+- `traceability:links[]` — shows both directions
+
+See xref:reference/traceability-macros.adoc[Traceability Macros Reference].
+
+== Validation
+
+The extension validates items and relationships at processing time:
+
+=== Role validation
+- **Role exists**: If `role=widget` and `widget` isn't in the config, warning: `Unknown role "widget". Known roles: requirement, design, test.`
+
+=== Relation validation
+- **Relation allowed**: Checks `source role → target role` against the `relations` map. Disallowed relations generate errors with the allowed types listed.
+- **Target exists**: Missing targets generate: `Target item not found: MISSING-001.`
+
+=== Graph validation
+- **Circular references**: DFS-based cycle detection. Reports cycles with the full path: `Circular reference detected: REQ-001 -> REQ-002 -> REQ-001.`
+- **Self-references**: An item referencing itself is also detected and reported as circular.
+
+Warnings don't block processing; errors do. Unknown roles generate warnings (graceful degradation). Invalid relations generate errors.
+
+== Deprecated: Legacy macros
+
+Older versions used role-specific block macros (`[req]`, `[imp]`, `[test]`). These are detected with a deprecation error:
+
+----
+Error: Deprecated macro [req] found. Use [item, role=requirement] instead.
+----
+
+See xref:how-to/write-traceable-items.adoc[How to write traceable items] for migration guidance.
+
+== Related
+
+- xref:how-to/write-traceable-items.adoc[How to write traceable items] — practical guide
+- xref:reference/traceability-macros.adoc[Traceability Macros Reference] — rendering macros
+- xref:reference/configuration.adoc[Configuration Reference] — role and relation configuration

@@ -1,0 +1,156 @@
+= How to Define a Custom Domain Model
+:description: Extend built-in presets with custom roles, relations, and matrices for your project's specific traceability needs
+:keywords: antora, asciidoc, traceability, configuration, preset
+:toc: macro
+
+toc::[]
+
+Built-in presets cover common domains, but most projects need adjustments. This guide shows how to extend a preset with your own roles, relations, and matrices.
+
+== Initialize from a preset
+
+Start from the closest built-in preset, then customize:
+
+[source,bash]
+----
+npx antora-tracer preset init -n requirements-engineering -o ./config/
+----
+
+This writes the preset's full configuration to `./config/traceability.yml`. Edit this file to add your domain-specific roles and relations.
+
+See xref:reference/presets.adoc[Presets Reference] for the complete structure of each built-in preset.
+
+== Add a new role
+
+Say your project uses use cases alongside requirements. Add a `use_case` role:
+
+[source,yaml]
+----
+traceability:
+  roles:
+    - requirement
+    - design
+    - implementation
+    - test
+    - document
+    - use_case       # <1>
+----
+<1> New role added to the preset's existing list
+
+== Define relations for the new role
+
+Define which relations connect `use_case` to other roles:
+
+[source,yaml]
+----
+traceability:
+  relations:
+    # ... existing relations from preset ...
+
+    use_case:
+      requirement:
+        - leads_to
+      design:
+        - informs
+
+    requirement:
+      # ... existing relations ...
+      use_case:       # <1>
+        - motivated_by
+----
+<1> Bidirectional: when you add a new role, also add reverse relations from existing roles to it
+
+The `leads_to` and `informs` relations are now valid from `use_case` items. The `motivated_by` relation is valid from `requirement` back to `use_case`. The extension will validate that only these relation types are used between these roles.
+
+== Add a custom matrix
+
+Add a matrix that cross-references use cases against requirements:
+
+[source,yaml]
+----
+traceability:
+  matrices:
+    # ... existing matrices from preset ...
+    - name: usecases-to-requirements
+      description: "Which requirements each use case motivates"
+      rows: use_case
+      columns:
+        - requirement
+      coverageRelations:
+        requirement:
+          - leads_to
+----
+
+== Point your playbook at the custom config
+
+Update `antora-playbook.yml`:
+
+[source,yaml]
+----
+antora:
+  extensions:
+    - require: antora-tracer/antora-extension
+      config:
+        configPath: ./config/traceability.yml
+----
+
+The `configPath` takes precedence over `preset`. The extension loads your file and validates it against the schema.
+
+== Use the `extends` field for partial overrides
+
+You don't need to copy the entire preset. Use `extends` to only declare what you're changing:
+
+[source,yaml]
+----
+traceability:
+  extends: requirements-engineering   # <1>
+
+  roles:
+    - requirement
+    - design
+    - implementation
+    - test
+    - document
+    - use_case
+
+  relations:
+    use_case:
+      requirement:
+        - leads_to
+    requirement:
+      use_case:
+        - motivated_by
+
+  matrices:
+    - name: usecases-to-requirements
+      description: "Which requirements each use case motivates"
+      rows: use_case
+      columns:
+        - requirement
+      coverageRelations:
+        requirement:
+          - leads_to
+----
+<1> Pulls in the full `requirements-engineering` preset, then merges your changes on top
+
+The `extends` field deep-merges — your roles are added, relations are merged, and matrices are appended. You only write what's different from the preset.
+
+== Validate your config
+
+After editing `traceability.yml`, run a validation check:
+
+[source,bash]
+----
+npx antora-tracer validate -i modules/ --config ./config/traceability.yml
+----
+
+This catches:
+- Unknown roles referenced in relations
+- Invalid matrix row/column roles
+- Missing `coverageRelations` fields
+
+== Related
+
+- xref:reference/configuration.adoc[Configuration Reference] — every option and schema detail
+- xref:reference/presets.adoc[Presets Reference] — built-in preset definitions
+- xref:explanation/traceability-model.adoc[The Traceability Model] — how roles, relations, and matrices work

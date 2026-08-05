@@ -141,7 +141,7 @@ rules. `ConfigLoader.isRelationAllowed()` checks source role, target role
 and relation type against the configured `relations` map. Cross-file
 references are re-validated after all files are loaded to catch late-resolved
 targets. Error messages include file path, line number, and allowed
-alternatives (see xref:adr/0004-zero-framework.adoc[ADR-004]).
+alternatives (see xref:explanation/adr/0004-zero-framework.adoc[ADR-004]).
 
 addresses:REQ-071[]
 addresses:QA-056[]
@@ -187,7 +187,7 @@ title injection — operate on in-memory buffers. Source `.adoc` files are never
 written to. The Antora content catalog provides the text buffers; the extension
 modifies them in place and writes them back to the catalog without touching disk.
 This ensures idempotency and version-control safety (see
-xref:adr/0003-in-memory-graph.adoc[ADR-003]).
+xref:explanation/adr/0003-in-memory-graph.adoc[ADR-003]).
 
 The graph has a well-defined lifecycle — understanding which operations are valid in each state explains why pass ordering matters:
 
@@ -305,7 +305,7 @@ API versions and testable with plain string inputs. Verbatim blocks
 (`----` and `....` fences) are pre-scanned and excluded to avoid
 false positives from example code. Known limitations (`]` in quoted
 attribute values, indented macros) are handled with targeted fixes
-(see xref:adr/0002-regex-parser-over-ast.adoc[ADR-002]).
+(see xref:explanation/adr/0002-regex-parser-over-ast.adoc[ADR-002]).
 
 The parser's internal pipeline has four distinct steps — each builds on the previous:
 
@@ -580,7 +580,7 @@ ESM (`"type": "module"` in package.json) is used throughout the project. This
 choice enables modern `import`/`export` syntax, the `node:` protocol for built-in
 modules, and alignment with browser JavaScript. The tradeoff is that Antora's
 extension loader uses `require()`, requiring `.cjs` wrappers for integration
-points (see xref:adr/0001-esm-over-cjs.adoc[ADR-001]).
+points (see xref:explanation/adr/0001-esm-over-cjs.adoc[ADR-001]).
 
 addresses:QA-055[]
 --
@@ -592,7 +592,7 @@ service locator, DI container, or global state. `TraceabilityGraph` receives
 `ConfigLoader`, `MatrixGenerator` receives `TraceabilityGraph` and `ConfigLoader`
 and `DocumentParser` receives `ConfigLoader` optionally. This makes every
 component independently testable without mocking frameworks (see
-xref:adr/0004-zero-framework.adoc[ADR-004]).
+xref:explanation/adr/0004-zero-framework.adoc[ADR-004]).
 
 addresses:QA-059[]
 --

@@ -1,0 +1,161 @@
+= Traceability Macros Reference
+:description: Complete reference for traceability:outgoing[], traceability:incoming[], traceability:links[], traceability:graph[], and traceability:graph-coverage[] macros
+:keywords: antora, asciidoc, traceability, macros, reference
+:toc: macro
+
+toc::[]
+
+== Relationship Link Macros
+
+These macros display relationship lists as formatted text. They are gated by the `:traceability-links:` document attribute.
+
+=== traceability:outgoing[]
+
+Lists items that this item points to (outgoing relationships). Place inside an item block:
+
+[source,asciidoc]
+----
+[#REQ-001, item, role=requirement]
+====
+Requirement description...
+
+traceability:outgoing[]
+----
+
+=== traceability:incoming[]
+
+Lists items that point to this item (incoming relationships). Uses inverse labels (e.g., `addresses` displays as "Addressed by"):
+
+[source,asciidoc]
+----
+traceability:incoming[]
+----
+
+=== traceability:links[]
+
+Shows both outgoing and incoming relationships in one call:
+
+[source,asciidoc]
+----
+traceability:links[]
+----
+
+=== Enabling
+
+Opt-in per page via document attribute:
+
+[source,asciidoc]
+----
+= Architecture
+:traceability-links: true
+----
+
+Without this attribute, the macro text is stripped from output.
+
+=== Display options
+
+[width="100%", cols="25,25,50"]
+|===
+| Attribute | Values | Effect
+
+| `:traceability-links:`
+| `true`
+| Enables the macros
+
+| `:traceability-style:`
+| `list` (default), `table`, `inline`
+| Display format: bulleted list, AsciiDoc table, or comma-separated inline
+
+| `:traceability-order:`
+| `target-id` (default), `target-title`, `relation-type`
+| Sort order
+
+| `:traceability-collapsible:`
+| `true`
+| Wrap output in collapsible `<details>` sections by relation type (HTML only)
+|===
+
+=== PDF compatibility
+
+The macros generate standard AsciiDoc constructs (xrefs, lists, tables) — compatible with both HTML and PDF backends. The `@antora/pdf-extension` renders them identically.
+
+== Visualization Macros
+
+These macros render diagrams. They are gated by the `:traceability-graph:` document attribute.
+
+=== traceability:graph[]
+
+Renders a relationship graph diagram.
+
+[source,asciidoc]
+----
+= Dashboard
+:traceability-graph: true
+
+[#REQ-001, item, role=requirement]
+\--
+Requirement description...
+
+traceability:graph[]
+\--
+----
+
+Renders a Kroki-generated GraphViz DOT diagram showing the item and all directly related items (both outgoing and incoming). Nodes are colored by role; edges are labeled with relation types.
+
+=== Explicit target
+
+Reference any item by passing an explicit ID:
+
+[source,asciidoc]
+----
+traceability:graph[REQ-001]
+----
+
+=== Depth parameter
+
+Pass a depth to control how many hops are shown (default `1`):
+
+[source,asciidoc]
+----
+traceability:graph[REQ-001, 2]
+----
+
+=== traceability:graph-coverage[]
+
+Renders a coverage bar chart.
+
+Inside an item — per-relationship-type coverage:
+
+[source,asciidoc]
+----
+traceability:graph-coverage[]
+----
+
+Outside any item — global role-based coverage:
+
+[source,asciidoc]
+----
+= Dashboard
+:traceability-graph: true
+
+traceability:graph-coverage[]
+----
+
+Renders a Kroki-generated Vega-Lite bar chart. Both macros auto-scale and have no additional attributes beyond `:traceability-graph:`.
+
+=== Enabling
+
+[source,asciidoc]
+----
+= Dashboard
+:traceability-graph: true
+----
+
+=== Kroki format
+
+Both macros generate URLs pointing to the configured Kroki server. The image format (SVG/PNG) is controlled by the extension's Kroki configuration, not by document attributes.
+
+== Related
+
+- xref:how-to/visualizations.adoc[How to add traceability visualizations] — practical guide
+- xref:reference/item-macro.adoc[Item Macro Reference] — inline relationship syntax

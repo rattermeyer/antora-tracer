@@ -1,0 +1,176 @@
+= Configuration Reference
+:description: Complete reference for all Antora Tracer configuration options — playbook options, traceability.yml schema, presets, and validation
+:keywords: antora, traceability, configuration, yaml, reference
+:toc: macro
+
+toc::[]
+
+== Playbook Options
+
+Configure the extension in your Antora playbook (`antora-playbook.yml` or `antora.yml`):
+
+[source,yaml]
+----
+antora:
+  extensions:
+    - require: antora-tracer/antora-extension
+      config:
+        preset: requirements-engineering
+        # ... additional options ...
+----
+
+[width=100%, cols="25,15,30,30"]
+|===
+| Option | Type | Default | Description
+
+| `enabled`
+| boolean
+| `true`
+| Set to `false` to disable the extension without uninstalling
+
+| `preset`
+| string
+| `requirements-engineering`
+| Built-in preset name. Overridden by `configPath`. Valid: `requirements-engineering`, `agile`, `medical-iec62304`, `minimal`
+
+| `configPath`
+| string
+| —
+| Path to a custom `traceability.yml` file. Takes precedence over `preset`
+
+| `outputDir`
+| string
+| `traceability`
+| Output directory relative to the site output root
+
+| `generateMatrices`
+| boolean
+| `true`
+| Generate traceability matrices. Set to `false` for Neo4j-only usage
+
+| `matrixFormats`
+| string[]
+| `['html']`
+| Output formats. Valid: `html` (interactive), `csv` (data)
+
+| `includeInNavigation`
+| boolean
+| `true`
+| Add traceability pages to the Antora site navigation
+|===
+
+== traceability.yml Schema
+
+When using a custom configuration, create a `traceability.yml` file:
+
+[source,yaml]
+----
+traceability:
+  extends: requirements-engineering   # optional
+
+  roles:
+    - requirement
+    - design
+    - implementation
+    - test
+
+  relations:
+    requirement:
+      design: [addresses, satisfied_by]
+      implementation: [implemented_by]
+      test: [verified_by]
+
+    design:
+      requirement: [implements]
+      implementation: [realized_by]
+      test: [validated_by]
+
+    implementation:
+      requirement: [satisfies]
+      design: [implements]
+      test: [tested_by]
+
+    test:
+      requirement: [covers, verifies]
+      implementation: [tests]
+
+  matrices:
+    - name: requirements-to-design
+      description: "Forward traceability from requirements to design"
+      rows: requirement
+      columns: [design]
+      coverageRelations:
+        design: [addresses, satisfies]
+----
+
+=== `extends`
+
+[source,yaml]
+----
+traceability:
+  extends: requirements-engineering
+----
+
+Pulls in a built-in preset as the base. Your config is deep-merged on top:
+- `roles`: appended (duplicates silently merged)
+- `relations`: merged at all levels
+- `matrices`: appended
+
+If `extends` is omitted, the config is standalone — no preset is loaded.
+
+=== `roles`
+
+Flat list of strings. Every `[item]` must use a role in this list. Case-insensitive. Unknown roles generate warnings.
+
+=== `relations`
+
+Nested map: `source_role → target_role → [allowed_types]`. Each entry says "items with role X can use relation types [A, B, C] to point at items with role Y."
+
+If a relation type is used that isn't in this map, the extension reports an error with the allowed alternatives.
+
+TIP: Define bidirectional relations — if `design → requirement: [implements]`, also define `requirement → design: [implemented_by]` so items in both directions can express the relationship in their natural direction.
+
+=== `matrices`
+
+An array of matrix definitions:
+
+[width=100%, cols="25,20,55"]
+|===
+| Key | Type | Description
+
+| `name`
+| string
+| Used in output filename: `matrix-<name>.html` and `matrix-<name>.csv`
+
+| `description`
+| string
+| Human-readable description, displayed as caption in HTML output
+
+| `rows`
+| string
+| Role for the row index. One row per item of this role
+
+| `columns`
+| string[]
+| Roles for the columns. Each cell shows items of that role related to the row item
+
+| `coverageRelations`
+| map
+| Which relation types count as "coverage" per column role. `coverageRelations: design: [addresses, satisfies]` means only `addresses` and `satisfies` from row items to design items count
+|===
+
+== Configuration Resolution
+
+When both `preset` and `configPath` are provided, `configPath` takes precedence:
+
+1. If `configPath` is set → load user YAML file
+2. If `configPath` has `extends` → load the referenced preset, then deep-merge
+3. If only `preset` is set → load the built-in preset
+4. If neither → error
+
+The resolved configuration is memoized — loaded once and shared across all components.
+
+== Related
+
+- xref:how-to/custom-domain-model.adoc[How to define a custom domain model] — practical configuration guide
+- xref:reference/presets.adoc[Presets Reference] — built-in preset definitions

@@ -1,0 +1,99 @@
+= How to Add Traceability Visualizations
+:description: Add relationship graphs and coverage charts to your documentation pages
+:keywords: antora, asciidoc, traceability, graph, visualization, graphviz, vega-lite
+:toc: macro
+
+toc::[]
+
+The extension provides two visualization macros that render as diagrams in your HTML and PDF output. Both use Kroki (https://kroki.io) under the hood and require no local tooling.
+
+== Enable visualization macros
+
+Add the `:traceability-graph:` document attribute to any page where you want visualizations:
+
+[source,asciidoc]
+----
+= My Page
+:traceability-graph: true
+----
+
+Without this attribute, the `traceability:graph[]` and `traceability:graph-coverage[]` placeholders are stripped from output.
+
+== Add a relationship graph
+
+Place `traceability:graph[]` inside any item block:
+
+[source,asciidoc]
+----
+[#REQ-001, item, role=requirement, title="User authentication"]
+====
+The system shall require authentication.
+
+traceability:graph[]
+====
+----
+
+This renders a GraphViz DOT diagram showing the item and all directly related items (both outgoing and incoming). Nodes are colored by role, edges are labeled with relation types.
+
+By default, the graph shows one hop. For deeper graphs, pass a depth parameter:
+
+[source,asciidoc]
+----
+traceability:graph[REQ-001, 2]   <1>
+----
+<1> Shows the item and items within two hops
+
+Reference any item by ID — useful outside item blocks:
+
+[source,asciidoc]
+----
+traceability:graph[REQ-001]
+----
+
+== Add a coverage chart
+
+Place `traceability:graph-coverage[]` inside any item block:
+
+[source,asciidoc]
+----
+[#REQ-001, item, role=requirement]
+====
+traceability:graph-coverage[]
+====
+----
+
+This renders a Vega-Lite bar chart showing per-relationship-type coverage for that item — which relations are present and which are missing.
+
+For a global coverage chart (all roles), place it outside any item block:
+
+[source,asciidoc]
+----
+= Dashboard
+:traceability-graph: true
+
+== Global Coverage
+
+traceability:graph-coverage[]
+----
+
+== Enabling relationship link macros
+
+For textual relationship lists (not diagrams), enable the link macros:
+
+[source,asciidoc]
+----
+= My Page
+:traceability-links: true
+:traceability-style: table
+:traceability-order: target-id
+----
+
+Then use `traceability:outgoing[]` and `traceability:incoming[]` inside item blocks. See xref:reference/traceability-macros.adoc[Traceability Macros Reference] for all options.
+
+== PDF compatibility
+
+All visualization macros render identically in HTML and PDF — they generate standard AsciiDoc constructs (xrefs, images via Kroki URLs). The `@antora/pdf-extension` handles the image resolution.
+
+== Related
+
+- xref:reference/traceability-macros.adoc[Traceability Macros Reference] — complete macro syntax and options

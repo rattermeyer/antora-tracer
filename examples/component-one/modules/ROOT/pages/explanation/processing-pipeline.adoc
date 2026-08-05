@@ -1,0 +1,85 @@
+= Processing Pipeline
+:description: How the extension processes AsciiDoc files during an Antora build — the pass structure, graph lifecycle, and component interaction
+:keywords: antora, traceability, processing, pipeline, architecture
+:toc: macro
+
+toc::[]
+
+This page explains how the Antora Tracer extension processes content during a build. It covers the internal pass structure, the graph lifecycle, and how components coordinate.
+
+== Build integration
+
+The extension hooks into Antora's event pipeline through two events:
+
+- `contentClassified` — fires per-page during content processing. The extension parses items, expands macros, and substitutes links.
+- `sitePublished` — fires once after all pages are classified. The extension generates matrices and exports.
+
+The same `RequirementsTraceabilityExtension` class works standalone (via CLI) or within Antora — the event handlers are optional.
+
+== Pass structure within contentClassified
+
+The extension runs four passes within the `contentClassified` event. The order matters — each pass depends on the result of earlier ones.
+
+=== Pass 1: Parse and populate the graph
+
+`DocumentParser` scans every page and partial for `[item]` blocks and inline relationship macros. Items and relationships are registered in the `TraceabilityGraph`. Both pages and partials are processed here.
+
+The graph must be complete before any subsequent pass can resolve cross-file references. This is why Pass 1 processes *all* files before moving on.
+
+=== Pass 2: Expand relation macros (pages only)
+
+`traceability:outgoing[]`, `traceability:incoming[]`, and `traceability:links[]` placeholders are replaced with formatted relationship lists. The expansion queries the graph to enumerate relationships for each item.
+
+This pass is opt-in: only pages with `:traceability-links: true` get macro expansion. Pages without the attribute have the macro text stripped.
+
+Display style (list, table, inline), sort order (target-id, target-title, relation-type), and collapsible sections are configurable via document attributes.
+
+=== Pass 2b: Expand graph macros (pages only)
+
+`traceability:graph[]` and `traceability:graph-coverage[]` placeholders are replaced with Kroki image URLs. The graph's `toDot()` and `toVegaLite()` methods generate the diagram source.
+
+This pass is opt-in via `:traceability-graph: true`. It's independent of Pass 2 — you can enable graph macros without link macros, and vice versa.
+
+=== Pass 3: Substitute relationship links (pages only)
+
+Inline relationship macros (``) are replaced with clickable xrefs to the target item's source page. This is the mechanism that makes matrix cells clickable links to item definitions.
+
+For page items: `xref:page.html#ID`. For partial items: `link:URL#ID` (since partials don't produce HTML pages).
+
+This pass also runs `injectTitleIds()` (prepends ID to title for visible display) and `unindentItemMacros()`.
+
+== Graph lifecycle
+
+The traceability graph has a defined lifecycle — understanding which operations are valid in each state explains why pass ordering matters:
+
+. **Creation**: The extension initializes the graph synchronously in its constructor. Config/preset loading is a synchronous file read.
+
+. **Population** (Pass 1): Items and relationships are added. Validation runs on each `addRelationship()` call — source exists, target exists, relation allowed by config.
+
+. **Quiescent** (between Pass 1 and Pass 2): The graph is complete. All items and relationships from all files are loaded. Queries and macro expansion are safe.
+
+. **Macro expansion** (Pass 2/2b/3): The graph is read-only. Macros query the graph to generate output. No new items or relationships are added.
+
+. **Finalization** (sitePublished): Matrices are generated from the quiescent graph and written to the output directory.
+
+== Component interaction
+
+The extension follows a dependency-injection pattern:
+
+- `ConfigLoader` is created first (config/preset loading)
+- `TraceabilityGraph` receives `ConfigLoader` for validation
+- `DocumentParser` receives `ConfigLoader` for role validation
+- `MatrixGenerator` receives both `TraceabilityGraph` and `ConfigLoader`
+- `Neo4jExporter` receives `TraceabilityGraph`
+
+Each component is independently testable without mocking frameworks. There is no service locator, DI container, or global state.
+
+== File state caching
+
+The `prepareFile()` method computes file content, document attributes, and item block positions once per file, then feeds the same `PreparedFile` to all macro-expansion methods. This eliminates redundant buffer conversions and regex scans.
+
+== Related
+
+- xref:reference/api.adoc[API Reference] — component interfaces
+- xref:explanation/architecture.adoc[Architecture] — arc42 architecture with sequence and pass-pipeline diagrams
+- xref:explanation/adr/index.adoc[Architecture Decisions] — design rationale behind these patterns

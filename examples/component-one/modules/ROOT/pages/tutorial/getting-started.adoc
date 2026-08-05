@@ -1,0 +1,183 @@
+= Getting Started
+:description: Step-by-step tutorial for first-time users of the Antora Tracer extension
+:keywords: antora, asciidoc, requirements, traceability, tutorial
+:toc: macro
+
+toc::[]
+
+This tutorial walks you through setting up traceability from scratch. By the end, you'll have a working Antora site with traceable items, relationships, and generated matrices.
+
+If you already have an Antora site, skip to <<Step 2: Add the extension to your playbook>>.
+
+== Step 1: Set up an Antora site
+
+If you don't have an Antora site yet, create one:
+
+[source,bash]
+----
+mkdir my-docs && cd my-docs
+npm init -y
+----
+
+Create a minimal Antora structure:
+
+[source,bash]
+----
+mkdir -p modules/ROOT/pages
+----
+
+Create an Antora playbook (`antora-playbook.yml`):
+
+[source,yaml]
+----
+site:
+  title: My Project Docs
+  url: http://localhost:8080
+content:
+  sources:
+    - url: ./
+      branches: HEAD
+ui:
+  bundle:
+    url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable
+    snapshot: true
+----
+
+Create a home page (`modules/ROOT/pages/index.adoc`):
+
+[source,asciidoc]
+----
+= Welcome
+
+Hello world! This site uses traceability.
+----
+
+Create a navigation file (`modules/ROOT/nav.adoc`):
+
+[source]
+----
+* xref:index.adoc[Home]
+----
+
+Create the component descriptor (`modules/ROOT/antora.yml`):
+
+[source,yaml]
+----
+name: my-project
+version: '1.0'
+----
+
+Verify the site builds:
+
+[source,bash]
+----
+npx antora antora-playbook.yml
+----
+
+Open `public/index.html` — you should see your home page.
+
+== Step 2: Add the extension to your playbook
+
+Install the extension:
+
+[source,bash]
+----
+npm install antora-tracer --save-dev
+----
+
+Add it to your playbook (`antora-playbook.yml`):
+
+[source,yaml]
+----
+antora:
+  extensions:
+    - require: antora-tracer/antora-extension
+      config:
+        preset: requirements-engineering
+----
+
+The `requirements-engineering` preset defines five roles (`requirement`, `design`, `implementation`, `test`, `document`) and three matrices. You can explore other presets later — for now, stick with this one.
+
+Build again to verify everything still works:
+
+[source,bash]
+----
+npx antora antora-playbook.yml
+----
+
+The build should complete without errors. The extension is active but won't produce traceability output until you write some items.
+
+== Step 3: Write your first traceable items
+
+Open `modules/ROOT/pages/index.adoc` and add three traceable items — a requirement, an implementation, and a test:
+
+[source,asciidoc]
+----
+= Welcome
+:traceability-links: true
+
+[#REQ-001, item, role=requirement, title="User authentication required"]
+====
+The system shall require authentication for all protected endpoints.
+====
+
+[#IMP-001, item, role=implementation, title="JWT Auth Service"]
+====
+JWT-based authentication with token refresh.
+
+satisfies:REQ-001[]
+====
+
+[#TEST-001, item, role=test, title="Authentication integration tests"]
+====
+Unit and integration tests for the auth service.
+
+tests:IMP-001[]
+verifies:REQ-001[]
+====
+----
+
+Here's what you just wrote:
+
+- `REQ-001` — a requirement item. The `[#REQ-001, item, role=requirement]` block macro tells the extension this is a traceable item of role `requirement`.
+- `IMP-001` — an implementation. It declares `satisfies:REQ-001[]` — a relationship pointing from this implementation to the requirement it satisfies.
+- `TEST-001` — a test. It references both the implementation it tests (`tests:IMP-001[]`) and the requirement it verifies (`verifies:REQ-001[]`).
+
+The `:traceability-links:` attribute enables the `traceability:outgoing[]` and `traceability:incoming[]` macros, which display relationship lists in the rendered output.
+
+== Step 4: Build and see the results
+
+Build the site again:
+
+[source,bash]
+----
+npx antora antora-playbook.yml
+----
+
+Open `public/traceability/index.html`. You'll see:
+
+- A link to a traceability matrix — your three items appear in the `requirements-to-design` and `requirements-to-tests` matrices
+- A coverage report showing which roles have complete coverage
+
+Open `public/index.html` — the item blocks render as styled sections in the page.
+
+== Step 5: Explore what you've built
+
+Congratulations! You have a working traceability setup. Here's what's happening under the hood:
+
+- The extension found your three `[item]` blocks and registered them in the traceability graph
+- The inline relationships (`satisfies:REQ-001[]`, `tests:IMP-001[]`, `verifies:REQ-001[]`) were validated against the preset's configuration and stored
+- Matrices were generated showing which requirements have implementations and tests
+- A coverage report shows a green status — all items have at least one relationship
+
+== Next Steps
+
+Now that you've got the basics working, here's where to go next:
+
+- xref:how-to/new-project-setup.adoc[How to set up traceability for a new project] — deeper dive into configuration options and project structure
+- xref:how-to/write-traceable-items.adoc[How to write traceable items] — learn about ID conventions, status attributes, and relationship patterns
+- xref:how-to/visualizations.adoc[How to add traceability visualizations] — add relationship graphs and coverage charts to your pages
+
+To understand the concepts behind the extension, read:
+
+- xref:explanation/traceability-model.adoc[The Traceability Model] — how roles, relations, and matrices work together

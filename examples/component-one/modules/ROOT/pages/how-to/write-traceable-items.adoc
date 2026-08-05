@@ -1,0 +1,159 @@
+= How to Write Traceable Items
+:description: Practical guide to writing items with the [item] macro, inline relationships, and ID conventions
+:keywords: antora, asciidoc, traceability, item macro, relationships
+:toc: macro
+
+toc::[]
+
+This guide covers the practical workflow for writing traceable items. For the complete syntax specification, see xref:reference/item-macro.adoc[Item Macro Reference].
+
+== Write your first item
+
+An item starts with the `[item]` block macro:
+
+[source,asciidoc]
+----
+[#REQ-001, item, role=requirement, title="User authentication"]
+====
+The system shall require authentication for all protected endpoints.
+====
+----
+
+- `#REQ-001` — unique ID. Use a consistent prefix convention (see <<Choose ID conventions>> below)
+- `role=requirement` — must match a role in your configuration
+- `title` — display title. Defaults to the ID if omitted
+- `====` delimiters — the block content goes between them
+
+== Add inline relationships
+
+Inside the item block, add relationships using the `<type>:TARGET-ID[]` syntax:
+
+[source,asciidoc]
+----
+[#IMP-001, item, role=implementation]
+====
+JWT-based authentication service.
+
+satisfies:REQ-001[]           <1>
+depends_on:IMP-002[]          <2>
+====
+----
+<1> This implementation satisfies the requirement REQ-001
+<2> This implementation depends on another implementation IMP-002
+
+Multiple targets in one type:
+
+    satisfies:REQ-001,REQ-002,REQ-003[]
+
+Inline relationship macros are *invisible* in rendered output — they are pure data markers for the traceability graph.
+
+== Choose ID conventions
+
+While any unique string works, a consistent convention helps readability:
+
+[width=100%, cols="30,40,30"]
+|===
+| Pattern | Example | Convention
+
+| Role prefix
+| `REQ-001`, `IMP-042`, `TEST-099`
+| Two-to-four uppercase letters, hyphen, number
+
+| Hierarchical
+| `SYS.SEC.AUTH-001`
+| Dotted namespace
+
+| Domain prefix
+| `PROJ-REQ-001`
+| Project prefix
+|===
+
+Use the `next-id` CLI command to get the next available ID without scanning the document manually:
+
+[source,bash]
+----
+npx antora-tracer next-id --prefix REQ -i docs/
+# → REQ-004
+----
+
+The command auto-detects padding from existing IDs.
+
+== Add status and priority
+
+Track the lifecycle of items with attributes:
+
+[source,asciidoc]
+----
+[#REQ-001, item, role=requirement, title="Auth", status="draft", priority="high"]
+====
+...
+====
+----
+
+`status` and `priority` are free-form strings. They appear in the traceability graph and Neo4j export.
+
+== Display relationships in rendered output
+
+Use the `traceability:outgoing[]` and `traceability:incoming[]` macros to show relationship lists:
+
+[source,asciidoc]
+----
+[#IMP-001, item, role=implementation]
+====
+JWT-based authentication.
+
+satisfies:REQ-001[]
+
+traceability:outgoing[]     <1>
+traceability:incoming[]     <2>
+====
+----
+<1> Renders a list of items this item points to
+<2> Renders a list of items that point to this item
+
+Enable these macros per page with the document attribute:
+
+[source,asciidoc]
+----
+= My Page
+:traceability-links: true
+:traceability-style: table       <1>
+:traceability-order: target-id   <2>
+----
+<1> Display style: `list` (default), `table`, or `inline`
+<2> Sort order: `target-id` (default), `target-title`, or `relation-type`
+
+See xref:reference/traceability-macros.adoc[Traceability Macros Reference] for all options.
+
+== Use partial files for items
+
+You can define items in AsciiDoc partials and include them in pages:
+
+[source,asciidoc]
+----
+// architecture.adoc
+= Architecture
+include::partial$04-solution-strategy.adoc[]
+----
+
+[source,asciidoc]
+----
+// partials/04-solution-strategy.adoc
+[#ARC-005, item, role=design]
+== Solution Strategy
+...
+----
+
+Partials are processed on equal footing with pages. Matrix links for partial items point to the source repository rather than rendered HTML (since partials don't produce their own pages).
+
+See xref:how-to/partials.adoc[How to use partial files with items] for the full patterns and tradeoffs.
+
+== Share items across files
+
+Items can live in any `.adoc` file in your Antora component. A requirement in one file can be referenced by an implementation in another — as long as the IDs match. The extension aggregates all items into a single graph.
+
+== Related
+
+- xref:reference/item-macro.adoc[Item Macro Reference] — complete syntax, attributes, and validation rules
+- xref:reference/traceability-macros.adoc[Traceability Macros Reference] — outgoing, incoming, links, graph, coverage macros
+- xref:how-to/partials.adoc[How to use partial files with items] — patterns and tradeoffs

@@ -74,6 +74,27 @@ When code behavior changes, verify consistency across these layers before commit
 After archiving a change, run the `update-example-site` skill to refresh requirements,
 architecture, and test-plan documents to reflect the complete current project state.
 
+## Documentation Framework
+
+The example site documentation follows https://diataxis.fr[Diátaxis] — a framework that organizes documentation into four distinct modes, each serving a different reader need. Every page in the example site belongs to exactly one mode:
+
+| Mode | Purpose | Reader asks | Example pages |
+|---|---|---|---|
+| **Tutorial** | Learning-oriented, step-by-step | "Can you teach me to…?" | `getting-started.adoc` |
+| **How-to Guides** | Task-oriented, solving a problem | "How do I…?" | `how-to/custom-domain-model.adoc` |
+| **Reference** | Information-oriented, exhaustive | "What does X do?" | `reference/cli.adoc`, `reference/api.adoc` |
+| **Explanation** | Understanding-oriented, background | "Why does it work that way?" | `architecture.adoc`, `adr/`, `quality/` |
+
+A fifth section, **Self-Traceability**, groups pages that demonstrate the extension tracing its own development artifacts (requirements, use cases, test plan, dashboard). These are not user-facing documentation — they are the extension applied to itself.
+
+**Key rules when adding or editing documentation:**
+
+- One page = one mode. Do not mix tutorial steps, how-to instructions, reference listings, and conceptual explanation in the same page.
+- Tutorials should not link out to Reference or Explanation — they are a guided path.
+- How-to, Reference, and Explanation pages cross-reference each other freely.
+- How-to page titles use the "How to <verb> <object>" format.
+- Reference pages are exhaustive — every option, flag, and attribute is documented.
+
 ## Architecture
 
 ```

@@ -25,11 +25,11 @@ configLoader.load(resolve(__dirname, "traceability.yml"));
 const extension = new RequirementsTraceabilityExtension(configLoader);
 const files = [
   { adoc: "requirements.adoc", realPath: resolve(__dirname, "component-one/modules/requirements/pages/index.adoc") },
-  "architecture.adoc", "test-plan.adoc",
-  "quality/zero-operational-overhead.adoc", "quality/configurable-without-code.adoc",
-  "quality/fail-fast-diagnostics.adoc", "quality/no-side-effects.adoc",
-  "quality/testability-by-design.adoc", "quality/pdf-compatibility.adoc",
-  "quality/platform-stability.adoc", "quality/performance.adoc"
+  "explanation/architecture.adoc", "self-traceability/test-plan.adoc",
+  "explanation/quality/zero-operational-overhead.adoc", "explanation/quality/configurable-without-code.adoc",
+  "explanation/quality/fail-fast-diagnostics.adoc", "explanation/quality/no-side-effects.adoc",
+  "explanation/quality/testability-by-design.adoc", "explanation/quality/pdf-compatibility.adoc",
+  "explanation/quality/platform-stability.adoc", "explanation/quality/performance.adoc"
 ];
 const results = extension.processFiles(
   files.map((f) => {

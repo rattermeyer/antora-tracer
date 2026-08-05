@@ -1,0 +1,11 @@
+= Architecture Decision Records
+
+This section documents the architectural decisions that shaped the Antora Tracer extension. Each record follows the https://github.com/architecture-decision-record/architecture-decision-record[MADR] template.
+
+* xref:explanation/adr/0001-esm-over-cjs.adoc[ADR-001 — ESM over CommonJS]
+* xref:explanation/adr/0002-regex-parser-over-ast.adoc[ADR-002 — Regex-based parsing over AST]
+* xref:explanation/adr/0003-in-memory-graph.adoc[ADR-003 — In-memory graph over persisted database]
+* xref:explanation/adr/0004-zero-framework.adoc[ADR-004 — Zero framework dependencies]
+* xref:explanation/adr/0005-typescript-strict-node20.adoc[ADR-005 — TypeScript strict mode and Node.js 20+]
+* xref:explanation/adr/0006-dfs-circular-reference-detection.adoc[ADR-006 — DFS-based circular reference detection]
+* xref:explanation/adr/0007-partial-files-pass-1-only.adoc[ADR-007 — Partial files — Pass 1 only]

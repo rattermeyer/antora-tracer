@@ -1,0 +1,93 @@
+= How to Set Up Traceability for a New Project
+:description: Step-by-step guide for adding Antora Tracer to a project
+:keywords: antora, asciidoc, traceability, setup
+:toc: macro
+
+toc::[]
+
+This guide covers adding Antora Tracer to a project — whether greenfield or existing Antora site.
+
+== Choose a preset
+
+Start by picking the preset that matches your domain. Four presets ship with the extension:
+
+[width=100%, cols="25,75"]
+|===
+| Preset | Best for
+
+| `requirements-engineering`
+| Systems and software engineering with five roles and three matrices
+
+| `agile`
+| Scrum teams with epics, features, user stories, tasks, bugs, and tests
+
+| `medical-iec62304`
+| Medical device software compliant with IEC 62304, with risk and hazard tracking
+
+| `minimal`
+| Getting started and prototypes — just requirements and tests
+|===
+
+For full details on each preset's roles, relations, and matrices, see xref:reference/presets.adoc[Presets Reference].
+
+== Add the extension to your playbook
+
+In your `antora-playbook.yml`, add the extension entry:
+
+[source,yaml]
+----
+antora:
+  extensions:
+    - require: antora-tracer/antora-extension
+      config:
+        preset: requirements-engineering
+----
+
+If you need custom configuration, point to a `traceability.yml` file instead:
+
+[source,yaml]
+----
+antora:
+  extensions:
+    - require: antora-tracer/antora-extension
+      config:
+        configPath: ./config/traceability.yml
+----
+
+See xref:reference/configuration.adoc[Configuration Reference] for all playbook options.
+
+== Verify the setup
+
+Build your site:
+
+[source,bash]
+----
+npx antora antora-playbook.yml
+----
+
+The build should complete without errors. The extension is active — you'll see a `traceability/` directory in your output with an index page.
+
+At this stage the matrices will be empty because you haven't written any items yet. Continue to xref:how-to/write-traceable-items.adoc[How to write traceable items].
+
+== Add navigation links to traceability output
+
+By default, the extension adds a "Traceability" section to your site navigation. If your `nav.adoc` already has traceability entries, they'll be merged.
+
+To control whether traceability pages appear in navigation, set `includeInNavigation`:
+
+[source,yaml]
+----
+antora:
+  extensions:
+    - require: antora-tracer/antora-extension
+      config:
+        preset: requirements-engineering
+        includeInNavigation: false
+----
+
+== Go further
+
+Once your project is set up, you may want to:
+
+- xref:how-to/custom-domain-model.adoc[Define a custom domain model] — add roles and relations beyond the built-in presets
+- xref:how-to/neo4j-export.adoc[Export to Neo4j] — query the traceability graph

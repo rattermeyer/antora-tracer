@@ -1,0 +1,208 @@
+= Presets Reference
+:description: Complete definitions of all four built-in presets — roles, relations, matrices, and Neo4j queries
+:keywords: antora, traceability, presets, reference
+:toc: macro
+
+toc::[]
+
+The extension ships with four built-in presets. Each is a self-contained YAML configuration defining roles, allowed relations, and matrix definitions.
+
+[[requirements-engineering]]
+== requirements-engineering
+
+Systems and software engineering. Five roles with comprehensive relation coverage.
+
+[width=100%, cols="20,80"]
+|===
+| Roles | `requirement`, `design`, `implementation`, `test`, `document`
+| Matrices | `requirements-to-design`, `design-to-implementation`, `requirements-to-tests`
+| Version | 1.0.0
+|===
+
+*Relations:*
+
+- `design → requirement`: `addresses`, `satisfies`
+- `implementation → requirement`: `satisfies`
+- `implementation → design`: `implements`
+- `test → requirement`: `covers`, `verifies`
+- `test → implementation`: `tests`
+- `requirement → requirement`: `refines`, `depends_on`, `conflicts_with`
+
+The `requirement` role defines only requirement-to-requirement relations. Downstream roles (design, implementation, test) declare their own relations back to requirements.
+
+*Matrices:*
+
+[width=100%, cols="30,20,50"]
+|===
+| Name | Rows | Columns
+
+| `requirements-to-design`
+| requirement
+| design
+
+| `design-to-implementation`
+| design
+| implementation
+
+| `requirements-to-tests`
+| requirement
+| test
+|===
+
+[[agile]]
+== agile
+
+Agile/Scrum teams. Eight roles mapping the Scrum backlog.
+
+[width=100%, cols="20,80"]
+|===
+| Roles | `epic`, `feature`, `user_story`, `acceptance_criterion`, `task`, `spike`, `bug`, `test`
+| Matrices | `epic-progress`, `story-completion`, `sprint-backlog`, `test-coverage`
+| Version | 1.0.0
+|===
+
+*Relations:*
+
+- `epic → feature`: `contains`
+- `feature → user_story`: `contains`
+- `user_story → task`: `broken_down_into`
+- `user_story → acceptance_criterion`: `verified_by`
+- `task → user_story`: `implements`
+- `task → bug`: `fixes`
+- `test → user_story`: `verified_by`
+- `test → task`: `tests`
+- `spike → user_story`: `investigates`
+
+[[medical-iec62304]]
+== medical-iec62304
+
+Medical device software compliant with IEC 62304. Safety classification support.
+
+[width=100%, cols="20,80"]
+|===
+| Roles | `system_requirement`, `software_requirement`, `software_item`, `software_unit`, `risk`, `hazard`, `mitigation`
+| Matrices | `risk-mitigation`
+| Version | 1.0.0
+|===
+
+*Relations:*
+
+- `system_requirement → software_requirement`: `allocated_to`
+- `system_requirement → risk`: `mitigated_by`
+- `software_requirement → software_requirement`: `refines`, `depends_on`
+- `mitigation → risk`: `mitigates`
+- `hazard → risk`: `poses`
+- `software_item → software_requirement`: `implements`
+- `software_unit → software_item`: `composes`
+- `test → software_requirement`: `verifies`
+
+[[minimal]]
+== minimal
+
+Two roles — the simplest possible setup.
+
+[width=100%, cols="20,80"]
+|===
+| Roles | `requirement`, `test`
+| Matrices | `requirements-tests`
+| Version | 1.0.0
+|===
+
+*Relations:*
+
+- `test → requirement`: `covers`
+- `test → requirement`: `verified_by`
+- `requirement → requirement`: `depends_on`
+
+== Preset metadata schema
+
+Each preset YAML file follows this structure:
+
+[width=100%, cols="20,30,50"]
+|===
+| Key | Type | Description
+
+| `name`
+| string
+| Unique preset identifier
+
+| `description`
+| string
+| Human-readable explanation of domain and intended use
+
+| `version`
+| semver
+| Independent version, separate from the extension
+
+| `author`
+| string
+| Preset author or organization
+
+| `tags`
+| string[]
+| Keywords for categorisation
+
+| `compatibility`
+| object
+| `minExtensionVersion`: minimum extension version (reserved for future checks)
+
+| `traceability.roles`
+| string[]
+| Ordered list of valid role names
+
+| `traceability.relations`
+| map
+| `sourceRole → targetRole → [relationTypes]`
+
+| `traceability.matrices`
+| object[]
+| Array of matrix definitions (name, rows, columns, coverageRelations)
+
+| `neo4j.queries`
+| object[]
+| Optional named Cypher queries shipped with the preset
+
+| `documentation`
+| object
+| `description` (markdown), `examples` (string[])
+|===
+
+== Initialize from a preset
+
+To customize a preset, initialize a local copy:
+
+[source,bash]
+----
+npx antora-tracer preset init -n requirements-engineering -o ./config/
+----
+
+This writes the full YAML to `./config/traceability.yml`. Edit it, then point your playbook at the file:
+
+[source,yaml]
+----
+antora:
+  extensions:
+    - require: antora-tracer/antora-extension
+      config:
+        configPath: ./config/traceability.yml
+----
+
+== List available presets
+
+[source,bash]
+----
+npx antora-tracer preset list
+# → requirements-engineering, agile, medical-iec62304, minimal
+----
+
+Show a preset's details:
+
+[source,bash]
+----
+npx antora-tracer preset show requirements-engineering
+----
+
+== Related
+
+- xref:how-to/custom-domain-model.adoc[How to define a custom domain model] — extending presets
+- xref:reference/configuration.adoc[Configuration Reference] — playbook options and YAML schema

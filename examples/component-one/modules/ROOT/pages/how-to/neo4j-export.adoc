@@ -1,0 +1,98 @@
+= How to Export to Neo4j
+:description: Export the traceability graph to Neo4j for graph queries, impact analysis, and visualization
+:keywords: antora, asciidoc, traceability, neo4j, cypher, csv, graph
+:toc: macro
+
+toc::[]
+
+The extension can export the traceability graph to Neo4j-compatible formats — CSV (nodes + relationships) and Cypher (executable script).
+
+== Export from the CLI
+
+[source,bash]
+----
+# Export as CSV
+npx antora-tracer export neo4j -i modules/ROOT/pages/ --format csv -o ./neo4j-export/
+
+# Export as Cypher script
+npx antora-tracer export neo4j -i modules/ROOT/pages/ --format cypher -o ./neo4j-export/
+----
+
+The `-i` flag processes the input files first (parsing items and relationships), then exports the graph. Use `--config` or `--preset` to specify your configuration.
+
+== CSV format
+
+Two files are produced:
+
+- `nodes.csv` — all items with `id`, `role`, `title`, and attributes
+- `relationships.csv` — all relationships with `fromId`, `targetId`, and `type`
+
+Import into Neo4j:
+
+[source,cypher]
+----
+LOAD CSV WITH HEADERS FROM 'file:///nodes.csv' AS row
+CREATE (n:Item {id: row.id, role: row.role, title: row.title});
+
+LOAD CSV WITH HEADERS FROM 'file:///relationships.csv' AS row
+MATCH (a:Item {id: row.fromId}), (b:Item {id: row.targetId})
+CREATE (a)-[r:RELATES {type: row.type}]->(b);
+----
+
+Create indexes for faster queries:
+
+[source,cypher]
+----
+CREATE INDEX item_id FOR (n:Item) ON (n.id);
+CREATE INDEX item_role FOR (n:Item) ON (n.role);
+----
+
+== Cypher format
+
+A single `import.cypher` file with `CREATE` statements for all nodes and relationships. Execute directly in Neo4j Browser or via `cypher-shell`:
+
+[source,bash]
+----
+cat import.cypher | cypher-shell -u neo4j -p password
+----
+
+== Export from the Antora build
+
+Antora-based builds generate Neo4j exports automatically during `sitePublished`:
+
+[source,bash]
+----
+npx antora antora-playbook.yml
+----
+
+Exports appear in `<site-output>/traceability/neo4j/`.
+
+== Example queries
+
+Once imported, query the graph:
+
+[source,cypher]
+----
+// Requirements without any implementation or test coverage
+MATCH (r:Item {role: 'requirement'})
+WHERE NOT EXISTS {
+  MATCH (r)<-[:RELATES]-(:Item)
+}
+RETURN r.id, r.title ORDER BY r.id
+
+// Full traceability chain: requirement → design → implementation → test
+MATCH path = (r:Item {role: 'requirement'})<-[:RELATES]-(d:Item {role: 'design'})
+           -[:RELATES]->(i:Item {role: 'implementation'})<-[:RELATES]-(t:Item {role: 'test'})
+RETURN r.id, d.id, i.id, t.id
+
+// Impact analysis: what depends on REQ-001?
+MATCH (r:Item {id: 'REQ-001'})
+OPTIONAL MATCH (r)<-[:RELATES]-(d:Item {role: 'design'})
+OPTIONAL MATCH (d)-[:RELATES]->(i:Item {role: 'implementation'})
+RETURN r.id, collect(d.id) as designs, collect(i.id) as implementations
+----
+
+== Related
+
+- xref:reference/cli.adoc[CLI Reference] — all export options and flags
+- xref:reference/presets.adoc[Presets Reference] — each preset ships with domain-specific Neo4j queries

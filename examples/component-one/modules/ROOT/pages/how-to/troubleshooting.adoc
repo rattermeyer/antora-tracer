@@ -1,0 +1,98 @@
+= How to Troubleshoot Common Issues
+:description: Solutions for common errors and warnings when using the Antora Tracer extension
+:keywords: antora, traceability, troubleshooting, errors
+:toc: macro
+
+toc::[]
+
+== Items not appearing in matrices
+
+Check that the item's `role` matches a row or column role in your configured matrices. Items with roles not referenced in any matrix still exist in the graph but won't appear in matrix output.
+
+Verify the item was parsed correctly — run the `stats` command:
+
+[source,bash]
+----
+npx antora-tracer stats -i modules/ --preset requirements-engineering
+----
+
+This shows item counts per role.
+
+== Relationships not showing up
+
+Verify the relation type is listed in `coverageRelations` for the relevant column. Only relations matching those types count as coverage in the matrix.
+
+For example, if your matrix defines `coverageRelations: design: [addresses, satisfies]`, then a `design → requirement` relation using `implements` won't appear in that matrix cell.
+
+== "Relation not allowed" errors
+
+Your configuration doesn't permit that relation type between those roles. The error message lists the allowed types. Example:
+
+----
+Error: Relation 'verifies' not allowed from 'design' to 'requirement'.
+Allowed: [addresses, satisfied_by, implements]
+----
+
+Fix: either use an allowed relation type, or add the missing type to your `traceability.yml`:
+
+[source,yaml]
+----
+traceability:
+  relations:
+    design:
+      requirement:
+        - addresses
+        - satisfied_by
+        - implements
+        - verifies          # ← add this
+----
+
+== "Unknown role" warnings
+
+The item's `role` attribute doesn't match any role in your configuration. Example:
+
+----
+Warning: Unknown role "widget". Known roles: requirement, design, test.
+----
+
+Unknown roles generate warnings, not errors — the item is still stored in the graph. To fix: either add the role to `traceability.yml`, or correct the `role` attribute on the item.
+
+== Build completes but no traceability output
+
+Check:
+
+1. `enabled: true` in your playbook config (or the default, which is `true`)
+2. Your `.adoc` files are in the Antora content catalog (have page family)
+3. The files contain valid `[item]` blocks
+
+Enable verbose logging for more detail:
+
+[source,bash]
+----
+npx antora antora-playbook.yml --log-level debug
+----
+
+== "target of xref not found" when referencing partial items
+
+Partials don't produce HTML pages — use inline relationship macros instead of +xref:partial$...+. See xref:how-to/partials.adoc[How to use partial files with items].
+
+== Circular reference errors
+
+The graph has a cycle:
+
+----
+Error: Circular reference detected: REQ-001 -> REQ-002 -> REQ-001.
+----
+
+Break the cycle by removing one of the relationships. Self-referencing items are also detected and reported.
+
+== Validation returns errors
+
+Run validation standalone to get a full report:
+
+[source,bash]
+----
+npx antora-tracer validate -i modules/ --preset requirements-engineering
+----
+
+The command exits with a non-zero code if errors are found. Fix all errors before proceeding — they indicate invalid graph state.

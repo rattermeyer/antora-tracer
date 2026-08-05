@@ -1,0 +1,12 @@
+= Quality Attributes
+
+This section documents the quality attributes (non-functional requirements) that shape the Antora Tracer extension. Each quality attribute follows the https://quality.arc42.org/[arc42 Quality Model] format: Context, Trigger, Acceptance Criteria.
+
+* xref:explanation/quality/zero-operational-overhead.adoc[Zero Operational Overhead] — No external services, minimal dependencies
+* xref:explanation/quality/configurable-without-code.adoc[Configurable Without Code Changes] — Roles, relations, and matrices in YAML
+* xref:explanation/quality/fail-fast-diagnostics.adoc[Fail-Fast with Clear Diagnostics] — Typo detection, file/line/item-IDs in errors
+* xref:explanation/quality/no-side-effects.adoc[No Side Effects on Source Files] — All transformations in-memory, source files never modified
+* xref:explanation/quality/pdf-compatibility.adoc[PDF Compatibility of Generated Output] — Standard AsciiDoc output for cross-backend rendering
+* xref:explanation/quality/testability-by-design.adoc[Testability by Design] — Dependency injection, isolated test files, fast feedback
+* xref:explanation/quality/platform-stability.adoc[Platform Stability and Longevity] — ESM, TypeScript strict, Node.js 20+, zero-framework
+* xref:explanation/quality/performance.adoc[Query and Indexing Performance] — O(1) lookup, reverse indexes, BFS, caching with invalidation

@@ -1,0 +1,245 @@
+= CLI Reference
+:description: Complete reference for the antora-tracer CLI — all commands, subcommands, flags, and options
+:keywords: antora, traceability, cli, reference, commands
+:toc: macro
+
+toc::[]
+
+The CLI is available as `npx antora-tracer` after installing the extension.
+
+[source,bash]
+----
+npx antora-tracer --help
+npx antora-tracer <command> --help
+----
+
+Global options (`--config`, `--preset`) are inherited by all commands.
+
+== process
+
+Process AsciiDoc files to populate the traceability graph.
+
+[source,bash]
+----
+npx antora-tracer process -i docs/ --preset requirements-engineering
+npx antora-tracer process -i requirements.adoc --config ./traceability.yml
+----
+
+[width=100%, cols="25,15,60"]
+|===
+| Option | Type | Description
+
+| `-i, --input <path>`
+| string (required)
+| Input file or directory
+
+| `-o, --output <path>`
+| string
+| Output directory (default: `./output`)
+
+| `-f, --format <format>`
+| string
+| Output format: `html`, `csv`, `json` (default: `html`)
+
+| `--preset <name>`
+| string
+| Built-in preset name
+
+| `--config <path>`
+| string
+| Custom traceability YAML file
+|===
+
+== matrix
+
+Generate traceability matrices from processed items.
+
+[source,bash]
+----
+npx antora-tracer matrix -i docs/ -t requirements-to-design -f html
+npx antora-tracer matrix -t requirements-to-design -f csv -o matrix.csv
+----
+
+[width=100%, cols="25,15,60"]
+|===
+| Option | Type | Description
+
+| `-i, --input <path>`
+| string
+| Input file to process first (optional)
+
+| `-t, --type <type>`
+| string (required)
+| Matrix name from your config
+
+| `-f, --format <format>`
+| string
+| Output format: `csv`, `html`, `json` (default: `csv`)
+
+| `-o, --output <path>`
+| string
+| Output file (defaults to stdout)
+|===
+
+== validate
+
+Validate the traceability graph for orphaned items, missing targets, invalid relations, and circular references.
+
+[source,bash]
+----
+npx antora-tracer validate -i docs/ --preset requirements-engineering
+----
+
+[width=100%, cols="25,15,60"]
+|===
+| Option | Type | Description
+
+| `-i, --input <path>`
+| string (required)
+| Input file or directory to validate
+
+| `--preset <name>`
+| string
+| Built-in preset
+
+| `--config <path>`
+| string
+| Custom traceability YAML
+|===
+
+Exits with non-zero code if errors are found.
+
+== export neo4j
+
+Export the graph to Neo4j-compatible formats.
+
+[source,bash]
+----
+npx antora-tracer export neo4j -i docs/ --format csv -o ./neo4j-export/
+npx antora-tracer export neo4j -i docs/ --format cypher -o ./neo4j-export/
+----
+
+[width=100%, cols="25,15,60"]
+|===
+| Option | Type | Description
+
+| `-i, --input <path>`
+| string
+| Input file or directory to process first
+
+| `--format <format>`
+| string (required)
+| `csv` (nodes + relationships) or `cypher` (single script)
+
+| `-o, --output <path>`
+| string (required)
+| Output directory
+|===
+
+== stats
+
+Display role statistics for the current graph.
+
+[source,bash]
+----
+npx antora-tracer stats -i docs/ --preset requirements-engineering
+----
+
+Output shows item counts per role and relationship counts.
+
+[width=100%, cols="25,15,60"]
+|===
+| Option | Type | Description
+
+| `-i, --input <path>`
+| string
+| Input file or directory to process first
+
+| `--preset <name>`
+| string
+| Built-in preset
+
+| `--config <path>`
+| string
+| Custom traceability YAML
+|===
+
+== preset list
+
+List all available presets with descriptions.
+
+[source,bash]
+----
+npx antora-tracer preset list
+----
+
+== preset show
+
+Show a preset's configuration details.
+
+[source,bash]
+----
+npx antora-tracer preset show requirements-engineering
+----
+
+[width=100%, cols="25,15,60"]
+|===
+| Option | Type | Description
+
+| `name`
+| string (argument)
+| Preset name (required)
+|===
+
+== preset init
+
+Write a preset's traceability YAML to a file for customization.
+
+[source,bash]
+----
+npx antora-tracer preset init -n medical-iec62304 -o ./config/
+----
+
+[width=100%, cols="25,15,60"]
+|===
+| Option | Type | Description
+
+| `-n, --name <name>`
+| string (required)
+| Preset name
+
+| `-o, --output <path>`
+| string
+| Output directory (default: current directory)
+|===
+
+== next-id
+
+Get the next available sequential ID for a given prefix.
+
+[source,bash]
+----
+npx antora-tracer next-id --prefix REQ -i docs/
+npx antora-tracer next-id --prefix TST -i test-plan.adoc
+----
+
+[width=100%, cols="25,15,60"]
+|===
+| Option | Type | Description
+
+| `-p, --prefix <prefix>`
+| string (required)
+| ID prefix, e.g. `REQ`, `TST`, `ARC`
+
+| `-i, --input <path>`
+| string (required)
+| Input file or directory to scan for existing IDs
+|===
+
+Auto-detects padding from existing IDs. If `REQ-001` and `REQ-002` exist, returns `REQ-003`. If `TST-0001` exists, returns `TST-0002`. With no existing items matching the prefix, defaults to 3-digit padding (`REQ-001`).
+
+== Related
+
+- xref:how-to/write-traceable-items.adoc[How to write traceable items] — using next-id in workflow
+- xref:how-to/neo4j-export.adoc[How to export to Neo4j] — Neo4j export workflow
+- xref:reference/presets.adoc[Presets Reference] — preset definitions
