@@ -2,6 +2,24 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.12.1] — 2026-08-06
+
+### Fixed
+- Partial file macros now expand correctly — `traceability:links[]`, `traceability:outgoing[]`, `traceability:graph[]`, and inline macros in partials are no longer left as raw text in rendered HTML
+- Partial items in traceability matrices now link to the including page (`architecture.html#ARC-009`) instead of broken GitHub URLs
+- ROOT module prefix no longer appears in same-module xref paths
+
+### Changed
+- Macro expansion consolidated — three near-identical methods (`expandOutgoingMacros`, `expandIncomingMacros`, `expandLinksMacros`) replaced by one `expandRelationMacros(file, macroName)`. Net reduction of ~500 lines
+- Matrix HTML template split into Mustache partials (`styles`, `header`, `matrix-row`, `footer`). Dead `design-matrix` template and unused `MatrixGenerator` methods removed
+- Extension initialization made synchronous, eliminating a race condition on early `contentClassified` events
+- Per-item/per-file `console.log` noise replaced with injectable `TracerLogger` (defaults to no-op)
+
+### Docs
+- Four new PlantUML architecture diagrams: API overview (class), parser flow (activity), graph lifecycle (state), PreparedFile caching (activity)
+- Two new quality attributes: QA-061 (Platform stability), QA-062 (Query performance)
+- `update-example-site` skill expanded with diagram checklist and type decision guide
+
 ## [0.12.0] — 2026-08-06
 
 ### Added
