@@ -1,1 +1,3 @@
-* xref:architecture.adoc[Architecture]
+ifdef::loader-assembler[]
+* xref:explanation/architecture.adoc[Architecture]
+endif::[]

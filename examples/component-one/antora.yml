@@ -5,11 +5,21 @@ prerelease: '-wip'
 start_page: index.adoc
 nav:
   - modules/ROOT/nav.adoc
+  - modules/ROOT/nav-architecture.adoc
+  - modules/ROOT/nav-use-cases.adoc
+  - modules/ROOT/nav-requirements.adoc
+  - modules/ROOT/nav-test-plan.adoc
 ext:
   assembler:
     - profile: pdf-architecture
       nav:
         - modules/ROOT/nav-architecture.adoc
+    - profile: pdf-use-cases
+      nav:
+        - modules/ROOT/nav-use-cases.adoc
+    - profile: pdf-requirements
+      nav:
+        - modules/ROOT/nav-requirements.adoc
     - profile: pdf-test-plan
       nav:
         - modules/ROOT/nav-test-plan.adoc

@@ -1,0 +1,3 @@
+ifdef::loader-assembler[]
+* xref:requirements:index.adoc[Requirements]
+endif::[]

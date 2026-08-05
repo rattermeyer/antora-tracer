@@ -42,6 +42,7 @@
     "mustache": "^4.2.0"
   },
   "devDependencies": {
+    "@antora/assembler": "^1.0.0-beta.20",
     "@antora/cli": "3.1",
     "@antora/lunr-extension": "^1.0.0-alpha.13",
     "@antora/pdf-extension": "^1.0.0-beta.20",

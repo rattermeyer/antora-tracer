@@ -1,0 +1,3 @@
+ifdef::loader-assembler[]
+* xref:self-traceability/use-cases.adoc[Use Cases]
+endif::[]

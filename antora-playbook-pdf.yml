@@ -26,6 +26,12 @@ antora:
       matrixFormats: [html, csv]
       includeInNavigation: true
     - require: ./antora-pdf-extension.cjs
+      config_files:
+        - antora-assembler-pdf.yml
+        - antora-assembler-pdf-architecture.yml
+        - antora-assembler-pdf-use-cases.yml
+        - antora-assembler-pdf-requirements.yml
+        - antora-assembler-pdf-test-plan.yml
 
 output:
   dir: ./build/pdf-output

@@ -1,0 +1,48 @@
+diff --git a/node_modules/@antora/assembler/lib/configure.js b/node_modules/@antora/assembler/lib/configure.js
+index f97da91..bda5a02 100644
+--- a/node_modules/@antora/assembler/lib/configure.js
++++ b/node_modules/@antora/assembler/lib/configure.js
+@@ -5,7 +5,7 @@ function configure (context, ...args) {
+ }
+
+ function internalConfigure (converter, config = {}, providers = {}) {
+-  this.once('componentsRegistered', ({ contentCatalog, assemblerProfiles }) => {
++  this.once('contentClassified', ({ contentCatalog, assemblerProfiles }) => {
+     if (assemblerProfiles) return
+     this.updateVariables({ assemblerProfiles: getAssemblerProfiles(contentCatalog) })
+   })
+@@ -41,15 +41,19 @@ function restoreKeepSource ({ siteAsciiDocConfig, contentCatalog }) {
+ }
+
+ function getAssemblerProfiles (contentCatalog, assemblerProfiles = new Map()) {
++  // Patched for Antora 3.1: componentVersion lacks origins/descriptor/ext/files.
++  // Use contentCatalog.findBy() for files; find descriptor via file origins.
+   contentCatalog.getComponents().forEach((component) => {
+     component.versions.forEach((componentVersion) => {
+-      const source =
+-        componentVersion.nav?.origin ??
+-        [...(componentVersion.origins ?? [])].find((it) => it.descriptor?.ext?.assembler)
+-      const assemblerConfig = getAssemblerConfigFromDescriptor(source?.descriptor)
+-      if (!assemblerConfig) return
+       const componentVersionRef = `${componentVersion.version}@${componentVersion.name}`
+-      const filesByPath = componentVersion.files.reduce((accum, it) => accum.set(it.path, it), new Map())
++      const files = contentCatalog.findBy({ component: componentVersion.name, version: componentVersion.version })
++      let descriptor
++      for (const file of files) {
++        if (file.src?.origin?.descriptor) { descriptor = file.src.origin.descriptor; break }
++      }
++      const assemblerConfig = getAssemblerConfigFromDescriptor(descriptor)
++      if (!assemblerConfig) return
++      const filesByPath = files.reduce((accum, it) => accum.set(it.path, it), new Map())
+       const componentVersionProfiles = assemblerConfig.reduce((accum, entry) => {
+         const data = {}
+         const profile = entry.profile ?? undefined
+@@ -68,7 +72,7 @@ function getAssemblerProfiles (contentCatalog, assemblerProfiles = new Map()) {
+             } else {
+               ;(data.messages ??= []).push([
+                 'warn',
+-                { source },
++                { file: { path: componentVersionRef } },
+                 `Could not resolve nav file for ${profile || '<default>'} profile in ${componentVersionRef}: ${path_}`,
+               ])
+             }

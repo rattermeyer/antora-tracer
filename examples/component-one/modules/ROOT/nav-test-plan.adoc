@@ -1,1 +1,3 @@
-* xref:test-plan.adoc[Test Plan]
+ifdef::loader-assembler[]
+* xref:self-traceability/test-plan.adoc[Test Plan]
+endif::[]

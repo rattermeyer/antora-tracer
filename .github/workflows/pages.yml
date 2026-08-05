@@ -50,10 +50,10 @@ jobs:
         run: |
           mkdir -p public/pdf
           component_version=$(grep '^version:' examples/component-one/antora.yml | awk '{print $2}')
-          build_dir="build/assembler/pdf/tracer/${component_version}/_exports"
-          cp "$build_dir/architecture.pdf" public/pdf/
-          cp "$build_dir/requirements.pdf" public/pdf/
-          cp "$build_dir/test-plan.pdf" public/pdf/
+          exports_dir="build/pdf-output/tracer/${component_version}/_exports"
+          for pdf in architecture use-cases requirements test-plan; do
+            cp "$exports_dir/${pdf}.pdf" public/pdf/
+          done
 
       - name: Copy landing page
         run: cp -r landing/* public/
