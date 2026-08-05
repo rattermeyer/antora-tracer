@@ -13,7 +13,7 @@ no external services, and a minimal dependency tree
 Optional features like Neo4j export degrade gracefully without warnings.
 
 addresses:QA-055[]
-
+traceability:links[]
 --
 
 [#ARC-006, item, role=design, title="Configurable without code changes"]
@@ -36,7 +36,7 @@ and post-hoc re-validation for cross-file references. Error messages
 include file, line, item IDs with roles, and allowed alternatives.
 
 addresses:QA-057[]
-
+traceability:links[]
 --
 
 [#ARC-008, item, role=design, title="No side effects on source files"]
@@ -48,6 +48,7 @@ Processing is idempotent.
 
 addresses:QA-058[]
 addresses:REQ-050[]
+traceability:links[]
 --
 
 [#ARC-009, item, role=design, title="Testability by design"]
@@ -59,6 +60,7 @@ The regex-based parser (xref:adr/0002-regex-parser-over-ast.adoc[ADR-002])
 is decoupled from Asciidoctor's API.
 
 addresses:QA-059[]
+traceability:links[]
 
 --
 
@@ -69,6 +71,8 @@ Future-proofness is achieved through ESM with `"type": "module"`
 and a Node.js 20+ baseline (xref:adr/0005-typescript-strict-node20.adoc[ADR-005]).
 The zero-framework policy avoids dependency on libraries with short upgrade cycles.
 
+addresses:QA-061[]
+traceability:links[]
 --
 
 [#ARC-011, item, role=design, title="Performance through indexing"]
@@ -77,5 +81,7 @@ Performance is achieved through forward, reverse, and inverse
 relationship indexes (O(1) lookup), result caching with invalidation
 on mutation, and BFS path finding with configurable `maxDepth`.
 
+addresses:QA-062[]
+traceability:links[]
 --
 

@@ -75,6 +75,8 @@ QA-057,QA-057 — Fail-fast with clear diagnostics,ARC-018: ARC-018 — Config-d
 QA-058,QA-058 — No side effects on source files,ARC-015: ARC-015 — In-memory processing with no side effects
 QA-059,QA-059 — Testability by design,ARC-014: ARC-014 — Dependency injection by constructor
 QA-060,QA-060 — PDF compatibility of generated output,ARC-024: ARC-024 — traceability:outgoing[] and traceability:incoming[] link rendering
+QA-061,QA-061 — Platform stability and longevity,
+QA-062,QA-062 — Query and indexing performance,
 
-Total 76 rows
-Coverage: 100.0%
+Total 78 rows
+Coverage: 97.4%

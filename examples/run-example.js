@@ -28,7 +28,8 @@ const files = [
   "architecture.adoc", "test-plan.adoc",
   "quality/zero-operational-overhead.adoc", "quality/configurable-without-code.adoc",
   "quality/fail-fast-diagnostics.adoc", "quality/no-side-effects.adoc",
-  "quality/testability-by-design.adoc", "quality/pdf-compatibility.adoc"
+  "quality/testability-by-design.adoc", "quality/pdf-compatibility.adoc",
+  "quality/platform-stability.adoc", "quality/performance.adoc"
 ];
 const results = extension.processFiles(
   files.map((f) => {

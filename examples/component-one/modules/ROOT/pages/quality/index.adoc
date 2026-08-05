@@ -8,3 +8,5 @@ This section documents the quality attributes (non-functional requirements) that
 * xref:quality/no-side-effects.adoc[No Side Effects on Source Files] — All transformations in-memory, source files never modified
 * xref:quality/pdf-compatibility.adoc[PDF Compatibility of Generated Output] — Standard AsciiDoc output for cross-backend rendering
 * xref:quality/testability-by-design.adoc[Testability by Design] — Dependency injection, isolated test files, fast feedback
+* xref:quality/platform-stability.adoc[Platform Stability and Longevity] — ESM, TypeScript strict, Node.js 20+, zero-framework
+* xref:quality/performance.adoc[Query and Indexing Performance] — O(1) lookup, reverse indexes, BFS, caching with invalidation

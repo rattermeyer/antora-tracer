@@ -942,3 +942,9 @@ Source: openspec/changes/archive/2026-07-28-add-pdf-output/specs/pdf-output/spec
 QA-060,QA-060 — PDF compatibility of generated output,requirement,,quality/pdf-compatibility.adoc,"""Generated output from \`traceability:outgoing[]\` and \`traceability:incoming[]\` SHALL be standard AsciiDoc constructs — not raw HTML — ensuring compatibility with both HTML and PDF backends.
 
 Source: openspec/specs/traceability-links-macro/spec.md"""
+QA-061,QA-061 — Platform stability and longevity,requirement,,quality/platform-stability.adoc,"""The extension SHALL use ESM (`""""type"""": """"module""""`), TypeScript strict mode, and target Node.js 20+ as the baseline runtime. The zero-framework policy SHALL avoid dependencies on libraries with short upgrade cycles, ensuring the extension remains maintainable and runnable without forced migrations.
+
+Source: examples/component-one/modules/ROOT/partials/04-solution-strategy.adoc (ARC-010)"""
+QA-062,QA-062 — Query and indexing performance,requirement,,quality/performance.adoc,"""The traceability graph SHALL provide forward, reverse, and inverse relationship indexes enabling O(1) lookup by item ID. Path finding SHALL use BFS with configurable `maxDepth`. Result caching SHALL be used with invalidation on mutation to avoid redundant computation during repeated queries within a single processing session.
+
+Source: examples/component-one/modules/ROOT/partials/04-solution-strategy.adoc (ARC-011)"""
