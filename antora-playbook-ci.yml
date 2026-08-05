@@ -2,6 +2,8 @@ site:
   title: Antora Tracer — Self-Traceability Example
   url: https://antora-tracer.conemso.de/docs
   start_page: tracer::index.adoc
+  keys:
+    annotatejs: opt-out
 
 content:
   sources:
@@ -26,7 +28,7 @@ antora:
 
 ui:
   bundle:
-    url: https://github.com/rattermeyer/antora-ui-conemso/releases/download/v1.0.0/ui-bundle.zip
+    url: https://github.com/rattermeyer/antora-ui-conemso/releases/download/v1.1.3/ui-bundle.zip
 
 urls:
   latest_version_segment: latest
