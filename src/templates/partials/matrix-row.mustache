@@ -1,0 +1,36 @@
+                <tr class="status-{{status}} role-{{rowRole}}">
+                    <td>
+                        {{#rowHref}}
+                        <a href="{{rowHref}}">{{rowId}}</a>
+                        {{/rowHref}}
+                        {{^rowHref}}
+                        {{rowId}}
+                        {{/rowHref}}
+                    </td>
+                    <td>{{rowTitle}}</td>
+                    {{#cells}}
+                    <td{{#hasItems}} class="role-{{role}}"{{/hasItems}}>
+                        {{#hasItems}}
+                            {{#items}}
+                            <div>
+                                {{#itemHref}}
+                                <a href="{{itemHref}}" title="Source: {{sourceFile}}"><strong>{{itemId}}</strong></a>
+                                {{/itemHref}}
+                                {{^itemHref}}
+                                <strong>{{itemId}}</strong>
+                                {{/itemHref}}
+                                : {{itemTitle}}
+                                {{#sourceFile}}
+                                <small class="source-ref">[{{sourceFile}}]</small>
+                                {{/sourceFile}}
+                            </div>
+                            {{/items}}
+                        {{/hasItems}}
+                        {{^hasItems}}
+                            <span class="empty-cell">-</span>
+                        {{/hasItems}}
+                    </td>
+                    {{/cells}}
+                    <td>{{coverageFormatted}}%</td>
+                    <td><span class="coverage-badge coverage-{{status}}">{{status}}</span></td>
+                </tr>

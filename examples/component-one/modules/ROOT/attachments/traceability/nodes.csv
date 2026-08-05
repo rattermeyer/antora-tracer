@@ -366,6 +366,13 @@ traceability:links[]
 traceability:graph[]"""
 ARC-002,ARC-002 — Component-level architecture,design,,architecture.adoc,"""include::partial$05-bb-overview.adoc[]
 
+The following class diagram shows the public API of each component — the method signatures that form the contract boundaries between modules.
+
+[plantuml]
+----
+include::example$api-overview.puml[]
+----
+
 traceability:outgoing[]"""
 ARC-012,ARC-012 — Preset YAML schema,design,,architecture.adoc,"""Presets are YAML files following a defined structure. Each preset is a self-contained
 versioned configuration that users can extend or override.
@@ -459,6 +466,13 @@ modifies them in place and writes them back to the catalog without touching disk
 This ensures idempotency and version-control safety (see
 xref:adr/0003-in-memory-graph.adoc[ADR-003]).
 
+The graph has a well-defined lifecycle — understanding which operations are valid in each state explains why pass ordering matters:
+
+[plantuml]
+----
+include::example$graph-lifecycle.puml[]
+----
+
 addresses:REQ-050[]
 addresses:REQ-069[]
 addresses:QA-058[]
@@ -541,6 +555,13 @@ API versions and testable with plain string inputs. Verbatim blocks
 false positives from example code. Known limitations (`]` in quoted
 attribute values, indented macros) are handled with targeted fixes
 (see xref:adr/0002-regex-parser-over-ast.adoc[ADR-002]).
+
+The parser's internal pipeline has four distinct steps — each builds on the previous:
+
+[plantuml]
+----
+include::example$parser-flow.puml[]
+----
 
 addresses:REQ-087[]
 addresses:REQ-088[]
@@ -734,6 +755,15 @@ Key timing characteristics:
 - *Synchronous init*: `AntoraTraceabilityExtension` constructor initializes the traceability graph synchronously (config/preset loading is a synchronous file read) before any event handler is registered. This eliminates the race where a `contentClassified` event could fire before the graph is ready.
 - *Single-pass processing*: `process()` call does both parsing and graph population in one call. No separate relationship processing pass needed.
 - *Lazy rendering*: Templates are loaded and compiled on first use, cached thereafter.
+
+.File state caching
+
+The `prepareFile()` method computes file content, document attributes, and item block positions once per file, then feeds the same `PreparedFile` to all five macro-expansion methods. This eliminates redundant buffer conversions and regex scans that were previously repeated in each method.
+
+[plantuml]
+----
+include::example$prepared-file-caching.puml[]
+----
 
 addresses:REQ-005[]"""
 ARC-013,ARC-013 — ESM module system,design,,architecture.adoc,"""ESM (`""""type"""": """"module""""` in package.json) is used throughout the project. This

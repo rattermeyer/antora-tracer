@@ -60,7 +60,7 @@ Group items by capability area (matching the spec's parent directory name).
 
 ### 4. Update `architecture.adoc`
 
-The file is at `examples/modules/ROOT/pages/architecture.adoc`. It uses arc42 sections as `[item, id=ARC-XXX, role=design]`.
+The file is at `examples/component-one/modules/ROOT/pages/architecture.adoc`. It uses arc42 sections as `[item, id=ARC-XXX, role=design]`.
 
 **Scan design decisions:**
 
@@ -68,8 +68,8 @@ Read `design.md` from all changes (active + archived). Each `### N. Decision Tit
 
 Current sections:
 - `ARC-001`: Introduction & Goals
-- `ARC-002`: Building Block View (component diagram, responsibility table)
-- `ARC-003`: Runtime View (processing sequence diagram)
+- `ARC-002`: Building Block View (component diagram, class/API diagram, config resolution)
+- `ARC-003`: Runtime View (sequence diagram, pass pipeline, file state caching)
 - `ARC-004`: Architecture Decisions (decisions table)
 
 **Update strategy:**
@@ -77,8 +77,37 @@ Current sections:
 - Keep existing sections (they describe the architecture, which doesn't change often).
 - Update the `addresses:` inline macros to reference the correct current `REQ-XXX` IDs.
 - If new architecture patterns emerge (new components, new flows, new decisions), add them as new `ARC-XXX` items with fresh IDs.
-- Update the PlantUML component diagram to match current `src/` layout.
-- Update the runtime sequence diagram if the processing flow changed.
+
+**Diagram checklist — by arc42 section:**
+
+Review each existing diagram for accuracy and consider whether a section is missing a diagram that would clarify its concept.
+
+| arc42 Section | Expected Diagrams | When to Update |
+|---|---|---|
+| Building Block View (ARC-002) | `bb-overview.puml` (component dependencies), `api-overview.puml` (class/API), `config-resolution.puml` (config flow) | New component added or interface signature changes |
+| Runtime View (ARC-003) | `sequence-diagram.puml` (Antora flow), `pass-pipeline.puml` (pass ordering), `prepared-file-caching.puml` (caching optimization) | Processing flow or internal algorithm changes |
+| Individual components (ARC-015–ARC-033) | `parser-flow.puml` (DocumentParser activity), `graph-lifecycle.puml` (graph state) | Component's internal logic changes significantly |
+| Architecture Decisions (ARC-004) | (none — text table) | New ADR added |
+
+**Diagram type decision guide:**
+
+| Concept type | Diagram type | Example |
+|---|---|---|
+| Who depends on whom | Component | `bb-overview.puml` |
+| What they expose (public API) | Class | `api-overview.puml` |
+| What happens in what order (across components) | Sequence | `sequence-diagram.puml` |
+| How a component works internally (algorithm) | Activity | `parser-flow.puml` |
+| What states something has (lifecycle) | State | `graph-lifecycle.puml` |
+| How data/config flows through the system | Flow/Activity | `config-resolution.puml` |
+
+**Heuristic for new diagrams:** if a component's internal logic spans more than ~20 lines of prose description, consider adding an activity or state diagram.
+
+**Placement conventions:**
+
+- All diagrams live in `examples/component-one/modules/ROOT/examples/` as `.puml` files
+- Included in `architecture.adoc` via `[plantuml]\n----\ninclude::example$name.puml[]\n----`
+- Each diagram is placed inline with its corresponding section — not in a separate gallery
+- Introduce each diagram with 1–2 sentences explaining what the reader should take away
 
 ### 5. Update `test-plan.adoc`
 

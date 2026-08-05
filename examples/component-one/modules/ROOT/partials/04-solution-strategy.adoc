@@ -25,7 +25,7 @@ Items with unknown roles generate warnings, not errors — enabling
 incremental domain model adoption.
 
 addresses:QA-056[]
-
+traceability:links[]
 --
 
 [#ARC-007, item, role=design, title="Fail-fast with clear diagnostics"]

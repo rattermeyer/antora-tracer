@@ -1,0 +1,52 @@
+@startuml
+' TraceabilityGraph — lifecycle states
+' Shows the phases from creation through querying
+
+skinparam stateBackgroundColor #F8F9FA
+skinparam stateBorderColor #888888
+
+[*] --> Empty
+
+state Empty {
+  [*] --> Ready : constructor()
+}
+
+state "Populated\n(items registered)" as Populated {
+  [*] --> HasItems : addItem() × N
+}
+
+state "Complete\n(relationships added)" as Complete {
+  [*] --> ReadyToQuery : addRelationship() × N
+  --
+  state "Validation" as Validate #FFF3E0 {
+    ReadyToQuery --> Validated : validate()
+    Validated --> ReadyToQuery : items/rels changed
+  }
+}
+
+state "Cleared" as Cleared #FCE4EC
+
+Empty --> Populated : addItem()
+Populated --> Populated : addItem()
+Populated --> Complete : addRelationship()
+Complete --> Complete : addItem()\naddRelationship()
+Complete --> Cleared : clear()
+Cleared --> Empty
+
+note right of Complete
+  Pass 3 (link substitution)
+  requires Complete state —
+  all sourceFiles must be known
+  to resolve cross-file xrefs.
+end note
+
+note right of Validate
+  validate() checks:
+  • Orphaned relationships
+  • Circular references (DFS)
+  • Role/relation rule violations
+  Returns ValidationResult with
+  errors[] and warnings[].
+end note
+
+@enduml

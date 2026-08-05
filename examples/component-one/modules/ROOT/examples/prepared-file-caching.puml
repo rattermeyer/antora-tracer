@@ -1,0 +1,58 @@
+@startuml
+' PreparedFile caching — single preparation feeds five macro-expansion passes
+' Eliminates redundant buf→string, parseDocAttributes, and findItemBlocks calls
+
+skinparam activityBackgroundColor #F8F9FA
+skinparam activityBorderColor #888888
+
+start
+
+partition "Per-file loop in contentClassified" {
+  :For each page file;
+
+  partition "prepareFile() — once per file" #E8F5E9 {
+    :Read contents buffer;
+    :buf→string(content);
+    :parseDocAttributes(content);
+    :findItemBlocks(content);
+    :normalizeSourceFile();
+    note right
+      These 4 operations were previously
+      repeated 5× (once per expand method).
+      Now computed once and cached.
+    end note
+    :Return PreparedFile {\n  file, content, docAttrs,\n  blocks, sourceFile,\n  component, module\n};
+  }
+
+  fork
+    :expandRelationMacros(prepared, "outgoing");
+  fork again
+    :expandRelationMacros(prepared, "incoming");
+  fork again
+    :expandRelationMacros(prepared, "links");
+  fork again
+    :expandGraphMacros(prepared);
+  fork again
+    :expandCoverageMacros(prepared);
+  end fork
+
+  note right
+    All five methods use:
+    prepared.content
+    prepared.docAttrs
+    prepared.blocks
+    prepared.file (for write-back)
+    No redundant conversions or scans.
+  end note
+}
+
+:Continue to next file;
+note right
+  PreparedFile is scoped to one
+  file iteration — garbage
+  collected when loop advances.
+end note
+
+stop
+
+@enduml

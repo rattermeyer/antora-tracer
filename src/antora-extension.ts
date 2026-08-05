@@ -321,7 +321,7 @@ export class AntoraTraceabilityExtension {
       if (!content.includes(`traceability:${macroName}[]`)) return;
 
       const docAttrs = this.parseDocAttributes(content);
-      const linksEnabled = this.isLinksEnabled(docAttrs);
+      const linksEnabled = (file as any).__isPartial || this.isLinksEnabled(docAttrs);
       const style = this.getLinksStyle(docAttrs);
       const order = this.getLinksOrder(docAttrs);
       const collapsible = this.getCollapsible(docAttrs);
@@ -641,7 +641,7 @@ export class AntoraTraceabilityExtension {
       const docAttrs = this.parseDocAttributes(content);
       if (!content.includes("traceability:graph[")) return;
 
-      const graphEnabled = this.isGraphEnabled(docAttrs);
+      const graphEnabled = (file as any).__isPartial || this.isGraphEnabled(docAttrs);
       const blocks = this.findItemBlocks(content);
       const replacements: Array<{ start: number; end: number; text: string }> =
         [];
@@ -758,7 +758,7 @@ export class AntoraTraceabilityExtension {
       const docAttrs = this.parseDocAttributes(content);
       if (!content.includes("traceability:graph-coverage[")) return;
 
-      const graphEnabled = this.isGraphEnabled(docAttrs);
+      const graphEnabled = (file as any).__isPartial || this.isGraphEnabled(docAttrs);
       const blocks = this.findItemBlocks(content);
       const replacements: Array<{ start: number; end: number; text: string }> =
         [];
@@ -916,21 +916,31 @@ export class AntoraTraceabilityExtension {
           this.processAsciiDocFile(file, file.src?.fileUri);
         }
 
-        // Expand traceability:outgoing[], traceability:incoming[], and traceability:links[] macros
+        // Expand macros on pages
         for (const file of pageFilesForVersion) {
           this.expandRelationMacros(file, "outgoing");
           this.expandRelationMacros(file, "incoming");
           this.expandRelationMacros(file, "links");
-        }
-
-        // Expand traceability:graph[] and traceability:graph-coverage[] macros
-        for (const file of pageFilesForVersion) {
           this.expandGraphMacros(file);
           this.expandCoverageMacros(file);
         }
 
-        // Substitute relationship macros with xrefs
+        // Expand macros on partials — mark them so expand methods default
+        // links/graph to enabled (partials have no doc attributes of their own)
+        for (const file of partialFilesForVersion) {
+          (file as any).__isPartial = true;
+          this.expandRelationMacros(file, "outgoing");
+          this.expandRelationMacros(file, "incoming");
+          this.expandRelationMacros(file, "links");
+          this.expandGraphMacros(file);
+          this.expandCoverageMacros(file);
+        }
+
+        // Substitute relationship macros with xrefs — both pages and partials
         for (const file of pageFilesForVersion) {
+          this.substituteLinksInFile(file);
+        }
+        for (const file of partialFilesForVersion) {
           this.substituteLinksInFile(file);
         }
       }

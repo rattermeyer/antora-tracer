@@ -1,0 +1,71 @@
+@startuml
+' DocumentParser — step-by-step regex parsing pipeline
+' Shows how raw AsciiDoc content becomes ParserResult
+
+skinparam activityBackgroundColor #F8F9FA
+skinparam activityBorderColor #888888
+
+start
+
+partition "Input" {
+  :Receive content string\n+ optional sourceFile, component, module;
+}
+
+partition "Step 1 — Pre-scan verbatim blocks" #FFF3E0 {
+  :Scan for ---- listing blocks\nand .... literal blocks;
+  :Build exclude ranges\nfrom fence positions;
+  note right
+    Items inside verbatim blocks
+    are documentation examples,
+    not real traceability data.
+  end note
+}
+
+partition "Step 2 — Find item blocks" #E3F2FD {
+  :Global regex scan for\n[#ID, item, role=..., title=...];
+  repeat
+    :Match found at position N;
+    :Quote-aware scan forward\nfor closing ']';
+    if (Closing bracket found?) then (yes)
+      :Find opening -- delimiter\nafter macro line;
+      if (Found?) then (yes)
+        :Record item block:\nitemId, headerStart, headerEnd,\nbodyStart, bodyEnd;
+      else (no)
+        :Skip — malformed block;
+      endif
+    else (no)
+      :Skip — unclosed macro;
+    endif
+  repeat while (More matches?)
+}
+
+partition "Step 3 — Extract inline relationships" #E3F2FD {
+  :For each item block body;
+  :Find body end (closing -- delimiter);
+  :Slice body content between delimiters;
+  :Scan for relation:TARGET[] macros\n(regex: \\w+:ID[]);
+  note right
+    Skips inline-code spans (backticks)
+    to avoid false positives.
+    traceability: prefixed macros
+    are NOT parsed as relationships.
+  end note
+  :Build ItemRelationship objects\n(fromId, targetId, type, sourceFile);
+}
+
+partition "Step 4 — Old-macro detection" #FCE4EC {
+  :Check entire content for legacy\nmacros: [req], [imp], [test], [doc], [design];
+  if (Old macro found outside verbatim?) then (yes)
+    :Report deprecation error (strict)\nor warning (non-strict);
+  else (no)
+    :No old macros detected;
+  endif
+}
+
+partition "Output" #E8F5E9 {
+  :Return ParserResult {\n  items: Item[],\n  relationships: ItemRelationship[],\n  oldMacroWarnings: OldMacroError[]\n};
+}
+
+stop
+
+@enduml
