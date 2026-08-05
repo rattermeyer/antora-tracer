@@ -7,31 +7,31 @@ skinparam stateBorderColor #888888
 
 [*] --> Empty
 
-state Empty {
-  [*] --> Ready : constructor()
-}
-
-state "Populated\n(items registered)" as Populated {
-  [*] --> HasItems : addItem() × N
-}
-
-state "Complete\n(relationships added)" as Complete {
-  [*] --> ReadyToQuery : addRelationship() × N
-  --
-  state "Validation" as Validate #FFF3E0 {
-    ReadyToQuery --> Validated : validate()
-    Validated --> ReadyToQuery : items/rels changed
-  }
-}
-
-state "Cleared" as Cleared #FCE4EC
-
 Empty --> Populated : addItem()
 Populated --> Populated : addItem()
 Populated --> Complete : addRelationship()
-Complete --> Complete : addItem()\naddRelationship()
+Complete --> Complete : addItem() / addRelationship()
 Complete --> Cleared : clear()
 Cleared --> Empty
+
+state Empty {
+  state "Ready for items" as e1
+}
+
+state Populated {
+  state "Items registered" as p1
+}
+
+state Complete {
+  state "Ready for queries" as c1
+}
+
+state Complete : << validated? >>
+state Complete : validate() checks orphans,\ncircular refs, rule violations
+
+state Cleared {
+  state "Graph reset" as cl1
+}
 
 note right of Complete
   Pass 3 (link substitution)
@@ -40,13 +40,11 @@ note right of Complete
   to resolve cross-file xrefs.
 end note
 
-note right of Validate
-  validate() checks:
-  • Orphaned relationships
-  • Circular references (DFS)
-  • Role/relation rule violations
-  Returns ValidationResult with
-  errors[] and warnings[].
+note bottom of Complete
+  validate() returns ValidationResult
+  with errors[] and warnings[].
+  Re-validation runs on every
+  addItem()/addRelationship() call.
 end note
 
 @enduml
