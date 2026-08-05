@@ -52,6 +52,7 @@ jobs:
           component_version=$(grep '^version:' examples/component-one/antora.yml | awk '{print $2}')
           build_dir="build/assembler/pdf/tracer/${component_version}/_exports"
           cp "$build_dir/architecture.pdf" public/pdf/
+          cp "$build_dir/requirements.pdf" public/pdf/
           cp "$build_dir/test-plan.pdf" public/pdf/
 
       - name: Copy landing page

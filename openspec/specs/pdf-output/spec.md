@@ -20,12 +20,13 @@ The project SHALL include a `Gemfile` that specifies `asciidoctor-pdf` and `asci
 - **AND** `Gemfile.lock` records the exact versions
 
 ### Requirement: PDF playbook generates PDF from example site
-A separate `antora-playbook-pdf.yml` SHALL exist that uses `@antora/pdf-extension` to generate a single PDF from the example site's content. The playbook SHALL use the same content sources as the HTML playbook but output to `public/pdf/`.
+A separate `antora-playbook-pdf.yml` SHALL exist that uses `@antora/pdf-extension` to generate PDFs from the example site's content. The playbook SHALL use the same content sources as the HTML playbook but output intermediate HTML to `./build/pdf-output/`, not `./public/pdf/`.
 
-#### Scenario: Running the PDF playbook produces a PDF
+#### Scenario: Running the PDF playbook produces PDFs
 - **WHEN** `npx antora antora-playbook-pdf.yml` runs in the project root
-- **THEN** a PDF file is produced in `public/pdf/`
-- **AND** the PDF contains the requirements, architecture, and test plan content from the example site
+- **THEN** PDF files are produced in `build/assembler/pdf/` by the assembler
+- **AND** intermediate HTML site files are written to `build/pdf-output/`
+- **AND** no files are written to `public/pdf/` by the playbook
 
 #### Scenario: HTML playbook is unchanged
 - **WHEN** `npx antora antora-playbook.yml` runs
