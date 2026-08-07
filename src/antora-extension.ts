@@ -91,10 +91,24 @@ export class AntoraTraceabilityExtension {
     antoraConfig?: { config?: Partial<AntoraTraceabilityConfig> },
   ) {
     this.logger = context.getLogger("requirements-traceability");
-    this.config = {
+    // Antora normalizes YAML extension config keys to lowercase, so merge
+    // all sources first, then re-apply camelCase keys so DEFAULT_CONFIG
+    // fields like configPath/outputDir are correctly overridden.
+    const rawConfig = {
       ...DEFAULT_CONFIG,
       ...this.loadConfig(),
       ...antoraConfig?.config,
+    };
+    const rc = rawConfig as Record<string, any>;
+    this.config = {
+      ...rawConfig,
+      configPath: rc.configpath || rc.configPath || "",
+      outputDir: rc.outputdir || rc.outputDir || "traceability",
+      generateMatrices: rc.generateMatrices ?? rc.generatematrices ?? true,
+      matrixFormats: rc.matrixFormats || rc.matrixformats || ["html", "csv"],
+      includeInNavigation: rc.includeInNavigation ?? rc.includeinnavigation ?? true,
+      preset: rc.preset || "requirements-engineering",
+      krokiImageFormat: rc.krokiImageFormat || rc.krokiimageformat || "svg",
     };
 
     // Fallback: if no configPath is set, try the example site config
@@ -239,6 +253,15 @@ export class AntoraTraceabilityExtension {
     return val === "true" || val === "yes" || val === "1";
   }
 
+  private getEmptyStyle(
+    attrs: Record<string, string>,
+  ): "none" | "italic" | "admonition" {
+    const val = (attrs["traceability-empty"] || "").toLowerCase();
+    if (val === "italic") return "italic";
+    if (val === "admonition") return "admonition";
+    return "none";
+  }
+
   /**
    * Find all item block boundaries in content using quote-aware scanning
    * so that ']' inside quoted title values doesn't break detection.
@@ -325,6 +348,7 @@ export class AntoraTraceabilityExtension {
       const style = this.getLinksStyle(docAttrs);
       const order = this.getLinksOrder(docAttrs);
       const collapsible = this.getCollapsible(docAttrs);
+      const emptyStyle = this.getEmptyStyle(docAttrs);
       const sourceFile = file.src?.path || file.path || "unknown";
       const currentFile = this.normalizeSourceFile(sourceFile);
       const currentComponent = file.src?.component || undefined;
@@ -361,6 +385,7 @@ export class AntoraTraceabilityExtension {
                 collapsible,
                 currentComponent,
                 currentModule,
+                emptyStyle,
               )
             : "";
           replacements.push({ start: macroStart, end: macroEnd, text });
@@ -402,6 +427,7 @@ export class AntoraTraceabilityExtension {
     collapsible: boolean,
     currentComponent?: string,
     currentModule?: string,
+    emptyStyle: "none" | "italic" | "admonition" = "none",
   ): string {
     const directions: RelationDirection[] =
       macroName === "links"
@@ -426,6 +452,13 @@ export class AntoraTraceabilityExtension {
             currentModule,
           ),
         );
+      } else if (emptyStyle !== "none") {
+        const msg = `No ${direction} relationships.`;
+        if (emptyStyle === "admonition") {
+          parts.push(`\n[NOTE]\n====\n${msg}\n====\n`);
+        } else {
+          parts.push(`\n_${msg}_\n`);
+        }
       }
     }
     return parts.join("");
