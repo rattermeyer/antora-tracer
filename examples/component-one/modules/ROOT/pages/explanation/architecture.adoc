@@ -36,14 +36,14 @@ include::partial$04-solution-strategy.adoc[]
 --
 include::partial$05-bb-overview.adoc[]
 
-The following class diagram shows the public API of each component — the method signatures that form the contract boundaries between modules.
+The following class diagram shows the public API of each component — the method groups and key signatures that form the contract boundaries between modules. See the API reference for full signatures.
 
 [plantuml]
 ----
 include::example$api-overview.puml[]
 ----
 
-traceability:outgoing[]
+traceability:links[]
 --
 
 === ConfigLoader
@@ -102,7 +102,7 @@ versioned configuration that users can extend or override.
 | `description` (markdown string), `examples` (string[]). Inline documentation explaining the preset's domain and usage.
 |===
 
-traceability:outgoing[]
+traceability:links[]
 --
 
 .Configuration resolution chain
@@ -147,7 +147,7 @@ addresses:REQ-071[]
 addresses:QA-056[]
 addresses:QA-057[]
 
-traceability:outgoing[]
+traceability:links[]
 --
 
 [#ARC-028, item, role=design, title="Circular reference detection in graph validation"]
@@ -160,6 +160,7 @@ same path, a circular reference error is reported with the full cycle path
 are skipped to avoid false positives.
 
 addresses:REQ-109[]
+traceability:links[]
 --
 
 [#ARC-029, item, role=design, title="Partial file processing with source-repo links"]
@@ -176,6 +177,7 @@ Partials are excluded from macro expansion and link substitution passes
 because they do not produce HTML pages.
 
 addresses:REQ-110[]
+traceability:links[]
 --
 
 === TraceabilityGraph
@@ -199,7 +201,7 @@ include::example$graph-lifecycle.puml[]
 addresses:REQ-050[]
 addresses:REQ-069[]
 addresses:QA-058[]
-traceability:outgoing[]
+traceability:links[]
 --
 
 [#ARC-026, item, role=design, title="GraphViz DOT and Vega-Lite serialization methods"]
@@ -213,6 +215,7 @@ when called without an item ID. Both methods produce source strings that are
 encoded into Kroki URLs for rendering.
 
 addresses:REQ-053[]
+traceability:links[]
 --
 
 === AntoraTraceabilityExtension
@@ -228,13 +231,13 @@ the CLI outside Antora, demonstrating the event handlers are optional.
 
 addresses:REQ-103[]
 addresses:QA-055[]
-traceability:outgoing[]
+traceability:links[]
 --
 
-[#ARC-024, item, role=design, title="traceability:outgoing[] and traceability:incoming[] link rendering"]
+[#ARC-024, item, role=design, title="traceability:links[] and traceability:incoming[] link rendering"]
 --
 The `expandRelationMacros()` method in the Antora extension (not the
-DocumentParser) replaces `traceability:outgoing[]` and
+DocumentParser) replaces `traceability:links[]` and
 `traceability:incoming[]` placeholders with formatted AsciiDoc content
 showing the item's relationships. All three rendering macros (`outgoing`
 `incoming`, and `links`) share this single scan/render pipeline; only the
@@ -264,6 +267,7 @@ addresses:REQ-101[]
 addresses:REQ-102[]
 addresses:REQ-104[]
 addresses:QA-060[]
+traceability:links[]
 --
 
 [#ARC-025, item, role=design, title="traceability:graph[] and traceability:graph-coverage[] visualization macros"]
@@ -279,6 +283,7 @@ via the `:traceability-graph:` document attribute.
 addresses:REQ-051[]
 addresses:REQ-052[]
 addresses:REQ-063[]
+traceability:links[]
 --
 
 [#ARC-027, item, role=design, title="Automatic matrix sync to component _attachments"]
@@ -293,6 +298,7 @@ without requiring manual file copies. The correct version URL segment (e.g.
 output paths from the Antora content catalog.
 
 addresses:REQ-108[]
+traceability:links[]
 --
 
 === DocumentParser
@@ -320,7 +326,7 @@ addresses:REQ-089[]
 addresses:REQ-090[]
 addresses:REQ-091[]
 addresses:REQ-092[]
-traceability:outgoing[]
+traceability:links[]
 --
 
 === MatrixGenerator
@@ -337,7 +343,7 @@ addresses:REQ-083[]
 addresses:REQ-084[]
 addresses:REQ-085[]
 addresses:REQ-086[]
-traceability:outgoing[]
+traceability:links[]
 --
 
 === TemplateRenderer
@@ -349,7 +355,7 @@ ship with the extension in `src/templates/`. Users can specify a custom template
 directory — the renderer falls back to built-in templates for any files not found
 in the custom directory.
 
-traceability:outgoing[]
+traceability:links[]
 --
 
 === LinkResolver
@@ -369,7 +375,7 @@ addresses:REQ-040[]
 addresses:REQ-041[]
 addresses:REQ-042[]
 addresses:REQ-043[]
-traceability:outgoing[]
+traceability:links[]
 --
 
 === Neo4jExporter
@@ -383,7 +389,7 @@ produces CREATE statements with `:Item` and role-specific labels. All item
 attributes are included as node properties. The export is optional and requires
 no Neo4j runtime dependency.
 
-traceability:outgoing[]
+traceability:links[]
 --
 
 === CLI Tool
@@ -398,6 +404,7 @@ Global `--config` and `--preset` flags apply to all commands. The CLI
 operates standalone — it does not require an Antora build pipeline.
 
 addresses:REQ-056[]
+traceability:links[]
 --
 
 [#ARC-030, item, role=design, title="CI/CD PDF build and deployment pipeline"]
@@ -422,6 +429,7 @@ addresses:REQ-096[]
 addresses:REQ-097[]
 addresses:REQ-098[]
 addresses:REQ-099[]
+traceability:links[]
 --
 
 [#ARC-031, item, role=design, title="Static landing page at GitHub Pages root"]
@@ -442,6 +450,7 @@ addresses:REQ-075[]
 addresses:REQ-076[]
 addresses:REQ-077[]
 addresses:REQ-078[]
+traceability:links[]
 --
 
 [#ARC-032, item, role=design, title="Lunr search extension customization for item anchor indexing"]
@@ -460,6 +469,7 @@ addresses:REQ-079[]
 addresses:REQ-080[]
 addresses:REQ-081[]
 addresses:REQ-082[]
+traceability:links[]
 --
 
 [#ARC-033, item, role=design, title="Example site: config extension and dashboard patterns"]
@@ -477,6 +487,7 @@ addresses:REQ-054[]
 addresses:REQ-105[]
 addresses:REQ-106[]
 addresses:REQ-107[]
+traceability:links[]
 --
 
 == Runtime View
@@ -538,7 +549,7 @@ include::example$pass-pipeline.puml[]
 | Graph must be complete before Pass 3 can resolve cross-file `addresses:TARGET[]` references. Partials are only processed here — they skip subsequent passes.
 
 | Pass 2
-| `expandRelationMacros(file, macroName)` — replace `traceability:outgoing[]`, `traceability:incoming[]`, and `traceability:links[]` with formatted relationship lists (grouped by type, configurable style/order); macroName is `outgoing`, `incoming`, or `links`.
+| `expandRelationMacros(file, macroName)` — replace `traceability:links[]`, `traceability:incoming[]`, and `traceability:links[]` with formatted relationship lists (grouped by type, configurable style/order); macroName is `outgoing`, `incoming`, or `links`.
 | Pages only
 | Depends on complete graph from Pass 1 to enumerate relationships. Opt-in via `:traceability-links:` document attribute.
 
@@ -569,6 +580,7 @@ include::example$prepared-file-caching.puml[]
 ----
 
 addresses:REQ-005[]
+traceability:links[]
 
 --
 
@@ -583,6 +595,7 @@ extension loader uses `require()`, requiring `.cjs` wrappers for integration
 points (see xref:explanation/adr/0001-esm-over-cjs.adoc[ADR-001]).
 
 addresses:QA-055[]
+traceability:links[]
 --
 
 [#ARC-014, item, role=design, title="Dependency injection by constructor"]
@@ -595,6 +608,7 @@ component independently testable without mocking frameworks (see
 xref:explanation/adr/0004-zero-framework.adoc[ADR-004]).
 
 addresses:QA-059[]
+traceability:links[]
 --
 
 == Architecture Decisions

@@ -1,32 +1,29 @@
 @startuml
 ' Component architecture — who depends on whom, why, and whether via constructor injection
 
-skinparam packageBorderColor #888888
 skinparam componentBackgroundColor #F8F9FA
 
-package "Antora Pipeline" {
-  [AntoraTraceabilityExtension] as antora_ext #E8F5E9
-  [CLI\n(cli.ts)] as cli #FCE4EC
-}
+[AntoraTraceabilityExtension] as antora_ext #E8F5E9
+[CLI\n(cli.ts)] as cli #FCE4EC
 
-package "Core" {
-  [RequirementsTraceabilityExtension] as main_ext #BBDEFB
-  [DocumentParser] as parser #BBDEFB
-  [TraceabilityGraph] as graph #BBDEFB
-}
+[RequirementsTraceabilityExtension] as main_ext #BBDEFB
+[DocumentParser] as parser #BBDEFB
+[TraceabilityGraph] as graph #BBDEFB
 
-package "Configuration" {
-  [ConfigLoader] as config #FFF3E0
-  database "Built-in\nPresets" as presets #FFF8E1
-  file "User\nYAML Config" as userconfig #FFF8E1
-}
+[ConfigLoader] as config #FFF3E0
+[Built-in\nPresets] as presets #FFF8E1
+[User\nYAML Config] as userconfig #FFF8E1
 
-package "Output" {
-  [MatrixGenerator] as matrix #E8EAF6
-  [TemplateRenderer] as templates #E8EAF6
-  [LinkResolver] as linkresolver #E8EAF6
-  [Neo4jExporter] as neo4j #E8EAF6
-}
+[MatrixGenerator] as matrix #E8EAF6
+[TemplateRenderer] as templates #E8EAF6
+[LinkResolver] as linkresolver #E8EAF6
+[Neo4jExporter] as neo4j #E8EAF6
+
+legend right
+  | Arrow | Meaning |
+  | <#000000>→ | depends on / delegates to |
+  | Label on arrow | nature of dependency |
+endlegend
 
 ' Constructor injection — arrow labels show the dependency
 antora_ext --> main_ext : creates, orchestrates

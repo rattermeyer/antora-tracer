@@ -29,7 +29,7 @@ partition "Pass 2 — Rendering Macros" #E8F5E9 {
   end note
 }
 
-partition "Pass 2b — Visualization Macros" #E8F5E9 {
+partition "Pass 2b — Visualization Macros" #FFF3E0 {
   :expandGraphMacros()\n→ Kroki GraphViz DOT images;
   :expandCoverageMacros()\n→ Kroki Vega-Lite charts;
   note right
@@ -40,7 +40,7 @@ partition "Pass 2b — Visualization Macros" #E8F5E9 {
   end note
 }
 
-partition "Pass 3 — Link Substitution" #FFF3E0 {
+partition "Pass 3 — Link Substitution" #E8EAF6 {
   :substituteLinksInFile()\nfor each page file;
   :addresses:REQ-001[]\n→ xref:page#ID or link:URL;
   :injectTitleIds()\n→ prepend ID to title attribute;

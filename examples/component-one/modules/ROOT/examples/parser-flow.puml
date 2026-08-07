@@ -47,8 +47,6 @@ partition "Step 3 — Extract inline relationships" #E3F2FD {
   note right
     Skips inline-code spans (backticks)
     to avoid false positives.
-    traceability: prefixed macros
-    are NOT parsed as relationships.
   end note
   :Build ItemRelationship objects\n(fromId, targetId, type, sourceFile);
 }

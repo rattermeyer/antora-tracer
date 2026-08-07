@@ -2,10 +2,9 @@
 ' Configuration resolution chain — preset → merge → validation queries
 
 skinparam componentBackgroundColor #F8F9FA
-skinparam packageBackgroundColor #FAFAFA
 
-database "Built-in\nPresets" as presets #FFF8E1
-file "User\nConfig\n(traceability.yml)" as userconfig #FFF8E1
+[Built-in\nPresets] as presets #FFF8E1
+[User\nConfig\n(traceability.yml)] as userconfig #FFF8E1
 
 [ConfigLoader] as loader #E8EAF6
 

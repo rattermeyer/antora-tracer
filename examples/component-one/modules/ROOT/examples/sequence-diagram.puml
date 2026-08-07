@@ -1,68 +1,52 @@
 @startuml
+' High-level Antora build flow — internal pass detail in pass-pipeline.puml
+
 actor "Antora Build" as antora
 participant "AntoraTraceabilityExtension" as antora_ext
 participant "RequirementsTraceabilityExtension" as main_ext
-participant "DocumentParser" as parser
 participant "TraceabilityGraph" as graph
 participant "MatrixGenerator" as matrix
-participant "TemplateRenderer" as templates
 participant "Neo4jExporter" as neo4j
 
 == Initialization ==
 antora -> antora_ext : register(context)
 antora_ext -> antora_ext : loadConfig() from playbook
 antora_ext -> main_ext : createWithPreset() or createWithConfig()
-antora_ext -> antora_ext : registerContentClassifier()
-antora_ext -> antora_ext : registerPageProcessor()
 
-== Content Processing ==
+== contentClassified — parse, expand, substitute ==
 antora -> antora_ext : contentClassified event
-antora_ext -> antora_ext : find all .adoc files in contentCatalog
 
-== Pass 1: Populate graph ==
 loop for each .adoc file
-  antora_ext -> main_ext : process(content, { sourceFile })
-  main_ext -> parser : parse(content, sourceFile)
-  parser -> parser : extract [item] blocks
-  parser -> parser : extract relation:TARGET[] macros
-  parser --> main_ext : ParserResult { items, relationships }
-  main_ext -> graph : addItem() for each item
-  main_ext -> graph : addRelationship() for each relationship
-  graph -> graph : validate relation (ConfigLoader.isRelationAllowed)
+  antora_ext -> main_ext : process(content, sourceFile)
+  main_ext -> graph : add items + relationships
+  graph -> graph : validate (config rules)
 end
 
-== Pass 2: Expand traceability:outgoing[], traceability:incoming[], traceability:links[] macros ==
-loop for each .adoc file
-  antora_ext -> antora_ext : expandRelationMacros(file, "outgoing") / "incoming" / "links"
-  antora_ext -> antora_ext : find macro and enclosing item ID
-  antora_ext -> graph : getRelationships(itemId) / getReverseRelationships(itemId)
-  graph --> antora_ext : relationships (outgoing, incoming, or both)
-  antora_ext -> antora_ext : generate AsciiDoc list/table/inline (inverse labels for incoming)
-  antora_ext -> antora_ext : replace macro with generated content
+loop for each page file
+  antora_ext -> graph : query relationships (outgoing, incoming)
+  antora_ext -> antora_ext : expand traceability:links[] / graph[] macros
+  antora_ext -> antora_ext : substitute addresses:ID[] → xref / link
 end
 
-== Pass 3: Strip inline macros ==
-loop for each .adoc file
-  antora_ext -> antora_ext : substituteRelationshipLinks(content)
-  note right: inline macros always stripped\n(traceability:outgoing[] / traceability:incoming[] render)
-  antora_ext -> antora_ext : write modified content to in-memory buffer
-end
+note right
+  Three internal passes — Pass 1 populates the graph,
+  Pass 2 expands rendering and visualization macros,
+  Pass 3 replaces inline relationship markers with
+  Asciidoctor xrefs/link macros.
+  See pass-pipeline diagram for full detail.
+end note
 
-== Matrix Generation ==
+== sitePublished — generate matrices + export ==
 antora -> antora_ext : sitePublished event
-antora_ext -> main_ext : getMatrixDefinitions()
+
 loop for each matrix definition
-  main_ext -> matrix : generateMatrix(name)
+  antora_ext -> matrix : generateMatrix(name)
   matrix -> graph : query items, relationships, coverage
-  matrix -> templates : render(matrix data)
-  templates --> matrix : HTML string
-  matrix --> main_ext : GeneratedMatrix
-  main_ext -> antora_ext : write to outputDir
+  matrix --> antora_ext : HTML + CSV output
 end
 
-== Neo4j Export (optional) ==
-antora_ext -> main_ext : createNeo4jExporter()
-main_ext -> neo4j : export({ outputDir, format })
+antora_ext -> neo4j : export({ outputDir, format })
 neo4j -> graph : getAllItems(), getAllRelationships()
-neo4j --> main_ext : ExportResult { nodeCount, relationshipCount, files }
+neo4j --> antora_ext : nodes.csv, relationships.csv, import.cypher
+
 @enduml

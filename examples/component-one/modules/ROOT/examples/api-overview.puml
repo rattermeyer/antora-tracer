@@ -1,6 +1,7 @@
 @startuml
-' Public API — key interfaces and their method signatures
+' Public API — class structure and key method groups
 ' Grouped by package: Core, Configuration, Output, Antora Integration
+' Full method signatures: see API reference
 
 skinparam classBackgroundColor #F8F9FA
 skinparam classBorderColor #888888
@@ -8,100 +9,58 @@ skinparam packageBackgroundColor #FAFAFA
 
 package "Core" #E3F2FD {
   class TraceabilityGraph {
-    + addItem(item: Item): void
-    + getItem(id: string): Item | undefined
-    + getAllItems(): Item[]
-    + getItemsByRole(role: string): Item[]
-    + getAllRoles(): string[]
-    + hasItem(id: string): boolean
-    + hasRole(role: string): boolean
-    --
-    + addRelationship(rel: ItemRelationship): void
-    + getRelationship(id: string): ItemRelationship | undefined
-    + getAllRelationships(): ItemRelationship[]
-    + getRelationships(fromId: string, type?): ItemRelationship[]
-    + getReverseRelationships(targetId: string, type?): ItemRelationship[]
-    + getRelationshipsByType(type: string): ItemRelationship[]
-    + getRelationshipsByRoles(src: string, tgt: string): ItemRelationship[]
-    --
-    + findPath(from: string, to: string, maxDepth?): string[] | null
-    + getImpactAnalysis(id: string): Item[]
-    + getRelatedItems(id: string, type?): Item[]
-    + getItemsWithRelationTo(id: string, type?): Item[]
-    + merge(other: TraceabilityGraph): void
-    --
-    + toDot(fromId: string, depth?): string
-    + toVegaLite(itemId?): string
-    + validate(): ValidationResult
-    + clear(): void
+    population: addItem(), addRelationship()
+    query: getItemsByRole(), getRelationships(), getReverseRelationships()
+    analysis: findPath(), getImpactAnalysis(), validate()
+    serialization: toDot(), toVegaLite()
   }
 
   class DocumentParser {
-    + parse(content: string, sourceFile?, component?, module?): ParserResult
-    + checkForOldMacros(content: string): OldMacroError[]
+    + parse(content, sourceFile?, component?, module?): ParserResult
+    + checkForOldMacros(content): OldMacroError[]
   }
 
   class RequirementsTraceabilityExtension {
-    + graph: TraceabilityGraph
-    + configLoader?: ConfigLoader
-    + process(content: string, options?): ParserResult
-    + processFiles(files: FileInput[]): ProcessedFileResult[]
-    + clear(): void
-    + validate(): ValidationResult
-    + {static} createWithPreset(name: string): RequirementsTraceabilityExtension
+    factory: {static} createWithPreset(name)
+    processing: process(), processFiles()
+    access: graph, configLoader
   }
 }
 
 package "Configuration" #FFF3E0 {
   class ConfigLoader {
-    + load(path: string): void
-    + loadPreset(name: string): Preset
-    + isKnownRole(role: string): boolean
-    + isRelationAllowed(src: string, tgt: string, type: string): boolean
-    + getAllowedRelations(src: string, tgt: string): string[]
-    + getMatrices(): MatrixConfig[]
-    + getNeo4jQueries(): Neo4jQuery[]
-    + listPresets(): string[]
-    + getPreset(name: string): Preset | undefined
+    loading: load(), loadPreset(), listPresets()
+    validation: isKnownRole(), isRelationAllowed()
+    queries: getMatrices(), getNeo4jQueries()
   }
 }
 
 package "Output" #E8EAF6 {
   class MatrixGenerator {
-    + generateMatrix(name?): GeneratedMatrix
-    + exportToHTML(matrix: GeneratedMatrix): string
-    + exportToCSV(matrix: GeneratedMatrix): string
-    + getCoverageReport(): CoverageReport
-    + getRoleCoverage(role: string): RoleCoverage
-    + getRelationshipStatistics(): Record<string, number>
+    generation: generateMatrix()
+    export: exportToHTML(), exportToCSV()
+    statistics: getCoverageReport(), getRelationshipStatistics()
   }
 
   class TemplateRenderer {
-    + render(templateName: string, data: unknown): string
-    + getAvailableTemplates(): string[]
-    + getAvailablePartials(): string[]
+    + render(templateName, data): string
   }
 
   class LinkResolver {
-    + generateItemLink(item: Item): string | null
-    + generateRowLink(item: Item): string | null
+    + generateItemLink(item): string | null
+    + generateRowLink(item): string | null
   }
 
   class Neo4jExporter {
-    + export(options: ExportOptions): ExportResult
+    + export(options): ExportResult
   }
 }
 
 package "Antora Integration" #E8F5E9 {
   class AntoraTraceabilityExtension {
-    - traceability: RequirementsTraceabilityExtension
-    - prepareFile(file: any): PreparedFile
-    - expandRelationMacros(prepared: PreparedFile, macro: RelationMacro): void
-    - expandGraphMacros(prepared: PreparedFile): void
-    - expandCoverageMacros(prepared: PreparedFile): void
-    - substituteLinksInFile(file: any): void
-    - registerContentClassifier(): void
-    - registerPageProcessor(): void
+    registration: registerContentClassifier(), registerPageProcessor()
+    processing: prepareFile(), expandRelationMacros(), substituteLinksInFile()
+    visualization: expandGraphMacros(), expandCoverageMacros()
   }
 }
 
@@ -117,10 +76,9 @@ MatrixGenerator --> LinkResolver : resolves links
 ConfigLoader --> TraceabilityGraph : provides validation rules
 
 note bottom of TraceabilityGraph
-  All query methods are read-only
-  after the initial population phase.
-  addItem() and addRelationship()
-  are only called during Pass 1.
+  Query methods are read-only after Pass 1.
+  addItem() and addRelationship() are only
+  called during graph population.
 end note
 
 @enduml
