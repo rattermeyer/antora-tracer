@@ -11,6 +11,9 @@ Generated traceability artifacts for the Antora Tracer project. All items extrac
 * xref:attachment$traceability/matrix-requirements-to-tests.html[Requirements → Tests] — Which tests cover each requirement
 * xref:attachment$traceability/matrix-requirements-to-tests.csv[CSV] — Same data for spreadsheet import
 
+* xref:attachment$traceability/matrix-process-to-design.html[Process → Design] — Which architectural decisions consider each process requirement
+* xref:attachment$traceability/matrix-process-to-design.csv[CSV] — Same data for spreadsheet import
+
 [NOTE]
 ====
 These files are pre-generated. To regenerate after content changes:

@@ -105,6 +105,7 @@ TST-002-verifies-REQ-102,TST-002,REQ-102,verifies,self-traceability/test-plan.ad
 TST-002-verifies-REQ-104,TST-002,REQ-104,verifies,self-traceability/test-plan.adoc
 TST-002-verifies-REQ-108,TST-002,REQ-108,verifies,self-traceability/test-plan.adoc
 TST-002-verifies-REQ-110,TST-002,REQ-110,verifies,self-traceability/test-plan.adoc
+TST-002-verifies-REQ-119,TST-002,REQ-119,verifies,self-traceability/test-plan.adoc
 TST-003-verifies-REQ-056,TST-003,REQ-056,verifies,self-traceability/test-plan.adoc
 TST-004-verifies-REQ-083,TST-004,REQ-083,verifies,self-traceability/test-plan.adoc
 TST-004-verifies-REQ-084,TST-004,REQ-084,verifies,self-traceability/test-plan.adoc
@@ -117,3 +118,17 @@ TST-006-verifies-REQ-038,TST-006,REQ-038,verifies,self-traceability/test-plan.ad
 TST-006-verifies-REQ-039,TST-006,REQ-039,verifies,self-traceability/test-plan.adoc
 TST-006-verifies-REQ-042,TST-006,REQ-042,verifies,self-traceability/test-plan.adoc
 TST-006-verifies-REQ-043,TST-006,REQ-043,verifies,self-traceability/test-plan.adoc
+TST-006-verifies-REQ-128,TST-006,REQ-128,verifies,self-traceability/test-plan.adoc
+PRQ-001-considered_by-ARC-031,PRQ-001,ARC-031,considered_by,self-traceability/delivery-process.adoc
+PRQ-002-validates-REQ-087,PRQ-002,REQ-087,validates,self-traceability/delivery-process.adoc
+PRQ-002-validates-REQ-088,PRQ-002,REQ-088,validates,self-traceability/delivery-process.adoc
+PRQ-002-validates-REQ-089,PRQ-002,REQ-089,validates,self-traceability/delivery-process.adoc
+PRQ-002-considered_by-ARC-031,PRQ-002,ARC-031,considered_by,self-traceability/delivery-process.adoc
+PRQ-003-validates-REQ-005,PRQ-003,REQ-005,validates,self-traceability/delivery-process.adoc
+PRQ-003-considered_by-ARC-031,PRQ-003,ARC-031,considered_by,self-traceability/delivery-process.adoc
+PRQ-004-validates-REQ-072,PRQ-004,REQ-072,validates,self-traceability/delivery-process.adoc
+PRQ-004-considered_by-ARC-033,PRQ-004,ARC-033,considered_by,self-traceability/delivery-process.adoc
+PRQ-005-considered_by-ARC-031,PRQ-005,ARC-031,considered_by,self-traceability/delivery-process.adoc
+PRQ-006-validates-REQ-060,PRQ-006,REQ-060,validates,self-traceability/delivery-process.adoc
+PRQ-006-validates-REQ-093,PRQ-006,REQ-093,validates,self-traceability/delivery-process.adoc
+PRQ-006-considered_by-ARC-031,PRQ-006,ARC-031,considered_by,self-traceability/delivery-process.adoc

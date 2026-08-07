@@ -39,6 +39,11 @@ REQ-110,REQ-110 — Items defined in partials are processed,requirement,,require
 Source: openspec/specs/partial-file-processing/spec.md
 
 traceability:links[]"""
+REQ-128,REQ-128 — Matrix links include module path for module-aware items,requirement,,requirements.adoc,"""When an item has module information (from Antora processing), the LinkResolver SHALL generate links that include the module name so the link navigates to the correct page under the correct module directory.
+
+Source: openspec/specs/matrix-item-linking/spec.md
+
+traceability:links[]"""
 REQ-037,REQ-037 — Matrix displays row items as clickable links,requirement,,requirements.adoc,"""The matrix SHALL render row item IDs as hyperlinks that navigate to the item's definition in the rendered HTML documentation.
 
 Source: openspec/specs/matrix-item-linking/spec.md
@@ -94,7 +99,7 @@ REQ-086,REQ-086 — Preset does not define wide multi-column matrices,requiremen
 Source: openspec/specs/pairwise-matrices-preset/spec.md
 
 traceability:links[]"""
-REQ-044,REQ-044 — traceability:outgoing[] macro renders outgoing links,requirement,,requirements.adoc,"""The system SHALL provide a `traceability:outgoing[]` macro (formerly `traceability:links[]`) that expands to a formatted list of all outgoing relationships for the enclosing item.
+REQ-044,REQ-044 — traceability:outgoing[] macro renders outgoing links,requirement,,requirements.adoc,"""The system SHALL provide a `traceability:outgoing[]` macro (formerly `traceability:links[]`) that expands to a formatted list of all outgoing relationships for the enclosing item. When the item has no outgoing relationships, the macro SHALL render a configurable empty-state message controlled by the `:traceability-empty:` document attribute.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
@@ -259,6 +264,31 @@ REQ-099,REQ-099 — Single-PDF output is preserved,requirement,,requirements.ado
 Source: openspec/specs/split-pdf-documents/spec.md
 
 traceability:links[]"""
+REQ-123,REQ-123 — Architecture document includes class-level API diagram,requirement,,requirements.adoc,"""The architecture document SHALL include a PlantUML class diagram showing the public method signatures of all key components (TraceabilityGraph, DocumentParser, ConfigLoader, MatrixGenerator, LinkResolver, TemplateRenderer, Neo4jExporter, RequirementsTraceabilityExtension).
+
+Source: openspec/specs/architecture-diagram-checklist/spec.md
+
+traceability:links[]"""
+REQ-124,REQ-124 — Architecture document includes DocumentParser activity diagram,requirement,,requirements.adoc,"""The architecture document SHALL include a PlantUML activity diagram showing the DocumentParser's step-by-step regex parsing pipeline: verbatim block pre-scanning, item block extraction with quote-aware bracket matching, body delimiter detection, relationship macro scanning with inline-code exclusion, old-macro detection, and result assembly.
+
+Source: openspec/specs/architecture-diagram-checklist/spec.md
+
+traceability:links[]"""
+REQ-125,REQ-125 — Architecture document includes TraceabilityGraph state diagram,requirement,,requirements.adoc,"""The architecture document SHALL include a PlantUML state diagram showing the TraceabilityGraph lifecycle: Empty → Populated (items added) → Complete (relationships added, ready for queries), including which operations are valid in each state.
+
+Source: openspec/specs/architecture-diagram-checklist/spec.md
+
+traceability:links[]"""
+REQ-126,REQ-126 — Architecture document includes PreparedFile caching flow diagram,requirement,,requirements.adoc,"""The architecture document SHALL include a PlantUML activity diagram showing the PreparedFile caching optimization: `prepareFile()` computing content/docAttrs/blocks once, then feeding the five macro-expansion methods from a single prepared state.
+
+Source: openspec/specs/architecture-diagram-checklist/spec.md
+
+traceability:links[]"""
+REQ-127,REQ-127 — update-example-site skill includes diagram checklist,requirement,,requirements.adoc,"""The `update-example-site` skill SHALL include a diagram checklist per arc42 section, guidance on when to add each diagram type (class, sequence, activity, state), and conventions for diagram file placement in the `examples/` directory.
+
+Source: openspec/specs/architecture-diagram-checklist/spec.md
+
+traceability:links[]"""
 REQ-060,REQ-060 — Pages workflow generates PDFs,requirement,,requirements.adoc,"""The GitHub Pages workflow SHALL include Ruby setup and PDF generation steps so that requirements, architecture, and test-plan PDFs are built and deployed alongside the HTML site on every push to main.
 
 Source: openspec/specs/ci-pdf-deploy/spec.md
@@ -349,6 +379,66 @@ REQ-107,REQ-107 — usecase-requirements matrix is generated,requirement,,requir
 Source: openspec/specs/use-case-example/spec.md
 
 traceability:links[]"""
+REQ-111,REQ-111 — File state is prepared once per file,requirement,,requirements.adoc,"""The system SHALL compute file content (buffer→string), document attributes, and item block positions exactly once per page file during the `contentClassified` event, and SHALL reuse the computed values across all macro-expansion passes for that file.
+
+Source: openspec/specs/file-preparation-cache/spec.md
+
+traceability:links[]"""
+REQ-112,REQ-112 — PreparedFile carries all needed state,requirement,,requirements.adoc,"""The system SHALL define a `PreparedFile` type containing the raw Antora file reference, the full content string, parsed document attributes, item block position array, and normalized source-file metadata.
+
+Source: openspec/specs/file-preparation-cache/spec.md
+
+traceability:links[]"""
+REQ-113,REQ-113 — Matrix template uses partials for structure,requirement,,requirements.adoc,"""The `matrix.html.mustache` template SHALL be split into a main template and four Mustache partials (`styles`, `header`, `matrix-row`, `footer`) loaded from the `partials/` subdirectory.
+
+Source: openspec/specs/template-partials/spec.md
+
+traceability:links[]"""
+REQ-114,REQ-114 — Dead design-matrix template is removed,requirement,,requirements.adoc,"""The `design-matrix.html.mustache` template and all seven partials in `src/templates/partials/` SHALL be removed, as they are not rendered by any code path.
+
+Source: openspec/specs/template-partials/spec.md
+
+traceability:links[]"""
+REQ-115,REQ-115 — Dead MatrixGenerator methods are removed,requirement,,requirements.adoc,"""The `generateRequirementsMatrix()`, `generateDesignMatrix()`, and `generateAllMatrices()` methods SHALL be removed from `MatrixGenerator.ts` as they are not called by any code path.
+
+Source: openspec/specs/template-partials/spec.md
+
+traceability:links[]"""
+REQ-116,REQ-116 — Items carry component and module context from Antora,requirement,,requirements.adoc,"""When processing `.adoc` files through the Antora extension, the system SHALL store the Antora component and module names on each `Item` so that downstream xref and link generation can distinguish same-module from cross-module and cross-component references.
+
+Source: openspec/specs/cross-module-xref/spec.md
+
+traceability:links[]"""
+REQ-117,REQ-117 — Cross-module and cross-component xref includes correct prefix,requirement,,requirements.adoc,"""When `buildXref` generates an Antora xref for an item in a different module or component than the current page, the system SHALL include the appropriate prefix matching Antora's xref resolution hierarchy: `component:module:` for cross-component, `module:` for cross-module, and no prefix for same-module.
+
+Source: openspec/specs/cross-module-xref/spec.md
+
+traceability:links[]"""
+REQ-118,REQ-118 — Matrix links include module path when available,requirement,,requirements.adoc,"""When `LinkResolver` generates an HTML link for a matrix item that has module information, the system SHALL include the module name in the URL path.
+
+Source: openspec/specs/cross-module-xref/spec.md
+
+traceability:links[]"""
+REQ-119,REQ-119 — Cross-module and cross-component xref resolution,requirement,,requirements.adoc,"""When an item in one module has relationships to items in other modules or components, the `traceability:outgoing[]` and `traceability:incoming[]` macros SHALL generate xrefs with the correct Antora prefix (`component:module:` or `module:`) so Antora can resolve them correctly.
+
+Source: openspec/specs/traceability-links-macro/spec.md
+
+traceability:links[]"""
+REQ-120,REQ-120 — Process requirements are traceable to product requirements,requirement,,requirements.adoc,"""The example site SHALL include a `delivery-process.adoc` document containing process requirements with the `process_requirement` role. Each process requirement SHALL trace to the product requirements it validates via a `validates` relation and to the architectural decisions it implements via a `deploys` relation.
+
+Source: openspec/specs/delivery-process-traceability/spec.md
+
+traceability:links[]"""
+REQ-121,REQ-121 — Process requirements document follows site conventions,requirement,,requirements.adoc,"""The `delivery-process.adoc` SHALL use the same `[item]` macro format, `[#PRQ-XXX, item, role=process_requirement]` IDs, and `traceability:links[]` rendering macros as other example documents.
+
+Source: openspec/specs/delivery-process-traceability/spec.md
+
+traceability:links[]"""
+REQ-122,REQ-122 — Process-to-product matrix exists,requirement,,requirements.adoc,"""The example site configuration SHALL define a `process-to-product` matrix with `process_requirement` as rows, `requirement` as columns, and `validates` as the coverage relation.
+
+Source: openspec/specs/delivery-process-traceability/spec.md
+
+traceability:links[]"""
 ARC-001,ARC-001 — Project scope and architectural goals,design,,explanation/architecture.adoc,"""*Project scope and architectural goals*
 
 The Antora Tracer is an Antora extension that adds role-based requirements traceability to AsciiDoc documentation. It replaces fixed macro types with a single configurable `[item]` macro.
@@ -366,14 +456,14 @@ traceability:links[]
 traceability:graph[]"""
 ARC-002,ARC-002 — Component-level architecture,design,,explanation/architecture.adoc,"""include::partial$05-bb-overview.adoc[]
 
-The following class diagram shows the public API of each component — the method signatures that form the contract boundaries between modules.
+The following class diagram shows the public API of each component — the method groups and key signatures that form the contract boundaries between modules. See the API reference for full signatures.
 
 [plantuml]
 ----
 include::example$api-overview.puml[]
 ----
 
-traceability:outgoing[]"""
+traceability:links[]"""
 ARC-012,ARC-012 — Preset YAML schema,design,,explanation/architecture.adoc,"""Presets are YAML files following a defined structure. Each preset is a self-contained
 versioned configuration that users can extend or override.
 
@@ -426,7 +516,7 @@ versioned configuration that users can extend or override.
 | `description` (markdown string), `examples` (string[]). Inline documentation explaining the preset's domain and usage.
 |===
 
-traceability:outgoing[]"""
+traceability:links[]"""
 ARC-018,ARC-018 — Config-driven validation,design,,explanation/architecture.adoc,"""Relation validation is driven by the YAML configuration rather than hardcoded
 rules. `ConfigLoader.isRelationAllowed()` checks source role, target role
 and relation type against the configured `relations` map. Cross-file
@@ -438,7 +528,7 @@ addresses:REQ-071[]
 addresses:QA-056[]
 addresses:QA-057[]
 
-traceability:outgoing[]"""
+traceability:links[]"""
 ARC-028,ARC-028 — Circular reference detection in graph validation,design,,explanation/architecture.adoc,"""The `validate()` method calls `findCircularReferences()`, a DFS-based cycle
 detector that traverses all items and their outgoing relationships. A path stack
 and recursion set track visited nodes; when a node is encountered twice in the
@@ -446,7 +536,8 @@ same path, a circular reference error is reported with the full cycle path
 (e.g., """"REQ-001 → REQ-002 → REQ-001""""). Auto-generated inverse relationships
 are skipped to avoid false positives.
 
-addresses:REQ-109[]"""
+addresses:REQ-109[]
+traceability:links[]"""
 ARC-029,ARC-029 — Partial file processing with source-repo links,design,,explanation/architecture.adoc,"""The `registerContentClassifier()` handler processes both `family: page` and
 `family: partial` files during Pass 1 (graph population). Partial items use
 Antora's pre-computed `fileUri` as their `sourceFile`, making traceability
@@ -458,7 +549,8 @@ and returns them unchanged, skipping the HTML path conversion. In
 Partials are excluded from macro expansion and link substitution passes
 because they do not produce HTML pages.
 
-addresses:REQ-110[]"""
+addresses:REQ-110[]
+traceability:links[]"""
 ARC-015,ARC-015 — In-memory processing with no side effects,design,,explanation/architecture.adoc,"""All content transformations — parsing, macro expansion, link substitution
 title injection — operate on in-memory buffers. Source `.adoc` files are never
 written to. The Antora content catalog provides the text buffers; the extension
@@ -476,7 +568,7 @@ include::example$graph-lifecycle.puml[]
 addresses:REQ-050[]
 addresses:REQ-069[]
 addresses:QA-058[]
-traceability:outgoing[]"""
+traceability:links[]"""
 ARC-026,ARC-026 — GraphViz DOT and Vega-Lite serialization methods,design,,explanation/architecture.adoc,"""`toDot(fromId, depth?)` generates GraphViz DOT source for a relationship graph
 using BFS traversal in both outgoing and incoming directions from the given item. Nodes are colored by role using a
 hardcoded palette; edges are labeled with the relationship type. Depth limits
@@ -485,7 +577,8 @@ charts — per-relationship-type for a specific item, or global role counts
 when called without an item ID. Both methods produce source strings that are
 encoded into Kroki URLs for rendering.
 
-addresses:REQ-053[]"""
+addresses:REQ-053[]
+traceability:links[]"""
 ARC-016,ARC-016 — Event-driven Antora integration,design,,explanation/architecture.adoc,"""The extension hooks into Antora's event pipeline via `register()`:
 `contentClassified` triggers parsing and macro expansion; `sitePublished`
 triggers matrix generation and export. Each event handler is self-contained
@@ -495,9 +588,9 @@ the CLI outside Antora, demonstrating the event handlers are optional.
 
 addresses:REQ-103[]
 addresses:QA-055[]
-traceability:outgoing[]"""
-ARC-024,ARC-024 — traceability:outgoing[] and traceability:incoming[] link rendering,design,,explanation/architecture.adoc,"""The `expandRelationMacros()` method in the Antora extension (not the
-DocumentParser) replaces `traceability:outgoing[]` and
+traceability:links[]"""
+ARC-024,ARC-024 — traceability:links[] and traceability:incoming[] link rendering,design,,explanation/architecture.adoc,"""The `expandRelationMacros()` method in the Antora extension (not the
+DocumentParser) replaces `traceability:links[]` and
 `traceability:incoming[]` placeholders with formatted AsciiDoc content
 showing the item's relationships. All three rendering macros (`outgoing`
 `incoming`, and `links`) share this single scan/render pipeline; only the
@@ -526,7 +619,8 @@ addresses:REQ-100[]
 addresses:REQ-101[]
 addresses:REQ-102[]
 addresses:REQ-104[]
-addresses:QA-060[]"""
+addresses:QA-060[]
+traceability:links[]"""
 ARC-025,ARC-025 — traceability:graph[] and traceability:graph-coverage[] visualization macros,design,,explanation/architecture.adoc,"""The `expandGraphMacros()` and `expandCoverageMacros()` methods replace
 `traceability:graph[]` and `traceability:graph-coverage[]` placeholders with
 Kroki-rendered images. `traceability:graph[]` generates a GraphViz DOT
@@ -537,7 +631,8 @@ via the `:traceability-graph:` document attribute.
 
 addresses:REQ-051[]
 addresses:REQ-052[]
-addresses:REQ-063[]"""
+addresses:REQ-063[]
+traceability:links[]"""
 ARC-027,ARC-027 — Automatic matrix sync to component _attachments,design,,explanation/architecture.adoc,"""The `syncMatricesToAttachments()` method, called from
 `generateTraceabilityFiles()` during the `sitePublished` event, copies all
 generated matrix files (HTML and CSV) to each component version's
@@ -547,7 +642,8 @@ without requiring manual file copies. The correct version URL segment (e.g.
 `latest` instead of `0.7.0`) is resolved by inspecting attachment file
 output paths from the Antora content catalog.
 
-addresses:REQ-108[]"""
+addresses:REQ-108[]
+traceability:links[]"""
 ARC-017,ARC-017 — Regex-based parsing,design,,explanation/architecture.adoc,"""AsciiDoc content is parsed using regular expressions rather than an
 Asciidoctor AST walker. This makes the parser independent of Asciidoctor
 API versions and testable with plain string inputs. Verbatim blocks
@@ -569,7 +665,7 @@ addresses:REQ-089[]
 addresses:REQ-090[]
 addresses:REQ-091[]
 addresses:REQ-092[]
-traceability:outgoing[]"""
+traceability:links[]"""
 ARC-019,ARC-019 — Config-driven matrix generation with coverage calculations,design,,explanation/architecture.adoc,"""The `MatrixGenerator` reads matrix definitions from configuration, queries the
 graph for items by role, and computes per-cell coverage based on
 `coverageRelations`. Each cell shows related item IDs or `—` for no
@@ -580,13 +676,13 @@ addresses:REQ-083[]
 addresses:REQ-084[]
 addresses:REQ-085[]
 addresses:REQ-086[]
-traceability:outgoing[]"""
+traceability:links[]"""
 ARC-020,ARC-020 — Mustache template rendering for HTML output,design,,explanation/architecture.adoc,"""The `TemplateRenderer` wraps Mustache for HTML matrix output. Built-in templates
 ship with the extension in `src/templates/`. Users can specify a custom template
 directory — the renderer falls back to built-in templates for any files not found
 in the custom directory.
 
-traceability:outgoing[]"""
+traceability:links[]"""
 ARC-021,ARC-021 — Path resolution for matrix-to-item links,design,,explanation/architecture.adoc,"""The `LinkResolver` generates relative link paths from matrix output to component
 root. It normalizes `sourceFile` values by stripping the `pages/` prefix and
 `.adoc` extension, producing `../../component/page.html#ID` links. The
@@ -600,7 +696,7 @@ addresses:REQ-040[]
 addresses:REQ-041[]
 addresses:REQ-042[]
 addresses:REQ-043[]
-traceability:outgoing[]"""
+traceability:links[]"""
 ARC-022,ARC-022 — Graph-to-Neo4j CSV and Cypher export,design,,explanation/architecture.adoc,"""The `Neo4jExporter` serializes the traceability graph into `nodes.csv` and
 `relationships.csv` with proper headers, comma delimiters, and escaped special
 characters — importable via Neo4j's `LOAD CSV`. The `import.cypher` format
@@ -608,7 +704,7 @@ produces CREATE statements with `:Item` and role-specific labels. All item
 attributes are included as node properties. The export is optional and requires
 no Neo4j runtime dependency.
 
-traceability:outgoing[]"""
+traceability:links[]"""
 ARC-023,ARC-023 — Commander-based CLI with subcommands,design,,explanation/architecture.adoc,"""The CLI is built on https://www.npmjs.com/package/commander[Commander] with
 subcommands for processing (`process`), matrix generation (`matrix`)
 validation (`validate`), Neo4j export (`export neo4j`), statistics
@@ -616,7 +712,8 @@ validation (`validate`), Neo4j export (`export neo4j`), statistics
 Global `--config` and `--preset` flags apply to all commands. The CLI
 operates standalone — it does not require an Antora build pipeline.
 
-addresses:REQ-056[]"""
+addresses:REQ-056[]
+traceability:links[]"""
 ARC-030,ARC-030 — CI/CD PDF build and deployment pipeline,design,,explanation/architecture.adoc,"""The GitHub Actions CI workflow (`.github/workflows/ci.yml` and `pages.yml`)
 builds and deploys the example site to GitHub Pages. The pages workflow
 builds the Antora HTML site, generates PDFs via `@antora/pdf-extension`
@@ -636,7 +733,8 @@ addresses:REQ-095[]
 addresses:REQ-096[]
 addresses:REQ-097[]
 addresses:REQ-098[]
-addresses:REQ-099[]"""
+addresses:REQ-099[]
+traceability:links[]"""
 ARC-031,ARC-031 — Static landing page at GitHub Pages root,design,,explanation/architecture.adoc,"""A static `landing/index.html` page with Tailwind CSS loaded from CDN
 serves as the project landing page at the GitHub Pages root (`/`).
 The page uses conemso branding (teal palette `#108193`, Roboto font)
@@ -652,7 +750,8 @@ addresses:REQ-074[]
 addresses:REQ-075[]
 addresses:REQ-076[]
 addresses:REQ-077[]
-addresses:REQ-078[]"""
+addresses:REQ-078[]
+traceability:links[]"""
 ARC-032,ARC-032 — Lunr search extension customization for item anchor indexing,design,,explanation/architecture.adoc,"""The `@antora/lunr-extension` is configured with a custom indexing pass
 that traverses non-heading elements with `id` attributes inside
 `<article class=""""doc"""">`. Each such element becomes a separate search
@@ -666,7 +765,8 @@ section chunking.
 addresses:REQ-079[]
 addresses:REQ-080[]
 addresses:REQ-081[]
-addresses:REQ-082[]"""
+addresses:REQ-082[]
+traceability:links[]"""
 ARC-033,ARC-033 — Example site: config extension and dashboard patterns,design,,explanation/architecture.adoc,"""The example site demonstrates two architectural patterns. First, config
 extension: `examples/traceability.yml` extends the `requirements-engineering`
 preset with a custom `use_case` role and `leads_to` relation, showing how
@@ -679,7 +779,8 @@ reference implementations for users extending the extension to their own domains
 addresses:REQ-054[]
 addresses:REQ-105[]
 addresses:REQ-106[]
-addresses:REQ-107[]"""
+addresses:REQ-107[]
+traceability:links[]"""
 ARC-003,ARC-003 — Processing flow during Antora build,design,,explanation/architecture.adoc,"""The following sequence shows how an AsciiDoc file flows through the system during an Antora build:
 
 [plantuml]
@@ -735,7 +836,7 @@ include::example$pass-pipeline.puml[]
 | Graph must be complete before Pass 3 can resolve cross-file `addresses:TARGET[]` references. Partials are only processed here — they skip subsequent passes.
 
 | Pass 2
-| `expandRelationMacros(file, macroName)` — replace `traceability:outgoing[]`, `traceability:incoming[]`, and `traceability:links[]` with formatted relationship lists (grouped by type, configurable style/order); macroName is `outgoing`, `incoming`, or `links`.
+| `expandRelationMacros(file, macroName)` — replace `traceability:links[]`, `traceability:incoming[]`, and `traceability:links[]` with formatted relationship lists (grouped by type, configurable style/order); macroName is `outgoing`, `incoming`, or `links`.
 | Pages only
 | Depends on complete graph from Pass 1 to enumerate relationships. Opt-in via `:traceability-links:` document attribute.
 
@@ -765,14 +866,16 @@ The `prepareFile()` method computes file content, document attributes, and item 
 include::example$prepared-file-caching.puml[]
 ----
 
-addresses:REQ-005[]"""
+addresses:REQ-005[]
+traceability:links[]"""
 ARC-013,ARC-013 — ESM module system,design,,explanation/architecture.adoc,"""ESM (`""""type"""": """"module""""` in package.json) is used throughout the project. This
 choice enables modern `import`/`export` syntax, the `node:` protocol for built-in
 modules, and alignment with browser JavaScript. The tradeoff is that Antora's
 extension loader uses `require()`, requiring `.cjs` wrappers for integration
 points (see xref:explanation/adr/0001-esm-over-cjs.adoc[ADR-001]).
 
-addresses:QA-055[]"""
+addresses:QA-055[]
+traceability:links[]"""
 ARC-014,ARC-014 — Dependency injection by constructor,design,,explanation/architecture.adoc,"""All modules accept their dependencies via constructor parameters. There is no
 service locator, DI container, or global state. `TraceabilityGraph` receives
 `ConfigLoader`, `MatrixGenerator` receives `TraceabilityGraph` and `ConfigLoader`
@@ -780,7 +883,8 @@ and `DocumentParser` receives `ConfigLoader` optionally. This makes every
 component independently testable without mocking frameworks (see
 xref:explanation/adr/0004-zero-framework.adoc[ADR-004]).
 
-addresses:QA-059[]"""
+addresses:QA-059[]
+traceability:links[]"""
 ARC-004,ARC-004 — Key architectural decisions and their rationale,design,,explanation/architecture.adoc,"""This section captures the design decisions from `openspec/changes/unified-item-architecture/design.md`.
 
 [width=100%, cols=""""20,50,30""""]
@@ -852,7 +956,7 @@ traceability:links[]
 traceability:graph[]"""
 TST-002,TST-002 — Antora Extension Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/antora-extension.test.ts`
 
-Tests the `AntoraTraceabilityExtension` — initialization with default config, preset, config path, and disabled state. Tests event handler registration, content processing via `contentClassified` event (in-memory only, never touches disk), matrix generation via `sitePublished` event, and API access patterns. Also tests `traceability:outgoing[]`, `traceability:incoming[]`, and `traceability:links[]` macro expansion with configurable display style, sort order, collapsible sections, and opt-in behavior. Tests incoming macro display styles, sort orders, inverse labels, PDF compatibility, and collapsible support. Tests `traceability:graph[]` and `traceability:graph-coverage[]` macro expansion with configurable Kroki image format, graph-enabled and graph-disabled modes, including global coverage, explicit target IDs, and header exclusion. Tests automatic matrix sync to component `_attachments` directories during `sitePublished`. Tests partial file processing including item registration from partials, view URL as sourceFile, and Pass 2 skip.
+Tests the `AntoraTraceabilityExtension` — initialization with default config, preset, config path, and disabled state. Tests event handler registration, content processing via `contentClassified` event (in-memory only, never touches disk), matrix generation via `sitePublished` event, and API access patterns. Also tests `traceability:outgoing[]`, `traceability:incoming[]`, and `traceability:links[]` macro expansion with configurable display style, sort order, collapsible sections, empty-state messages (`:traceability-empty:`), and opt-in behavior. Tests incoming macro display styles, sort orders, inverse labels, PDF compatibility, and collapsible support. Tests `traceability:graph[]` and `traceability:graph-coverage[]` macro expansion with configurable Kroki image format, graph-enabled and graph-disabled modes, including global coverage, explicit target IDs, and header exclusion. Tests automatic matrix sync to component `_attachments` directories during `sitePublished`. Tests partial file processing including item registration from partials, view URL as sourceFile, and Pass 2 skip. Tests cross-module and cross-component xref prefix generation.
 
 verifies:REQ-040[]
 verifies:REQ-044[]
@@ -876,6 +980,7 @@ verifies:REQ-102[]
 verifies:REQ-104[]
 verifies:REQ-108[]
 verifies:REQ-110[]
+verifies:REQ-119[]
 
 traceability:links[]"""
 TST-003,TST-003 — CLI Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/cli.test.ts`
@@ -912,6 +1017,7 @@ verifies:REQ-038[]
 verifies:REQ-039[]
 verifies:REQ-042[]
 verifies:REQ-043[]
+verifies:REQ-128[]
 
 traceability:links[]"""
 TST-007,TST-007 — Neo4jExporter Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/neo4j-exporter.test.ts`
@@ -922,6 +1028,53 @@ traceability:links[]"""
 TST-008,TST-008 — Relationship Link Substitution Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/relationship-link-substitution.test.ts`
 
 Tests the in-memory regex substitution that replaces relationship macros with Asciidoctor xrefs. Covers same-page xref generation, cross-page xref generation with basename path resolution, orphan reference handling, non-relationship text preservation, hyphenated/dotted IDs, missing sourceFile fallback, and surrounding text preservation.
+
+traceability:links[]"""
+PRQ-001,PRQ-001 — CI workflows trigger on push and PR,process_requirement,,self-traceability/delivery-process.adoc,"""The GitHub Actions CI workflow SHALL trigger on every push to `main` and every pull request. The workflow SHALL run on the latest Ubuntu runner and SHALL execute `npm ci`, `npm run build`, `npm test`, and `npm run lint` in sequence.
+
+The CI pipeline ensures that every change is validated against the full test suite before it reaches users — no manual testing step required.
+
+considered_by:ARC-031[]
+
+traceability:links[]"""
+PRQ-002,PRQ-002 — Test suite runs as merge gate,process_requirement,,self-traceability/delivery-process.adoc,"""The test suite SHALL run as a required status check before merging any pull request to `main`. The suite SHALL include 275+ tests covering the extension core, Antora integration, CLI, matrix generation, Neo4j export, and link substitution. Any test failure SHALL block the merge.
+
+validates:REQ-087[]
+validates:REQ-088[]
+validates:REQ-089[]
+considered_by:ARC-031[]
+
+traceability:links[]"""
+PRQ-003,PRQ-003 — Example site builds without errors,process_requirement,,self-traceability/delivery-process.adoc,"""The example site SHALL build successfully as part of the CI pipeline. The build SHALL include the Antora HTML site generation and PDF output. Any xref warnings or build errors SHALL be treated as failures.
+
+The site build exercises the full extension pipeline — parsing, macro expansion, link substitution, matrix generation, and attachment sync — serving as an integration test.
+
+validates:REQ-005[]
+considered_by:ARC-031[]
+
+traceability:links[]"""
+PRQ-004,PRQ-004 — Example site deploys from main branch,process_requirement,,self-traceability/delivery-process.adoc,"""The example site SHALL deploy to GitHub Pages automatically on every push to `main`. The Pages workflow SHALL build the Antora site, generate PDFs, copy the landing page, and deploy to the `gh-pages` branch. The deployment SHALL be atomic — either all artifacts deploy or none.
+
+The deployed site serves as the project's public documentation and a live demonstration of the extension's capabilities.
+
+validates:REQ-072[]
+considered_by:ARC-033[]
+
+traceability:links[]"""
+PRQ-005,PRQ-005 — Release is tagged and versioned,process_requirement,,self-traceability/delivery-process.adoc,"""Every release SHALL be tagged with a semver tag (`v0.12.1`) and the version SHALL be updated in `package.json`. The CHANGELOG SHALL be updated with all notable changes since the previous release. The release SHALL be published to npm.
+
+Versioning follows https://semver.org/[Semantic Versioning]: MAJOR for breaking API changes, MINOR for new features, PATCH for bug fixes and internal refactoring.
+
+considered_by:ARC-031[]
+
+traceability:links[]"""
+PRQ-006,PRQ-006 — PDF artifacts are generated alongside HTML,process_requirement,,self-traceability/delivery-process.adoc,"""The Pages workflow SHALL generate PDF artifacts for the requirements, architecture, and test-plan documents using `@antora/pdf-extension` with Ruby and `asciidoctor-pdf`. PDFs SHALL be placed alongside HTML output in the deployed site.
+
+The PDF pipeline is provisioned by `devbox.json` (Node.js + Ruby) and `Gemfile` (asciidoctor-pdf), ensuring reproducible builds across environments.
+
+validates:REQ-060[]
+validates:REQ-093[]
+considered_by:ARC-031[]
 
 traceability:links[]"""
 QA-055,QA-055 — Zero operational overhead,requirement,,explanation/quality/zero-operational-overhead.adoc,"""The extension SHALL operate without requiring external services, databases, or runtime dependencies beyond Node.js standard library and a minimal set of npm packages. Optional features such as Neo4j export SHALL degrade gracefully when not configured.

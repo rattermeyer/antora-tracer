@@ -29,9 +29,11 @@
 ** xref:self-traceability/use-cases.adoc[Use Cases]
 ** xref:requirements:index.adoc[Requirements]
 ** xref:self-traceability/test-plan.adoc[Test Plan]
+** xref:self-traceability/delivery-process.adoc[Delivery Process]
 ** xref:self-traceability/dashboard.adoc[Dashboard]
 * Traceability
 ** xref:traceability/index.adoc[Overview]
 ** xref:attachment$traceability/matrix-usecases-to-requirements.html[UC → Req]
 ** xref:attachment$traceability/matrix-requirements-to-design.html[Req → Design]
 ** xref:attachment$traceability/matrix-requirements-to-tests.html[Req → Tests]
+** xref:attachment$traceability/matrix-process-to-design.html[Process → Design]

@@ -25,7 +25,7 @@ configLoader.load(resolve(__dirname, "traceability.yml"));
 const extension = new RequirementsTraceabilityExtension(configLoader);
 const files = [
   { adoc: "requirements.adoc", realPath: resolve(__dirname, "component-one/modules/requirements/pages/index.adoc") },
-  "explanation/architecture.adoc", "self-traceability/test-plan.adoc",
+  "explanation/architecture.adoc", "self-traceability/test-plan.adoc", "self-traceability/delivery-process.adoc",
   "explanation/quality/zero-operational-overhead.adoc", "explanation/quality/configurable-without-code.adoc",
   "explanation/quality/fail-fast-diagnostics.adoc", "explanation/quality/no-side-effects.adoc",
   "explanation/quality/testability-by-design.adoc", "explanation/quality/pdf-compatibility.adoc",

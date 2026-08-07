@@ -89,6 +89,15 @@ traceability:links[]
 
 == Matrix Item Linking
 
+[#REQ-128, item, role=requirement, title="Matrix links include module path for module-aware items"]
+--
+When an item has module information (from Antora processing), the LinkResolver SHALL generate links that include the module name so the link navigates to the correct page under the correct module directory.
+
+Source: openspec/specs/matrix-item-linking/spec.md
+
+traceability:links[]
+--
+
 [#REQ-037, item, role=requirement, title="Matrix displays row items as clickable links"]
 --
 The matrix SHALL render row item IDs as hyperlinks that navigate to the item's definition in the rendered HTML documentation.
@@ -194,7 +203,7 @@ traceability:links[]
 
 [#REQ-044, item, role=requirement, title="traceability:outgoing[] macro renders outgoing links"]
 --
-The system SHALL provide a `traceability:outgoing[]` macro (formerly `traceability:links[]`) that expands to a formatted list of all outgoing relationships for the enclosing item.
+The system SHALL provide a `traceability:outgoing[]` macro (formerly `traceability:links[]`) that expands to a formatted list of all outgoing relationships for the enclosing item. When the item has no outgoing relationships, the macro SHALL render a configurable empty-state message controlled by the `:traceability-empty:` document attribute.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
@@ -503,7 +512,52 @@ Source: openspec/specs/split-pdf-documents/spec.md
 traceability:links[]
 --
 
-== CI/CD PDF Deployment
+== Architecture Diagram Checklist
+
+[#REQ-123, item, role=requirement, title="Architecture document includes class-level API diagram"]
+--
+The architecture document SHALL include a PlantUML class diagram showing the public method signatures of all key components (TraceabilityGraph, DocumentParser, ConfigLoader, MatrixGenerator, LinkResolver, TemplateRenderer, Neo4jExporter, RequirementsTraceabilityExtension).
+
+Source: openspec/specs/architecture-diagram-checklist/spec.md
+
+traceability:links[]
+--
+
+[#REQ-124, item, role=requirement, title="Architecture document includes DocumentParser activity diagram"]
+--
+The architecture document SHALL include a PlantUML activity diagram showing the DocumentParser's step-by-step regex parsing pipeline: verbatim block pre-scanning, item block extraction with quote-aware bracket matching, body delimiter detection, relationship macro scanning with inline-code exclusion, old-macro detection, and result assembly.
+
+Source: openspec/specs/architecture-diagram-checklist/spec.md
+
+traceability:links[]
+--
+
+[#REQ-125, item, role=requirement, title="Architecture document includes TraceabilityGraph state diagram"]
+--
+The architecture document SHALL include a PlantUML state diagram showing the TraceabilityGraph lifecycle: Empty → Populated (items added) → Complete (relationships added, ready for queries), including which operations are valid in each state.
+
+Source: openspec/specs/architecture-diagram-checklist/spec.md
+
+traceability:links[]
+--
+
+[#REQ-126, item, role=requirement, title="Architecture document includes PreparedFile caching flow diagram"]
+--
+The architecture document SHALL include a PlantUML activity diagram showing the PreparedFile caching optimization: `prepareFile()` computing content/docAttrs/blocks once, then feeding the five macro-expansion methods from a single prepared state.
+
+Source: openspec/specs/architecture-diagram-checklist/spec.md
+
+traceability:links[]
+--
+
+[#REQ-127, item, role=requirement, title="update-example-site skill includes diagram checklist"]
+--
+The `update-example-site` skill SHALL include a diagram checklist per arc42 section, guidance on when to add each diagram type (class, sequence, activity, state), and conventions for diagram file placement in the `examples/` directory.
+
+Source: openspec/specs/architecture-diagram-checklist/spec.md
+
+traceability:links[]
+--
 
 [#REQ-060, item, role=requirement, title="Pages workflow generates PDFs"]
 --
@@ -676,6 +730,122 @@ traceability:links[]
 --
 
 
+== File Preparation Cache
+
+[#REQ-111, item, role=requirement, title="File state is prepared once per file"]
+--
+The system SHALL compute file content (buffer→string), document attributes, and item block positions exactly once per page file during the `contentClassified` event, and SHALL reuse the computed values across all macro-expansion passes for that file.
+
+Source: openspec/specs/file-preparation-cache/spec.md
+
+traceability:links[]
+--
+
+[#REQ-112, item, role=requirement, title="PreparedFile carries all needed state"]
+--
+The system SHALL define a `PreparedFile` type containing the raw Antora file reference, the full content string, parsed document attributes, item block position array, and normalized source-file metadata.
+
+Source: openspec/specs/file-preparation-cache/spec.md
+
+traceability:links[]
+--
+
+== Template Partials
+
+[#REQ-113, item, role=requirement, title="Matrix template uses partials for structure"]
+--
+The `matrix.html.mustache` template SHALL be split into a main template and four Mustache partials (`styles`, `header`, `matrix-row`, `footer`) loaded from the `partials/` subdirectory.
+
+Source: openspec/specs/template-partials/spec.md
+
+traceability:links[]
+--
+
+[#REQ-114, item, role=requirement, title="Dead design-matrix template is removed"]
+--
+The `design-matrix.html.mustache` template and all seven partials in `src/templates/partials/` SHALL be removed, as they are not rendered by any code path.
+
+Source: openspec/specs/template-partials/spec.md
+
+traceability:links[]
+--
+
+[#REQ-115, item, role=requirement, title="Dead MatrixGenerator methods are removed"]
+--
+The `generateRequirementsMatrix()`, `generateDesignMatrix()`, and `generateAllMatrices()` methods SHALL be removed from `MatrixGenerator.ts` as they are not called by any code path.
+
+Source: openspec/specs/template-partials/spec.md
+
+traceability:links[]
+--
+
+== Cross-Module Xref
+
+[#REQ-116, item, role=requirement, title="Items carry component and module context from Antora"]
+--
+When processing `.adoc` files through the Antora extension, the system SHALL store the Antora component and module names on each `Item` so that downstream xref and link generation can distinguish same-module from cross-module and cross-component references.
+
+Source: openspec/specs/cross-module-xref/spec.md
+
+traceability:links[]
+--
+
+[#REQ-117, item, role=requirement, title="Cross-module and cross-component xref includes correct prefix"]
+--
+When `buildXref` generates an Antora xref for an item in a different module or component than the current page, the system SHALL include the appropriate prefix matching Antora's xref resolution hierarchy: `component:module:` for cross-component, `module:` for cross-module, and no prefix for same-module.
+
+Source: openspec/specs/cross-module-xref/spec.md
+
+traceability:links[]
+--
+
+[#REQ-118, item, role=requirement, title="Matrix links include module path when available"]
+--
+When `LinkResolver` generates an HTML link for a matrix item that has module information, the system SHALL include the module name in the URL path.
+
+Source: openspec/specs/cross-module-xref/spec.md
+
+traceability:links[]
+--
+
+[#REQ-119, item, role=requirement, title="Cross-module and cross-component xref resolution"]
+--
+When an item in one module has relationships to items in other modules or components, the `traceability:outgoing[]` and `traceability:incoming[]` macros SHALL generate xrefs with the correct Antora prefix (`component:module:` or `module:`) so Antora can resolve them correctly.
+
+Source: openspec/specs/traceability-links-macro/spec.md
+
+traceability:links[]
+--
+
+== Delivery Process
+
+[#REQ-120, item, role=requirement, title="Process requirements are traceable to product requirements"]
+--
+The example site SHALL include a `delivery-process.adoc` document containing process requirements with the `process_requirement` role. Each process requirement SHALL trace to the product requirements it validates via a `validates` relation and to the architectural decisions it implements via a `deploys` relation.
+
+Source: openspec/specs/delivery-process-traceability/spec.md
+
+traceability:links[]
+--
+
+[#REQ-121, item, role=requirement, title="Process requirements document follows site conventions"]
+--
+The `delivery-process.adoc` SHALL use the same `[item]` macro format, `[#PRQ-XXX, item, role=process_requirement]` IDs, and `traceability:links[]` rendering macros as other example documents.
+
+Source: openspec/specs/delivery-process-traceability/spec.md
+
+traceability:links[]
+--
+
+[#REQ-122, item, role=requirement, title="Process-to-product matrix exists"]
+--
+The example site configuration SHALL define a `process-to-product` matrix with `process_requirement` as rows, `requirement` as columns, and `validates` as the coverage relation.
+
+Source: openspec/specs/delivery-process-traceability/spec.md
+
+traceability:links[]
+--
+
 == Quality Attributes
 
 Quality attributes are documented as `[item]` blocks in their respective
@@ -688,6 +858,8 @@ and measurable Acceptance Criteria.
 * xref:ROOT:explanation/quality/no-side-effects.adoc#QA-058[QA-058 — No side effects on source files]
 * xref:ROOT:explanation/quality/testability-by-design.adoc#QA-059[QA-059 — Testability by design]
 * xref:ROOT:explanation/quality/pdf-compatibility.adoc#QA-060[QA-060 — PDF compatibility of generated output]
+* xref:ROOT:explanation/quality/platform-stability.adoc#QA-061[QA-061 — Platform stability and longevity]
+* xref:ROOT:explanation/quality/performance.adoc#QA-062[QA-062 — Query and indexing performance]
 
 ifdef::assembler-backend-pdf[]
 == Changelog

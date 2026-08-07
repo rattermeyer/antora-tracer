@@ -7,6 +7,7 @@ REQ-090,REQ-090 — Verbatim block detection handles standard AsciiDoc fences,TS
 REQ-091,REQ-091 — Inline macros inside verbatim blocks are preserved in rendered output,TST-001: TST-001 — Core Extension Tests
 REQ-092,REQ-092 — Inline macros inside backtick code spans are not parsed,TST-001: TST-001 — Core Extension Tests
 REQ-110,REQ-110 — Items defined in partials are processed,TST-002: TST-002 — Antora Extension Tests
+REQ-128,REQ-128 — Matrix links include module path for module-aware items,TST-006: TST-006 — MatrixGenerator Tests
 REQ-037,REQ-037 — Matrix displays row items as clickable links,TST-006: TST-006 — MatrixGenerator Tests
 REQ-038,REQ-038 — Matrix displays cell items as clickable links,TST-006: TST-006 — MatrixGenerator Tests
 REQ-039,REQ-039 — Links include source file tooltip,TST-006: TST-006 — MatrixGenerator Tests
@@ -51,6 +52,11 @@ REQ-096,REQ-096 — PDF extension is a dev dependency,
 REQ-097,REQ-097 — Assembler profiles produce separate PDFs per document,
 REQ-098,REQ-098 — Custom nav files select single documents,
 REQ-099,REQ-099 — Single-PDF output is preserved,
+REQ-123,REQ-123 — Architecture document includes class-level API diagram,
+REQ-124,REQ-124 — Architecture document includes DocumentParser activity diagram,
+REQ-125,REQ-125 — Architecture document includes TraceabilityGraph state diagram,
+REQ-126,REQ-126 — Architecture document includes PreparedFile caching flow diagram,
+REQ-127,REQ-127 — update-example-site skill includes diagram checklist,
 REQ-060,REQ-060 — Pages workflow generates PDFs,
 REQ-061,REQ-061 — Site links to PDF downloads,
 REQ-062,REQ-062 — Local PDF workflow is unchanged,
@@ -69,6 +75,18 @@ REQ-082,REQ-082 — Item indexing is scoped to article body,
 REQ-105,REQ-105 — Use-case role extends self-traceability preset,
 REQ-106,REQ-106 — Use-case page renders with traceability links,
 REQ-107,REQ-107 — usecase-requirements matrix is generated,
+REQ-111,REQ-111 — File state is prepared once per file,
+REQ-112,REQ-112 — PreparedFile carries all needed state,
+REQ-113,REQ-113 — Matrix template uses partials for structure,
+REQ-114,REQ-114 — Dead design-matrix template is removed,
+REQ-115,REQ-115 — Dead MatrixGenerator methods are removed,
+REQ-116,REQ-116 — Items carry component and module context from Antora,
+REQ-117,REQ-117 — Cross-module and cross-component xref includes correct prefix,
+REQ-118,REQ-118 — Matrix links include module path when available,
+REQ-119,REQ-119 — Cross-module and cross-component xref resolution,TST-002: TST-002 — Antora Extension Tests
+REQ-120,REQ-120 — Process requirements are traceable to product requirements,
+REQ-121,REQ-121 — Process requirements document follows site conventions,
+REQ-122,REQ-122 — Process-to-product matrix exists,
 QA-055,QA-055 — Zero operational overhead,
 QA-056,QA-056 — Configurable without code changes,
 QA-057,QA-057 — Fail-fast with clear diagnostics,
@@ -78,5 +96,5 @@ QA-060,QA-060 — PDF compatibility of generated output,
 QA-061,QA-061 — Platform stability and longevity,
 QA-062,QA-062 — Query and indexing performance,
 
-Total 78 rows
-Coverage: 52.6%
+Total 96 rows
+Coverage: 44.8%

@@ -5,10 +5,14 @@ extends: requirements-engineering
 
 roles:
   - use_case
+  - process_requirement
 
 relations:
   use_case:
     requirement: ["leads_to"]
+  process_requirement:
+    requirement: ["validates"]
+    design: ["considered_by"]
 
 matrices:
   - name: usecases-to-requirements
@@ -17,6 +21,19 @@ matrices:
     columns: [requirement]
     coverageRelations:
       requirement: [leads_to]
+  - name: process-to-product
+    description: "Process requirements traced to product requirements"
+    rows: process_requirement
+    columns: [requirement]
+    coverageRelations:
+      requirement: [validates]
+  - name: process-to-design
+    description: "Process requirements traced to architectural decisions"
+    rows: process_requirement
+    columns: [design]
+    coverageRelations:
+      design: [considered_by]
 
 inverseLabels:
   leads_to: "is_derived_from"
+  considered_by: "considers"
