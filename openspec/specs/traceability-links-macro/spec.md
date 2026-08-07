@@ -7,7 +7,7 @@ Renders outgoing, incoming, and combined relationships inside item blocks via `t
 ## Requirements
 
 ### Requirement: traceability:outgoing[] macro renders outgoing links
-The system SHALL provide a `traceability:outgoing[]` macro (formerly `traceability:links[]`) that expands to a formatted list of all outgoing relationships for the enclosing item.
+The system SHALL provide a `traceability:outgoing[]` macro (formerly `traceability:links[]`) that expands to a formatted list of all outgoing relationships for the enclosing item. When the item has no outgoing relationships, the macro SHALL render a configurable empty-state message controlled by the `:traceability-empty:` document attribute.
 
 #### Scenario: Macro expands for an item with multiple relationships
 - **WHEN** an item block contains `traceability:outgoing[]` and has outgoing relations of types `addresses` and `depends_on`
@@ -15,9 +15,20 @@ The system SHALL provide a `traceability:outgoing[]` macro (formerly `traceabili
 - **AND** each group shows a section title named after the relation type
 - **AND** each target renders as a clickable xref with the target's ID and title
 
-#### Scenario: Macro in an item with no relationships
+#### Scenario: Macro in an item with no relationships — default (none)
 - **WHEN** an item block contains `traceability:outgoing[]` but the item has no outgoing relationships
-- **THEN** the macro expands to nothing (empty, no error)
+- **AND** `:traceability-empty:` is not set or is set to `none`
+- **THEN** the macro expands to nothing (empty, backward compatible)
+
+#### Scenario: Macro in an item with no relationships — italic style
+- **WHEN** an item block contains `traceability:outgoing[]` but the item has no outgoing relationships
+- **AND** `:traceability-empty: italic` is set
+- **THEN** the macro expands to `_No outgoing relationships._`
+
+#### Scenario: Macro in an item with no relationships — admonition style
+- **WHEN** an item block contains `traceability:outgoing[]` but the item has no outgoing relationships
+- **AND** `:traceability-empty: admonition` is set
+- **THEN** the macro expands to a `[NOTE]` block containing "No outgoing relationships."
 
 #### Scenario: Macro outside an item block
 - **WHEN** `traceability:outgoing[]` appears outside any `[#ID, item, ...]` block
@@ -172,16 +183,36 @@ The system SHALL provide a `traceability:links[]` macro that expands to a combin
 #### Scenario: Macro in an item with only outgoing relationships
 - **WHEN** an item block contains `traceability:links[]` but the item has only outgoing relationships
 - **THEN** only the outgoing groups render
-- **AND** no empty incoming section is present
+- **AND** when `:traceability-empty: none` (default), no empty incoming section is present
+- **AND** when `:traceability-empty:` is `italic` or `admonition`, an empty-state message for the incoming direction is rendered
 
 #### Scenario: Macro in an item with only incoming relationships
 - **WHEN** an item block contains `traceability:links[]` but the item has only incoming relationships
 - **THEN** only the incoming groups render with inverse labels
-- **AND** no empty outgoing section is present
+- **AND** when `:traceability-empty: none` (default), no empty outgoing section is present
+- **AND** when `:traceability-empty:` is `italic` or `admonition`, an empty-state message for the outgoing direction is rendered
 
 #### Scenario: Macro in an item with no relationships
 - **WHEN** an item block contains `traceability:links[]` but the item has no relationships of any kind
-- **THEN** the macro expands to nothing (empty, no error)
+- **AND** `:traceability-empty:` is not set or is set to `none`
+- **THEN** the macro expands to nothing (empty, backward compatible)
+
+#### Scenario: Macro in an item with no relationships — italic style
+- **WHEN** an item block contains `traceability:links[]` but the item has no relationships of any kind
+- **AND** `:traceability-empty: italic` is set
+- **THEN** the macro expands to `_No outgoing relationships._\n_No incoming relationships._`
+
+#### Scenario: Macro with outgoing but no incoming — italic style
+- **WHEN** an item block contains `traceability:links[]` with outgoing relationships but no incoming relationships
+- **AND** `:traceability-empty: italic` is set
+- **THEN** the outgoing groups render normally
+- **AND** `_No incoming relationships._` appears after the outgoing groups
+
+#### Scenario: Macro with incoming but no outgoing — italic style
+- **WHEN** an item block contains `traceability:links[]` with incoming relationships but no outgoing relationships
+- **AND** `:traceability-empty: italic` is set
+- **THEN** `_No outgoing relationships._` appears before the incoming groups
+- **AND** the incoming groups render normally
 
 #### Scenario: Macro respects document attributes
 - **WHEN** `:traceability-links: true` and `:traceability-style: table`
