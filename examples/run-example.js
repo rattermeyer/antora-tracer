@@ -14,8 +14,8 @@ import {
 } from "../lib/src/index.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const pagesDir = resolve(__dirname, "component-one/modules/ROOT/pages");
-const outputDir = resolve(__dirname, "component-one/modules/ROOT/attachments/traceability");
+const pagesDir = resolve(__dirname, "tracer/modules/ROOT/pages");
+const outputDir = resolve(__dirname, "tracer/modules/ROOT/attachments/traceability");
 
 // Load custom config
 const configLoader = new ConfigLoader();
@@ -24,7 +24,8 @@ configLoader.load(resolve(__dirname, "traceability.yml"));
 // Process all example files
 const extension = new RequirementsTraceabilityExtension(configLoader);
 const files = [
-  { adoc: "requirements.adoc", realPath: resolve(__dirname, "component-one/modules/requirements/pages/index.adoc") },
+  "self-traceability/use-cases.adoc",
+  { adoc: "requirements.adoc", realPath: resolve(__dirname, "tracer/modules/requirements/pages/index.adoc") },
   "explanation/architecture.adoc", "self-traceability/test-plan.adoc", "self-traceability/delivery-process.adoc",
   "explanation/quality/zero-operational-overhead.adoc", "explanation/quality/configurable-without-code.adoc",
   "explanation/quality/fail-fast-diagnostics.adoc", "explanation/quality/no-side-effects.adoc",

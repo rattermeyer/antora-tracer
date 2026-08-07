@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>usecases-to-requirements - Traceability Matrix</title>
+    <style>        body {
+                       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+                       margin: 20px;
+                       line-height: 1.6;
+                   }
+                   h1, h2, h3 { color: #333; }
+                   .matrix-container { overflow-x: auto; margin: 20px 0; }
+                   table {
+                       border-collapse: collapse;
+                       width: 100%;
+                   }
+                   th, td {
+                       border: 1px solid #ddd;
+                       padding: 8px 12px;
+                       text-align: left;
+                   }
+                   th {
+                       background-color: #4a5568;
+                       color: white;
+                       font-weight: 600;
+                   }
+                   tr:nth-child(even) { background-color: #f8f9fa; }
+                   tr:hover { background-color: #e9ecef; }
+
+                   /* Role-specific styling */
+                   .role-requirement { background-color: #fff5f5; }
+                   .role-design { background-color: #f0fff4; }
+                   .role-implementation { background-color: #f0f8ff; }
+                   .role-test { background-color: #fffaf0; }
+                   .role-document { background-color: #f8f9fa; }
+
+                   /* Status styling */
+                   .status-complete { background-color: #d6f5d6; }
+                   .status-partial { background-color: #fff9db; }
+                   .status-missing { background-color: #ffdbdb; }
+
+                   .coverage-summary {
+                       background-color: #f8f9fa;
+                       padding: 15px;
+                       border-radius: 5px;
+                       margin: 20px 0;
+                   }
+                   .coverage-badge {
+                       display: inline-block;
+                       padding: 3px 8px;
+                       border-radius: 12px;
+                       font-size: 12px;
+                       font-weight: 600;
+                   }
+                   .coverage-complete { background-color: #22c55e; color: white; }
+                   .coverage-partial { background-color: #f59e0b; color: white; }
+                   .coverage-missing { background-color: #ef4444; color: white; }
+                   .coverage-low { background-color: #f97316; color: white; }
+
+                   .metadata {
+                       color: #666;
+                       font-size: 14px;
+                       margin: 10px 0;
+                   }
+                   .empty-cell { color: #999; font-style: italic; }
+
+                   /* Item link styling */
+                   .matrix-container a {
+                       color: inherit;
+                       text-decoration: none;
+                   }
+                   .matrix-container a:hover {
+                       text-decoration: underline;
+                   }
+                   .source-ref {
+                       color: #666;
+                       font-size: 0.85em;
+                       margin-left: 0.5em;
+                   }
+</style>
+</head>
+<body>
+    <h1>usecases-to-requirements</h1>
+    <p class="metadata">Type: use_case-requirement | Generated: 2026-08-07T12:51:51.908Z</p>
+
+    <div class="coverage-summary">
+        <h3>Coverage Summary</h3>
+        <p>
+            <span class="coverage-badge coverage-complete">Complete: 6 / 8</span>
+            <span class="coverage-badge coverage-partial">Partial: 0</span>
+            <span class="coverage-badge coverage-missing">Missing: 2</span>
+            <br>
+            <strong>Overall Coverage: 75.0%</strong>
+        </p>
+    </div>
+
+    <div class="matrix-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>requirement<br><small>requirement</small></th>
+                    <th>Coverage</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                                <tr class="status-complete role-use_case">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;self-traceability&#x2F;use-cases.html#UC-001">UC-001</a>
+                                    </td>
+                                    <td>UC-001 — Team member writes traceable items in AsciiDoc</td>
+                                    <td class="role-requirement">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-056" title="Source: requirements.adoc"><strong>REQ-056</strong></a>
+                                                : REQ-056 — CLI next-id command returns next available ID
+                                                <small class="source-ref">[requirements.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-missing role-use_case">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;self-traceability&#x2F;use-cases.html#UC-002">UC-002</a>
+                                    </td>
+                                    <td>UC-002 — Requirements Engineer defines custom domain model via config</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-complete role-use_case">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;self-traceability&#x2F;use-cases.html#UC-004">UC-004</a>
+                                    </td>
+                                    <td>UC-004 — Requirements Engineer organizes items in partial files</td>
+                                    <td class="role-requirement">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-110" title="Source: requirements.adoc"><strong>REQ-110</strong></a>
+                                                : REQ-110 — Items defined in partials are processed
+                                                <small class="source-ref">[requirements.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-use_case">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;self-traceability&#x2F;use-cases.html#UC-005">UC-005</a>
+                                    </td>
+                                    <td>UC-005 — Reviewer browses traceability matrices for coverage</td>
+                                    <td class="role-requirement">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-037" title="Source: requirements.adoc"><strong>REQ-037</strong></a>
+                                                : REQ-037 — Matrix displays row items as clickable links
+                                                <small class="source-ref">[requirements.adoc]</small>
+                                            </div>
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-038" title="Source: requirements.adoc"><strong>REQ-038</strong></a>
+                                                : REQ-038 — Matrix displays cell items as clickable links
+                                                <small class="source-ref">[requirements.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-use_case">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;self-traceability&#x2F;use-cases.html#UC-006">UC-006</a>
+                                    </td>
+                                    <td>UC-006 — Project lead bootstraps traceability for a new project</td>
+                                    <td class="role-requirement">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-083" title="Source: requirements.adoc"><strong>REQ-083</strong></a>
+                                                : REQ-083 — Preset defines pairwise requirements-to-design matrix
+                                                <small class="source-ref">[requirements.adoc]</small>
+                                            </div>
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-084" title="Source: requirements.adoc"><strong>REQ-084</strong></a>
+                                                : REQ-084 — Preset defines pairwise design-to-implementation matrix
+                                                <small class="source-ref">[requirements.adoc]</small>
+                                            </div>
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-085" title="Source: requirements.adoc"><strong>REQ-085</strong></a>
+                                                : REQ-085 — Preset defines pairwise requirements-to-tests matrix
+                                                <small class="source-ref">[requirements.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-use_case">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;self-traceability&#x2F;use-cases.html#UC-007">UC-007</a>
+                                    </td>
+                                    <td>UC-007 — Developer validates traceability in CI pipeline</td>
+                                    <td class="role-requirement">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-109" title="Source: requirements.adoc"><strong>REQ-109</strong></a>
+                                                : REQ-109 — Circular reference detection in graph validation
+                                                <small class="source-ref">[requirements.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-missing role-use_case">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;self-traceability&#x2F;use-cases.html#UC-008">UC-008</a>
+                                    </td>
+                                    <td>UC-008 — Data analyst explores traceability in Neo4j</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-complete role-use_case">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;self-traceability&#x2F;use-cases.html#UC-009">UC-009</a>
+                                    </td>
+                                    <td>UC-009 — Architect visualizes relationship dependencies</td>
+                                    <td class="role-requirement">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-051" title="Source: requirements.adoc"><strong>REQ-051</strong></a>
+                                                : REQ-051 — Relationship graph via traceability:graph[] macro
+                                                <small class="source-ref">[requirements.adoc]</small>
+                                            </div>
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-052" title="Source: requirements.adoc"><strong>REQ-052</strong></a>
+                                                : REQ-052 — Coverage chart via traceability:graph-coverage[] macro
+                                                <small class="source-ref">[requirements.adoc]</small>
+                                            </div>
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;requirements.html#REQ-054" title="Source: requirements.adoc"><strong>REQ-054</strong></a>
+                                                : REQ-054 — Dashboard page in example site
+                                                <small class="source-ref">[requirements.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <footer class="metadata">
+        <p>Generated by Antora Tracer Extension</p>
+    </footer>
+</body>
+</html>

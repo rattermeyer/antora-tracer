@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>requirements-to-tests - Traceability Matrix</title>
+    <style>        body {
+                       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+                       margin: 20px;
+                       line-height: 1.6;
+                   }
+                   h1, h2, h3 { color: #333; }
+                   .matrix-container { overflow-x: auto; margin: 20px 0; }
+                   table {
+                       border-collapse: collapse;
+                       width: 100%;
+                   }
+                   th, td {
+                       border: 1px solid #ddd;
+                       padding: 8px 12px;
+                       text-align: left;
+                   }
+                   th {
+                       background-color: #4a5568;
+                       color: white;
+                       font-weight: 600;
+                   }
+                   tr:nth-child(even) { background-color: #f8f9fa; }
+                   tr:hover { background-color: #e9ecef; }
+
+                   /* Role-specific styling */
+                   .role-requirement { background-color: #fff5f5; }
+                   .role-design { background-color: #f0fff4; }
+                   .role-implementation { background-color: #f0f8ff; }
+                   .role-test { background-color: #fffaf0; }
+                   .role-document { background-color: #f8f9fa; }
+
+                   /* Status styling */
+                   .status-complete { background-color: #d6f5d6; }
+                   .status-partial { background-color: #fff9db; }
+                   .status-missing { background-color: #ffdbdb; }
+
+                   .coverage-summary {
+                       background-color: #f8f9fa;
+                       padding: 15px;
+                       border-radius: 5px;
+                       margin: 20px 0;
+                   }
+                   .coverage-badge {
+                       display: inline-block;
+                       padding: 3px 8px;
+                       border-radius: 12px;
+                       font-size: 12px;
+                       font-weight: 600;
+                   }
+                   .coverage-complete { background-color: #22c55e; color: white; }
+                   .coverage-partial { background-color: #f59e0b; color: white; }
+                   .coverage-missing { background-color: #ef4444; color: white; }
+                   .coverage-low { background-color: #f97316; color: white; }
+
+                   .metadata {
+                       color: #666;
+                       font-size: 14px;
+                       margin: 10px 0;
+                   }
+                   .empty-cell { color: #999; font-style: italic; }
+
+                   /* Item link styling */
+                   .matrix-container a {
+                       color: inherit;
+                       text-decoration: none;
+                   }
+                   .matrix-container a:hover {
+                       text-decoration: underline;
+                   }
+                   .source-ref {
+                       color: #666;
+                       font-size: 0.85em;
+                       margin-left: 0.5em;
+                   }
+</style>
+</head>
+<body>
+    <h1>requirements-to-tests</h1>
+    <p class="metadata">Type: requirement-test | Generated: 2026-08-07T12:51:51.906Z</p>
+
+    <div class="coverage-summary">
+        <h3>Coverage Summary</h3>
+        <p>
+            <span class="coverage-badge coverage-complete">Complete: 44 / 97</span>
+            <span class="coverage-badge coverage-partial">Partial: 0</span>
+            <span class="coverage-badge coverage-missing">Missing: 53</span>
+            <br>
+            <strong>Overall Coverage: 45.4%</strong>
+        </p>
+    </div>
+
+    <div class="matrix-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>test<br><small>test</small></th>
+                    <th>Coverage</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-005">REQ-005</a>
+                                    </td>
+                                    <td>REQ-005 — Old macro syntax generates a deprecation error or warning</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-001" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-001</strong></a>
+                                                : TST-001 — Core Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-087">REQ-087</a>
+                                    </td>
+                                    <td>REQ-087 — Items inside verbatim blocks are not parsed</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-001" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-001</strong></a>
+                                                : TST-001 — Core Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-088">REQ-088</a>
+                                    </td>
+                                    <td>REQ-088 — Inline macros inside verbatim blocks are not parsed</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-001" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-001</strong></a>
+                                                : TST-001 — Core Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-089">REQ-089</a>
+                                    </td>
+                                    <td>REQ-089 — Old macros inside verbatim blocks do not trigger errors</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-001" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-001</strong></a>
+                                                : TST-001 — Core Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-090">REQ-090</a>
+                                    </td>
+                                    <td>REQ-090 — Verbatim block detection handles standard AsciiDoc fences</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-001" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-001</strong></a>
+                                                : TST-001 — Core Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-091">REQ-091</a>
+                                    </td>
+                                    <td>REQ-091 — Inline macros inside verbatim blocks are preserved in rendered output</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-001" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-001</strong></a>
+                                                : TST-001 — Core Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-092">REQ-092</a>
+                                    </td>
+                                    <td>REQ-092 — Inline macros inside backtick code spans are not parsed</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-001" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-001</strong></a>
+                                                : TST-001 — Core Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-110">REQ-110</a>
+                                    </td>
+                                    <td>REQ-110 — Items defined in partials are processed</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-002" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-002</strong></a>
+                                                : TST-002 — Antora Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-128">REQ-128</a>
+                                    </td>
+                                    <td>REQ-128 — Matrix links include module path for module-aware items</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-006" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-006</strong></a>
+                                                : TST-006 — MatrixGenerator Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-037">REQ-037</a>
+                                    </td>
+                                    <td>REQ-037 — Matrix displays row items as clickable links</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-006" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-006</strong></a>
+                                                : TST-006 — MatrixGenerator Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-038">REQ-038</a>
+                                    </td>
+                                    <td>REQ-038 — Matrix displays cell items as clickable links</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-006" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-006</strong></a>
+                                                : TST-006 — MatrixGenerator Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-039">REQ-039</a>
+                                    </td>
+                                    <td>REQ-039 — Links include source file tooltip</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-006" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-006</strong></a>
+                                                : TST-006 — MatrixGenerator Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-040">REQ-040</a>
+                                    </td>
+                                    <td>REQ-040 — Link generation is context-aware</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-002" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-002</strong></a>
+                                                : TST-002 — Antora Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-041">REQ-041</a>
+                                    </td>
+                                    <td>REQ-041 — Source file paths are normalized</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-042">REQ-042</a>
+                                    </td>
+                                    <td>REQ-042 — Backward compatibility without LinkResolver</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-006" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-006</strong></a>
+                                                : TST-006 — MatrixGenerator Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-043">REQ-043</a>
+                                    </td>
+                                    <td>REQ-043 — Non-HTML matrix outputs unchanged</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-006" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-006</strong></a>
+                                                : TST-006 — MatrixGenerator Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-083">REQ-083</a>
+                                    </td>
+                                    <td>REQ-083 — Preset defines pairwise requirements-to-design matrix</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-004" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-004</strong></a>
+                                                : TST-004 — ConfigLoader Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-084">REQ-084</a>
+                                    </td>
+                                    <td>REQ-084 — Preset defines pairwise design-to-implementation matrix</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-004" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-004</strong></a>
+                                                : TST-004 — ConfigLoader Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-085">REQ-085</a>
+                                    </td>
+                                    <td>REQ-085 — Preset defines pairwise requirements-to-tests matrix</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-004" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-004</strong></a>
+                                                : TST-004 — ConfigLoader Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-086">REQ-086</a>
+                                    </td>
+                                    <td>REQ-086 — Preset does not define wide multi-column matrices</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-004" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-004</strong></a>
+                                                : TST-004 — ConfigLoader Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-044">REQ-044</a>
+                                    </td>
+                                    <td>REQ-044 — traceability:outgoing[] macro renders outgoing links</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-002" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-002</strong></a>
+                                                : TST-002 — Antora Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-045">REQ-045</a>
+                                    </td>
+                                    <td>REQ-045 — Opt-in via AsciiDoc attribute</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-002" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-002</strong></a>
+                                                : TST-002 — Antora Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-047">REQ-047</a>
+                                    </td>
+                                    <td>REQ-047 — Configurable display style</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-002" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-002</strong></a>
+                                                : TST-002 — Antora Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-048">REQ-048</a>
+                                    </td>
+                                    <td>REQ-048 — Configurable sort order</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-002" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-002</strong></a>
+                                                : TST-002 — Antora Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-050">REQ-050</a>
+                                    </td>
+                                    <td>REQ-050 — Source file not modified</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-002" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-002</strong></a>
+                                                : TST-002 — Antora Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-100">REQ-100</a>
+                                    </td>
+                                    <td>REQ-100 — Inline macros suppressed when links macros are active</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-002" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-002</strong></a>
+                                                : TST-002 — Antora Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-101">REQ-101</a>
+                                    </td>
+                                    <td>REQ-101 — PDF compatibility</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-102">REQ-102</a>
+                                    </td>
+                                    <td>REQ-102 — Collapsible list-style output via document attribute</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-002" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-002</strong></a>
+                                                : TST-002 — Antora Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-103">REQ-103</a>
+                                    </td>
+                                    <td>REQ-103 — Graph isolation per component version</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-104">REQ-104</a>
+                                    </td>
+                                    <td>REQ-104 — traceability:links[] macro renders combined outgoing and incoming links</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-002" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-002</strong></a>
+                                                : TST-002 — Antora Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-055">REQ-055</a>
+                                    </td>
+                                    <td>REQ-055 — traceability:incoming[] macro renders incoming links</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-002" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-002</strong></a>
+                                                : TST-002 — Antora Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-064">REQ-064</a>
+                                    </td>
+                                    <td>REQ-064 — Incoming macro respects document attributes</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-002" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-002</strong></a>
+                                                : TST-002 — Antora Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-065">REQ-065</a>
+                                    </td>
+                                    <td>REQ-065 — Incoming macro display styles</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-002" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-002</strong></a>
+                                                : TST-002 — Antora Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-066">REQ-066</a>
+                                    </td>
+                                    <td>REQ-066 — Incoming macro sort order</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-002" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-002</strong></a>
+                                                : TST-002 — Antora Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-067">REQ-067</a>
+                                    </td>
+                                    <td>REQ-067 — Inverse relation type labels</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-002" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-002</strong></a>
+                                                : TST-002 — Antora Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-068">REQ-068</a>
+                                    </td>
+                                    <td>REQ-068 — Incoming macro PDF compatibility</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-002" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-002</strong></a>
+                                                : TST-002 — Antora Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-069">REQ-069</a>
+                                    </td>
+                                    <td>REQ-069 — Source file not modified by incoming macro</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-002" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-002</strong></a>
+                                                : TST-002 — Antora Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-070">REQ-070</a>
+                                    </td>
+                                    <td>REQ-070 — Incoming macro supports collapsible output</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-002" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-002</strong></a>
+                                                : TST-002 — Antora Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-071">REQ-071</a>
+                                    </td>
+                                    <td>REQ-071 — Inverse labels are config-driven</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-051">REQ-051</a>
+                                    </td>
+                                    <td>REQ-051 — Relationship graph via traceability:graph[] macro</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-002" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-002</strong></a>
+                                                : TST-002 — Antora Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-052">REQ-052</a>
+                                    </td>
+                                    <td>REQ-052 — Coverage chart via traceability:graph-coverage[] macro</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-002" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-002</strong></a>
+                                                : TST-002 — Antora Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-053">REQ-053</a>
+                                    </td>
+                                    <td>REQ-053 — Graph visualization methods on TraceabilityGraph</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-005" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-005</strong></a>
+                                                : TST-005 — Graph and API Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-054">REQ-054</a>
+                                    </td>
+                                    <td>REQ-054 — Dashboard page in example site</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-063">REQ-063</a>
+                                    </td>
+                                    <td>REQ-063 — Configurable Kroki image format</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-002" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-002</strong></a>
+                                                : TST-002 — Antora Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-109">REQ-109</a>
+                                    </td>
+                                    <td>REQ-109 — Circular reference detection in graph validation</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-005" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-005</strong></a>
+                                                : TST-005 — Graph and API Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-129">REQ-129</a>
+                                    </td>
+                                    <td>REQ-129 — Bidirectional relationship pairs are merged into a single edge</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-005" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-005</strong></a>
+                                                : TST-005 — Graph and API Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-056">REQ-056</a>
+                                    </td>
+                                    <td>REQ-056 — CLI next-id command returns next available ID</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-003" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-003</strong></a>
+                                                : TST-003 — CLI Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-093">REQ-093</a>
+                                    </td>
+                                    <td>REQ-093 — Devbox provides Ruby and Node.js for PDF builds</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-094">REQ-094</a>
+                                    </td>
+                                    <td>REQ-094 — Gemfile locks asciidoctor-pdf version</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-095">REQ-095</a>
+                                    </td>
+                                    <td>REQ-095 — PDF playbook generates PDF from example site</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-096">REQ-096</a>
+                                    </td>
+                                    <td>REQ-096 — PDF extension is a dev dependency</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-097">REQ-097</a>
+                                    </td>
+                                    <td>REQ-097 — Assembler profiles produce separate PDFs per document</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-098">REQ-098</a>
+                                    </td>
+                                    <td>REQ-098 — Custom nav files select single documents</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-099">REQ-099</a>
+                                    </td>
+                                    <td>REQ-099 — Single-PDF output is preserved</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-123">REQ-123</a>
+                                    </td>
+                                    <td>REQ-123 — Architecture document includes class-level API diagram</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-124">REQ-124</a>
+                                    </td>
+                                    <td>REQ-124 — Architecture document includes DocumentParser activity diagram</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-125">REQ-125</a>
+                                    </td>
+                                    <td>REQ-125 — Architecture document includes TraceabilityGraph state diagram</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-126">REQ-126</a>
+                                    </td>
+                                    <td>REQ-126 — Architecture document includes PreparedFile caching flow diagram</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-127">REQ-127</a>
+                                    </td>
+                                    <td>REQ-127 — update-example-site skill includes diagram checklist</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-060">REQ-060</a>
+                                    </td>
+                                    <td>REQ-060 — Pages workflow generates PDFs</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-061">REQ-061</a>
+                                    </td>
+                                    <td>REQ-061 — Site links to PDF downloads</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-062">REQ-062</a>
+                                    </td>
+                                    <td>REQ-062 — Local PDF workflow is unchanged</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-108">REQ-108</a>
+                                    </td>
+                                    <td>REQ-108 — Matrix files synced to component _attachments</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-002" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-002</strong></a>
+                                                : TST-002 — Antora Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-072">REQ-072</a>
+                                    </td>
+                                    <td>REQ-072 — Landing page at GitHub Pages root</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-073">REQ-073</a>
+                                    </td>
+                                    <td>REQ-073 — Two-persona feature presentation</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-074">REQ-074</a>
+                                    </td>
+                                    <td>REQ-074 — Traceability visualization preview</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-075">REQ-075</a>
+                                    </td>
+                                    <td>REQ-075 — Deployment integration</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-076">REQ-076</a>
+                                    </td>
+                                    <td>REQ-076 — Minimal tooling</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-077">REQ-077</a>
+                                    </td>
+                                    <td>REQ-077 — Landing page uses conemso color palette</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-078">REQ-078</a>
+                                    </td>
+                                    <td>REQ-078 — Landing page uses Roboto font</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-079">REQ-079</a>
+                                    </td>
+                                    <td>REQ-079 — Non-heading elements with IDs are indexed as navigable anchors</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-080">REQ-080</a>
+                                    </td>
+                                    <td>REQ-080 — Item title is extracted from &#x60;.title&#x60; child element</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-081">REQ-081</a>
+                                    </td>
+                                    <td>REQ-081 — Heading elements are excluded from item indexing</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-082">REQ-082</a>
+                                    </td>
+                                    <td>REQ-082 — Item indexing is scoped to article body</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-105">REQ-105</a>
+                                    </td>
+                                    <td>REQ-105 — Use-case role extends self-traceability preset</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-106">REQ-106</a>
+                                    </td>
+                                    <td>REQ-106 — Use-case page renders with traceability links</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-107">REQ-107</a>
+                                    </td>
+                                    <td>REQ-107 — usecase-requirements matrix is generated</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-111">REQ-111</a>
+                                    </td>
+                                    <td>REQ-111 — File state is prepared once per file</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-112">REQ-112</a>
+                                    </td>
+                                    <td>REQ-112 — PreparedFile carries all needed state</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-113">REQ-113</a>
+                                    </td>
+                                    <td>REQ-113 — Matrix template uses partials for structure</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-114">REQ-114</a>
+                                    </td>
+                                    <td>REQ-114 — Dead design-matrix template is removed</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-115">REQ-115</a>
+                                    </td>
+                                    <td>REQ-115 — Dead MatrixGenerator methods are removed</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-116">REQ-116</a>
+                                    </td>
+                                    <td>REQ-116 — Items carry component and module context from Antora</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-117">REQ-117</a>
+                                    </td>
+                                    <td>REQ-117 — Cross-module and cross-component xref includes correct prefix</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-118">REQ-118</a>
+                                    </td>
+                                    <td>REQ-118 — Matrix links include module path when available</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-complete role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-119">REQ-119</a>
+                                    </td>
+                                    <td>REQ-119 — Cross-module and cross-component xref resolution</td>
+                                    <td class="role-test">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;self-traceability&#x2F;test-plan.html#TST-002" title="Source: self-traceability&#x2F;test-plan.adoc"><strong>TST-002</strong></a>
+                                                : TST-002 — Antora Extension Tests
+                                                <small class="source-ref">[self-traceability&#x2F;test-plan.adoc]</small>
+                                            </div>
+                                    </td>
+                                    <td>100.0%</td>
+                                    <td><span class="coverage-badge coverage-complete">complete</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-120">REQ-120</a>
+                                    </td>
+                                    <td>REQ-120 — Process requirements are traceable to product requirements</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-121">REQ-121</a>
+                                    </td>
+                                    <td>REQ-121 — Process requirements document follows site conventions</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;requirements.html#REQ-122">REQ-122</a>
+                                    </td>
+                                    <td>REQ-122 — Process-to-product matrix exists</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;explanation&#x2F;quality&#x2F;zero-operational-overhead.html#QA-055">QA-055</a>
+                                    </td>
+                                    <td>QA-055 — Zero operational overhead</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;explanation&#x2F;quality&#x2F;configurable-without-code.html#QA-056">QA-056</a>
+                                    </td>
+                                    <td>QA-056 — Configurable without code changes</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;explanation&#x2F;quality&#x2F;fail-fast-diagnostics.html#QA-057">QA-057</a>
+                                    </td>
+                                    <td>QA-057 — Fail-fast with clear diagnostics</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;explanation&#x2F;quality&#x2F;no-side-effects.html#QA-058">QA-058</a>
+                                    </td>
+                                    <td>QA-058 — No side effects on source files</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;explanation&#x2F;quality&#x2F;testability-by-design.html#QA-059">QA-059</a>
+                                    </td>
+                                    <td>QA-059 — Testability by design</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;explanation&#x2F;quality&#x2F;pdf-compatibility.html#QA-060">QA-060</a>
+                                    </td>
+                                    <td>QA-060 — PDF compatibility of generated output</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;explanation&#x2F;quality&#x2F;platform-stability.html#QA-061">QA-061</a>
+                                    </td>
+                                    <td>QA-061 — Platform stability and longevity</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+                                <tr class="status-missing role-requirement">
+                                    <td>
+                                        <a href="..&#x2F;..&#x2F;explanation&#x2F;quality&#x2F;performance.html#QA-062">QA-062</a>
+                                    </td>
+                                    <td>QA-062 — Query and indexing performance</td>
+                                    <td>
+                                            <span class="empty-cell">-</span>
+                                    </td>
+                                    <td>0.0%</td>
+                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <footer class="metadata">
+        <p>Generated by Antora Tracer Extension</p>
+    </footer>
+</body>
+</html>

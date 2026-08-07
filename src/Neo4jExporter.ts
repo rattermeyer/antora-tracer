@@ -192,7 +192,7 @@ export class Neo4jExporter {
     relationships: ItemRelationship[],
     filePath: string,
   ): void {
-    const headers = ["id", "source", "target", "type", "sourceFile"];
+    const headers = ["id", "source", "target", "type", "sourceFile", "bidirectional"];
     const lines: string[] = [this.escapeCSVRow(headers)];
 
     for (const rel of relationships) {
@@ -202,6 +202,7 @@ export class Neo4jExporter {
         rel.targetId,
         rel.type,
         rel.sourceFile || "",
+        rel.bidirectional ? "true" : "false",
       ];
       lines.push(this.escapeCSVRow(row));
     }
@@ -266,6 +267,10 @@ export class Neo4jExporter {
 
       if (rel.sourceFile) {
         props.sourceFile = rel.sourceFile;
+      }
+
+      if (rel.bidirectional) {
+        props.bidirectional = "true";
       }
 
       const propsStr = this.formatCypherProperties(props);

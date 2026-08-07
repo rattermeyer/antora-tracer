@@ -1,10 +1,4 @@
-# circular-reference-detection
-
-## Purpose
-
-Detect circular references in the traceability graph during validation. A circular reference is a cycle in the directed relationship graph. The detection skips auto-generated inverse relationships to avoid false positives and reports cycle paths in human-readable form.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Circular reference detection in graph validation
 The system SHALL detect circular references in the traceability graph during validation via `validate()`. A circular reference is a cycle in the directed relationship graph (e.g., A → B → A, or A → B → C → A). Self-referencing relationships (A → A) SHALL also be detected as cycles. Auto-generated inverse relationships SHALL be skipped during cycle detection to avoid false positives. Relationships marked as bidirectional SHALL also be skipped during cycle detection, since a bidirectional pair (A → B and B → A with complementary types) is a legitimate traceability construct, not a cycle.

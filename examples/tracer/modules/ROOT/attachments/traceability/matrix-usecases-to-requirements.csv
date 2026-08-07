@@ -1,0 +1,12 @@
+Row ID,Row Title,requirement
+UC-001,UC-001 — Team member writes traceable items in AsciiDoc,REQ-056: REQ-056 — CLI next-id command returns next available ID
+UC-002,UC-002 — Requirements Engineer defines custom domain model via config,
+UC-004,UC-004 — Requirements Engineer organizes items in partial files,REQ-110: REQ-110 — Items defined in partials are processed
+UC-005,UC-005 — Reviewer browses traceability matrices for coverage,REQ-037: REQ-037 — Matrix displays row items as clickable links; REQ-038: REQ-038 — Matrix displays cell items as clickable links
+UC-006,UC-006 — Project lead bootstraps traceability for a new project,REQ-083: REQ-083 — Preset defines pairwise requirements-to-design matrix; REQ-084: REQ-084 — Preset defines pairwise design-to-implementation matrix; REQ-085: REQ-085 — Preset defines pairwise requirements-to-tests matrix
+UC-007,UC-007 — Developer validates traceability in CI pipeline,REQ-109: REQ-109 — Circular reference detection in graph validation
+UC-008,UC-008 — Data analyst explores traceability in Neo4j,
+UC-009,UC-009 — Architect visualizes relationship dependencies,REQ-051: REQ-051 — Relationship graph via traceability:graph[] macro; REQ-052: REQ-052 — Coverage chart via traceability:graph-coverage[] macro; REQ-054: REQ-054 — Dashboard page in example site
+
+Total 8 rows
+Coverage: 75.0%

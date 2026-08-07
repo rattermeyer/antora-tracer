@@ -30,7 +30,7 @@ The system SHALL provide a `traceability:graph-coverage[]` inline macro that ren
 - **THEN** the macro expands to a global coverage chart showing items per role with covered/uncovered segments
 
 ### Requirement: Graph visualization methods on TraceabilityGraph
-The `TraceabilityGraph` SHALL provide `toDot(fromId, depth?)` returning a GraphViz DOT source string, and `toVegaLite(itemId?)` returning a Vega-Lite JSON specification. The `toDot` method SHALL traverse relationships in both outgoing and incoming directions, showing the complete subgraph around an item.
+The `TraceabilityGraph` SHALL provide `toDot(fromId, depth?)` returning a GraphViz DOT source string, and `toVegaLite(itemId?)` returning a Vega-Lite JSON specification. The `toDot` method SHALL traverse relationships in both outgoing and incoming directions, showing the complete subgraph around an item. When a relationship is marked as bidirectional, the DOT output SHALL use a distinct arrow style (`dir=both`) and dashed stroke to indicate bidirectionality.
 
 #### Scenario: toDot generates valid DOT with bidirectional traversal
 - **WHEN** `toDot("REQ-001")` is called with an item that has both outgoing and incoming relationships
@@ -47,6 +47,10 @@ The `TraceabilityGraph` SHALL provide `toDot(fromId, depth?)` returning a GraphV
 #### Scenario: toDot with depth 0 shows only the source node
 - **WHEN** `toDot("REQ-001", 0)` is called
 - **THEN** only `REQ-001` appears as a node with no edges
+
+#### Scenario: toDot renders bidirectional edge with distinct style
+- **WHEN** `toDot("UC-003")` is called and `UC-003 leads_to REQ-001` is marked `bidirectional: true`
+- **THEN** the edge from UC-003 to REQ-001 SHALL be rendered with `dir=both` and `style=dashed`
 
 #### Scenario: toVegaLite with item generates per-item chart
 - **WHEN** `toVegaLite("REQ-001")` is called

@@ -1,14 +1,13 @@
 site:
   title: Antora Tracer — Self-Traceability Example
-  url: https://antora-tracer.conemso.de/docs
-  start_page: tracer::index.adoc
+  start_page: tracer@latest::index.adoc
   keys:
     annotatejs: opt-out
 
 content:
   sources:
     - url: .
-      start_path: examples/component-one
+      start_path: examples/tracer
       branches: HEAD
 
 asciidoc:
@@ -38,4 +37,3 @@ urls:
 
 output:
   dir: ./public/docs
-  clean: true

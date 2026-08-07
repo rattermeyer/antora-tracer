@@ -10,6 +10,8 @@ roles:
 relations:
   use_case:
     requirement: ["leads_to"]
+  requirement:
+    use_case: ["is_derived_from"]
   process_requirement:
     requirement: ["validates"]
     design: ["considered_by"]

@@ -1,0 +1,30 @@
+= Platform Stability and Longevity
+
+[#QA-061, item, role=requirement, title="Platform stability and longevity"]
+--
+The extension SHALL use ESM (`"type": "module"`), TypeScript strict mode, and target Node.js 20+ as the baseline runtime. The zero-framework policy SHALL avoid dependencies on libraries with short upgrade cycles, ensuring the extension remains maintainable and runnable without forced migrations.
+
+Source: examples/tracer/modules/ROOT/partials/04-solution-strategy.adoc (ARC-010)
+--
+
+== Context
+
+A documentation-as-code tool may be used in projects with multi-year maintenance windows. The extension must remain buildable and runnable across Node.js LTS cycles without requiring breaking dependency upgrades.
+
+== Trigger
+
+A new Node.js LTS version is released, or a transitive dependency introduces a breaking change. The extension is rebuilt and tested against the new version.
+
+== Acceptance Criteria
+
+ESM throughout::
+  The extension uses ECMAScript modules exclusively (`"type": "module"` in package.json); source: `package.json` and `tsconfig.json`; horizon: every release.
+
+TypeScript strict mode::
+  All source code compiles with TypeScript `strict: true`; source: `tsconfig.json`; horizon: every CI build.
+
+Node.js 20+ baseline::
+  The extension's `engines` field specifies `node >= 20` and no APIs newer than Node.js 20 are used without detection; source: `package.json`; horizon: every release.
+
+Zero-framework policy::
+  No runtime framework (Express, Fastify, etc.) is used. Dependencies are limited to the Node.js standard library plus Mustache (template rendering) and Commander (CLI); source: `package.json` dependencies; horizon: every release.
