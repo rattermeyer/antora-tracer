@@ -49,7 +49,7 @@ jobs:
       - name: Copy PDFs for deployment
         run: |
           mkdir -p public/pdf
-          component_version=$(grep '^version:' examples/component-one/antora.yml | awk '{print $2}')
+          component_version=$(grep '^version:' examples/tracer/antora.yml | awk '{print $2}')
           exports_dir="build/pdf-output/tracer/${component_version}/_exports"
           for pdf in architecture use-cases requirements test-plan; do
             cp "$exports_dir/${pdf}.pdf" public/pdf/
