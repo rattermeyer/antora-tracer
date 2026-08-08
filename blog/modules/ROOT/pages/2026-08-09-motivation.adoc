@@ -1,0 +1,119 @@
+= Why I Built an AsciiDoc Traceability Extension (And What AI Had to Do With It)
+:page-date: 2026-08-09
+:page-tags: motivation, traceability, asciidoc, spec-driven-development, ai
+:page-author: Richard Attermeyer
+:description: The story behind antora-tracer — why Polarion-style tools fail developers, how Sphinx-Needs showed a better way, and what happened when spec-driven development met AI-assisted coding.
+
+// === Notes for the author ===
+//
+// 1. Audience: developers and tech leads evaluating traceability tooling.
+//    The existing "Hello, Traceability" post is lighter — this one is deeper.
+//    Your ADRs are a good tonal reference: direct, technical, but conversational.
+//
+// 2. The Sphinx-Needs comparison already has its own page in the main docs:
+//    xref:../docs/explanation/sphinx-comparison.adoc[]
+//    Reference it rather than repeating the full comparison here.
+//
+// 3. Consider mentioning a concrete Polarion moment — what specifically
+//    developers rejected (separate UI? workflow overhead? file format lock-in?).
+//    One sharp anecdote lands better than general statements.
+//
+// 4. The "spec-driven + AI" section is your most original angle.
+//    Readers who came for the traceability story should leave curious
+//    about the workflow implications.
+
+== Why Another Traceability Tool?
+
+// What problem were you trying to solve? What did Polarion get wrong?
+// What did developers actually do instead — spreadsheets? Markdown files?
+// Lead with the human problem, not the technical specification.
+
+I work at a Biotech company.
+Our mission is to advance scientific understanding and medicine by providing solutions for cell and gene therapy and biomedical research.
+For this, we also produce instruments for research and for cell therapy.
+Parts of this require full traceability for compliance reasons.
+For this, we currently use a tool called Polarion.
+Polarion works for most development, but developers in the software group resist it.
+Problems we encounter:
+
+* Developers document already in our repository using markdown.
+* They are using plantuml as a diagramming tool.
+* Generating diagrams and manually keeping them in sync with Polarion means diagrams quickly fall out of date.
+* Structure in Polarion is quite rigid. People try to write the bare minimum.
+
+We want to bring the documentation that design control requires — with traceability — closer to where people work: in the code.
+But for this, we need support for traceability.
+
+The first idea was creating a link to Polarion and syncing texts back.
+This was a small side project I was working on using Antora.
+
+== Sphinx-Needs Showed It's Possible
+
+// How did you discover Sphinx-Needs? What about it clicked?
+// Why not just use Sphinx? (AsciiDoc/Antora vs. reStructuredText/Sphinx)
+// Core insight you borrowed: the item macro? the role system?
+Then a colleague made the jump: What if we could get rid of Polarion completely?
+But this would require supporting traceability in the documents.
+A part of our software was already using Sphinx to provide richer documentation than simply using Doxygen.
+That was the starting point.
+He soon discovered that https://sphinx-needs.readthedocs.io/en/stable/[Sphinx Needs] supports traceability.
+He showed the proof-of-concept just before I went on vacation.
+I am fine with any text-based tool, but I still prefer AsciiDoc for technical documentation more than reStructuredText or Markdown.
+
+== Spec-Driven Development Meets AI
+
+// The unique angle. How building the tool became an experiment
+// in AI-assisted spec-driven development.
+//
+// - OpenSpec workflow: proposals → specs → design → tasks → implementation
+// - The project traces itself (self-traceability docs)
+// - AI as a coding partner within a structured spec framework
+// - What surprised you? What worked? What didn't?
+I also wanted to use the project to explore more spec-driven development using frameworks like https://openspec.dev/[OpenSpec] or https://docs.bmad-method.org/[BMad].
+
+For this project, I settled with OpenSpec.
+Every change I made, was first explored, proposed, applied, archived and synced.
+A little later, I created a skill to sync specs with the example site.
+From platforms used, I went from Claud over Mistral to DeepSeek.
+DeepSeek was ok for this kind of project, because it is open source and published on github anyway.
+So, they will eventually use it for their model training.
+DeepSeek had the benefit, that it costs a magnitude less than the other platforms.
+Unfortunately, this time is over.
+This week, they anounced a signficant price increase.
+According to LiteLLM, I spent 1.8bn tokens on deepseek and spent around $11.
+Hope, I am able to still conduct one experiment: Giving the LLM the example site and see, if a working version can be built.
+This would give me good ideas, what needs to be better documented.
+Requirements are also a bit technical.
+Normally, you would not get requirements on that level.
+
+=== How did it go?
+
+I found the workflow quite good.
+The only issue is, when you had applied the proposal and you did some manual testing and detected some errors, it turned quickly into vibe coding.
+You had to remind the LLM to write a spec or proposal for what just had been changed.
+A few times, I asked the LLM to take the role of a senior developer and review the code base and make some improvements.
+
+== What's the difference:
+
+Not sure if there are conceptually real differences.
+We made the choice that it would be a good idea to delegate some of the more complex queries to Neo4j (at least for now).
+The main purpose should be on establishing the traceability links.
+However, you often collaborate on these kind of documents using comments, we added the https://reviewjs.github.io/annotate/[annotate.js] library to the default ui theme.
+But this requires export and import and we need to improve in this area.
+But this is probably not something that belongs to the core product.
+
+== What's Next
+
+// Toward 1.0, community feedback, what you're exploring.
+// Call to action: try it, file issues, share ideas.
+* Get community feedback.
+* Run experiment to re-create the project using its own requirements
+* Add some more features found in Sphinx needs, that would make sense to have them in antora-tracer as well
+** Overview page generation for issues
+*** invalid links between items (using undefined links types for this combination)
+*** orphaned items (no in- or outgoing links)
+* Allowing more attributes on items
+* support creating reporting on role types / prefix etc.
+
+Tell me, what you would like to have include.
+
