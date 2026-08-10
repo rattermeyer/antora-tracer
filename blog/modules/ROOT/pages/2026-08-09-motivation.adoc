@@ -2,7 +2,7 @@
 :page-date: 2026-08-09
 :page-tags: motivation, traceability, asciidoc, spec-driven-development, ai
 :page-author: Richard Attermeyer
-:description: The story behind antora-tracer — why Polarion-style tools fail developers, how Sphinx-Needs showed a better way, and what happened when spec-driven development met AI-assisted coding.
+:description: The story behind antora-tracer — why Polarion-style tools fail developers, how Sphinx-Needs showed a better way and what happened when spec-driven development met AI-assisted coding.
 
 // === Notes for the author ===
 //
@@ -36,10 +36,10 @@ For this, we currently use a tool called Polarion.
 Polarion works for most development, but developers in the software group resist it.
 Problems we encounter:
 
-* Developers document already in our repository using markdown.
+* Developers document already in our repository using Markdown.
 * They are using plantuml as a diagramming tool.
 * Generating diagrams and manually keeping them in sync with Polarion means diagrams quickly fall out of date.
-* Structure in Polarion is quite rigid. People try to write the bare minimum.
+* The structure in Polarion is quite rigid. People try to write the bare minimum.
 
 We want to bring the documentation that design control requires — with traceability — closer to where people work: in the code.
 But for this, we need support for traceability.
@@ -72,14 +72,14 @@ I am fine with any text-based tool, but I still prefer AsciiDoc for technical do
 I also wanted to use the project to explore more spec-driven development using frameworks like https://openspec.dev/[OpenSpec] or https://docs.bmad-method.org/[BMad].
 
 For this project, I settled with OpenSpec.
-Every change I made, was first explored, proposed, applied, archived and synced.
+Every change I made was first explored, proposed, applied, archived and synced.
 A little later, I created a skill to sync specs with the example site.
 From platforms used, I went from Claud over Mistral to DeepSeek.
-DeepSeek was ok for this kind of project, because it is open source and published on github anyway.
+DeepSeek was ok for this kind of project because it is open source and published on GitHub anyway.
 So, they will eventually use it for their model training.
-DeepSeek had the benefit, that it costs a magnitude less than the other platforms.
+DeepSeek had the benefit that it costs a magnitude less than the other platforms.
 Unfortunately, this time is over.
-This week, they anounced a signficant price increase.
+This week, they announced a significant price increase.
 According to LiteLLM, I spent 1.8bn tokens on deepseek and spent around $11.
 Hope, I am able to still conduct one experiment: Giving the LLM the example site and see, if a working version can be built.
 This would give me good ideas, what needs to be better documented.
@@ -89,7 +89,7 @@ Normally, you would not get requirements on that level.
 === How did it go?
 
 I found the workflow quite good.
-The only issue is, when you had applied the proposal and you did some manual testing and detected some errors, it turned quickly into vibe coding.
+The only issue is, when you had applied the proposal, and you did some manual testing and detected some errors, it turned quickly into vibe coding.
 You had to remind the LLM to write a spec or proposal for what just had been changed.
 A few times, I asked the LLM to take the role of a senior developer and review the code base and make some improvements.
 
@@ -98,8 +98,8 @@ A few times, I asked the LLM to take the role of a senior developer and review t
 Not sure if there are conceptually real differences.
 We made the choice that it would be a good idea to delegate some of the more complex queries to Neo4j (at least for now).
 The main purpose should be on establishing the traceability links.
-However, you often collaborate on these kind of documents using comments, we added the https://reviewjs.github.io/annotate/[annotate.js] library to the default ui theme.
-But this requires export and import and we need to improve in this area.
+However, you often collaborate on these kinds of documents using comments; we added the https://reviewjs.github.io/annotate/[annotate.js] library to the default ui theme.
+But this requires export and import, and we need to improve in this area.
 But this is probably not something that belongs to the core product.
 
 == What's Next
@@ -109,7 +109,7 @@ But this is probably not something that belongs to the core product.
 * Get community feedback.
 * Run experiments to re-create the project using its own requirements
 * Add some more features found in Sphinx needs, that would make sense to have them in antora-tracer as well
-* Some general enhancments
+* Some general enhancements
 ** Overview page generation for issues, like:
 *** invalid links between items (using undefined links types for this combination)
 *** orphaned items (no in- or outgoing links)
