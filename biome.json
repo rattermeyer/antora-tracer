@@ -39,7 +39,8 @@
       "!**/dist",
       "!**/public",
       "!**/.devbox",
-      "!package-lock.json"
+      "!package-lock.json",
+      "!**/build"
     ]
   },
   "overrides": [

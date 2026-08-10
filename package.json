@@ -21,6 +21,7 @@
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
     "format": "biome format --write .",
+    "preview": "node scripts/preview.js",
     "start": "node lib/cli.js",
     "dev": "nodemon --watch src --exec \"npm run build && node lib/index.js\"",
     "tsc": "tsc",

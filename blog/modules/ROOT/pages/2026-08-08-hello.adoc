@@ -1,0 +1,22 @@
+= Hello, Traceability
+:page-date: 2026-08-08
+:page-tags: release, announcement
+:page-author: Richard Attermeyer
+
+Welcome to the *Antora Tracer* blog.
+
+This is where we'll share release notes, tips, and updates about the traceability extension.
+Stay tuned for more content.
+
+== What's next
+
+Expect posts about:
+
+* New features and CLI improvements
+* Tips for writing traceable requirements
+* Community contributions and examples
+* Release notes for each version
+* Reasons for this project and experiences
+* Experiments run with this project
+
+In the meantime, check out the xref:../docs/[documentation] to get started.

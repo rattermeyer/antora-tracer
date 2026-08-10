@@ -9,6 +9,9 @@ content:
     - url: .
       start_path: examples/tracer
       branches: HEAD
+    - url: .
+      start_path: blog
+      branches: HEAD
 
 asciidoc:
   extensions:

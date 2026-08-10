@@ -41,22 +41,7 @@ jobs:
         run: npm run build
 
       - name: Build site
-        run: npx antora antora-playbook-ci.yml
-
-      - name: Build PDF
-        run: KROKI_IMAGE_FORMAT=png npx antora antora-playbook-pdf.yml
-
-      - name: Copy PDFs for deployment
-        run: |
-          mkdir -p public/pdf
-          component_version=$(grep '^version:' examples/tracer/antora.yml | awk '{print $2}')
-          exports_dir="build/pdf-output/tracer/${component_version}/_exports"
-          for pdf in architecture use-cases requirements test-plan; do
-            cp "$exports_dir/${pdf}.pdf" public/pdf/
-          done
-
-      - name: Copy landing page
-        run: cp -r landing/* public/
+        run: node scripts/preview.js --ci
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

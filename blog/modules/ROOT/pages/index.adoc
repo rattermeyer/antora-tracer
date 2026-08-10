@@ -1,0 +1,6 @@
+= Blog
+
+Welcome to the Antora Tracer blog — release notes, updates, and articles.
+
+* 2026-08-09: xref:2026-08-09-motivation.adoc[Why I Built an AsciiDoc Traceability Extension (And What AI Had to Do With It)] [motivation, traceability, asciidoc, spec-driven-development, ai]
+* 2026-08-08: xref:2026-08-08-hello.adoc[Hello, Traceability] [release, announcement]

@@ -10,6 +10,9 @@ content:
     - url: https://github.com/rattermeyer/antora-tracer.git
       start_path: examples/tracer
       branches: ['main']
+    - url: https://github.com/rattermeyer/antora-tracer.git
+      start_path: blog
+      branches: ['main']
 
 asciidoc:
   extensions:
