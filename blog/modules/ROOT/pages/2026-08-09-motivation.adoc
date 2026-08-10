@@ -107,13 +107,14 @@ But this is probably not something that belongs to the core product.
 // Toward 1.0, community feedback, what you're exploring.
 // Call to action: try it, file issues, share ideas.
 * Get community feedback.
-* Run experiment to re-create the project using its own requirements
+* Run experiments to re-create the project using its own requirements
 * Add some more features found in Sphinx needs, that would make sense to have them in antora-tracer as well
-** Overview page generation for issues
+* Some general enhancments
+** Overview page generation for issues, like:
 *** invalid links between items (using undefined links types for this combination)
 *** orphaned items (no in- or outgoing links)
-* Allowing more attributes on items
+* Allowing more attributes on items and report generation
 * support creating reporting on role types / prefix etc.
 
-Tell me, what you would like to have include.
+Tell me what you would like to have included.
 
