@@ -36,6 +36,46 @@ The build script (`scripts/build.js`) copies templates, presets, and compiled fi
 
 Pre-commit hooks: biome lint + format via `pre-commit`.
 
+== Preview the example site
+
+Build the full deployed site locally (Antora docs + blog + landing page + PDF):
+
+[source,bash]
+----
+npm run preview    # same pipeline as CI, uses local content
+----
+
+This script (`scripts/preview.js`) replicates the CI pipeline in one command:
+
+. Cleans `public/`
+. Builds the Antora documentation site and blog (`public/docs/`)
+. Generates PDFs (`public/pdf/`) — skipped if Ruby/asciidoctor-pdf is missing
+. Copies the landing page (`landing/` → `public/`)
+
+After building, serve locally:
+
+[source,bash]
+----
+npx serve public
+----
+
+The CI workflow calls the same script with `--ci` to use the remote content source (`antora-playbook-ci.yml`) instead of the local one (`antora-playbook.yml`).
+
+== Blog
+
+The blog is an Antora component (`blog/`) that renders alongside the docs. Posts are AsciiDoc files with `:page-date:` and `:page-tags:` attributes.
+
+[source,bash]
+----
+# Add a new post
+cp blog/modules/ROOT/pages/2026-01-15-hello.adoc blog/modules/ROOT/pages/$(date +%Y-%m-%d)-my-post.adoc
+# Edit content, update :page-date: and :page-tags:
+node scripts/generate-blog-index.js    # Regenerate index page
+npm run preview                        # Build and check locally
+----
+
+The index generator (`scripts/generate-blog-index.js`) scans `blog/modules/ROOT/pages/*.adoc`, extracts metadata, and writes `index.adoc` with a date-sorted listing. It's called automatically by `npm run preview` and in CI.
+
 == Code style
 
 - TypeScript strict mode
