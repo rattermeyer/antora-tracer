@@ -73,7 +73,7 @@ const { LinkResolver } = await import("../lib/src/LinkResolver.js");
 mkdirSync(outputDir, { recursive: true });
 
 // Create LinkResolver for Antora output context (matrices in _attachments/, pages at component root)
-const linkResolver = new LinkResolver({ relativePathPrefix: "../../" });
+const linkResolver = new LinkResolver({ relativePathPrefix: "../../", indexify: true });
 const matrixGen = new MatrixGenerator(extension.graph, configLoader, {
   linkResolver,
 });

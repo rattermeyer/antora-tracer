@@ -832,6 +832,15 @@ Source: openspec/specs/traceability-links-macro/spec.md
 traceability:links[]
 --
 
+[#REQ-120, item, role=requirement, title="LinkResolver produces indexify-aware links"]
+--
+When Antora's default `indexify` URL style is active (pages at the module root become `pagename/index.html`), the LinkResolver SHALL generate links with `pagename/index.html` instead of `pagename.html` so links from traceability matrices resolve to the correct page.
+
+Source: openspec/specs/matrix-generation/spec.md
+
+traceability:links[]
+--
+
 == Delivery Process
 
 [#REQ-120, item, role=requirement, title="Process requirements are traceable to product requirements"]

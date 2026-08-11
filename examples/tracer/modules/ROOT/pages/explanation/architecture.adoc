@@ -364,8 +364,11 @@ traceability:links[]
 --
 The `LinkResolver` generates relative link paths from matrix output to component
 root. It normalizes `sourceFile` values by stripping the `pages/` prefix and
-`.adoc` extension, producing `../../component/page.html#ID` links. The
-`relativePathPrefix` option allows configurable base paths. When no
+`.adoc` extension, producing `../../component/page.html#ID` links. With Antora's
+default `indexify` URL style, pages at the module root produce
+`pagename/index.html` instead of `pagename.html`. The `relativePathPrefix`
+option allows configurable base paths, and the `indexify` option (default
+`true`) controls whether root-level pages use `index.html`. When no
 `LinkResolver` is provided, items render as plain text without links.
 
 addresses:REQ-037[]

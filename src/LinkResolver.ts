@@ -17,6 +17,12 @@ export interface LinkResolverOptions {
    * - CLI: '../../pages/' (from attachments/traceability/ to pages/)
    */
   relativePathPrefix: string;
+  /**
+   * Whether Antora's indexify URL style is used (default: true).
+   * When true, pages at the module root (no directory separator in path)
+   * produce pagename/index.html instead of pagename.html.
+   */
+  indexify?: boolean;
 }
 
 /**
@@ -62,8 +68,8 @@ export class LinkResolver {
    *
    * Handles all possible sourceFile formats:
    *  - Full URL (partial item): passed through unchanged
-   *  - "architecture"           -> "architecture.html"
-   *  - "architecture.adoc"      -> "architecture.html"
+   *  - "architecture"           -> "architecture.html" (or "architecture/index.html" with indexify)
+   *  - "architecture.adoc"      -> "architecture.html" (or "architecture/index.html" with indexify)
    *  - "pages/architecture"     -> "architecture.html"
    *  - "traceability/index"     -> "traceability/index.html"
    *
@@ -101,6 +107,13 @@ export class LinkResolver {
     // component version directory without a module subdirectory.
     if (item.module && item.module !== "ROOT") {
       sourceFile = `${item.module}/${sourceFile}`;
+    }
+
+    // With indexify, pages at the module root (no '/' in the path after
+    // module prefix handling) become pagename/index.html instead of pagename.html.
+    // e.g. "requirements" -> "requirements/index.html"
+    if (this.options.indexify && !sourceFile.includes("/")) {
+      return `${sourceFile}/index.html`;
     }
 
     // Add .html extension

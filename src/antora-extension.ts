@@ -1303,7 +1303,11 @@ export class AntoraTraceabilityExtension {
               this.traceability.graph.getAllRoles(),
             );
 
-      const linkResolver = new LinkResolver({ relativePathPrefix: "../../" });
+      const htmlStyle = event.playbook?.urls?.html_style;
+      const linkResolver = new LinkResolver({
+        relativePathPrefix: "../../",
+        indexify: htmlStyle !== "default",
+      });
       const generator = new MatrixGenerator(
         this.traceability.graph,
         this.traceability.configLoader,

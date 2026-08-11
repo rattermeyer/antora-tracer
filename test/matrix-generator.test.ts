@@ -801,5 +801,41 @@ matrices:
       const link = resolver.generateItemLink(item);
       expect(link).to.equal("../../requirements/index.html#REQ-035");
     });
+
+    it("should use index.html for module-root pages with indexify", () => {
+      const resolver = new LinkResolver({
+        relativePathPrefix: "../../",
+        indexify: true,
+      });
+
+      const item = {
+        id: "ARC-001",
+        title: "Test",
+        role: "architecture",
+        attributes: {},
+        sourceFile: "architecture",
+      };
+
+      const link = resolver.generateItemLink(item);
+      expect(link).to.equal("../../architecture/index.html#ARC-001");
+    });
+
+    it("should not use index.html for nested pages with indexify", () => {
+      const resolver = new LinkResolver({
+        relativePathPrefix: "../../",
+        indexify: true,
+      });
+
+      const item = {
+        id: "UC-001",
+        title: "Test",
+        role: "use_case",
+        attributes: {},
+        sourceFile: "self-traceability/use-cases",
+      };
+
+      const link = resolver.generateItemLink(item);
+      expect(link).to.equal("../../self-traceability/use-cases.html#UC-001");
+    });
   });
 });
