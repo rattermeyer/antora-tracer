@@ -32,6 +32,13 @@ antora:
         - antora-assembler-pdf-use-cases.yml
         - antora-assembler-pdf-requirements.yml
         - antora-assembler-pdf-test-plan.yml
+    - require: ./antora-docx-extension.cjs
+      config_files:
+        - antora-assembler-docx.yml
+        - antora-assembler-docx-architecture.yml
+        - antora-assembler-docx-requirements.yml
+        - antora-assembler-docx-use-cases.yml
+        - antora-assembler-docx-test-plan.yml
 
 output:
   dir: ./build/pdf-output

@@ -8,6 +8,7 @@
 ** xref:how-to/visualizations.adoc[Add traceability visualizations]
 ** xref:how-to/partials.adoc[Use partial files with items]
 ** xref:how-to/neo4j-export.adoc[Export to Neo4j]
+** xref:how-to/generate-docx.adoc[Generate DOCX output]
 ** xref:how-to/contribute.adoc[Contribute to the project]
 ** xref:how-to/troubleshooting.adoc[Troubleshoot common issues]
 * Reference

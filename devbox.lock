@@ -19,6 +19,10 @@
       "last_modified": "2026-07-27T08:35:34Z",
       "resolved": "github:NixOS/nixpkgs/38a4887411571457d700c51c64a6e49ead2ed5ab?lastModified=1785141334&narHash=sha256-kh35kIx7el4Jk8Ki3BH9%2FPn1eZYSYLJ6LMALos0zOy0%3D"
     },
+    "librsvg": {
+      "resolved": "github:NixOS/nixpkgs/38a4887411571457d700c51c64a6e49ead2ed5ab?narHash=sha256-kh35kIx7el4Jk8Ki3BH9%2FPn1eZYSYLJ6LMALos0zOy0%3D#librsvg",
+      "source": "nixpkg"
+    },
     "nodejs": {
       "plugin_version": "0.0.2",
       "resolved": "github:NixOS/nixpkgs/59682e0069f0ed0a452e2179a7f4c1f247027b9e?narHash=sha256-x8i%2BHYAulduMlM63oxWJj5tAm%2BSc%2FW756wUzcV5p24w%3D#nodejs",
@@ -33,6 +37,10 @@
           ]
         }
       }
+    },
+    "pandoc": {
+      "resolved": "github:NixOS/nixpkgs/38a4887411571457d700c51c64a6e49ead2ed5ab?narHash=sha256-kh35kIx7el4Jk8Ki3BH9%2FPn1eZYSYLJ6LMALos0zOy0%3D#pandoc",
+      "source": "nixpkg"
     },
     "ruby": {
       "plugin_version": "0.0.2",

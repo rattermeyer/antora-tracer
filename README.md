@@ -392,6 +392,18 @@ After a build, you’ll find in `<site-output>/traceability/`:
 
 This project is developed using **spec-driven development** with [OpenSpec](https://openspec.dev) — an experiment in using formal specifications as the primary design artifact with minimal manual coding outside the spec workflow.
 
+### PDF and DOCX builds
+
+The example site produces both PDF and DOCX from assembled AsciiDoc. Build prerequisites:
+
+- Node.js 20+, Ruby 3.x, Bundler — provided by `devbox shell`
+- Pandoc 3.x — for DOCX generation; also available via devbox
+
+```bash
+devbox shell          # installs Node.js + Ruby + Pandoc + deps
+npx antora antora-playbook-pdf.yml  # generates PDF and DOCX
+```
+
 ### Lunr search patch
 
 The example site uses `patch-package` to fix `@antora/lunr-extension` so that traceability items (e.g. `REQ-001`) appear as separate search results linking directly to their anchors. The patch is in `patches/` and applied automatically via the `postinstall` script. See the archived [change proposal](openspec/changes/archive/2025-08-05-index-item-anchors-in-lunr/) for details.

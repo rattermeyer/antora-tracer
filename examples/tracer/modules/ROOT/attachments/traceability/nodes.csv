@@ -692,6 +692,11 @@ REQ-119,REQ-119 — Cross-module and cross-component xref resolution,requirement
 Source: openspec/specs/traceability-links-macro/spec.md
 
 traceability:links[]"""
+REQ-130,REQ-130 — LinkResolver produces indexify-aware links,requirement,,requirements.adoc,"""When Antora's default `indexify` URL style is active (pages at the module root become `pagename/index.html`), the LinkResolver SHALL generate links with `pagename/index.html` instead of `pagename.html` so links from traceability matrices resolve to the correct page.
+
+Source: openspec/specs/matrix-generation/spec.md
+
+traceability:links[]"""
 REQ-120,REQ-120 — Process requirements are traceable to product requirements,requirement,,requirements.adoc,"""The example site SHALL include a `delivery-process.adoc` document containing process requirements with the `process_requirement` role. Each process requirement SHALL trace to the product requirements it validates via a `validates` relation and to the architectural decisions it implements via a `deploys` relation.
 
 Source: openspec/specs/delivery-process-traceability/spec.md
@@ -705,6 +710,31 @@ traceability:links[]"""
 REQ-122,REQ-122 — Process-to-product matrix exists,requirement,,requirements.adoc,"""The example site configuration SHALL define a `process-to-product` matrix with `process_requirement` as rows, `requirement` as columns, and `validates` as the coverage relation.
 
 Source: openspec/specs/delivery-process-traceability/spec.md
+
+traceability:links[]"""
+REQ-131,REQ-131 — DOCX wrapper script converts assembled AsciiDoc to DOCX,requirement,,requirements.adoc,"""The project SHALL include an `adoc-to-docx` shell script that reads assembled AsciiDoc from stdin, converts it to DocBook using `asciidoctor -b docbook` with Kroki support, then pipes the result through `pandoc -f docbook -t docx` to produce a DOCX file.
+
+Source: openspec/specs/docx-output/spec.md
+
+traceability:links[]"""
+REQ-132,REQ-132 — DOCX assembler configs mirror PDF assembler configs,requirement,,requirements.adoc,"""For each existing PDF assembler configuration, a corresponding DOCX assembler configuration SHALL exist that differs only in the build command, using `./adoc-to-docx` instead of `bundle exec asciidoctor-pdf`.
+
+Source: openspec/specs/docx-output/spec.md
+
+traceability:links[]"""
+REQ-133,REQ-133 — PDF playbook includes DOCX assembler configurations,requirement,,requirements.adoc,"""The `antora-playbook-pdf.yml` SHALL register DOCX assembler configs alongside PDF assembler configs so a single build produces both PDF and DOCX outputs.
+
+Source: openspec/specs/docx-output/spec.md
+
+traceability:links[]"""
+REQ-134,REQ-134 — pandoc is available in the build environment,requirement,,requirements.adoc,"""The project SHALL declare `pandoc` as a dependency in `devbox.json` so that `devbox shell` provides the pandoc binary for DOCX generation.
+
+Source: openspec/specs/docx-output/spec.md
+
+traceability:links[]"""
+REQ-135,REQ-135 — DOCX output format is documented,requirement,,requirements.adoc,"""The project documentation SHALL include a how-to guide for generating DOCX output and reference documentation for the DOCX assembler configuration.
+
+Source: openspec/specs/docx-output/spec.md
 
 traceability:links[]"""
 ARC-001,ARC-001 — Project scope and architectural goals,design,,explanation/architecture.adoc,"""*Project scope and architectural goals*
@@ -953,8 +983,11 @@ in the custom directory.
 traceability:links[]"""
 ARC-021,ARC-021 — Path resolution for matrix-to-item links,design,,explanation/architecture.adoc,"""The `LinkResolver` generates relative link paths from matrix output to component
 root. It normalizes `sourceFile` values by stripping the `pages/` prefix and
-`.adoc` extension, producing `../../component/page.html#ID` links. The
-`relativePathPrefix` option allows configurable base paths. When no
+`.adoc` extension, producing `../../component/page.html#ID` links. With Antora's
+default `indexify` URL style, pages at the module root produce
+`pagename/index.html` instead of `pagename.html`. The `relativePathPrefix`
+option allows configurable base paths, and the `indexify` option (default
+`true`) controls whether root-level pages use `index.html`. When no
 `LinkResolver` is provided, items render as plain text without links.
 
 addresses:REQ-037[]
@@ -984,12 +1017,12 @@ addresses:REQ-056[]
 traceability:links[]"""
 ARC-030,ARC-030 — CI/CD PDF build and deployment pipeline,design,,explanation/architecture.adoc,"""The GitHub Actions CI workflow (`.github/workflows/ci.yml` and `pages.yml`)
 builds and deploys the example site to GitHub Pages. The pages workflow
-builds the Antora HTML site, generates PDFs via `@antora/pdf-extension`
-with Ruby/asciidoctor-pdf (provisioned by `devbox.json` and `Gemfile`),
+builds the Antora HTML site, generates PDFs and DOCX via `@antora/pdf-extension`
+with Ruby/asciidoctor-pdf and pandoc (provisioned by `devbox.json` and `Gemfile`),
 and deploys a combined output with the landing page at root and docs at
-`/docs/`. PDF builds use assembler profiles with custom nav files
+`/docs/`. PDF and DOCX builds use assembler profiles with custom nav files
 (`nav-requirements.adoc`, `nav-architecture.adoc`, `nav-test-plan.adoc`)
-to produce separate PDFs per document. The existing single-PDF config
+to produce separate documents per profile. The existing single-document config
 (`antora-assembler-pdf.yml`) is preserved as a standalone option.
 
 addresses:REQ-060[]

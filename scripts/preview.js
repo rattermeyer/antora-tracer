@@ -37,11 +37,13 @@ function copyPDFs() {
   const version = execSync("grep '^version:' examples/tracer/antora.yml | awk '{print $2}'", { cwd: ROOT, encoding: 'utf8' }).trim();
   const exportsDir = `build/pdf-output/tracer/${version}/_exports`;
   execSync(`mkdir -p "${PUBLIC}/pdf"`, { stdio: 'inherit' });
-  for (const pdf of ['architecture', 'use-cases', 'requirements', 'test-plan']) {
-    const src = join(ROOT, exportsDir, `${pdf}.pdf`);
-    if (existsSync(src)) {
-      cpSync(src, join(PUBLIC, 'pdf', `${pdf}.pdf`));
-      console.log(`  copied pdf/${pdf}.pdf`);
+  for (const name of ['architecture', 'use-cases', 'requirements', 'test-plan']) {
+    for (const ext of ['pdf', 'docx']) {
+      const src = join(ROOT, exportsDir, `${name}.${ext}`);
+      if (existsSync(src)) {
+        cpSync(src, join(PUBLIC, 'pdf', `${name}.${ext}`));
+        console.log(`  copied pdf/${name}.${ext}`);
+      }
     }
   }
 }
@@ -54,7 +56,7 @@ if (isCI) {
     run('KROKI_IMAGE_FORMAT=png npx antora antora-playbook-pdf.yml', 'Build PDF');
     copyPDFs();
   } catch (e) {
-    console.log('⚠ PDF build skipped (Ruby/asciidoctor-pdf not available? Use devbox shell for PDF).');
+    console.log('⚠ PDF/DOCX build skipped (ruby/pandoc not available? Use devbox shell).');
   }
 }
 
@@ -67,6 +69,6 @@ console.log('\n━━━━━━━━━━━━━━━━━━━━━�
 console.log('Site ready in public/');
 console.log('  Landing:  public/index.html');
 console.log('  Docs:     public/docs/');
-if (existsSync(join(PUBLIC, 'pdf'))) console.log('  PDF:      public/pdf/');
+if (existsSync(join(PUBLIC, 'pdf'))) console.log('  PDF/DOCX: public/pdf/');
 console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 console.log('Open with:  npx serve public  (or any static server)\n');

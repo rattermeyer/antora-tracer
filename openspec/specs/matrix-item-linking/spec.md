@@ -130,3 +130,23 @@ When an item has module information (from Antora processing), the LinkResolver S
 #### Scenario: Existing tooltip behavior is preserved
 - **WHEN** hovering over a matrix link for an item with module info
 - **THEN** the tooltip SHALL display the source file path as before (e.g., "Source: architecture")
+
+---
+
+### Requirement: LinkResolver produces indexify-aware links
+When Antora's default `indexify` URL style is active (pages at the module root become `pagename/index.html`), the LinkResolver SHALL generate links with `pagename/index.html` instead of `pagename.html` so links from traceability matrices resolve to the correct page.
+
+#### Scenario: Root-level page with indexify
+- **WHEN** an item has `sourceFile: "requirements"` and no module
+- **AND** indexify URL style is active (default in Antora)
+- **THEN** the generated link is `../../requirements/index.html#ID`
+
+#### Scenario: Nested page with indexify (no change)
+- **WHEN** an item has `sourceFile: "self-traceability/use-cases"`
+- **AND** indexify URL style is active
+- **THEN** the generated link is `../../self-traceability/use-cases.html#ID`
+
+#### Scenario: Module-prefixed page with indexify (no change)
+- **WHEN** an item has `sourceFile: "index"` and `module: "requirements"`
+- **AND** indexify URL style is active
+- **THEN** the generated link is `../../requirements/index.html#ID`

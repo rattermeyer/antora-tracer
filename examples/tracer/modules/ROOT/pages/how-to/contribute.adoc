@@ -38,7 +38,7 @@ Pre-commit hooks: biome lint + format via `pre-commit`.
 
 == Preview the example site
 
-Build the full deployed site locally (Antora docs + blog + landing page + PDF):
+Build the full deployed site locally (Antora docs + blog + landing page + PDF + DOCX):
 
 [source,bash]
 ----
@@ -49,7 +49,7 @@ This script (`scripts/preview.js`) replicates the CI pipeline in one command:
 
 . Cleans `public/`
 . Builds the Antora documentation site and blog (`public/docs/`)
-. Generates PDFs (`public/pdf/`) — skipped if Ruby/asciidoctor-pdf is missing
+. Generates PDFs and DOCX (`public/pdf/`) — skipped if ruby/pandoc is missing
 . Copies the landing page (`landing/` → `public/`)
 
 After building, serve locally:

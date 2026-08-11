@@ -832,7 +832,7 @@ Source: openspec/specs/traceability-links-macro/spec.md
 traceability:links[]
 --
 
-[#REQ-120, item, role=requirement, title="LinkResolver produces indexify-aware links"]
+[#REQ-130, item, role=requirement, title="LinkResolver produces indexify-aware links"]
 --
 When Antora's default `indexify` URL style is active (pages at the module root become `pagename/index.html`), the LinkResolver SHALL generate links with `pagename/index.html` instead of `pagename.html` so links from traceability matrices resolve to the correct page.
 
@@ -866,6 +866,53 @@ traceability:links[]
 The example site configuration SHALL define a `process-to-product` matrix with `process_requirement` as rows, `requirement` as columns, and `validates` as the coverage relation.
 
 Source: openspec/specs/delivery-process-traceability/spec.md
+
+traceability:links[]
+--
+
+== DOCX Output
+
+[#REQ-131, item, role=requirement, title="DOCX wrapper script converts assembled AsciiDoc to DOCX"]
+--
+The project SHALL include an `adoc-to-docx` shell script that reads assembled AsciiDoc from stdin, converts it to DocBook using `asciidoctor -b docbook` with Kroki support, then pipes the result through `pandoc -f docbook -t docx` to produce a DOCX file.
+
+Source: openspec/specs/docx-output/spec.md
+
+traceability:links[]
+--
+
+[#REQ-132, item, role=requirement, title="DOCX assembler configs mirror PDF assembler configs"]
+--
+For each existing PDF assembler configuration, a corresponding DOCX assembler configuration SHALL exist that differs only in the build command, using `./adoc-to-docx` instead of `bundle exec asciidoctor-pdf`.
+
+Source: openspec/specs/docx-output/spec.md
+
+traceability:links[]
+--
+
+[#REQ-133, item, role=requirement, title="PDF playbook includes DOCX assembler configurations"]
+--
+The `antora-playbook-pdf.yml` SHALL register DOCX assembler configs alongside PDF assembler configs so a single build produces both PDF and DOCX outputs.
+
+Source: openspec/specs/docx-output/spec.md
+
+traceability:links[]
+--
+
+[#REQ-134, item, role=requirement, title="pandoc is available in the build environment"]
+--
+The project SHALL declare `pandoc` as a dependency in `devbox.json` so that `devbox shell` provides the pandoc binary for DOCX generation.
+
+Source: openspec/specs/docx-output/spec.md
+
+traceability:links[]
+--
+
+[#REQ-135, item, role=requirement, title="DOCX output format is documented"]
+--
+The project documentation SHALL include a how-to guide for generating DOCX output and reference documentation for the DOCX assembler configuration.
+
+Source: openspec/specs/docx-output/spec.md
 
 traceability:links[]
 --

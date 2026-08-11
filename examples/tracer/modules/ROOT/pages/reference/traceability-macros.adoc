@@ -75,9 +75,9 @@ Without this attribute, the macro text is stripped from output.
 | Wrap output in collapsible `<details>` sections by relation type (HTML only)
 |===
 
-=== PDF compatibility
+=== PDF and DOCX compatibility
 
-The macros generate standard AsciiDoc constructs (xrefs, lists, tables) — compatible with both HTML and PDF backends. The `@antora/pdf-extension` renders them identically.
+The macros generate standard AsciiDoc constructs (xrefs, lists, tables) — compatible with HTML, PDF, and DOCX backends. The `@antora/pdf-extension` renders them identically in PDF; the `@antora/assembler` with `adoc-to-docx` renders them in DOCX.
 
 == Visualization Macros
 

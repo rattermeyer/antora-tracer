@@ -1,0 +1,87 @@
+= How to Generate DOCX Output
+:description: Generate Word documents from the assembled documentation for regulatory submissions and review workflows
+:keywords: antora, asciidoc, docx, word, pandoc, regulatory, submission
+:toc: macro
+
+toc::[]
+
+The project can generate DOCX (Microsoft Word) files from the assembled AsciiDoc pages. This is useful for regulatory submissions in domains like medical device software (IEC 62304) where DOCX is the standard review and approval format.
+
+== Prerequisites
+
+. *Ruby* — installed via `devbox shell` or system package manager
+. *Pandoc 3.x* — available via `devbox shell` or `apt install pandoc` / `brew install pandoc` / `choco install pandoc`
+. *Node.js 20+* — for running Antora
+
+== Generate DOCX alongside PDF
+
+The `antora-playbook-pdf.yml` playbook generates both PDF and DOCX in one build:
+
+[source,shell]
+----
+npx antora antora-playbook-pdf.yml
+----
+
+This produces:
+* PDF files in `build/assembler-pdf/` (unchanged)
+* DOCX files in `build/assembler-pdf/` (new)
+
+== Output profiles
+
+The build generates DOCX for each document profile:
+
+|===
+| Profile | Output | Content
+
+| full
+| `index.docx`
+| Complete assembled documentation
+
+| architecture
+| `architecture.docx`
+| ARC-* architecture items and arc42 sections
+
+| requirements
+| `requirements.docx`
+| REQ-* requirement items
+
+| use-cases
+| `use-cases.docx`
+| UC-* use case items
+
+| test-plan
+| `test-plan.docx`
+| TEST-* test plan items
+|===
+
+== Open the generated DOCX
+
+Open the `.docx` file in Microsoft Word or LibreOffice Writer.
+
+* *Table of Contents* — Right-click the TOC field and select "Update Field" (or press kbd:[F9]) to refresh page numbers.
+* *Cross-references* — Item IDs like `REQ-001` are linked to their definitions. Ctrl+click to navigate.
+* *Images* — Kroki diagrams are embedded as PNG images.
+
+== How it works
+
+The DOCX pipeline reuses the same assembler infrastructure as PDF:
+
+[source]
+----
+Assembled AsciiDoc
+    │
+    ▼
+asciidoctor -b docbook   ← Ruby (asciidoctor + asciidoctor-kroki)
+    │
+    ▼
+pandoc -f docbook -t docx ← Pandoc
+    │
+    ▼
+output.docx
+----
+
+The `adoc-to-docx` wrapper script in the project root connects the two steps. Each `antora-assembler-docx*.yml` config file mirrors its PDF counterpart but uses `./adoc-to-docx` as the build command.
+
+== Customize styling
+
+To apply a custom Word template, add `--reference-doc=/path/to/template.docx` to the pandoc invocation in the `adoc-to-docx` script. The template controls fonts, heading styles, page margins, and header/footer content.

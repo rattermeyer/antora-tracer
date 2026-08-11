@@ -40,11 +40,11 @@ A fifth section, *Self-Traceability*, demonstrates the extension applied to its 
 
 == Downloads
 
-Download the traceability documents as PDF:
+Download the traceability documents:
 
-* link:../../../pdf/requirements.pdf[Requirements (PDF)]
-* link:../../../pdf/architecture.pdf[Architecture (PDF)]
-* link:../../../pdf/test-plan.pdf[Test Plan (PDF)]
+* link:../../../pdf/requirements.pdf[Requirements (PDF)] / link:../../../pdf/requirements.docx[DOCX]
+* link:../../../pdf/architecture.pdf[Architecture (PDF)] / link:../../../pdf/architecture.docx[DOCX]
+* link:../../../pdf/test-plan.pdf[Test Plan (PDF)] / link:../../../pdf/test-plan.docx[DOCX]
 
 == Generated Traceability
 

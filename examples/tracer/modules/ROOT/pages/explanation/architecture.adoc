@@ -414,12 +414,12 @@ traceability:links[]
 --
 The GitHub Actions CI workflow (`.github/workflows/ci.yml` and `pages.yml`)
 builds and deploys the example site to GitHub Pages. The pages workflow
-builds the Antora HTML site, generates PDFs via `@antora/pdf-extension`
-with Ruby/asciidoctor-pdf (provisioned by `devbox.json` and `Gemfile`),
+builds the Antora HTML site, generates PDFs and DOCX via `@antora/pdf-extension`
+with Ruby/asciidoctor-pdf and pandoc (provisioned by `devbox.json` and `Gemfile`),
 and deploys a combined output with the landing page at root and docs at
-`/docs/`. PDF builds use assembler profiles with custom nav files
+`/docs/`. PDF and DOCX builds use assembler profiles with custom nav files
 (`nav-requirements.adoc`, `nav-architecture.adoc`, `nav-test-plan.adoc`)
-to produce separate PDFs per document. The existing single-PDF config
+to produce separate documents per profile. The existing single-document config
 (`antora-assembler-pdf.yml`) is preserved as a standalone option.
 
 addresses:REQ-060[]

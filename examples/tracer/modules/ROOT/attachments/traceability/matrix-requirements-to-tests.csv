@@ -85,9 +85,15 @@ REQ-116,REQ-116 — Items carry component and module context from Antora,
 REQ-117,REQ-117 — Cross-module and cross-component xref includes correct prefix,
 REQ-118,REQ-118 — Matrix links include module path when available,
 REQ-119,REQ-119 — Cross-module and cross-component xref resolution,TST-002: TST-002 — Antora Extension Tests
+REQ-130,REQ-130 — LinkResolver produces indexify-aware links,
 REQ-120,REQ-120 — Process requirements are traceable to product requirements,
 REQ-121,REQ-121 — Process requirements document follows site conventions,
 REQ-122,REQ-122 — Process-to-product matrix exists,
+REQ-131,REQ-131 — DOCX wrapper script converts assembled AsciiDoc to DOCX,
+REQ-132,REQ-132 — DOCX assembler configs mirror PDF assembler configs,
+REQ-133,REQ-133 — PDF playbook includes DOCX assembler configurations,
+REQ-134,REQ-134 — pandoc is available in the build environment,
+REQ-135,REQ-135 — DOCX output format is documented,
 QA-055,QA-055 — Zero operational overhead,
 QA-056,QA-056 — Configurable without code changes,
 QA-057,QA-057 — Fail-fast with clear diagnostics,
@@ -97,5 +103,5 @@ QA-060,QA-060 — PDF compatibility of generated output,
 QA-061,QA-061 — Platform stability and longevity,
 QA-062,QA-062 — Query and indexing performance,
 
-Total 97 rows
-Coverage: 45.4%
+Total 103 rows
+Coverage: 42.7%
