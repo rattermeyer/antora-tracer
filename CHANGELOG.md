@@ -2,6 +2,30 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.14.1] — 2026-08-08
+
+### Fixed
+- Matrix links now respect Antora's default `indexify` URL style — pages at the component root produce `pagename/index.html` instead of incorrect `pagename.html` links
+
+## [0.14.0] — 2026-08-08
+
+### Added
+- `TraceabilityGraph.merge()` with primary-type-wins semantics for bidirectional relationship merging
+
+## [0.13.0] — 2026-08-07
+
+### Added
+- `process_requirement` role and process traceability matrices in `requirements-engineering` preset
+- Configurable `traceability-empty` attribute for empty link message style (`none`, `italic`, `admonition`)
+- `review-architecture-diagrams` skill for diagram quality reviews
+
+### Fixed
+- Architecture, use-cases, requirements, and test-plan now generate as separate PDFs instead of a single combined PDF
+
+### Changed
+- Example site restructured following Diátaxis documentation framework
+- UI theme version bumped
+
 ## [0.12.1] — 2026-08-06
 
 ### Fixed
