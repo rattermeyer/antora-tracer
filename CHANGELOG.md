@@ -4,6 +4,13 @@ All notable changes to the Antora Requirements Traceability Extension.
 
 ## [Unreleased]
 
+## [0.16.0] — 2026-08-12
+
+### Added
+- `krokiServerUrl` extension config option to override the Kroki server base URL (default: `https://kroki.io`)
+- `KROKI_SERVER_URL` environment variable support (takes precedence over config)
+- Trailing slash is automatically stripped from configured server URLs
+
 ## [0.15.1] — 2026-08-12
 
 ### Fixed
