@@ -1,0 +1,53 @@
+@startuml
+' AsciiDoc → DOCX conversion pipeline comparison
+' Shows why pandoc-direct was rejected in favor of docbook intermediate
+
+skinparam activityBackgroundColor #F8F9FA
+skinparam activityBorderColor #888888
+
+|Assembler|
+start
+:Assembled AsciiDoc\n(stdin);
+
+fork
+  |Rejected: pandoc-direct|
+  :pandoc -f asciidoc -t docx;
+  note right #FCE4EC
+    Pandoc's native AsciiDoc reader
+    does not support:
+    • asciidoctor-kroki diagrams
+    • custom [item] block macros
+    • Antora xref: macros
+    → Broken output
+  end note
+  :❌ DOCX with missing diagrams\nand mangled macros;
+
+fork again
+  |Accepted: docbook pipeline|
+  :asciidoctor -b docbook\n-r asciidoctor-kroki\n-a kroki-default-format=png;
+  note right #E8F5E9
+    DocBook is asciidoctor's native
+    structured output. All features
+    preserved:
+    • Kroki diagrams → embedded images
+    • xrefs → DocBook xref elements
+    • Admonitions → DocBook admonitions
+    • Tables → CALS tables
+  end note
+  :DocBook XML\n(stdout);
+  :pandoc -f docbook -t docx;
+  note right #E8F5E9
+    Pandoc's docbook reader is mature.
+    Converts:
+    • xref → Word cross-references
+    • images → embedded in docx
+    • TOC → Word TOC field
+    • SVG images → PNG via rsvg-convert
+  end note
+  :✓ well-formed DOCX\nwith navigable TOC,\ncross-references,\nand embedded images;
+
+endfork
+
+stop
+
+@enduml

@@ -9,3 +9,4 @@ This section documents the architectural decisions that shaped the Antora Tracer
 * xref:explanation/adr/0005-typescript-strict-node20.adoc[ADR-005 — TypeScript strict mode and Node.js 20+]
 * xref:explanation/adr/0006-dfs-circular-reference-detection.adoc[ADR-006 — DFS-based circular reference detection]
 * xref:explanation/adr/0007-partial-files-pass-1-only.adoc[ADR-007 — Partial files — Pass 1 only]
+* xref:explanation/adr/0008-docbook-pipeline-for-docx.adoc[ADR-008 — Assembled document output via asciidoctor docbook pipeline]

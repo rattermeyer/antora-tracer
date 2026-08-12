@@ -1,0 +1,76 @@
+= ADR-008: Assembled document output via asciidoctor docbook pipeline
+
+*Status*: accepted +
+*Deciders*: Richard Attermeyer +
+*Date*: 2026-08-11
+
+== Context and Problem Statement
+
+The project generates PDF output from assembled AsciiDoc pages using `@antora/pdf-extension` + `asciidoctor-pdf`.
+Regulatory use cases (IEC 62304) require DOCX as an alternate format.
+The assembler infrastructure (`@antora/assembler`) combines pages into a single AsciiDoc document and invokes a `build.command` to convert it.
+
+Two design questions needed answers:
+
+. *Conversion pipeline*: How to convert assembled AsciiDoc to DOCX with fidelity comparable to PDF?
+. *Extension architecture*: Can the existing `@antora/pdf-extension` be reused, or is a separate extension needed?
+
+== Decision Drivers
+
+* Kroki diagram support — diagrams must render in DOCX output
+* Traceability macros — custom `item` blocks, xrefs, and link macros must survive the conversion
+* Existing infrastructure — reuse the assembler config pattern already established for PDF
+* CI compatibility — the solution must work in GitHub Actions runners (Ubuntu)
+* Regulatory acceptability — output must be a valid `.docx` with navigable TOC, cross-references, and embedded images
+
+== Considered Options
+
+=== Conversion pipeline
+
+The following diagram compares the two conversion paths — pandoc-direct (rejected) and docbook pipeline (accepted):
+
+[plantuml, docx-pipeline-comparison, png]
+----
+include::example$docx-pipeline-comparison.puml[]
+----
+
+*Pandoc direct from AsciiDoc* (`pandoc -f asciidoc -t docx`): Pandoc's native AsciiDoc reader does not support Asciidoctor extensions (Kroki diagrams render as broken links, custom `[item]` blocks are mangled, `xref:` macros don't resolve). Rejected.
+
+*Pandoc from HTML* (`asciidoctor -b html5 | pandoc -f html -t docx`): HTML intermediate preserves more features but loses document structure (heading hierarchy, page breaks). Rejected.
+
+*LibreOffice headless* (`soffice --headless --convert-to docx`): Requires LibreOffice installation, output quality varies. Rejected.
+
+*asciidoctor docbook → pandoc* (`asciidoctor -b docbook | pandoc -f docbook -t docx`): DocBook is asciidoctor's native structured output format. All AsciiDoc features (xrefs, tables, admonitions, images) are represented. Pandoc's docbook reader is mature and produces well-formed DOCX. Accepted.
+
+=== Extension architecture
+
+*Reuse `@antora/pdf-extension` with `build.command: ./adoc-to-docx`*: The PDF extension has `backend: 'pdf'` and `extname: '.pdf'` hardcoded in its converter. When the assembler sees a `.docx` output but `backend: 'pdf'`, it fails with "cannot produce pdf output from docx". Rejected.
+
+*Custom Antora extension from scratch*: Would implement the full exporter interface. Over-engineered — the assembler already supports arbitrary converters via the `command` key.
+
+*Thin converter + assembler*: Create a converter object (`antora-docx-converter.cjs`) with `backend: 'docx'` and `extname: '.docx'`, register it via a thin extension (`antora-docx-extension.cjs`) that calls `assembler.configure()`. Mirrors the PDF extension's architecture without the hardcoded backend. Accepted.
+
+== Decision Outcome
+
+The DOCX pipeline uses a *thin converter + assembler* pattern that is *format-agnostic*:
+
+* `antora-docx-converter.cjs` — declares `backend: 'docx'`, `extname: '.docx'`, `convert()` function
+* `antora-docx-extension.cjs` — registers the converter with `@antora/assembler`
+* `adoc-to-docx` — wrapper script: stdin → `asciidoctor -b docbook` → `pandoc -f docbook -t docx`
+* `antora-assembler-docx*.yml` — assembler configs mirroring PDF profiles, using `build.command: ./adoc-to-docx`
+
+The pattern is reusable: an epub or html-single format would follow the same structure — write a converter, a wrapper script, and assembler configs.
+
+=== Positive Consequences
+
+* Full AsciiDoc feature fidelity — Kroki diagrams, xrefs, admonitions, tables all render correctly
+* Independent from PDF pipeline — DOCX and PDF builds run in parallel with separate build directories
+* CI-ready — pandoc is installed via `apt-get`, Ruby deps via `bundler`
+* Pattern documented for future formats
+
+=== Negative Consequences
+
+* Two-process pipeline adds build time compared to a single converter
+* Code syntax highlighting is lost (pandoc docbook→docx does not preserve Rouge/Pygments)
+* SVG images require `librsvg2-bin` for pandoc's internal rasterization
+* Separate build directories needed (`assembler-docx-*`) to avoid clashing with PDF builds
