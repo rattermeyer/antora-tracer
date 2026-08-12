@@ -802,7 +802,7 @@ matrices:
       expect(link).to.equal("../../requirements/index.html#REQ-035");
     });
 
-    it("should use index.html for module-root pages with indexify", () => {
+    it("should use trailing slash for module-root pages with indexify", () => {
       const resolver = new LinkResolver({
         relativePathPrefix: "../../",
         indexify: true,
@@ -817,7 +817,7 @@ matrices:
       };
 
       const link = resolver.generateItemLink(item);
-      expect(link).to.equal("../../architecture/index.html#ARC-001");
+      expect(link).to.equal("../../architecture/#ARC-001");
     });
 
     it("should not use index.html for nested pages with indexify", () => {

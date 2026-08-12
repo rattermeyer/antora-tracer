@@ -110,10 +110,11 @@ export class LinkResolver {
     }
 
     // With indexify, pages at the module root (no '/' in the path after
-    // module prefix handling) become pagename/index.html instead of pagename.html.
-    // e.g. "requirements" -> "requirements/index.html"
+    // module prefix handling) use a trailing slash instead of /index.html.
+    // e.g. "requirements" -> "requirements/"
+    // This avoids server redirects from /index.html to / that can drop fragments.
     if (this.options.indexify && !sourceFile.includes("/")) {
-      return `${sourceFile}/index.html`;
+      return `${sourceFile}/`;
     }
 
     // Add .html extension

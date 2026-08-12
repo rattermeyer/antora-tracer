@@ -2,6 +2,11 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [Unreleased]
+
+### Fixed
+- Matrix links use trailing slash (`requirements/`) instead of `/index.html` to avoid server redirects dropping URL fragments
+
 ## [0.14.1] — 2026-08-08
 
 ### Fixed
