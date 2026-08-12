@@ -45,10 +45,10 @@
     "mustache": "^4.2.0"
   },
   "devDependencies": {
-    "@antora/assembler": "^1.0.0-beta.20",
+    "@antora/assembler": "1.0.0-beta.20",
     "@antora/cli": "3.1",
     "@antora/lunr-extension": "^1.0.0-alpha.13",
-    "@antora/pdf-extension": "^1.0.0-beta.20",
+    "@antora/pdf-extension": "1.0.0-beta.20",
     "@antora/site-generator": "3.1",
     "@biomejs/biome": "^2.5.5",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
@@ -71,8 +71,8 @@
     "typescript": "^7.0.2"
   },
   "peerDependencies": {
-    "@antora/assembler": "^1.0.0-beta.20",
-    "@antora/pdf-extension": "^1.0.0-beta.20"
+    "@antora/assembler": "1.0.0-beta.20",
+    "@antora/pdf-extension": "1.0.0-beta.20"
   },
   "peerDependenciesMeta": {
     "@antora/assembler": {
