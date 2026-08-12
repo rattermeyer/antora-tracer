@@ -80,7 +80,32 @@ pandoc -f docbook -t docx ← Pandoc
 output.docx
 ----
 
-The `adoc-to-docx` wrapper script in the project root connects the two steps. Each `antora-assembler-docx*.yml` config file mirrors its PDF counterpart but uses `./adoc-to-docx` as the build command.
+The `adoc-to-docx` wrapper script (in `examples/`) connects the two steps. Each `antora-assembler-docx*.yml` config file (also in `examples/`) mirrors its PDF counterpart but uses `./examples/adoc-to-docx` as the build command.
+
+== Install the DOCX extension
+
+If you are consuming `antora-tracer` as a dependency, install the peer dependencies for PDF and DOCX output:
+
+[source,shell]
+----
+npm install @antora/assembler @antora/pdf-extension
+----
+
+Then reference the DOCX extension in your playbook:
+
+[source,yaml]
+----
+antora:
+  extensions:
+    - require: antora-tracer/antora-pdf
+      config_files:
+        - my-pdf-assembler.yml
+    - require: antora-tracer/antora-docx
+      config_files:
+        - my-docx-assembler.yml
+----
+
+Assembler config files and the `adoc-to-docx` script are consumer-side configuration — see the `examples/` directory in the repository for reference implementations.
 
 == Customize styling
 

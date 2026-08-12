@@ -25,20 +25,20 @@ antora:
       generateMatrices: true
       matrixFormats: [html, csv]
       includeInNavigation: true
-    - require: ./antora-pdf-extension.cjs
+    - require: ./lib/src/antora-pdf-extension.cjs
       config_files:
-        - antora-assembler-pdf.yml
-        - antora-assembler-pdf-architecture.yml
-        - antora-assembler-pdf-use-cases.yml
-        - antora-assembler-pdf-requirements.yml
-        - antora-assembler-pdf-test-plan.yml
-    - require: ./antora-docx-extension.cjs
+        - examples/antora-assembler-pdf.yml
+        - examples/antora-assembler-pdf-architecture.yml
+        - examples/antora-assembler-pdf-use-cases.yml
+        - examples/antora-assembler-pdf-requirements.yml
+        - examples/antora-assembler-pdf-test-plan.yml
+    - require: ./lib/src/antora-docx-extension.cjs
       config_files:
-        - antora-assembler-docx.yml
-        - antora-assembler-docx-architecture.yml
-        - antora-assembler-docx-requirements.yml
-        - antora-assembler-docx-use-cases.yml
-        - antora-assembler-docx-test-plan.yml
+        - examples/antora-assembler-docx.yml
+        - examples/antora-assembler-docx-architecture.yml
+        - examples/antora-assembler-docx-requirements.yml
+        - examples/antora-assembler-docx-use-cases.yml
+        - examples/antora-assembler-docx-test-plan.yml
 
 output:
   dir: ./build/pdf-output

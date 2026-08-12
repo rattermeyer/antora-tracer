@@ -1,10 +1,10 @@
 build:
-  command: ./adoc-to-docx
-  dir: ./build/assembler-docx-architecture
+  command: ./examples/adoc-to-docx
+  dir: ./build/assembler-docx-use-cases
   publish: true
   keepSource: true
 assembly:
-  profile: pdf-architecture
+  profile: pdf-use-cases
   insert_start_page: false
   root_level: 1
   sectionMergeStrategy: fuse
