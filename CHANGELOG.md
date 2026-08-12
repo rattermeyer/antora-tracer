@@ -4,12 +4,26 @@ All notable changes to the Antora Requirements Traceability Extension.
 
 ## [Unreleased]
 
+## [0.15.1] — 2026-08-12
+
 ### Fixed
-- Matrix links use trailing slash (`requirements/`) instead of `/index.html` to avoid server redirects dropping URL fragments
+- Pin `@antora/assembler` and `@antora/pdf-extension` peer dependencies to exact `1.0.0-beta.20` — the `rc.8` release requires `contentCatalog.publishableFamilies` (Antora 3.2+ only)
+
+## [0.15.0] — 2026-08-12
+
+### Added
+- Published PDF/DOCX Antora extensions as package subpath exports (`antora-tracer/antora-pdf`, `antora-tracer/antora-docx`)
+- DOCX output support via asciidoctor docbook → pandoc pipeline
+- `@antora/assembler` and `@antora/pdf-extension` as optional peer dependencies
+
+### Changed
+- Extension source files moved to `src/` (built to `lib/src/`)
+- Assembler config examples moved to `examples/`
 
 ## [0.14.1] — 2026-08-08
 
 ### Fixed
+- Matrix links use trailing slash (`requirements/`) instead of `/index.html` to avoid server redirects dropping URL fragments
 - Matrix links now respect Antora's default `indexify` URL style — pages at the component root produce `pagename/index.html` instead of incorrect `pagename.html` links
 
 ## [0.14.0] — 2026-08-08
