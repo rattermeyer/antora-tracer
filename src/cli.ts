@@ -23,7 +23,7 @@ import {
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const packageJsonPath = resolve(__dirname, "../package.json");
+const packageJsonPath = resolve(__dirname, "../../package.json");
 const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8"));
 
 // Global options

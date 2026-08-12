@@ -4,16 +4,16 @@
   "type": "module",
   "description": "Requirements traceability extensions for Antora/AsciiDoc",
   "main": "./lib/src/index.js",
-  "module": "lib/index.js",
+  "module": "lib/src/index.js",
   "exports": {
-    ".": "./lib/index.js",
+    ".": "./lib/src/index.js",
     "./antora-extension": "./lib/src/antora-extension.js",
     "./package.json": "./package.json"
   },
   "scripts": {
     "postinstall": "patch-package",
     "build": "tsc && node scripts/build.js",
-    "test": "tsc -p tsconfig.test.json && node --import=tsx/cjs 'node_modules/mocha/bin/mocha' 'lib/test/**/*.test.js'",
+    "test": "tsc -p tsconfig.test.json && node scripts/build.js && node --import=tsx/cjs 'node_modules/mocha/bin/mocha' 'lib/test/**/*.test.js'",
     "test:coverage": "npm run build && rm -rf .nyc_output coverage && c8 --include='lib/src/**/*.js' --exclude='lib/src/test/**' --exclude='lib/src/coverage/**' --exclude='lib/src/cli.js' node --import=tsx/cjs node_modules/mocha/bin/mocha 'lib/test/**/*.test.js'",
     "test:coverage:report": "c8 report",
     "test:coverage:check": "c8 check-coverage --lines 80 --branches 70 --functions 80 --statements 80",
@@ -22,8 +22,8 @@
     "lint:fix": "biome lint --write .",
     "format": "biome format --write .",
     "preview": "node scripts/preview.js",
-    "start": "node lib/cli.js",
-    "dev": "nodemon --watch src --exec \"npm run build && node lib/index.js\"",
+    "start": "node lib/src/cli.js",
+    "dev": "nodemon --watch src --exec \"npm run build && node lib/src/index.js\"",
     "tsc": "tsc",
     "tsc:watch": "tsc --watch"
   },
@@ -69,13 +69,11 @@
     "typescript": "^7.0.2"
   },
   "bin": {
-    "antora-tracer": "lib/cli.js"
+    "antora-tracer": "lib/src/cli.js"
   },
   "files": [
-    "lib",
-    "!lib/test",
+    "lib/src",
     "!lib/src/test",
-    "!lib/coverage",
     "!lib/src/coverage",
     "package.json",
     "LICENSE"
