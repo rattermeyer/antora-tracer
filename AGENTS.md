@@ -59,6 +59,23 @@ Skills: `.pi/skills/` — `update-example-site` refreshes the self-traceability 
 
 ## Consistency
 
+**Documentation is part of the change, not an afterthought.**
+Every code change that affects user-facing behavior, configuration, macros, CLI, or APIs MUST include corresponding documentation updates in the same commit.
+
+Before marking a task complete, scan these files for stale content about the changed feature:
+
+| Change type | Documentation to check |
+|---|---|
+| New/change extension config option | `reference/traceability-macros.adoc`, `how-to/contribute.adoc` |
+| New/change CLI option | `reference/cli.adoc`, `how-to/contribute.adoc` |
+| New/change macro or API | `reference/traceability-macros.adoc`, `user-guide.adoc` |
+| New/change visualization | `how-to/visualizations.adoc`, `architecture.adoc` |
+| New/change file output | `how-to/contribute.adoc`, `reference/traceability-macros.adoc` |
+| New/change env var | `how-to/contribute.adoc`, `reference/traceability-macros.adoc` |
+| General behavior change | `user-guide.adoc`, `reference/traceability-macros.adoc`, `how-to/visualizations.adoc` |
+
+When adding a new config option, env var, or feature flag: find every page that mentions sibling options (same reference section, same how-to page) and add the new one.
+
 When code behavior changes, verify consistency across these layers before committing:
 
 | Layer | Check |
