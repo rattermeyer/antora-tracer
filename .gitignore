@@ -177,6 +177,7 @@ tags
 # End of https://www.toptal.com/developers/gitignore/api/vim
 ui-bundle.zip
 public/
+lib/test/
 lib/src/test/
 build/
 **/diag-*-md5-*
