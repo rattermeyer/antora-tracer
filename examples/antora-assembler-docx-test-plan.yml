@@ -1,10 +1,10 @@
 build:
-  command: ./adoc-to-docx
-  dir: ./build/assembler-docx-requirements
+  command: ./examples/adoc-to-docx
+  dir: ./build/assembler-docx-test-plan
   publish: true
   keepSource: true
 assembly:
-  profile: pdf-requirements
+  profile: pdf-test-plan
   insert_start_page: false
   root_level: 1
   sectionMergeStrategy: fuse

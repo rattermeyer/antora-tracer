@@ -32,7 +32,7 @@ Two TypeScript configurations:
 - `tsconfig.json` — production build: `src/` → `lib/`
 - `tsconfig.test.json` — test build: `src/` + `test/` → `lib/`
 
-The build script (`scripts/build.js`) copies templates, presets, and compiled files to `lib/` for npm distribution.
+The build script (`scripts/build.js`) copies templates, presets, and CJS extension files to `lib/src/` for npm distribution.
 
 Pre-commit hooks: biome lint + format via `pre-commit`.
 

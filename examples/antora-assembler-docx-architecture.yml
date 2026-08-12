@@ -1,9 +1,11 @@
 build:
-  command: ./adoc-to-docx
-  dir: ./build/assembler-docx
+  command: ./examples/adoc-to-docx
+  dir: ./build/assembler-docx-architecture
   publish: true
   keepSource: true
 assembly:
+  profile: pdf-architecture
+  insert_start_page: false
   root_level: 1
   sectionMergeStrategy: fuse
   doctype: book
