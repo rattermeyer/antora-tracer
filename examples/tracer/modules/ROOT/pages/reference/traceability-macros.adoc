@@ -151,9 +151,31 @@ Renders a Kroki-generated Vega-Lite bar chart. Both macros auto-scale and have n
 :traceability-graph: true
 ----
 
-=== Kroki format
+=== Kroki configuration
 
-Both macros generate URLs pointing to the configured Kroki server. The image format (SVG/PNG) is controlled by the extension's Kroki configuration, not by document attributes.
+Both macros generate URLs pointing to the configured Kroki server.
+The image format (SVG/PNG) is controlled by `krokiImageFormat`, the server URL by `krokiServerUrl`.
+
+.Default: kroki.io (SVG format)
+[source,yaml]
+----
+antora:
+  extensions:
+    - require: antora-tracer/antora-extension
+      # defaults: krokiServerUrl: https://kroki.io, krokiImageFormat: svg
+----
+
+.Local Kroki server (PNG for PDF)
+[source,yaml]
+----
+antora:
+  extensions:
+    - require: antora-tracer/antora-extension
+      krokiServerUrl: http://localhost:8000
+      krokiImageFormat: png
+----
+
+You can also set `KROKI_SERVER_URL` and `KROKI_IMAGE_FORMAT` environment variables, which take precedence over extension config.
 
 == Related
 

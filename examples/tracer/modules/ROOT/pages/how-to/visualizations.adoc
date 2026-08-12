@@ -90,6 +90,22 @@ For textual relationship lists (not diagrams), enable the link macros:
 
 Then use `traceability:outgoing[]` and `traceability:incoming[]` inside item blocks. See xref:reference/traceability-macros.adoc[Traceability Macros Reference] for all options.
 
+=== Local Kroki server
+
+To use a local Kroki instance instead of the public `kroki.io` service, set `krokiServerUrl` in your playbook:
+
+[source,yaml]
+----
+antora:
+  extensions:
+    - require: antora-tracer/antora-extension
+      krokiServerUrl: http://localhost:8000
+      krokiImageFormat: png
+----
+
+Or set the environment variable: `KROKI_SERVER_URL=http://localhost:8000`.
+This works for air-gapped environments and avoids external network dependencies.
+
 == PDF compatibility
 
 All visualization macros render identically in HTML and PDF — they generate standard AsciiDoc constructs (xrefs, images via Kroki URLs). The `@antora/pdf-extension` handles the image resolution.
