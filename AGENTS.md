@@ -89,6 +89,7 @@ A fifth section, **Self-Traceability**, groups pages that demonstrate the extens
 
 **Key rules when adding or editing documentation:**
 
+- One sentence per line. See https://asciidoctor.org/docs/asciidoc-recommended-practices/#one-sentence-per-line[AsciiDoc Recommended Practices] — this makes pull request diffs line-level and reviews easier.
 - One page = one mode. Do not mix tutorial steps, how-to instructions, reference listings, and conceptual explanation in the same page.
 - Tutorials should not link out to Reference or Explanation — they are a guided path.
 - How-to, Reference, and Explanation pages cross-reference each other freely.
