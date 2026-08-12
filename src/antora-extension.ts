@@ -42,6 +42,7 @@ export interface AntoraTraceabilityConfig {
   preset?: string;
   configPath?: string;
   krokiImageFormat?: "svg" | "png";
+  krokiServerUrl?: string;
 }
 
 const DEFAULT_CONFIG: Required<AntoraTraceabilityConfig> = {
@@ -53,6 +54,7 @@ const DEFAULT_CONFIG: Required<AntoraTraceabilityConfig> = {
   preset: "requirements-engineering",
   configPath: "",
   krokiImageFormat: "svg",
+  krokiServerUrl: "",
 };
 
 export interface AntoraExtensionContext {
@@ -109,6 +111,7 @@ export class AntoraTraceabilityExtension {
       includeInNavigation: rc.includeInNavigation ?? rc.includeinnavigation ?? true,
       preset: rc.preset || "requirements-engineering",
       krokiImageFormat: rc.krokiImageFormat || rc.krokiimageformat || "svg",
+      krokiServerUrl: rc.krokiServerUrl || rc.krokiserverurl || "",
     };
 
     // Fallback: if no configPath is set, try the example site config
@@ -656,10 +659,11 @@ export class AntoraTraceabilityExtension {
    * Uses deflate + base64url encoding.
    */
   private krokiUrl(type: string, source: string): string {
+    const serverUrl = (process.env.KROKI_SERVER_URL || this.config.krokiServerUrl || "https://kroki.io").replace(/\/$/, "");
     const format = process.env.KROKI_IMAGE_FORMAT || this.config.krokiImageFormat || "svg";
     const compressed = deflateSync(Buffer.from(source, "utf-8"));
     const encoded = Buffer.from(compressed).toString("base64url");
-    return `https://kroki.io/${type}/${format}/${encoded}`;
+    return `${serverUrl}/${type}/${format}/${encoded}`;
   }
 
   /**

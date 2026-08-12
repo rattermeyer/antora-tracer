@@ -1646,6 +1646,181 @@ traceability:graph[REQ-001]
       const traceExt = ext.getTraceabilityExtension();
       expect(traceExt.getAllItems()).to.have.lengthOf(2);
     });
+
+    // ---- Kroki server URL configuration tests ----
+
+    it("should generate URLs pointing to default kroki.io server", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const content = `:traceability-graph: true
+
+[#REQ-001, item, role=requirement, title="Auth"]
+--
+addresses:ARC-001[]
+
+traceability:graph[]
+--
+
+[#ARC-001, item, role=architecture, title="Auth Module"]
+--
+Description.
+--
+`;
+
+      const file = { src: { path: "test.adoc" }, contents: Buffer.from(content) };
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: { findBy: () => [file] },
+      });
+
+      const output = file.contents.toString("utf8");
+      expect(output).to.include("image::https://kroki.io/graphviz/");
+    });
+
+    it("should use custom krokiServerUrl from extension config", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any, {
+        config: { krokiServerUrl: "http://localhost:8000" },
+      });
+      await waitForInit();
+
+      const content = `:traceability-graph: true
+
+[#REQ-001, item, role=requirement, title="Auth"]
+--
+addresses:ARC-001[]
+
+traceability:graph[]
+--
+
+[#ARC-001, item, role=architecture, title="Auth Module"]
+--
+Description.
+--
+`;
+
+      const file = { src: { path: "test.adoc" }, contents: Buffer.from(content) };
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: { findBy: () => [file] },
+      });
+
+      const output = file.contents.toString("utf8");
+      expect(output).to.include("image::http://localhost:8000/graphviz/");
+      expect(output).to.not.include("kroki.io");
+    });
+
+    it("should use KROKI_SERVER_URL env var when set", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const content = `:traceability-graph: true
+
+[#REQ-001, item, role=requirement, title="Auth"]
+--
+addresses:ARC-001[]
+
+traceability:graph[]
+--
+
+[#ARC-001, item, role=architecture, title="Auth Module"]
+--
+Description.
+--
+`;
+
+      process.env.KROKI_SERVER_URL = "http://env-server:9999";
+      try {
+        const file = { src: { path: "test.adoc" }, contents: Buffer.from(content) };
+        ctx.fireEvent("contentClassified", {
+          contentCatalog: { findBy: () => [file] },
+        });
+        const output = file.contents.toString("utf8");
+        expect(output).to.include("image::http://env-server:9999/graphviz/");
+      } finally {
+        delete process.env.KROKI_SERVER_URL;
+      }
+    });
+
+    it("should let KROKI_SERVER_URL env var override config", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any, {
+        config: { krokiServerUrl: "http://config-server:8000" },
+      });
+      await waitForInit();
+
+      const content = `:traceability-graph: true
+
+[#REQ-001, item, role=requirement, title="Auth"]
+--
+addresses:ARC-001[]
+
+traceability:graph[]
+--
+
+[#ARC-001, item, role=architecture, title="Auth Module"]
+--
+Description.
+--
+`;
+
+      process.env.KROKI_SERVER_URL = "http://env-server:9999";
+      try {
+        const file = { src: { path: "test.adoc" }, contents: Buffer.from(content) };
+        ctx.fireEvent("contentClassified", {
+          contentCatalog: { findBy: () => [file] },
+        });
+        const output = file.contents.toString("utf8");
+        expect(output).to.include("image::http://env-server:9999/graphviz/");
+        expect(output).to.not.include("config-server");
+      } finally {
+        delete process.env.KROKI_SERVER_URL;
+      }
+    });
+
+    it("should strip trailing slash from krokiServerUrl", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any, {
+        config: { krokiServerUrl: "http://localhost:8000/" },
+      });
+      await waitForInit();
+
+      const content = `:traceability-graph: true
+
+[#REQ-001, item, role=requirement, title="Auth"]
+--
+addresses:ARC-001[]
+
+traceability:graph[]
+--
+
+[#ARC-001, item, role=architecture, title="Auth Module"]
+--
+Description.
+--
+`;
+
+      const file = { src: { path: "test.adoc" }, contents: Buffer.from(content) };
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: { findBy: () => [file] },
+      });
+
+      const output = file.contents.toString("utf8");
+      // Should NOT have double-slash after host
+      expect(output).to.include("image::http://localhost:8000/graphviz/");
+      expect(output).to.not.include("//graphviz");
+    });
   });
 
   // ========================================================================
