@@ -404,7 +404,7 @@ npx antora antora-playbook-pdf.yml  # generates PDF and DOCX
 
 ### Lunr search patch
 
-The example site uses `patch-package` to fix `@antora/lunr-extension` so that traceability items (e.g. `REQ-001`) appear as separate search results linking directly to their anchors. The patch is in `patches/` and applied automatically via the `postinstall` script. See the archived [change proposal](openspec/changes/archive/2025-08-05-index-item-anchors-in-lunr/) for details.
+The example site uses `patch-package` to fix `@antora/lunr-extension` so that traceability items (e.g. `REQ-001`) appear as separate search results linking directly to their anchors. The patch is in `patches/` and applied in CI via an explicit `npx patch-package` step (not a `postinstall` script). See the archived [change proposal](openspec/changes/archive/2025-08-05-index-item-anchors-in-lunr/) for details.
 
 Every feature, fix, and refactor starts as a proposal with specs, design, and tasks in the `openspec/changes/` directory. The archive at `openspec/changes/archive/` preserves the complete history of every change.
 

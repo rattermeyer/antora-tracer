@@ -1,6 +1,6 @@
 {
   "name": "antora-tracer",
-  "version": "0.16.0",
+  "version": "0.16.1",
   "type": "module",
   "description": "Requirements traceability extensions for Antora/AsciiDoc",
   "main": "./lib/src/index.js",
@@ -13,7 +13,6 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "postinstall": "patch-package",
     "build": "tsc && node scripts/build.js",
     "test": "tsc -p tsconfig.test.json && node scripts/build.js && node --import=tsx/cjs 'node_modules/mocha/bin/mocha' 'lib/test/**/*.test.js'",
     "test:coverage": "npm run build && rm -rf .nyc_output coverage && c8 --include='lib/src/**/*.js' --exclude='lib/src/test/**' --exclude='lib/src/coverage/**' --exclude='lib/src/cli.js' node --import=tsx/cjs node_modules/mocha/bin/mocha 'lib/test/**/*.test.js'",
@@ -42,6 +41,7 @@
     "@asciidoctor/core": "^2.2.7",
     "chalk": "^5.6.2",
     "commander": "^12.1.0",
+    "js-yaml": "^4.1.0",
     "mustache": "^4.2.0"
   },
   "devDependencies": {

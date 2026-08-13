@@ -2,7 +2,19 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
-## [Unreleased]
+## [0.16.1] — 2026-08-13
+
+### Fixed
+- Generated matrices are now registered in the Antora content catalog during
+  `contentClassified`, so `xref:attachment$traceability/matrix-*.html[]`
+  resolves instead of failing with "target of xref not found" (#6)
+- Removed the `postinstall` script — it shipped `patch-package` (a dev
+  dependency), so `npm install antora-tracer` failed for consumers with
+  "patch-package: not found". Patches are applied in CI via an explicit
+  `npx patch-package` step.
+- Added `js-yaml` to runtime `dependencies` — it is imported by the config
+  loader but was only present transitively, so the CLI failed on a fresh
+  install with "Cannot find package 'js-yaml'".
 
 ## [0.16.0] — 2026-08-12
 
