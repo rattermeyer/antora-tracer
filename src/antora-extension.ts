@@ -17,10 +17,6 @@ import {
   existsSync,
   mkdirSync,
   writeFileSync,
-  readdirSync,
-  rmSync,
-  statSync,
-  copyFileSync,
 } from "node:fs";
 import { isAbsolute, join } from "node:path";
 import { deflateSync } from "node:zlib";
@@ -919,26 +915,31 @@ export class AntoraTraceabilityExtension {
       // Antora xrefs are version-scoped — an xref from v0.10.x cannot resolve
       // to a page in v0.11.x. Clearing the graph between versions prevents
       // items from one version leaking into another version's xref generation.
+      // The key includes the component because two components may share a
+      // version string (e.g. "latest").
       const groupByVersion = (files: any[]) => {
         const groups = new Map<string, any[]>();
         for (const file of files) {
-          const v = file.src?.version || "unknown";
-          if (!groups.has(v)) groups.set(v, []);
-          groups.get(v)!.push(file);
+          const key = `${file.src?.component || "unknown"}@${file.src?.version || "unknown"}`;
+          if (!groups.has(key)) groups.set(key, []);
+          groups.get(key)!.push(file);
         }
         return groups;
       };
 
       const pageGroups = groupByVersion(adocFiles);
       const partialGroups = groupByVersion(adocPartials);
-      const allVersions = new Set([
+      const allKeys = new Set([
         ...pageGroups.keys(),
         ...partialGroups.keys(),
       ]);
 
-      for (const version of allVersions) {
-        const pageFilesForVersion = pageGroups.get(version) || [];
-        const partialFilesForVersion = partialGroups.get(version) || [];
+      const htmlStyle = event.playbook?.urls?.html_style;
+
+      for (const key of allKeys) {
+        const [component, version] = key.split("@");
+        const pageFilesForVersion = pageGroups.get(key) || [];
+        const partialFilesForVersion = partialGroups.get(key) || [];
 
         // Clear the graph so each version is self-contained
         if (this.traceability) {
@@ -980,8 +981,91 @@ export class AntoraTraceabilityExtension {
         for (const file of partialFilesForVersion) {
           this.substituteLinksInFile(file);
         }
+
+        // Register generated matrices in the content catalog as attachments so
+        // xref:attachment$traceability/matrix-*.{format}[...] resolves during
+        // document conversion (which happens after this contentClassified event).
+        this.registerMatricesInCatalog(
+          contentCatalog,
+          component,
+          version,
+          pageFilesForVersion.concat(partialFilesForVersion),
+          htmlStyle,
+        );
       }
     });
+  }
+
+  /**
+   * Register generated matrix files in the content catalog as attachments for a
+   * single component version. Files are registered under every module that has
+   * AsciiDoc content so xref:attachment$traceability/... resolves from any page
+   * or nav file in that module during document conversion.
+   *
+   * Runs during contentClassified — after classification but before
+   * convertDocuments — the window in which xrefs are resolved.
+   */
+  private registerMatricesInCatalog(
+    contentCatalog: any,
+    component: string,
+    version: string,
+    files: any[],
+    htmlStyle?: string,
+  ): void {
+    if (!this.config.generateMatrices || !this.traceability) return;
+    if (this.traceability.graph.getAllItems().length === 0) return;
+
+    const modules = new Set<string>();
+    for (const file of files) {
+      modules.add(file.src?.module || "ROOT");
+    }
+    if (modules.size === 0) modules.add("ROOT");
+
+    const { files: matrixFiles } = this.generateMatrixFiles(htmlStyle);
+    for (const module of modules) {
+      for (const { fileName, content } of matrixFiles) {
+        this.registerAttachmentInCatalog(
+          contentCatalog,
+          component,
+          version,
+          module,
+          `traceability/${fileName}`,
+          content,
+        );
+      }
+    }
+  }
+
+  /**
+   * Add (or refresh) a single attachment in the content catalog. If a committed
+   * copy already exists (e.g. matrices checked into modules/ROOT/attachments/),
+   * its contents are replaced so the freshly generated output is authoritative.
+   */
+  private registerAttachmentInCatalog(
+    contentCatalog: any,
+    component: string,
+    version: string,
+    module: string,
+    relative: string,
+    content: string,
+  ): void {
+    const family = "attachment";
+    const id = { component, version, module, family, relative };
+    const existing = contentCatalog.getById?.(id);
+    if (existing) {
+      existing.contents = Buffer.from(content, "utf8");
+      return;
+    }
+    try {
+      contentCatalog.addFile({
+        src: { component, version, module, family, relative },
+        contents: Buffer.from(content, "utf8"),
+      });
+    } catch (error: any) {
+      this.logger.warn(
+        `Failed to register ${relative} in content catalog: ${error.message}`,
+      );
+    }
   }
 
   private processAsciiDocFile(file: any, viewUrl?: string): void {
@@ -1277,6 +1361,59 @@ export class AntoraTraceabilityExtension {
     });
   }
 
+  private generateMatrixFiles(
+    htmlStyle?: string,
+  ): { matrixNames: string[]; files: Array<{ fileName: string; content: string }> } {
+    const files: Array<{ fileName: string; content: string }> = [];
+    if (!this.traceability) return { matrixNames: [], files };
+
+    const matrices =
+      this.traceability.configLoader?.getConfig()?.matrices || [];
+    const matrixNames =
+      matrices.length > 0
+        ? matrices.map((m: any) => m.name)
+        : this.generateDefaultMatrixNames(
+            this.traceability.graph.getAllRoles(),
+          );
+
+    const generator = new MatrixGenerator(
+      this.traceability.graph,
+      this.traceability.configLoader,
+      {
+        linkResolver: new LinkResolver({
+          relativePathPrefix: "../../",
+          indexify: htmlStyle !== "default",
+        }),
+      },
+    );
+
+    for (const matrixName of matrixNames) {
+      for (const format of this.config.matrixFormats) {
+        try {
+          const matrix = generator.generateMatrix(matrixName);
+          let content: string;
+          if (format === "html") {
+            content = generator.exportToHTML(matrix);
+          } else if (format === "json") {
+            content = JSON.stringify(matrix, null, 2);
+          } else {
+            content = generator.exportToCSV(matrix);
+          }
+          const safeName = matrixName
+            .replace(/[^a-zA-Z0-9-]/g, "-")
+            .toLowerCase();
+          files.push({ fileName: `matrix-${safeName}.${format}`, content });
+        } catch (error: any) {
+          this.logger.warn(
+            `Failed to generate matrix ${matrixName} (${format}): ${error.message}`,
+          );
+        }
+      }
+    }
+
+    return { matrixNames, files };
+  }
+
   private generateTraceabilityFiles(event: any): void {
     if (!this.traceability) {
       this.logger.warn(
@@ -1290,59 +1427,19 @@ export class AntoraTraceabilityExtension {
       const traceabilityDir = join(outputDir, this.config.outputDir);
       this.logger.info(`Writing traceability files to ${traceabilityDir}`);
       mkdirSync(traceabilityDir, { recursive: true });
-      const allItems = this.traceability.graph.getAllItems();
-      if (allItems.length === 0) {
+      if (this.traceability.graph.getAllItems().length === 0) {
         this.logger.warn(
           "No traceable items found. Skipping matrix generation.",
         );
         return;
       }
 
-      const matrices =
-        this.traceability?.configLoader?.getConfig()?.matrices || [];
-      const matrixNames =
-        matrices.length > 0
-          ? matrices.map((m: any) => m.name)
-          : this.generateDefaultMatrixNames(
-              this.traceability.graph.getAllRoles(),
-            );
-
-      const htmlStyle = event.playbook?.urls?.html_style;
-      const linkResolver = new LinkResolver({
-        relativePathPrefix: "../../",
-        indexify: htmlStyle !== "default",
-      });
-      const generator = new MatrixGenerator(
-        this.traceability.graph,
-        this.traceability.configLoader,
-        { linkResolver },
+      const { matrixNames, files } = this.generateMatrixFiles(
+        event.playbook?.urls?.html_style,
       );
-
-      for (const matrixName of matrixNames) {
-        for (const format of this.config.matrixFormats) {
-          try {
-            const matrix = generator.generateMatrix(matrixName);
-            let matrixContent: string;
-            if (format === "html") {
-              matrixContent = generator.exportToHTML(matrix);
-            } else if (format === "json") {
-              matrixContent = JSON.stringify(matrix, null, 2);
-            } else {
-              matrixContent = generator.exportToCSV(matrix);
-            }
-            const safeName = matrixName
-              .replace(/[^a-zA-Z0-9-]/g, "-")
-              .toLowerCase();
-            const fileName = `matrix-${safeName}.${format}`;
-            const filePath = join(traceabilityDir, fileName);
-            writeFileSync(filePath, matrixContent, "utf8");
-            this.logger.info(`Generated ${fileName}`);
-          } catch (error: any) {
-            this.logger.warn(
-              `Failed to generate matrix ${matrixName} (${format}): ${error.message}`,
-            );
-          }
-        }
+      for (const { fileName, content } of files) {
+        writeFileSync(join(traceabilityDir, fileName), content, "utf8");
+        this.logger.info(`Generated ${fileName}`);
       }
 
       this.generateCoverageReport(traceabilityDir);
@@ -1352,95 +1449,9 @@ export class AntoraTraceabilityExtension {
       this.logger.info(
         `Traceability files written to ${this.config.outputDir}/`,
       );
-
-      // Also write matrices to each component version's _attachments/traceability/
-      // so that attachment$traceability/... links in nav resolve correctly.
-      this.syncMatricesToAttachments(event, traceabilityDir, outputDir);
     } catch (error: any) {
       this.logger.error(
         `Error generating traceability pages: ${error.message}`,
-      );
-    }
-  }
-
-  /**
-   * Sync generated matrix files from traceabilityDir to each component version's
-   * _attachments/traceability/ directory so that attachment$traceability/... links
-   * in AsciiDoc resolve to the latest matrix output.
-   *
-   * Uses contentCatalog to find component version output paths, resolving the
-   * correct version URL segment (e.g. "latest" instead of "0.7.0").
-   */
-  private syncMatricesToAttachments(
-    event: any,
-    traceabilityDir: string,
-    outputDir: string,
-  ): void {
-    try {
-      const contentCatalog = event.contentCatalog;
-      if (!contentCatalog) {
-        this.logger.warn("No contentCatalog, skipping attachment sync");
-        return;
-      }
-
-      // Get attachment files from the catalog to discover the correct version segment
-      const attachmentFiles = contentCatalog.findBy?.({ family: "attachment" }) || [];
-      const versionSegments = new Map<string, string>(); // component -> versionSegment
-      for (const file of attachmentFiles) {
-        if (file.src?.component && file.src?.version && !versionSegments.has(file.src.component)) {
-          // Extract version segment from the output path
-          // path is like: tracer/latest/_attachments/traceability/matrix-requirements-tests.html
-          const outPath = file.out?.path || file.out?.dirname || "";
-          const match = outPath.match(
-            /^([^/]+)\/([^/]+)\/_attachments\//,
-          );
-          if (match) {
-            versionSegments.set(match[1], match[2]);
-          }
-        }
-      }
-
-      if (versionSegments.size === 0) {
-        // Fallback: get components and try with their versions
-        const components = contentCatalog.getComponents();
-        if (components) {
-          for (const comp of components) {
-            for (const cv of comp.versions || []) {
-              if (cv.version) versionSegments.set(comp.name, cv.version);
-            }
-          }
-        }
-      }
-
-      const traceabilityFiles = readdirSync(traceabilityDir);
-      for (const [componentName, versionSegment] of versionSegments) {
-        const attachDir = join(
-          outputDir,
-          componentName,
-          versionSegment,
-          "_attachments",
-          "traceability",
-        );
-        mkdirSync(attachDir, { recursive: true });
-
-        // Clean stale files from previous builds so only current matrices remain
-        const existingFiles = readdirSync(attachDir);
-        for (const existing of existingFiles) {
-          rmSync(join(attachDir, existing), { force: true });
-        }
-
-        for (const file of traceabilityFiles) {
-          const src = join(traceabilityDir, file);
-          if (!statSync(src).isFile()) continue;
-          copyFileSync(src, join(attachDir, file));
-        }
-        this.logger.info(
-          `Synced matrices to ${componentName}/${versionSegment}/_attachments/traceability/`,
-        );
-      }
-    } catch (error: any) {
-      this.logger.warn(
-        `Failed to sync matrices to attachments: ${error.message}`,
       );
     }
   }

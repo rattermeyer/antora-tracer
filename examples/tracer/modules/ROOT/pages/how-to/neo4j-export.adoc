@@ -5,7 +5,7 @@
 
 toc::[]
 
-The extension can export the traceability graph to Neo4j-compatible formats — CSV (nodes + relationships) and Cypher (executable script).
+The extension exports the traceability graph to files Neo4j can import — CSV (nodes + relationships) and Cypher (an executable script). The export is file-based only: there is no direct Neo4j connection; you import the generated files into Neo4j yourself (for example with `LOAD CSV`, `cypher-shell`, or the Neo4j Data Importer).
 
 == Export from the CLI
 
@@ -55,17 +55,6 @@ A single `import.cypher` file with `CREATE` statements for all nodes and relatio
 ----
 cat import.cypher | cypher-shell -u neo4j -p password
 ----
-
-== Export from the Antora build
-
-Antora-based builds generate Neo4j exports automatically during `sitePublished`:
-
-[source,bash]
-----
-npx antora antora-playbook.yml
-----
-
-Exports appear in `<site-output>/traceability/neo4j/`.
 
 == Example queries
 

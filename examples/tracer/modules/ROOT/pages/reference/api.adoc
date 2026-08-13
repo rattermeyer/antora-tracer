@@ -289,7 +289,7 @@ export class AntoraTraceabilityExtension {
 }
 ----
 
-Event handlers: `contentClassified` (process items), `sitePublished` (generate matrices and export).
+Event handlers: `contentClassified` (process items and register matrices), `sitePublished` (write standalone traceability output).
 
 == Related
 

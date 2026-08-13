@@ -223,9 +223,10 @@ traceability:links[]
 [#ARC-016, item, role=design, title="Event-driven Antora integration"]
 --
 The extension hooks into Antora's event pipeline via `register()`:
-`contentClassified` triggers parsing and macro expansion; `sitePublished`
-triggers matrix generation and export. Each event handler is self-contained
-does not block the build pipeline, and receives the content catalog as a
+`contentClassified` triggers parsing, macro expansion, and matrix
+registration in the content catalog; `sitePublished` writes the standalone
+traceability output directory. Each event handler is self-contained, does
+not block the build pipeline, and receives the content catalog as a
 parameter. The same `RequirementsTraceabilityExtension` class is used by
 the CLI outside Antora, demonstrating the event handlers are optional.
 
@@ -286,16 +287,16 @@ addresses:REQ-063[]
 traceability:links[]
 --
 
-[#ARC-027, item, role=design, title="Automatic matrix sync to component _attachments"]
+[#ARC-027, item, role=design, title="Matrix registration in the content catalog"]
 --
-The `syncMatricesToAttachments()` method, called from
-`generateTraceabilityFiles()` during the `sitePublished` event, copies all
-generated matrix files (HTML and CSV) to each component version's
-`_attachments/traceability/` subdirectory. This ensures that
-`attachment$traceability/...` nav links resolve to the latest matrix output
-without requiring manual file copies. The correct version URL segment (e.g.
-`latest` instead of `0.7.0`) is resolved by inspecting attachment file
-output paths from the Antora content catalog.
+The `registerMatricesInCatalog()` method generates matrix files (HTML, CSV,
+JSON) per component version during the `contentClassified` event and
+registers them in the Antora content catalog as `attachment`-family files
+via `contentCatalog.addFile()`. Registration happens before document
+conversion, so `attachment$traceability/...` xrefs in nav files and pages
+resolve without manual file copies. Matrices are registered under every
+module that has AsciiDoc content; a committed copy, if present, has its
+contents refreshed in place.
 
 addresses:REQ-108[]
 traceability:links[]
@@ -509,10 +510,10 @@ include::example$sequence-diagram.puml[]
 | Participant | Role in processing
 
 | Antora Build
-| Triggers `contentClassified` (per-page document processing) and `sitePublished` (matrix generation after all pages). Provides the content catalog.
+| Triggers `contentClassified` (document processing and matrix registration) and `sitePublished` (standalone output directory). Provides the content catalog.
 
 | `AntoraTraceabilityExtension`
-| Event handler registration. Orchestrates the three processing passes and matrix sync. Reads playbook config to determine preset, config path, output directory.
+| Event handler registration. Orchestrates the processing passes and matrix registration in the content catalog. Reads playbook config to determine preset, config path, output directory.
 
 | `RequirementsTraceabilityExtension`
 | Core API. Owns the graph, delegates to parser and generators. Same class used by CLI without Antora events.

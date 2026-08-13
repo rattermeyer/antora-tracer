@@ -61,7 +61,7 @@ REQ-127,REQ-127 — update-example-site skill includes diagram checklist,
 REQ-060,REQ-060 — Pages workflow generates PDFs,
 REQ-061,REQ-061 — Site links to PDF downloads,
 REQ-062,REQ-062 — Local PDF workflow is unchanged,
-REQ-108,REQ-108 — Matrix files synced to component _attachments,TST-002: TST-002 — Antora Extension Tests
+REQ-108,REQ-108 — Matrix files registered in the content catalog,TST-002: TST-002 — Antora Extension Tests
 REQ-072,REQ-072 — Landing page at GitHub Pages root,
 REQ-073,REQ-073 — Two-persona feature presentation,
 REQ-074,REQ-074 — Traceability visualization preview,

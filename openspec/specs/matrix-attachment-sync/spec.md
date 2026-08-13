@@ -2,37 +2,33 @@
 
 ## Purpose
 
-Automatically sync generated matrix files (HTML and CSV) from the global traceability output directory to each component version's `_attachments/traceability/` directory during the `sitePublished` event. This ensures `attachment$traceability/...` links in AsciiDoc navigation resolve to the latest matrix output without manual copying.
+Register generated matrix files in the Antora content catalog as `attachment`-family files during the `contentClassified` event, before document conversion. This ensures `attachment$traceability/...` xrefs in AsciiDoc navigation and pages resolve without manual copying or committing matrix output.
 
 ## Requirements
 
-### Requirement: Matrix files synced to component _attachments
-The system SHALL automatically sync generated matrix files (HTML and CSV) from the global traceability output directory to each component version's `_attachments/traceability/` directory during the `sitePublished` event. The sync SHALL resolve the correct version URL segment (e.g., `latest` instead of `0.7.0`) using the content catalog.
+### Requirement: Matrix files registered in the content catalog
+The system SHALL register generated matrix files (HTML, CSV, JSON) in the Antora content catalog as `attachment`-family files during the `contentClassified` event, before document conversion, so `attachment$traceability/...` xrefs resolve. Registration SHALL occur per component version and under every module that has AsciiDoc content. A committed copy, if present, SHALL have its contents refreshed in place.
 
-#### Scenario: Matrices are synced to all component versions
-- **WHEN** the `sitePublished` event fires and matrices have been generated
-- **THEN** generated matrix files are copied to `<component>/<version>/_attachments/traceability/` for each component version
-- **AND** `attachment$traceability/...` links in AsciiDoc navigation resolve to the synced files
+#### Scenario: Matrices are registered for each component version
+- **WHEN** the `contentClassified` event fires and a component version has traceable items
+- **THEN** matrix files are added to the content catalog via `contentCatalog.addFile()` for that component version
+- **AND** `attachment$traceability/...` xrefs in AsciiDoc navigation and pages resolve to the registered files
 
-#### Scenario: Version URL segment uses catalog resolution
-- **WHEN** matrix sync discovers a version segment via attachment file paths in the content catalog
-- **THEN** the discovered segment (e.g., `latest`) is used instead of the raw version string (e.g., `0.7.0`)
+#### Scenario: Matrices are registered under every module with content
+- **WHEN** a component version has AsciiDoc content in multiple modules
+- **THEN** matrix files are registered under each such module
+- **AND** module-relative `attachment$traceability/...` xrefs resolve from any of those modules
 
-#### Scenario: Fallback when content catalog has no attachment files
-- **WHEN** the content catalog has no attachment files yet (first build)
-- **THEN** the sync falls back to component version strings from `getComponents()`
+#### Scenario: A committed copy is refreshed in place
+- **WHEN** an attachment with the same component, version, module, and relative path already exists in the content catalog
+- **THEN** its contents are replaced with the freshly generated matrix output
+- **AND** no duplicate attachment error is raised
 
-#### Scenario: Stale files from previous builds are cleaned
-- **WHEN** matrices are synced to `_attachments/traceability/`
-- **THEN** existing files in the target directory are removed before copying
-- **AND** only the current build's matrices remain
+#### Scenario: No traceable items
+- **WHEN** a component version has no traceable items
+- **THEN** no matrix files are registered
 
-#### Scenario: No contentCatalog available
-- **WHEN** the `sitePublished` event has no `contentCatalog` property
-- **THEN** the sync is skipped with a warning
-- **AND** no error is thrown
-
-#### Scenario: Sync failure does not crash the build
-- **WHEN** an I/O error occurs during sync (e.g., permission denied)
+#### Scenario: Registration failure does not crash the build
+- **WHEN** `contentCatalog.addFile()` throws (e.g., duplicate or malformed metadata)
 - **THEN** a warning is logged
 - **AND** the Antora build continues normally

@@ -601,11 +601,11 @@ Source: openspec/specs/ci-pdf-deploy/spec.md
 traceability:links[]
 --
 
-== Matrix Sync
+== Matrix Registration
 
-[#REQ-108, item, role=requirement, title="Matrix files synced to component _attachments"]
+[#REQ-108, item, role=requirement, title="Matrix files registered in the content catalog"]
 --
-The system SHALL automatically sync generated matrix files (HTML and CSV) from the global traceability output directory to each component version's `_attachments/traceability/` directory during the `sitePublished` event. The sync SHALL resolve the correct version URL segment (e.g., `latest` instead of `0.7.0`) using the content catalog.
+The system SHALL register generated matrix files (HTML, CSV, JSON) in the Antora content catalog as `attachment`-family files during the `contentClassified` event, before document conversion, so `attachment$traceability/...` xrefs resolve. Registration SHALL occur per component version and under every module that has AsciiDoc content. A committed copy, if present, SHALL have its contents refreshed in place.
 
 Source: openspec/specs/matrix-attachment-sync/spec.md
 

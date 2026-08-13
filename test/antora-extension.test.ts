@@ -1824,135 +1824,93 @@ Description.
   });
 
   // ========================================================================
-  // Matrix Attachment Sync (REQ-057)
+  // Matrix Catalog Registration (REQ-057)
   // ========================================================================
 
-  describe("Matrix Attachment Sync", () => {
-    it("should sync matrix files to _attachments during sitePublished", async () => {
-      const testOutputDir = join(tempDir, "site-output");
-      mkdirSync(testOutputDir, { recursive: true });
-
-      const ctx = createMockContext({
-        playbook: {
-          output: { dir: testOutputDir },
-          extensions: [],
-        },
-      });
-      const ext = new AntoraTraceabilityExtension(ctx as any);
-      await waitForInit();
-
-      // Set up traceability items so matrices are generated
-      const content = `
+  describe("Matrix Catalog Registration", () => {
+    const itemContent = `
 [#REQ-001, item, role=requirement, title="Test requirement"]
---
-addresses:ARC-001[]
---
-
-[#ARC-001, item, role=architecture, title="Test architecture"]
---
-Description.
---
+====
+The system shall authenticate users.
+====
 `;
-      ctx.fireEvent(
-        "contentClassified",
-        createContentClassifiedEvent([{ path: "test.adoc", content }]),
-      );
 
-      // Create a mock sitePublished event with contentCatalog
-      const mockContentCatalog = {
-        getComponents: () => [
-          {
-            name: "test-component",
-            versions: [{ version: "1.0.0" }],
-          },
-        ],
+    function createCatalog(overrides: Partial<any> = {}) {
+      return {
         findBy: ({ family }: { family: string }) => {
-          if (family === "attachment") {
+          if (family === "page") {
             return [
               {
-                src: { component: "test-component", version: "1.0.0" },
-                out: {
-                  path: "test-component/latest/_attachments/traceability/old-matrix.html",
-                  dirname: "test-component/latest/_attachments/traceability",
+                src: {
+                  path: "test.adoc",
+                  module: "ROOT",
+                  component: "test-component",
+                  version: "1.0.0",
                 },
+                contents: Buffer.from(itemContent),
               },
             ];
           }
           return [];
         },
+        getById: () => undefined,
+        addFile: (file: any) => file,
+        ...overrides,
       };
+    }
 
-      const sitePublishedEvent = {
-        playbook: { output: { dir: testOutputDir } },
-        contentCatalog: mockContentCatalog,
-      };
-
-      ctx.fireEvent("sitePublished", sitePublishedEvent);
-
-      // Verify attachment directory was created and matrix files synced
-      const attachDir = join(
-        testOutputDir,
-        "test-component",
-        "latest",
-        "_attachments",
-        "traceability",
-      );
-      expect(existsSync(attachDir)).to.be.true;
-
-      // Verify at least the CSV file was synced
-      const files = readdirSync(attachDir);
-      expect(files.some((f: string) => f.startsWith("matrix-"))).to.be.true;
-    });
-
-    it("should handle contentCatalog without attachment files", async () => {
-      const testOutputDir = join(tempDir, "site-output-no-attach");
-      mkdirSync(testOutputDir, { recursive: true });
+    it("should register matrix attachments in the content catalog during contentClassified", async () => {
+      const addedFiles: any[] = [];
+      const contentCatalog = createCatalog({
+        addFile: (file: any) => {
+          addedFiles.push(file);
+          return file;
+        },
+      });
 
       const ctx = createMockContext({
-        playbook: {
-          output: { dir: testOutputDir },
-          extensions: [],
-        },
+        playbook: { output: { dir: tempDir }, extensions: [] },
       });
       const ext = new AntoraTraceabilityExtension(ctx as any);
       await waitForInit();
 
-      const content = `
-[#REQ-001, item, role=requirement, title="Test requirement"]
---
-Content.
---
-`;
-      ctx.fireEvent(
-        "contentClassified",
-        createContentClassifiedEvent([{ path: "test.adoc", content }]),
+      ctx.fireEvent("contentClassified", { contentCatalog });
+
+      const matrixFiles = addedFiles.filter(
+        (f: any) =>
+          f.src?.family === "attachment" &&
+          f.src?.relative?.startsWith("traceability/matrix-"),
       );
+      expect(matrixFiles.length).to.be.greaterThan(0);
+      expect(matrixFiles[0].src.component).to.equal("test-component");
+      expect(matrixFiles[0].src.version).to.equal("1.0.0");
+      expect(matrixFiles[0].src.module).to.equal("ROOT");
+      expect(matrixFiles[0].contents).to.be.instanceOf(Buffer);
+    });
 
-      // contentCatalog with no attachments — fallback to component versions
-      const mockContentCatalog = {
-        getComponents: () => [
-          {
-            name: "fallback-comp",
-            versions: [{ version: "2.0.0" }],
-          },
-        ],
-        findBy: () => [],
-      };
-
-      ctx.fireEvent("sitePublished", {
-        playbook: { output: { dir: testOutputDir } },
-        contentCatalog: mockContentCatalog,
+    it("should replace contents of an existing committed matrix attachment", async () => {
+      const existing = { contents: Buffer.from("stale") };
+      const addedFiles: any[] = [];
+      const contentCatalog = createCatalog({
+        getById: () => existing,
+        addFile: (file: any) => {
+          addedFiles.push(file);
+          return file;
+        },
       });
 
-      // Should fall back to version from getComponents()
-      const attachDir = join(
-        testOutputDir,
-        "fallback-comp",
-        "2.0.0",
-        "_attachments",
-        "traceability",
-      );
-      expect(existsSync(attachDir)).to.be.true;
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      ctx.fireEvent("contentClassified", { contentCatalog });
+
+      // Existing attachment is refreshed in place, not re-added.
+      expect(addedFiles).to.have.length(0);
+      expect(existing.contents).to.be.instanceOf(Buffer);
+      expect(existing.contents.toString()).to.not.equal("stale");
     });
   });
 

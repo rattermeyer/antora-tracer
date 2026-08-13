@@ -115,7 +115,7 @@ traceability:links[]
 | Title | Reviewer browses traceability matrices for coverage
 | Goal | Reviewer inspects traceability matrices so that they can verify which requirements are covered by design decisions, tests, and other downstream artifacts
 | Primary Actor | Reviewer or Auditor
-| Preconditions | The Antora site has been built And traceability matrices have been generated during the `sitePublished` event And the site navigation includes links to the matrix pages And the Reviewer has access to the published site
+| Preconditions | The Antora site has been built And traceability matrices have been registered in the content catalog during the `contentClassified` event And the site navigation includes links to the matrix pages And the Reviewer has access to the published site
 | Trigger | Reviewer needs to verify coverage — during a design review, a compliance audit, or a quality gate
 | Basic Flow |
 . Reviewer opens the published Antora site in a browser

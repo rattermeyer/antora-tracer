@@ -11,8 +11,8 @@ This page explains how the Antora Tracer extension processes content during a bu
 
 The extension hooks into Antora's event pipeline through two events:
 
-- `contentClassified` — fires per-page during content processing. The extension parses items, expands macros, and substitutes links.
-- `sitePublished` — fires once after all pages are classified. The extension generates matrices and exports.
+- `contentClassified` — fires once after content classification, before document conversion. The extension parses items, expands macros, substitutes links, and registers generated matrices in the content catalog.
+- `sitePublished` — fires once after all pages are published. The extension writes the standalone traceability output directory (matrices, coverage, index).
 
 The same `RequirementsTraceabilityExtension` class works standalone (via CLI) or within Antora — the event handlers are optional.
 
@@ -60,7 +60,7 @@ The traceability graph has a defined lifecycle — understanding which operation
 
 . **Macro expansion** (Pass 2/2b/3): The graph is read-only. Macros query the graph to generate output. No new items or relationships are added.
 
-. **Finalization** (sitePublished): Matrices are generated from the quiescent graph and written to the output directory.
+. **Finalization**: Matrices are generated from each version's graph during `contentClassified` and registered in the content catalog as attachments; the standalone output directory is written at `sitePublished`.
 
 == Component interaction
 

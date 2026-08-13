@@ -61,7 +61,7 @@ REQ-127,REQ-127 — update-example-site skill includes diagram checklist,
 REQ-060,REQ-060 — Pages workflow generates PDFs,ARC-030: ARC-030 — CI/CD PDF build and deployment pipeline
 REQ-061,REQ-061 — Site links to PDF downloads,ARC-030: ARC-030 — CI/CD PDF build and deployment pipeline
 REQ-062,REQ-062 — Local PDF workflow is unchanged,ARC-030: ARC-030 — CI/CD PDF build and deployment pipeline
-REQ-108,REQ-108 — Matrix files synced to component _attachments,ARC-027: ARC-027 — Automatic matrix sync to component _attachments
+REQ-108,REQ-108 — Matrix files registered in the content catalog,ARC-027: ARC-027 — Matrix registration in the content catalog
 REQ-072,REQ-072 — Landing page at GitHub Pages root,ARC-031: ARC-031 — Static landing page at GitHub Pages root
 REQ-073,REQ-073 — Two-persona feature presentation,ARC-031: ARC-031 — Static landing page at GitHub Pages root
 REQ-074,REQ-074 — Traceability visualization preview,ARC-031: ARC-031 — Static landing page at GitHub Pages root

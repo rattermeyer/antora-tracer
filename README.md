@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg) ![ESM](https://img.shields.io/badge/Module-ESM-red.svg)
 
-A role-based traceability extension for Antora. Define traceability items with a single `[item]` macro, configure your own roles and relations, and let Antora generate matrices, coverage reports, and Neo4j exports — all driven by your domain model, not ours.
+A role-based traceability extension for Antora. Define traceability items with a single `[item]` macro, configure your own roles and relations, and let Antora generate matrices and coverage reports, and export the graph as Neo4j-compatible CSV/Cypher files — all driven by your domain model, not ours.
 
 I am still experimenting with some aspects, so use at your own risk until it reaches 1.0.
 But I am very much interested in your feedback and ideas.
@@ -25,7 +25,7 @@ The reStructuredText ecosystem has https://sphinx-needs.readthedocs.io/[Sphinx-N
 this purpose. AsciiDoc had no equivalent.
 
 *antora-tracer* fills that gap: a single `[item]` macro with configurable roles, inline
-relationships, matrix generation, coverage tracking, graph visualization, and Neo4j export.
+relationships, matrix generation, coverage tracking, graph visualization, and Neo4j CSV/Cypher export.
 All native to the AsciiDoc/Antora pipeline. All driven by your domain model — not ours —
 so it fits whatever regulatory framework you work under.
 
@@ -43,8 +43,8 @@ so it fits whatever regulatory framework you work under.
  │  role=requirement]│──────▶│  matrices:             │──────▶│    matrix-*.html          │
  │ --                │       └───────────┬────────────┘       │    matrix-*.csv           │
  │ Req content       │                   │                    │    coverage.html          │
- │ --                │                   │                    │    neo4j/nodes.csv        │
- │                   │       ┌───────────▼───────────┐        │    neo4j/relationships.csv│
+ │ --                │                   │                    │                             │
+ │                   │       ┌───────────▼───────────┐        │                              │
  │ [#IMP-001, item,  │       │    Antora Extension   │        └───────────────────────────┘
  │  role=impl]       │       │                       │
  │ --                │       │  parse → validate     │
@@ -53,7 +53,7 @@ so it fits whatever regulatory framework you work under.
  └───────────────────┘       └───────────────────────┘
 ```
 
-Your AsciiDoc files use the `[item]` macro. The Antora extension picks them up during `contentClassified`, processes them against your traceability configuration (roles, relations, matrices), and generates matrices, coverage reports, and optional Neo4j CSV exports into your site’s `traceability/` directory.
+Your AsciiDoc files use the `[item]` macro. The Antora extension picks them up during `contentClassified`, processes them against your traceability configuration (roles, relations, matrices), and generates matrices and coverage reports into your site's `traceability/` directory. Neo4j CSV/Cypher files are exported separately via the CLI (`antora-tracer export neo4j`).
 
 ---
 
@@ -206,7 +206,7 @@ This generates a traceability matrix showing which requirements are addressed by
 | Configurable | Relations | Specify which relationship types are valid between roles |
 | Matrix Generation | Output | Generate HTML, CSV, or JSON traceability matrices |
 | Coverage Reports | Output | Visual coverage reports showing traceability completeness |
-| Neo4j Export | Integration | Export to Neo4j CSV or Cypher format for graph analysis |
+| Neo4j Export | Integration | File-based CSV or Cypher export for import into Neo4j |
 | Preset System | Configuration | Built-in presets for common domains (requirements engineering, agile, medical IEC 62304) |
 | Antora Integration | Integration | Seamless integration with Antora documentation pipeline |
 | CLI Tool | Tooling | Command-line interface for processing, validation, and export |
@@ -374,8 +374,6 @@ After a build, you’ll find in `<site-output>/traceability/`:
 | `matrix-<name>.html` | One HTML matrix per configured matrix |
 | `matrix-<name>.csv` | One CSV matrix per configured matrix |
 | `coverage.html` | Coverage report with status badges and per-role breakdown |
-| `neo4j/nodes.csv` | Neo4j CSV node export |
-| `neo4j/relationships.csv` | Neo4j CSV relationship export |
 
 **Coverage** is calculated per-matrix based on `coverageRelations` in your config. Each row item gets a status badge: ✓ Complete (100%), ◐ Partial, or ✗ Missing (0%).
 
