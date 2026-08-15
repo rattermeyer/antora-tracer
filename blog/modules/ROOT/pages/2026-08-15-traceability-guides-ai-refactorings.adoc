@@ -1,0 +1,104 @@
+= How Traceability Helped an AI Agent Refactor Legacy Code
+:page-date: 2026-08-15
+:page-tags: traceability, ai, refactoring, cleanup, spec-driven-development
+:page-author: Richard Attermeyer
+:description: What happened when I asked an AI agent to remove a legacy requirement from antora-tracer, and how the traceability graph — not just grep — told it what to delete.
+
+A few days ago I asked the AI agent I use for coding a simple question about *antora-tracer*:
+
+> Is requirement REQ-005 still valid? Is there still code implementing it?
+
+REQ-005 was the old requirement that the extension detect legacy macro syntax (`[req]`, `[imp]`, `[test]`) and warn users to migrate to the unified `[item]` macro.
+That migration happened a long time ago, so I expected the answer to be "no, you can delete it".
+
+What I did not expect was how much deleting it would touch.
+The agent ended up removing 642 lines across twenty-seven files — source code, tests, specs, reference docs, use cases, and two PlantUML diagrams.
+
+This post is about how it found all of that.
+The interesting part for me was not the deletion, but what guided it.
+
+== Following the reverse edges
+
+The first thing the agent did was search for the requirement ID.
+That search turned up three places I would not have thought to check:
+
+* the test plan had a `verifies:REQ-005[]`
+* the architecture had an `addresses:REQ-005[]`
+* the delivery process had a `validates:REQ-005[]`
+
+Those three macros are the traceability graph.
+Every test, design, and process item points back at the requirement it covers.
+Deleting the requirement without touching those three would have left dangling links.
+
+This is the part I want to keep from the experiment.
+The relationship macros I added for humans turn out to be exactly what an AI agent needs to answer "who else will notice when this is gone?"
+The agent did not have to guess.
+It could follow the edges.
+
+== What grep found that the graph did not
+
+I asked the agent afterwards how it had found everything, because the result felt more complete than a single grep should produce.
+
+The honest answer was: it was grep, twice.
+
+The first pass used the requirement ID, and that is where the traceability did the real work.
+But the graph only covers items with IDs and explicit relationship macros.
+It knows nothing about free prose.
+
+So the agent ran a second, broader search for "old macro", "legacy", and "deprecated".
+That surfaced the things no traceability link pointed to:
+
+* a "Deprecated: Legacy macros" section in the item-macro reference
+* an "old macro detection" phrase in the API reference
+* an alternate-flow bullet in a use case
+* the method name inside a second class diagram
+
+I found this reassuring rather than disappointing.
+Traceability handled the structured half, search handled the unstructured half.
+One was the map, the other the sweep for leftovers.
+
+== The sibling requirement
+
+REQ-005 was not the only requirement about the old macros.
+A sibling, REQ-089, said that old macros inside verbatim blocks should not trigger errors.
+It had its own three inbound links, in the same three documents.
+
+Deleting REQ-005 and leaving REQ-089 behind would have removed half the feature and left a requirement that made no sense on its own.
+The agent caught it because it treated the requirements as a set and asked what else shared the feature.
+
+I had written both requirements together originally and forgotten that.
+The agent reminded me.
+
+== The closing loop
+
+After the edits, the agent re-ran the same searches and looked for zero hits.
+Then it rebuilt, ran the tests, and regenerated the self-traceability matrices so the committed CSVs did not go stale.
+
+The test count dropped from 293 to 285, and the eight removed were exactly the old-macro tests.
+That detail mattered to me.
+It meant the change deleted one coherent feature, not a random set of files.
+
+That last loop is the part I want to keep.
+The same data that guided the deletion became the check that nothing was left behind.
+
+== What I take from this
+
+I am careful not to overstate it.
+Traceability is not magic, and it did not replace grep.
+
+What it changed was the order of operations.
+Instead of searching blindly and hoping the search terms were good, the agent started from a requirement and asked who pointed at it.
+That is a graph traversal, and it is a better starting point for a refactor than a keyword list.
+
+I have been building the xref:tracer:ROOT:self-traceability/test-plan.adoc[self-traceability example] for a while now, partly as documentation and partly as a test.
+This experiment gave me a concrete reason to keep doing it.
+The traceability is not just for auditors.
+It is the map an AI — or a future contributor — needs to make a change without breaking the parts I forgot about.
+
+== Still open
+
+A few things I have not figured out yet:
+
+* The keyword pass still relied on good search terms. A cleaner approach would be to let the agent query the graph directly instead of grepping IDs.
+* Free prose is invisible to the graph. I do not know how much of the codebase that is, or how to measure it.
+* The experiment only covered a deletion. Renames and requirement changes might behave differently.
