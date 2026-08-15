@@ -166,17 +166,19 @@ traceability:links[]
 [#ARC-029, item, role=design, title="Partial file processing with source-repo links"]
 --
 The `registerContentClassifier()` handler processes both `family: page` and
-`family: partial` files during Pass 1 (graph population). Partial items use
-Antora's pre-computed `fileUri` as their `sourceFile`, making traceability
-matrix links point directly to the partial source in the content repository
-(e.g., GitHub blob URL). The `LinkResolver` detects URL `sourceFile` values
-and returns them unchanged, skipping the HTML path conversion. In
-`buildXref()`, URL-based items use AsciiDoc's `link:` macro instead of
-`xref:` since Asciidoctor cannot resolve external URLs as cross-references.
-Partials are excluded from macro expansion and link substitution passes
-because they do not produce HTML pages.
+`family: partial` files. Partial items use Antora's pre-computed `fileUri`
+as their `sourceFile`, making traceability matrix links point directly to the
+partial source in the content repository (e.g., GitHub blob URL). The
+`LinkResolver` detects URL `sourceFile` values and returns them unchanged,
+skipping the HTML path conversion. In `buildXref()`, URL-based items use
+AsciiDoc's `link:` macro instead of `xref:` since Asciidoctor cannot resolve
+external URLs as cross-references. All three passes (graph population, macro
+expansion, and link substitution) apply to partials as well as pages, because
+partial content is inlined into pages and reaches the browser.
 
 addresses:REQ-110[]
+addresses:REQ-144[]
+addresses:REQ-145[]
 traceability:links[]
 --
 
@@ -549,21 +551,21 @@ include::example$pass-pipeline.puml[]
 | Pass 1
 | `processAsciiDocFile()` — DocumentParser extracts items + relationships, populates TraceabilityGraph. Both pages and partials are processed.
 | Pages + partials
-| Graph must be complete before Pass 3 can resolve cross-file `addresses:TARGET[]` references. Partials are only processed here — they skip subsequent passes.
+| Graph must be complete before Pass 3 can resolve cross-file `addresses:TARGET[]` references. Both pages and partials are processed in all three passes — partial content is inlined into pages and reaches the browser.
 
 | Pass 2
-| `expandRelationMacros(file, macroName)` — replace `traceability:links[]`, `traceability:incoming[]`, and `traceability:links[]` with formatted relationship lists (grouped by type, configurable style/order); macroName is `outgoing`, `incoming`, or `links`.
-| Pages only
-| Depends on complete graph from Pass 1 to enumerate relationships. Opt-in via `:traceability-links:` document attribute.
+| `expandRelationMacros(file, macroName)` — replace `traceability:outgoing[]`, `traceability:incoming[]`, and `traceability:links[]` with formatted relationship lists (grouped by type, configurable style/order); macroName is `outgoing`, `incoming`, or `links`.
+| Pages + partials
+| Depends on complete graph from Pass 1 to enumerate relationships. Opt-in via `:traceability-links:` document attribute; forced on for partials.
 
 | Pass 2b
-| `expandGraphMacros()` + `expandCoverageMacros()` — replace `traceability:graph[]` and `traceability:graph-coverage[]` with Kroki image URLs (DOT and Vega-Lite).
-| Pages only
+| `expandGraphMacros()` + `expandCoverageMacros()` — replace `traceability:graph[]` and `traceability:graph-coverage[]` with rendered diagram image references (DOT and Vega-Lite).
+| Pages + partials
 | Uses `toDot()` / `toVegaLite()` on the graph. Opt-in via `:traceability-graph:` document attribute. Independent of Pass 2.
 
 | Pass 3
-| `substituteLinksInFile()` — replace `` with `xref:page.html#ID` (pages) or `link:URL#ID` (partials). Also runs `injectTitleIds()` and `unindentItemMacros()`.
-| Pages only
+| `substituteLinksInFile()` — replace inline relationship macros with `xref:page.html#ID` (pages) or `link:URL#ID` (partials). Also runs `injectTitleIds()` and `unindentItemMacros()`.
+| Pages + partials
 | Needs complete graph (all sourceFiles known) from Pass 1. This is why Pass 1 processes all files before any macro expansion.
 |===
 
