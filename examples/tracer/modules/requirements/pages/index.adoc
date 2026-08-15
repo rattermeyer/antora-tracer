@@ -71,7 +71,7 @@ traceability:links[]
 
 [#REQ-128, item, role=requirement, title="Matrix links include module path for module-aware items"]
 --
-When an item has module information (from Antora processing), the LinkResolver SHALL generate links that include the module name so the link navigates to the correct page under the correct module directory.
+When an item has module information, the system SHALL generate HTML links that include the module name so the link navigates to the correct module page.
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
@@ -360,7 +360,7 @@ traceability:links[]
 
 [#REQ-051, item, role=requirement, title="Relationship graph via traceability:graph[] macro"]
 --
-The system SHALL provide a `traceability:graph[]` inline macro that renders a GraphViz relationship graph for the enclosing item. The graph SHALL show the item and its direct relationships as labeled nodes and edges, colored by role. An optional depth parameter SHALL control the number of hops.
+The system SHALL provide a `traceability:graph[]` inline macro that renders a relationship diagram for the enclosing item. The diagram SHALL show the item and its related items as labeled nodes and edges, colored by role. An optional depth parameter SHALL control the number of relationship hops shown.
 
 Source: openspec/specs/graph-visualization/spec.md
 
@@ -371,7 +371,7 @@ traceability:links[]
 
 [#REQ-052, item, role=requirement, title="Coverage chart via traceability:graph-coverage[] macro"]
 --
-The system SHALL provide a `traceability:graph-coverage[]` inline macro that renders a Vega-Lite bar chart showing coverage. When used inside an item block, it SHALL show per-relationship-type coverage for that item. When used outside an item block, it SHALL show global coverage by role.
+The system SHALL provide a `traceability:graph-coverage[]` inline macro that renders a coverage chart. When used inside an item block, it SHALL show per-relationship-type coverage for that item. When used outside an item block, it SHALL show global coverage by role.
 
 Source: openspec/specs/graph-visualization/spec.md
 
@@ -380,7 +380,7 @@ traceability:links[]
 
 [#REQ-053, item, role=requirement, title="Graph visualization methods on TraceabilityGraph"]
 --
-The `TraceabilityGraph` SHALL provide `toDot(fromId, depth?)` returning a GraphViz DOT source string, and `toVegaLite(itemId?)` returning a Vega-Lite JSON specification. The `toDot` method SHALL traverse relationships in both outgoing and incoming directions, showing the complete subgraph around an item. When a relationship is marked as bidirectional, the DOT output SHALL use a distinct arrow style (`dir=both`) and dashed stroke.
+The graph model SHALL support producing a traversal-bounded relationship subgraph for a given item, traversing both outgoing and incoming directions. Bidirectional relationships SHALL be visually distinguishable from one-directional relationships in the rendered output. The graph model SHALL also support producing coverage data for a given item, or globally across all items.
 
 Source: openspec/specs/graph-visualization/spec.md
 
@@ -462,7 +462,7 @@ traceability:links[]
 
 [#REQ-136, item, role=requirement, title="CLI exposes a query subcommand"]
 --
-The CLI SHALL provide a `query` subcommand that parses AsciiDoc source files, builds the in-memory traceability graph, and answers one structural question per invocation. No Antora build SHALL be required.
+The CLI SHALL provide a `query` subcommand that reads AsciiDoc source files and answers one structural question about items and their relationships per invocation. No Antora build SHALL be required.
 
 Source: openspec/specs/cli-query/spec.md
 
@@ -594,7 +594,7 @@ traceability:links[]
 
 [#REQ-124, item, role=requirement, title="Architecture document includes DocumentParser activity diagram"]
 --
-The architecture document SHALL include a PlantUML activity diagram showing the DocumentParser's step-by-step regex parsing pipeline: verbatim block pre-scanning, item block extraction with quote-aware bracket matching, body delimiter detection, relationship macro scanning with inline-code exclusion, and result assembly.
+The architecture document SHALL include an activity diagram showing the parser's step-by-step pipeline: verbatim block pre-scanning, item block extraction with quote-aware bracket matching, body delimiter detection, relationship macro scanning with inline-code exclusion, and result assembly.
 
 Source: openspec/specs/architecture-diagram-checklist/spec.md
 
@@ -812,7 +812,7 @@ traceability:links[]
 
 [#REQ-112, item, role=requirement, title="PreparedFile carries all needed state"]
 --
-The system SHALL define a `PreparedFile` type containing the raw Antora file reference, the full content string, parsed document attributes, item block position array, and normalized source-file metadata.
+The system SHALL cache the parsed state of each source file — including its full content, document attributes, item block positions, and normalized source-file metadata — so that subsequent processing steps within the same file pass do not reparse it.
 
 Source: openspec/specs/file-preparation-cache/spec.md
 
@@ -823,7 +823,7 @@ traceability:links[]
 
 [#REQ-113, item, role=requirement, title="Matrix template uses partials for structure"]
 --
-The `matrix.html.mustache` template SHALL be split into a main template and four Mustache partials (`styles`, `header`, `matrix-row`, `footer`) loaded from the `partials/` subdirectory.
+The HTML matrix template SHALL be split into a main template and four reusable partial fragments (`styles`, `header`, `matrix-row`, `footer`) loaded from the `partials/` subdirectory.
 
 Source: openspec/specs/template-partials/spec.md
 
@@ -888,7 +888,7 @@ traceability:links[]
 
 [#REQ-130, item, role=requirement, title="LinkResolver produces indexify-aware links"]
 --
-When Antora's default `indexify` URL style is active (pages at the module root become `pagename/index.html`), the LinkResolver SHALL generate links with `pagename/index.html` instead of `pagename.html` so links from traceability matrices resolve to the correct page.
+When Antora's `indexify` URL style is active (root-level pages are served as `pagename/index.html`), the system SHALL generate matrix links that include `index.html` in the path for root-level pages so links from traceability matrices resolve to the correct page.
 
 Source: openspec/specs/matrix-generation/spec.md
 
