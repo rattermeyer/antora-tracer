@@ -110,7 +110,7 @@ After creating the post, remind the user to run `node scripts/generate-blog-inde
 When the user asks for a review, check:
 
 1. **Length** — is the post scoped well? Flag sections that drift or feel padded.
-2. **Tonality** — does it match the author's voice? The project's existing posts (ADRs, architecture docs) tend toward clear, direct, technical-but-approachable prose.
+2. **Tonality** — does it match the author's voice? See the *Voice and Tonality* section.
 3. **Clarity** — flag sentences or paragraphs that are hard to follow. Say WHY they're unclear. Suggest a direction, not a rewrite.
 
 **Review rules:**
@@ -124,6 +124,20 @@ When the user asks for a review, check:
 **Style guide references** — when relevant, point the user to:
 - https://stylepedia.net/style/ — comprehensive style guide collection
 - The project's own ADR and architecture docs for tone reference
+
+## Voice and Tonality
+
+Blog posts are prose, not code. The ponytail/code-first discipline — shortest diff, no unrequested prose, optimize for economy — does NOT apply here. Do not write a post for brevity, token count, or a tidy structure.
+
+Match the author's established voice (see `2026-08-09-motivation.adoc`):
+
+- **First person, personal stakes.** Write "I" and say why the topic matters to you. No detached narrator.
+- **Concrete and specific.** Name tools, versions, numbers, real moments. "1.8 billion tokens for $11" beats "significant usage".
+- **Honest about rough edges.** It's fine to say "I'm not sure", leave a question open, or admit something is unfinished.
+- **No formulaic essay skeleton.** Avoid hook → thesis → three points → moral. A loose sequence of reflections with plain headings is better than polish.
+- **No aphorisms, no sales close.** Avoid "the real X is never Y", "the lesson generalizes", "give it something to follow". If a sentence would fit on a conference slide, soften it.
+
+Rewrite if you see: rhetorical questions the narrator immediately answers; efficiency metaphors ("surgical", "blast radius", "map") clustered together; a closing paragraph that pitches instead of reflects; zero "I" and zero concrete, dated, or named specifics.
 
 ## File Locations
 
