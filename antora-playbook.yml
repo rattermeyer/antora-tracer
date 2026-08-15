@@ -1,6 +1,6 @@
 site:
   title: Antora Tracer — Self-Traceability Example
-  start_page: tracer@latest::index.adoc
+  start_page: tracer::index.adoc
   keys:
     annotatejs: opt-out
 
