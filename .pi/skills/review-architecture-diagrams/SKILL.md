@@ -1,6 +1,6 @@
 ---
 name: review-architecture-diagrams
-description: Review architecture diagrams against better-architecture-diagrams principles. Use when the user asks to review diagrams, audit architecture diagrams, check diagram quality, improve diagram readability, or mentions "better architecture diagrams" / InnoQ diagram review. Works with PlantUML (.puml, .plantuml), Mermaid (.mmd), D2 (.d2), and Graphviz DOT (.dot, .gv).
+description: Review architecture diagrams against better-architecture-diagrams principles. Use when the user asks to review, audit, or improve diagrams — phrases like "review my diagrams", "check my PlantUML", "is this diagram clear", "audit architecture diagrams", "check diagram quality", "improve diagram readability", or mentions "better architecture diagrams" / InnoQ diagram review. Works with PlantUML (.puml, .plantuml), Mermaid (.mmd), D2 (.d2), and Graphviz DOT (.dot, .gv).
 ---
 
 # Review Architecture Diagrams
@@ -20,9 +20,11 @@ Find all diagrams in the project:
 find . -type f \( -name "*.puml" -o -name "*.plantuml" -o -name "*.mmd" -o -name "*.mermaid" -o -name "*.d2" -o -name "*.dot" -o -name "*.gv" \) ! -path "*/.devbox/*" ! -path "*/node_modules/*" ! -path "*/.git/*"
 ```
 
-Also find where they're included (AsciiDoc `include::`, markdown image refs, etc.) to understand context.
+Also find where they're included (AsciiDoc `include::`, markdown image refs, etc.) to understand context. In this project, diagrams live in `examples/tracer/modules/ROOT/examples/*.puml` and are included from `examples/tracer/modules/ROOT/pages/explanation/architecture.adoc`.
 
-Read every diagram file completely. Do NOT skim.
+For each diagram:
+1. Read the diagram file completely.
+2. Read the surrounding documentation section (the paragraph before the `include::` and its section heading) to understand the diagram's stated purpose before evaluating it against the checklist.
 
 ### Phase 2 — Audit
 
@@ -57,7 +59,7 @@ minimal — the article says "sparse details" and "single purpose" are the
 highest-leverage principles. When splitting a diagram, create a new file
 alongside the original and update the documentation include to reference both.
 
-After each fix, show the before/after element + relation counts.
+After each fix, show the before/after element + relation counts. Then re-run the violated checklist items against the updated diagram and confirm each violation is resolved. If a fix introduces a new violation (e.g., splitting a diagram removes line crossings but now each half lacks a legend), flag it.
 
 ## The 11-Point Checklist
 
@@ -79,8 +81,12 @@ notation (UML, C4, etc.) where arrow types are predefined.
 ### 3. Established notation
 Is the diagram using a recognized notation (UML, C4, SysML, etc.)? If not, is
 the custom notation at least explained? Free-form boxes-and-lines needs a legend
-(tip 2). Standard notations carry their own semantics — but only use them if
-stakeholders understand that notation.
+(tip 2). Standard notations carry their own semantics — but mixed use is a violation:
+if a diagram uses UML component boxes but non-UML arrow semantics, it needs a legend.
+
+Heuristic: if an arrow could mean "calls", "depends on", "sends data to", or "is
+contained in" and the reader can't tell which — add a legend or switch to a
+notation where the arrow type carries that meaning.
 
 ### 4. Element name explanations
 Are the names in the diagram explained somewhere accessible (table in the same
@@ -157,7 +163,7 @@ A diagram with tangled lines is a diagram that needs layout work.
 
 | Diagram | Elements | Tips violated | Suggested fix |
 |---------|----------|---------------|---------------|
-| sequence-diagram.puml | 8p, 30m | #1 multi-purpose, #5 too detailed, #6 over limit | Split into init + per-pass detail |
+| sequence-diagram.puml | 8n, 30e | #1 multi-purpose, #5 too detailed, #6 over limit | Split into init + per-pass detail |
 
 ### 🟡 Medium
 
