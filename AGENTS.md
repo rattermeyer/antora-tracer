@@ -4,10 +4,10 @@
 
 Antora Tracer — a role-based requirements traceability extension for Antora/AsciiDoc. Single `[item]` macro with configurable roles, relations, and matrices. Ships with built-in presets, Neo4j export, and CLI.
 
-- **Version**: 0.7.0
+- **Version**: 0.16.1
 - **Language**: TypeScript (strict mode, ESM)
 - **Runtime**: Node.js 20+
-- **Tests**: 194 passing (Mocha + Chai)
+- **Tests**: 298 passing (Mocha + Chai)
 - **Package**: `antora-tracer` on npm
 
 ## Development
@@ -15,7 +15,7 @@ Antora Tracer — a role-based requirements traceability extension for Antora/As
 ```bash
 npm install
 npm run build      # compile src/ → lib/
-npm test           # compile + run 194 tests
+npm test           # compile + run 298 tests
 npm run lint       # biome check
 npm run format     # biome format --write
 ```
@@ -66,13 +66,13 @@ Before marking a task complete, scan these files for stale content about the cha
 
 | Change type | Documentation to check |
 |---|---|
-| New/change extension config option | `reference/traceability-macros.adoc`, `how-to/contribute.adoc` |
+| New/change extension config option | `reference/configuration.adoc`, `reference/traceability-macros.adoc` |
 | New/change CLI option | `reference/cli.adoc`, `how-to/contribute.adoc` |
-| New/change macro or API | `reference/traceability-macros.adoc`, `user-guide.adoc` |
-| New/change visualization | `how-to/visualizations.adoc`, `architecture.adoc` |
-| New/change file output | `how-to/contribute.adoc`, `reference/traceability-macros.adoc` |
-| New/change env var | `how-to/contribute.adoc`, `reference/traceability-macros.adoc` |
-| General behavior change | `user-guide.adoc`, `reference/traceability-macros.adoc`, `how-to/visualizations.adoc` |
+| New/change macro or API | `reference/item-macro.adoc`, `reference/traceability-macros.adoc`, `reference/api.adoc` |
+| New/change visualization | `how-to/visualizations.adoc`, `explanation/architecture.adoc` |
+| New/change file output | `how-to/contribute.adoc`, `reference/configuration.adoc` |
+| New/change env var | `reference/configuration.adoc`, `how-to/contribute.adoc` |
+| General behavior change | `reference/item-macro.adoc`, `reference/traceability-macros.adoc`, `how-to/visualizations.adoc` |
 
 When adding a new config option, env var, or feature flag: find every page that mentions sibling options (same reference section, same how-to page) and add the new one.
 
@@ -81,10 +81,10 @@ When code behavior changes, verify consistency across these layers before commit
 | Layer | Check |
 |---|---|
 | **Tests** | Review test comments for stale workarounds describing old behavior. Update or add tests to cover the new behavior. |
-| **Requirements** | `examples/modules/ROOT/pages/requirements.adoc` — do REQ items need updating to match spec changes? |
-| **User Guide** | `examples/modules/ROOT/pages/user-guide.adoc` — does the macro/API description match the new behavior? |
-| **Architecture** | `examples/modules/ROOT/pages/architecture.adoc` — do ARC items describing components (e.g., toDot, graph macros) need updating? |
-| **Developer Guide** | `examples/modules/ROOT/pages/developer-guide.adoc` — does the API reference need changes? |
+| **Requirements** | `examples/tracer/modules/requirements/pages/index.adoc` — do REQ items need updating to match spec changes? |
+| **Reference** | `examples/tracer/modules/ROOT/pages/reference/` — do `item-macro.adoc`, `traceability-macros.adoc`, `api.adoc`, `cli.adoc`, `configuration.adoc` match the new behavior? |
+| **How-to guides** | `examples/tracer/modules/ROOT/pages/how-to/` — do task guides (write-traceable-items, visualizations, query-graph, contribute) match? |
+| **Explanation** | `examples/tracer/modules/ROOT/pages/explanation/architecture.adoc` — do ARC items describing components need updating? |
 | **Specs** | Sync delta specs to main specs (`/opsx-sync`) before archiving. |
 | **Example site** | Rebuild with `npx antora antora-playbook.yml` and regenerate matrices with `node examples/run-example.js` to verify self-traceability works. |
 
@@ -125,7 +125,7 @@ src/
 ├── Neo4jExporter.ts         Neo4j CSV + Cypher export
 ├── TemplateRenderer.ts      Mustache template loading + rendering
 ├── antora-extension.ts      Antora extension (events: contentClassified, sitePublished)
-├── cli.ts                   Commander CLI (process, matrix, validate, export, stats, preset)
+├── cli.ts                   Commander CLI (process, matrix, validate, export, stats, preset, next-id, query)
 └── config/
     └── TraceabilityConfig.ts ConfigLoader, types, presets
 ```
@@ -138,7 +138,7 @@ src/
 
 ## Example Site
 
-`examples/modules/ROOT/pages/` — self-traceability site built with Antora.
+`examples/tracer/modules/` — self-traceability site built with Antora.
 `antora-playbook.yml` at project root. Requires UI bundle (cached from GitLab).
 
 ```bash
