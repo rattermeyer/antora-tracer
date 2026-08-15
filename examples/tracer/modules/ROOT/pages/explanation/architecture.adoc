@@ -323,7 +323,6 @@ include::example$parser-flow.puml[]
 
 addresses:REQ-087[]
 addresses:REQ-088[]
-addresses:REQ-089[]
 addresses:REQ-090[]
 addresses:REQ-091[]
 addresses:REQ-092[]
@@ -583,7 +582,6 @@ The `prepareFile()` method computes file content, document attributes, and item 
 include::example$prepared-file-caching.puml[]
 ----
 
-addresses:REQ-005[]
 traceability:links[]
 
 --

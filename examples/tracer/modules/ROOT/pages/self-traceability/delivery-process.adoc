@@ -22,7 +22,6 @@ The test suite SHALL run as a required status check before merging any pull requ
 
 validates:REQ-087[]
 validates:REQ-088[]
-validates:REQ-089[]
 considered_by:ARC-031[]
 
 traceability:links[]
@@ -34,7 +33,6 @@ The example site SHALL build successfully as part of the CI pipeline. The build 
 
 The site build exercises the full extension pipeline — parsing, macro expansion, link substitution, matrix generation, and matrix registration in the content catalog — serving as an integration test.
 
-validates:REQ-005[]
 considered_by:ARC-031[]
 
 traceability:links[]

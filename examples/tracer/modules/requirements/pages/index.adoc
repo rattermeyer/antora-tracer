@@ -9,17 +9,6 @@
 
 This document lists the traceability requirements for the Antora Tracer extension. Each requirement maps to an OpenSpec specification under `openspec/specs/`.
 
-== Legacy Macro Detection
-
-[#REQ-005, item, role=requirement, title="Old macro syntax generates a deprecation error or warning"]
---
-The system SHALL detect legacy macro syntax (`[req]`, `[imp]`, `[test]`, `[doc]`, `[design]`) used in place of the unified `[item]` macro and SHALL generate a deprecation error (strict mode) or warning (non-strict mode) that points the user to the role-based replacement.
-
-Source: openspec/specs/old-macro-detection/spec.md
-
-traceability:links[]
---
-
 == Parser: Verbatim Block Handling
 
 [#REQ-087, item, role=requirement, title="Items inside verbatim blocks are not parsed"]
@@ -34,15 +23,6 @@ traceability:links[]
 [#REQ-088, item, role=requirement, title="Inline macros inside verbatim blocks are not parsed"]
 --
 The system SHALL NOT register inline relationship macros (`relation:TARGET[]`) whose enclosing item was skipped because it fell inside a verbatim block.
-
-Source: openspec/specs/parser-verbatim-skip/spec.md
-
-traceability:links[]
---
-
-[#REQ-089, item, role=requirement, title="Old macros inside verbatim blocks do not trigger errors"]
---
-The system SHALL NOT emit deprecation errors or warnings for old macro syntax (`[req, ...]`, `[imp, ...]`, etc.) when they appear inside verbatim blocks.
 
 Source: openspec/specs/parser-verbatim-skip/spec.md
 
@@ -540,7 +520,7 @@ traceability:links[]
 
 [#REQ-124, item, role=requirement, title="Architecture document includes DocumentParser activity diagram"]
 --
-The architecture document SHALL include a PlantUML activity diagram showing the DocumentParser's step-by-step regex parsing pipeline: verbatim block pre-scanning, item block extraction with quote-aware bracket matching, body delimiter detection, relationship macro scanning with inline-code exclusion, old-macro detection, and result assembly.
+The architecture document SHALL include a PlantUML activity diagram showing the DocumentParser's step-by-step regex parsing pipeline: verbatim block pre-scanning, item block extraction with quote-aware bracket matching, body delimiter detection, relationship macro scanning with inline-code exclusion, and result assembly.
 
 Source: openspec/specs/architecture-diagram-checklist/spec.md
 

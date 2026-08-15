@@ -133,7 +133,7 @@ export interface ParserResult {
 }
 ----
 
-Two-pass approach: find `[item]` block macros, then scan content for inline relationship macros (`<type>:<TARGET-ID>[]`). Supports verbatim block exclusion, old macro detection, source file and line tracking.
+Two-pass approach: find `[item]` block macros, then scan content for inline relationship macros (`<type>:<TARGET-ID>[]`). Supports verbatim block exclusion, source file and line tracking.
 
 == MatrixGenerator
 

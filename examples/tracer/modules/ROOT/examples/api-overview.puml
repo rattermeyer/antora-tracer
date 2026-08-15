@@ -17,7 +17,6 @@ package "Core" #E3F2FD {
 
   class DocumentParser {
     + parse(content, sourceFile?, component?, module?): ParserResult
-    + checkForOldMacros(content): OldMacroError[]
   }
 
   class RequirementsTraceabilityExtension {

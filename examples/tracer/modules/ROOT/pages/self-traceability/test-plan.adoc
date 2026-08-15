@@ -13,12 +13,10 @@ This document maps the test suite to the requirements it verifies. Each test fil
 --
 Test file: `test/v2-unified-item-architecture.test.ts`
 
-Tests the `RequirementsTraceabilityExtension` orchestrator — initialization, processing, query methods, role statistics, lifecycle. Covers the public API surface of the main extension class. Includes old-macro deprecation detection and verbatim block handling (listing, literal, and backtick code spans).
+Tests the `RequirementsTraceabilityExtension` orchestrator — initialization, processing, query methods, role statistics, lifecycle. Covers the public API surface of the main extension class. Includes verbatim block handling (listing, literal, and backtick code spans).
 
-verifies:REQ-005[]
 verifies:REQ-087[]
 verifies:REQ-088[]
-verifies:REQ-089[]
 verifies:REQ-090[]
 verifies:REQ-091[]
 verifies:REQ-092[]

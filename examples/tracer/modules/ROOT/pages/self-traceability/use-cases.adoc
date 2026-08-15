@@ -29,7 +29,6 @@ This page captures the key user workflows for the Antora Tracer extension. Each 
 . *Team member links to a target that does not exist:* Extension stores the relationship with a warning. The matrix shows a partial link.
 . *Team member writes an incomplete item block:* The item may not register correctly in the traceability graph.
 . *Team member includes rendering macros but no relationships exist:* The placeholder is replaced with an empty section in the rendered output.
-. *Team member uses legacy macro syntax (e.g., `[req]`):* Extension reports a deprecation error with a suggestion to use `[item, role=requirement]`.
 | Postconditions | The traceability graph contains the new item with a consistent ID And all inline relationships are registered And the rendered page shows relationship lists if macros were included And the traceability matrix reflects updated coverage
 | Priority | High
 | Frequency | Per item — multiple times per documentation session

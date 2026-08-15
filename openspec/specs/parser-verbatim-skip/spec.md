@@ -38,19 +38,6 @@ The system SHALL NOT register inline relationship macros (`relation:TARGET[]`) w
 
 ---
 
-### Requirement: Old macros inside verbatim blocks do not trigger errors
-The system SHALL NOT emit deprecation errors or warnings for old macro syntax (`[req, ...]`, `[imp, ...]`, etc.) when they appear inside verbatim blocks.
-
-#### Scenario: Old macro syntax in a source block example
-- **WHEN** a `[source,asciidoc]` block contains `[req, id=REQ-001]` as example text
-- **THEN** the parser does not emit a deprecation error for that occurrence
-
-#### Scenario: Old macro syntax outside verbatim blocks still errors
-- **WHEN** `[req, id=REQ-001]` appears in real AsciiDoc content (not inside a verbatim block)
-- **THEN** the parser still emits a deprecation error
-
----
-
 ### Requirement: Verbatim block detection handles standard AsciiDoc fences
 The system SHALL detect verbatim blocks by matching opening and closing fence lines consisting of exactly `----` or `....` (with optional trailing whitespace), ignoring style prefix lines like `[source,asciidoc]`.
 

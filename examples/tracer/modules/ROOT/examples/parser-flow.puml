@@ -51,17 +51,8 @@ partition "Step 3 — Extract inline relationships" #E3F2FD {
   :Build ItemRelationship objects\n(fromId, targetId, type, sourceFile);
 }
 
-partition "Step 4 — Old-macro detection" #FCE4EC {
-  :Check entire content for legacy\nmacros: [req], [imp], [test], [doc], [design];
-  if (Old macro found outside verbatim?) then (yes)
-    :Report deprecation error (strict)\nor warning (non-strict);
-  else (no)
-    :No old macros detected;
-  endif
-}
-
 partition "Output" #E8F5E9 {
-  :Return ParserResult {\n  items: Item[],\n  relationships: ItemRelationship[],\n  oldMacroWarnings: OldMacroError[]\n};
+  :Return ParserResult {\n  items: Item[],\n  relationships: ItemRelationship[]\n};
 }
 
 stop

@@ -23,7 +23,6 @@ UC-001,UC-001 — Team member writes traceable items in AsciiDoc,use_case,,self-
 . *Team member links to a target that does not exist:* Extension stores the relationship with a warning. The matrix shows a partial link.
 . *Team member writes an incomplete item block:* The item may not register correctly in the traceability graph.
 . *Team member includes rendering macros but no relationships exist:* The placeholder is replaced with an empty section in the rendered output.
-. *Team member uses legacy macro syntax (e.g., `[req]`):* Extension reports a deprecation error with a suggestion to use `[item, role=requirement]`.
 | Postconditions | The traceability graph contains the new item with a consistent ID And all inline relationships are registered And the rendered page shows relationship lists if macros were included And the traceability matrix reflects updated coverage
 | Priority | High
 | Frequency | Per item — multiple times per documentation session
@@ -258,22 +257,12 @@ leads_to:REQ-052[]
 leads_to:REQ-054[]
 
 traceability:links[]"""
-REQ-005,REQ-005 — Old macro syntax generates a deprecation error or warning,requirement,,requirements.adoc,"""The system SHALL detect legacy macro syntax (`[req]`, `[imp]`, `[test]`, `[doc]`, `[design]`) used in place of the unified `[item]` macro and SHALL generate a deprecation error (strict mode) or warning (non-strict mode) that points the user to the role-based replacement.
-
-Source: openspec/specs/old-macro-detection/spec.md
-
-traceability:links[]"""
 REQ-087,REQ-087 — Items inside verbatim blocks are not parsed,requirement,,requirements.adoc,"""The system SHALL NOT register item declarations (`[#ID, item, role=...]`) found inside AsciiDoc verbatim blocks (listing blocks delimited by `----` and literal blocks delimited by `....`) as traceability items.
 
 Source: openspec/specs/parser-verbatim-skip/spec.md
 
 traceability:links[]"""
 REQ-088,REQ-088 — Inline macros inside verbatim blocks are not parsed,requirement,,requirements.adoc,"""The system SHALL NOT register inline relationship macros (`relation:TARGET[]`) whose enclosing item was skipped because it fell inside a verbatim block.
-
-Source: openspec/specs/parser-verbatim-skip/spec.md
-
-traceability:links[]"""
-REQ-089,REQ-089 — Old macros inside verbatim blocks do not trigger errors,requirement,,requirements.adoc,"""The system SHALL NOT emit deprecation errors or warnings for old macro syntax (`[req, ...]`, `[imp, ...]`, etc.) when they appear inside verbatim blocks.
 
 Source: openspec/specs/parser-verbatim-skip/spec.md
 
@@ -537,7 +526,7 @@ REQ-123,REQ-123 — Architecture document includes class-level API diagram,requi
 Source: openspec/specs/architecture-diagram-checklist/spec.md
 
 traceability:links[]"""
-REQ-124,REQ-124 — Architecture document includes DocumentParser activity diagram,requirement,,requirements.adoc,"""The architecture document SHALL include a PlantUML activity diagram showing the DocumentParser's step-by-step regex parsing pipeline: verbatim block pre-scanning, item block extraction with quote-aware bracket matching, body delimiter detection, relationship macro scanning with inline-code exclusion, old-macro detection, and result assembly.
+REQ-124,REQ-124 — Architecture document includes DocumentParser activity diagram,requirement,,requirements.adoc,"""The architecture document SHALL include a PlantUML activity diagram showing the DocumentParser's step-by-step regex parsing pipeline: verbatim block pre-scanning, item block extraction with quote-aware bracket matching, body delimiter detection, relationship macro scanning with inline-code exclusion, and result assembly.
 
 Source: openspec/specs/architecture-diagram-checklist/spec.md
 
@@ -960,7 +949,6 @@ include::example$parser-flow.puml[]
 
 addresses:REQ-087[]
 addresses:REQ-088[]
-addresses:REQ-089[]
 addresses:REQ-090[]
 addresses:REQ-091[]
 addresses:REQ-092[]
@@ -1168,7 +1156,6 @@ The `prepareFile()` method computes file content, document attributes, and item 
 include::example$prepared-file-caching.puml[]
 ----
 
-addresses:REQ-005[]
 traceability:links[]"""
 ARC-013,ARC-013 — ESM module system,design,,explanation/architecture.adoc,"""ESM (`""""type"""": """"module""""` in package.json) is used throughout the project. This
 choice enables modern `import`/`export` syntax, the `node:` protocol for built-in
@@ -1243,12 +1230,10 @@ ARC-004,ARC-004 — Key architectural decisions and their rationale,design,,expl
 |==="""
 TST-001,TST-001 — Core Extension Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/v2-unified-item-architecture.test.ts`
 
-Tests the `RequirementsTraceabilityExtension` orchestrator — initialization, processing, query methods, role statistics, lifecycle. Covers the public API surface of the main extension class. Includes old-macro deprecation detection and verbatim block handling (listing, literal, and backtick code spans).
+Tests the `RequirementsTraceabilityExtension` orchestrator — initialization, processing, query methods, role statistics, lifecycle. Covers the public API surface of the main extension class. Includes verbatim block handling (listing, literal, and backtick code spans).
 
-verifies:REQ-005[]
 verifies:REQ-087[]
 verifies:REQ-088[]
-verifies:REQ-089[]
 verifies:REQ-090[]
 verifies:REQ-091[]
 verifies:REQ-092[]
@@ -1344,7 +1329,6 @@ PRQ-002,PRQ-002 — Test suite runs as merge gate,process_requirement,,self-trac
 
 validates:REQ-087[]
 validates:REQ-088[]
-validates:REQ-089[]
 considered_by:ARC-031[]
 
 traceability:links[]"""
@@ -1352,7 +1336,6 @@ PRQ-003,PRQ-003 — Example site builds without errors,process_requirement,,self
 
 The site build exercises the full extension pipeline — parsing, macro expansion, link substitution, matrix generation, and matrix registration in the content catalog — serving as an integration test.
 
-validates:REQ-005[]
 considered_by:ARC-031[]
 
 traceability:links[]"""

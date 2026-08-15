@@ -1,6 +1,5 @@
 /**
  * DocumentParser - Parses AsciiDoc content for [item] block macros with role attribute
- * Replaces the old DocumentParser that used [req], [imp], [test], [doc] macros
  */
 
 import type { ConfigLoader } from "./config/TraceabilityConfig.js";
@@ -11,7 +10,6 @@ import type { Item, ItemRelationship } from "./types.js";
  */
 export interface ParserWarning {
   type:
-    | "old_macro"
     | "missing_role"
     | "unknown_role"
     | "invalid_attribute"
@@ -39,8 +37,6 @@ export interface ParserError {
 export interface ParserOptions {
   sourceFile?: string;
   configLoader?: ConfigLoader;
-  /** If true, generate errors for old macro syntax (default: true) */
-  strictMode?: boolean;
   /** Antora component name. Absent for CLI usage. */
   component?: string;
   /** Antora module name. Absent for CLI usage. */
@@ -62,7 +58,6 @@ export interface ParserResult {
  *
  * This parser:
  * - Recognizes [item] block macros with role attribute
- * - Generates errors for old macro syntax ([req], [imp], [test], [doc])
  * - Supports all existing attributes (id, title, status) plus role
  * - Validates item IDs are unique
  * - Parses inline relationship macros
@@ -70,7 +65,6 @@ export interface ParserResult {
 export class DocumentParser {
   private currentFile: string = "";
   private configLoader?: ConfigLoader;
-  private strictMode: boolean = true;
   private warnings: ParserWarning[] = [];
   private errors: ParserError[] = [];
   private component?: string;
@@ -79,7 +73,6 @@ export class DocumentParser {
   constructor(options: ParserOptions = {}) {
     this.currentFile = options.sourceFile || "";
     this.configLoader = options.configLoader;
-    this.strictMode = options.strictMode !== false;
   }
 
   /**
@@ -111,10 +104,7 @@ export class DocumentParser {
 
     const seen = new Set<string>();
 
-    // First pass: Check for old macro syntax and generate errors
-    this.checkForOldMacros(content, result, verbatimRanges);
-
-    // Second pass: Parse all [item] block macros
+    // First pass: Parse all [item] block macros
     this.parseItemMacros(
       content,
       sourceFile || this.currentFile,
@@ -123,7 +113,7 @@ export class DocumentParser {
       verbatimRanges,
     );
 
-    // Third pass: Parse inline relationship macros from item content
+    // Second pass: Parse inline relationship macros from item content
     this.parseInlineMacrosFromItems(
       content,
       sourceFile || this.currentFile,
@@ -135,72 +125,6 @@ export class DocumentParser {
     result.errors = this.errors;
 
     return result;
-  }
-
-  /**
-   * Check for old macro syntax and generate errors
-   */
-  private checkForOldMacros(
-    content: string,
-    _result: ParserResult,
-    verbatimRanges: Array<{ start: number; end: number }>,
-  ): void {
-    const oldMacros = ["req", "imp", "test", "doc", "design"];
-
-    for (const macro of oldMacros) {
-      // Match an attribute-style block prefix: '[' + macro keyword followed by
-      // a comma, whitespace, or closing ']' (e.g. [req, ...], [req ...], [req]).
-      // Use a real alternation instead of a character class so we don't match
-      // stray single characters in ordinary prose.
-      const regex = new RegExp(`\\[${macro}(?:,|\\s|\\])`, "g");
-      let match: RegExpExecArray | null;
-
-      while ((match = regex.exec(content)) !== null) {
-        // Skip matches inside verbatim blocks (example code)
-        if (
-          verbatimRanges.some(
-            (r) => match!.index >= r.start && match!.index < r.end,
-          )
-        ) {
-          continue;
-        }
-        const line = this.lineAt(content, match.index);
-        const error: ParserError = {
-          type: "syntax_error",
-          message: `Old macro syntax '[${macro}]' is deprecated. Use [item, role=${this.getSuggestedRole(macro)}] instead.`,
-          file: this.currentFile,
-          line,
-          position: match.index,
-        };
-
-        if (this.strictMode) {
-          this.errors.push(error);
-        } else {
-          // In non-strict mode, add as warning
-          this.warnings.push({
-            type: "old_macro",
-            message: error.message,
-            file: this.currentFile,
-            line,
-            position: match.index,
-          });
-        }
-      }
-    }
-  }
-
-  /**
-   * Get suggested role for old macro type
-   */
-  private getSuggestedRole(macro: string): string {
-    const mapping: Record<string, string> = {
-      req: "requirement",
-      imp: "implementation",
-      test: "test",
-      doc: "document",
-      design: "design",
-    };
-    return mapping[macro] || "unknown";
   }
 
   /**
@@ -618,20 +542,4 @@ export class DocumentParser {
   ): boolean {
     return ranges.some((r) => pos >= r.start && pos < r.end);
   }
-
-  /**
-   * Parse using the old format (for backward compatibility testing)
-   * This method can be used to compare old vs new parsing
-   */
-  parseLegacyFormat?(
-    content: string,
-    sourceFile: string,
-  ): {
-    requirements: any[];
-    implementations: any[];
-    tests: any[];
-    documents: any[];
-    designs: any[];
-    relationships: any[];
-  };
 }

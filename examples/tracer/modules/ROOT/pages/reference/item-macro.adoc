@@ -97,16 +97,6 @@ The extension validates items and relationships at processing time:
 
 Warnings don't block processing; errors do. Unknown roles generate warnings (graceful degradation). Invalid relations generate errors.
 
-== Deprecated: Legacy macros
-
-Older versions used role-specific block macros (`[req]`, `[imp]`, `[test]`). These are detected with a deprecation error:
-
-----
-Error: Deprecated macro [req] found. Use [item, role=requirement] instead.
-----
-
-See xref:how-to/write-traceable-items.adoc[How to write traceable items] for migration guidance.
-
 == Related
 
 - xref:how-to/write-traceable-items.adoc[How to write traceable items] — practical guide
