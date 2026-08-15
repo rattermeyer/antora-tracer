@@ -1,6 +1,6 @@
 ---
 name: requirements-writing
-description: Create or review functional requirements (REQ items) in AsciiDoc/Antora Tracer format. Enforces the core principle — state what the system must do, never how it must do it. Use when writing new REQ items, reviewing existing ones for solution prescription, or checking requirement quality (testable, atomic, unambiguous).
+description: Create or review functional requirements (REQ items) in AsciiDoc/Antora Tracer format. Requirements must follow EARS style (Ubiquitous, Event-Driven, State-Driven, Unwanted Behaviour, Optional Feature) and state what the system must do, never how. Use when writing new REQ items, reviewing existing ones for solution prescription, or checking requirement quality (testable, atomic, unambiguous).
 ---
 
 # Requirements Writing Skill
@@ -14,6 +14,7 @@ Help the user create or review functional requirements stored as Antora Tracer `
 - User asks whether a requirement prescribes a solution
 - User wants to verify requirements are testable and unambiguous
 - User mentions "what not how", "solution prescription", or "technology in requirements"
+- User asks about EARS, requirement patterns, or how to structure a SHALL statement
 
 ## Core Principle: What, Not How
 
@@ -63,6 +64,111 @@ Colour hex codes (`#108193`), named fonts (`Roboto`, `Inter`), CDN URLs — thes
 
 **Exception**: Brand requirements may legitimately reference a design system name at the brand level, but not hex codes or specific font families.
 
+## EARS: Easy Approach to Requirements Syntax
+
+All requirements SHALL be written in EARS style (Alistair Mavin, IEEE RE 2009).
+EARS provides five patterns — choose based on whether the behaviour is always active, triggered by an event, dependent on a state, a response to an error, or conditional on an optional feature.
+
+### Generic EARS structure
+
+Clauses always appear in this order:
+
+```
+While <precondition(s)>, when <trigger>, the <system name> shall <system response>
+```
+
+Rules:
+- **Zero or many** `While` preconditions
+- **Zero or one** `When` trigger
+- **Exactly one** system name
+- **One or many** system responses
+
+### Pattern 1 — Ubiquitous
+
+Use when the behaviour always applies — no condition, no trigger.
+
+```
+The <system> shall <response>.
+```
+
+Project examples:
+- `The system shall accept a traceability configuration file in YAML format.`
+- `The system shall assign each item a unique identifier within its component.`
+- `The CLI shall display a human-readable error message when validation fails.`
+
+### Pattern 2 — Event-Driven
+
+Use when the behaviour is triggered by a specific event.
+
+```
+When <trigger>, the <system> shall <response>.
+```
+
+Project examples:
+- `When an item declaration is detected in a source file, the system shall register the item in the traceability graph.`
+- `When the user runs the validate command, the system shall report all items with missing required attributes.`
+- `When a relationship references an item ID that does not exist, the system shall emit a validation warning.`
+
+### Pattern 3 — State-Driven
+
+Use when the behaviour applies continuously while the system is in a given state.
+
+```
+While <state>, the <system> shall <response>.
+```
+
+Project examples:
+- `While the traceability graph is being populated, the system shall preserve all previously registered items.`
+- `While a Kroki server URL is configured, the system shall render diagrams via that server.`
+
+### Pattern 4 — Unwanted Behaviour
+
+Use when specifying the required response to an undesired situation or error condition.
+
+```
+If <unwanted condition>, then the <system> shall <response>.
+```
+
+Project examples:
+- `If an item ID is declared more than once across all source files, then the system shall report a duplicate ID error.`
+- `If the configuration file cannot be parsed, then the system shall halt the build and display the parse error with file location.`
+- `If a relationship macro appears inside a backtick-enclosed code span, then the system shall NOT register it as a traceability relationship.`
+
+### Pattern 5 — Optional Feature
+
+Use when the behaviour applies only if an optional feature or configuration is present.
+
+```
+Where <feature is included>, the <system> shall <response>.
+```
+
+Project examples:
+- `Where Neo4j export is enabled, the system shall generate CSV node and relationship files compatible with Neo4j import.`
+- `Where a Kroki server URL is configured, the system shall delegate diagram rendering to that server rather than using a local renderer.`
+- `Where a custom preset is specified in the configuration, the system shall apply it instead of the built-in default.`
+
+### Pattern 6 — Complex
+
+Combine patterns when both a precondition (state) and a trigger (event) apply. Include `If-Then` for error handling in complex scenarios.
+
+```
+While <precondition>, when <trigger>, the <system> shall <response>.
+```
+
+Project example:
+- `While processing a multi-module Antora component, when a partial file contains item declarations, the system shall register those items in the graph alongside items from page files.`
+
+### Choosing the right pattern
+
+| Question | Pattern |
+|---|---|
+| Always true, no conditions? | Ubiquitous |
+| Triggered by a user action or system event? | Event-Driven |
+| Applies continuously during a state? | State-Driven |
+| Specifies response to an error or invalid input? | Unwanted Behaviour |
+| Only when an optional feature/config is present? | Optional Feature |
+| Both a state and a trigger? | Complex |
+
 ## Creating a Requirement
 
 ### Step 1: Get the Next ID
@@ -89,6 +195,7 @@ traceability:incoming[]
 
 ### SHALL Statement Guidelines
 
+- **Choose the right EARS pattern first.** The pattern determines the sentence structure — ubiquitous, event-driven (`When`), state-driven (`While`), unwanted behaviour (`If … then`), or optional feature (`Where`). See the EARS section above.
 - **One SHALL per requirement.** Multiple SHALLs in one block usually means two requirements — split them.
 - **Subject is "the system" or a user-facing feature name**, never an internal component name.
 - **Verb is observable**: "provide", "display", "generate", "register", "validate", "notify" — not "define a type", "build a graph", "use a library".
@@ -108,6 +215,14 @@ Short, noun-phrase or outcome-phrase. Used in matrices and dashboards.
 When asked to review, check every item against this list. Do NOT silently accept vague or prescriptive content — flag it with a specific question and a suggested rewrite.
 
 ### Quality Checklist
+
+**EARS pattern**
+- [ ] Uses a recognised EARS pattern (Ubiquitous / Event-Driven / State-Driven / Unwanted Behaviour / Optional Feature / Complex)
+- [ ] `When` used for event triggers, not `if` (reserve `If … then` for unwanted/error behaviour)
+- [ ] `While` used for continuous state conditions, not `when`
+- [ ] `Where` used for optional feature scope, not `if` or `when`
+- [ ] Clauses in correct order: `While … When … the system shall …`
+- [ ] No trigger present when behaviour is always active (ubiquitous) — remove the `When` clause
 
 **Solution prescription**
 - [ ] No technology name (tool, library, framework) unless the technology IS the feature
