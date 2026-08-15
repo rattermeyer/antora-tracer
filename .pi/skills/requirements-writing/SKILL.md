@@ -280,6 +280,46 @@ Functional requirements refine use cases — they answer "what exactly must the 
 - Requirements use `is_addressed_by:UC-XXX[]` (or the configured inverse relation) to link back.
 - If a requirement cannot be traced to any use case, question whether it is needed.
 
+## After Changing Requirements
+
+When a requirement is rewritten, split, removed, or has its ID changed, sweep these layers before committing. Each layer can harbour stale text that now contradicts the updated requirement.
+
+| Layer | What to check |
+|---|---|
+| **Spec file** | The source spec in `openspec/specs/*/spec.md` — requirement statement and scenario bodies match the rewrite |
+| **Example site index** | `examples/tracer/modules/requirements/pages/index.adoc` — same item block updated or removed |
+| **Architecture doc** | `examples/tracer/modules/ROOT/pages/explanation/architecture.adoc` — any ARC item body that describes the changed behaviour; `addresses:REQ-NNN[]` links pointing to removed/split IDs |
+| **Processing pipeline doc** | `examples/tracer/modules/ROOT/pages/explanation/processing-pipeline.adoc` — prose descriptions of passes or lifecycle that mention the changed behaviour |
+| **Test file comments** | `test/*.test.ts` — `it("...")` descriptions and inline comments that describe old behaviour; assertions that verify the old (now wrong) outcome |
+| **Test-plan doc** | `examples/tracer/modules/ROOT/pages/self-traceability/test-plan.adoc` — TST item bodies describing what the test covers; `verifies:REQ-NNN[]` links for new/removed IDs |
+
+### Checklist for splits (REQ-N → REQ-N + REQ-X + REQ-Y)
+
+- [ ] Old spec body replaced with first new requirement; new IDs appended in same spec file
+- [ ] Example site index: old block rewritten as first ID; new blocks inserted immediately after
+- [ ] Architecture doc: ARC item `addresses:` list updated to include all new IDs
+- [ ] Architecture doc: ARC item body updated if it described the compound behaviour
+- [ ] Test file: any `it()` whose description mentions the old compound behaviour updated
+- [ ] Test-plan TST item: body mentions the expanded coverage; `verifies:` list includes new IDs
+
+### Checklist for removals (REQ-N deleted)
+
+- [ ] Block removed from spec file (or spec notes canonical ID elsewhere)
+- [ ] Block removed from example site index
+- [ ] `addresses:REQ-N[]` removed from all ARC items in architecture doc
+- [ ] No `verifies:REQ-N[]` remaining in test-plan
+- [ ] No `it()` description in test files references the removed requirement by number
+
+### Grep to find stale references
+
+```bash
+# Find all references to a specific requirement ID across docs and tests
+grep -rn 'REQ-NNN' examples/ test/ openspec/
+
+# Find stale behaviour descriptions (adapt the phrase to what changed)
+grep -rn 'Pass 2 skip\|skip.*partial\|partial.*only' examples/ test/
+```
+
 ## Related Commands
 
 ```bash

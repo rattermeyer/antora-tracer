@@ -76,7 +76,18 @@ Before mark task done, scan these file for stale content bout changed feature:
 
 When add new config option, env var, or feature flag: find every page that mention sibling option (same reference section, same how-to page) and add new one there too.
 
-When code behavior change, check consistency cross these layer before commit:
+When **requirement** change (rewrite, split, remove, rename), check these layer before commit:
+
+| Layer | Check |
+|---|---|
+| **Spec file** | `openspec/specs/*/spec.md` — requirement statement + scenario bodies match rewrite |
+| **Example site index** | `examples/tracer/modules/requirements/pages/index.adoc` — same block updated/removed |
+| **Architecture doc** | `explanation/architecture.adoc` — ARC item bodies + `addresses:REQ-N[]` links for removed/split IDs |
+| **Pipeline doc** | `explanation/processing-pipeline.adoc` — prose describing changed behaviour |
+| **Test comments** | `test/*.test.ts` — `it()` descriptions + assertions verifying old (now wrong) outcome |
+| **Test-plan doc** | `self-traceability/test-plan.adoc` — TST body + `verifies:REQ-N[]` links for new/removed IDs |
+
+When **code** behavior change, check consistency cross these layer before commit:
 
 | Layer | Check |
 |---|---|
