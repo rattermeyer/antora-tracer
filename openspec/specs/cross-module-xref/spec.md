@@ -59,7 +59,7 @@ When `buildXref` generates an Antora xref for an item in a different module or c
 ---
 
 ### Requirement: Matrix links include module path when available
-When `LinkResolver` generates an HTML link for a matrix item that has module information, the system SHALL include the module name in the URL path.
+When a matrix item has module information, the system SHALL include the module name in the URL path of its HTML link.
 
 #### Scenario: Item with module generates module-scoped link
 - **WHEN** LinkResolver generates a link for an item with `module: "ROOT"` and `sourceFile: "architecture"`

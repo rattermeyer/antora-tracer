@@ -107,7 +107,7 @@ The system SHALL NOT modify CSV and JSON matrix outputs to include links.
 ---
 
 ### Requirement: Matrix links include module path for module-aware items
-When an item has module information (from Antora processing), the LinkResolver SHALL generate links that include the module name so the link navigates to the correct page under the correct module directory.
+When an item has module information, the system SHALL generate HTML links that include the module name so the link navigates to the correct module page.
 
 #### Scenario: Row item link includes module
 - **WHEN** a matrix row item has `module: "ROOT"` and `sourceFile: "architecture"`
@@ -134,7 +134,7 @@ When an item has module information (from Antora processing), the LinkResolver S
 ---
 
 ### Requirement: LinkResolver produces indexify-aware links
-When Antora's default `indexify` URL style is active (pages at the module root become `pagename/index.html`), the LinkResolver SHALL generate links with `pagename/index.html` instead of `pagename.html` so links from traceability matrices resolve to the correct page.
+When Antora's `indexify` URL style is active (root-level pages are served as `pagename/index.html`), the system SHALL generate matrix links that include `index.html` in the path for root-level pages so links from traceability matrices resolve to the correct page.
 
 #### Scenario: Root-level page with indexify
 - **WHEN** an item has `sourceFile: "requirements"` and no module

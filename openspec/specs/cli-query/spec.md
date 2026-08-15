@@ -7,7 +7,7 @@ Provide a `query` subcommand on the CLI that parses AsciiDoc source files direct
 ## Requirements
 
 ### Requirement: CLI exposes a query subcommand
-The CLI SHALL provide a `query` subcommand that parses AsciiDoc source files, builds the in-memory traceability graph, and answers one structural question per invocation.
+The CLI SHALL provide a `query` subcommand that reads AsciiDoc source files and answers one structural question about items and their relationships per invocation.
 No Antora build SHALL be required.
 
 #### Scenario: Help lists all query subcommands

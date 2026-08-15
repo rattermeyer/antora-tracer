@@ -7,7 +7,7 @@ The matrix HTML template (`matrix.html.mustache`) uses Mustache partials for cle
 ## Requirements
 
 ### Requirement: Matrix template uses partials for structure
-The `matrix.html.mustache` template SHALL be split into a main template and four Mustache partials (`styles`, `header`, `matrix-row`, `footer`) loaded from the `partials/` subdirectory.
+The HTML matrix template SHALL be split into a main template and four reusable partial fragments (`styles`, `header`, `matrix-row`, `footer`) loaded from the `partials/` subdirectory.
 
 #### Scenario: Main template references partials
 - **WHEN** `TemplateRenderer.render("matrix", data)` is called

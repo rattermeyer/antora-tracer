@@ -22,7 +22,7 @@ The system SHALL compute file content (buffer→string), document attributes, an
 - **AND** all existing macro expansion tests SHALL pass without modification
 
 ### Requirement: PreparedFile carries all needed state
-The system SHALL define a `PreparedFile` type containing the raw Antora file reference, the full content string, parsed document attributes, item block position array, and normalized source-file metadata.
+The system SHALL cache the parsed state of each source file — including its full content, document attributes, item block positions, and normalized source-file metadata — so that subsequent processing steps within the same file pass do not reparse it.
 
 #### Scenario: PreparedFile provides content to expand methods
 - **WHEN** `expandRelationMacros` receives a `PreparedFile`

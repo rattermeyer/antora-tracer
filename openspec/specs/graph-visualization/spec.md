@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: Relationship graph via traceability:graph[] macro
-The system SHALL provide a `traceability:graph[]` inline macro that renders a GraphViz relationship graph for the enclosing item. The graph SHALL show the item and its direct relationships as labeled nodes and edges, colored by role. An optional depth parameter SHALL control the number of hops.
+The system SHALL provide a `traceability:graph[]` inline macro that renders a relationship diagram for the enclosing item. The diagram SHALL show the item and its related items as labeled nodes and edges, colored by role. An optional depth parameter SHALL control the number of relationship hops shown.
 
 #### Scenario: Graph renders for an item with relationships
 - **WHEN** an item block contains `traceability:graph[]` and `:traceability-graph:` is enabled
@@ -18,7 +18,7 @@ The system SHALL provide a `traceability:graph[]` inline macro that renders a Gr
 - **THEN** the graph shows items within 2 hops of the enclosing item
 
 ### Requirement: Coverage chart via traceability:graph-coverage[] macro
-The system SHALL provide a `traceability:graph-coverage[]` inline macro that renders a Vega-Lite bar chart showing coverage. When used inside an item block, it SHALL show per-relationship-type coverage for that item. When used outside an item block, it SHALL show global coverage by role.
+The system SHALL provide a `traceability:graph-coverage[]` inline macro that renders a coverage chart. When used inside an item block, it SHALL show per-relationship-type coverage for that item. When used outside an item block, it SHALL show global coverage by role.
 
 #### Scenario: Per-item coverage chart
 - **WHEN** an item block contains `traceability:graph-coverage[]`
@@ -30,7 +30,7 @@ The system SHALL provide a `traceability:graph-coverage[]` inline macro that ren
 - **THEN** the macro expands to a global coverage chart showing items per role with covered/uncovered segments
 
 ### Requirement: Graph visualization methods on TraceabilityGraph
-The `TraceabilityGraph` SHALL provide `toDot(fromId, depth?)` returning a GraphViz DOT source string, and `toVegaLite(itemId?)` returning a Vega-Lite JSON specification. The `toDot` method SHALL traverse relationships in both outgoing and incoming directions, showing the complete subgraph around an item. When a relationship is marked as bidirectional, the DOT output SHALL use a distinct arrow style (`dir=both`) and dashed stroke to indicate bidirectionality.
+The graph model SHALL support producing a traversal-bounded relationship subgraph for a given item, traversing both outgoing and incoming directions. Bidirectional relationships SHALL be visually distinguishable from one-directional relationships in the rendered output. The graph model SHALL also support producing coverage data for a given item, or globally across all items.
 
 #### Scenario: toDot generates valid DOT with bidirectional traversal
 - **WHEN** `toDot("REQ-001")` is called with an item that has both outgoing and incoming relationships

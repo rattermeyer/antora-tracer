@@ -13,7 +13,7 @@ The architecture document SHALL include a PlantUML class diagram showing the pub
 - **THEN** the `update-example-site` skill SHALL flag the class diagram for review
 
 ### Requirement: Architecture document includes DocumentParser activity diagram
-The architecture document SHALL include a PlantUML activity diagram showing the DocumentParser's step-by-step regex parsing pipeline: verbatim block pre-scanning, item block extraction with quote-aware bracket matching, body delimiter detection, relationship macro scanning with inline-code exclusion, old-macro detection, and result assembly.
+The architecture document SHALL include an activity diagram showing the parser's step-by-step pipeline: verbatim block pre-scanning, item block extraction with quote-aware bracket matching, body delimiter detection, relationship macro scanning with inline-code exclusion, old-macro detection, and result assembly.
 
 #### Scenario: Developer reads DocumentParser section
 - **WHEN** a developer reads the DocumentParser component description (ARC-017)
