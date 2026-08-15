@@ -7,6 +7,7 @@ UC-006,UC-006 — Project lead bootstraps traceability for a new project,REQ-083
 UC-007,UC-007 — Developer validates traceability in CI pipeline,REQ-109: REQ-109 — Circular reference detection in graph validation
 UC-008,UC-008 — Data analyst explores traceability in Neo4j,
 UC-009,UC-009 — Architect visualizes relationship dependencies,REQ-051: REQ-051 — Relationship graph via traceability:graph[] macro; REQ-052: REQ-052 — Coverage chart via traceability:graph-coverage[] macro; REQ-054: REQ-054 — Dashboard page in example site
+UC-010,UC-010 — Developer assesses impact before changing a traceable item,REQ-136: REQ-136 — CLI exposes a query subcommand; REQ-137: REQ-137 — query reverse — find all items that point at a given ID; REQ-138: REQ-138 — query impact — find all items connected to a given ID; REQ-139: REQ-139 — query orphaned — find items with no relationships; REQ-140: REQ-140 — query path — find the shortest path between two items; REQ-141: REQ-141 — JSON output flag
 
-Total 8 rows
-Coverage: 75.0%
+Total 9 rows
+Coverage: 77.8%

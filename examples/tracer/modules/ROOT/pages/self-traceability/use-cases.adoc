@@ -292,3 +292,44 @@ leads_to:REQ-054[]
 
 traceability:links[]
 --
+
+[#UC-010, item, role=use_case, title="Developer assesses impact before changing a traceable item"]
+--
+.Use Case: Developer assesses impact before changing a traceable item
+[width=100%, cols="25h,75a"]
+|===
+| ID | UC-010
+| Title | Developer assesses impact before changing a traceable item
+| Goal | Developer queries the traceability graph so they can identify every item that references a target before changing or removing it, avoiding dangling references and broken coverage
+| Primary Actor | Developer or Requirements Engineer
+| Preconditions | The project's `.adoc` source files contain traceable items with IDs And the Antora Tracer CLI is available And the developer has read access to the source files
+| Trigger | Developer plans to change, rename, or remove a traceable item and needs to know what references it
+| Basic Flow |
+. Developer identifies the ID of the item they intend to change or remove
+. Developer runs `antora-tracer query reverse <ID>` to list every item that references the target, with relationship type and source file and line
+. Developer runs `antora-tracer query impact <ID>` to list all items transitively connected to the target
+. Developer reviews the results to determine the full set of items affected by the change
+. Developer updates each referencing item — or confirms none exist — before making the change
+. Developer commits the change with all affected items accounted for
+| Alternate Flows |
+. *No item references the target:* `reverse` returns an empty result and exits 0. The change is safe from a traceability perspective.
+. *The target ID does not exist:* The command exits 1 with an "Item not found" warning. Developer verifies the ID spelling or confirms the item was already removed.
+. *Developer needs machine-readable output:* Developer adds `--json` for structured output consumable by scripts or AI coding agents.
+. *Developer needs the chain between two specific items:* Developer runs `query path <from> <to>`. The shortest relationship path prints, or the command exits 1 with "No path found".
+. *Developer wants to find items with no relationships:* Developer runs `query orphaned`, optionally filtered with `--role`.
+. *Developer wants to limit the search:* Developer passes `-i <path>` to scan a specific directory or file instead of the current directory.
+| Postconditions | The developer has identified every item that references the target And no Antora build was required And no source files were modified (query is read-only) And the change can proceed with all referencing items accounted for
+| Priority | Medium
+| Frequency | Before each refactor, rename, or removal of a traceable item
+| Notes | The `query` command parses `.adoc` files directly — it reuses the same parser and graph as the build, so no Antora build or running Neo4j database is required. This is the lightweight in-repo counterpart to UC-008 (Neo4j exploration): `query` answers simple structural questions without infrastructure, while Neo4j supports deeper ad-hoc graph analysis. ⚠ Actor "Developer or Requirements Engineer" is a compound role without a persona definition.
+|===
+
+leads_to:REQ-136[]
+leads_to:REQ-137[]
+leads_to:REQ-138[]
+leads_to:REQ-139[]
+leads_to:REQ-140[]
+leads_to:REQ-141[]
+
+traceability:links[]
+--

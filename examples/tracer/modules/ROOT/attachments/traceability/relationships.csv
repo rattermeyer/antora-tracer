@@ -10,6 +10,12 @@ UC-007-leads_to-REQ-109,UC-007,REQ-109,leads_to,self-traceability/use-cases.adoc
 UC-009-leads_to-REQ-051,UC-009,REQ-051,leads_to,self-traceability/use-cases.adoc,true
 UC-009-leads_to-REQ-052,UC-009,REQ-052,leads_to,self-traceability/use-cases.adoc,false
 UC-009-leads_to-REQ-054,UC-009,REQ-054,leads_to,self-traceability/use-cases.adoc,false
+UC-010-leads_to-REQ-136,UC-010,REQ-136,leads_to,self-traceability/use-cases.adoc,false
+UC-010-leads_to-REQ-137,UC-010,REQ-137,leads_to,self-traceability/use-cases.adoc,false
+UC-010-leads_to-REQ-138,UC-010,REQ-138,leads_to,self-traceability/use-cases.adoc,false
+UC-010-leads_to-REQ-139,UC-010,REQ-139,leads_to,self-traceability/use-cases.adoc,false
+UC-010-leads_to-REQ-140,UC-010,REQ-140,leads_to,self-traceability/use-cases.adoc,false
+UC-010-leads_to-REQ-141,UC-010,REQ-141,leads_to,self-traceability/use-cases.adoc,false
 ARC-018-addresses-REQ-071,ARC-018,REQ-071,addresses,explanation/architecture.adoc,false
 ARC-018-addresses-QA-056,ARC-018,QA-056,addresses,explanation/architecture.adoc,false
 ARC-018-addresses-QA-057,ARC-018,QA-057,addresses,explanation/architecture.adoc,false
