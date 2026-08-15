@@ -5,7 +5,38 @@ description: Update the self-traceability example site to reflect the current as
 
 # Update Example Site
 
-Update the self-traceability example site (`examples/`) to reflect the current state of the project. The documents describe the **as-is situation**, not a diff of recent changes.
+Update the self-traceability example site (`examples/tracer/`) to reflect the complete current state of the project.
+The documents describe the **as-is situation**, not a diff of recent changes.
+
+## Key File Paths
+
+| Document | Path |
+|---|---|
+| Requirements index | `examples/tracer/modules/requirements/pages/index.adoc` |
+| Architecture | `examples/tracer/modules/ROOT/pages/explanation/architecture.adoc` |
+| Processing pipeline | `examples/tracer/modules/ROOT/pages/explanation/processing-pipeline.adoc` |
+| Test plan | `examples/tracer/modules/ROOT/pages/self-traceability/test-plan.adoc` |
+| Use cases | `examples/tracer/modules/ROOT/pages/self-traceability/use-cases.adoc` |
+| Diagrams | `examples/tracer/modules/ROOT/examples/*.puml` |
+| Traceability config | `examples/traceability.yml` |
+| Matrix generator | `examples/run-example.js` |
+
+## Item Syntax
+
+All items use this format — **not** `[item, id=...]`:
+
+```asciidoc
+[#REQ-NNN, item, role=requirement, title="Short title"]
+--
+The system SHALL <observable behaviour>.
+
+Source: openspec/specs/<capability>/spec.md
+
+traceability:links[]
+--
+```
+
+Roles: `requirement`, `process_requirement`, `design`, `test`, `use_case`.
 
 ## When to Use
 
@@ -21,97 +52,97 @@ Read spec files from `openspec/specs/` (the source of truth — not archived cha
 ls openspec/specs/*/spec.md
 ```
 
-Each spec file contains requirements under `### Requirement:` headings with scenarios under `#### Scenario:`.
+Each spec file contains requirements under `### Requirement:` headings.
+The **requirement heading text** is the canonical title for each REQ item.
+REQ item titles MUST match the spec requirement heading exactly — this makes future diffing trivial.
 
-The **requirement heading text** is the canonical title for each `REQ-XXX` item. REQ item titles MUST match the spec requirement heading exactly — this makes diffing trivial.
+### 2. Diff Requirements Before Updating
 
-### 2. Diff requirements before updating
-
-Before modifying `requirements.adoc`, show what will change:
+Before modifying `index.adoc`, show what will change:
 
 1. Extract requirement titles from main specs (`### Requirement: ...`)
-2. Extract existing REQ item titles from `examples/modules/ROOT/pages/requirements.adoc`
-3. Compare the two sets:
-   - **New**: titles in specs but not in requirements.adoc
-   - **Removed**: titles in requirements.adoc but not in specs
+2. Extract existing REQ item titles from `examples/tracer/modules/requirements/pages/index.adoc`
+3. Compare:
+   - **New**: titles in specs but not in index
+   - **Removed**: titles in index but not in specs
    - **Title mismatch**: same ID but different title text
 
-Present this diff to the user for confirmation before applying changes.
+Present the diff to the user for confirmation before applying changes.
 
-### 3. Update `requirements.adoc`
+### 3. Update the Requirements Index
 
-The file is at `examples/modules/ROOT/pages/requirements.adoc`. It contains `[item, id=REQ-XXX, role=requirement]` blocks.
+File: `examples/tracer/modules/requirements/pages/index.adoc`
 
 **Merge strategy (preserve traceability links):**
 
-- **Keep** existing items whose spec source still exists (same requirement heading in a spec file). Do not change their IDs.
-- **Remove** items whose spec source no longer exists (requirement deleted from specs).
-- **Add** new items for requirements found in specs that don't have a matching `REQ-XXX` yet. Assign fresh IDs sequentially.
-- **Update** content for kept items if the spec text changed.
+- **Keep** existing items whose spec source still exists. Do not change their IDs.
+- **Remove** items whose spec source no longer exists.
+- **Add** new items for requirements found in specs that don't have a matching REQ-NNN yet. Assign fresh IDs sequentially using `antora-tracer next-id --prefix REQ`.
+- **Update** body text for kept items if the spec text changed.
 
-Each item should have:
-- `id` — `REQ-NNN` (three-digit, zero-padded)
-- `role=requirement`
-- Title — the exact `### Requirement:` heading text from the spec (must match)
-- Content body — the spec description text
-- Source reference — which spec file it came from (`Source: openspec/specs/<capability>/spec.md`)
+Each item block:
 
-Group items by capability area (matching the spec's parent directory name).
+```asciidoc
+[#REQ-NNN, item, role=requirement, title="<exact spec heading text>"]
+--
+<spec description text>
+
+Source: openspec/specs/<capability>/spec.md
+
+traceability:links[]
+--
+```
+
+Group items by capability area (matching the spec's directory name).
+
+**After updating requirements**, run the downstream consistency sweep from the `requirements-writing` skill — architecture doc, processing-pipeline doc, test comments, and test-plan `verifies:` links may all need updating when requirements are added, removed, or split.
 
 ### 4. Update `architecture.adoc`
 
-The file is at `examples/component-one/modules/ROOT/pages/architecture.adoc`. It uses arc42 sections as `[item, id=ARC-XXX, role=design]`.
+File: `examples/tracer/modules/ROOT/pages/explanation/architecture.adoc`
 
-**Scan design decisions:**
+This file contains ARC items (`role=design`) covering building blocks, runtime view, component designs, and architecture decisions. ARC IDs currently run from ARC-001 to ARC-033.
 
-Read `design.md` from all changes (active + archived). Each `### N. Decision Title` is an architecture decision. Each decision maps to one arc42 section.
+**What to check:**
 
-Current sections:
-- `ARC-001`: Introduction & Goals
-- `ARC-002`: Building Block View (component diagram, class/API diagram, config resolution)
-- `ARC-003`: Runtime View (sequence diagram, pass pipeline, file state caching)
-- `ARC-004`: Architecture Decisions (decisions table)
+- ARC item bodies that describe behaviour changed by the archived change
+- `addresses:REQ-NNN[]` links pointing to removed or split requirement IDs
+- Pass table (scope column) — must match actual implementation scope (pages vs pages+partials)
+- Component descriptions — must match current source layout and class names
 
-**Update strategy:**
+**Diagrams** live in `examples/tracer/modules/ROOT/examples/*.puml`:
 
-- Keep existing sections (they describe the architecture, which doesn't change often).
-- Update the `addresses:` inline macros to reference the correct current `REQ-XXX` IDs.
-- If new architecture patterns emerge (new components, new flows, new decisions), add them as new `ARC-XXX` items with fresh IDs.
-
-**Diagram checklist — by arc42 section:**
-
-Review each existing diagram for accuracy and consider whether a section is missing a diagram that would clarify its concept.
-
-| arc42 Section | Expected Diagrams | When to Update |
+| File | What it shows | When to update |
 |---|---|---|
-| Building Block View (ARC-002) | `bb-overview.puml` (component dependencies), `api-overview.puml` (class/API), `config-resolution.puml` (config flow) | New component added or interface signature changes |
-| Runtime View (ARC-003) | `sequence-diagram.puml` (Antora flow), `pass-pipeline.puml` (pass ordering), `prepared-file-caching.puml` (caching optimization) | Processing flow or internal algorithm changes |
-| Individual components (ARC-015–ARC-033) | `parser-flow.puml` (DocumentParser activity), `graph-lifecycle.puml` (graph state) | Component's internal logic changes significantly |
-| Architecture Decisions (ARC-004) | (none — text table) | New ADR added |
+| `bb-overview.puml` | Component dependencies | New component added or removed |
+| `api-overview.puml` | Public class/API surface | Interface signatures change |
+| `config-resolution.puml` | Config loading flow | ConfigLoader logic changes |
+| `sequence-diagram.puml` | Antora build event flow | Extension event handling changes |
+| `pass-pipeline.puml` | Pass ordering within contentClassified | Pass structure changes |
+| `prepared-file-caching.puml` | File state caching | PreparedFile logic changes |
+| `parser-flow.puml` | DocumentParser internal activity | Parser algorithm changes |
+| `graph-lifecycle.puml` | TraceabilityGraph state lifecycle | Graph state machine changes |
+| `docx-pipeline-comparison.puml` | PDF vs DOCX build pipeline | DOCX/PDF pipeline changes |
 
-**Diagram type decision guide:**
+Diagrams are included via `[plantuml]\n----\ninclude::example$name.puml[]\n----`.
 
-| Concept type | Diagram type | Example |
-|---|---|---|
-| Who depends on whom | Component | `bb-overview.puml` |
-| What they expose (public API) | Class | `api-overview.puml` |
-| What happens in what order (across components) | Sequence | `sequence-diagram.puml` |
-| How a component works internally (algorithm) | Activity | `parser-flow.puml` |
-| What states something has (lifecycle) | State | `graph-lifecycle.puml` |
-| How data/config flows through the system | Flow/Activity | `config-resolution.puml` |
+### 5. Update `processing-pipeline.adoc`
 
-**Heuristic for new diagrams:** if a component's internal logic spans more than ~20 lines of prose description, consider adding an activity or state diagram.
+File: `examples/tracer/modules/ROOT/pages/explanation/processing-pipeline.adoc`
 
-**Placement conventions:**
+This doc describes the four passes within `contentClassified` and the graph lifecycle.
 
-- All diagrams live in `examples/component-one/modules/ROOT/examples/` as `.puml` files
-- Included in `architecture.adoc` via `[plantuml]\n----\ninclude::example$name.puml[]\n----`
-- Each diagram is placed inline with its corresponding section — not in a separate gallery
-- Introduce each diagram with 1–2 sentences explaining what the reader should take away
+**What to check:**
 
-### 5. Update `test-plan.adoc`
+- Pass headings and scope annotations (e.g., "pages and partials" vs "pages only")
+- Pass descriptions — must match what the implementation actually does
+- Graph lifecycle steps — creation, population, quiescent, macro expansion, finalization
 
-The file is at `examples/modules/ROOT/pages/test-plan.adoc`. It contains `[item, id=TST-XXX, role=test]` blocks, one per test file.
+### 6. Update `test-plan.adoc`
+
+File: `examples/tracer/modules/ROOT/pages/self-traceability/test-plan.adoc`
+
+Contains TST items (`role=test`), one per test file.
 
 **Scan current test files:**
 
@@ -121,115 +152,79 @@ ls test/*.test.ts
 
 **Update strategy:**
 
-- For each `.test.ts` file, create or update a `TST-XXX` item.
-- Map each test file to the requirements it verifies by:
-  1. Reading the test file to find which API methods/components it tests
-  2. Cross-referencing with the current requirements list to find matching `REQ-XXX` IDs
-  3. Populating `verifies:` inline macros
+- For each `.test.ts`, create or update a TST-NNN item.
+- TST item body: describe what the test file covers (which components, which scenarios).
+- `verifies:REQ-NNN[]` links: cross-reference with current REQ IDs for requirements the tests exercise.
 - Remove items for test files that no longer exist.
-- Preserve existing IDs for stability.
+- Add `verifies:` for any new REQ IDs (especially after splits) that the existing tests already cover.
+- Preserve existing TST IDs.
 
-### 6. Review `use-cases.adoc` for coverage gaps
+**Common staleness patterns:**
 
-The file is at `examples/modules/ROOT/pages/use-cases.adoc`. It contains `[item, id=UC-XXX, role=use_case]` blocks in Karl Wiegers tabular format.
+- `it()` description in test file says "skip" or "only" when behaviour now applies to more cases → update TST body
+- New REQ IDs from a requirement split not yet in the `verifies:` list → add them
+- Removed requirement ID still in `verifies:` list → remove it
 
-**Scan user-facing capabilities:**
+### 7. Review `use-cases.adoc` for Coverage Gaps
 
-Read the user guide (`examples/modules/ROOT/pages/user-guide.adoc`) to identify all documented user-facing capabilities. The use cases should cover every major workflow the user guide describes.
+File: `examples/tracer/modules/ROOT/pages/self-traceability/use-cases.adoc`
+
+Contains UC items (`role=use_case`) in Karl Wiegers tabular format.
 
 **Review each existing use case for quality:**
 
-1. **Actor scope** — does the actor name accurately describe who performs this workflow? A use case called "Business Analyst writes items" that applies equally to developers and test managers has a scope problem.
-2. **Goal scope** — is this a genuine user goal or a tool-invocation task? "Get next ID from CLI" is a sub-step of item creation, not a user goal. Each use case should describe a complete workflow that delivers value independently.
-3. **Preconditions** — are they testable? "The extension is installed" is testable; "the team understands traceability" is not.
-4. **Postconditions** — are they measurable? "The traceability graph contains the new item" is measurable; "coverage improves" is vague.
-5. **Alternate flows** — do they cover error scenarios the system actually handles? Each validation error, warning path, and edge case from the specs should have a corresponding alternate flow.
+1. **Actor scope** — does the actor describe who actually performs this workflow?
+2. **Goal scope** — is this a complete user goal, not just a tool invocation?
+3. **Preconditions** — testable? ("The extension is installed" yes; "the team understands traceability" no)
+4. **Postconditions** — measurable? ("graph contains the new item" yes; "coverage improves" no)
+5. **Alternate flows** — do they cover error scenarios the system actually handles?
 
-**Identify missing use cases:**
+**Identify gaps** by cross-referencing user-facing capabilities in `how-to/` pages against existing use cases. Present a proposed outline (ID, actor, goal, key flows) for confirmation before writing new use cases.
 
-Cross-reference the user guide's capability sections against the existing use cases:
+### 8. Check `traceability.yml`
 
-| User Guide Section | Expected Use Case |
-|---|---|
-| Getting Started / Configuration | Project setup and bootstrap |
-| Writing Items | Item authoring (UC-001) |
-| Rendering Macros | Item authoring (UC-001 covers this) |
-| Items in Partials | Partial file organization (UC-004) |
-| Configuration (extends) | Domain model definition (UC-002) |
-| Matrices / Coverage Report | Coverage review (UC-005) |
-| CLI validate | CI validation |
-| Neo4j Export | Neo4j exploration |
-| Graph Visualization | Visual dependency exploration |
-| CLI matrix / stats | Covered by CLI validation (pipeline context) |
+File: `examples/traceability.yml`
 
-**Present the review for confirmation:**
+Check that roles, relations, and matrix definitions still match what the documents use:
 
-1. List existing use cases with quality observations
-2. List identified gaps (user guide capabilities with no use case)
-3. Propose: merge too-narrow use cases, add new ones for gaps
-4. Present the proposed use case outline before writing (ID, actor, goal, key flows)
+- Roles: `requirement`, `process_requirement`, `design`, `test`, `use_case`
+- Relations: `addresses`, `verifies`, `validates`, `leads_to` (and their inverses)
+- Matrices: one per cross-cutting concern (requirements↔design, requirements↔tests, etc.)
 
-Do not write new use cases until the user confirms the outline.
-
-### 7. Update `traceability.yml` if needed
-
-The file is at `examples/traceability.yml`. Check if the roles, relations, or matrix definitions need updating:
-
-- Roles should match the roles used in requirements, architecture, test, and use-case items.
-- Relations should allow the `addresses` (architecture→requirement), `verifies` (test→requirement), `validates` (test→architecture), and `leads_to` (use_case→requirement) patterns used in the documents.
-- Matrices should provide useful cross-references of requirements against architecture, tests, and use cases.
-
-### 8. Update `run-example.js`
-
-The script at `examples/run-example.js` generates matrices by name. Ensure it uses matrix names from the current config, not hardcoded names:
-
-```javascript
-const matrixNames = configLoader.getConfig().matrices.map(m => m.name);
-for (const matrixName of matrixNames) {
-  // generate matrix...
-}
-```
-
-If the script uses hardcoded matrix names, update them to match `traceability.yml`.
-
-### 9. Regenerate traceability output
-
-After all documents are updated, regenerate the matrices:
+### 9. Regenerate Traceability Output
 
 ```bash
 npm run build
 node examples/run-example.js
 ```
 
-This produces updated matrix files in `examples/modules/ROOT/attachments/traceability/`.
+`run-example.js` reads matrix names from the config and generates CSV and HTML matrix files into `examples/tracer/modules/ROOT/attachments/traceability/`.
 
-### 10. Rebuild the Antora site
+### 10. Rebuild the Antora Site
 
 ```bash
-npx antora generate antora-playbook.yml
+npx antora antora-playbook.yml
 ```
 
-Verify no xref warnings and the matrices are navigable.
+Check for xref warnings. Verify matrices are navigable and link to the correct requirement anchors.
 
 ### 11. Commit
 
-Commit all updated files with a message like:
-
 ```
-Update example site to reflect current project state
+docs(example-site): update self-traceability to reflect current state
 
-Requirements: N total (M added, K removed)
-Architecture: unchanged / updated
-Tests: N total (matches N test files)
+Requirements: N total (M added, K removed, P updated)
+Architecture: <unchanged | updated ARC-NNN body | added ARC-NNN>
+Test plan: N total (verifies: updated for REQ-NNN splits)
 Matrices: regenerated
 ```
 
 ## Guardrails
 
-- **Preserve IDs** — never change an existing `REQ-XXX`, `ARC-XXX`, `TST-XXX`, or `UC-XXX` id. Traceability links depend on stable IDs.
-- **As-is, not diff** — the documents describe the complete current state, not what changed.
-- **Grounded in specs** — every requirement must trace back to a spec file. Don't invent requirements.
-- **Grounded in code** — test items must match actual test files. Architecture must match actual source layout.
-- **Title matching** — REQ item titles MUST match the spec's `### Requirement:` heading exactly. This makes diffing and future syncs trivial.
-- **Use case quality** — each use case should describe a complete user goal, not a tool-invocation task. Verify actors, preconditions, postconditions, and alternate flows before writing. Cross-reference against the user guide to ensure all documented capabilities have use case coverage.
-- **Regenerate and verify** — always run `run-example.js` after document changes to produce updated matrices. Then rebuild the site and check for xref errors.
+- **Preserve IDs** — never change an existing REQ-NNN, ARC-NNN, TST-NNN, or UC-NNN. Traceability links depend on stable IDs.
+- **As-is, not diff** — documents describe the complete current state, not what recently changed.
+- **Grounded in specs** — every requirement must trace back to a spec file. Do not invent requirements.
+- **Grounded in code** — TST items must match actual test files. ARC items must match actual source layout and class names.
+- **Title matching** — REQ item titles MUST match the spec's `### Requirement:` heading exactly.
+- **Run the consistency sweep** — after updating requirements, check architecture docs, test `it()` descriptions, and test-plan `verifies:` links. See the `requirements-writing` skill's "After Changing Requirements" section for the full checklist.
+- **Regenerate and verify** — always run `run-example.js` after document changes, then rebuild and check for xref errors.
