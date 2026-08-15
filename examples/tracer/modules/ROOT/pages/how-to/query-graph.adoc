@@ -1,0 +1,79 @@
+= How to Query the Graph from the Command Line
+:description: Query the traceability graph without a build using the antora-tracer query command
+:keywords: antora, asciidoc, traceability, cli, query, graph
+:toc: macro
+
+toc::[]
+
+The `query` command parses your AsciiDoc source files and answers structural questions about your traceability graph. It does not require an Antora build, so it works from any directory in your project.
+
+== Find what references an item
+
+Before you change or remove an item, find everything that points at it:
+
+[source,bash]
+----
+npx antora-tracer query reverse REQ-005
+----
+
+The output lists each referencing item with its role, the relationship type, and the source file and line:
+
+----
+ID       Role   Relation   File                    Line
+ARC-017  design addresses  pages/architecture.adoc  323
+TST-001  test   verifies   pages/test-plan.adoc      17
+----
+
+Add `--json` for machine-readable output:
+
+[source,bash]
+----
+npx antora-tracer query reverse REQ-005 --json
+----
+
+== Find the impact of changing an item
+
+`impact` lists every item transitively connected to the given ID:
+
+[source,bash]
+----
+npx antora-tracer query impact REQ-005
+----
+
+== Find orphaned items
+
+`orphaned` lists items with no relationships in either direction:
+
+[source,bash]
+----
+npx antora-tracer query orphaned
+npx antora-tracer query orphaned --role requirement
+----
+
+== Find a path between two items
+
+`path` prints the shortest relationship chain between two items:
+
+[source,bash]
+----
+npx antora-tracer query path TST-001 REQ-001
+----
+
+----
+TST-001 --tests--> IMP-001 --implements--> DES-001 --addresses--> REQ-001
+----
+
+== Scope the search
+
+By default `query` scans the current directory. Point it at a specific directory or file:
+
+[source,bash]
+----
+npx antora-tracer query reverse REQ-005 -i modules/ROOT/pages/
+npx antora-tracer query orphaned -i requirements.adoc
+----
+
+== Related
+
+- xref:reference/cli.adoc[CLI Reference] — all query subcommands and options
+- xref:how-to/neo4j-export.adoc[How to Export to Neo4j] — graph queries in Neo4j

@@ -152,6 +152,22 @@ function collectAdocFiles(
   ];
 }
 
+/**
+ * Format an array of rows as an aligned plain-text table.
+ * An empty rows array renders the header only.
+ */
+function formatTable(header: string[], rows: string[][]): string {
+  const widths = header.map((h, i) =>
+    Math.max(h.length, ...rows.map((r) => (r[i] ?? "").length)),
+  );
+  const render = (cells: string[]) =>
+    cells
+      .map((c, i) => (c ?? "").padEnd(widths[i] ?? 0))
+      .join("  ")
+      .trimEnd();
+  return [render(header), ...rows.map(render)].join("\n");
+}
+
 program
   .command("process")
   .description("Process AsciiDoc files for requirements traceability")
@@ -798,11 +814,12 @@ program
 
 program
   .command("next-id")
-  .description(
-    "Get the next available sequential ID for a given prefix",
-  )
+  .description("Get the next available sequential ID for a given prefix")
   .requiredOption("-p, --prefix <prefix>", "ID prefix (e.g., REQ, ARC, TST)")
-  .option("-i, --input <path>", "Input file or directory to scan for existing IDs")
+  .option(
+    "-i, --input <path>",
+    "Input file or directory to scan for existing IDs",
+  )
   .action(async (options) => {
     if (!options.input) {
       console.error(chalk.red("Error: Input file or directory is required"));
@@ -817,6 +834,164 @@ program
     } catch (error: any) {
       console.error(chalk.red("Error:", error.message));
       process.exit(1);
+    }
+  });
+
+// ========================================================================
+// Query command
+// ========================================================================
+
+const queryProgram = program
+  .command("query")
+  .description("Query the traceability graph (no Antora build required)")
+  .option("-i, --input <path>", "Input file or directory to scan", ".")
+  .option("--json", "Output machine-readable JSON");
+
+/**
+ * Build the traceability graph from the input path declared on the parent
+ * `query` command.
+ */
+async function buildQueryGraph(
+  cmd: any,
+): Promise<RequirementsTraceabilityExtension> {
+  const { input } = cmd.parent.opts();
+  const extension = await createExtension({});
+  const adocFiles = collectAdocFiles(input ?? ".");
+  extension.processFiles(adocFiles);
+  return extension;
+}
+
+queryProgram
+  .command("reverse <id>")
+  .description("List all items that reference the given ID")
+  .action(async (id: string, _options: any, cmd: any) => {
+    const { json } = cmd.parent.opts();
+    const extension = await buildQueryGraph(cmd);
+    const graph = extension.graph;
+    if (!graph.getItem(id)) {
+      console.error(chalk.red(`Item not found: ${id}`));
+      process.exit(1);
+    }
+    const rels = graph.getReverseRelationships(id);
+    if (json) {
+      console.log(
+        JSON.stringify(
+          rels.map((rel) => ({
+            item: graph.getItem(rel.fromId) ?? null,
+            relationship: rel,
+          })),
+          null,
+          2,
+        ),
+      );
+    } else {
+      const rows = rels.map((rel) => {
+        const item = graph.getItem(rel.fromId);
+        return [
+          item?.id ?? rel.fromId,
+          item?.role ?? "",
+          rel.type,
+          rel.sourceFile ?? "",
+          rel.line !== undefined ? String(rel.line) : "",
+        ];
+      });
+      console.log(
+        formatTable(["ID", "Role", "Relation", "File", "Line"], rows),
+      );
+    }
+  });
+
+queryProgram
+  .command("impact <id>")
+  .description("List all items transitively connected to the given ID")
+  .action(async (id: string, _options: any, cmd: any) => {
+    const { json } = cmd.parent.opts();
+    const extension = await buildQueryGraph(cmd);
+    const graph = extension.graph;
+    if (!graph.getItem(id)) {
+      console.error(chalk.red(`Item not found: ${id}`));
+      process.exit(1);
+    }
+    const ids = graph.getImpactAnalysis(id);
+    const items = ids
+      .map((iid) => graph.getItem(iid))
+      .filter((i): i is NonNullable<typeof i> => i !== undefined);
+    if (json) {
+      console.log(JSON.stringify(items, null, 2));
+    } else {
+      const rows = items.map((item) => [item.id, item.role, item.title]);
+      console.log(formatTable(["ID", "Role", "Title"], rows));
+    }
+  });
+
+queryProgram
+  .command("orphaned")
+  .description("List items with no relationships")
+  .option("--role <role>", "Filter by role")
+  .action(async (options: any, cmd: any) => {
+    const { json } = cmd.parent.opts();
+    const extension = await buildQueryGraph(cmd);
+    const graph = extension.graph;
+    const orphans = graph
+      .getAllItems()
+      .filter(
+        (item) =>
+          graph.getRelationships(item.id).length === 0 &&
+          graph.getReverseRelationships(item.id).length === 0,
+      );
+    const filtered = options.role
+      ? orphans.filter((i) => i.role === options.role)
+      : orphans;
+    if (json) {
+      console.log(JSON.stringify(filtered, null, 2));
+    } else {
+      const rows = filtered.map((item) => [
+        item.id,
+        item.role,
+        item.title,
+        item.sourceFile ?? "",
+      ]);
+      console.log(formatTable(["ID", "Role", "Title", "File"], rows));
+    }
+  });
+
+queryProgram
+  .command("path <from> <to>")
+  .description("Find the shortest relationship path between two items")
+  .action(async (from: string, to: string, _options: any, cmd: any) => {
+    const { json } = cmd.parent.opts();
+    const extension = await buildQueryGraph(cmd);
+    const graph = extension.graph;
+    if (!graph.getItem(from)) {
+      console.error(chalk.red(`Item not found: ${from}`));
+      process.exit(1);
+    }
+    if (!graph.getItem(to)) {
+      console.error(chalk.red(`Item not found: ${to}`));
+      process.exit(1);
+    }
+    const path = graph.findPath(from, to);
+    if (path === null) {
+      console.error(chalk.red("No path found"));
+      process.exit(1);
+    }
+    const edges = [];
+    for (let i = 0; i < path.length - 1; i++) {
+      const rel = graph
+        .getRelationships(path[i])
+        .find((r) => r.targetId === path[i + 1]);
+      if (rel) {
+        edges.push(rel);
+      }
+    }
+    if (json) {
+      console.log(JSON.stringify(edges, null, 2));
+    } else {
+      let line = path[0];
+      for (let i = 0; i < edges.length; i++) {
+        line += ` --${edges[i].type}--> ${path[i + 1]}`;
+      }
+      console.log(line);
     }
   });
 

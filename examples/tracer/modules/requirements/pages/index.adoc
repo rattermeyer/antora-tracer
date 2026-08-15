@@ -440,6 +440,60 @@ Source: openspec/specs/next-id/spec.md
 traceability:links[]
 --
 
+[#REQ-136, item, role=requirement, title="CLI exposes a query subcommand"]
+--
+The CLI SHALL provide a `query` subcommand that parses AsciiDoc source files, builds the in-memory traceability graph, and answers one structural question per invocation. No Antora build SHALL be required.
+
+Source: openspec/specs/cli-query/spec.md
+
+traceability:links[]
+--
+
+[#REQ-137, item, role=requirement, title="query reverse — find all items that point at a given ID"]
+--
+The CLI SHALL provide `query reverse <id>` that returns all items whose relationship macros reference the given item ID.
+
+Source: openspec/specs/cli-query/spec.md
+
+traceability:links[]
+--
+
+[#REQ-138, item, role=requirement, title="query impact — find all items connected to a given ID"]
+--
+The CLI SHALL provide `query impact <id>` that returns all items transitively connected to the given item (its connected component, excluding the item itself), following relationships in both directions.
+
+Source: openspec/specs/cli-query/spec.md
+
+traceability:links[]
+--
+
+[#REQ-139, item, role=requirement, title="query orphaned — find items with no relationships"]
+--
+The CLI SHALL provide `query orphaned` that returns all items that have neither incoming nor outgoing relationships in the graph.
+
+Source: openspec/specs/cli-query/spec.md
+
+traceability:links[]
+--
+
+[#REQ-140, item, role=requirement, title="query path — find the shortest path between two items"]
+--
+The CLI SHALL provide `query path <from-id> <to-id>` that returns the shortest relationship path between two items in the graph.
+
+Source: openspec/specs/cli-query/spec.md
+
+traceability:links[]
+--
+
+[#REQ-141, item, role=requirement, title="JSON output flag"]
+--
+All `query` subcommands SHALL accept a `--json` flag that switches output to a machine-readable JSON array.
+
+Source: openspec/specs/cli-query/spec.md
+
+traceability:links[]
+--
+
 == PDF Output
 
 [#REQ-093, item, role=requirement, title="Devbox provides Ruby and Node.js for PDF builds"]

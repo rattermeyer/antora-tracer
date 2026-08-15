@@ -44,6 +44,12 @@ REQ-063,REQ-063 — Configurable Kroki image format,ARC-025: ARC-025 — traceab
 REQ-109,REQ-109 — Circular reference detection in graph validation,ARC-028: ARC-028 — Circular reference detection in graph validation
 REQ-129,REQ-129 — Bidirectional relationship pairs are merged into a single edge,
 REQ-056,REQ-056 — CLI next-id command returns next available ID,ARC-023: ARC-023 — Commander-based CLI with subcommands
+REQ-136,REQ-136 — CLI exposes a query subcommand,
+REQ-137,REQ-137 — query reverse — find all items that point at a given ID,
+REQ-138,REQ-138 — query impact — find all items connected to a given ID,
+REQ-139,REQ-139 — query orphaned — find items with no relationships,
+REQ-140,REQ-140 — query path — find the shortest path between two items,
+REQ-141,REQ-141 — JSON output flag,
 REQ-093,REQ-093 — Devbox provides Ruby and Node.js for PDF builds,ARC-030: ARC-030 — CI/CD PDF build and deployment pipeline
 REQ-094,REQ-094 — Gemfile locks asciidoctor-pdf version,ARC-030: ARC-030 — CI/CD PDF build and deployment pipeline
 REQ-095,REQ-095 — PDF playbook generates PDF from example site,ARC-030: ARC-030 — CI/CD PDF build and deployment pipeline
@@ -101,5 +107,5 @@ QA-060,QA-060 — PDF compatibility of generated output,ARC-024: ARC-024 — tra
 QA-061,QA-061 — Platform stability and longevity,
 QA-062,QA-062 — Query and indexing performance,
 
-Total 101 rows
-Coverage: 73.3%
+Total 107 rows
+Coverage: 69.2%

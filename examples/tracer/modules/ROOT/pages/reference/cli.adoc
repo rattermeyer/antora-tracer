@@ -238,8 +238,60 @@ npx antora-tracer next-id --prefix TST -i test-plan.adoc
 
 Auto-detects padding from existing IDs. If `REQ-001` and `REQ-002` exist, returns `REQ-003`. If `TST-0001` exists, returns `TST-0002`. With no existing items matching the prefix, defaults to 3-digit padding (`REQ-001`).
 
+== query
+
+Query the traceability graph directly from the command line — no Antora build required. Parses your `.adoc` source files and answers one structural question per invocation.
+
+[source,bash]
+----
+npx antora-tracer query reverse REQ-005
+npx antora-tracer query reverse REQ-005 -i docs/
+npx antora-tracer query impact REQ-005 --json
+npx antora-tracer query orphaned --role requirement
+npx antora-tracer query path TST-001 REQ-001
+----
+
+[width=100%, cols="25,15,60"]
+|===
+| Option | Type | Description
+
+| `-i, --input <path>`
+| string
+| Input file or directory to scan (default: `.`)
+
+| `--json`
+| flag
+| Output machine-readable JSON instead of a table
+
+| `--role <role>`
+| string
+| For `orphaned`: filter results by role
+|===
+
+Subcommands:
+
+[width=100%, cols="30,70"]
+|===
+| Subcommand | Description
+
+| `reverse <id>`
+| List every item that references `<id>` (inbound relationships)
+
+| `impact <id>`
+| List every item transitively connected to `<id>`
+
+| `orphaned`
+| List items with no relationships (optionally `--role <role>`)
+
+| `path <from> <to>`
+| Print the shortest relationship path between two items
+|===
+
+Exit codes: `0` for success (including empty results), `1` for an unknown item ID or when no path exists.
+
 == Related
 
 - xref:how-to/write-traceable-items.adoc[How to write traceable items] — using next-id in workflow
 - xref:how-to/neo4j-export.adoc[How to export to Neo4j] — Neo4j export workflow
+xref:how-to/query-graph.adoc[How to query the graph from the command line] — query subcommands and examples
 - xref:reference/presets.adoc[Presets Reference] — preset definitions

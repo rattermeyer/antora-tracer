@@ -121,7 +121,7 @@ export class RequirementsTraceabilityExtension {
     };
     (loader as any).configPath = `preset:${presetName}`;
 
-    console.log(`Created extension with preset: ${presetName}`);
+    console.error(`Created extension with preset: ${presetName}`);
     return new RequirementsTraceabilityExtension(loader);
   }
 
@@ -142,18 +142,27 @@ export class RequirementsTraceabilityExtension {
     const startTime = Date.now();
 
     // Parse the content
-    const parsed = this.parser.parse(content, this.currentFile, options.component, options.module);
+    const parsed = this.parser.parse(
+      content,
+      this.currentFile,
+      options.component,
+      options.module,
+    );
 
     // Add parsed items to the graph
     for (const item of parsed.items) {
       this.graph.addItem(item);
-      this.logger.debug(`Item registered: ${item.id} (role: ${item.role}) - ${item.title}`);
+      this.logger.debug(
+        `Item registered: ${item.id} (role: ${item.role}) - ${item.title}`,
+      );
     }
 
     // Add parsed relationships to the graph
     for (const rel of parsed.relationships) {
       this.graph.addRelationship(rel);
-      this.logger.debug(`Relationship added: ${rel.fromId} ${rel.type} ${rel.targetId}`);
+      this.logger.debug(
+        `Relationship added: ${rel.fromId} ${rel.type} ${rel.targetId}`,
+      );
     }
 
     const elapsed = Date.now() - startTime;
@@ -241,7 +250,9 @@ export class RequirementsTraceabilityExtension {
    */
   addItem(item: Item): void {
     this.graph.addItem(item);
-    this.logger.debug(`Item registered: ${item.id} (role: ${item.role}) - ${item.title}`);
+    this.logger.debug(
+      `Item registered: ${item.id} (role: ${item.role}) - ${item.title}`,
+    );
   }
 
   /**

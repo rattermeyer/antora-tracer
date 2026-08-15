@@ -131,6 +131,22 @@ Tests the in-memory regex substitution that replaces relationship macros with As
 traceability:links[]
 --
 
+[#TST-009, item, role=test, title="Query Command Tests"]
+--
+Test file: `test/query-command.test.ts`
+
+Tests the `query` CLI subcommand end-to-end — reverse (inbound relationships, empty results, unknown ID), impact (connected items, disconnected items), orphaned (relationship-less items, role filter), path (chain output, no path, unknown ID), and the `--json` flag (valid JSON, empty array). Spawns the compiled CLI binary against a temporary fixture directory.
+
+verifies:REQ-136[]
+verifies:REQ-137[]
+verifies:REQ-138[]
+verifies:REQ-139[]
+verifies:REQ-140[]
+verifies:REQ-141[]
+
+traceability:links[]
+--
+
 ifdef::ssembler-backend-pdf[]
 == Changelog
 [cols="1,2,2,3"]

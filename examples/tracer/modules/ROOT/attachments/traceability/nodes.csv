@@ -486,6 +486,36 @@ REQ-056,REQ-056 — CLI next-id command returns next available ID,requirement,,r
 Source: openspec/specs/next-id/spec.md
 
 traceability:links[]"""
+REQ-136,REQ-136 — CLI exposes a query subcommand,requirement,,requirements.adoc,"""The CLI SHALL provide a `query` subcommand that parses AsciiDoc source files, builds the in-memory traceability graph, and answers one structural question per invocation. No Antora build SHALL be required.
+
+Source: openspec/specs/cli-query/spec.md
+
+traceability:links[]"""
+REQ-137,REQ-137 — query reverse — find all items that point at a given ID,requirement,,requirements.adoc,"""The CLI SHALL provide `query reverse <id>` that returns all items whose relationship macros reference the given item ID.
+
+Source: openspec/specs/cli-query/spec.md
+
+traceability:links[]"""
+REQ-138,REQ-138 — query impact — find all items connected to a given ID,requirement,,requirements.adoc,"""The CLI SHALL provide `query impact <id>` that returns all items transitively connected to the given item (its connected component, excluding the item itself), following relationships in both directions.
+
+Source: openspec/specs/cli-query/spec.md
+
+traceability:links[]"""
+REQ-139,REQ-139 — query orphaned — find items with no relationships,requirement,,requirements.adoc,"""The CLI SHALL provide `query orphaned` that returns all items that have neither incoming nor outgoing relationships in the graph.
+
+Source: openspec/specs/cli-query/spec.md
+
+traceability:links[]"""
+REQ-140,REQ-140 — query path — find the shortest path between two items,requirement,,requirements.adoc,"""The CLI SHALL provide `query path <from-id> <to-id>` that returns the shortest relationship path between two items in the graph.
+
+Source: openspec/specs/cli-query/spec.md
+
+traceability:links[]"""
+REQ-141,REQ-141 — JSON output flag,requirement,,requirements.adoc,"""All `query` subcommands SHALL accept a `--json` flag that switches output to a machine-readable JSON array.
+
+Source: openspec/specs/cli-query/spec.md
+
+traceability:links[]"""
 REQ-093,REQ-093 — Devbox provides Ruby and Node.js for PDF builds,requirement,,requirements.adoc,"""The devbox.json configuration SHALL include `ruby`, `bundler`, and `nodejs` packages so that `devbox shell` provides a complete PDF build environment. The init hook SHALL run `npm install` and `bundle install` automatically.
 
 Source: openspec/specs/pdf-output/spec.md
@@ -1316,6 +1346,18 @@ traceability:links[]"""
 TST-008,TST-008 — Relationship Link Substitution Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/relationship-link-substitution.test.ts`
 
 Tests the in-memory regex substitution that replaces relationship macros with Asciidoctor xrefs. Covers same-page xref generation, cross-page xref generation with basename path resolution, orphan reference handling, non-relationship text preservation, hyphenated/dotted IDs, missing sourceFile fallback, and surrounding text preservation.
+
+traceability:links[]"""
+TST-009,TST-009 — Query Command Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/query-command.test.ts`
+
+Tests the `query` CLI subcommand end-to-end — reverse (inbound relationships, empty results, unknown ID), impact (connected items, disconnected items), orphaned (relationship-less items, role filter), path (chain output, no path, unknown ID), and the `--json` flag (valid JSON, empty array). Spawns the compiled CLI binary against a temporary fixture directory.
+
+verifies:REQ-136[]
+verifies:REQ-137[]
+verifies:REQ-138[]
+verifies:REQ-139[]
+verifies:REQ-140[]
+verifies:REQ-141[]
 
 traceability:links[]"""
 PRQ-001,PRQ-001 — CI workflows trigger on push and PR,process_requirement,,self-traceability/delivery-process.adoc,"""The GitHub Actions CI workflow SHALL trigger on every push to `main` and every pull request. The workflow SHALL run on the latest Ubuntu runner and SHALL execute `npm ci`, `npm run build`, `npm test`, and `npm run lint` in sequence.
