@@ -80,7 +80,6 @@ So, they will eventually use it for their model training.
 DeepSeek had the benefit that it costs a magnitude less than the other platforms.
 Unfortunately, this time is over.
 This week, they announced a significant price increase.
-According to LiteLLM, I spent 1.8bn tokens on deepseek and spent around $11.
 Hope, I am able to still conduct one experiment: Giving the LLM the example site and see, if a working version can be built.
 This would give me good ideas, what needs to be better documented.
 Requirements are also a bit technical.
