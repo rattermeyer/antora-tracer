@@ -53,6 +53,9 @@ verifies:REQ-068[]
 verifies:REQ-069[]
 verifies:REQ-070[]
 verifies:REQ-071[]
+verifies:REQ-147[]
+verifies:REQ-148[]
+verifies:REQ-149[]
 verifies:REQ-100[]
 verifies:REQ-101[]
 verifies:REQ-102[]
@@ -99,7 +102,7 @@ traceability:links[]
 --
 Test file: `test/graph-and-api.test.ts`
 
-Tests the `TraceabilityGraph` (extended queries: merge, getRelatedItems, getItemsWithRelationTo, getRelationshipsByRoles, findPath, getImpactAnalysis) and graph visualization methods (`toDot`, `toVegaLite`). Tests graph integrity validation including circular reference detection (direct, indirect, self-referencing cycles, bidirectional pair exclusion). Tests bidirectional relationship merge. Also tests `RequirementsTraceabilityExtension` API methods (processFiles, validate, export, coverage, config access, preset management, lifecycle).
+Tests the `TraceabilityGraph` (extended queries: merge, getRelatedItems, getItemsWithRelationTo, getRelationshipsByRoles, findPath, getImpactAnalysis) and graph visualization methods (`toDot`, `toVegaLite`). Tests graph integrity validation including circular reference detection (direct, indirect, self-referencing cycles, bidirectional pair exclusion), orphaned relationship detection with source location and expected-role hints, and invalid relation type reporting with allowed-relations hints. Tests bidirectional relationship merge. Also tests `RequirementsTraceabilityExtension` API methods (processFiles, validate, export, coverage, config access, preset management, lifecycle).
 
 verifies:REQ-053[]
 verifies:REQ-109[]

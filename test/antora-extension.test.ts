@@ -1120,6 +1120,105 @@ Description.
       expect(incoming[0].type).to.equal("addresses");
     });
 
+    it("should render config-defined inverse label for incoming macro", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      // `contains` has an inverse label only in the preset config
+      // ("contained-in"), not in the compile-time INVERSE_MAP.
+      const content = `:traceability-links: true
+
+[#REQ-001, item, role=requirement, title="User Auth"]
+--
+traceability:incoming[]
+--
+
+[#DOC-001, item, role=document, title="Spec"]
+--
+contains:REQ-001[]
+--
+`;
+
+      const file = {
+        src: { path: "test.adoc" },
+        contents: Buffer.from(content),
+      };
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: { findBy: () => [file] },
+      });
+
+      expect(file.contents.toString("utf8")).to.include("Contained-in");
+    });
+
+    it("should fall back to compile-time inverse label when config has no entry", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      // `depends` has no entry in the preset config inverseLabels,
+      // but INVERSE_MAP maps it to "depended-by".
+      const content = `:traceability-links: true
+
+[#REQ-001, item, role=requirement, title="User Auth"]
+--
+traceability:incoming[]
+--
+
+[#DES-001, item, role=design, title="Design"]
+--
+depends:REQ-001[]
+--
+`;
+
+      const file = {
+        src: { path: "test.adoc" },
+        contents: Buffer.from(content),
+      };
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: { findBy: () => [file] },
+      });
+
+      expect(file.contents.toString("utf8")).to.include("Depended-by");
+    });
+
+    it("should fall back to raw relation type when no inverse label exists", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      // `foobar` has no entry in config inverseLabels or INVERSE_MAP,
+      // so the raw relation type is displayed as-is.
+      const content = `:traceability-links: true
+
+[#REQ-001, item, role=requirement, title="User Auth"]
+--
+traceability:incoming[]
+--
+
+[#DES-001, item, role=design, title="Design"]
+--
+foobar:REQ-001[]
+--
+`;
+
+      const file = {
+        src: { path: "test.adoc" },
+        contents: Buffer.from(content),
+      };
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: { findBy: () => [file] },
+      });
+
+      expect(file.contents.toString("utf8")).to.include("Foobar");
+    });
+
     it("should wrap output in [%collapsible] when attribute is true", async () => {
       const ctx = createMockContext({
         playbook: { output: { dir: tempDir }, extensions: [] },

@@ -791,6 +791,7 @@ describe("RequirementsTraceabilityExtension - API Methods", () => {
         targetId: "REQ-001",
         type: "addresses",
         sourceFile: "test.adoc",
+        line: 5,
       });
 
       // Now remove the target item to create an orphan
@@ -799,8 +800,97 @@ describe("RequirementsTraceabilityExtension - API Methods", () => {
 
       const validation = extension.validate();
       expect(validation.errors.length).to.be.greaterThan(0);
-      expect(validation.errors.some((e) => e.includes("does not exist"))).to.be
-        .true;
+      const orphanError = validation.errors.find((e) =>
+        e.includes("does not exist"),
+      );
+      expect(orphanError).to.exist;
+      // Error message carries the sourceFile:line location for usability
+      expect(orphanError).to.include("at test.adoc:5");
+      expect(orphanError).to.include("declares addresses");
+    });
+
+    it("should include expected target role hint in orphaned relationship error", async () => {
+      const extension =
+        await RequirementsTraceabilityExtension.createWithPreset(
+          "requirements-engineering",
+        );
+      extension.graph.addItem(createItem("REQ-001", "requirement"));
+      extension.graph.addItem(createItem("DES-001", "design"));
+      extension.graph.addRelationship({
+        id: "R1",
+        fromId: "DES-001",
+        targetId: "REQ-001",
+        type: "addresses",
+        sourceFile: "test.adoc",
+        line: 42,
+      });
+
+      // Remove the target to orphan the relationship
+      (extension.graph as any)._items.delete("REQ-001");
+
+      const validation = extension.validate();
+      const orphanError = validation.errors.find((e) =>
+        e.includes("does not exist"),
+      );
+      expect(orphanError).to.exist;
+      // Config design->requirement allows `addresses`, so the hint names
+      // the expected target role to help the author fix the typo
+      expect(orphanError).to.include("expected target role: requirement");
+    });
+
+    it("should report invalid relation with allowed relations hint", async () => {
+      const extension =
+        await RequirementsTraceabilityExtension.createWithPreset(
+          "requirements-engineering",
+        );
+      extension.graph.addItem(createItem("REQ-001", "requirement"));
+      extension.graph.addItem(createItem("REQ-002", "requirement"));
+      // requirement->requirement only allows refines, depends_on, conflicts_with
+      extension.graph.addRelationship({
+        id: "R1",
+        fromId: "REQ-001",
+        targetId: "REQ-002",
+        type: "addresses",
+        sourceFile: "test.adoc",
+        line: 7,
+      });
+
+      const validation = extension.validate();
+      const invalidError = validation.errors.find((e) =>
+        e.includes("Invalid relation"),
+      );
+      expect(invalidError).to.exist;
+      expect(invalidError).to.include("at test.adoc:7");
+      expect(invalidError).to.include("(requirement) declares addresses ->");
+      expect(invalidError).to.include(
+        "Allowed: [refines, depends_on, conflicts_with]",
+      );
+    });
+
+    it("should report no relations allowed when none defined between roles", async () => {
+      const extension =
+        await RequirementsTraceabilityExtension.createWithPreset(
+          "requirements-engineering",
+        );
+      extension.graph.addItem(createItem("REQ-001", "requirement"));
+      extension.graph.addItem(createItem("DOC-001", "document"));
+      // The preset defines no requirement->document relations at all
+      extension.graph.addRelationship({
+        id: "R1",
+        fromId: "REQ-001",
+        targetId: "DOC-001",
+        type: "describes",
+        sourceFile: "test.adoc",
+      });
+
+      const validation = extension.validate();
+      const invalidError = validation.errors.find((e) =>
+        e.includes("Invalid relation"),
+      );
+      expect(invalidError).to.exist;
+      expect(invalidError).to.include(
+        "No relations allowed from 'requirement' to 'document'",
+      );
     });
   });
 
