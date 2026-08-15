@@ -28,7 +28,7 @@ The HTML matrix template SHALL be split into a main template and four reusable p
 - **THEN** the `matrix-row.mustache` partial SHALL render a link via `{{#rowHref}}`
 
 ### Requirement: Dead design-matrix template is removed
-The `design-matrix.html.mustache` template and all seven partials in `src/templates/partials/` SHALL be removed, as they are not rendered by any code path.
+The unused design-matrix HTML template and its associated partials SHALL be removed, as they are not rendered by any code path.
 
 #### Scenario: TemplateRenderer loads only the live template
 - **WHEN** `TemplateRenderer` initializes from the templates directory
@@ -41,7 +41,7 @@ The `design-matrix.html.mustache` template and all seven partials in `src/templa
 - **AND** the HTML SHALL render a complete traceability matrix in a browser
 
 ### Requirement: Dead MatrixGenerator methods are removed
-The `generateRequirementsMatrix()`, `generateDesignMatrix()`, and `generateAllMatrices()` methods SHALL be removed from `MatrixGenerator.ts` as they are not called by any code path.
+The unused matrix generation methods (`generateRequirementsMatrix`, `generateDesignMatrix`, `generateAllMatrices`) SHALL be removed, as they are not called by any code path.
 
 #### Scenario: Matrix generation still works via generateMatrix
 - **WHEN** `MatrixGenerator.generateMatrix()` is called with no arguments

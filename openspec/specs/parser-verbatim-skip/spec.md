@@ -75,7 +75,7 @@ The system SHALL NOT strip inline relationship macros (`relation:TARGET[]`) from
 ---
 
 ### Requirement: Inline macros inside backtick code spans are not parsed
-The `DocumentParser` SHALL skip inline relationship macros (`relation:ID[]`) that appear inside backtick-enclosed code spans when parsing item body content for relationships.
+The system SHALL NOT register inline relationship macros (`relation:ID[]`) that appear inside backtick-enclosed code spans as traceability relationships.
 
 #### Scenario: Backtick-enclosed macro is skipped
 - **WHEN** an item block contains `` `addresses:TARGET[]` `` inside backtick code spans

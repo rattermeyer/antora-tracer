@@ -111,7 +111,7 @@ The system SHALL support configurable sort order via the `:traceability-order:` 
 ---
 
 ### Requirement: PDF compatibility
-The generated output from `traceability:outgoing[]` and `traceability:incoming[]` SHALL be compatible with the asciidoctor-pdf backend.
+The generated output from `traceability:outgoing[]` and `traceability:incoming[]` SHALL use standard AsciiDoc constructs, ensuring compatibility with both HTML and PDF rendering backends.
 
 #### Scenario: List style in PDF
 - **WHEN** `:traceability-style: list` and the page is exported to PDF

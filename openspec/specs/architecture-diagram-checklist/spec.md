@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: Architecture document includes class-level API diagram
-The architecture document SHALL include a PlantUML class diagram showing the public method signatures of all key components (TraceabilityGraph, DocumentParser, ConfigLoader, MatrixGenerator, LinkResolver, TemplateRenderer, Neo4jExporter, RequirementsTraceabilityExtension).
+The architecture document SHALL include a class-level diagram showing the public interface of each major component.
 
 #### Scenario: Developer reads Building Block View
 - **WHEN** a developer opens the architecture page
@@ -21,7 +21,7 @@ The architecture document SHALL include an activity diagram showing the parser's
 - **AND** the diagram SHALL show the sequential order of parsing operations
 
 ### Requirement: Architecture document includes TraceabilityGraph state diagram
-The architecture document SHALL include a PlantUML state diagram showing the TraceabilityGraph lifecycle: Empty → Populated (items added) → Complete (relationships added, ready for queries), including which operations are valid in each state.
+The architecture document SHALL include a state diagram showing the graph lifecycle: empty → populated (items added) → complete (relationships added, ready for queries), including which operations are valid in each state.
 
 #### Scenario: Developer reads TraceabilityGraph section
 - **WHEN** a developer reads the TraceabilityGraph component description (ARC-015)
@@ -29,7 +29,7 @@ The architecture document SHALL include a PlantUML state diagram showing the Tra
 - **AND** the diagram SHALL make the pass-ordering constraint (Complete before Pass 3 queries) visually explicit
 
 ### Requirement: Architecture document includes PreparedFile caching flow diagram
-The architecture document SHALL include a PlantUML activity diagram showing the PreparedFile caching optimization: `prepareFile()` computing content/docAttrs/blocks once, then feeding the five macro-expansion methods from a single prepared state.
+The architecture document SHALL include an activity diagram showing the file-state caching flow: file content, document attributes, and block positions computed once per file, then reused across all macro-expansion passes.
 
 #### Scenario: Developer reads the macro expansion section
 - **WHEN** a developer reads about the contentClassified processing flow (ARC-003 or ARC-016)

@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: Inverse labels are config-driven
-The system SHALL support `inverseLabels` in the traceability configuration YAML, mapping each relation type to its inverse display label for `traceability:incoming[]` rendering. When no config label is defined, the system SHALL fall back to the compile-time `INVERSE_MAP` in `types.ts`, then to the raw relation type name.
+The system SHALL support `inverseLabels` in the traceability configuration YAML, mapping each relation type to its inverse display label for `traceability:incoming[]` rendering. When no config label is defined, the system SHALL fall back to the built-in inverse label mapping, then to the raw relation type name.
 
 #### Scenario: Config-defined inverse label used
 - **WHEN** `traceability.yml` defines `inverseLabels: { refines: "refined-by" }`

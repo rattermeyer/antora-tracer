@@ -81,8 +81,8 @@ The system SHALL normalize item `sourceFile` paths by stripping any `pages/` pre
 
 ---
 
-### Requirement: Backward compatibility without LinkResolver
-The system SHALL maintain existing matrix rendering behavior when no LinkResolver is provided.
+### Requirement: Matrix renders correctly without link resolution configured
+The system SHALL maintain existing matrix rendering behavior when no link resolver is configured.
 
 #### Scenario: Matrix generation without LinkResolver
 - **WHEN** MatrixGenerator is created without a LinkResolver
@@ -133,7 +133,7 @@ When an item has module information, the system SHALL generate HTML links that i
 
 ---
 
-### Requirement: LinkResolver produces indexify-aware links
+### Requirement: Matrix links are compatible with Antora indexify URL style
 When Antora's `indexify` URL style is active (root-level pages are served as `pagename/index.html`), the system SHALL generate matrix links that include `index.html` in the path for root-level pages so links from traceability matrices resolve to the correct page.
 
 #### Scenario: Root-level page with indexify

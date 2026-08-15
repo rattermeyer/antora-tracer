@@ -7,7 +7,7 @@ Register generated matrix files in the Antora content catalog as `attachment`-fa
 ## Requirements
 
 ### Requirement: Matrix files registered in the content catalog
-The system SHALL register generated matrix files (HTML, CSV, JSON) in the Antora content catalog as `attachment`-family files during the `contentClassified` event, before document conversion, so `attachment$traceability/...` xrefs resolve. Registration SHALL occur per component version and under every module that has AsciiDoc content. A committed copy, if present, SHALL have its contents refreshed in place.
+The system SHALL register generated matrix files (HTML, CSV, JSON) as site attachments before document conversion, so that `attachment$traceability/...` xrefs in pages and navigation resolve correctly. Registration SHALL occur per component version and under every module that has AsciiDoc content. A committed copy, if present, SHALL have its contents refreshed in place.
 
 #### Scenario: Matrices are registered for each component version
 - **WHEN** the `contentClassified` event fires and a component version has traceable items

@@ -49,7 +49,7 @@ traceability:links[]
 
 [#REQ-092, item, role=requirement, title="Inline macros inside backtick code spans are not parsed"]
 --
-The `DocumentParser` SHALL skip inline relationship macros (`relation:ID[]`) that appear inside backtick-enclosed code spans when parsing item body content for relationships.
+The system SHALL NOT register inline relationship macros (`relation:ID[]`) that appear inside backtick-enclosed code spans as traceability relationships.
 
 Source: openspec/specs/parser-verbatim-skip/spec.md
 
@@ -60,7 +60,7 @@ traceability:links[]
 
 [#REQ-110, item, role=requirement, title="Items defined in partials are processed"]
 --
-The system SHALL process items defined in AsciiDoc partial files (`family: partial`) during the `contentClassified` event, alongside page files. Items from partials SHALL use the file's view URL (from the Antora content source configuration) as their source file reference, enabling traceability matrix links to resolve to the source repository. Partial items SHALL be processed only for graph population (Pass 1 — parsing and registration); macro expansion and link substitution passes SHALL be skipped since partials do not produce rendered HTML output.
+The system SHALL process items defined in AsciiDoc partial files alongside page files. Items from partials SHALL use the file's view URL as their source file reference, enabling traceability matrix links to resolve to the source repository. Partial items SHALL be processed only for graph population (Pass 1 — parsing and registration); macro expansion and link substitution passes SHALL be skipped since partials do not produce rendered HTML output.
 
 Source: openspec/specs/partial-file-processing/spec.md
 
@@ -123,7 +123,7 @@ Source: openspec/specs/matrix-item-linking/spec.md
 traceability:links[]
 --
 
-[#REQ-042, item, role=requirement, title="Backward compatibility without LinkResolver"]
+[#REQ-042, item, role=requirement, title="Matrix renders correctly without link resolution configured"]
 --
 The system SHALL maintain existing matrix rendering behavior when no LinkResolver is provided.
 
@@ -237,7 +237,7 @@ traceability:links[]
 
 [#REQ-101, item, role=requirement, title="PDF compatibility"]
 --
-The generated output from `traceability:outgoing[]` and `traceability:incoming[]` SHALL be compatible with the asciidoctor-pdf backend.
+The generated output from `traceability:outgoing[]` and `traceability:incoming[]` SHALL use standard AsciiDoc constructs, ensuring compatibility with both HTML and PDF rendering backends.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
@@ -311,7 +311,7 @@ traceability:links[]
 
 [#REQ-067, item, role=requirement, title="Inverse relation type labels"]
 --
-The system SHALL transform relation type names to their inverse form for display in `traceability:incoming[]` using the existing `INVERSE_MAP`. When a relation type has no inverse mapping, the raw type name SHALL be displayed.
+The system SHALL transform relation type names to their inverse form for display in `traceability:incoming[]` using the built-in inverse label mapping. When a relation type has no inverse mapping, the raw type name SHALL be displayed.
 
 Source: openspec/specs/incoming-links-macro/spec.md
 
@@ -349,7 +349,7 @@ traceability:links[]
 
 [#REQ-071, item, role=requirement, title="Inverse labels are config-driven"]
 --
-The system SHALL support `inverseLabels` in the traceability configuration YAML, mapping each relation type to its inverse display label for `traceability:incoming[]` rendering. When no config label is defined, the system SHALL fall back to the compile-time `INVERSE_MAP` in `types.ts`, then to the raw relation type name.
+The system SHALL support `inverseLabels` in the traceability configuration YAML, mapping each relation type to its inverse display label for `traceability:incoming[]` rendering. When no config label is defined, the system SHALL fall back to the built-in inverse label mapping, then to the raw relation type name.
 
 Source: openspec/specs/inverse-labels/spec.md
 
@@ -585,7 +585,7 @@ traceability:links[]
 
 [#REQ-123, item, role=requirement, title="Architecture document includes class-level API diagram"]
 --
-The architecture document SHALL include a PlantUML class diagram showing the public method signatures of all key components (TraceabilityGraph, DocumentParser, ConfigLoader, MatrixGenerator, LinkResolver, TemplateRenderer, Neo4jExporter, RequirementsTraceabilityExtension).
+The architecture document SHALL include a class-level diagram showing the public interface of each major component.
 
 Source: openspec/specs/architecture-diagram-checklist/spec.md
 
@@ -603,7 +603,7 @@ traceability:links[]
 
 [#REQ-125, item, role=requirement, title="Architecture document includes TraceabilityGraph state diagram"]
 --
-The architecture document SHALL include a PlantUML state diagram showing the TraceabilityGraph lifecycle: Empty → Populated (items added) → Complete (relationships added, ready for queries), including which operations are valid in each state.
+The architecture document SHALL include a state diagram showing the graph lifecycle: empty → populated (items added) → complete (relationships added, ready for queries), including which operations are valid in each state.
 
 Source: openspec/specs/architecture-diagram-checklist/spec.md
 
@@ -612,7 +612,7 @@ traceability:links[]
 
 [#REQ-126, item, role=requirement, title="Architecture document includes PreparedFile caching flow diagram"]
 --
-The architecture document SHALL include a PlantUML activity diagram showing the PreparedFile caching optimization: `prepareFile()` computing content/docAttrs/blocks once, then feeding the five macro-expansion methods from a single prepared state.
+The architecture document SHALL include an activity diagram showing the file-state caching flow: file content, document attributes, and block positions computed once per file, then reused across all macro-expansion passes.
 
 Source: openspec/specs/architecture-diagram-checklist/spec.md
 
@@ -659,7 +659,7 @@ traceability:links[]
 
 [#REQ-108, item, role=requirement, title="Matrix files registered in the content catalog"]
 --
-The system SHALL register generated matrix files (HTML, CSV, JSON) in the Antora content catalog as `attachment`-family files during the `contentClassified` event, before document conversion, so `attachment$traceability/...` xrefs resolve. Registration SHALL occur per component version and under every module that has AsciiDoc content. A committed copy, if present, SHALL have its contents refreshed in place.
+The system SHALL register generated matrix files (HTML, CSV, JSON) as site attachments before document conversion, so that `attachment$traceability/...` xrefs in pages and navigation resolve correctly. Registration SHALL occur per component version and under every module that has AsciiDoc content. A committed copy, if present, SHALL have its contents refreshed in place.
 
 Source: openspec/specs/matrix-attachment-sync/spec.md
 
@@ -706,7 +706,7 @@ traceability:links[]
 
 [#REQ-076, item, role=requirement, title="Minimal tooling"]
 --
-The landing page SHALL be implemented as static HTML with Tailwind CSS loaded from CDN, requiring no build step, npm dependencies, or static site generator.
+The landing page SHALL require no build step or installed dependencies to deploy — it SHALL be served as static HTML.
 
 Source: openspec/specs/landing-page/spec.md
 
@@ -715,7 +715,7 @@ traceability:links[]
 
 [#REQ-077, item, role=requirement, title="Landing page uses conemso color palette"]
 --
-The landing page SHALL use the conemso teal color palette for all brand-colored elements, replacing the indigo/purple palette. Primary brand elements (buttons, links, icons, section backgrounds) SHALL use conemso teal (`#108193`) as the primary color and conemso darkest (`#07424c`) for headings and dark backgrounds.
+The landing page SHALL use a consistent brand color palette for all brand-colored elements. Primary brand elements (buttons, links, icons, section backgrounds) SHALL use the primary brand color for interactive elements and a darker variant for headings and dark backgrounds.
 
 Source: openspec/specs/landing-page/spec.md
 
@@ -724,7 +724,7 @@ traceability:links[]
 
 [#REQ-078, item, role=requirement, title="Landing page uses Roboto font"]
 --
-The landing page SHALL use the Roboto font family (matching the conemso UI theme) instead of Inter for all text content.
+The landing page SHALL use a consistent font family matching the documentation site theme for all text content.
 
 Source: openspec/specs/landing-page/spec.md
 
@@ -803,7 +803,7 @@ traceability:links[]
 
 [#REQ-111, item, role=requirement, title="File state is prepared once per file"]
 --
-The system SHALL compute file content (buffer→string), document attributes, and item block positions exactly once per page file during the `contentClassified` event, and SHALL reuse the computed values across all macro-expansion passes for that file.
+The system SHALL compute file content, document attributes, and item block positions exactly once per page file, and SHALL reuse the computed values across all macro-expansion passes for that file.
 
 Source: openspec/specs/file-preparation-cache/spec.md
 
@@ -832,7 +832,7 @@ traceability:links[]
 
 [#REQ-114, item, role=requirement, title="Dead design-matrix template is removed"]
 --
-The `design-matrix.html.mustache` template and all seven partials in `src/templates/partials/` SHALL be removed, as they are not rendered by any code path.
+The unused design-matrix HTML template and its associated partials SHALL be removed, as they are not rendered by any code path.
 
 Source: openspec/specs/template-partials/spec.md
 
@@ -841,7 +841,7 @@ traceability:links[]
 
 [#REQ-115, item, role=requirement, title="Dead MatrixGenerator methods are removed"]
 --
-The `generateRequirementsMatrix()`, `generateDesignMatrix()`, and `generateAllMatrices()` methods SHALL be removed from `MatrixGenerator.ts` as they are not called by any code path.
+The unused matrix generation methods (`generateRequirementsMatrix`, `generateDesignMatrix`, `generateAllMatrices`) SHALL be removed, as they are not called by any code path.
 
 Source: openspec/specs/template-partials/spec.md
 
@@ -886,7 +886,7 @@ Source: openspec/specs/traceability-links-macro/spec.md
 traceability:links[]
 --
 
-[#REQ-130, item, role=requirement, title="LinkResolver produces indexify-aware links"]
+[#REQ-130, item, role=requirement, title="Matrix links are compatible with Antora indexify URL style"]
 --
 When Antora's `indexify` URL style is active (root-level pages are served as `pagename/index.html`), the system SHALL generate matrix links that include `index.html` in the path for root-level pages so links from traceability matrices resolve to the correct page.
 

@@ -59,7 +59,7 @@ The GitHub Pages deployment workflow SHALL place the landing page at the root an
 - **THEN** only `public/docs/` is cleaned; the landing page at `public/index.html` and its assets are preserved
 
 ### Requirement: Minimal tooling
-The landing page SHALL be implemented as static HTML with Tailwind CSS loaded from CDN, requiring no build step, npm dependencies, or static site generator.
+The landing page SHALL require no build step or installed dependencies to deploy — it SHALL be served as static HTML.
 
 #### Scenario: Page renders without build step
 - **WHEN** a developer opens `landing/index.html` directly in a browser
@@ -70,7 +70,7 @@ The landing page SHALL be implemented as static HTML with Tailwind CSS loaded fr
 - **THEN** the project's `package.json`, `node_modules/`, and build scripts (`npm run build`) are unchanged
 
 ### Requirement: Landing page uses conemso color palette
-The landing page SHALL use the conemso teal color palette for all brand-colored elements, replacing the indigo/purple palette. Primary brand elements (buttons, links, icons, section backgrounds) SHALL use conemso teal (`#108193`) as the primary color and conemso darkest (`#07424c`) for headings and dark backgrounds.
+The landing page SHALL use a consistent brand color palette for all brand-colored elements. Primary brand elements (buttons, links, icons, section backgrounds) SHALL use the primary brand color for interactive elements and a darker variant for headings and dark backgrounds.
 
 #### Scenario: Hero section uses conemso gradient
 - **WHEN** a visitor loads the landing page
@@ -85,7 +85,7 @@ The landing page SHALL use the conemso teal color palette for all brand-colored 
 - **THEN** the card border SHALL change to conemso mid teal (`#3ea0ad`) and the box shadow SHALL use conemso base with reduced opacity
 
 ### Requirement: Landing page uses Roboto font
-The landing page SHALL use the Roboto font family (matching the conemso UI theme) instead of Inter for all text content.
+The landing page SHALL use a consistent font family matching the documentation site theme for all text content.
 
 #### Scenario: Page renders with Roboto
 - **WHEN** a visitor loads the landing page

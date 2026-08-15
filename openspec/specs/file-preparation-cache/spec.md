@@ -7,7 +7,7 @@ Cache file content, document attributes, and item block positions once per page 
 ## Requirements
 
 ### Requirement: File state is prepared once per file
-The system SHALL compute file content (buffer→string), document attributes, and item block positions exactly once per page file during the `contentClassified` event, and SHALL reuse the computed values across all macro-expansion passes for that file.
+The system SHALL compute file content, document attributes, and item block positions exactly once per page file, and SHALL reuse the computed values across all macro-expansion passes for that file.
 
 #### Scenario: Single preparation per file
 - **WHEN** the `contentClassified` event fires with 9 page files
