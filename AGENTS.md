@@ -2,7 +2,7 @@
 
 ## Project
 
-Antora Tracer — a role-based requirements traceability extension for Antora/AsciiDoc. Single `[item]` macro with configurable roles, relations, and matrices. Ships with built-in presets, Neo4j export, and CLI.
+Antora Tracer — tool for track requirement in Antora/AsciiDoc. One `[item]` macro, role+relation+matrix all configurable. Come with built-in preset, Neo4j export, CLI.
 
 - **Version**: 0.16.1
 - **Language**: TypeScript (strict mode, ESM)
@@ -20,16 +20,16 @@ npm run lint       # biome check
 npm run format     # biome format --write
 ```
 
-Two tsconfigs:
+Two tsconfig:
 - `tsconfig.json` — production build (`src/` → `lib/`)
 - `tsconfig.test.json` — test build (`src/` + `test/` → `lib/`)
 
-Pre-commit hooks: biome lint + format via `pre-commit`.
+Pre-commit hook: biome lint + format via `pre-commit`.
 
 ## Commit Convention
 
-This project follows https://www.conventionalcommits.org/[Conventional Commits].
-All commit messages must use the format:
+This project follow https://www.conventionalcommits.org/[Conventional Commits].
+All commit message must use this format:
 
 ```
 <type>(<scope>): <description>
@@ -43,8 +43,8 @@ Examples: `feat(parser): support escaped inline macros`, `fix(cli): show file lo
 
 ## Spec-Driven Development
 
-This project uses https://openspec.dev[OpenSpec] for spec-driven development.
-All features, fixes, and refactors start as proposals with specs, design, and tasks.
+This project use https://openspec.dev[OpenSpec] for spec-driven dev.
+All feature, fix, refactor start as proposal with spec, design, task.
 
 ```bash
 openspec list                         # active changes
@@ -53,16 +53,16 @@ openspec new change "<name>"         # create proposal
 /opsx-archive                         # archive completed change
 ```
 
-Archived changes: `openspec/changes/archive/`
+Archived change: `openspec/changes/archive/`
 
-Skills: `.pi/skills/` — `update-example-site` refreshes the self-traceability example after archiving.
+Skill: `.pi/skills/` — `update-example-site` refresh self-traceability example after archive.
 
 ## Consistency
 
-**Documentation is part of the change, not an afterthought.**
-Every code change that affects user-facing behavior, configuration, macros, CLI, or APIs MUST include corresponding documentation updates in the same commit.
+**Doc part of change, not afterthought.**
+Every code change that touch user-facing behavior, config, macro, CLI, or API MUST include matching doc update in same commit.
 
-Before marking a task complete, scan these files for stale content about the changed feature:
+Before mark task done, scan these file for stale content bout changed feature:
 
 | Change type | Documentation to check |
 |---|---|
@@ -74,44 +74,43 @@ Before marking a task complete, scan these files for stale content about the cha
 | New/change env var | `reference/configuration.adoc`, `how-to/contribute.adoc` |
 | General behavior change | `reference/item-macro.adoc`, `reference/traceability-macros.adoc`, `how-to/visualizations.adoc` |
 
-When adding a new config option, env var, or feature flag: find every page that mentions sibling options (same reference section, same how-to page) and add the new one.
+When add new config option, env var, or feature flag: find every page that mention sibling option (same reference section, same how-to page) and add new one there too.
 
-When code behavior changes, verify consistency across these layers before committing:
+When code behavior change, check consistency cross these layer before commit:
 
 | Layer | Check |
 |---|---|
-| **Tests** | Review test comments for stale workarounds describing old behavior. Update or add tests to cover the new behavior. |
-| **Requirements** | `examples/tracer/modules/requirements/pages/index.adoc` — do REQ items need updating to match spec changes? |
-| **Reference** | `examples/tracer/modules/ROOT/pages/reference/` — do `item-macro.adoc`, `traceability-macros.adoc`, `api.adoc`, `cli.adoc`, `configuration.adoc` match the new behavior? |
-| **How-to guides** | `examples/tracer/modules/ROOT/pages/how-to/` — do task guides (write-traceable-items, visualizations, query-graph, contribute) match? |
-| **Explanation** | `examples/tracer/modules/ROOT/pages/explanation/architecture.adoc` — do ARC items describing components need updating? |
-| **Specs** | Sync delta specs to main specs (`/opsx-sync`) before archiving. |
-| **Example site** | Rebuild with `npx antora antora-playbook.yml` and regenerate matrices with `node examples/run-example.js` to verify self-traceability works. |
+| **Tests** | Look at test comments for stale workaround describing old behavior. Update or add test to cover new behavior. |
+| **Requirements** | `examples/tracer/modules/requirements/pages/index.adoc` — REQ items need update to match spec change? |
+| **Reference** | `examples/tracer/modules/ROOT/pages/reference/` — `item-macro.adoc`, `traceability-macros.adoc`, `api.adoc`, `cli.adoc`, `configuration.adoc` match new behavior? |
+| **How-to guides** | `examples/tracer/modules/ROOT/pages/how-to/` — task guide (write-traceable-items, visualizations, query-graph, contribute) match? |
+| **Explanation** | `examples/tracer/modules/ROOT/pages/explanation/architecture.adoc` — ARC items describing component need update? |
+| **Specs** | Sync delta spec to main spec (`/opsx-sync`) before archive. |
+| **Example site** | Rebuild with `npx antora antora-playbook.yml` and regen matrix with `node examples/run-example.js` to check self-traceability still work. |
 
-After archiving a change, run the `update-example-site` skill to refresh requirements,
-architecture, and test-plan documents to reflect the complete current project state.
+After archive change, run `update-example-site` skill to refresh requirement, architecture, test-plan doc so they show full current project state.
 
 ## Documentation Framework
 
-The example site documentation follows https://diataxis.fr[Diátaxis] — a framework that organizes documentation into four distinct modes, each serving a different reader need. Every page in the example site belongs to exactly one mode:
+Example site doc follow https://diataxis.fr[Diátaxis] — framework that split doc into four mode, each serve different reader need. Every page in example site belong to exactly one mode:
 
 | Mode | Purpose | Reader asks | Example pages |
 |---|---|---|---|
-| **Tutorial** | Learning-oriented, step-by-step | "Can you teach me to…?" | `getting-started.adoc` |
-| **How-to Guides** | Task-oriented, solving a problem | "How do I…?" | `how-to/custom-domain-model.adoc` |
-| **Reference** | Information-oriented, exhaustive | "What does X do?" | `reference/cli.adoc`, `reference/api.adoc` |
-| **Explanation** | Understanding-oriented, background | "Why does it work that way?" | `architecture.adoc`, `adr/`, `quality/` |
+| **Tutorial** | Learn-oriented, step-by-step | "Can you teach me to…?" | `getting-started.adoc` |
+| **How-to Guides** | Task-oriented, solve a problem | "How do I…?" | `how-to/custom-domain-model.adoc` |
+| **Reference** | Info-oriented, exhaustive | "What does X do?" | `reference/cli.adoc`, `reference/api.adoc` |
+| **Explanation** | Understand-oriented, background | "Why does it work that way?" | `architecture.adoc`, `adr/`, `quality/` |
 
-A fifth section, **Self-Traceability**, groups pages that demonstrate the extension tracing its own development artifacts (requirements, use cases, test plan, dashboard). These are not user-facing documentation — they are the extension applied to itself.
+Fifth section, **Self-Traceability**, group page that show extension tracing its own dev artifact (requirement, use case, test plan, dashboard). Not user-facing doc — extension applied on itself.
 
-**Key rules when adding or editing documentation:**
+**Key rule when add or edit doc:**
 
-- One sentence per line. See https://asciidoctor.org/docs/asciidoc-recommended-practices/#one-sentence-per-line[AsciiDoc Recommended Practices] — this makes pull request diffs line-level and reviews easier.
-- One page = one mode. Do not mix tutorial steps, how-to instructions, reference listings, and conceptual explanation in the same page.
-- Tutorials should not link out to Reference or Explanation — they are a guided path.
-- How-to, Reference, and Explanation pages cross-reference each other freely.
-- How-to page titles use the "How to <verb> <object>" format.
-- Reference pages are exhaustive — every option, flag, and attribute is documented.
+- One sentence per line. See https://asciidoctor.org/docs/asciidoc-recommended-practices/#one-sentence-per-line[AsciiDoc Recommended Practices] — make pull request diff line-level, review easier.
+- One page = one mode. No mix tutorial step, how-to instruction, reference listing, and explanation in same page.
+- Tutorial no link out to Reference or Explanation — it a guided path.
+- How-to, Reference, Explanation page cross-reference each other freely.
+- How-to page title use the "How to <verb> <object>" format.
+- Reference page exhaustive — every option, flag, attribute get documented.
 
 ## Architecture
 
@@ -133,13 +132,13 @@ src/
 **Item syntax**: `[#REQ-001, item, role=requirement, title="Title"]`
 
 **ContentClassified Pass 2** (in antora-extension.ts):
-1. `substituteRelationshipLinks` — replace `addresses:REQ-001[]` with Asciidoctor xrefs
-2. `injectTitleIds` — prepend ID to title attribute for visible display
+1. `substituteRelationshipLinks` — swap `addresses:REQ-001[]` for Asciidoctor xref
+2. `injectTitleIds` — put ID front of title attribute, so it show
 
 ## Example Site
 
-`examples/tracer/modules/` — self-traceability site built with Antora.
-`antora-playbook.yml` at project root. Requires UI bundle (cached from GitLab).
+`examples/tracer/modules/` — self-traceability site, built with Antora.
+`antora-playbook.yml` at project root. Need UI bundle (cached from GitLab).
 
 ```bash
 npx antora antora-playbook.yml       # build HTML site
@@ -149,8 +148,8 @@ node examples/run-example.js         # generate matrices via CLI
 
 ### PDF Output
 
-PDF generation uses the `@antora/pdf-extension` with Ruby's `asciidoctor-pdf` gem.
-Easiest setup is via devbox:
+PDF gen use `@antora/pdf-extension` with Ruby `asciidoctor-pdf` gem.
+Easiest setup via devbox:
 
 ```bash
 devbox shell                        # installs Node.js + Ruby + deps
