@@ -58,9 +58,17 @@ traceability:links[]
 
 == Partial File Processing
 
-[#REQ-110, item, role=requirement, title="Items defined in partials are processed"]
+[#REQ-110, item, role=requirement, title="Items defined in partials are registered in the graph"]
 --
-The system SHALL process items defined in AsciiDoc partial files alongside page files. Items from partials SHALL use the file's view URL as their source file reference, enabling traceability matrix links to resolve to the source repository. Partial items SHALL be processed only for graph population (Pass 1 — parsing and registration); macro expansion and link substitution passes SHALL be skipped since partials do not produce rendered HTML output.
+The system SHALL process items defined in AsciiDoc partial files alongside page files, registering them in the traceability graph.
+
+[#REQ-144, item, role=requirement, title="Partial items use view URL as source reference"]
+--
+Items from partial files SHALL use the file's view URL as their source file reference, enabling traceability matrix links to resolve to the source repository.
+
+[#REQ-145, item, role=requirement, title="All processing passes apply to partial files"]
+--
+The system SHALL apply graph population, macro expansion, and link substitution passes to partial files in the same way as page files, because partial content is inlined into pages and reaches the browser.
 
 Source: openspec/specs/partial-file-processing/spec.md
 
@@ -105,9 +113,9 @@ Source: openspec/specs/matrix-item-linking/spec.md
 traceability:links[]
 --
 
-[#REQ-040, item, role=requirement, title="Link generation is context-aware"]
+[#REQ-040, item, role=requirement, title="Matrix links resolve correctly from site output location"]
 --
-The system SHALL generate the same relative link path (`../../`) regardless of execution context, since matrices are always served from the Antora output site where pages sit at the component root.
+The system SHALL generate matrix links that resolve correctly regardless of where the matrix file is served within the Antora site output.
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
@@ -116,7 +124,7 @@ traceability:links[]
 
 [#REQ-041, item, role=requirement, title="Source file paths are normalized"]
 --
-The system SHALL normalize item `sourceFile` paths by stripping any `pages/` prefix and `.adoc` extension at link resolution time.
+The system SHALL normalize item source file references so that matrix links resolve to the rendered page URL rather than the AsciiDoc source file path.
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
@@ -125,7 +133,7 @@ traceability:links[]
 
 [#REQ-042, item, role=requirement, title="Matrix renders correctly without link resolution configured"]
 --
-The system SHALL maintain existing matrix rendering behavior when no LinkResolver is provided.
+The system SHALL maintain existing matrix rendering behaviour when link resolution is not configured.
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
@@ -183,7 +191,11 @@ traceability:links[]
 
 [#REQ-044, item, role=requirement, title="traceability:outgoing[] macro renders outgoing links"]
 --
-The system SHALL provide a `traceability:outgoing[]` macro (formerly `traceability:links[]`) that expands to a formatted list of all outgoing relationships for the enclosing item. When the item has no outgoing relationships, the macro SHALL render a configurable empty-state message controlled by the `:traceability-empty:` document attribute.
+The system SHALL provide a `traceability:outgoing[]` macro (formerly `traceability:links[]`) that expands to a formatted list of all outgoing relationships for the enclosing item.
+
+[#REQ-146, item, role=requirement, title="Empty-state message when item has no outgoing relationships"]
+--
+If the enclosing item has no outgoing relationships, then the `traceability:outgoing[]` macro SHALL render a configurable empty-state message controlled by the `:traceability-empty:` document attribute.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
@@ -311,7 +323,11 @@ traceability:links[]
 
 [#REQ-067, item, role=requirement, title="Inverse relation type labels"]
 --
-The system SHALL transform relation type names to their inverse form for display in `traceability:incoming[]` using the built-in inverse label mapping. When a relation type has no inverse mapping, the raw type name SHALL be displayed.
+The system SHALL transform relation type names to their inverse form for display in `traceability:incoming[]` using the built-in inverse label mapping.
+
+[#REQ-147, item, role=requirement, title="Fallback to raw type name when no inverse mapping exists"]
+--
+If a relation type has no inverse mapping defined, then the system SHALL display the raw relation type name.
 
 Source: openspec/specs/incoming-links-macro/spec.md
 
@@ -349,7 +365,15 @@ traceability:links[]
 
 [#REQ-071, item, role=requirement, title="Inverse labels are config-driven"]
 --
-The system SHALL support `inverseLabels` in the traceability configuration YAML, mapping each relation type to its inverse display label for `traceability:incoming[]` rendering. When no config label is defined, the system SHALL fall back to the built-in inverse label mapping, then to the raw relation type name.
+The system SHALL support `inverseLabels` in the traceability configuration YAML, mapping each relation type to its inverse display label for `traceability:incoming[]` rendering.
+
+[#REQ-148, item, role=requirement, title="Fallback to built-in inverse label mapping"]
+--
+If no `inverseLabels` config entry is defined for a relation type, then the system SHALL use the built-in inverse label mapping for that type.
+
+[#REQ-149, item, role=requirement, title="Fallback to raw type name when no mapping exists"]
+--
+If a relation type has no entry in `inverseLabels` and no built-in inverse mapping, then the system SHALL display the raw relation type name.
 
 Source: openspec/specs/inverse-labels/spec.md
 
@@ -378,7 +402,7 @@ Source: openspec/specs/graph-visualization/spec.md
 traceability:links[]
 --
 
-[#REQ-053, item, role=requirement, title="Graph visualization methods on TraceabilityGraph"]
+[#REQ-053, item, role=requirement, title="Graph model supports traversal-bounded subgraph and coverage queries"]
 --
 The graph model SHALL support producing a traversal-bounded relationship subgraph for a given item, traversing both outgoing and incoming directions. Bidirectional relationships SHALL be visually distinguishable from one-directional relationships in the rendered output. The graph model SHALL also support producing coverage data for a given item, or globally across all items.
 
@@ -398,7 +422,7 @@ traceability:links[]
 
 [#REQ-063, item, role=requirement, title="Configurable Kroki image format"]
 --
-The `krokiImageFormat` extension config option SHALL control the image format (`svg` or `png`) used in Kroki URLs generated by `traceability:graph[]` and `traceability:graph-coverage[]` macros. When not set, the format SHALL default to `svg`. The generated URLs SHALL use the configured `krokiServerUrl` (or its default `https://kroki.io`) as the base URL.
+The `krokiImageFormat` extension config option SHALL control the image format (`svg` or `png`) used in rendered relationship diagram images. When not set, the format SHALL default to `svg`. The configured `krokiServerUrl` (or its default `https://kroki.io`) SHALL be used as the base URL for diagram rendering requests.
 
 Source: openspec/specs/graph-visualization/spec.md
 
@@ -429,7 +453,7 @@ traceability:links[]
 
 [#REQ-109, item, role=requirement, title="Circular reference detection in graph validation"]
 --
-The system SHALL detect circular references in the traceability graph during validation via `validate()`. A circular reference is a cycle in the directed relationship graph (e.g., A → B → A, or A → B → C → A). Self-referencing relationships (A → A) SHALL also be detected as cycles. Auto-generated inverse relationships SHALL be skipped during cycle detection to avoid false positives. Relationships marked as bidirectional SHALL also be skipped during cycle detection.
+The system SHALL detect circular references in the traceability graph during validation. A circular reference is a cycle in the directed relationship graph (e.g., A → B → A, or A → B → C → A). Self-referencing relationships (A → A) SHALL also be detected as cycles. Auto-generated inverse relationships SHALL be skipped during cycle detection to avoid false positives. Relationships marked as bidirectional SHALL also be skipped during cycle detection.
 
 Source: openspec/specs/circular-reference-detection/spec.md
 
@@ -442,7 +466,7 @@ traceability:links[]
 
 [#REQ-129, item, role=requirement, title="Bidirectional relationship pairs are merged into a single edge"]
 --
-The system SHALL detect when a newly added relationship forms a complementary pair with an existing relationship — the existing edge goes from B to A with a type that is the configured inverse of the new edge's type — and merge them into a single bidirectional edge instead of storing two directed edges. Merging SHALL follow first-writer-wins: the first relationship stored remains as the canonical entry, and the second call to `addRelationship` is silently dropped.
+The system SHALL detect when a newly added relationship forms a complementary pair with an existing relationship — the existing edge goes from B to A with a type that is the configured inverse of the new edge's type — and merge them into a single bidirectional edge instead of storing two directed edges. Merging SHALL follow first-writer-wins: the first relationship stored remains as the canonical entry, and the second relationship is not stored.
 
 Source: openspec/specs/bidirectional-relationship-merge/spec.md
 
@@ -735,7 +759,7 @@ traceability:links[]
 
 [#REQ-079, item, role=requirement, title="Non-heading elements with IDs are indexed as navigable anchors"]
 --
-The `@antora/lunr-extension` SHALL index every non-heading HTML element inside `<article class="doc">` that has an `id` attribute as a separate searchable chunk. Each chunk SHALL use the element's `id` as its `hash`, enabling search result links to navigate directly to the element's anchor.
+The search index SHALL include every non-heading HTML element inside `<article class="doc">` that has an `id` attribute as a separate searchable chunk. Each chunk SHALL use the element's `id` as its `hash`, enabling search result links to navigate directly to the element's anchor.
 
 Source: openspec/specs/lunr-item-anchor-indexing/spec.md
 
@@ -926,7 +950,7 @@ traceability:links[]
 
 == DOCX Output
 
-[#REQ-131, item, role=requirement, title="DOCX wrapper script converts assembled AsciiDoc to DOCX"]
+[#REQ-131, item, role=process_requirement, title="DOCX wrapper script converts assembled AsciiDoc to DOCX"]
 --
 The project SHALL include an `adoc-to-docx` shell script that reads assembled AsciiDoc from stdin, converts it to DocBook using `asciidoctor -b docbook` with Kroki support, then pipes the result through `pandoc -f docbook -t docx` to produce a DOCX file.
 
@@ -935,7 +959,7 @@ Source: openspec/specs/docx-output/spec.md
 traceability:links[]
 --
 
-[#REQ-132, item, role=requirement, title="DOCX assembler configs mirror PDF assembler configs"]
+[#REQ-132, item, role=process_requirement, title="DOCX assembler configs mirror PDF assembler configs"]
 --
 For each existing PDF assembler configuration, a corresponding DOCX assembler configuration SHALL exist that differs only in the build command, using `./adoc-to-docx` instead of `bundle exec asciidoctor-pdf`.
 
@@ -944,7 +968,7 @@ Source: openspec/specs/docx-output/spec.md
 traceability:links[]
 --
 
-[#REQ-133, item, role=requirement, title="PDF playbook includes DOCX assembler configurations"]
+[#REQ-133, item, role=process_requirement, title="PDF playbook includes DOCX assembler configurations"]
 --
 The `antora-playbook-pdf.yml` SHALL register DOCX assembler configs alongside PDF assembler configs so a single build produces both PDF and DOCX outputs.
 
@@ -953,7 +977,7 @@ Source: openspec/specs/docx-output/spec.md
 traceability:links[]
 --
 
-[#REQ-134, item, role=requirement, title="pandoc is available in the build environment"]
+[#REQ-134, item, role=process_requirement, title="pandoc is available in the build environment"]
 --
 The project SHALL declare `pandoc` as a dependency in `devbox.json` so that `devbox shell` provides the pandoc binary for DOCX generation.
 

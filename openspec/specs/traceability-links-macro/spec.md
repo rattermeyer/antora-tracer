@@ -7,7 +7,10 @@ Renders outgoing, incoming, and combined relationships inside item blocks via `t
 ## Requirements
 
 ### Requirement: traceability:outgoing[] macro renders outgoing links
-The system SHALL provide a `traceability:outgoing[]` macro (formerly `traceability:links[]`) that expands to a formatted list of all outgoing relationships for the enclosing item. When the item has no outgoing relationships, the macro SHALL render a configurable empty-state message controlled by the `:traceability-empty:` document attribute.
+The system SHALL provide a `traceability:outgoing[]` macro (formerly `traceability:links[]`) that expands to a formatted list of all outgoing relationships for the enclosing item.
+
+### Requirement: Empty-state message when item has no outgoing relationships
+If the enclosing item has no outgoing relationships, then the `traceability:outgoing[]` macro SHALL render a configurable empty-state message controlled by the `:traceability-empty:` document attribute.
 
 #### Scenario: Macro expands for an item with multiple relationships
 - **WHEN** an item block contains `traceability:outgoing[]` and has outgoing relations of types `addresses` and `depends_on`

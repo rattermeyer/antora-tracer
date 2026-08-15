@@ -6,8 +6,14 @@ Process items defined in AsciiDoc partial files (`family: partial`) during the `
 
 ## Requirements
 
-### Requirement: Items defined in partials are processed
-The system SHALL process items defined in AsciiDoc partial files alongside page files. Items from partials SHALL use the file's view URL as their source file reference, enabling traceability matrix links to resolve to the source repository. Partial items SHALL be processed for graph population (Pass 1), macro expansion (Pass 2 — rendering macros), and link substitution (Pass 3 — stripping inline macros). All three passes apply to partial files just as they do to page files, because partial content is inlined into pages by Asciidoctor and reaches the browser.
+### Requirement: Items defined in partials are registered in the graph
+The system SHALL process items defined in AsciiDoc partial files alongside page files, registering them in the traceability graph.
+
+### Requirement: Partial items use view URL as source reference
+Items from partial files SHALL use the file's view URL as their source file reference, enabling traceability matrix links to resolve to the source repository.
+
+### Requirement: All processing passes apply to partial files
+The system SHALL apply graph population, macro expansion, and link substitution passes to partial files in the same way as page files, because partial content is inlined into pages and reaches the browser.
 
 #### Scenario: Item in a partial is registered in the graph
 - **WHEN** a partial file contains `[#REQ-100, item, role=requirement]`

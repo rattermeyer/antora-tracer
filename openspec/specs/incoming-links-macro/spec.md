@@ -73,7 +73,10 @@ The system SHALL support the same sort orders for `traceability:incoming[]` as f
 - **THEN** inverse relation type groups are sorted alphabetically, with items within each group sorted by source ID
 
 ### Requirement: Inverse relation type labels
-The system SHALL transform relation type names to their inverse form for display in `traceability:incoming[]` using the built-in inverse label mapping. When a relation type has no inverse mapping, the raw type name SHALL be displayed.
+The system SHALL transform relation type names to their inverse form for display in `traceability:incoming[]` using the built-in inverse label mapping.
+
+### Requirement: Fallback to raw type name when no inverse mapping exists
+If a relation type has no inverse mapping defined, then the system SHALL display the raw relation type name.
 
 #### Scenario: Known relation type has inverse
 - **WHEN** a relationship of type `addresses` points to the enclosing item

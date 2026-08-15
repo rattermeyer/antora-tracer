@@ -9,7 +9,7 @@ Detect complementary directed relationship pairs (e.g., A `leads_to` B and B `is
 ### Requirement: Bidirectional relationship pairs are merged into a single edge
 The system SHALL detect when a newly added relationship forms a complementary pair with an existing relationship — the existing edge goes from B to A with a type that is the configured inverse of the new edge's type — and merge them into a single bidirectional edge instead of storing two directed edges.
 
-Merging SHALL follow first-writer-wins: the first relationship stored remains as the canonical entry with its original metadata (sourceFile, line), and the second call to `addRelationship` is silently dropped. No warning is emitted.
+Merging SHALL follow first-writer-wins: the first relationship stored remains as the canonical entry with its original metadata (sourceFile, line), and the second relationship is not stored. No warning is emitted.
 
 #### Scenario: User-defined inverse pair is merged
 - **WHEN** the graph already contains `UC-003 leads_to REQ-001`

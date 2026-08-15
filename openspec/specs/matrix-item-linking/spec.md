@@ -51,8 +51,8 @@ The matrix SHALL display the source file name as a tooltip when users hover over
 
 ---
 
-### Requirement: Link generation is context-aware
-The system SHALL generate the same relative link path (`../../`) regardless of execution context, since matrices are always served from the Antora output site where pages sit at the component root.
+### Requirement: Matrix links resolve correctly from site output location
+The system SHALL generate matrix links that resolve correctly regardless of where the matrix file is served within the Antora site output.
 
 #### Scenario: Link generation in Antora build context
 - **WHEN** matrices are generated during Antora build
@@ -65,7 +65,7 @@ The system SHALL generate the same relative link path (`../../`) regardless of e
 ---
 
 ### Requirement: Source file paths are normalized
-The system SHALL normalize item `sourceFile` paths by stripping any `pages/` prefix and `.adoc` extension at link resolution time.
+The system SHALL normalize item source file references so that matrix links resolve to the rendered page URL rather than the AsciiDoc source file path.
 
 #### Scenario: Parsing item from modules/ROOT/pages/architecture.adoc
 - **WHEN** DocumentParser processes an item from `modules/ROOT/pages/architecture.adoc`
@@ -82,7 +82,7 @@ The system SHALL normalize item `sourceFile` paths by stripping any `pages/` pre
 ---
 
 ### Requirement: Matrix renders correctly without link resolution configured
-The system SHALL maintain existing matrix rendering behavior when no link resolver is configured.
+The system SHALL maintain existing matrix rendering behaviour when link resolution is not configured.
 
 #### Scenario: Matrix generation without LinkResolver
 - **WHEN** MatrixGenerator is created without a LinkResolver

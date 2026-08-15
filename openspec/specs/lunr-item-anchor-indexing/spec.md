@@ -7,7 +7,7 @@ Ensure that non-heading HTML elements with `id` attributes inside the article bo
 ## Requirements
 
 ### Requirement: Non-heading elements with IDs are indexed as navigable anchors
-The `@antora/lunr-extension` SHALL index every non-heading HTML element inside `<article class="doc">` that has an `id` attribute as a separate searchable chunk. Each chunk SHALL use the element's `id` as its `hash`, enabling search result links to navigate directly to the element's anchor.
+The search index SHALL include every non-heading HTML element inside `<article class="doc">` that has an `id` attribute as a separate searchable chunk. Each chunk SHALL use the element's `id` as its `hash`, enabling search result links to navigate directly to the element's anchor.
 
 #### Scenario: Item anchor is indexed with correct hash
 - **WHEN** a page contains `<div id="REQ-002" class="openblock requirement"><div class="title">REQ-002 — item macro</div>...</div>` inside `<article class="doc">`
