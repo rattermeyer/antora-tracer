@@ -694,7 +694,7 @@ traceability:links[]
 
 [#REQ-072, item, role=requirement, title="Landing page at GitHub Pages root"]
 --
-The system SHALL serve a visually appealing landing page at the GitHub Pages root URL (`/`) that introduces the antora-tracer project before visitors enter the documentation, while the Antora documentation site remains accessible at `/docs/`.
+The system SHALL serve a landing page at the GitHub Pages root URL (`/`) that introduces the antora-tracer project before visitors enter the documentation, while the Antora documentation site remains accessible at `/docs/`.
 
 Source: openspec/specs/landing-page/spec.md
 
@@ -892,14 +892,6 @@ Source: openspec/specs/cross-module-xref/spec.md
 traceability:links[]
 --
 
-[#REQ-118, item, role=requirement, title="Matrix links include module path when available"]
---
-When `LinkResolver` generates an HTML link for a matrix item that has module information, the system SHALL include the module name in the URL path.
-
-Source: openspec/specs/cross-module-xref/spec.md
-
-traceability:links[]
---
 
 [#REQ-119, item, role=requirement, title="Cross-module and cross-component xref resolution"]
 --

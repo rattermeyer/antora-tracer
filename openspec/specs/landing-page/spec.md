@@ -7,7 +7,7 @@ A static HTML landing page hosted at the GitHub Pages root that introduces antor
 ## Requirements
 
 ### Requirement: Landing page at GitHub Pages root
-The system SHALL serve a visually appealing landing page at the GitHub Pages root URL (`/`) that introduces the antora-tracer project before visitors enter the documentation, while the Antora documentation site remains accessible at `/docs/`.
+The system SHALL serve a landing page at the GitHub Pages root URL (`/`) that introduces the antora-tracer project before visitors enter the documentation, while the Antora documentation site remains accessible at `/docs/`.
 
 #### Scenario: Visitor lands on root URL
 - **WHEN** a visitor navigates to the GitHub Pages root URL

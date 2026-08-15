@@ -58,17 +58,16 @@ When `buildXref` generates an Antora xref for an item in a different module or c
 
 ---
 
-### Requirement: Matrix links include module path when available
-When a matrix item has module information, the system SHALL include the module name in the URL path of its HTML link.
+> **Note:** The requirement for module-scoped matrix links is captured in `openspec/specs/matrix-item-linking/spec.md` (REQ-128). The scenarios below serve as acceptance tests for that requirement in the cross-module context.
 
 #### Scenario: Item with module generates module-scoped link
-- **WHEN** LinkResolver generates a link for an item with `module: "ROOT"` and `sourceFile: "architecture"`
+- **WHEN** a link is generated for an item with `module: "ROOT"` and `sourceFile: "architecture"`
 - **THEN** the generated HTML link SHALL be `../../ROOT/architecture.html#ID`
 
 #### Scenario: Item without module generates unscoped link
-- **WHEN** LinkResolver generates a link for an item with `module: undefined` and `sourceFile: "architecture"`
+- **WHEN** a link is generated for an item with `module: undefined` and `sourceFile: "architecture"`
 - **THEN** the generated HTML link SHALL be `../../architecture.html#ID` (backward-compatible)
 
 #### Scenario: Subdirectory sourceFile with module
-- **WHEN** LinkResolver generates a link for an item with `module: "ROOT"` and `sourceFile: "traceability/index"`
+- **WHEN** a link is generated for an item with `module: "ROOT"` and `sourceFile: "traceability/index"`
 - **THEN** the generated HTML link SHALL be `../../ROOT/traceability/index.html#ID`
