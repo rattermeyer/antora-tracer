@@ -181,3 +181,7 @@ lib/test/
 lib/src/test/
 build/
 **/diag-*-md5-*
+
+# Python bytecode
+__pycache__/
+*.pyc
