@@ -1,6 +1,6 @@
 ---
 name: use-case-engineering
-description: Create or review use case descriptions in Karl Wiegers tabular format for requirements engineering in AsciiDoc/Antora Tracer. Use when writing new use cases, reviewing existing ones for testable pre/post conditions, or checking traceability to requirements.
+description: Create or review use case descriptions in Karl Wiegers tabular format for requirements engineering in AsciiDoc/Antora Tracer. Use when writing new use cases, reviewing existing ones for testable pre/post conditions, or checking traceability to requirements. For writing or reviewing functional requirements (REQ items), use the requirements-writing skill instead.
 location: /home/richard/devel/git/antora-tracer/.pi/skills/use-case-engineering/SKILL.md
 ---
 
@@ -15,6 +15,8 @@ Help the user create or review use case descriptions following the Karl Wiegers 
 - User mentions "Karl Wiegers template" or "use case template"
 - User wants to verify that actors have persona definitions
 - User checks whether pre/post conditions are testable
+
+**For functional requirement quality (REQ items), solution prescription, or "what not how" reviews — use the `requirements-writing` skill instead.**
 
 ## Guardrails
 
@@ -123,6 +125,8 @@ Numbered steps in present tense, active voice. Each step should describe **one o
 | "The `contentClassified` event fires" | "The extension registers the item" |
 
 Ask: "Would a Business Analyst or Product Owner describe it this way, or am I writing the implementation?"
+
+The same principle applies to functional requirements (REQ items) — see the `requirements-writing` skill for the full checklist.
 
 ### Alternate Flows
 
