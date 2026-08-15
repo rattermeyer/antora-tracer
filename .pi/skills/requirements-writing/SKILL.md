@@ -15,6 +15,17 @@ Help the user create or review functional requirements stored as Antora Tracer `
 - User wants to verify requirements are testable and unambiguous
 - User mentions "what not how", "solution prescription", or "technology in requirements"
 - User asks about EARS, requirement patterns, or how to structure a SHALL statement
+- User pastes a single REQ item block and asks to review or check it
+
+## Guardrails
+
+**Do not silently accept prescriptive or vague content.** When a requirement names a technology, internal component, algorithm, or event hook — flag it with the specific category, a pointed question, and a suggested rewrite. Do not rewrite without asking first unless the user explicitly says "fix it".
+
+**Do not fabricate relation IDs.** If the user hasn't provided a UC ID to link to, leave the traceability relation out and note it needs adding.
+
+**Do not add both SHALL and SHALL NOT in one block.** Positive and negative obligations are separate requirements — split them.
+
+**Do not use EARS keywords interchangeably.** `When` is for events, `While` is for states, `Where` is for optional features, `If … then` is for unwanted behaviour. Wrong keyword = wrong meaning.
 
 ## Core Principle: What, Not How
 
@@ -45,7 +56,9 @@ Named tools, libraries, frameworks, or external services that are an implementat
 **Exception**: When the integration or export IS the feature — e.g., "Neo4j export", "Antora extension", "AsciiDoc parsing" — naming the technology is acceptable because it defines the scope of the requirement.
 
 ### Algorithm or data-structure names
-`regex`, `in-memory`, `BFS`, `DFS`, `depth-first`, `breadth-first`, `cache`, `hash`, `sort` (as an implementation qualifier, not a behavioural constraint)
+`regex`, `in-memory`, `BFS`, `DFS`, `depth-first`, `breadth-first`, `hash`, `sort` (as an implementation qualifier, not a behavioural constraint)
+
+**Note**: "cache" as a verb describing observable behaviour is acceptable — "the system SHALL cache parsed file state" states what is observable. What is prescriptive is naming the *type* of cache: `LRU`, `in-memory hash map`, `write-through`. Flag the qualifier, not the word.
 
 **Note**: "shortest path" is a behavioural constraint if shortest is genuinely required — acceptable.
 
@@ -111,7 +124,7 @@ Project examples:
 
 ### Pattern 3 — State-Driven
 
-Use when the behaviour applies continuously while the system is in a given state.
+Use when the behaviour applies continuously while the system is in a given state. The state is a runtime condition, not a configuration presence (that is Pattern 5).
 
 ```
 While <state>, the <system> shall <response>.
@@ -119,14 +132,15 @@ While <state>, the <system> shall <response>.
 
 Project examples:
 - `While the traceability graph is being populated, the system shall preserve all previously registered items.`
-- `While a Kroki server URL is configured, the system shall render diagrams via that server.`
+- `While an Antora build is in progress, the system shall not write to the content catalog after the conversion phase.`
 
 ### Pattern 4 — Unwanted Behaviour
 
-Use when specifying the required response to an undesired situation or error condition.
+Use when specifying the required response to an undesired situation or error condition. Use `shall NOT` to express a prohibition.
 
 ```
 If <unwanted condition>, then the <system> shall <response>.
+If <unwanted condition>, then the <system> shall NOT <prohibited response>.
 ```
 
 Project examples:
@@ -146,6 +160,7 @@ Project examples:
 - `Where Neo4j export is enabled, the system shall generate CSV node and relationship files compatible with Neo4j import.`
 - `Where a Kroki server URL is configured, the system shall delegate diagram rendering to that server rather than using a local renderer.`
 - `Where a custom preset is specified in the configuration, the system shall apply it instead of the built-in default.`
+- `Where a Kroki server URL is configured, the system shall render diagrams via that server.`
 
 ### Pattern 6 — Complex
 
@@ -186,12 +201,12 @@ The system SHALL <observable behaviour or outcome>.
 
 <additional constraints, scope, or boundary conditions if needed.>
 
-is_addressed_by:UC-XXX[]
-
 traceability:outgoing[]
 traceability:incoming[]
 --
 ```
+
+Traceability links from requirements back to use cases depend on the relation type configured in `traceability.yml`. In the built-in `requirements-engineering` preset, the link runs from use case to requirement (`leads_to:REQ-NNN[]` in the UC block). Add a reverse relation only if your config defines one.
 
 ### SHALL Statement Guidelines
 
@@ -246,8 +261,9 @@ When asked to review, check every item against this list. Do NOT silently accept
 - [ ] Scope is clear: "per page file", "for the enclosing item", "across all component versions"
 
 **Completeness**
-- [ ] Boundary conditions stated: what happens when input is empty, missing, or invalid
-- [ ] Exception behaviour documented
+- [ ] All aspects of the stated behaviour are covered — nothing implied or left to interpretation
+- [ ] For each error or edge case, a corresponding Unwanted Behaviour (`If … then`) requirement exists or is noted as missing
+- [ ] Scope boundaries are explicit: does "all files" mean all source files, all page files, all component versions?
 
 ### If a Requirement Is Prescriptive
 
