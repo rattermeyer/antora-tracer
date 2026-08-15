@@ -475,14 +475,14 @@ A requirement from a partial file.
       expect(partialItem!.sourceFile).to.include("github.com");
     });
 
-    it("should skip partial files during Pass 2 macro expansion", async () => {
+    it("should expand macros in partial files during Pass 2", async () => {
       const ctx = createMockContext({
         playbook: { output: { dir: tempDir }, extensions: [] },
       });
       const ext = new AntoraTraceabilityExtension(ctx as any);
       await waitForInit();
 
-      // A partial with a traceability:outgoing[] macro
+      // A partial with a traceability:outgoing[] macro (uses -- open block, not ====)
       const partialFiles = [
         {
           src: {
@@ -491,13 +491,13 @@ A requirement from a partial file.
             component: "test",
             fileUri: "https://github.com/example/repo/blob/main/partials/with-macros.adoc",
           },
-          contents: Buffer.from(`
-[#REQ-200, item, role=requirement, title="With Macros"]
-====
+          contents: Buffer.from(
+`[#REQ-200, item, role=requirement, title="With Macros"]
+--
 Has outgoing macro in partial.
 
 traceability:outgoing[]
-====
+--
 `),
         },
       ];
@@ -517,9 +517,10 @@ traceability:outgoing[]
       expect(items).to.have.lengthOf(1);
       expect(items[0].id).to.equal("REQ-200");
 
-      // Partial content should NOT have had macro expansion applied
+      // Macro expansion (Pass 2) applies to partials — macro is replaced
+      // (REQ-200 has no relationships so emptyStyle=none produces empty string)
       const partialContent = partialFiles[0].contents.toString("utf8");
-      expect(partialContent).to.include("traceability:outgoing[]");
+      expect(partialContent).to.not.include("traceability:outgoing[]");
     });
 
     it("should handle partial with no items gracefully", async () => {
