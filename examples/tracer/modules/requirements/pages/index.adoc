@@ -630,6 +630,17 @@ Source: openspec/specs/cli-query/spec.md
 traceability:links[]
 --
 
+[#REQ-150, item, role=requirement, title="CLI exposes a validate command"]
+--
+The CLI SHALL provide a `validate` command that reads AsciiDoc source files and reports validation errors — invalid relation types, orphaned relationships, and circular references — with diagnostics naming the source and target item IDs with roles, the invalid relation type, and the allowed alternatives.
+No Antora build SHALL be required.
+The command SHALL exit with a non-zero code when errors are found and code 0 when the input is valid.
+
+Source: openspec/specs/cli-validate/spec.md
+
+traceability:links[]
+--
+
 === Search Integration
 
 [#REQ-079, item, role=requirement, title="Non-heading elements with IDs are indexed as navigable anchors"]
