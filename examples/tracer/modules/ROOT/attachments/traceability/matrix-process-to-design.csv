@@ -1,4 +1,8 @@
 Row ID,Row Title,design
+REQ-131,REQ-131 — DOCX wrapper script converts assembled AsciiDoc to DOCX,
+REQ-132,REQ-132 — DOCX assembler configs mirror PDF assembler configs,
+REQ-133,REQ-133 — PDF playbook includes DOCX assembler configurations,
+REQ-134,REQ-134 — pandoc is available in the build environment,
 PRQ-001,PRQ-001 — CI workflows trigger on push and PR,ARC-031: ARC-031 — Static landing page at GitHub Pages root
 PRQ-002,PRQ-002 — Test suite runs as merge gate,ARC-031: ARC-031 — Static landing page at GitHub Pages root
 PRQ-003,PRQ-003 — Example site builds without errors,ARC-031: ARC-031 — Static landing page at GitHub Pages root
@@ -6,5 +10,5 @@ PRQ-004,PRQ-004 — Example site deploys from main branch,ARC-033: ARC-033 — E
 PRQ-005,PRQ-005 — Release is tagged and versioned,ARC-031: ARC-031 — Static landing page at GitHub Pages root
 PRQ-006,PRQ-006 — PDF artifacts are generated alongside HTML,ARC-031: ARC-031 — Static landing page at GitHub Pages root
 
-Total 6 rows
-Coverage: 100.0%
+Total 10 rows
+Coverage: 60.0%

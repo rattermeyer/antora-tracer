@@ -200,8 +200,6 @@ The graph has a well-defined lifecycle — understanding which operations are va
 include::example$graph-lifecycle.puml[]
 ----
 
-addresses:REQ-050[]
-addresses:REQ-069[]
 addresses:QA-058[]
 traceability:links[]
 --
@@ -263,10 +261,8 @@ addresses:REQ-064[]
 addresses:REQ-065[]
 addresses:REQ-066[]
 addresses:REQ-067[]
-addresses:REQ-068[]
 addresses:REQ-070[]
 addresses:REQ-100[]
-addresses:REQ-101[]
 addresses:REQ-102[]
 addresses:REQ-104[]
 addresses:QA-060[]

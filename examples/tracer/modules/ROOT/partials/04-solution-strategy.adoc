@@ -47,7 +47,6 @@ buffers. Source `.adoc` files are never written to.
 Processing is idempotent.
 
 addresses:QA-058[]
-addresses:REQ-050[]
 traceability:links[]
 --
 
