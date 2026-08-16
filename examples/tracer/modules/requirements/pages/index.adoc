@@ -1088,7 +1088,7 @@ ifdef::assembler-backend-pdf[]
 |===
 | Version | Date | Author | Change
 
-| 0.16.1 | 2026-08-04 | Team | Restructure: add Constraints, Quality Requirements sections; extract QA item bodies as partials; reorganize functional requirements by capability
+| 0.17.0 | 2026-08-16 | Team | Restructure: add Constraints, Quality Requirements sections; extract QA item bodies as partials; reorganize functional requirements by capability
 | 0.7.0 | 2026-08-04 | Team | Reconcile with main OpenSpec specs
 |===
 endif::[]

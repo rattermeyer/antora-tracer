@@ -2,6 +2,18 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.17.0] — 2026-08-16
+
+### Added
+- `query` CLI subcommand for graph traversal: `reverse`, `impact`, `orphaned`, and `path`, each accepting `--json` for machine-readable output
+- Agent skills shipped in the npm package for cross-harness installation
+
+### Changed
+- Parser: removed legacy macro detection and backward-compat types
+
+### Fixed
+- Mark compiled `cli.js` executable so the CLI runs after install
+
 ## [0.16.1] — 2026-08-13
 
 ### Fixed
