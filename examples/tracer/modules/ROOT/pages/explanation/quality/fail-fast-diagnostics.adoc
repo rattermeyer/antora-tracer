@@ -1,11 +1,6 @@
 = Fail-Fast with Clear Diagnostics
 
-[#QA-057, item, role=requirement, title="Fail-fast with clear diagnostics"]
---
-The extension SHALL validate every relationship against configured role-relation rules. Error messages SHALL include file path, line number, source and target item IDs with roles, the invalid relation type, and the list of allowed alternatives. Cross-file references SHALL be re-validated after all files are loaded.
-
-Source: openspec/changes/archive/2026-07-28-add-pdf-output/specs/pdf-output/spec.md
---
+include::partial$quality/qa-fail-fast-diagnostics.adoc[]
 
 == Context
 

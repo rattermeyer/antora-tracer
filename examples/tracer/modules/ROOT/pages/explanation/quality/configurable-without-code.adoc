@@ -1,11 +1,6 @@
 = Configurable Without Code Changes
 
-[#QA-056, item, role=requirement, title="Configurable without code changes"]
---
-The extension SHALL allow users to define roles, relations, and matrices entirely in YAML configuration. Built-in presets SHALL be overridable via the `extends` mechanism. Items with roles not yet in the configuration SHALL generate warnings rather than errors.
-
-Source: openspec/changes/archive/2026-07-28-add-pdf-output/specs/pdf-output/spec.md
---
+include::partial$quality/qa-configurable-without-code.adoc[]
 
 == Context
 

@@ -1,0 +1,3 @@
+Generated output from `traceability:outgoing[]` and `traceability:incoming[]` SHALL be standard AsciiDoc constructs — not raw HTML — ensuring compatibility with both HTML and PDF backends.
+
+Source: openspec/specs/traceability-links-macro/spec.md

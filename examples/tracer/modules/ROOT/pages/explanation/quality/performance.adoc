@@ -1,11 +1,6 @@
 = Query and Indexing Performance
 
-[#QA-062, item, role=requirement, title="Query and indexing performance"]
---
-The traceability graph SHALL provide forward, reverse, and inverse relationship indexes enabling O(1) lookup by item ID. Path finding SHALL use BFS with configurable `maxDepth`. Result caching SHALL be used with invalidation on mutation to avoid redundant computation during repeated queries within a single processing session.
-
-Source: examples/tracer/modules/ROOT/partials/04-solution-strategy.adoc (ARC-011)
---
+include::partial$quality/qa-performance.adoc[]
 
 == Context
 

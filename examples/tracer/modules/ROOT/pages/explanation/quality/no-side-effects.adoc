@@ -1,11 +1,6 @@
 = No Side Effects on Source Files
 
-[#QA-058, item, role=requirement, title="No side effects on source files"]
---
-All content transformations SHALL operate on in-memory buffers. Source `.adoc` files SHALL never be modified by the extension. Processing the same file twice SHALL produce the same result.
-
-Source: openspec/changes/archive/2026-07-28-add-pdf-output/specs/pdf-output/spec.md
---
+include::partial$quality/qa-no-side-effects.adoc[]
 
 == Context
 

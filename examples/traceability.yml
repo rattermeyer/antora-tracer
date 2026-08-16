@@ -6,6 +6,7 @@ extends: requirements-engineering
 roles:
   - use_case
   - process_requirement
+  - constraint
 
 relations:
   use_case:

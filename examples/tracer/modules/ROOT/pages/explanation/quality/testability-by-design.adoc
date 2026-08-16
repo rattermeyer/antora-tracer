@@ -1,11 +1,6 @@
 = Testability by Design
 
-[#QA-059, item, role=requirement, title="Testability by design"]
---
-Each module SHALL accept dependencies via constructor parameters. Each module SHALL have a dedicated test file. The traceability graph SHALL expose internal state for test access. The full test suite SHALL complete in under 500 ms.
-
-Source: openspec/changes/archive/2026-07-28-add-pdf-output/specs/pdf-output/spec.md
---
+include::partial$quality/qa-testability-by-design.adoc[]
 
 == Context
 

@@ -1,0 +1,4 @@
+The extension SHALL use ESM (`"type": "module"`), TypeScript strict mode, and target Node.js 20+ as the baseline runtime.
+The zero-framework policy SHALL avoid dependencies on libraries with short upgrade cycles, ensuring the extension remains maintainable and runnable without forced migrations.
+
+Source: examples/tracer/modules/ROOT/partials/04-solution-strategy.adoc (ARC-010)
