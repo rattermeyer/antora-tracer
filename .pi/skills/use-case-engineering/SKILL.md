@@ -1,12 +1,13 @@
 ---
 name: use-case-engineering
-description: Create or review use case descriptions in Karl Wiegers tabular format for requirements engineering in AsciiDoc/Antora Tracer. Use when writing new use cases, reviewing existing ones for testable pre/post conditions, or checking traceability to requirements. For writing or reviewing functional requirements (REQ items), use the requirements-writing skill instead.
-location: /home/richard/devel/git/antora-tracer/.pi/skills/use-case-engineering/SKILL.md
+description: Create or review use case descriptions in Karl Wiegers tabular format for requirements engineering in AsciiDoc/Antora Tracer. Use when writing new use cases, reviewing existing ones for testable pre/post conditions, or checking traceability to requirements. For writing or reviewing functional requirements, use the requirements-writing skill instead.
 ---
 
 # Use Case Engineering Skill
 
-Help the user create or review use case descriptions following the Karl Wiegers template, stored as Antora Tracer `[item]` blocks with `role=use_case`.
+Help the user create or review use case descriptions following the Karl Wiegers template, stored as Antora Tracer `[item]` blocks.
+
+This skill is project-agnostic: the Karl Wiegers template, actor discipline, and testable pre/post-condition rules are universal. Only the role names, relation types, and ID prefix vary per project — those are discovered from the project's own `traceability.yml` (see below).
 
 ## When to Use
 
@@ -16,7 +17,37 @@ Help the user create or review use case descriptions following the Karl Wiegers 
 - User wants to verify that actors have persona definitions
 - User checks whether pre/post conditions are testable
 
-**For functional requirement quality (REQ items), solution prescription, or "what not how" reviews — use the `requirements-writing` skill instead.**
+**For functional requirement quality, solution prescription, or "what not how" reviews — use the `requirements-writing` skill instead.**
+
+## Discover the Project's Traceability Model
+
+Before writing or reviewing, learn the project's model from its traceability config (`traceability.yml` or `traceability.yaml`). The same discovery commands as the `requirements-writing` skill apply:
+
+```bash
+ls traceability.yml traceability.yaml 2>/dev/null
+
+# ID prefixes already in use (UC-001, REQ-001, ...)
+grep -rhoE '\[#[A-Za-z]+-[0-9]+' --include='*.adoc' . | sort -u | head -20
+
+# Role vocabulary already in use
+grep -rhoE 'role=[a-z_]+' --include='*.adoc' . | sort -u
+
+# Relation types already in use
+grep -rhoE '[a-z_]+:[A-Z]+-[0-9]+\[\]' --include='*.adoc' . | sort -u | head -20
+```
+
+Resolve these placeholders used throughout this skill:
+
+| Placeholder | Meaning | Example (antora-tracer's own site) |
+|---|---|---|
+| `{{UC_PREFIX}}` | Use-case ID prefix | `UC` |
+| `{{UC_ROLE}}` | The use-case role name | `use_case` |
+| `{{REQ_PREFIX}}` | Requirement ID prefix | `REQ` |
+| `{{UC_TO_REQ}}` | Relation from use case to requirement (from `relations:`) | `leads_to` |
+| `{{ROLE}}` | The requirement role name | `requirement` |
+| `{{PRESET}}` | Active preset (`extends:` or playbook config) | `requirements-engineering` |
+
+Do not invent role or relation names — take them from the config. If the project defines no use-case role or no `{{UC_TO_REQ}}` relation, tell the user use cases are not wired into their traceability model yet and offer to add the config first.
 
 ## Guardrails
 
@@ -37,7 +68,7 @@ Never fabricate actors, steps, conditions, or priorities. If the user cannot ans
 ### Step 1: Get the Next ID
 
 ```bash
-antora-tracer next-id --prefix UC -i docs/
+antora-tracer next-id --prefix {{UC_PREFIX}} -i <docs-dir>
 ```
 
 ### Step 2: Define the Actor (Persona)
@@ -58,12 +89,12 @@ Only proceed to write the use case after the actor is precisely identified.
 Use the Karl Wiegers tabular template. The `[item]` block body contains a table with all sections:
 
 ```asciidoc
-[#UC-NNN, item, role=use_case, title="<Actor> <action verb> <observable outcome>"]
+[#{{UC_PREFIX}}-NNN, item, role={{UC_ROLE}}, title="<Actor> <action verb> <observable outcome>"]
 
 .Use Case: <title>
 [width=100%, cols="25h,75a"]
 |===
-| ID | UC-NNN
+| ID | {{UC_PREFIX}}-NNN
 | Title | <actor> <action> <outcome>
 | Goal | <actor> does <action> so that <stakeholder benefit>
 | Primary Actor | <role from persona definition>
@@ -82,16 +113,18 @@ Use the Karl Wiegers tabular template. The `[item]` block body contains a table 
 | Notes | <open issues, assumptions, references>
 |===
 
-leads_to:REQ-XXX[]
+{{UC_TO_REQ}}:{{REQ_PREFIX}}-XXX[]
 
 traceability:outgoing[]
 traceability:incoming[]
 --
 ```
 
+The `{{UC_TO_REQ}}:{{REQ_PREFIX}}-XXX[]` relation names the requirements this use case derives. Only include it if the relation is defined in `traceability.yml` — see the discovery step.
+
 ### Naming Conventions
 
-- **ID**: `UC-NNN` with 3-digit padding
+- **ID**: `{{UC_PREFIX}}-NNN` with 3-digit padding
 - **Title format**: `<Actor> <present-tense action verb> <observable outcome>`
   - Good: "Author writes traceable items in AsciiDoc"
   - Bad: "Writing items", "Item writing by author"
@@ -105,7 +138,7 @@ Must be written as **testable statements in past tense**:
 |-------|-------|
 | "Log in" | "User has authenticated with valid credentials" |
 | "Data available" | "At least one requirement item exists in the traceability graph" |
-| "System ready" | "The extension is loaded and Antora build has emitted contentClassified" |
+| "System ready" | "The extension is loaded and the build has emitted its content-classification event" |
 
 Multiple conditions use **"And"** or **"Or"** as conjunctive/disjunctive separators:
 
@@ -122,17 +155,17 @@ Numbered steps in present tense, active voice. Each step should describe **one o
 |---|---|
 | "Author writes `[#ID, item, role=XXX, title=\"...\"]` on its own line, followed by `--`" | "Author identifies a concept that needs to be traceable" |
 | "Author closes the item block with `--` on its own line" | "Author writes a description of the concept" |
-| "The `contentClassified` event fires" | "The extension registers the item" |
+| "The build's content-classification event fires" | "The extension registers the item" |
 
 Ask: "Would a Business Analyst or Product Owner describe it this way, or am I writing the implementation?"
 
-The same principle applies to functional requirements (REQ items) — see the `requirements-writing` skill for the full checklist.
+The same principle applies to functional requirements — see the `requirements-writing` skill for the full checklist.
 
 ### Alternate Flows
 
 Each entry starts with a **condition** followed by the alternate steps:
 
-- *. No existing items match the prefix: Extension defaults to 3-digit padding And outputs `REQ-001`.
+- *. No existing items match the prefix: Extension defaults to 3-digit padding And outputs `{{REQ_PREFIX}}-001`.
 - *. Input path does not exist: Extension exits with error message And code 1.
 
 ### Postconditions
@@ -140,7 +173,7 @@ Each entry starts with a **condition** followed by the alternate steps:
 Describe the **state of the system after successful completion**, in past tense:
 
 - "The next sequential ID for the prefix is displayed on stdout" And "Exit code is 0"
-- "Extension traceability graph is unchanged" And "No files are modified on disk"
+- "The extension's graph is unchanged" And "No files are modified on disk"
 
 ## Reviewing a Use Case
 
@@ -149,7 +182,7 @@ Describe the **state of the system after successful completion**, in past tense:
 When asked to review a use case, check the following. Do NOT stop at formatting — verify the **substance** of each section.
 
 ### Structure
-- [ ] Uses `role=use_case` with padded UC-NNN ID
+- [ ] Uses `role={{UC_ROLE}}` with padded `{{UC_PREFIX}}-NNN` ID
 - [ ] Title follows `<Actor> <action> <outcome>` pattern
 - [ ] Table has all required sections (ID, Title, Goal, Actor, Preconditions, Trigger, Basic Flow, Alternate Flows, Postconditions, Priority, Frequency)
 
@@ -189,8 +222,8 @@ When asked to review a use case, check the following. Do NOT stop at formatting 
 - [ ] Multiple conditions use "And" or "Or"
 
 ### Traceability
-- [ ] At least one `leads_to:REQ-XXX[]` relationship
-- [ ] All referenced REQ IDs exist in the requirements document
+- [ ] At least one `{{UC_TO_REQ}}:{{REQ_PREFIX}}-XXX[]` relationship
+- [ ] All referenced requirement IDs exist in the requirements document
 - [ ] `traceability:outgoing[]` is present
 
 ### Consistency
@@ -200,25 +233,24 @@ When asked to review a use case, check the following. Do NOT stop at formatting 
 
 ## Config Requirements
 
-The use case role and relations must be defined in `traceability.yml`:
+The use-case role and the `{{UC_TO_REQ}}` relation must be defined in `traceability.yml` before use cases can trace to requirements:
 
 ```yaml
-extends: requirements-engineering
+extends: {{PRESET}}
 
 roles:
-  - use_case
+  - {{UC_ROLE}}
 
 relations:
-  use_case:
-    requirement: [leads_to]
-
-inverseLabels:
-  leads_to: "is-derived-from"
+  {{UC_ROLE}}:
+    {{ROLE}}: [{{UC_TO_REQ}}]
 ```
+
+If they are not, add them to the project's config first — do not write use cases that cannot be traced. An `inverseLabels` entry for the reverse direction is optional and only needed if requirements must link back to use cases.
 
 ## Related Commands
 
 ```bash
-antora-tracer next-id --prefix UC -i docs/
-antora-tracer validate -i docs/
+antora-tracer next-id --prefix {{UC_PREFIX}} -i <docs-dir>
+antora-tracer validate -i <docs-dir>
 ```

@@ -226,5 +226,5 @@ Matrices: regenerated
 - **Grounded in specs** — every requirement must trace back to a spec file. Do not invent requirements.
 - **Grounded in code** — TST items must match actual test files. ARC items must match actual source layout and class names.
 - **Title matching** — REQ item titles MUST match the spec's `### Requirement:` heading exactly.
-- **Run the consistency sweep** — after updating requirements, check architecture docs, test `it()` descriptions, and test-plan `verifies:` links. See the `requirements-writing` skill's "After Changing Requirements" section for the full checklist.
+- **Run the consistency sweep** — after updating requirements, check architecture docs, test `it()` descriptions, and test-plan `verifies:` links. The `requirements-writing` skill's "After Changing Requirements" section gives the generic principle; the detailed project-specific sweep is the steps in this skill.
 - **Regenerate and verify** — always run `run-example.js` after document changes, then rebuild and check for xref errors.
