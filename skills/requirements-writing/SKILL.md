@@ -1,6 +1,7 @@
 ---
 name: requirements-writing
 description: Create or review functional requirements (requirement items) in AsciiDoc/Antora Tracer format. Requirements must follow EARS style (Ubiquitous, Event-Driven, State-Driven, Unwanted Behaviour, Optional Feature) and state what the system must do, never how. Use when writing new requirement items, reviewing existing ones for solution prescription, or checking requirement quality (testable, atomic, unambiguous).
+license: MIT
 ---
 
 # Requirements Writing Skill
@@ -303,7 +304,7 @@ To find every reference to a changed ID:
 grep -rn '{{ID_PREFIX}}-NNN' .
 ```
 
-Project-specific layouts need a project-specific sweep. In the antora-tracer repository itself, this sweep is owned by the `update-example-site` skill (specs → example site → architecture doc → test plan). For your own project, identify where requirements, design, tests, and coverage documents live, and update them together.
+Project-specific layouts need a project-specific sweep. Identify where requirements, design, tests, and coverage documents live in your project and update them together.
 
 ## Related Commands
 

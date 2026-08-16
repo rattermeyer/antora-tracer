@@ -1,6 +1,7 @@
 ---
 name: use-case-engineering
 description: Create or review use case descriptions in Karl Wiegers tabular format for requirements engineering in AsciiDoc/Antora Tracer. Use when writing new use cases, reviewing existing ones for testable pre/post conditions, or checking traceability to requirements. For writing or reviewing functional requirements, use the requirements-writing skill instead.
+license: MIT
 ---
 
 # Use Case Engineering Skill

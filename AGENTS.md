@@ -57,6 +57,8 @@ Archived change: `openspec/changes/archive/`
 
 Skill: `.pi/skills/` — `update-example-site` refresh self-traceability example after archive.
 
+Skill: `skills/` — published skills (shipped in npm package). requirements-writing, use-case-engineering, review-architecture-diagrams. Repo-local pi loads them via `.pi/settings.json`.
+
 ## Consistency
 
 **Doc part of change, not afterthought.**

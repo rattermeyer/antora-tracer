@@ -386,6 +386,34 @@ After a build, you’ll find in `<site-output>/traceability/`:
 
 ---
 
+## Agent Skills
+
+The npm package ships [Agent Skills](https://agentskills.io/specification) that teach AI assistants how to write and review traceable content in an antora-tracer project:
+
+- `requirements-writing` — EARS-style functional requirements, "what not how"
+- `use-case-engineering` — Karl Wiegers use case template
+- `review-architecture-diagrams` — diagram review against better-architecture-diagrams principles
+
+They live in the `skills/` directory of the installed package. Point your agent harness at them:
+
+```bash
+# pi — install antora-tracer as a pi package (auto-loads the skills)
+pi install npm:antora-tracer
+
+# pi — or, with a regular npm install, add to .pi/settings.json:
+#   { "skills": ["../node_modules/antora-tracer/skills"] }
+
+# Claude Code
+cp -r node_modules/antora-tracer/skills/* ~/.claude/skills/
+
+# OpenAI Codex
+cp -r node_modules/antora-tracer/skills/* ~/.codex/skills/
+```
+
+See the example site's how-to guide for a step-by-step walkthrough: <https://antora-tracer.conemso.de/docs/tracer/latest/how-to/install-skills.html>.
+
+---
+
 ## Development
 
 This project is developed using **spec-driven development** with [OpenSpec](https://openspec.dev) — an experiment in using formal specifications as the primary design artifact with minimal manual coding outside the spec workflow.

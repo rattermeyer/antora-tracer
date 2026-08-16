@@ -1,6 +1,7 @@
 ---
 name: review-architecture-diagrams
 description: Review architecture diagrams against better-architecture-diagrams principles. Use when the user asks to review, audit, or improve diagrams — phrases like "review my diagrams", "check my PlantUML", "is this diagram clear", "audit architecture diagrams", "check diagram quality", "improve diagram readability", or mentions "better architecture diagrams" / InnoQ diagram review. Works with PlantUML (.puml, .plantuml), Mermaid (.mmd), D2 (.d2), and Graphviz DOT (.dot, .gv).
+license: MIT
 ---
 
 # Review Architecture Diagrams
@@ -20,7 +21,7 @@ Find all diagrams in the project:
 find . -type f \( -name "*.puml" -o -name "*.plantuml" -o -name "*.mmd" -o -name "*.mermaid" -o -name "*.d2" -o -name "*.dot" -o -name "*.gv" \) ! -path "*/.devbox/*" ! -path "*/node_modules/*" ! -path "*/.git/*"
 ```
 
-Also find where they're included (AsciiDoc `include::`, markdown image refs, etc.) to understand context. In this project, diagrams live in `examples/tracer/modules/ROOT/examples/*.puml` and are included from `examples/tracer/modules/ROOT/pages/explanation/architecture.adoc`.
+Also find where they're included (AsciiDoc `include::`, markdown image refs, etc.) to understand context — for example, a `.puml` file included from an architecture page via `include::example$name.puml[]`.
 
 For each diagram:
 1. Read the diagram file completely.

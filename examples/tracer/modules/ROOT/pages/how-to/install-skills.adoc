@@ -1,0 +1,74 @@
+= How to Install the Agent Skills
+:description: Step-by-step guide for installing the antora-tracer agent skills in pi, Claude Code, and OpenAI Codex
+:keywords: skills, ai, agent, claude, codex, pi, install
+
+The `antora-tracer` npm package ships three https://agentskills.io/specification[Agent Skills] that teach an AI assistant how to write and review traceable content.
+The skills live in the `skills/` directory of the installed package.
+
+== Before you start
+
+Install antora-tracer as a regular dependency:
+
+[source,bash]
+----
+npm install antora-tracer
+----
+
+The skills are now in `node_modules/antora-tracer/skills/`.
+
+== Install for pi
+
+Option A — install antora-tracer as a pi package so pi auto-loads the skills:
+
+[source,bash]
+----
+pi install npm:antora-tracer
+----
+
+Option B — keep the regular npm install and point pi at the skills directory.
+Create or extend `.pi/settings.json` in your project:
+
+[source,json]
+----
+{
+  "skills": ["../node_modules/antora-tracer/skills"]
+}
+----
+
+The `../` prefix is required because paths in `.pi/settings.json` resolve relative to the `.pi/` directory.
+
+== Install for Claude Code
+
+Copy the skills into Claude Code's skills directory:
+
+[source,bash]
+----
+cp -r node_modules/antora-tracer/skills/* ~/.claude/skills/
+----
+
+Alternatively, symlink them so package updates are picked up automatically:
+
+[source,bash]
+----
+for s in requirements-writing use-case-engineering review-architecture-diagrams; do
+  ln -s "$(pwd)/node_modules/antora-tracer/skills/$s" ~/.claude/skills/$s
+done
+----
+
+== Install for OpenAI Codex
+
+Copy the skills into the Codex skills directory:
+
+[source,bash]
+----
+cp -r node_modules/antora-tracer/skills/* ~/.codex/skills/
+----
+
+== Verify the install
+
+Ask your agent to list its available skills.
+Confirm the three antora-tracer skills appear:
+
+* `requirements-writing`
+* `use-case-engineering`
+* `review-architecture-diagrams`
