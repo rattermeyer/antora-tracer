@@ -4,7 +4,7 @@
 
 Antora Tracer — tool for track requirement in Antora/AsciiDoc. One `[item]` macro, role+relation+matrix all configurable. Come with built-in preset, Neo4j export, CLI.
 
-- **Version**: 0.17.0
+- **Version**: 0.17.1
 - **Language**: TypeScript (strict mode, ESM)
 - **Runtime**: Node.js 20+
 - **Tests**: 298 passing (Mocha + Chai)

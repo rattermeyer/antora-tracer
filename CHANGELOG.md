@@ -2,6 +2,11 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.17.1] — 2026-08-16
+
+### Fixed
+- `--config` was silently ignored because the `--preset` option's default value (`requirements-engineering`) took precedence in `createExtension`. Config-defined `inverseLabels` and custom roles never loaded, so complementary relationship pairs were not merged into bidirectional edges and cycle detection reported false circular references (e.g. `REQ-109 -> UC-007 -> REQ-109`). An explicit `--config` now takes precedence over the default `--preset`.
+
 ## [0.17.0] — 2026-08-16
 
 ### Added
