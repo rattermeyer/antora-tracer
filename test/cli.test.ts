@@ -5,6 +5,7 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 
@@ -407,6 +408,59 @@ implements:DES-001[]
 
       expect(preset).to.exist;
       expect(preset.name).to.equal("requirements-engineering");
+    });
+  });
+
+  describe("Config precedence over default preset", () => {
+    it("should load --config (inverseLabels) instead of the default preset", () => {
+      const tempDir = path.join(__dirname, "temp-cli-precedence");
+      fs.mkdirSync(tempDir, { recursive: true });
+      const configPath = path.join(tempDir, "traceability.yml");
+      const adocPath = path.join(tempDir, "items.adoc");
+      fs.writeFileSync(
+        configPath,
+        [
+          "roles: [requirement, use_case]",
+          "relations:",
+          "  use_case:",
+          "    requirement: [leads_to]",
+          "  requirement:",
+          "    use_case: [is_derived_from]",
+          "inverseLabels:",
+          "  leads_to: is_derived_from",
+          "",
+        ].join("\n"),
+      );
+      fs.writeFileSync(
+        adocPath,
+        [
+          "[#REQ-001, item, role=requirement]",
+          "--",
+          "is_derived_from:UC-001[]",
+          "--",
+          "",
+          "[#UC-001, item, role=use_case]",
+          "--",
+          "leads_to:REQ-001[]",
+          "--",
+          "",
+        ].join("\n"),
+      );
+      try {
+        const cliPath = path.join(__dirname, "..", "src", "cli.js");
+        const out = execFileSync(
+          "node",
+          [cliPath, "validate", "-i", adocPath, "--config", configPath],
+          { encoding: "utf8" },
+        );
+        // A complementary leads_to/is_derived_from pair must merge (via the
+        // config's inverseLabels) and NOT be flagged as circular. With the
+        // old bug, --config was ignored and the preset (no inverseLabels)
+        // produced a false circular reference and a non-zero exit.
+        expect(out).to.not.contain("Circular reference");
+      } finally {
+        fs.rmSync(tempDir, { recursive: true, force: true });
+      }
     });
   });
 
