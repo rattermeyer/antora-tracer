@@ -1,4 +1,5 @@
-The extension is composed of eleven components organized in four layers. Arrows indicate dependencies, with constructor-injected dependencies labeled explicitly.
+The extension is composed of eleven components organized in four layers.
+Arrows indicate dependencies, with constructor-injected dependencies labeled explicitly.
 
 [plantuml]
 ----

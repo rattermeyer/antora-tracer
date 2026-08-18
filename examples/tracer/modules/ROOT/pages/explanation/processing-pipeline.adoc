@@ -5,7 +5,8 @@
 
 toc::[]
 
-This page explains how the Antora Tracer extension processes content during a build. It covers the internal pass structure, the graph lifecycle, and how components coordinate.
+This page explains how the Antora Tracer extension processes content during a build.
+It covers the internal pass structure, the graph lifecycle, and how components coordinate.
 
 == Build integration
 
@@ -18,33 +19,44 @@ The same `RequirementsTraceabilityExtension` class works standalone (via CLI) or
 
 == Pass structure within contentClassified
 
-The extension runs four passes within the `contentClassified` event. The order matters — each pass depends on the result of earlier ones.
+The extension runs four passes within the `contentClassified` event.
+The order matters — each pass depends on the result of earlier ones.
 
 === Pass 1: Parse and populate the graph
 
-`DocumentParser` scans every page and partial for `[item]` blocks and inline relationship macros. Items and relationships are registered in the `TraceabilityGraph`. Both pages and partials are processed here.
+`DocumentParser` scans every page and partial for `[item]` blocks and inline relationship macros.
+Items and relationships are registered in the `TraceabilityGraph`.
+Both pages and partials are processed here.
 
-The graph must be complete before any subsequent pass can resolve cross-file references. This is why Pass 1 processes *all* files before moving on.
+The graph must be complete before any subsequent pass can resolve cross-file references.
+This is why Pass 1 processes *all* files before moving on.
 
 === Pass 2: Expand relation macros (pages and partials)
 
-`traceability:outgoing[]`, `traceability:incoming[]`, and `traceability:links[]` placeholders are replaced with formatted relationship lists. The expansion queries the graph to enumerate relationships for each item.
+`traceability:outgoing[]`, `traceability:incoming[]`, and `traceability:links[]` placeholders are replaced with formatted relationship lists.
+The expansion queries the graph to enumerate relationships for each item.
 
-This pass is opt-in: only files with `:traceability-links: true` get macro expansion. Partials have the attribute forced on since they have no document attributes of their own. Files without the attribute have the macro text stripped.
+This pass is opt-in: only files with `:traceability-links: true` get macro expansion.
+Partials have the attribute forced on since they have no document attributes of their own.
+Files without the attribute have the macro text stripped.
 
 Display style (list, table, inline), sort order (target-id, target-title, relation-type), and collapsible sections are configurable via document attributes.
 
 === Pass 2b: Expand graph macros (pages and partials)
 
-`traceability:graph[]` and `traceability:graph-coverage[]` placeholders are replaced with rendered diagram image references. The graph's `toDot()` and `toVegaLite()` methods generate the diagram source.
+`traceability:graph[]` and `traceability:graph-coverage[]` placeholders are replaced with rendered diagram image references.
+The graph's `toDot()` and `toVegaLite()` methods generate the diagram source.
 
-This pass is opt-in via `:traceability-graph: true`. It's independent of Pass 2 — you can enable graph macros without link macros, and vice versa.
+This pass is opt-in via `:traceability-graph: true`.
+It's independent of Pass 2 — you can enable graph macros without link macros, and vice versa.
 
 === Pass 3: Substitute relationship links (pages and partials)
 
-Inline relationship macros (``) are replaced with clickable xrefs to the target item's source page. This is the mechanism that makes matrix cells clickable links to item definitions.
+Inline relationship macros (``) are replaced with clickable xrefs to the target item's source page.
+This is the mechanism that makes matrix cells clickable links to item definitions.
 
-For page items: `xref:page.html#ID`. For partial items: `link:URL#ID` (since partials don't produce HTML pages).
+For page items: `xref:page.html#ID`.
+For partial items: `link:URL#ID` (since partials don't produce HTML pages).
 
 This pass also runs `injectTitleIds()` (prepends ID to title for visible display) and `unindentItemMacros()`.
 
@@ -72,11 +84,13 @@ The extension follows a dependency-injection pattern:
 - `MatrixGenerator` receives both `TraceabilityGraph` and `ConfigLoader`
 - `Neo4jExporter` receives `TraceabilityGraph`
 
-Each component is independently testable without mocking frameworks. There is no service locator, DI container, or global state.
+Each component is independently testable without mocking frameworks.
+There is no service locator, DI container, or global state.
 
 == File state caching
 
-The `prepareFile()` method computes file content, document attributes, and item block positions once per file, then feeds the same `PreparedFile` to all macro-expansion methods. This eliminates redundant buffer conversions and regex scans.
+The `prepareFile()` method computes file content, document attributes, and item block positions once per file, then feeds the same `PreparedFile` to all macro-expansion methods.
+This eliminates redundant buffer conversions and regex scans.
 
 == Related
 

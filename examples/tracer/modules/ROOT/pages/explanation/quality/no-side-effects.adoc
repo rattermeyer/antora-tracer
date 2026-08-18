@@ -1,10 +1,12 @@
 = No Side Effects on Source Files
+:keywords: quality, side effects, read-only, source files, idempotent
 
 include::partial$quality/qa-no-side-effects.adoc[]
 
 == Context
 
-The extension processes `.adoc` files during the Antora build — parsing items, expanding macros, and substituting inline relationship links. The user's source files are under version control and must never be modified by the build process.
+The extension processes `.adoc` files during the Antora build — parsing items, expanding macros, and substituting inline relationship links.
+The user's source files are under version control and must never be modified by the build process.
 
 == Trigger
 

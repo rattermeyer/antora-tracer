@@ -1,4 +1,5 @@
 = Traceability Dashboard
+:keywords: traceability, dashboard, visualization, coverage, graph
 :traceability-graph: true
 
 This page provides visual overviews of the Antora Tracer traceability data.

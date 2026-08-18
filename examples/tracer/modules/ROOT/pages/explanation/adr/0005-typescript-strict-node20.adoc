@@ -1,4 +1,5 @@
 = ADR-005: TypeScript strict mode and Node.js 20+ baseline
+:keywords: adr, architecture, decision, typescript, strict mode, node.js
 
 *Status*: accepted +
 *Deciders*: Richard Attermeyer +
@@ -6,7 +7,10 @@
 
 == Context and Problem Statement
 
-The project needs a language and runtime baseline. TypeScript offers type safety but has varying strictness levels. Node.js versions introduce new APIs and drop support for older ones. The choices affect code quality, available language features, and user compatibility.
+The project needs a language and runtime baseline.
+TypeScript offers type safety but has varying strictness levels.
+Node.js versions introduce new APIs and drop support for older ones.
+The choices affect code quality, available language features, and user compatibility.
 
 == Decision Drivers
 
@@ -22,7 +26,8 @@ The project needs a language and runtime baseline. TypeScript offers type safety
 
 == Decision Outcome
 
-Chosen option: TypeScript strict mode with Node.js 20+, because strict mode catches more bugs and Node.js 20 is the active LTS with modern APIs (native `fetch`, `node:` protocol, ESM maturity). The `noUnusedVariables`, `noUnusedImports`, and `noUnusedPrivateClassMembers` checks are disabled — they're more noise than value in this codebase.
+Chosen option: TypeScript strict mode with Node.js 20+, because strict mode catches more bugs and Node.js 20 is the active LTS with modern APIs (native `fetch`, `node:` protocol, ESM maturity).
+The `noUnusedVariables`, `noUnusedImports`, and `noUnusedPrivateClassMembers` checks are disabled — they're more noise than value in this codebase.
 
 === Positive Consequences
 

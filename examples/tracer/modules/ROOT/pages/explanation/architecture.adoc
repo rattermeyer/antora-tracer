@@ -1,11 +1,13 @@
 = Architecture
+:keywords: antora, traceability, architecture, arc42, components, graph, parser
 :traceability-links: true
 :traceability-graph: true
 :traceability-style: list
 :traceability-order: target-id
 :arc42-sections: 1,4,5,6,8,9
 
-This document describes the architecture of the Antora Tracer extension using selected arc42 sections. Each section is a traceable `[item]` that references the requirements it addresses.
+This document describes the architecture of the Antora Tracer extension using selected arc42 sections.
+Each section is a traceable `[item]` that references the requirements it addresses.
 
 == Introduction and Goals
 
@@ -13,7 +15,8 @@ This document describes the architecture of the Antora Tracer extension using se
 --
 *Project scope and architectural goals*
 
-The Antora Tracer is an Antora extension that adds role-based requirements traceability to AsciiDoc documentation. It replaces fixed macro types with a single configurable `[item]` macro.
+The Antora Tracer is an Antora extension that adds role-based requirements traceability to AsciiDoc documentation.
+It replaces fixed macro types with a single configurable `[item]` macro.
 
 Architectural goals:
 
@@ -36,7 +39,8 @@ include::partial$04-solution-strategy.adoc[]
 --
 include::partial$05-bb-overview.adoc[]
 
-The following class diagram shows the public API of each component — the method groups and key signatures that form the contract boundaries between modules. See the API reference for full signatures.
+The following class diagram shows the public API of each component — the method groups and key signatures that form the contract boundaries between modules.
+See the API reference for full signatures.
 
 [plantuml]
 ----
@@ -50,7 +54,8 @@ traceability:links[]
 
 [#ARC-012, item, role=design, title="Preset YAML schema"]
 --
-Presets are YAML files following a defined structure. Each preset is a self-contained
+Presets are YAML files following a defined structure.
+Each preset is a self-contained
 versioned configuration that users can extend or override.
 
 [width=100%, cols="20,30,50"]
@@ -107,7 +112,8 @@ traceability:links[]
 
 .Configuration resolution chain
 
-Built-in presets and user config are merged by `ConfigLoader`. The resolved configuration is memoized and consumed independently by each component.
+Built-in presets and user config are merged by `ConfigLoader`.
+The resolved configuration is memoized and consumed independently by each component.
 
 [plantuml]
 ----
@@ -138,9 +144,11 @@ include::example$config-resolution.puml[]
 --
 Relation validation is driven by the YAML configuration rather than hardcoded
 rules. `ConfigLoader.isRelationAllowed()` checks source role, target role
-and relation type against the configured `relations` map. Cross-file
+and relation type against the configured `relations` map.
+Cross-file
 references are re-validated after all files are loaded to catch late-resolved
-targets. Error messages include file path, line number, and allowed
+targets.
+Error messages include file path, line number, and allowed
 alternatives (see xref:explanation/adr/0004-zero-framework.adoc[ADR-004]).
 
 addresses:REQ-071[]
@@ -153,10 +161,12 @@ traceability:links[]
 [#ARC-028, item, role=design, title="Circular reference detection in graph validation"]
 --
 The `validate()` method calls `findCircularReferences()`, a DFS-based cycle
-detector that traverses all items and their outgoing relationships. A path stack
+detector that traverses all items and their outgoing relationships.
+A path stack
 and recursion set track visited nodes; when a node is encountered twice in the
 same path, a circular reference error is reported with the full cycle path
-(e.g., "REQ-001 → REQ-002 → REQ-001"). Auto-generated inverse relationships
+(e.g., "REQ-001 → REQ-002 → REQ-001").
+Auto-generated inverse relationships
 are skipped to avoid false positives.
 
 addresses:REQ-109[]
@@ -166,13 +176,17 @@ traceability:links[]
 [#ARC-029, item, role=design, title="Partial file processing with source-repo links"]
 --
 The `registerContentClassifier()` handler processes both `family: page` and
-`family: partial` files. Partial items use Antora's pre-computed `fileUri`
+`family: partial` files.
+Partial items use Antora's pre-computed `fileUri`
 as their `sourceFile`, making traceability matrix links point directly to the
-partial source in the content repository (e.g., GitHub blob URL). The
+partial source in the content repository (e.g., GitHub blob URL).
+The
 `LinkResolver` detects URL `sourceFile` values and returns them unchanged,
-skipping the HTML path conversion. In `buildXref()`, URL-based items use
+skipping the HTML path conversion.
+In `buildXref()`, URL-based items use
 AsciiDoc's `link:` macro instead of `xref:` since Asciidoctor cannot resolve
-external URLs as cross-references. All three passes (graph population, macro
+external URLs as cross-references.
+All three passes (graph population, macro
 expansion, and link substitution) apply to partials as well as pages, because
 partial content is inlined into pages and reaches the browser.
 
@@ -187,8 +201,10 @@ traceability:links[]
 [#ARC-015, item, role=design, title="In-memory processing with no side effects"]
 --
 All content transformations — parsing, macro expansion, link substitution
-title injection — operate on in-memory buffers. Source `.adoc` files are never
-written to. The Antora content catalog provides the text buffers; the extension
+title injection — operate on in-memory buffers.
+Source `.adoc` files are never
+written to.
+The Antora content catalog provides the text buffers; the extension
 modifies them in place and writes them back to the catalog without touching disk.
 This ensures idempotency and version-control safety (see
 xref:explanation/adr/0003-in-memory-graph.adoc[ADR-003]).
@@ -207,11 +223,14 @@ traceability:links[]
 [#ARC-026, item, role=design, title="GraphViz DOT and Vega-Lite serialization methods"]
 --
 `toDot(fromId, depth?)` generates GraphViz DOT source for a relationship graph
-using BFS traversal in both outgoing and incoming directions from the given item. Nodes are colored by role using a
-hardcoded palette; edges are labeled with the relationship type. Depth limits
+using BFS traversal in both outgoing and incoming directions from the given item.
+Nodes are colored by role using a
+hardcoded palette; edges are labeled with the relationship type.
+Depth limits
 hopping. `toVegaLite(itemId?)` generates a Vega-Lite JSON spec for coverage
 charts — per-relationship-type for a specific item, or global role counts
-when called without an item ID. Both methods produce source strings that are
+when called without an item ID.
+Both methods produce source strings that are
 encoded into Kroki URLs for rendering.
 
 addresses:REQ-053[]
@@ -225,9 +244,11 @@ traceability:links[]
 The extension hooks into Antora's event pipeline via `register()`:
 `contentClassified` triggers parsing, macro expansion, and matrix
 registration in the content catalog; `sitePublished` writes the standalone
-traceability output directory. Each event handler is self-contained, does
+traceability output directory.
+Each event handler is self-contained, does
 not block the build pipeline, and receives the content catalog as a
-parameter. The same `RequirementsTraceabilityExtension` class is used by
+parameter.
+The same `RequirementsTraceabilityExtension` class is used by
 the CLI outside Antora, demonstrating the event handlers are optional.
 
 addresses:REQ-103[]
@@ -240,14 +261,19 @@ traceability:links[]
 The `expandRelationMacros()` method in the Antora extension (not the
 DocumentParser) replaces `traceability:links[]` and
 `traceability:incoming[]` placeholders with formatted AsciiDoc content
-showing the item's relationships. All three rendering macros (`outgoing`
+showing the item's relationships.
+All three rendering macros (`outgoing`
 `incoming`, and `links`) share this single scan/render pipeline; only the
-relationship direction(s) they emit differ. The DocumentParser's inline
+relationship direction(s) they emit differ.
+The DocumentParser's inline
 macro regex excludes these via a `traceability:` namespace guard; they are
-NOT parsed as relationships. Rendering is opt-in via the
-`:traceability-links:` document attribute. Display style (list, table
+NOT parsed as relationships.
+Rendering is opt-in via the
+`:traceability-links:` document attribute.
+Display style (list, table
 inline), sort order (target ID, title, relation type), and collapsible
-sections are configurable via document attributes. Inline relationship
+sections are configurable via document attributes.
+Inline relationship
 macros (``) are always stripped from output — they are
 pure data markers; the link macros are the sole rendering mechanism.
 
@@ -276,7 +302,8 @@ The `expandGraphMacros()` and `expandCoverageMacros()` methods replace
 Kroki-rendered images. `traceability:graph[]` generates a GraphViz DOT
 relationship graph for the enclosing item (or a specified item ID), colored
 by role with labeled edges. `traceability:graph-coverage[]` generates a
-Vega-Lite bar chart showing per-item or global coverage. Rendering is opt-in
+Vega-Lite bar chart showing per-item or global coverage.
+Rendering is opt-in
 via the `:traceability-graph:` document attribute.
 
 addresses:REQ-051[]
@@ -290,9 +317,11 @@ traceability:links[]
 The `registerMatricesInCatalog()` method generates matrix files (HTML, CSV,
 JSON) per component version during the `contentClassified` event and
 registers them in the Antora content catalog as `attachment`-family files
-via `contentCatalog.addFile()`. Registration happens before document
+via `contentCatalog.addFile()`.
+Registration happens before document
 conversion, so `attachment$traceability/...` xrefs in nav files and pages
-resolve without manual file copies. Matrices are registered under every
+resolve without manual file copies.
+Matrices are registered under every
 module that has AsciiDoc content; a committed copy, if present, has its
 contents refreshed in place.
 
@@ -305,10 +334,13 @@ traceability:links[]
 [#ARC-017, item, role=design, title="Regex-based parsing"]
 --
 AsciiDoc content is parsed using regular expressions rather than an
-Asciidoctor AST walker. This makes the parser independent of Asciidoctor
-API versions and testable with plain string inputs. Verbatim blocks
+Asciidoctor AST walker.
+This makes the parser independent of Asciidoctor
+API versions and testable with plain string inputs.
+Verbatim blocks
 (`----` and `....` fences) are pre-scanned and excluded to avoid
-false positives from example code. Known limitations (`]` in quoted
+false positives from example code.
+Known limitations (`]` in quoted
 attribute values, indented macros) are handled with targeted fixes
 (see xref:explanation/adr/0002-regex-parser-over-ast.adoc[ADR-002]).
 
@@ -333,9 +365,12 @@ traceability:links[]
 --
 The `MatrixGenerator` reads matrix definitions from configuration, queries the
 graph for items by role, and computes per-cell coverage based on
-`coverageRelations`. Each cell shows related item IDs or `—` for no
-relationships. CSV output is direct; HTML output delegates to `TemplateRenderer`.
-Coverage is calculated as overall, complete, partial, and missing counts. The `requirements-engineering` preset defines pairwise matrices.
+`coverageRelations`.
+Each cell shows related item IDs or `—` for no
+relationships.
+CSV output is direct; HTML output delegates to `TemplateRenderer`.
+Coverage is calculated as overall, complete, partial, and missing counts.
+The `requirements-engineering` preset defines pairwise matrices.
 
 addresses:REQ-083[]
 addresses:REQ-084[]
@@ -348,8 +383,10 @@ traceability:links[]
 
 [#ARC-020, item, role=design, title="Mustache template rendering for HTML output"]
 --
-The `TemplateRenderer` wraps Mustache for HTML matrix output. Built-in templates
-ship with the extension in `src/templates/`. Users can specify a custom template
+The `TemplateRenderer` wraps Mustache for HTML matrix output.
+Built-in templates
+ship with the extension in `src/templates/`.
+Users can specify a custom template
 directory — the renderer falls back to built-in templates for any files not found
 in the custom directory.
 
@@ -361,16 +398,21 @@ traceability:links[]
 [#ARC-021, item, role=design, title="Path resolution for matrix-to-item links"]
 --
 The `LinkResolver` generates relative link paths from matrix output to component
-root. It normalizes `sourceFile` values by stripping the `pages/` prefix and
-`.adoc` extension, producing `../../page.html#ID` links. When an item carries a
+root.
+It normalizes `sourceFile` values by stripping the `pages/` prefix and
+`.adoc` extension, producing `../../page.html#ID` links.
+When an item carries a
 `module` attribute, the module name is prepended to the path
 (`../../requirements/index.html#ID`) so links resolve across modules in a
 multi-module Antora site; the `ROOT` module is skipped because Antora serves it
-directly under the component version directory. With Antora's
+directly under the component version directory.
+With Antora's
 default `indexify` URL style, pages at the module root produce
-`pagename/index.html` instead of `pagename.html`. The `relativePathPrefix`
+`pagename/index.html` instead of `pagename.html`.
+The `relativePathPrefix`
 option allows configurable base paths, and the `indexify` option (default
-`true`) controls whether root-level pages use `index.html`. When no
+`true`) controls whether root-level pages use `index.html`.
+When no
 `LinkResolver` is provided, items render as plain text without links.
 
 addresses:REQ-037[]
@@ -390,9 +432,12 @@ traceability:links[]
 --
 The `Neo4jExporter` serializes the traceability graph into `nodes.csv` and
 `relationships.csv` with proper headers, comma delimiters, and escaped special
-characters — importable via Neo4j's `LOAD CSV`. The `import.cypher` format
-produces CREATE statements with `:Item` and role-specific labels. All item
-attributes are included as node properties. The export is optional and requires
+characters — importable via Neo4j's `LOAD CSV`.
+The `import.cypher` format
+produces CREATE statements with `:Item` and role-specific labels.
+All item
+attributes are included as node properties.
+The export is optional and requires
 no Neo4j runtime dependency.
 
 traceability:links[]
@@ -406,7 +451,8 @@ The CLI is built on https://www.npmjs.com/package/commander[Commander] with
 subcommands for processing (`process`), matrix generation (`matrix`)
 validation (`validate`), Neo4j export (`export neo4j`), statistics
 (`stats`), preset management (`preset`), and ID allocation (`next-id`).
-Global `--config` and `--preset` flags apply to all commands. The CLI
+Global `--config` and `--preset` flags apply to all commands.
+The CLI
 operates standalone — it does not require an Antora build pipeline.
 
 addresses:REQ-056[]
@@ -416,13 +462,16 @@ traceability:links[]
 [#ARC-030, item, role=design, title="CI/CD PDF build and deployment pipeline"]
 --
 The GitHub Actions CI workflow (`.github/workflows/ci.yml` and `pages.yml`)
-builds and deploys the example site to GitHub Pages. The pages workflow
+builds and deploys the example site to GitHub Pages.
+The pages workflow
 builds the Antora HTML site, generates PDFs and DOCX via `@antora/pdf-extension`
 with Ruby/asciidoctor-pdf and pandoc (provisioned by `devbox.json` and `Gemfile`),
 and deploys a combined output with the landing page at root and docs at
-`/docs/`. PDF and DOCX builds use assembler profiles with custom nav files
+`/docs/`.
+PDF and DOCX builds use assembler profiles with custom nav files
 (`nav-requirements.adoc`, `nav-architecture.adoc`, `nav-test-plan.adoc`)
-to produce separate documents per profile. The existing single-document config
+to produce separate documents per profile.
+The existing single-document config
 (`antora-assembler-pdf.yml`) is preserved as a standalone option.
 
 addresses:REQ-060[]
@@ -444,9 +493,12 @@ A static `landing/index.html` page with Tailwind CSS loaded from CDN
 serves as the project landing page at the GitHub Pages root (`/`).
 The page uses conemso branding (teal palette `#108193`, Roboto font)
 and targets two personas: developers/architects (docs-as-code) and
-requirements engineers/PMs (traceability/compliance). The Antora
-documentation site remains at `/docs/`. The CI workflow copies
-`landing/` assets to `public/` during deployment. No build step,
+requirements engineers/PMs (traceability/compliance).
+The Antora
+documentation site remains at `/docs/`.
+The CI workflow copies
+`landing/` assets to `public/` during deployment.
+No build step,
 npm dependencies, or static site generator required.
 
 addresses:REQ-072[]
@@ -463,11 +515,14 @@ traceability:links[]
 --
 The `@antora/lunr-extension` is configured with a custom indexing pass
 that traverses non-heading elements with `id` attributes inside
-`<article class="doc">`. Each such element becomes a separate search
+`<article class="doc">`.
+Each such element becomes a separate search
 chunk with its `id` as the `hash`, enabling search results to link
-directly to item anchors (e.g., `#REQ-002`). Child elements with CSS
+directly to item anchors (e.g., `#REQ-002`).
+Child elements with CSS
 class `title` provide the chunk title; elements without a `.title`
-child fall back to the `id`. Heading elements are excluded from this
+child fall back to the `id`.
+Heading elements are excluded from this
 pass since they are already indexed by the existing heading-based
 section chunking.
 
@@ -480,13 +535,16 @@ traceability:links[]
 
 [#ARC-033, item, role=design, title="Example site: config extension and dashboard patterns"]
 --
-The example site demonstrates two architectural patterns. First, config
+The example site demonstrates two architectural patterns.
+First, config
 extension: `examples/traceability.yml` extends the `requirements-engineering`
 preset with a custom `use_case` role and `leads_to` relation, showing how
-projects add domain-specific roles without modifying built-in presets. Second,
+projects add domain-specific roles without modifying built-in presets.
+Second,
 the dashboard page (`dashboard.adoc`) embeds `traceability:graph[]` and
 `traceability:graph-coverage[]` macros to provide visual coverage at a glance,
-gated by the `:traceability-graph:` document attribute. Both patterns serve as
+gated by the `:traceability-graph:` document attribute.
+Both patterns serve as
 reference implementations for users extending the extension to their own domains.
 
 addresses:REQ-054[]
@@ -538,7 +596,8 @@ include::example$sequence-diagram.puml[]
 
 .Pass ordering within contentClassified
 
-The extension runs four passes inside `contentClassified`. The sequence diagram above shows the Antora-level flow; this diagram focuses on the internal pass structure.
+The extension runs four passes inside `contentClassified`.
+The sequence diagram above shows the Antora-level flow; this diagram focuses on the internal pass structure.
 
 [plantuml]
 ----
@@ -578,7 +637,8 @@ Key timing characteristics:
 
 .File state caching
 
-The `prepareFile()` method computes file content, document attributes, and item block positions once per file, then feeds the same `PreparedFile` to all five macro-expansion methods. This eliminates redundant buffer conversions and regex scans that were previously repeated in each method.
+The `prepareFile()` method computes file content, document attributes, and item block positions once per file, then feeds the same `PreparedFile` to all five macro-expansion methods.
+This eliminates redundant buffer conversions and regex scans that were previously repeated in each method.
 
 [plantuml]
 ----
@@ -593,9 +653,11 @@ traceability:links[]
 
 [#ARC-013, item, role=design, title="ESM module system"]
 --
-ESM (`"type": "module"` in package.json) is used throughout the project. This
+ESM (`"type": "module"` in package.json) is used throughout the project.
+This
 choice enables modern `import`/`export` syntax, the `node:` protocol for built-in
-modules, and alignment with browser JavaScript. The tradeoff is that Antora's
+modules, and alignment with browser JavaScript.
+The tradeoff is that Antora's
 extension loader uses `require()`, requiring `.cjs` wrappers for integration
 points (see xref:explanation/adr/0001-esm-over-cjs.adoc[ADR-001]).
 
@@ -605,10 +667,12 @@ traceability:links[]
 
 [#ARC-014, item, role=design, title="Dependency injection by constructor"]
 --
-All modules accept their dependencies via constructor parameters. There is no
+All modules accept their dependencies via constructor parameters.
+There is no
 service locator, DI container, or global state. `TraceabilityGraph` receives
 `ConfigLoader`, `MatrixGenerator` receives `TraceabilityGraph` and `ConfigLoader`
-and `DocumentParser` receives `ConfigLoader` optionally. This makes every
+and `DocumentParser` receives `ConfigLoader` optionally.
+This makes every
 component independently testable without mocking frameworks (see
 xref:explanation/adr/0004-zero-framework.adoc[ADR-004]).
 

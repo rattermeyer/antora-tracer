@@ -1,10 +1,12 @@
 = Zero Operational Overhead
+:keywords: quality, operational overhead, minimal, setup, zero
 
 include::partial$quality/qa-zero-operational-overhead.adoc[]
 
 == Context
 
-A documentation engineer adds the extension to their Antora playbook. The extension must parse AsciiDoc files, validate traceability relationships, and generate matrices — without requiring any external services, database installations, or configuration beyond the traceability YAML file already in their project.
+A documentation engineer adds the extension to their Antora playbook.
+The extension must parse AsciiDoc files, validate traceability relationships, and generate matrices — without requiring any external services, database installations, or configuration beyond the traceability YAML file already in their project.
 
 == Trigger
 

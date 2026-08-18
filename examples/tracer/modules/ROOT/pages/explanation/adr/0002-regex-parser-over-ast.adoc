@@ -1,4 +1,5 @@
 = ADR-002: Regex-based AsciiDoc parsing over AST
+:keywords: adr, architecture, decision, parser, regex, asciidoc, ast
 
 *Status*: accepted +
 *Deciders*: Richard Attermeyer +
@@ -6,7 +7,9 @@
 
 == Context and Problem Statement
 
-The extension needs to parse AsciiDoc files to extract `[item]` block macros and inline relationship macros (``). Two approaches exist: use a proper AsciiDoc parser (Asciidoctor.js API) to walk the document AST, or use regular expressions to match patterns directly in the source text. The choice affects accuracy, complexity, and maintainability.
+The extension needs to parse AsciiDoc files to extract `[item]` block macros and inline relationship macros (``).
+Two approaches exist: use a proper AsciiDoc parser (Asciidoctor.js API) to walk the document AST, or use regular expressions to match patterns directly in the source text.
+The choice affects accuracy, complexity, and maintainability.
 
 == Decision Drivers
 
@@ -22,7 +25,8 @@ The extension needs to parse AsciiDoc files to extract `[item]` block macros and
 
 == Decision Outcome
 
-Chosen option: regex-based parser, because it is simpler, version-independent, and easier to test. Known limitations (e.g., `]` inside quoted attribute values) have proven fixable and the pattern is well-understood.
+Chosen option: regex-based parser, because it is simpler, version-independent, and easier to test.
+Known limitations (e.g., `]` inside quoted attribute values) have proven fixable and the pattern is well-understood.
 
 === Positive Consequences
 

@@ -1,6 +1,9 @@
 = Sphinx Needs Comparison
+:keywords: antora, sphinx, comparison, sphinx-needs, migration, traceability
 
-This page maps concepts from https://sphinx-needs.readthedocs.io/[Sphinx Needs] to their equivalents in Antora Tracer. Both are language-agnostic documentation-tool extensions — they document projects written in any programming language. The key differences are in their markup languages and hosting platforms: Sphinx Needs uses reStructuredText (or Markdown via MyST) with the Sphinx builder (Python-based), while Antora Tracer uses AsciiDoc with the Antora site generator (Node.js-based).
+This page maps concepts from https://sphinx-needs.readthedocs.io/[Sphinx Needs] to their equivalents in Antora Tracer.
+Both are language-agnostic documentation-tool extensions — they document projects written in any programming language.
+The key differences are in their markup languages and hosting platforms: Sphinx Needs uses reStructuredText (or Markdown via MyST) with the Sphinx builder (Python-based), while Antora Tracer uses AsciiDoc with the Antora site generator (Node.js-based).
 
 == Directive Mapping
 
@@ -139,10 +142,13 @@ If you're moving from Sphinx Needs to Antora Tracer:
 
 For a comparison of Antora and Sphinx as *publishing platforms* (HTML, PDF, versioning, navigation), see xref:antora-vs-sphinx.adoc[].
 
-*Sphinx Needs* is tightly integrated with Sphinx. *Antora Tracer* is tightly integrated with Antora. Both are language-agnostic — they document projects written in any programming language.
+*Sphinx Needs* is tightly integrated with Sphinx. *Antora Tracer* is tightly integrated with Antora.
+Both are language-agnostic — they document projects written in any programming language.
 
-*Sphinx Needs* defines need types via `needs_types` configuration — each type gets its own directive name (`.. req::`, `.. spec::`, etc.). *Antora Tracer* uses a single `[item]` macro with a `role` attribute — one syntax for all types. Both let you define your own domain model.
+*Sphinx Needs* defines need types via `needs_types` configuration — each type gets its own directive name (`.. req::`, `.. spec::`, etc.). *Antora Tracer* uses a single `[item]` macro with a `role` attribute — one syntax for all types.
+Both let you define your own domain model.
 
 *Sphinx-Needs* provides `needflow` for in-page graph visualization with PlantUML or Graphviz. *Antora Tracer* provides `traceability:graph[]` and `traceability:graph-coverage[]` macros for in-page graphviz/DOT visualization, plus Neo4j export for external graph queries.
 
-*Sphinx Needs* is mature and well-established. *Antora Tracer* is newer but follows the same traceability principles with a more flexible, config-driven approach. Choose based on your documentation toolchain: Sphinx (reStructuredText/Markdown) or Antora (AsciiDoc).
+*Sphinx Needs* is mature and well-established. *Antora Tracer* is newer but follows the same traceability principles with a more flexible, config-driven approach.
+Choose based on your documentation toolchain: Sphinx (reStructuredText/Markdown) or Antora (AsciiDoc).

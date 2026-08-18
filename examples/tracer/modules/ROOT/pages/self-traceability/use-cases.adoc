@@ -1,7 +1,9 @@
 = Use Cases
+:keywords: traceability, use cases, workflows, requirements
 :traceability-links: true
 
-This page captures the key user workflows for the Antora Tracer extension. Each use case traces into the requirements it motivates via `leads_to` relations — demonstrating how config extension adds domain-specific roles and relations beyond the built-in presets.
+This page captures the key user workflows for the Antora Tracer extension.
+Each use case traces into the requirements it motivates via `leads_to` relations — demonstrating how config extension adds domain-specific roles and relations beyond the built-in presets.
 
 [#UC-001, item, role=use_case, title="Team member writes traceable items in AsciiDoc"]
 --

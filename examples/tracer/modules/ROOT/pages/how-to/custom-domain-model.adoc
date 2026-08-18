@@ -5,7 +5,8 @@
 
 toc::[]
 
-Built-in presets cover common domains, but most projects need adjustments. This guide shows how to extend a preset with your own roles, relations, and matrices.
+Built-in presets cover common domains, but most projects need adjustments.
+This guide shows how to extend a preset with your own roles, relations, and matrices.
 
 == Initialize from a preset
 
@@ -16,13 +17,15 @@ Start from the closest built-in preset, then customize:
 npx antora-tracer preset init -n requirements-engineering -o ./config/
 ----
 
-This writes the preset's full configuration to `./config/traceability.yml`. Edit this file to add your domain-specific roles and relations.
+This writes the preset's full configuration to `./config/traceability.yml`.
+Edit this file to add your domain-specific roles and relations.
 
 See xref:reference/presets.adoc[Presets Reference] for the complete structure of each built-in preset.
 
 == Add a new role
 
-Say your project uses use cases alongside requirements. Add a `use_case` role:
+Say your project uses use cases alongside requirements.
+Add a `use_case` role:
 
 [source,yaml]
 ----
@@ -60,7 +63,9 @@ traceability:
 ----
 <1> Bidirectional: when you add a new role, also add reverse relations from existing roles to it
 
-The `leads_to` and `informs` relations are now valid from `use_case` items. The `motivated_by` relation is valid from `requirement` back to `use_case`. The extension will validate that only these relation types are used between these roles.
+The `leads_to` and `informs` relations are now valid from `use_case` items.
+The `motivated_by` relation is valid from `requirement` back to `use_case`.
+The extension will validate that only these relation types are used between these roles.
 
 == Add a custom matrix
 
@@ -94,11 +99,13 @@ antora:
         configPath: ./config/traceability.yml
 ----
 
-The `configPath` takes precedence over `preset`. The extension loads your file and validates it against the schema.
+The `configPath` takes precedence over `preset`.
+The extension loads your file and validates it against the schema.
 
 == Use the `extends` field for partial overrides
 
-You don't need to copy the entire preset. Use `extends` to only declare what you're changing:
+You don't need to copy the entire preset.
+Use `extends` to only declare what you're changing:
 
 [source,yaml]
 ----
@@ -133,7 +140,8 @@ traceability:
 ----
 <1> Pulls in the full `requirements-engineering` preset, then merges your changes on top
 
-The `extends` field deep-merges — your roles are added, relations are merged, and matrices are appended. You only write what's different from the preset.
+The `extends` field deep-merges — your roles are added, relations are merged, and matrices are appended.
+You only write what's different from the preset.
 
 == Validate your config
 

@@ -9,7 +9,8 @@ This guide covers adding Antora Tracer to a project — whether greenfield or ex
 
 == Choose a preset
 
-Start by picking the preset that matches your domain. Four presets ship with the extension:
+Start by picking the preset that matches your domain.
+Four presets ship with the extension:
 
 [width=100%, cols="25,75"]
 |===
@@ -65,13 +66,16 @@ Build your site:
 npx antora antora-playbook.yml
 ----
 
-The build should complete without errors. The extension is active — you'll see a `traceability/` directory in your output with an index page.
+The build should complete without errors.
+The extension is active — you'll see a `traceability/` directory in your output with an index page.
 
-At this stage the matrices will be empty because you haven't written any items yet. Continue to xref:how-to/write-traceable-items.adoc[How to write traceable items].
+At this stage the matrices are empty because you haven't written any items yet.
+Continue to xref:how-to/write-traceable-items.adoc[How to write traceable items].
 
 == Add navigation links to traceability output
 
-By default, the extension adds a "Traceability" section to your site navigation. If your `nav.adoc` already has traceability entries, they'll be merged.
+By default, the extension adds a "Traceability" section to your site navigation.
+If your `nav.adoc` already has traceability entries, they'll be merged.
 
 To control whether traceability pages appear in navigation, set `includeInNavigation`:
 

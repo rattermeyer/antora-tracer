@@ -1,6 +1,8 @@
 = Architecture Decision Records
+:keywords: adr, architecture, decision, index, overview
 
-This section documents the architectural decisions that shaped the Antora Tracer extension. Each record follows the https://github.com/architecture-decision-record/architecture-decision-record[MADR] template.
+This section documents the architectural decisions that shaped the Antora Tracer extension.
+Each record follows the https://github.com/architecture-decision-record/architecture-decision-record[MADR] template.
 
 * xref:explanation/adr/0001-esm-over-cjs.adoc[ADR-001 — ESM over CommonJS]
 * xref:explanation/adr/0002-regex-parser-over-ast.adoc[ADR-002 — Regex-based parsing over AST]

@@ -1,4 +1,5 @@
 = Antora vs Sphinx — Publishing Pipeline Comparison
+:keywords: antora, sphinx, comparison, publishing, pdf, versioning
 :toc: macro
 :toclevels: 2
 
@@ -6,7 +7,9 @@ toc::[]
 
 [NOTE]
 ====
-This is a *subjective* comparison based on experience with both tools in enterprise documentation projects. The focus is on publishing pipelines — how each platform handles HTML output, PDF generation, multi-version support, and large documentation collections. For a comparison of traceability features, see xref:sphinx-comparison.adoc[].
+This is a *subjective* comparison based on experience with both tools in enterprise documentation projects.
+The focus is on publishing pipelines — how each platform handles HTML output, PDF generation, multi-version support, and large documentation collections.
+For a comparison of traceability features, see xref:sphinx-comparison.adoc[].
 ====
 
 == Summary
@@ -59,7 +62,8 @@ This is a *subjective* comparison based on experience with both tools in enterpr
 
 == HTML Publishing
 
-This is Antora's strongest area. It was designed from the beginning for documentation websites consisting of:
+This is Antora's strongest area.
+It was designed from the beginning for documentation websites consisting of:
 
 * many Git repositories
 * many products
@@ -83,15 +87,23 @@ API
     latest
 ....
 
-Antora automatically discovers component versions from Git branches and tags and builds a version switcher. It also resolves cross-references across repositories and versions. For details, see https://antora.org/[the Antora documentation].
+Antora automatically discovers component versions from Git branches and tags and builds a version switcher.
+It also resolves cross-references across repositories and versions.
+For details, see https://antora.org/[the Antora documentation].
 
-Sphinx was originally designed to build *one documentation project*. Large projects like the Python documentation demonstrate that it scales well, but versioning is not built into Sphinx itself. Typically people rely on ReadTheDocs, `sphinx-multiversion`, or custom CI to generate separate versions. It works, but it feels like an extension rather than the core model.
+Sphinx was originally designed to build *one documentation project*.
+Large projects like the Python documentation demonstrate that it scales well, but versioning is not built into Sphinx itself.
+Typically people rely on ReadTheDocs, `sphinx-multiversion`, or custom CI to generate separate versions.
+It works, but it feels like an extension rather than the core model.
 
 == PDF Generation
 
 This is where the biggest practical difference exists.
 
-AsciiDoc was originally designed for book publishing. The PDF pipeline is mature. With the Antora Assembler and PDF Extension, Antora can automatically merge a component's pages into a single book and render it with Asciidoctor PDF. For details, see the https://docs.antora.org/assembler/latest/[Antora Assembler documentation].
+AsciiDoc was originally designed for book publishing.
+The PDF pipeline is mature.
+With the Antora Assembler and PDF Extension, Antora can automatically merge a component's pages into a single book and render it with Asciidoctor PDF.
+For details, see the https://docs.antora.org/assembler/latest/[Antora Assembler documentation].
 
 The resulting PDFs support:
 
@@ -105,22 +117,28 @@ The resulting PDFs support:
 * cross-references
 * syntax highlighting
 
-out of the box. See the https://docs.asciidoctor.org/pdf-converter/latest/features/[Asciidoctor PDF feature list] for a complete overview. This feels much closer to producing a professionally typeset manual than printing a website.
+out of the box.
+See the https://docs.asciidoctor.org/pdf-converter/latest/features/[Asciidoctor PDF feature list] for a complete overview.
+This feels much closer to producing a professionally typeset manual than printing a website.
 
-Sphinx PDF generation is possible, but there are several routes: LaTeX → PDF, HTML → print, or MyST Book pipelines. The quality is good, but customization often means learning LaTeX. If your deliverable is a polished 600-page manual, you will probably spend more time tuning the output than with Asciidoctor PDF.
+Sphinx PDF generation is possible, but there are several routes: LaTeX → PDF, HTML → print, or MyST Book pipelines.
+The quality is good, but customization often means learning LaTeX.
+If your deliverable is a polished 600-page manual, you will probably spend more time tuning the output than with Asciidoctor PDF.
 
 == Multiple Versions
 
 This is probably the largest differentiator.
 
-In Antora, versioning is one of its defining features. A page reference like:
+In Antora, versioning is one of its defining features.
+A page reference like:
 
 [source,asciidoc]
 ----
 xref:component@2.0:module:page.adoc[]
 ----
 
-is completely normal. The generated site automatically provides:
+is completely normal.
+The generated site automatically provides:
 
 * version selector
 * version-aware navigation
@@ -129,13 +147,16 @@ is completely normal. The generated site automatically provides:
 
 without additional tooling.
 
-Sphinx versioning is possible, but typically implemented through `sphinx-multiversion`, ReadTheDocs, or CI jobs. Each version is essentially another Sphinx build. It works well, but the publishing workflow is noticeably less integrated.
+Sphinx versioning is possible, but typically implemented through `sphinx-multiversion`, ReadTheDocs, or CI jobs.
+Each version is essentially another Sphinx build.
+It works well, but the publishing workflow is noticeably less integrated.
 
 == Large Documentation Collections
 
 Suppose you have a documentation set with multiple guides, an SDK reference, an API reference, architecture documentation, requirements, and operations manuals — all sharing common pages.
 
-Antora was built exactly for this. It understands:
+Antora was built exactly for this.
+It understands:
 
 * reusable partials
 * shared images
@@ -149,7 +170,8 @@ Sphinx can certainly reuse content (e.g., via MyST includes), but it generally l
 
 == Navigation
 
-Antora's navigation is explicit. A `nav.adoc` file defines the site's structure, meaning:
+Antora's navigation is explicit.
+A `nav.adoc` file defines the site's structure, meaning:
 
 * documentation architecture is intentional
 * ordering is stable
@@ -190,7 +212,9 @@ Sphinx relies more on `toctree`, which works well but tends to become distribute
 
 == Markup Language: Simple vs Rich Document Markup
 
-It's not useful to frame this as "Markdown vs AsciiDoc" in general. Rather, it's *simple markup vs rich document markup*. MyST extends Markdown considerably, but it still inherits many of Markdown's design principles.
+It's not useful to frame this as "Markdown vs AsciiDoc" in general.
+Rather, it's *simple markup vs rich document markup*.
+MyST extends Markdown considerably, but it still inherits many of Markdown's design principles.
 
 The decision usually depends on the *complexity of the documents* and the *publishing requirements*.
 
@@ -261,13 +285,15 @@ Typical examples include:
 * design proposals (RFCs/ADRs)
 * meeting notes
 
-A developer can learn the basics in about 15 minutes. That's a huge advantage for open-source projects.
+A developer can learn the basics in about 15 minutes.
+That's a huge advantage for open-source projects.
 
 === Where AsciiDoc shines
 
 AsciiDoc was designed as a *technical publishing language*.
 
-Once documents become more structured, it starts to pull ahead. For example, AsciiDoc natively supports:
+Once documents become more structured, it starts to pull ahead.
+For example, AsciiDoc natively supports:
 
 * reusable partials
 * conditional content
@@ -291,7 +317,8 @@ These aren't extensions — they're part of the language.
 
 This is one of the biggest differences.
 
-Markdown generally has no standard mechanism for conditional reuse. MyST adds includes, substitutions, and directives, but they are Sphinx-specific rather than universally supported.
+Markdown generally has no standard mechanism for conditional reuse.
+MyST adds includes, substitutions, and directives, but they are Sphinx-specific rather than universally supported.
 
 AsciiDoc, on the other hand, treats reuse as a core feature:
 
@@ -325,7 +352,8 @@ Soon you'll want features like:
 * conditional chapters
 * shared snippets
 
-AsciiDoc provides these capabilities natively. Markdown projects can achieve many of them, but often through extensions or custom tooling.
+AsciiDoc provides these capabilities natively.
+Markdown projects can achieve many of them, but often through extensions or custom tooling.
 
 === Complex tables
 
@@ -389,9 +417,12 @@ These make large, structured documents easier to maintain.
 
 === Learning curve
 
-Markdown is deliberately minimal. Most developers become productive with it almost immediately.
+Markdown is deliberately minimal.
+Most developers become productive with it almost immediately.
 
-AsciiDoc is larger. Authors who only write occasional documentation may use just a subset of the language, while technical writers and documentation architects can take advantage of many more advanced features. Learning those features takes longer, but they pay off as documentation grows in size and sophistication.
+AsciiDoc is larger.
+Authors who only write occasional documentation may use only a subset of the language, while technical writers and documentation architects can take advantage of many more advanced features.
+Learning those features takes longer, but they pay off as documentation grows in size and sophistication.
 
 === When MyST changes the equation
 
@@ -411,7 +442,8 @@ It adds features such as:
 
 This makes it much more expressive than CommonMark.
 
-However, many of these capabilities come from the Sphinx ecosystem rather than Markdown itself. As a result, MyST documents are more tightly coupled to Sphinx than AsciiDoc documents are to a particular publishing tool.
+However, many of these capabilities come from the Sphinx ecosystem rather than Markdown itself.
+As a result, MyST documents are more tightly coupled to Sphinx than AsciiDoc documents are to a particular publishing tool.
 
 === A practical rule of thumb
 

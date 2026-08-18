@@ -1,10 +1,12 @@
 = Testability by Design
+:keywords: quality, testability, testing, modules, design
 
 include::partial$quality/qa-testability-by-design.adoc[]
 
 == Context
 
-The extension is composed of 8 modules with distinct responsibilities (parsing, graph storage, validation, matrix generation, export, rendering, configuration, CLI). Each module needs to be testable in isolation without requiring a full Antora build pipeline.
+The extension is composed of 8 modules with distinct responsibilities (parsing, graph storage, validation, matrix generation, export, rendering, configuration, CLI).
+Each module needs to be testable in isolation without requiring a full Antora build pipeline.
 
 == Trigger
 

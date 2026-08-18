@@ -5,7 +5,8 @@
 
 toc::[]
 
-The project can generate DOCX (Microsoft Word) files from the assembled AsciiDoc pages. This is useful for regulatory submissions in domains like medical device software (IEC 62304) where DOCX is the standard review and approval format.
+The project can generate DOCX (Microsoft Word) files from the assembled AsciiDoc pages.
+This is useful for regulatory submissions in domains like medical device software (IEC 62304) where DOCX is the standard review and approval format.
 
 == Prerequisites
 
@@ -80,7 +81,8 @@ pandoc -f docbook -t docx ← Pandoc
 output.docx
 ----
 
-The `adoc-to-docx` wrapper script (in `examples/`) connects the two steps. Each `antora-assembler-docx*.yml` config file (also in `examples/`) mirrors its PDF counterpart but uses `./examples/adoc-to-docx` as the build command.
+The `adoc-to-docx` wrapper script (in `examples/`) connects the two steps.
+Each `antora-assembler-docx*.yml` config file (also in `examples/`) mirrors its PDF counterpart but uses `./examples/adoc-to-docx` as the build command.
 
 == Install the DOCX extension
 
@@ -109,4 +111,5 @@ Assembler config files and the `adoc-to-docx` script are consumer-side configura
 
 == Customize styling
 
-To apply a custom Word template, add `--reference-doc=/path/to/template.docx` to the pandoc invocation in the `adoc-to-docx` script. The template controls fonts, heading styles, page margins, and header/footer content.
+To apply a custom Word template, add `--reference-doc=/path/to/template.docx` to the pandoc invocation in the `adoc-to-docx` script.
+The template controls fonts, heading styles, page margins, and header/footer content.

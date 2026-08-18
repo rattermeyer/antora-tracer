@@ -1,4 +1,5 @@
 = ADR-001: Use ESM over CommonJS
+:keywords: adr, architecture, decision, esm, commonjs, module system
 
 *Status*: accepted +
 *Deciders*: Richard Attermeyer +
@@ -6,7 +7,11 @@
 
 == Context and Problem Statement
 
-Node.js supports two module systems: CommonJS (CJS, `require`/`module.exports`) and ECMAScript Modules (ESM, `import`/`export`). The project needs to choose one as its primary module format. CJS is the legacy standard with the widest ecosystem compatibility. ESM is the forward-looking standard aligned with browser JavaScript and the ECMAScript specification. The decision affects tooling, dependency compatibility, and future maintenance burden.
+Node.js supports two module systems: CommonJS (CJS, `require`/`module.exports`) and ECMAScript Modules (ESM, `import`/`export`).
+The project needs to choose one as its primary module format.
+CJS is the legacy standard with the widest ecosystem compatibility.
+ESM is the forward-looking standard aligned with browser JavaScript and the ECMAScript specification.
+The decision affects tooling, dependency compatibility, and future maintenance burden.
 
 == Decision Drivers
 
@@ -22,7 +27,9 @@ Node.js supports two module systems: CommonJS (CJS, `require`/`module.exports`) 
 
 == Decision Outcome
 
-Chosen option: ESM with `"type": "module"`, despite knowing it creates friction with Antora's CJS extension loader. The project accepted the cost of `.cjs` wrappers as a one-time investment in exchange for long-term alignment with the ECMAScript standard and Node.js's stated direction. CJS is in maintenance mode; ESM is where the ecosystem is heading.
+Chosen option: ESM with `"type": "module"`, despite knowing it creates friction with Antora's CJS extension loader.
+The project accepted the cost of `.cjs` wrappers as a one-time investment in exchange for long-term alignment with the ECMAScript standard and Node.js's stated direction.
+CJS is in maintenance mode; ESM is where the ecosystem is heading.
 
 === Positive Consequences
 

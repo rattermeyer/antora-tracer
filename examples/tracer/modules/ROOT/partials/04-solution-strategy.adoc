@@ -20,7 +20,8 @@ traceability:links[]
 --
 xref:explanation/quality/configurable-without-code.adoc[Configurable without code changes]
 is achieved through YAML-based roles, relations, and matrices via
-`ConfigLoader`. Built-in presets can be extended or overridden.
+`ConfigLoader`.
+Built-in presets can be extended or overridden.
 Items with unknown roles generate warnings, not errors — enabling
 incremental domain model adoption.
 
@@ -32,7 +33,8 @@ traceability:links[]
 --
 xref:explanation/quality/fail-fast-diagnostics.adoc[Fail-fast with clear diagnostics]
 is achieved through role-based relation validation at processing time
-and post-hoc re-validation for cross-file references. Error messages
+and post-hoc re-validation for cross-file references.
+Error messages
 include file, line, item IDs with roles, and allowed alternatives.
 
 addresses:QA-057[]
@@ -43,7 +45,8 @@ traceability:links[]
 --
 xref:explanation/quality/no-side-effects.adoc[No side effects on source files]
 is achieved by performing all content transformations on in-memory
-buffers. Source `.adoc` files are never written to.
+buffers.
+Source `.adoc` files are never written to.
 Processing is idempotent.
 
 addresses:QA-058[]

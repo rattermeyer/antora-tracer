@@ -1,4 +1,5 @@
 = ADR-008: Assembled document output via asciidoctor docbook pipeline
+:keywords: adr, architecture, decision, docx, docbook, pandoc, pipeline
 
 *Status*: accepted +
 *Deciders*: Richard Attermeyer +
@@ -34,21 +35,32 @@ The following diagram compares the two conversion paths — pandoc-direct (rejec
 include::example$docx-pipeline-comparison.puml[]
 ----
 
-*Pandoc direct from AsciiDoc* (`pandoc -f asciidoc -t docx`): Pandoc's native AsciiDoc reader does not support Asciidoctor extensions (Kroki diagrams render as broken links, custom `[item]` blocks are mangled, `xref:` macros don't resolve). Rejected.
+*Pandoc direct from AsciiDoc* (`pandoc -f asciidoc -t docx`): Pandoc's native AsciiDoc reader does not support Asciidoctor extensions (Kroki diagrams render as broken links, custom `[item]` blocks are mangled, `xref:` macros don't resolve).
+Rejected.
 
-*Pandoc from HTML* (`asciidoctor -b html5 | pandoc -f html -t docx`): HTML intermediate preserves more features but loses document structure (heading hierarchy, page breaks). Rejected.
+*Pandoc from HTML* (`asciidoctor -b html5 | pandoc -f html -t docx`): HTML intermediate preserves more features but loses document structure (heading hierarchy, page breaks).
+Rejected.
 
-*LibreOffice headless* (`soffice --headless --convert-to docx`): Requires LibreOffice installation, output quality varies. Rejected.
+*LibreOffice headless* (`soffice --headless --convert-to docx`): Requires LibreOffice installation, output quality varies.
+Rejected.
 
-*asciidoctor docbook → pandoc* (`asciidoctor -b docbook | pandoc -f docbook -t docx`): DocBook is asciidoctor's native structured output format. All AsciiDoc features (xrefs, tables, admonitions, images) are represented. Pandoc's docbook reader is mature and produces well-formed DOCX. Accepted.
+*asciidoctor docbook → pandoc* (`asciidoctor -b docbook | pandoc -f docbook -t docx`): DocBook is asciidoctor's native structured output format.
+All AsciiDoc features (xrefs, tables, admonitions, images) are represented.
+Pandoc's docbook reader is mature and produces well-formed DOCX.
+Accepted.
 
 === Extension architecture
 
-*Reuse `@antora/pdf-extension` with `build.command: ./adoc-to-docx`*: The PDF extension has `backend: 'pdf'` and `extname: '.pdf'` hardcoded in its converter. When the assembler sees a `.docx` output but `backend: 'pdf'`, it fails with "cannot produce pdf output from docx". Rejected.
+*Reuse `@antora/pdf-extension` with `build.command: ./adoc-to-docx`*: The PDF extension has `backend: 'pdf'` and `extname: '.pdf'` hardcoded in its converter.
+When the assembler sees a `.docx` output but `backend: 'pdf'`, it fails with "cannot produce pdf output from docx".
+Rejected.
 
-*Custom Antora extension from scratch*: Would implement the full exporter interface. Over-engineered — the assembler already supports arbitrary converters via the `command` key.
+*Custom Antora extension from scratch*: Would implement the full exporter interface.
+Over-engineered — the assembler already supports arbitrary converters via the `command` key.
 
-*Thin converter + assembler*: Create a converter object (`antora-docx-converter.cjs`) with `backend: 'docx'` and `extname: '.docx'`, register it via a thin extension (`antora-docx-extension.cjs`) that calls `assembler.configure()`. Mirrors the PDF extension's architecture without the hardcoded backend. Accepted.
+*Thin converter + assembler*: Create a converter object (`antora-docx-converter.cjs`) with `backend: 'docx'` and `extname: '.docx'`, register it via a thin extension (`antora-docx-extension.cjs`) that calls `assembler.configure()`.
+Mirrors the PDF extension's architecture without the hardcoded backend.
+Accepted.
 
 == Decision Outcome
 

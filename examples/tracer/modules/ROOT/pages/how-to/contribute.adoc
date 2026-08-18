@@ -63,7 +63,8 @@ The CI workflow calls the same script with `--ci` to use the remote content sour
 
 == Blog
 
-The blog is an Antora component (`blog/`) that renders alongside the docs. Posts are AsciiDoc files with `:page-date:` and `:page-tags:` attributes.
+The blog is an Antora component (`blog/`) that renders alongside the docs.
+Posts are AsciiDoc files with `:page-date:` and `:page-tags:` attributes.
 
 [source,bash]
 ----
@@ -74,7 +75,8 @@ node scripts/generate-blog-index.js    # Regenerate index page
 npm run preview                        # Build and check locally
 ----
 
-The index generator (`scripts/generate-blog-index.js`) scans `blog/modules/ROOT/pages/*.adoc`, extracts metadata, and writes `index.adoc` with a date-sorted listing. It's called automatically by `npm run preview` and in CI.
+The index generator (`scripts/generate-blog-index.js`) scans `blog/modules/ROOT/pages/*.adoc`, extracts metadata, and writes `index.adoc` with a date-sorted listing.
+It's called automatically by `npm run preview` and in CI.
 
 == Code style
 
@@ -102,7 +104,8 @@ Common scopes: `parser`, `cli`, `preset`, `matrix`, `neo4j`, `antora`, `config`,
 
 == Testing
 
-Tests use Mocha + Chai, written in TypeScript, compiled with `tsconfig.test.json` to `lib/test/`. Write tests:
+Tests use Mocha + Chai, written in TypeScript, compiled with `tsconfig.test.json` to `lib/test/`.
+Write tests:
 
 [source,typescript]
 ----

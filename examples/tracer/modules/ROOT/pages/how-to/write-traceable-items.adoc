@@ -5,7 +5,8 @@
 
 toc::[]
 
-This guide covers the practical workflow for writing traceable items. For the complete syntax specification, see xref:reference/item-macro.adoc[Item Macro Reference].
+This guide covers the practical workflow for writing traceable items.
+For the complete syntax specification, see xref:reference/item-macro.adoc[Item Macro Reference].
 
 == Write your first item
 
@@ -90,7 +91,8 @@ Track the lifecycle of items with attributes:
 ====
 ----
 
-`status` and `priority` are free-form strings. They appear in the traceability graph and Neo4j export.
+`status` and `priority` are free-form strings.
+They appear in the traceability graph and Neo4j export.
 
 == Display relationships in rendered output
 
@@ -144,13 +146,16 @@ include::partial$04-solution-strategy.adoc[]
 ...
 ----
 
-Partials are processed on equal footing with pages. Matrix links for partial items point to the source repository rather than rendered HTML (since partials don't produce their own pages).
+Partials are processed on equal footing with pages.
+Matrix links for partial items point to the source repository rather than rendered HTML (since partials don't produce their own pages).
 
 See xref:how-to/partials.adoc[How to use partial files with items] for the full patterns and tradeoffs.
 
 == Share items across files
 
-Items can live in any `.adoc` file in your Antora component. A requirement in one file can be referenced by an implementation in another — as long as the IDs match. The extension aggregates all items into a single graph.
+Items can live in any `.adoc` file in your Antora component.
+A requirement in one file can be referenced by an implementation in another — as long as the IDs match.
+The extension aggregates all items into a single graph.
 
 == Related
 

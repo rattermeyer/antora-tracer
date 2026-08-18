@@ -1,6 +1,8 @@
 = Quality Attributes
+:keywords: quality, quality attributes, non-functional requirements, overview
 
-This section documents the quality attributes (non-functional requirements) that shape the Antora Tracer extension. Each quality attribute follows the https://quality.arc42.org/[arc42 Quality Model] format: Context, Trigger, Acceptance Criteria.
+This section documents the quality attributes (non-functional requirements) that shape the Antora Tracer extension.
+Each quality attribute follows the https://quality.arc42.org/[arc42 Quality Model] format: Context, Trigger, Acceptance Criteria.
 
 * xref:explanation/quality/zero-operational-overhead.adoc[Zero Operational Overhead] — No external services, minimal dependencies
 * xref:explanation/quality/configurable-without-code.adoc[Configurable Without Code Changes] — Roles, relations, and matrices in YAML

@@ -5,7 +5,8 @@
 
 toc::[]
 
-The `query` command parses your AsciiDoc source files and answers structural questions about your traceability graph. It does not require an Antora build, so it works from any directory in your project.
+The `query` command parses your AsciiDoc source files and answers structural questions about your traceability graph.
+It does not require an Antora build, so it works from any directory in your project.
 
 == Find what references an item
 
@@ -65,7 +66,8 @@ TST-001 --tests--> IMP-001 --implements--> DES-001 --addresses--> REQ-001
 
 == Scope the search
 
-By default `query` scans the current directory. Point it at a specific directory or file:
+By default `query` scans the current directory.
+Point it at a specific directory or file:
 
 [source,bash]
 ----

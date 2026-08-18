@@ -5,7 +5,8 @@
 
 toc::[]
 
-The extension provides two visualization macros that render as diagrams in your HTML and PDF output. Both use Kroki (https://kroki.io) under the hood and require no local tooling.
+The extension provides two visualization macros that render as diagrams in your HTML and PDF output.
+Both use Kroki (https://kroki.io) under the hood and require no local tooling.
 
 == Enable visualization macros
 
@@ -33,9 +34,11 @@ traceability:graph[]
 ====
 ----
 
-This renders a GraphViz DOT diagram showing the item and all directly related items (both outgoing and incoming). Nodes are colored by role, edges are labeled with relation types.
+This renders a GraphViz DOT diagram showing the item and all directly related items (both outgoing and incoming).
+Nodes are colored by role, edges are labeled with relation types.
 
-By default, the graph shows one hop. For deeper graphs, pass a depth parameter:
+By default, the graph shows one hop.
+For deeper graphs, pass a depth parameter:
 
 [source,asciidoc]
 ----
@@ -88,7 +91,8 @@ For textual relationship lists (not diagrams), enable the link macros:
 :traceability-order: target-id
 ----
 
-Then use `traceability:outgoing[]` and `traceability:incoming[]` inside item blocks. See xref:reference/traceability-macros.adoc[Traceability Macros Reference] for all options.
+Then use `traceability:outgoing[]` and `traceability:incoming[]` inside item blocks.
+See xref:reference/traceability-macros.adoc[Traceability Macros Reference] for all options.
 
 === Local Kroki server
 
@@ -108,7 +112,8 @@ This works for air-gapped environments and avoids external network dependencies.
 
 == PDF compatibility
 
-All visualization macros render identically in HTML and PDF — they generate standard AsciiDoc constructs (xrefs, images via Kroki URLs). The `@antora/pdf-extension` handles the image resolution.
+All visualization macros render identically in HTML and PDF — they generate standard AsciiDoc constructs (xrefs, images via Kroki URLs).
+The `@antora/pdf-extension` handles the image resolution.
 
 == Related
 

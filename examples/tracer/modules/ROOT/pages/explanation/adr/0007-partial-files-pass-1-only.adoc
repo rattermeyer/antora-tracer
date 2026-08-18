@@ -1,4 +1,5 @@
 = ADR-007: Partial files — graph population only (Pass 1)
+:keywords: adr, architecture, decision, partial files, graph population, parser
 
 *Status*: accepted +
 *Deciders*: Richard Attermeyer +
@@ -6,7 +7,9 @@
 
 == Context and Problem Statement
 
-Antora partial files (`family: partial`) contain reusable AsciiDoc content included into pages via `include::partial$...[]`. Items defined in partials need to appear in the traceability graph so matrices show them and relationships to them resolve. But partials do not produce standalone HTML pages — they are assembly-time includes.
+Antora partial files (`family: partial`) contain reusable AsciiDoc content included into pages via `include::partial$...[]`.
+Items defined in partials need to appear in the traceability graph so matrices show them and relationships to them resolve.
+But partials do not produce standalone HTML pages — they are assembly-time includes.
 
 The extension processes files in two passes during `contentClassified`:
 
@@ -33,11 +36,15 @@ Chosen option: Process partial files in Pass 1 only (graph population), because 
 
 === Implementation
 
-In the `contentClassified` handler, both `family: page` and `family: partial` files are filtered for `.adoc` content. Both are processed through `processAsciiDocFile()` for Pass 1. For Pass 2 (macro expansion), only page files are iterated.
+In the `contentClassified` handler, both `family: page` and `family: partial` files are filtered for `.adoc` content.
+Both are processed through `processAsciiDocFile()` for Pass 1.
+For Pass 2 (macro expansion), only page files are iterated.
 
-Partial items receive `sourceFile` values set to the partial's *view URL* (from the Antora content source), not a local file path. This enables matrix links to point to the source repository.
+Partial items receive `sourceFile` values set to the partial's *view URL* (from the Antora content source), not a local file path.
+This enables matrix links to point to the source repository.
 
-In `buildXref()`, items with `sourceFile` containing `://` (view URLs) use AsciiDoc's `link:` macro. Items with `sourceFile` containing `/partials/` fall back to same-page anchors (`xref:#ID`) since partials do not produce HTML pages to xref to.
+In `buildXref()`, items with `sourceFile` containing `://` (view URLs) use AsciiDoc's `link:` macro.
+Items with `sourceFile` containing `/partials/` fall back to same-page anchors (`xref:#ID`) since partials do not produce HTML pages to xref to.
 
 === Positive Consequences
 

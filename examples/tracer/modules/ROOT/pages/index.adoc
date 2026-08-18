@@ -1,4 +1,5 @@
 = Antora Tracer — Project Site
+:keywords: antora, traceability, asciidoc, requirements, overview
 
 Welcome to the project site for the *Antora Tracer* extension — a role-based traceability extension for Antora/AsciiDoc.
 

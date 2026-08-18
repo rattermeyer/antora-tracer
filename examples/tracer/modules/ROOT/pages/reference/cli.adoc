@@ -236,11 +236,15 @@ npx antora-tracer next-id --prefix TST -i test-plan.adoc
 | Input file or directory to scan for existing IDs
 |===
 
-Auto-detects padding from existing IDs. If `REQ-001` and `REQ-002` exist, returns `REQ-003`. If `TST-0001` exists, returns `TST-0002`. With no existing items matching the prefix, defaults to 3-digit padding (`REQ-001`).
+Auto-detects padding from existing IDs.
+If `REQ-001` and `REQ-002` exist, returns `REQ-003`.
+If `TST-0001` exists, returns `TST-0002`.
+With no existing items matching the prefix, defaults to 3-digit padding (`REQ-001`).
 
 == query
 
-Query the traceability graph directly from the command line — no Antora build required. Parses your `.adoc` source files and answers one structural question per invocation.
+Query the traceability graph directly from the command line — no Antora build required.
+Parses your `.adoc` source files and answers one structural question per invocation.
 
 [source,bash]
 ----

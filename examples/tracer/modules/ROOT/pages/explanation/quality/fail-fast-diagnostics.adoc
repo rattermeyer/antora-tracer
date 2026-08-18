@@ -1,10 +1,13 @@
 = Fail-Fast with Clear Diagnostics
+:keywords: quality, diagnostics, error messages, validation, fail-fast
 
 include::partial$quality/qa-fail-fast-diagnostics.adoc[]
 
 == Context
 
-A user writes a relationship `` (typo: missing second 's') from a design item to a requirement. The config allows `addresses` from design to requirement, but not `adresses`. Without clear diagnostics, the user would not discover the typo and the relationship would be silently accepted, corrupting traceability data.
+A user writes a relationship `` (typo: missing second 's') from a design item to a requirement.
+The config allows `addresses` from design to requirement, but not `adresses`.
+Without clear diagnostics, the user would not discover the typo and the relationship would be silently accepted, corrupting traceability data.
 
 == Trigger
 

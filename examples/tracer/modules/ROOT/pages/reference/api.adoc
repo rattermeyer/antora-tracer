@@ -7,7 +7,8 @@ toc::[]
 
 == RequirementsTraceabilityExtension
 
-`src/index.ts` — the orchestrator. Owns the `TraceabilityGraph`, delegates processing to `DocumentParser`, generation to `MatrixGenerator`, and export to `Neo4jExporter`.
+`src/index.ts` — the orchestrator.
+Owns the `TraceabilityGraph`, delegates processing to `DocumentParser`, generation to `MatrixGenerator`, and export to `Neo4jExporter`.
 
 [source,typescript]
 ----
@@ -65,7 +66,9 @@ Forwarded to `graph`:
 
 == TraceabilityGraph
 
-`src/TraceabilityGraph.ts` — in-memory directed graph. Items stored in a `Map<string, Item>` keyed by id. Relationships stored in a `Map<string, ItemRelationship>` keyed by composite key `fromId-type-targetId`.
+`src/TraceabilityGraph.ts` — in-memory directed graph.
+Items stored in a `Map<string, Item>` keyed by id.
+Relationships stored in a `Map<string, ItemRelationship>` keyed by composite key `fromId-type-targetId`.
 
 [source,typescript]
 ----
@@ -117,7 +120,8 @@ interface ValidationResult {
 }
 ----
 
-`addRelationship` validates: source exists, target exists, relation is allowed (if ConfigLoader is set). Invalid relations are stored with a warning. `validate()` runs `findCircularReferences()`, a DFS-based cycle detector.
+`addRelationship` validates: source exists, target exists, relation is allowed (if ConfigLoader is set).
+Invalid relations are stored with a warning. `validate()` runs `findCircularReferences()`, a DFS-based cycle detector.
 
 == DocumentParser
 
@@ -133,7 +137,8 @@ export interface ParserResult {
 }
 ----
 
-Two-pass approach: find `[item]` block macros, then scan content for inline relationship macros (`<type>:<TARGET-ID>[]`). Supports verbatim block exclusion, source file and line tracking.
+Two-pass approach: find `[item]` block macros, then scan content for inline relationship macros (`<type>:<TARGET-ID>[]`).
+Supports verbatim block exclusion, source file and line tracking.
 
 == MatrixGenerator
 

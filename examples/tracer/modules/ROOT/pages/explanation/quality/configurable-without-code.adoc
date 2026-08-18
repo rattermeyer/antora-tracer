@@ -1,10 +1,12 @@
 = Configurable Without Code Changes
+:keywords: quality, configuration, domain model, roles, relations, custom
 
 include::partial$quality/qa-configurable-without-code.adoc[]
 
 == Context
 
-A user needs to define a custom traceability domain model — roles, allowed relations between roles, and matrices — for a project with unique requirements (e.g., aerospace with ARP4754A). The extension ships with built-in presets, but the user's domain differs from all of them.
+A user needs to define a custom traceability domain model — roles, allowed relations between roles, and matrices — for a project with unique requirements (e.g., aerospace with ARP4754A).
+The extension ships with built-in presets, but the user's domain differs from all of them.
 
 == Trigger
 

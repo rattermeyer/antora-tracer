@@ -5,13 +5,17 @@
 
 toc::[]
 
-The Antora Tracer extension is built on three core concepts. Understanding how they work together is key to defining a domain model that fits your project.
+The Antora Tracer extension is built on three core concepts.
+Understanding how they work together is key to defining a domain model that fits your project.
 
 == Roles
 
-A *role* is a category of traceable item — a type label like "requirement", "design", "test", "user_story", or "risk_control". Roles are purely user-defined — the extension has no built-in roles. You define them in your configuration, and every `[item]` gets a `role` attribute.
+A *role* is a category of traceable item — a type label like "requirement", "design", "test", "user_story", or "risk_control".
+Roles are purely user-defined — the extension has no built-in roles.
+You define them in your configuration, and every `[item]` gets a `role` attribute.
 
-Think of roles as the columns in a traceability matrix. A typical project might track:
+Think of roles as the columns in a traceability matrix.
+A typical project might track:
 
 [source,asciidoc]
 ----
@@ -20,24 +24,32 @@ Think of roles as the columns in a traceability matrix. A typical project might 
 [#TEST-001, item, role=test]
 ----
 
-The extension doesn't care what your roles are named — `requirement`, `taco`, `widget` are all equally valid as long as they're in your config. This is what makes the extension domain-agnostic: you define the vocabulary.
+The extension doesn't care what your roles are named — `requirement`, `taco`, `widget` are all equally valid as long as they're in your config.
+This is what makes the extension domain-agnostic: you define the vocabulary.
 
 == Relations
 
-A *relation* connects two items of specific roles. Relations are directional (source → target) and typed: `satisfies`, `verifies`, `implements`, `depends_on`, `contains` — whatever your domain needs.
+A *relation* connects two items of specific roles.
+Relations are directional (source → target) and typed: `satisfies`, `verifies`, `implements`, `depends_on`, `contains` — whatever your domain needs.
 
-Each relation type is validated against your configuration. If your config allows `design → requirement: [addresses, satisfies]`, then a design writing `satisfies:REQ-001[]` is valid. A design writing `verifies:REQ-001[]` is not. The extension reports exactly what went wrong:
+Each relation type is validated against your configuration.
+If your config allows `design → requirement: [addresses, satisfies]`, then a design writing `satisfies:REQ-001[]` is valid.
+A design writing `verifies:REQ-001[]` is not.
+The extension reports exactly what went wrong:
 
 ----
 Error: Relation 'verifies' not allowed from 'design' to 'requirement'.
 Allowed: [addresses, satisfied_by, implements]
 ----
 
-This validation is the mechanism that keeps your traceability graph consistent. Without it, any item could claim any relationship to any other item, and the matrices would be meaningless.
+This validation is the mechanism that keeps your traceability graph consistent.
+Without it, any item could claim any relationship to any other item, and the matrices would be meaningless.
 
 === Direction matters
 
-Relations are directional. A design `satisfies` a requirement; a requirement is `satisfied_by` a design. Which direction you express depends on which item you're writing:
+Relations are directional.
+A design `satisfies` a requirement; a requirement is `satisfied_by` a design.
+Which direction you express depends on which item you're writing:
 
 [source,asciidoc]
 ----
@@ -47,11 +59,13 @@ satisfies:REQ-001[]                satisfied_by:DES-001[]
 ====                               ====
 ----
 
-Both approaches produce the same graph edge. Choose the direction that reads naturally in context.
+Both approaches produce the same graph edge.
+Choose the direction that reads naturally in context.
 
 == Matrices
 
-A *matrix* cross-references items of one role (rows) against items of other roles (columns). Each cell counts how many of a specific relation type exist between the row item and column items.
+A *matrix* cross-references items of one role (rows) against items of other roles (columns).
+Each cell counts how many of a specific relation type exist between the row item and column items.
 
 [width=100%, cols="3,2,2,2"]
 |===
@@ -68,7 +82,8 @@ The matrix definition controls:
 
 === Coverage
 
-Coverage is calculated per matrix cell: if the required relation types exist, the cell shows the related items. If none exist, the cell shows `—`.
+Coverage is calculated per matrix cell: if the required relation types exist, the cell shows the related items.
+If none exist, the cell shows `—`.
 
 The coverage report aggregates this across all matrices to give an overall picture:
 
@@ -84,7 +99,10 @@ Roles, relations, and matrices form a layered model:
 . **Relations** define the grammar — how those things can connect
 . **Matrices** define the analysis — which cross-sections matter
 
-The configuration is the contract. Items declare their role. Relationships declare their type and target. The extension validates that both conform to the configuration, then generates the matrices you defined.
+The configuration is the contract.
+Items declare their role.
+Relationships declare their type and target.
+The extension validates that both conform to the configuration, then generates the matrices you defined.
 
 == Related
 

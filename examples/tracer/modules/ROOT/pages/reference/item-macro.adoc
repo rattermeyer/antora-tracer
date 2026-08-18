@@ -72,7 +72,9 @@ depends_on:IMP-002[]
 
 === Visibility
 
-Inline relationship macros are *always invisible* in rendered output. They are pure data markers stored in the traceability graph. To display relationships in documentation, use:
+Inline relationship macros are *always invisible* in rendered output.
+They are pure data markers stored in the traceability graph.
+To display relationships in documentation, use:
 
 - `traceability:outgoing[]` — lists items this item points to
 - `traceability:incoming[]` — lists items that point to this item
@@ -95,7 +97,9 @@ The extension validates items and relationships at processing time:
 - **Circular references**: DFS-based cycle detection. Reports cycles with the full path: `Circular reference detected: REQ-001 -> REQ-002 -> REQ-001.`
 - **Self-references**: An item referencing itself is also detected and reported as circular.
 
-Warnings don't block processing; errors do. Unknown roles generate warnings (graceful degradation). Invalid relations generate errors.
+Warnings don't block processing; errors do.
+Unknown roles generate warnings (graceful degradation).
+Invalid relations generate errors.
 
 == Related
 

@@ -7,11 +7,13 @@ toc::[]
 
 == Relationship Link Macros
 
-These macros display relationship lists as formatted text. They are gated by the `:traceability-links:` document attribute.
+These macros display relationship lists as formatted text.
+They are gated by the `:traceability-links:` document attribute.
 
 === traceability:outgoing[]
 
-Lists items that this item points to (outgoing relationships). Place inside an item block:
+Lists items that this item points to (outgoing relationships).
+Place inside an item block:
 
 [source,asciidoc]
 ----
@@ -24,7 +26,8 @@ traceability:outgoing[]
 
 === traceability:incoming[]
 
-Lists items that point to this item (incoming relationships). Uses inverse labels (e.g., `addresses` displays as "Addressed by"):
+Lists items that point to this item (incoming relationships).
+Uses inverse labels (e.g., `addresses` displays as "Addressed by"):
 
 [source,asciidoc]
 ----
@@ -77,11 +80,13 @@ Without this attribute, the macro text is stripped from output.
 
 === PDF and DOCX compatibility
 
-The macros generate standard AsciiDoc constructs (xrefs, lists, tables) — compatible with HTML, PDF, and DOCX backends. The `@antora/pdf-extension` renders them identically in PDF; the `@antora/assembler` with `adoc-to-docx` renders them in DOCX.
+The macros generate standard AsciiDoc constructs (xrefs, lists, tables) — compatible with HTML, PDF, and DOCX backends.
+The `@antora/pdf-extension` renders them identically in PDF; the `@antora/assembler` with `adoc-to-docx` renders them in DOCX.
 
 == Visualization Macros
 
-These macros render diagrams. They are gated by the `:traceability-graph:` document attribute.
+These macros render diagrams.
+They are gated by the `:traceability-graph:` document attribute.
 
 === traceability:graph[]
 
@@ -100,7 +105,8 @@ traceability:graph[]
 \--
 ----
 
-Renders a Kroki-generated GraphViz DOT diagram showing the item and all directly related items (both outgoing and incoming). Nodes are colored by role; edges are labeled with relation types.
+Renders a Kroki-generated GraphViz DOT diagram showing the item and all directly related items (both outgoing and incoming).
+Nodes are colored by role; edges are labeled with relation types.
 
 === Explicit target
 
@@ -141,7 +147,8 @@ Outside any item — global role-based coverage:
 traceability:graph-coverage[]
 ----
 
-Renders a Kroki-generated Vega-Lite bar chart. Both macros auto-scale and have no additional attributes beyond `:traceability-graph:`.
+Renders a Kroki-generated Vega-Lite bar chart.
+Both macros auto-scale and have no additional attributes beyond `:traceability-graph:`.
 
 === Enabling
 

@@ -1,4 +1,5 @@
 = ADR-004: Zero framework dependencies
+:keywords: adr, architecture, decision, dependencies, minimal, zero framework
 
 *Status*: accepted +
 *Deciders*: Richard Attermeyer +
@@ -6,7 +7,10 @@
 
 == Context and Problem Statement
 
-The extension operates as an Antora plugin and a standalone CLI tool. It needs HTTP servers, HTML rendering, configuration loading, and CLI argument parsing. Frameworks (Express, React, NestJS, Yargs) could provide these, but introduce dependency chains and upgrade burdens. The project can instead use Node.js standard library and minimal, stable libraries.
+The extension operates as an Antora plugin and a standalone CLI tool.
+It needs HTTP servers, HTML rendering, configuration loading, and CLI argument parsing.
+Frameworks (Express, React, NestJS, Yargs) could provide these, but introduce dependency chains and upgrade burdens.
+The project can instead use Node.js standard library and minimal, stable libraries.
 
 == Decision Drivers
 
@@ -21,7 +25,9 @@ The extension operates as an Antora plugin and a standalone CLI tool. It needs H
 
 == Decision Outcome
 
-Chosen option: minimal dependencies, because it minimizes upgrade churn and keeps the dependency tree small. The extension uses `commander` for CLI (stable, widely used), `mustache` for HTML templates (logic-less, zero maintenance), and `chalk` for colored output. Everything else uses Node.js standard library (`fs`, `path`, `zlib`).
+Chosen option: minimal dependencies, because it minimizes upgrade churn and keeps the dependency tree small.
+The extension uses `commander` for CLI (stable, widely used), `mustache` for HTML templates (logic-less, zero maintenance), and `chalk` for colored output.
+Everything else uses Node.js standard library (`fs`, `path`, `zlib`).
 
 === Positive Consequences
 

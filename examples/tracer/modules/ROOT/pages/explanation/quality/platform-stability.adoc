@@ -1,14 +1,17 @@
 = Platform Stability and Longevity
+:keywords: quality, stability, longevity, maintenance, platform
 
 include::partial$quality/qa-platform-stability.adoc[]
 
 == Context
 
-A documentation-as-code tool may be used in projects with multi-year maintenance windows. The extension must remain buildable and runnable across Node.js LTS cycles without requiring breaking dependency upgrades.
+A documentation-as-code tool may be used in projects with multi-year maintenance windows.
+The extension must remain buildable and runnable across Node.js LTS cycles without requiring breaking dependency upgrades.
 
 == Trigger
 
-A new Node.js LTS version is released, or a transitive dependency introduces a breaking change. The extension is rebuilt and tested against the new version.
+A new Node.js LTS version is released, or a transitive dependency introduces a breaking change.
+The extension is rebuilt and tested against the new version.
 
 == Acceptance Criteria
 

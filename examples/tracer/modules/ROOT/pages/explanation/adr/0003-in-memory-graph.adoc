@@ -1,4 +1,5 @@
 = ADR-003: In-memory graph over persisted database
+:keywords: adr, architecture, decision, graph, in-memory, database
 
 *Status*: accepted +
 *Deciders*: Richard Attermeyer +
@@ -6,7 +7,9 @@
 
 == Context and Problem Statement
 
-The traceability graph stores items (nodes) and relationships (edges) and needs to support queries, validation, path finding, and impact analysis. Two architectural options: an in-memory data structure (Maps with indexes), or a persisted database (embedded or external). The choice affects deployment complexity, performance, and data persistence between builds.
+The traceability graph stores items (nodes) and relationships (edges) and needs to support queries, validation, path finding, and impact analysis.
+Two architectural options: an in-memory data structure (Maps with indexes), or a persisted database (embedded or external).
+The choice affects deployment complexity, performance, and data persistence between builds.
 
 == Decision Drivers
 
@@ -23,7 +26,9 @@ The traceability graph stores items (nodes) and relationships (edges) and needs 
 
 == Decision Outcome
 
-Chosen option: in-memory graph, because it has zero operational overhead and is fast enough for the workload. Neo4j is supported as an export target — the graph is populated in memory and then serialized to CSV/Cypher for external analysis. No database to install, configure, or migrate.
+Chosen option: in-memory graph, because it has zero operational overhead and is fast enough for the workload.
+Neo4j is supported as an export target — the graph is populated in memory and then serialized to CSV/Cypher for external analysis.
+No database to install, configure, or migrate.
 
 === Positive Consequences
 

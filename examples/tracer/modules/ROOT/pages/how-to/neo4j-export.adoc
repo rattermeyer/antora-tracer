@@ -5,7 +5,8 @@
 
 toc::[]
 
-The extension exports the traceability graph to files Neo4j can import — CSV (nodes + relationships) and Cypher (an executable script). The export is file-based only: there is no direct Neo4j connection; you import the generated files into Neo4j yourself (for example with `LOAD CSV`, `cypher-shell`, or the Neo4j Data Importer).
+The extension exports the traceability graph to files Neo4j can import — CSV (nodes + relationships) and Cypher (an executable script).
+The export is file-based only: there is no direct Neo4j connection; you import the generated files into Neo4j yourself (for example with `LOAD CSV`, `cypher-shell`, or the Neo4j Data Importer).
 
 == Export from the CLI
 
@@ -18,7 +19,8 @@ npx antora-tracer export neo4j -i modules/ROOT/pages/ --format csv -o ./neo4j-ex
 npx antora-tracer export neo4j -i modules/ROOT/pages/ --format cypher -o ./neo4j-export/
 ----
 
-The `-i` flag processes the input files first (parsing items and relationships), then exports the graph. Use `--config` or `--preset` to specify your configuration.
+The `-i` flag processes the input files first (parsing items and relationships), then exports the graph.
+Use `--config` or `--preset` to specify your configuration.
 
 == CSV format
 
@@ -49,7 +51,8 @@ CREATE INDEX item_role FOR (n:Item) ON (n.role);
 
 == Cypher format
 
-A single `import.cypher` file with `CREATE` statements for all nodes and relationships. Execute directly in Neo4j Browser or via `cypher-shell`:
+A single `import.cypher` file with `CREATE` statements for all nodes and relationships.
+Execute directly in Neo4j Browser or via `cypher-shell`:
 
 [source,bash]
 ----

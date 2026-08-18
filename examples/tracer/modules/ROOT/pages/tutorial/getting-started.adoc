@@ -5,7 +5,8 @@
 
 toc::[]
 
-This tutorial walks you through setting up traceability from scratch. By the end, you'll have a working Antora site with traceable items, relationships, and generated matrices.
+This tutorial walks you through setting up traceability from scratch.
+By the end, you'll have a working Antora site with traceable items, relationships, and generated matrices.
 
 If you already have an Antora site, skip to <<Step 2: Add the extension to your playbook>>.
 
@@ -96,7 +97,8 @@ antora:
         preset: requirements-engineering
 ----
 
-The `requirements-engineering` preset defines five roles (`requirement`, `design`, `implementation`, `test`, `document`) and three matrices. You can explore other presets later — for now, stick with this one.
+The `requirements-engineering` preset defines five roles (`requirement`, `design`, `implementation`, `test`, `document`) and three matrices.
+You can explore other presets later — for now, stick with this one.
 
 Build again to verify everything still works:
 
@@ -105,7 +107,8 @@ Build again to verify everything still works:
 npx antora antora-playbook.yml
 ----
 
-The build should complete without errors. The extension is active but won't produce traceability output until you write some items.
+The build should complete without errors.
+The extension is active but won't produce traceability output until you write some items.
 
 == Step 3: Write your first traceable items
 
@@ -154,7 +157,8 @@ Build the site again:
 npx antora antora-playbook.yml
 ----
 
-Open `public/traceability/index.html`. You'll see:
+Open `public/traceability/index.html`.
+You'll see:
 
 - A link to a traceability matrix — your three items appear in the `requirements-to-design` and `requirements-to-tests` matrices
 - A coverage report showing which roles have complete coverage
@@ -163,7 +167,9 @@ Open `public/index.html` — the item blocks render as styled sections in the pa
 
 == Step 5: Explore what you've built
 
-Congratulations! You have a working traceability setup. Here's what's happening under the hood:
+Congratulations!
+You have a working traceability setup.
+Here's what's happening under the hood:
 
 - The extension found your three `[item]` blocks and registered them in the traceability graph
 - The inline relationships (`satisfies:REQ-001[]`, `tests:IMP-001[]`, `verifies:REQ-001[]`) were validated against the preset's configuration and stored

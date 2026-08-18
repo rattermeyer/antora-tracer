@@ -1,14 +1,17 @@
 = Query and Indexing Performance
+:keywords: quality, performance, indexing, query, build
 
 include::partial$quality/qa-performance.adoc[]
 
 == Context
 
-During an Antora build, the traceability graph is queried repeatedly — for link substitution, macro expansion, matrix generation, and validation. For large projects with hundreds of items and thousands of relationships, O(n) lookup per query would make the build unacceptably slow.
+During an Antora build, the traceability graph is queried repeatedly — for link substitution, macro expansion, matrix generation, and validation.
+For large projects with hundreds of items and thousands of relationships, O(n) lookup per query would make the build unacceptably slow.
 
 == Trigger
 
-An Antora build processes a project with hundreds of items. The extension's graph query methods are invoked thousands of times during macro expansion and matrix generation.
+An Antora build processes a project with hundreds of items.
+The extension's graph query methods are invoked thousands of times during macro expansion and matrix generation.
 
 == Acceptance Criteria
 

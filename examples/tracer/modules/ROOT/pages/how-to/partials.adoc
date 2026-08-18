@@ -5,7 +5,8 @@
 
 toc::[]
 
-You can define `[item]` blocks in AsciiDoc partials — files in a `partials/` directory included into pages via `include::partial$...[]`. This is useful for keeping architectural decisions or shared requirements in standalone files.
+You can define `[item]` blocks in AsciiDoc partials — files in a `partials/` directory included into pages via `include::partial$...[]`.
+This is useful for keeping architectural decisions or shared requirements in standalone files.
 
 == Define items in a partial
 
@@ -38,7 +39,8 @@ The extension processes partials during graph population on equal footing with p
 - **Page items** link to the rendered HTML page: `architecture.html#ARC-001`
 - **Partial items** link to the source file in your content repository: `\https://github.com/.../blob/main/partials/04-solution-strategy.adoc#ARC-005`
 
-Partials don't produce their own HTML pages — Antora only renders pages. The extension uses Antora's content source URL to build a view link into your repository.
+Partials don't produce their own HTML pages — Antora only renders pages.
+The extension uses Antora's content source URL to build a view link into your repository.
 
 == Pattern: Page-defines-item, partial-for-body
 
@@ -84,13 +86,17 @@ The item's ID and relationships stay in the page file; the partial provides the 
 
 == Do not cross-reference partial items
 
-Do not use `xref:partial$...` to reference items defined in partials. Use inline relationship macros instead, or a plain `link:` URL. Partials don't produce HTML pages, so cross-references won't resolve.
+Do not use `xref:partial$...` to reference items defined in partials.
+Use inline relationship macros instead, or a plain `link:` URL.
+Partials don't produce HTML pages, so cross-references won't resolve.
 
 == Troubleshooting
 
-*Items defined in partials missing from matrices*: Verify the partial is in a `partials/` directory within your Antora module. The extension processes `family: partial` automatically.
+*Items defined in partials missing from matrices*: Verify the partial is in a `partials/` directory within your Antora module.
+The extension processes `family: partial` automatically.
 
-*"target of xref not found"*: You're trying to xref an item in a partial. Use inline relationship macros instead.
+*"target of xref not found"*: You're trying to xref an item in a partial.
+Use inline relationship macros instead.
 
 == Related
 

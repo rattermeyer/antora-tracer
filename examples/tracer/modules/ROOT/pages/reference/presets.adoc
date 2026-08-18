@@ -5,12 +5,14 @@
 
 toc::[]
 
-The extension ships with four built-in presets. Each is a self-contained YAML configuration defining roles, allowed relations, and matrix definitions.
+The extension ships with four built-in presets.
+Each is a self-contained YAML configuration defining roles, allowed relations, and matrix definitions.
 
 [[requirements-engineering]]
 == requirements-engineering
 
-Systems and software engineering. Five roles with comprehensive relation coverage.
+Systems and software engineering.
+Five roles with comprehensive relation coverage.
 
 [width=100%, cols="20,80"]
 |===
@@ -28,7 +30,8 @@ Systems and software engineering. Five roles with comprehensive relation coverag
 - `test → implementation`: `tests`
 - `requirement → requirement`: `refines`, `depends_on`, `conflicts_with`
 
-The `requirement` role defines only requirement-to-requirement relations. Downstream roles (design, implementation, test) declare their own relations back to requirements.
+The `requirement` role defines only requirement-to-requirement relations.
+Downstream roles (design, implementation, test) declare their own relations back to requirements.
 
 *Matrices:*
 
@@ -52,7 +55,8 @@ The `requirement` role defines only requirement-to-requirement relations. Downst
 [[agile]]
 == agile
 
-Agile/Scrum teams. Eight roles mapping the Scrum backlog.
+Agile/Scrum teams.
+Eight roles mapping the Scrum backlog.
 
 [width=100%, cols="20,80"]
 |===
@@ -76,7 +80,8 @@ Agile/Scrum teams. Eight roles mapping the Scrum backlog.
 [[medical-iec62304]]
 == medical-iec62304
 
-Medical device software compliant with IEC 62304. Safety classification support.
+Medical device software compliant with IEC 62304.
+Safety classification support.
 
 [width=100%, cols="20,80"]
 |===
@@ -176,7 +181,8 @@ To customize a preset, initialize a local copy:
 npx antora-tracer preset init -n requirements-engineering -o ./config/
 ----
 
-This writes the full YAML to `./config/traceability.yml`. Edit it, then point your playbook at the file:
+This writes the full YAML to `./config/traceability.yml`.
+Edit it, then point your playbook at the file:
 
 [source,yaml]
 ----

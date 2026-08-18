@@ -46,7 +46,8 @@ Rules:
 
 == Scannable content
 
-Readers and AI agents skim, they do not read linearly. Make every page scannable:
+Readers and AI agents skim, they do not read linearly.
+Make every page scannable:
 
 - Write headings that carry meaning on their own. A reader who reads only the headings should still understand the page.
 - Lead with the point. Put the conclusion or the command in the first sentence of each section and paragraph.
@@ -62,7 +63,8 @@ These rules help AI agents retrieve and reason about the documentation as much a
 
 - Use the reader's search terms, not internal jargon. Write "duplicate item IDs", not "node collision".
 - Write short, descriptive link text that names the target. Prefer "see xref:reference/cli.adoc[the validate command]" over "see xref:reference/cli.adoc[here]".
-- Give every page a meaningful `:description:` attribute. It feeds page metadata and search results.
+- Give every page a meaningful `:description:` attribute. It becomes the HTML meta description for SEO and social previews.
+- Give every page a meaningful `:keywords:` attribute. The site's lunr search index indexes and boosts these terms.
 
 == Voice and tone
 
@@ -82,7 +84,8 @@ These rules help AI agents retrieve and reason about the documentation as much a
 
 == Inclusive language
 
-Write for every reader. Two rules cover most cases:
+Write for every reader.
+Two rules cover most cases:
 
 *Bias-free communication.* Do not assume or stereotype the reader:
 
@@ -90,7 +93,8 @@ Write for every reader. Two rules cover most cases:
 - Avoid ableist terms. Prefer "surprising" over "crazy", "broken" over "lame", "unaware of" over "blind to", and "ignored" over "fell on deaf ears".
 - Refer to people by role, not by background, age, or ability.
 
-*Non-militaristic language.* Avoid war and violence metaphors. Name the action instead:
+*Non-militaristic language.* Avoid war and violence metaphors.
+Name the action instead:
 
 [width=100%, cols="50,50"]
 |===
