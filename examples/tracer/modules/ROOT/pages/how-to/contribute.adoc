@@ -84,6 +84,10 @@ The index generator (`scripts/generate-blog-index.js`) scans `blog/modules/ROOT/
 - No default exports (named exports only)
 - Biome for linting and formatting
 
+== Documentation style
+
+Documentation follows the xref:reference/documentation-style-guide.adoc[Documentation Style Guide] — Diátaxis structure, one sentence per line, EARS requirements, and the voice rules there.
+
 == Commit conventions
 
 This project follows https://www.conventionalcommits.org/[Conventional Commits]:

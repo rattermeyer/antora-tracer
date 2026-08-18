@@ -1,0 +1,98 @@
+= Documentation Style Guide
+:description: Conventions for writing this project's documentation — structure, AsciiDoc mechanics, voice, and requirements style
+:keywords: antora, asciidoc, style guide, diataxis, documentation, ears
+:toc: macro
+
+toc::[]
+
+This guide is the distilled, project-specific subset of the rules that matter here.
+For general English, grammar, and voice questions, defer to the https://learn.microsoft.com/en-us/style-guide/welcome/[Microsoft Style Guide], then https://developers.google.com/style[Google's developer documentation style guide].
+Do not duplicate their guidance in these pages.
+
+== Structure: Diátaxis
+
+Every page belongs to exactly one of four modes:
+
+[width=100%, cols="18,32,50"]
+|===
+| Mode | Reader asks | Example
+| Tutorial | "Can you teach me to…?" | tutorial/getting-started.adoc
+| How-to | "How do I…?" | how-to/write-traceable-items.adoc
+| Reference | "What does X do?" | reference/cli.adoc
+| Explanation | "Why does it work that way?" | explanation/architecture.adoc
+|===
+
+Rules:
+
+- One page = one mode. Never mix a how-to step with reference listing or explanation in the same page.
+- Tutorial pages do not link out to Reference or Explanation. They are a guided path.
+- How-to, Reference, and Explanation pages cross-reference each other freely.
+- The Self-Traceability section is not user-facing documentation. It is the extension applied to its own development artifacts.
+
+== AsciiDoc mechanics
+
+- One sentence per line. See the https://docs.asciidoctor.org/asciidoc/latest/recommended-practices/#one-sentence-per-line[AsciiDoc recommended practices]. This keeps diffs line-level and review easier.
+- Use `[source,<lang>]` blocks for code, commands, and file contents.
+- Use tables for option and reference listings.
+- Use `xref:` for links between pages and `link:` for external URLs.
+- Wrap identifiers, commands, options, file paths, and attribute names in backticks.
+
+== Titles and headings
+
+- How-to pages use the `How to <verb> <object>` format, such as `How to Write Traceable Items`.
+- Reference pages use a noun phrase, such as `Item Macro`.
+- Explanation pages name the concept, such as `The Traceability Model`.
+- Use sentence case for headings.
+
+== Voice and tone
+
+- Use second person and imperative for tasks: "Run `validate`", not "The user should run `validate`".
+- Prefer active voice and present tense.
+- Prefer short sentences and plain words.
+- Avoid "please", "just", "simply", "obviously", and "easily".
+- Write behavior in the present tense: "The build fails", not "The build will fail".
+
+== Requirements style
+
+Requirements written as `[item]` blocks follow the EARS patterns:
+
+[width=100%, cols="22,78"]
+|===
+| Pattern | Shape
+| Ubiquitous | The system SHALL <verb> <object>.
+| Event-driven | WHEN <trigger>, the system SHALL <verb> <object>.
+| State-driven | WHILE <state>, the system SHALL <verb> <object>.
+| Unwanted behaviour | IF <condition>, THEN the system SHALL <verb> <object>.
+| Optional | WHERE <feature>, the system SHALL <verb> <object>.
+|===
+
+A requirement states what the system must do, never how:
+
+[source,asciidoc]
+----
+[#REQ-001, item, role=requirement, title="Fail on duplicate IDs"]
+====
+The build SHALL fail when two items define the same ID.
+====
+----
+
+Each requirement must be testable, atomic, and unambiguous.
+See the `requirements-writing` skill for a full checklist.
+
+== Commit messages
+
+Commits follow https://www.conventionalcommits.org/[Conventional Commits]:
+
+[source]
+----
+<type>(<scope>): <description>
+----
+
+Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `ci`, `perf`.
+
+== Further reading
+
+- https://learn.microsoft.com/en-us/style-guide/welcome/[Microsoft Style Guide] — terminology, accessibility, and grammar
+- https://developers.google.com/style[Google developer documentation style guide] — voice, tone, and formatting
+- https://github.com/StyleGuides/WritingStyleGuide[StyleGuides/WritingStyleGuide] — concise cross-company rules
+- https://diataxis.fr/[Diátaxis] — the four documentation modes
