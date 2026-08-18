@@ -26,7 +26,7 @@ Four presets ship with the extension:
 | Medical device software compliant with IEC 62304, with risk and hazard tracking
 
 | `minimal`
-| Getting started and prototypes — just requirements and tests
+| Getting started and prototypes — only requirements and tests
 |===
 
 For full details on each preset's roles, relations, and matrices, see xref:reference/presets.adoc[Presets Reference].

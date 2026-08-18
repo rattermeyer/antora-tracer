@@ -1,0 +1,5 @@
+extends: existence
+message: "Avoid the filler word '%s'."
+level: suggestion
+tokens:
+  - '\bvery\b'

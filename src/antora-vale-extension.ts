@@ -47,11 +47,6 @@ const LEVEL_RANK: Record<ValeLevel, number> = {
   error: 2,
 };
 
-const DEFAULT_CONFIG: Required<AntoraValeConfig> = {
-  valeConfig: "",
-  minLevel: "warning",
-};
-
 function normalizeLevel(value: unknown): ValeLevel {
   return value === "error" || value === "suggestion" || value === "warning"
     ? value
@@ -68,11 +63,14 @@ export class AntoraValeExtension {
   ) {
     this.logger = context.getLogger("antora-vale-extension");
     // Antora normalizes YAML extension config keys to lowercase, so accept
-    // both camelCase and lowercase spellings.
-    const raw = { ...DEFAULT_CONFIG, ...config } as Record<string, unknown>;
+    // both camelCase and lowercase spellings. Read from the raw config (not
+    // merged with defaults) so `??` falls through on absent keys.
+    const raw = config as Record<string, unknown>;
     this.config = {
-      valeConfig: String(raw.valeConfig ?? raw.valeconfig ?? raw.vale_config ?? ""),
-      minLevel: normalizeLevel(raw.minLevel ?? raw.minlevel),
+      valeConfig: String(
+        raw.valeConfig ?? raw.valeconfig ?? raw.vale_config ?? "",
+      ),
+      minLevel: normalizeLevel(raw.minLevel ?? raw.minlevel ?? "warning"),
     };
     context.on("contentClassified", (event) => this.onContentClassified(event));
   }
@@ -122,7 +120,7 @@ export class AntoraValeExtension {
   }
 
   private lintContent(contents: Buffer, sourcePath: string): ValeFinding[] {
-    const args = ["--output=JSON", "--no-wrap", "--no-exit"];
+    const args = ["--output=JSON", "--no-wrap", "--no-exit", "--minAlertLevel=suggestion"];
     const valeConfig = this.resolveValeConfig();
     if (valeConfig) args.push("--config", valeConfig);
     args.push("--path", sourcePath);
@@ -132,7 +130,6 @@ export class AntoraValeExtension {
       stdout = execFileSync("vale", args, {
         input: contents.toString("utf8"),
         encoding: "utf8",
-        stdio: ["ignore", "pipe", "pipe"],
       });
     } catch (error) {
       const stderr = (error as any)?.stderr?.toString() || "";

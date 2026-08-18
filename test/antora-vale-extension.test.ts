@@ -225,4 +225,26 @@ describe("AntoraValeExtension", () => {
       cleanup();
     }
   });
+
+  it("reads lowercase config keys from Antora normalization", () => {
+    const cleanup = installFakeBinaries();
+    try {
+      process.env.FAKE_VALE_SEVERITY = "suggestion";
+      const ctx = createMockContext();
+      // Antora lowercases YAML keys, so the playbook's minLevel arrives as
+      // minlevel. The extension must still honor it.
+      new AntoraValeExtension(ctx as any, {
+        minlevel: "suggestion",
+        valeconfig: ".vale.ini",
+      } as any);
+      expect(() =>
+        ctx.fire(
+          "contentClassified",
+          createEvent(["modules/ROOT/pages/index.adoc"], []),
+        ),
+      ).to.throw(/level 'suggestion'/);
+    } finally {
+      cleanup();
+    }
+  });
 });

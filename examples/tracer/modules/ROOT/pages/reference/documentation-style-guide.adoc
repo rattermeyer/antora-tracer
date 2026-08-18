@@ -71,7 +71,11 @@ These rules help AI agents retrieve and reason about the documentation as much a
 - Use second person and imperative for tasks: "Run `validate`", not "The user should run `validate`".
 - Prefer active voice and present tense.
 - Prefer short sentences and plain words.
+
+pass:[<!-- vale off -->]
 - Avoid "please", "just", "simply", "obviously", and "easily".
+pass:[<!-- vale on -->]
+
 - Write behavior in the present tense: "The build fails", not "The build will fail".
 
 *Tone.*
@@ -90,12 +94,17 @@ Two rules cover most cases:
 *Bias-free communication.* Do not assume or stereotype the reader:
 
 - Use "they" as the singular pronoun, and prefer "staffed", "chairperson", and "humankind" over gendered terms.
+
+pass:[<!-- vale off -->]
 - Avoid ableist terms. Prefer "surprising" over "crazy", "broken" over "lame", "unaware of" over "blind to", and "ignored" over "fell on deaf ears".
+pass:[<!-- vale on -->]
+
 - Refer to people by role, not by background, age, or ability.
 
 *Non-militaristic language.* Avoid war and violence metaphors.
 Name the action instead:
 
+pass:[<!-- vale off -->]
 [width=100%, cols="50,50"]
 |===
 | Instead of | Use
@@ -105,6 +114,7 @@ Name the action instead:
 | attack the problem | solve the problem
 | blitz through | complete quickly
 |===
+pass:[<!-- vale on -->]
 
 Keep established technical terms as-is when they are the standard name of a concept, but do not coin new militaristic terms.
 In new text, prefer inclusive alternatives such as "allowlist/denylist" and "primary/replica".

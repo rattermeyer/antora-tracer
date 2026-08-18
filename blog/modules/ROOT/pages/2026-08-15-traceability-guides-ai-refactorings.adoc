@@ -2,7 +2,7 @@
 :page-date: 2026-08-15
 :page-tags: traceability, ai, refactoring, cleanup, spec-driven-development
 :page-author: Richard Attermeyer
-:description: What happened when I asked an AI agent to remove a legacy requirement from antora-tracer, and how the traceability graph — not just grep — told it what to delete.
+:description: What happened when I asked an AI agent to remove a legacy requirement from antora-tracer, and how the traceability graph — not only grep — told it what to delete.
 
 A few days ago I asked the AI agent I use for coding a simple question about *antora-tracer*:
 
@@ -92,7 +92,7 @@ That is a graph traversal, and it is a better starting point for a refactor than
 
 I have been building the xref:tracer:ROOT:self-traceability/test-plan.adoc[self-traceability example] for a while now, partly as documentation and partly as a test.
 This experiment gave me a concrete reason to keep doing it.
-The traceability is not just for auditors.
+The traceability is not only for auditors.
 It is the map an AI — or a future contributor — needs to make a change without breaking the parts I forgot about.
 
 == Still open

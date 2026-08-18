@@ -39,7 +39,7 @@ CJS is in maintenance mode; ESM is where the ecosystem is heading.
 
 === Negative Consequences
 
-* Antora loads extensions via `require()` which expects CJS. Every ESM `.js` file that Antora's extension loader touches needs a `.cjs` wrapper — not just third-party packages. This is the primary integration friction: the project's own extension entry point must be wrapped.
+* Antora loads extensions via `require()` which expects CJS. Every ESM `.js` file that Antora's extension loader touches needs a `.cjs` wrapper — not only third-party packages. This is the primary integration friction: the project's own extension entry point must be wrapped.
 * Third-party CJS packages (`@antora/pdf-extension`) require additional `.cjs` wrappers, compounding the issue.
 * `__dirname` and `require` not available without workarounds in ESM modules.
 * Stricter module resolution can surface edge cases in test runners (e.g., Mocha + ESM needed `tsx` workaround).

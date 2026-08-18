@@ -54,10 +54,10 @@ This was a small side project I was working on using Antora.
 // Core insight you borrowed: the item macro? the role system?
 Then a colleague made the jump: What if we could get rid of Polarion completely?
 But this would require supporting traceability in the documents.
-A part of our software was already using Sphinx to provide richer documentation than simply using Doxygen.
+A part of our software was already using Sphinx to provide richer documentation than using Doxygen.
 That was the starting point.
 He soon discovered that https://sphinx-needs.readthedocs.io/en/stable/[Sphinx Needs] supports traceability.
-He showed the proof-of-concept just before I went on vacation.
+He showed the proof-of-concept before I went on vacation.
 I am fine with any text-based tool, but I still prefer AsciiDoc for technical documentation more than reStructuredText or Markdown.
 
 == Spec-Driven Development Meets AI
@@ -89,7 +89,7 @@ Normally, you would not get requirements on that level.
 
 I found the workflow quite good.
 The only issue is, when you had applied the proposal, and you did some manual testing and detected some errors, it turned quickly into vibe coding.
-You had to remind the LLM to write a spec or proposal for what just had been changed.
+You had to remind the LLM to write a spec or proposal for what had been changed.
 A few times, I asked the LLM to take the role of a senior developer and review the code base and make some improvements.
 
 == What's the difference:

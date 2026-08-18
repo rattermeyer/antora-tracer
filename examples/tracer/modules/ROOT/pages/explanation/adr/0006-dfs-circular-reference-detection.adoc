@@ -22,7 +22,7 @@ The detection must find all cycles and report them with human-readable paths.
 == Considered Options
 
 * DFS with visited/recursion-stack tracking — tracks current exploration path
-* BFS-based cycle detection — cannot easily report cycle paths
+* BFS-based cycle detection — cannot readily report cycle paths
 * Union-Find — only detects connectivity, not directed cycles
 * Tarjan's strongly connected components — overkill, harder to produce user-friendly errors
 

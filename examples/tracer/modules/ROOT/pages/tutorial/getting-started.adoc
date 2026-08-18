@@ -140,7 +140,7 @@ verifies:REQ-001[]
 ====
 ----
 
-Here's what you just wrote:
+Here's what you wrote:
 
 - `REQ-001` — a requirement item. The `[#REQ-001, item, role=requirement]` block macro tells the extension this is a traceable item of role `requirement`.
 - `IMP-001` — an implementation. It declares `satisfies:REQ-001[]` — a relationship pointing from this implementation to the requirement it satisfies.

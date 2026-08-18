@@ -1,14 +1,12 @@
 extends: existence
 message: "Avoid the filler word '%s'."
 level: warning
-nonword: true
 tokens:
-  - 'please'
-  - 'just'
-  - 'simply'
-  - 'obviously'
-  - 'easily'
-  - 'very'
-  - 'really'
-  - 'basically'
-  - 'actually'
+  - '\bplease\b'
+  - '\bjust\b'
+  - '\bsimply\b'
+  - '\bobviously\b'
+  - '\beasily\b'
+  - '\breally\b'
+  - '\bbasically\b'
+  - '\bactually\b'

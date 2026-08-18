@@ -40,7 +40,7 @@ No database to install, configure, or migrate.
 === Negative Consequences
 
 * No persistence between builds — graph is rebuilt from source each time
-* Memory-bound for very large projects (practically, 10k+ items may be problematic)
+* Memory-bound for large projects (practically, 10k+ items may be problematic)
 * No concurrent access or shared state across processes
 
 == Pros and Cons of the Options
