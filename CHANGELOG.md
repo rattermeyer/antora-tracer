@@ -2,6 +2,15 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.18.0] — 2026-08-18
+
+### Added
+- `allowDuplicateIds` extension config option to opt out of the duplicate-ID build failure (default: fail)
+
+### Changed
+- The Antora build now fails when two items define the same ID, instead of silently keeping the first definition and dropping the second
+- `validate()` and the `validate` CLI command report duplicate item IDs as errors rather than warnings, so `validate` exits non-zero when duplicates exist
+
 ## [0.17.1] — 2026-08-16
 
 ### Fixed
