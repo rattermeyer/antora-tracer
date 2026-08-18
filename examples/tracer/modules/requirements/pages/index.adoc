@@ -877,6 +877,82 @@ Source: openspec/specs/docx-output/spec.md
 traceability:links[]
 --
 
+=== Vale Prose Linting
+
+[#REQ-151, item, role=requirement, title="Vale lints page and partial source content during the build"]
+--
+The system SHALL run Vale against the source AsciiDoc content of every page and partial file in the content catalog when the extension is enabled.
+
+Source: openspec/specs/vale-build-integration/spec.md
+
+traceability:links[]
+--
+
+[#REQ-152, item, role=requirement, title="The build gates on a configurable minimum severity"]
+--
+The system SHALL fail the build when Vale reports a finding at or above the configured minimum severity, and SHALL log findings below that severity without failing.
+
+Source: openspec/specs/vale-build-integration/spec.md
+
+traceability:links[]
+--
+
+[#REQ-153, item, role=requirement, title="The extension reports the Vale configuration source"]
+--
+The system SHALL load Vale's configuration from the path supplied in the playbook configuration, so users control which styles and rules apply.
+
+Source: openspec/specs/vale-build-integration/spec.md
+
+traceability:links[]
+--
+
+[#REQ-154, item, role=requirement, title="Missing executables fail with an actionable message"]
+--
+When the extension is enabled, if the `vale` or `asciidoctor` executable is unavailable, the system SHALL fail the build with a message naming the missing executable.
+
+Source: openspec/specs/vale-build-integration/spec.md
+
+traceability:links[]
+--
+
+[#REQ-155, item, role=requirement, title="The extension is opt-in"]
+--
+The system SHALL NOT run Vale unless the extension is explicitly registered in the playbook, so existing builds are unaffected.
+
+Source: openspec/specs/vale-build-integration/spec.md
+
+traceability:links[]
+--
+
+[#REQ-156, item, role=requirement, title="Source layout is out of scope"]
+--
+The system SHALL NOT enforce source line layout such as one sentence per line; that concern belongs to the source-layout checker.
+
+Source: openspec/specs/vale-build-integration/spec.md
+
+traceability:links[]
+--
+
+=== Documentation Style Rules
+
+[#REQ-157, item, role=requirement, title="Reusable Vale rules encode the style guide"]
+--
+The system SHALL provide a set of Vale rule files that encode the machine-checkable parts of the documentation style guide, including filler-word avoidance, inclusive language, non-militaristic language, and the instead-of/use substitutions.
+
+Source: openspec/specs/documentation-style-rules/spec.md
+
+traceability:links[]
+--
+
+[#REQ-158, item, role=requirement, title="Rules are packaged with the extension"]
+--
+The system SHALL ship the rule files and a sample configuration with the npm package, while remaining optional for users.
+
+Source: openspec/specs/documentation-style-rules/spec.md
+
+traceability:links[]
+--
+
 === CI and Deployment
 
 [#REQ-060, item, role=requirement, title="Pages workflow generates PDFs"]

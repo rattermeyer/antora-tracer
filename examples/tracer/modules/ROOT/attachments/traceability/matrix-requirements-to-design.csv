@@ -62,6 +62,7 @@ REQ-138,REQ-138 — query impact — find all items connected to a given ID,
 REQ-139,REQ-139 — query orphaned — find items with no relationships,
 REQ-140,REQ-140 — query path — find the shortest path between two items,
 REQ-141,REQ-141 — JSON output flag,
+REQ-150,REQ-150 — CLI exposes a validate command,
 REQ-079,REQ-079 — Non-heading elements with IDs are indexed as navigable anchors,ARC-032: ARC-032 — Lunr search extension customization for item anchor indexing
 REQ-080,REQ-080 — Item title is extracted from `.title` child element,ARC-032: ARC-032 — Lunr search extension customization for item anchor indexing
 REQ-081,REQ-081 — Heading elements are excluded from item indexing,ARC-032: ARC-032 — Lunr search extension customization for item anchor indexing
@@ -82,6 +83,14 @@ REQ-097,REQ-097 — Assembler profiles produce separate PDFs per document,ARC-03
 REQ-098,REQ-098 — Custom nav files select single documents,ARC-030: ARC-030 — CI/CD PDF build and deployment pipeline
 REQ-099,REQ-099 — Single-PDF output is preserved,ARC-030: ARC-030 — CI/CD PDF build and deployment pipeline
 REQ-135,REQ-135 — DOCX output format is documented,
+REQ-151,REQ-151 — Vale lints page and partial source content during the build,ARC-034: ARC-034 — Vale prose-lint extension
+REQ-152,REQ-152 — The build gates on a configurable minimum severity,ARC-034: ARC-034 — Vale prose-lint extension
+REQ-153,REQ-153 — The extension reports the Vale configuration source,ARC-034: ARC-034 — Vale prose-lint extension
+REQ-154,REQ-154 — Missing executables fail with an actionable message,ARC-034: ARC-034 — Vale prose-lint extension
+REQ-155,REQ-155 — The extension is opt-in,ARC-034: ARC-034 — Vale prose-lint extension
+REQ-156,REQ-156 — Source layout is out of scope,ARC-034: ARC-034 — Vale prose-lint extension
+REQ-157,REQ-157 — Reusable Vale rules encode the style guide,ARC-034: ARC-034 — Vale prose-lint extension
+REQ-158,REQ-158 — Rules are packaged with the extension,ARC-034: ARC-034 — Vale prose-lint extension
 REQ-060,REQ-060 — Pages workflow generates PDFs,ARC-030: ARC-030 — CI/CD PDF build and deployment pipeline
 REQ-061,REQ-061 — Site links to PDF downloads,ARC-030: ARC-030 — CI/CD PDF build and deployment pipeline
 REQ-062,REQ-062 — Local PDF workflow is unchanged,ARC-030: ARC-030 — CI/CD PDF build and deployment pipeline
@@ -106,5 +115,5 @@ REQ-122,REQ-122 — Process-to-product matrix exists,
 REQ-114,REQ-114 — Dead design-matrix template is removed,
 REQ-115,REQ-115 — Dead MatrixGenerator methods are removed,
 
-Total 106 rows
-Coverage: 68.9%
+Total 115 rows
+Coverage: 70.4%

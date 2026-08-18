@@ -62,6 +62,7 @@ REQ-138,REQ-138 — query impact — find all items connected to a given ID,TST-
 REQ-139,REQ-139 — query orphaned — find items with no relationships,TST-009: TST-009 — Query Command Tests
 REQ-140,REQ-140 — query path — find the shortest path between two items,TST-009: TST-009 — Query Command Tests
 REQ-141,REQ-141 — JSON output flag,TST-009: TST-009 — Query Command Tests
+REQ-150,REQ-150 — CLI exposes a validate command,
 REQ-079,REQ-079 — Non-heading elements with IDs are indexed as navigable anchors,
 REQ-080,REQ-080 — Item title is extracted from `.title` child element,
 REQ-081,REQ-081 — Heading elements are excluded from item indexing,
@@ -82,6 +83,14 @@ REQ-097,REQ-097 — Assembler profiles produce separate PDFs per document,
 REQ-098,REQ-098 — Custom nav files select single documents,
 REQ-099,REQ-099 — Single-PDF output is preserved,
 REQ-135,REQ-135 — DOCX output format is documented,
+REQ-151,REQ-151 — Vale lints page and partial source content during the build,TST-010: TST-010 — Vale Extension Tests
+REQ-152,REQ-152 — The build gates on a configurable minimum severity,TST-010: TST-010 — Vale Extension Tests
+REQ-153,REQ-153 — The extension reports the Vale configuration source,
+REQ-154,REQ-154 — Missing executables fail with an actionable message,TST-010: TST-010 — Vale Extension Tests
+REQ-155,REQ-155 — The extension is opt-in,TST-010: TST-010 — Vale Extension Tests
+REQ-156,REQ-156 — Source layout is out of scope,TST-010: TST-010 — Vale Extension Tests
+REQ-157,REQ-157 — Reusable Vale rules encode the style guide,
+REQ-158,REQ-158 — Rules are packaged with the extension,
 REQ-060,REQ-060 — Pages workflow generates PDFs,
 REQ-061,REQ-061 — Site links to PDF downloads,
 REQ-062,REQ-062 — Local PDF workflow is unchanged,
@@ -106,5 +115,5 @@ REQ-122,REQ-122 — Process-to-product matrix exists,
 REQ-114,REQ-114 — Dead design-matrix template is removed,
 REQ-115,REQ-115 — Dead MatrixGenerator methods are removed,
 
-Total 106 rows
-Coverage: 58.5%
+Total 115 rows
+Coverage: 58.3%

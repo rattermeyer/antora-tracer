@@ -177,6 +177,21 @@ verifies:REQ-141[]
 traceability:links[]
 --
 
+[#TST-010, item, role=test, title="Vale Extension Tests"]
+--
+Test file: `test/antora-vale-extension.test.ts`
+
+Tests the bundled Vale prose-lint extension with fake `vale` and `asciidoctor` executables on PATH — page and partial findings with source path and line, severity gating (at-or-above fails the build, below is logged), opt-in behavior with no `.adoc` files, missing-executable failure messages, and that a multi-sentence source line produces no Vale finding.
+
+verifies:REQ-151[]
+verifies:REQ-152[]
+verifies:REQ-154[]
+verifies:REQ-155[]
+verifies:REQ-156[]
+
+traceability:links[]
+--
+
 ifdef::ssembler-backend-pdf[]
 == Changelog
 [cols="1,2,2,3"]

@@ -554,6 +554,25 @@ addresses:REQ-107[]
 traceability:links[]
 --
 
+[#ARC-034, item, role=design, title="Vale prose-lint extension"]
+--
+The bundled `antora-vale-extension` runs the Vale prose linter during `contentClassified`.
+It streams each page and partial buffer to `vale --path=<source>` via stdin and parses the JSON output, reporting findings with source file and line references.
+A configurable `minLevel` gates the build: findings at or above it fail the build, findings below are logged.
+The extension is opt-in and requires the `vale` and `asciidoctor` executables on PATH, failing with an actionable message when either is missing.
+A starter Vale style under `src/vale/` encodes the machine-checkable parts of the documentation style guide.
+
+addresses:REQ-151[]
+addresses:REQ-152[]
+addresses:REQ-153[]
+addresses:REQ-154[]
+addresses:REQ-155[]
+addresses:REQ-156[]
+addresses:REQ-157[]
+addresses:REQ-158[]
+traceability:links[]
+--
+
 == Runtime View
 
 [#ARC-003, item, role=design, title="Processing flow during Antora build"]
