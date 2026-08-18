@@ -49,5 +49,4 @@ The system SHALL apply graph population, macro expansion, and link substitution 
 
 #### Scenario: Duplicate item ID across a page and a partial
 - **WHEN** the same item ID appears in both a page file and a partial file
-- **THEN** the duplicate is reported as a warning
-- **AND** the first occurrence (page) takes precedence
+- **THEN** the build fails with an error naming both definitions

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Provide a `validate` command on the CLI that checks the traceability graph for errors — invalid relation types, orphaned relationships, and circular references — and reports them with actionable diagnostics, without requiring an Antora build.
+Provide a `validate` command on the CLI that checks the traceability graph for errors — invalid relation types, orphaned relationships, duplicate item IDs, and circular references — and reports them with actionable diagnostics, without requiring an Antora build.
 
 ## Requirements
 
@@ -28,4 +28,9 @@ No Antora build SHALL be required.
 #### Scenario: Circular reference is reported
 - **WHEN** the graph contains a cycle, including a self-referencing relationship
 - **THEN** the command reports the circular reference
+- **AND** exits with a non-zero code
+
+#### Scenario: Duplicate item ID is reported
+- **WHEN** the same item ID is defined more than once across the input files
+- **THEN** the command reports it as an error naming the duplicate ID and the file and line of both definitions
 - **AND** exits with a non-zero code

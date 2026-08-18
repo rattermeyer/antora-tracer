@@ -780,6 +780,19 @@ describe("RequirementsTraceabilityExtension - API Methods", () => {
       expect(validation.warnings).to.be.an("array").that.is.empty;
     });
 
+    it("should report duplicate item IDs as errors, not warnings", () => {
+      const extension = new RequirementsTraceabilityExtension();
+      extension.graph.addItem(createItem("REQ-001", "requirement"));
+      extension.graph.addItem(createItem("REQ-001", "requirement"));
+
+      const validation = extension.validate();
+      expect(validation.errors).to.have.length(1);
+      expect(validation.errors[0]).to.include("Duplicate item ID: REQ-001");
+      expect(
+        validation.warnings.filter((w) => w.type === "duplicate_node"),
+      ).to.be.empty;
+    });
+
     it("should detect orphaned relationships via validate()", () => {
       const extension = new RequirementsTraceabilityExtension();
       // Add items and a relationship where both endpoints exist

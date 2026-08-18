@@ -67,6 +67,11 @@ antora:
 | string
 | `https://kroki.io`
 | Base URL for Kroki image generation. Overridden by the `KROKI_SERVER_URL` environment variable
+
+| `allowDuplicateIds`
+| boolean
+| `false`
+| When `false` (default), the build fails if two items define the same ID. Set to `true` to log a warning and keep the first definition instead
 |===
 
 The `KROKI_SERVER_URL` environment variable overrides the `krokiServerUrl` option. When set, it is used as the Kroki server base URL instead of the configured value or the default `https://kroki.io`.

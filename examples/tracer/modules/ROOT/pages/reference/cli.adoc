@@ -83,7 +83,7 @@ npx antora-tracer matrix -t requirements-to-design -f csv -o matrix.csv
 
 == validate
 
-Validate the traceability graph for orphaned items, missing targets, invalid relations, and circular references.
+Validate the traceability graph for orphaned items, missing targets, invalid relations, duplicate item IDs, and circular references.
 
 [source,bash]
 ----

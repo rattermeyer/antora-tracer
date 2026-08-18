@@ -39,6 +39,7 @@ export interface AntoraTraceabilityConfig {
   configPath?: string;
   krokiImageFormat?: "svg" | "png";
   krokiServerUrl?: string;
+  allowDuplicateIds?: boolean;
 }
 
 const DEFAULT_CONFIG: Required<AntoraTraceabilityConfig> = {
@@ -51,6 +52,7 @@ const DEFAULT_CONFIG: Required<AntoraTraceabilityConfig> = {
   configPath: "",
   krokiImageFormat: "svg",
   krokiServerUrl: "",
+  allowDuplicateIds: false,
 };
 
 export interface AntoraExtensionContext {
@@ -108,6 +110,7 @@ export class AntoraTraceabilityExtension {
       preset: rc.preset || "requirements-engineering",
       krokiImageFormat: rc.krokiImageFormat || rc.krokiimageformat || "svg",
       krokiServerUrl: rc.krokiServerUrl || rc.krokiserverurl || "",
+      allowDuplicateIds: rc.allowDuplicateIds ?? rc.allowduplicateids ?? false,
     };
 
     // Fallback: if no configPath is set, try the example site config
@@ -952,6 +955,20 @@ export class AntoraTraceabilityExtension {
         }
         for (const file of partialFilesForVersion) {
           this.processAsciiDocFile(file, file.src?.fileUri);
+        }
+
+        // Duplicate item IDs are merge-time conflicts, not recoverable state.
+        // Fail the build so the collision surfaces instead of silently
+        // dropping one definition, unless the site opts out.
+        const duplicates = this.traceability?.graph.getDuplicateWarnings() ?? [];
+        if (duplicates.length > 0) {
+          const details = duplicates.map((d) => d.message).join("\n");
+          const summary = `Duplicate item IDs detected in component '${component}' version '${version}':\n${details}`;
+          if (this.config.allowDuplicateIds) {
+            this.logger.warn(summary);
+          } else {
+            throw new Error(summary);
+          }
         }
 
         // Expand macros on pages

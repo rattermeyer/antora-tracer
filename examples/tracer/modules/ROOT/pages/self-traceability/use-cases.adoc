@@ -92,7 +92,7 @@ traceability:links[]
 . The extension processes both the page and the partial — items from the partial are registered in the graph And matrix links point to the partial's source location in the repository
 | Alternate Flows |
 . *Requirements Engineer includes a partial that defines no items:* The partial is included normally in the page output but contributes nothing to the traceability graph.
-. *Requirements Engineer includes a partial in multiple pages:* The partial's items are registered only once. Subsequent inclusions generate a duplicate-ID warning.
+. *Requirements Engineer includes a partial in multiple pages:* The build fails with a duplicate-ID error naming both definitions.
 . *Requirements Engineer references a partial item with `xref:`:* Asciidoctor reports "target of xref not found" — partials do not produce HTML pages. Use inline relationship macros or `link:` URLs instead.
 | Postconditions | The traceability graph contains the items from the partial And matrix links point to the partial's source file in the repository And the page content is rendered with the partial included
 | Priority | Medium

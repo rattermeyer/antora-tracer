@@ -120,15 +120,17 @@ function createContentClassifiedEvent(
 ) {
   return {
     contentCatalog: {
-      findBy: ({ family: _family }: { family: string }) =>
-        files.map((f) => ({
-          src: {
-            path: f.path,
-            module: f.module,
-            component: f.component,
-          },
-          contents: Buffer.from(f.content),
-        })),
+      findBy: ({ family }: { family: string }) =>
+        family === "page"
+          ? files.map((f) => ({
+              src: {
+                path: f.path,
+                module: f.module,
+                component: f.component,
+              },
+              contents: Buffer.from(f.content),
+            }))
+          : [],
     },
   };
 }
@@ -404,7 +406,8 @@ satisfies:REQ-002[]
 
       ctx.fireEvent("contentClassified", {
         contentCatalog: {
-          findBy: () => [{ src: { path: "empty.adoc" } }],
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [{ src: { path: "empty.adoc" } }] : [],
         },
       });
 
@@ -755,16 +758,19 @@ traceability:outgoing[]
       // Fire with a catalog that returns a file whose toString throws
       ctx.fireEvent("contentClassified", {
         contentCatalog: {
-          findBy: () => [
-            {
-              src: { path: "broken.adoc" },
-              contents: {
-                toString: () => {
-                  throw new Error("Simulated parse error");
-                },
-              },
-            },
-          ],
+          findBy: ({ family }: { family: string }) =>
+            family === "page"
+              ? [
+                  {
+                    src: { path: "broken.adoc" },
+                    contents: {
+                      toString: () => {
+                        throw new Error("Simulated parse error");
+                      },
+                    },
+                  },
+                ]
+              : [],
         },
       });
 
@@ -1147,7 +1153,7 @@ contains:REQ-001[]
         contents: Buffer.from(content),
       };
       ctx.fireEvent("contentClassified", {
-        contentCatalog: { findBy: () => [file] },
+        contentCatalog: { findBy: ({ family }: { family: string }) => (family === "page" ? [file] : []) },
       });
 
       expect(file.contents.toString("utf8")).to.include("Contained-in");
@@ -1180,7 +1186,7 @@ depends:REQ-001[]
         contents: Buffer.from(content),
       };
       ctx.fireEvent("contentClassified", {
-        contentCatalog: { findBy: () => [file] },
+        contentCatalog: { findBy: ({ family }: { family: string }) => (family === "page" ? [file] : []) },
       });
 
       expect(file.contents.toString("utf8")).to.include("Depended-by");
@@ -1213,7 +1219,7 @@ foobar:REQ-001[]
         contents: Buffer.from(content),
       };
       ctx.fireEvent("contentClassified", {
-        contentCatalog: { findBy: () => [file] },
+        contentCatalog: { findBy: ({ family }: { family: string }) => (family === "page" ? [file] : []) },
       });
 
       expect(file.contents.toString("utf8")).to.include("Foobar");
@@ -1482,7 +1488,7 @@ Description.
         contents: Buffer.from(content),
       };
       ctx.fireEvent("contentClassified", {
-        contentCatalog: { findBy: () => [file] },
+        contentCatalog: { findBy: ({ family }: { family: string }) => (family === "page" ? [file] : []) },
       });
       return file.contents.toString("utf8");
     }
@@ -1773,7 +1779,7 @@ Description.
 
       const file = { src: { path: "test.adoc" }, contents: Buffer.from(content) };
       ctx.fireEvent("contentClassified", {
-        contentCatalog: { findBy: () => [file] },
+        contentCatalog: { findBy: ({ family }: { family: string }) => (family === "page" ? [file] : []) },
       });
 
       const output = file.contents.toString("utf8");
@@ -1806,7 +1812,7 @@ Description.
 
       const file = { src: { path: "test.adoc" }, contents: Buffer.from(content) };
       ctx.fireEvent("contentClassified", {
-        contentCatalog: { findBy: () => [file] },
+        contentCatalog: { findBy: ({ family }: { family: string }) => (family === "page" ? [file] : []) },
       });
 
       const output = file.contents.toString("utf8");
@@ -1840,7 +1846,7 @@ Description.
       try {
         const file = { src: { path: "test.adoc" }, contents: Buffer.from(content) };
         ctx.fireEvent("contentClassified", {
-          contentCatalog: { findBy: () => [file] },
+          contentCatalog: { findBy: ({ family }: { family: string }) => (family === "page" ? [file] : []) },
         });
         const output = file.contents.toString("utf8");
         expect(output).to.include("image::http://env-server:9999/graphviz/");
@@ -1877,7 +1883,7 @@ Description.
       try {
         const file = { src: { path: "test.adoc" }, contents: Buffer.from(content) };
         ctx.fireEvent("contentClassified", {
-          contentCatalog: { findBy: () => [file] },
+          contentCatalog: { findBy: ({ family }: { family: string }) => (family === "page" ? [file] : []) },
         });
         const output = file.contents.toString("utf8");
         expect(output).to.include("image::http://env-server:9999/graphviz/");
@@ -1913,7 +1919,7 @@ Description.
 
       const file = { src: { path: "test.adoc" }, contents: Buffer.from(content) };
       ctx.fireEvent("contentClassified", {
-        contentCatalog: { findBy: () => [file] },
+        contentCatalog: { findBy: ({ family }: { family: string }) => (family === "page" ? [file] : []) },
       });
 
       const output = file.contents.toString("utf8");
@@ -2017,6 +2023,76 @@ The system shall authenticate users.
   // ========================================================================
   // Cross-Module Xref Generation
   // ========================================================================
+
+  describe("Duplicate item ID detection", () => {
+    it("should fail the build when two files define the same item ID", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const fileA = `[#REQ-001, item, role=requirement, title="Auth"]
+====
+The system shall authenticate users.
+====
+`;
+      const fileB = `[#REQ-001, item, role=requirement, title="Audit"]
+====
+The system shall log authentication events.
+====
+`;
+
+      expect(() =>
+        ctx.fireEvent(
+          "contentClassified",
+          createContentClassifiedEvent([
+            { path: "modules/ROOT/pages/a.adoc", content: fileA, component: "tracer" },
+            { path: "modules/ROOT/pages/b.adoc", content: fileB, component: "tracer" },
+          ]),
+        ),
+      ).to.throw(/Duplicate item IDs detected/);
+    });
+
+    it("should not fail the build when allowDuplicateIds is enabled", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any, {
+        config: { allowDuplicateIds: true },
+      });
+      await waitForInit();
+
+      const fileA = `[#REQ-001, item, role=requirement, title="Auth"]
+====
+The system shall authenticate users.
+====
+`;
+      const fileB = `[#REQ-001, item, role=requirement, title="Audit"]
+====
+The system shall log authentication events.
+====
+`;
+
+      expect(() =>
+        ctx.fireEvent(
+          "contentClassified",
+          createContentClassifiedEvent([
+            { path: "modules/ROOT/pages/a.adoc", content: fileA, component: "tracer" },
+            { path: "modules/ROOT/pages/b.adoc", content: fileB, component: "tracer" },
+          ]),
+        ),
+      ).to.not.throw();
+
+      expect(
+        ctx.logs.some(
+          (l) =>
+            l.level === "warn" &&
+            l.message.includes("Duplicate item IDs detected"),
+        ),
+      ).to.be.true;
+    });
+  });
 
   describe("Cross-Module Xrefs", () => {
     it("should generate cross-module xref with module prefix", async () => {

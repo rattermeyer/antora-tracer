@@ -1,0 +1,145 @@
+= How to Detect and Resolve Duplicate Item IDs at Merge Time
+:description: Catch duplicate item IDs introduced by parallel work on a git repository and fix them before they ship
+:keywords: antora, asciidoc, traceability, duplicate ids, ci, git, merge
+:toc: macro
+
+toc::[]
+
+When two people work on the same git repository in parallel, both can pick the same next ID for a new item.
+Both run `next-id` against the same starting point and both receive `REQ-005`.
+The two branches merge cleanly because git merges text, not semantics.
+The combined tree then contains two items with the same ID.
+
+A duplicate ID is data loss.
+The graph keeps the first definition it encounters and drops the second.
+One person's item — and its relationships — never reaches the matrices or the Neo4j export.
+
+This guide shows how to detect the collision at merge time and fix it before it ships.
+
+== Understand when IDs collide
+
+An item ID must be unique within an Antora component version.
+
+Two items collide when both define the same ID, even in different files:
+
+[source,asciidoc]
+----
+// requirements/security.adoc (branch A)
+[#REQ-005, item, role=requirement, title="Rate limiting"]
+====
+The system shall limit requests per client.
+====
+
+// requirements/audit.adoc (branch B)
+[#REQ-005, item, role=requirement, title="Audit logging"]
+====
+The system shall log all authentication events.
+====
+----
+
+The `validate` command reports the collision as an error naming both locations:
+
+[source,bash]
+----
+npx antora-tracer validate -i docs/
+----
+
+Because duplicate IDs are reported as errors, `validate` exits with a non-zero code.
+
+== Detect collisions in CI
+
+Run `validate` on every pull request and merge.
+Git merges the text of both branches, and the merged tree is where the collision becomes visible.
+Validating the merged tree turns a silent conflict into a failed check.
+
+Add a step to your GitHub Actions workflow:
+
+[source,yaml]
+----
+name: Traceability
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - name: Validate item IDs
+        run: npx antora-tracer validate -i docs/ --preset requirements-engineering
+----
+
+Replace `docs/` with the directory that holds your `.adoc` sources and `requirements-engineering` with your preset (or `--config traceability.yml`).
+
+The check fails on duplicate IDs with the same non-zero exit code as any other validation error.
+
+== When the CLI is not enough
+
+The `validate` command reads `.adoc` files from the directory you pass with `-i`.
+It does not read your Antora playbook and does not resolve its content sources.
+
+If every traceable item lives in one repository, the CI step above is sufficient.
+
+If your playbook aggregates content from multiple repositories, a single `-i docs/` only sees one checkout.
+Cross-repository duplicate IDs are only visible after Antora merges every content source into its content catalog.
+For that case, run a full Antora build on the merged tree:
+
+[source,bash]
+----
+npx antora antora-playbook.yml
+----
+
+The build fails on duplicate IDs.
+The extension aborts with an error naming both definitions, so the build itself is the gate for distributed content.
+If you must defer the fix, set `allowDuplicateIds: true` to log a warning instead — see xref:reference/configuration.adoc[Configuration].
+
+== Resolve a collision
+
+When CI flags a duplicate, resolve it on the merged branch before the change ships.
+
+. Decide which item keeps the ID and which one gets a new one.
+. On the item that changes, assign a fresh ID with `next-id`:
++
+[source,bash]
+----
+npx antora-tracer next-id --prefix REQ -i docs/
+# → REQ-006
+----
+. Update the `[#...]` attribute on the renamed item block.
+. Find every reference to the old ID:
++
+[source,bash]
+----
+npx antora-tracer query reverse REQ-005 -i docs/
+----
+. Update those references — inline macros such as `satisfies:REQ-005[]` and any `xref:...#REQ-005[...]` links — to the new ID.
+. Re-run `validate` to confirm the error is gone:
++
+[source,bash]
+----
+npx antora-tracer validate -i docs/
+----
+
+If you rename the dropped item, its references may already be attached to the surviving item.
+Inspect the item bodies to confirm which references belong where before re-pointing them.
+
+== Reduce collisions before they happen
+
+Duplicate IDs cannot be fully prevented with sequential IDs under parallel work.
+`next-id` reads the tree as it is now, and two branches read the same tree.
+
+Two cheap mitigations shrink the collision surface:
+
+- Use a namespace prefix per area or module, such as `AUTH-REQ-001` versus `API-REQ-001`, so parallel work does not share a numeric sequence.
+- Rename IDs as soon as a branch is opened, not at the end, so conflicts surface early in small diffs.
+
+== Related
+
+- xref:reference/cli.adoc[CLI Reference] — validate, next-id, and query commands
+- xref:how-to/write-traceable-items.adoc[How to write traceable items] — ID conventions and the next-id workflow

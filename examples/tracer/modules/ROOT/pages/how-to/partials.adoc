@@ -79,7 +79,7 @@ The item's ID and relationships stay in the page file; the partial provides the 
 
 | Content reused across multiple pages
 | Page-defines-item, partial-for-body
-| Avoids duplicate-ID warnings
+| Avoids duplicate IDs
 |===
 
 == Do not cross-reference partial items
