@@ -44,6 +44,26 @@ Rules:
 - Explanation pages name the concept, such as `The Traceability Model`.
 - Use sentence case for headings.
 
+== Scannable content
+
+Readers and AI agents skim, they do not read linearly. Make every page scannable:
+
+- Write headings that carry meaning on their own. A reader who reads only the headings should still understand the page.
+- Lead with the point. Put the conclusion or the command in the first sentence of each section and paragraph.
+- Prefer lists and tables over prose walls. When a sentence lists three or more parallel items, turn it into a list.
+- Keep paragraphs short: one idea per paragraph.
+- Prefer a concrete example over a description. Show the `[item]` block or the command, do not only describe it.
+- Make each section self-contained. Do not rely on "as mentioned above"; a section must survive being read or retrieved alone.
+- Keep subjects explicit. Prefer "The build fails on duplicate IDs" over "It fails", so a search or an AI can match the sentence out of context.
+
+These rules help AI agents retrieve and reason about the documentation as much as they help humans skim it.
+
+== Search and discoverability
+
+- Use the reader's search terms, not internal jargon. Write "duplicate item IDs", not "node collision".
+- Write short, descriptive link text that names the target. Prefer "see xref:reference/cli.adoc[the validate command]" over "see xref:reference/cli.adoc[here]".
+- Give every page a meaningful `:description:` attribute. It feeds page metadata and search results.
+
 == Voice and tone
 
 - Use second person and imperative for tasks: "Run `validate`", not "The user should run `validate`".
@@ -51,6 +71,41 @@ Rules:
 - Prefer short sentences and plain words.
 - Avoid "please", "just", "simply", "obviously", and "easily".
 - Write behavior in the present tense: "The build fails", not "The build will fail".
+
+*Tone.*
+
+- Write conversationally, like you would speak to a colleague. Use contractions: "don't", "you'll".
+- Be friendly and approachable, but never at the cost of precision.
+- Be respectful. Assume the reader is competent; do not condescend.
+- Prefer natural over formal. Prefer "you" over "the user" and "get" over "obtain" when it reads better.
+- Casual is fine as long as the instruction stays unambiguous and professional.
+
+== Inclusive language
+
+Write for every reader. Two rules cover most cases:
+
+*Bias-free communication.* Do not assume or stereotype the reader:
+
+- Use "they" as the singular pronoun, and prefer "staffed", "chairperson", and "humankind" over gendered terms.
+- Avoid ableist terms. Prefer "surprising" over "crazy", "broken" over "lame", "unaware of" over "blind to", and "ignored" over "fell on deaf ears".
+- Refer to people by role, not by background, age, or ability.
+
+*Non-militaristic language.* Avoid war and violence metaphors. Name the action instead:
+
+[width=100%, cols="50,50"]
+|===
+| Instead of | Use
+| war room | incident room
+| kill switch | emergency stop
+| battle-tested | well-tested
+| attack the problem | solve the problem
+| blitz through | complete quickly
+|===
+
+Keep established technical terms as-is when they are the standard name of a concept, but do not coin new militaristic terms.
+In new text, prefer inclusive alternatives such as "allowlist/denylist" and "primary/replica".
+
+For the full treatment, see the https://learn.microsoft.com/en-us/style-guide/bias-free-communication[Microsoft bias-free communication guidance] and https://developers.google.com/style/inclusive-documentation[Google's inclusive documentation guidance].
 
 == Requirements style
 
