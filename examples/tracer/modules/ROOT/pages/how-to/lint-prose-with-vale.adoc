@@ -1,0 +1,87 @@
+= How to Lint Prose with Vale
+:description: Run the Vale prose linter during the Antora build and understand how it differs from source-layout checking
+:keywords: antora, asciidoc, vale, prose, linting, style, documentation quality
+:toc: macro
+
+toc::[]
+
+Vale checks prose quality — tone, filler words, inclusive language, and style-guide rules — against the source AsciiDoc of your site.
+It complements the source-layout checker, which enforces one sentence per line.
+
+== Prerequisites
+
+Install the `vale` and `asciidoctor` executables and put them on `PATH`.
+
+With devbox:
+
+[source,bash]
+----
+devbox shell
+----
+
+Without devbox:
+
+[source,bash]
+----
+brew install vale asciidoctor     # macOS
+nix profile install nixpkgs#vale  # Nix
+----
+
+Vale lints AsciiDoc by converting it with `asciidoctor`, so both are required.
+
+== Register the extension
+
+Add the extension to your playbook:
+
+[source,yaml]
+----
+antora:
+  extensions:
+    - require: antora-tracer/antora-vale
+      valeConfig: .vale.ini
+      minLevel: warning
+----
+
+- `valeConfig` points to your Vale configuration, resolved relative to the playbook directory.
+- `minLevel` is the lowest severity that fails the build: `suggestion`, `warning` (default), or `error`.
+
+== Write a Vale configuration
+
+Create a `.vale.ini` and a styles directory:
+
+[source,ini]
+----
+StylesPath = styles
+
+MinAlertLevel = warning
+
+[*.adoc]
+BasedOnStyles = antora-tracer
+----
+
+A starter style ships in the package at `node_modules/antora-tracer/lib/src/vale/`.
+Copy its `.vale.ini` and `styles/antora-tracer/` into your project as a starting point, then add your own rules.
+Vale rules are YAML files that extend checks such as `existence` and `substitution`.
+
+== Run the build
+
+[source,bash]
+----
+npx antora antora-playbook.yml
+----
+
+The extension writes the content catalog to a temporary directory, runs Vale against each page and partial, and reports findings with source file and line references.
+Findings at or above `minLevel` fail the build; findings below are logged.
+
+== Vale vs the source-layout checker
+
+Vale and `check-one-sentence-per-line.js` check different layers:
+
+- Vale lints the prose itself — readability, tone, filler words, and inclusive language.
+- The source-layout checker enforces one sentence per line in the AsciiDoc source, which is invisible to Vale after conversion.
+
+Run both for full documentation quality.
+
+== Related
+
+- xref:reference/configuration.adoc[Configuration] — Vale extension options and prerequisites

@@ -1,0 +1,10 @@
+extends: substitution
+message: "Use '%s' instead of '%s'."
+level: warning
+ignorecase: true
+swap:
+  'war room': 'incident room'
+  'kill switch': 'emergency stop'
+  'battle-tested': 'well-tested'
+  'attack the problem': 'solve the problem'
+  'blitz through': 'complete quickly'

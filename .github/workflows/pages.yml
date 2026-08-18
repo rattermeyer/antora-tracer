@@ -43,6 +43,11 @@ jobs:
       - name: Build extension
         run: npm run build
 
+      - name: Install Vale
+        run: |
+          curl -sfL https://github.com/errata-ai/vale/releases/latest/download/vale_Linux_x86_64.tar.gz | tar xz -C /usr/local/bin vale
+          vale --version
+
       - name: Build site
         run: node scripts/preview.js --ci
 

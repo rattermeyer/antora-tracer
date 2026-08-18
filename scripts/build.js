@@ -20,6 +20,12 @@ if (fs.existsSync(srcPresets)) {
 // Copy .cjs extension files (Antora extensions that require CJS packages)
 copyGlob(path.join("src", "*.cjs"), libSrc);
 
+// Copy Vale starter style (.vale.ini + styles/) for the antora-vale-extension
+const srcVale = path.join("src", "vale");
+if (fs.existsSync(srcVale)) {
+  copyDirRecursive(srcVale, path.join(libSrc, "vale"));
+}
+
 console.log("✅ Assets copied to lib/src/");
 
 function copyGlob(pattern, dest) {

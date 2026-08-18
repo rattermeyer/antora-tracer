@@ -1,0 +1,14 @@
+extends: existence
+message: "Avoid the filler word '%s'."
+level: warning
+nonword: true
+tokens:
+  - 'please'
+  - 'just'
+  - 'simply'
+  - 'obviously'
+  - 'easily'
+  - 'very'
+  - 'really'
+  - 'basically'
+  - 'actually'

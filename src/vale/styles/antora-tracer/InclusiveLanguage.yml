@@ -1,0 +1,20 @@
+extends: existence
+message: "Use inclusive language instead of '%s'."
+level: error
+nonword: true
+tokens:
+  - 'crazy'
+  - 'insane'
+  - 'lame'
+  - 'dumb'
+  - 'crippled'
+  - 'blind to'
+  - 'deaf ears'
+  - 'chairman'
+  - 'manned'
+  - 'manpower'
+  - 'businessman'
+  - 'salesman'
+  - 'guys'
+  - 'he or she'
+  - 'himself'

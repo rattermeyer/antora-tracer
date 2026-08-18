@@ -28,6 +28,10 @@ antora:
       includeInNavigation: true
     - require: '@antora/lunr-extension'
       index_by_heading: true
+    - require: ./lib/src/antora-vale-extension.js
+      enabled: false
+      valeConfig: lib/src/vale/.vale.ini
+      minLevel: warning
 
 ui:
   bundle:

@@ -8,6 +8,7 @@
   "exports": {
     ".": "./lib/src/index.js",
     "./antora-extension": "./lib/src/antora-extension.js",
+    "./antora-vale": "./lib/src/antora-vale-extension.js",
     "./antora-pdf": "./lib/src/antora-pdf-extension.cjs",
     "./antora-docx": "./lib/src/antora-docx-extension.cjs",
     "./package.json": "./package.json"
