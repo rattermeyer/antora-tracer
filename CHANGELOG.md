@@ -2,6 +2,12 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.19.0] — 2026-08-19
+
+### Added
+- `antora-vale` bundled extension that runs the Vale prose linter against source AsciiDoc from the complete content catalog during `contentClassified`, failing the build at a configurable `minLevel` severity
+- Starter Vale style (`lib/src/vale/`) with filler-word, inclusive-language, and non-militaristic-language rules from the documentation style guide
+
 ## [0.18.0] — 2026-08-18
 
 ### Added
