@@ -1,0 +1,38 @@
+{
+  "type": "object",
+  "properties": {
+    "overall_pass": { "type": "boolean" },
+    "ears_pattern": { "type": "string" },
+    "prescriptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": ["technology", "algorithm", "component", "event", "ui"]
+          },
+          "phrase": { "type": "string" },
+          "suggested_rewrite": { "type": "string" }
+        },
+        "required": ["category", "phrase", "suggested_rewrite"],
+        "additionalProperties": false
+      }
+    },
+    "quality": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "check": { "type": "string" },
+          "pass": { "type": "boolean" },
+          "note": { "type": "string" }
+        },
+        "required": ["check", "pass", "note"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["overall_pass", "ears_pattern", "prescriptions", "quality"],
+  "additionalProperties": false
+}

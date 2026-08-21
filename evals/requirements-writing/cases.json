@@ -1,0 +1,40 @@
+{
+  "cases": [
+    {
+      "id": "technology-mustache",
+      "expect_prescription": "technology",
+      "expect_pass": false,
+      "block": "[#REQ-001, item, role=requirement, title=\"Render dashboard\"]\n--\nThe system SHALL render a Mustache template for the dashboard.\n--"
+    },
+    {
+      "id": "algorithm-regex",
+      "expect_prescription": "algorithm",
+      "expect_pass": false,
+      "block": "[#REQ-002, item, role=requirement, title=\"Detect items\"]\n--\nThe system SHALL use regex to detect item declarations.\n--"
+    },
+    {
+      "id": "component-parser",
+      "expect_prescription": "component",
+      "expect_pass": false,
+      "block": "[#REQ-003, item, role=requirement, title=\"Skip verbatim\"]\n--\nThe DocumentParser SHALL skip verbatim blocks.\n--"
+    },
+    {
+      "id": "clean",
+      "expect_prescription": null,
+      "expect_pass": true,
+      "block": "[#REQ-004, item, role=requirement, title=\"Detect items\"]\n--\nThe system SHALL detect item declarations in AsciiDoc source files.\n--"
+    },
+    {
+      "id": "neo4j-exception",
+      "expect_prescription": null,
+      "expect_pass": true,
+      "block": "[#REQ-005, item, role=requirement, title=\"Neo4j export\"]\n--\nThe system SHALL export the traceability graph to Neo4j.\n--"
+    },
+    {
+      "id": "atomicity-two-shall",
+      "expect_prescription": null,
+      "expect_pass": false,
+      "block": "[#REQ-006, item, role=requirement, title=\"Parse and matrix\"]\n--\nThe system SHALL parse items and SHALL generate a matrix.\n--"
+    }
+  ]
+}
