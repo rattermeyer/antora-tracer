@@ -545,6 +545,25 @@ Source: openspec/specs/graph-visualization/spec.md
 traceability:links[]
 --
 
+[#REQ-159, item, role=requirement, title="Configuration graph via traceability:config-graph[] macro"]
+--
+The system SHALL provide a `traceability:config-graph[]` macro that renders the effective traceability configuration as a Kroki GraphViz diagram.
+The diagram SHALL show each configured role as a node colored by role and each declared relation as a labeled edge, using declared directions only.
+
+Source: openspec/specs/graph-visualization/spec.md
+
+traceability:links[]
+--
+
+[#REQ-160, item, role=requirement, title="Config graph generator renders configuration as DOT"]
+--
+The system SHALL provide a DOT generator for the traceability configuration that renders roles as nodes and declared relations as labeled edges.
+
+Source: openspec/specs/graph-visualization/spec.md
+
+traceability:links[]
+--
+
 [#REQ-142, item, role=requirement, title="Configurable Kroki server URL via extension config"]
 --
 The `krokiServerUrl` extension config option SHALL set the base URL used by `traceability:graph[]` and `traceability:graph-coverage[]` macros when generating Kroki image URLs.

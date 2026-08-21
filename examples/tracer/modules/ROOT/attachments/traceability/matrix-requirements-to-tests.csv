@@ -53,6 +53,8 @@ REQ-052,REQ-052 — Coverage chart via traceability:graph-coverage[] macro,TST-0
 REQ-053,REQ-053 — Graph model supports traversal-bounded subgraph and coverage queries,TST-005: TST-005 — Graph and API Tests
 REQ-054,REQ-054 — Dashboard page in example site,
 REQ-063,REQ-063 — Configurable Kroki image format,TST-002: TST-002 — Antora Extension Tests
+REQ-159,REQ-159 — Configuration graph via traceability:config-graph[] macro,TST-002: TST-002 — Antora Extension Tests
+REQ-160,REQ-160 — Config graph generator renders configuration as DOT,TST-005: TST-005 — Graph and API Tests
 REQ-142,REQ-142 — Configurable Kroki server URL via extension config,TST-002: TST-002 — Antora Extension Tests
 REQ-143,REQ-143 — Kroki server URL via environment variable,TST-002: TST-002 — Antora Extension Tests
 REQ-056,REQ-056 — CLI next-id command returns next available ID,TST-003: TST-003 — CLI Tests
@@ -115,5 +117,5 @@ REQ-122,REQ-122 — Process-to-product matrix exists,
 REQ-114,REQ-114 — Dead design-matrix template is removed,
 REQ-115,REQ-115 — Dead MatrixGenerator methods are removed,
 
-Total 115 rows
-Coverage: 58.3%
+Total 117 rows
+Coverage: 59.0%

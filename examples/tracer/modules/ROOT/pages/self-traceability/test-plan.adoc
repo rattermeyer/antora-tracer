@@ -38,7 +38,7 @@ Tests the `AntoraTraceabilityExtension` — initialization with default config, 
 Tests event handler registration, content processing via `contentClassified` event (in-memory only, never touches disk), matrix generation via `sitePublished` event and matrix registration in the content catalog via `contentClassified`, and API access patterns.
 Also tests `traceability:outgoing[]`, `traceability:incoming[]`, and `traceability:links[]` macro expansion with configurable display style, sort order, collapsible sections, empty-state messages (`:traceability-empty:`), and opt-in behavior.
 Tests incoming macro display styles, sort orders, inverse labels, PDF compatibility, and collapsible support.
-Tests `traceability:graph[]` and `traceability:graph-coverage[]` macro expansion with configurable Kroki image format and Kroki server URL (extension config option and `KROKI_SERVER_URL` env var override), graph-enabled and graph-disabled modes, including global coverage, explicit target IDs, and header exclusion.
+Tests `traceability:graph[]`, `traceability:graph-coverage[]`, and `traceability:config-graph[]` macro expansion with configurable Kroki image format and Kroki server URL (extension config option and `KROKI_SERVER_URL` env var override), graph-enabled and graph-disabled modes, including global coverage, explicit target IDs, and header exclusion.
 Tests automatic matrix registration in the content catalog during `contentClassified`.
 Tests partial file processing including item registration from partials, view URL as sourceFile, and macro expansion in Pass 2.
 Tests cross-module and cross-component xref prefix generation.
@@ -51,6 +51,7 @@ verifies:REQ-047[]
 verifies:REQ-048[]
 verifies:REQ-051[]
 verifies:REQ-052[]
+verifies:REQ-159[]
 verifies:REQ-055[]
 verifies:REQ-063[]
 verifies:REQ-142[]
@@ -111,12 +112,13 @@ traceability:links[]
 --
 Test file: `test/graph-and-api.test.ts`
 
-Tests the `TraceabilityGraph` (extended queries: merge, getRelatedItems, getItemsWithRelationTo, getRelationshipsByRoles, findPath, getImpactAnalysis) and graph visualization methods (`toDot`, `toVegaLite`).
+Tests the `TraceabilityGraph` (extended queries: merge, getRelatedItems, getItemsWithRelationTo, getRelationshipsByRoles, findPath, getImpactAnalysis) and graph visualization methods (`toDot`, `toVegaLite`, `toConfigDot`).
 Tests graph integrity validation including circular reference detection (direct, indirect, self-referencing cycles, bidirectional pair exclusion), orphaned relationship detection with source location and expected-role hints, and invalid relation type reporting with allowed-relations hints.
 Tests bidirectional relationship merge.
 Also tests `RequirementsTraceabilityExtension` API methods (processFiles, validate, export, coverage, config access, preset management, lifecycle).
 
 verifies:REQ-053[]
+verifies:REQ-160[]
 verifies:REQ-109[]
 verifies:REQ-129[]
 

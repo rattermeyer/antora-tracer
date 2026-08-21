@@ -225,15 +225,17 @@ traceability:links[]
 `toDot(fromId, depth?)` generates GraphViz DOT source for a relationship graph
 using BFS traversal in both outgoing and incoming directions from the given item.
 Nodes are colored by role using a
-hardcoded palette; edges are labeled with the relationship type.
+shared role-color palette; edges are labeled with the relationship type.
 Depth limits
 hopping. `toVegaLite(itemId?)` generates a Vega-Lite JSON spec for coverage
 charts — per-relationship-type for a specific item, or global role counts
 when called without an item ID.
-Both methods produce source strings that are
+`toConfigDot(config)` renders the traceability configuration as DOT — roles as nodes and declared relations as labeled edges.
+Each method produces a source string that is
 encoded into Kroki URLs for rendering.
 
 addresses:REQ-053[]
+addresses:REQ-160[]
 traceability:links[]
 --
 
@@ -295,20 +297,22 @@ addresses:QA-060[]
 traceability:links[]
 --
 
-[#ARC-025, item, role=design, title="traceability:graph[] and traceability:graph-coverage[] visualization macros"]
+[#ARC-025, item, role=design, title="traceability:graph[], traceability:graph-coverage[], and traceability:config-graph[] visualization macros"]
 --
-The `expandGraphMacros()` and `expandCoverageMacros()` methods replace
-`traceability:graph[]` and `traceability:graph-coverage[]` placeholders with
+The `expandGraphMacros()`, `expandCoverageMacros()`, and `expandConfigGraphMacros()` methods replace
+`traceability:graph[]`, `traceability:graph-coverage[]`, and `traceability:config-graph[]` placeholders with
 Kroki-rendered images. `traceability:graph[]` generates a GraphViz DOT
 relationship graph for the enclosing item (or a specified item ID), colored
 by role with labeled edges. `traceability:graph-coverage[]` generates a
 Vega-Lite bar chart showing per-item or global coverage.
+`traceability:config-graph[]` renders the traceability configuration as a GraphViz DOT diagram of roles and declared relations.
 Rendering is opt-in
 via the `:traceability-graph:` document attribute.
 
 addresses:REQ-051[]
 addresses:REQ-052[]
 addresses:REQ-063[]
+addresses:REQ-159[]
 traceability:links[]
 --
 
@@ -638,9 +642,9 @@ include::example$pass-pipeline.puml[]
 | Depends on complete graph from Pass 1 to enumerate relationships. Opt-in via `:traceability-links:` document attribute; forced on for partials.
 
 | Pass 2b
-| `expandGraphMacros()` + `expandCoverageMacros()` — replace `traceability:graph[]` and `traceability:graph-coverage[]` with rendered diagram image references (DOT and Vega-Lite).
+| `expandGraphMacros()` + `expandCoverageMacros()` + `expandConfigGraphMacros()` — replace `traceability:graph[]`, `traceability:graph-coverage[]`, and `traceability:config-graph[]` with rendered diagram image references (DOT and Vega-Lite).
 | Pages + partials
-| Uses `toDot()` / `toVegaLite()` on the graph. Opt-in via `:traceability-graph:` document attribute. Independent of Pass 2.
+| Uses `toDot()` / `toVegaLite()` / `toConfigDot()`. Opt-in via `:traceability-graph:` document attribute. Independent of Pass 2.
 
 | Pass 3
 | `substituteLinksInFile()` — replace inline relationship macros with `xref:page.html#ID` (pages) or `link:URL#ID` (partials). Also runs `injectTitleIds()` and `unindentItemMacros()`.

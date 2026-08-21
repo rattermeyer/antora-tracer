@@ -48,11 +48,13 @@ REQ-083,REQ-083 — Preset defines pairwise requirements-to-design matrix,ARC-01
 REQ-084,REQ-084 — Preset defines pairwise design-to-implementation matrix,ARC-019: ARC-019 — Config-driven matrix generation with coverage calculations
 REQ-085,REQ-085 — Preset defines pairwise requirements-to-tests matrix,ARC-019: ARC-019 — Config-driven matrix generation with coverage calculations
 REQ-086,REQ-086 — Preset does not define wide multi-column matrices,ARC-019: ARC-019 — Config-driven matrix generation with coverage calculations
-REQ-051,REQ-051 — Relationship graph via traceability:graph[] macro,ARC-025: ARC-025 — traceability:graph[] and traceability:graph-coverage[] visualization macros
-REQ-052,REQ-052 — Coverage chart via traceability:graph-coverage[] macro,ARC-025: ARC-025 — traceability:graph[] and traceability:graph-coverage[] visualization macros
+REQ-051,REQ-051 — Relationship graph via traceability:graph[] macro,"ARC-025: ARC-025 — traceability:graph[], traceability:graph-coverage[], and traceability:config-graph[] visualization macros"
+REQ-052,REQ-052 — Coverage chart via traceability:graph-coverage[] macro,"ARC-025: ARC-025 — traceability:graph[], traceability:graph-coverage[], and traceability:config-graph[] visualization macros"
 REQ-053,REQ-053 — Graph model supports traversal-bounded subgraph and coverage queries,ARC-026: ARC-026 — GraphViz DOT and Vega-Lite serialization methods
 REQ-054,REQ-054 — Dashboard page in example site,ARC-033: ARC-033 — Example site: config extension and dashboard patterns
-REQ-063,REQ-063 — Configurable Kroki image format,ARC-025: ARC-025 — traceability:graph[] and traceability:graph-coverage[] visualization macros
+REQ-063,REQ-063 — Configurable Kroki image format,"ARC-025: ARC-025 — traceability:graph[], traceability:graph-coverage[], and traceability:config-graph[] visualization macros"
+REQ-159,REQ-159 — Configuration graph via traceability:config-graph[] macro,"ARC-025: ARC-025 — traceability:graph[], traceability:graph-coverage[], and traceability:config-graph[] visualization macros"
+REQ-160,REQ-160 — Config graph generator renders configuration as DOT,ARC-026: ARC-026 — GraphViz DOT and Vega-Lite serialization methods
 REQ-142,REQ-142 — Configurable Kroki server URL via extension config,
 REQ-143,REQ-143 — Kroki server URL via environment variable,
 REQ-056,REQ-056 — CLI next-id command returns next available ID,ARC-023: ARC-023 — Commander-based CLI with subcommands
@@ -115,5 +117,5 @@ REQ-122,REQ-122 — Process-to-product matrix exists,
 REQ-114,REQ-114 — Dead design-matrix template is removed,
 REQ-115,REQ-115 — Dead MatrixGenerator methods are removed,
 
-Total 115 rows
-Coverage: 70.4%
+Total 117 rows
+Coverage: 70.9%

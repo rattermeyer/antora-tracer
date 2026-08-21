@@ -106,6 +106,7 @@ The extension validates that both conform to the configuration, then generates t
 
 == Related
 
+- xref:explanation/our-traceability-model.adoc[Our Traceability Model] — how this project applies these concepts to its own artifacts
 - xref:how-to/custom-domain-model.adoc[How to define a custom domain model] — put these concepts into practice
 - xref:reference/configuration.adoc[Configuration Reference] — the YAML schema for defining roles, relations, and matrices
 - xref:reference/presets.adoc[Presets Reference] — see how built-in presets apply this model

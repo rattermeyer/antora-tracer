@@ -1,0 +1,172 @@
+= Our Traceability Model
+:description: The roles and relations Antora Tracer uses to trace its own development artifacts
+:keywords: antora, traceability, model, roles, relations, self-traceability
+:toc: macro
+:traceability-graph: true
+
+toc::[]
+
+This page describes the traceability model that Antora Tracer uses to trace its own development artifacts.
+For the general concepts behind roles and relations, see xref:explanation/traceability-model.adoc[The Traceability Model].
+
+The diagram below is generated from the project's configuration — `examples/traceability.yml` extending the built-in `requirements-engineering` preset.
+Each node is a role.
+Each arrow is a relation the configuration permits, labeled with its relation types.
+Only declared directions are drawn: the diagram does not add the inverse direction that the extension derives for traversal.
+
+traceability:config-graph[]
+
+== Roles
+
+This project tracks eight roles.
+
+*requirement*::
+A functional requirement the extension must fulfill (`REQ-xxx`).
+These are the "what the system must do" statements.
+
+*use_case*::
+A user goal with actors, preconditions, a main flow, and postconditions (`UC-xxx`).
+Use cases lead to requirements.
+
+*process_requirement*::
+A requirement on the delivery process itself — how the team builds and ships (`PRQ-xxx`).
+
+*constraint*::
+A condition the system must not violate (`CON-xxx`), such as runtime or output-format limits.
+This role currently has no relations declared, so it renders as an isolated node until the model is completed.
+
+*design*::
+An architectural or design element that addresses requirements (`ARC-xxx`, `DES-xxx`).
+
+*implementation*::
+A code artifact that implements a design (`IMP-xxx`).
+
+*test*::
+A verification or validation procedure (`TST-xxx`, `TEST-xxx`).
+
+*document*::
+An external specification or standard the project references.
+This role is inherited from the preset and not yet populated by this project's artifacts.
+
+== Relations
+
+Relations are directional and typed: each states one fact per item, reading source → target.
+The sections below follow the source role, mirroring how the configuration declares them.
+
+=== requirement → requirement
+
+`refines`::
+The requirement narrows a broader requirement.
+
+`depends_on`::
+The requirement can only be satisfied after another requirement.
+
+`conflicts_with`::
+Two requirements cannot both be satisfied as stated.
+
+=== design → requirement
+
+`addresses`::
+The design responds to the requirement.
+
+`satisfies`::
+The design fulfills the requirement.
+
+=== design → design
+
+`depends_on`::
+The design depends on another design element.
+
+`composed_of`::
+The design is composed of smaller design elements.
+
+`refined_by`::
+The design is refined by a more detailed design.
+
+=== design → implementation, test, document
+
+`realized_by`::
+The design is realized by an implementation.
+
+`validated_by`::
+The design is validated by a test.
+
+`documented_by`::
+The design is documented by a document.
+
+=== implementation → requirement, design
+
+`satisfies`::
+The implementation fulfills the requirement.
+
+`implements`::
+The implementation implements the design.
+
+=== implementation → implementation
+
+`depends_on`::
+The implementation depends on another implementation.
+
+`uses`::
+The implementation reuses another implementation.
+
+=== implementation → test
+
+`tested_by`::
+The implementation is tested by a test.
+
+=== test → requirement
+
+`covers`::
+The test covers the requirement.
+
+`verifies`::
+The test verifies the requirement.
+
+=== test → design, implementation
+
+`validates`::
+The test validates the design.
+
+`tests`::
+The test tests the implementation.
+
+=== document → requirement, design
+
+`contains`::
+The document contains the requirement.
+
+`describes`::
+The document describes the design.
+
+=== use_case ↔ requirement
+
+`leads_to`::
+The use case leads to the requirement.
+
+`is_derived_from`::
+The requirement is derived from the use case.
+
+These two types form one logical pair and are both declared, so both arrows appear in the diagram.
+
+=== process_requirement → requirement, design
+
+`validates`::
+The process requirement validates that a product requirement is met by the delivery process.
+
+`considered_by`::
+The process requirement is considered by a design or architectural decision.
+
+== Reading the diagram
+
+Three self-loops appear: `requirement`, `design`, and `implementation` each declare relations back to their own role.
+These are intentional — intra-role refinement and dependency are part of the model.
+
+The `constraint` role renders as an isolated node.
+This is a known gap: the role has items (`CON-001` through `CON-005`) but no relations are declared for it yet.
+
+== Related
+
+- xref:explanation/traceability-model.adoc[The Traceability Model] — the general concepts
+- xref:how-to/custom-domain-model.adoc[How to define a custom domain model] — put these concepts into practice
+- xref:reference/configuration.adoc[Configuration Reference] — the YAML schema

@@ -44,8 +44,8 @@ Display style (list, table, inline), sort order (target-id, target-title, relati
 
 === Pass 2b: Expand graph macros (pages and partials)
 
-`traceability:graph[]` and `traceability:graph-coverage[]` placeholders are replaced with rendered diagram image references.
-The graph's `toDot()` and `toVegaLite()` methods generate the diagram source.
+`traceability:graph[]`, `traceability:graph-coverage[]`, and `traceability:config-graph[]` placeholders are replaced with rendered diagram image references.
+The graph's `toDot()` and `toVegaLite()` methods generate the item and coverage diagram source; `toConfigDot()` renders the configuration model.
 
 This pass is opt-in via `:traceability-graph: true`.
 It's independent of Pass 2 — you can enable graph macros without link macros, and vice versa.
