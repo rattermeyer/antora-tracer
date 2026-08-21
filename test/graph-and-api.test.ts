@@ -10,6 +10,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect } from "chai";
+import { toConfigDot } from "../src/config/TraceabilityConfig.js";
 import {
   ConfigLoader,
   RequirementsTraceabilityExtension,
@@ -304,12 +305,8 @@ describe("TraceabilityGraph - Extended Queries", () => {
       graph = new TraceabilityGraph();
       graph.addItem(createItem("REQ-001", "requirement", "Login Security"));
       graph.addItem(createItem("DES-001", "design", "Auth Module"));
-      graph.addItem(
-        createItem("IMP-001", "implementation", "auth-service"),
-      );
-      graph.addRelationship(
-        createRel("R1", "DES-001", "REQ-001", "addresses"),
-      );
+      graph.addItem(createItem("IMP-001", "implementation", "auth-service"));
+      graph.addRelationship(createRel("R1", "DES-001", "REQ-001", "addresses"));
       graph.addRelationship(
         createRel("R2", "IMP-001", "DES-001", "implements"),
       );
@@ -396,9 +393,7 @@ describe("TraceabilityGraph - Extended Queries", () => {
       graph.addItem(createItem("REQ-002", "requirement", "Performance"));
       graph.addItem(createItem("DES-001", "design", "Auth Module"));
       graph.addItem(createItem("IMP-001", "implementation", "auth-svc"));
-      graph.addRelationship(
-        createRel("R1", "DES-001", "REQ-001", "addresses"),
-      );
+      graph.addRelationship(createRel("R1", "DES-001", "REQ-001", "addresses"));
       graph.addRelationship(
         createRel("R2", "IMP-001", "DES-001", "implements"),
       );
@@ -455,12 +450,8 @@ describe("TraceabilityGraph - Extended Queries", () => {
       const graph = new TraceabilityGraph();
       graph.addItem(createItem("REQ-001", "requirement", "A"));
       graph.addItem(createItem("REQ-002", "requirement", "B"));
-      graph.addRelationship(
-        createRel("R1", "REQ-001", "REQ-002", "addresses"),
-      );
-      graph.addRelationship(
-        createRel("R2", "REQ-002", "REQ-001", "addresses"),
-      );
+      graph.addRelationship(createRel("R1", "REQ-001", "REQ-002", "addresses"));
+      graph.addRelationship(createRel("R2", "REQ-002", "REQ-001", "addresses"));
 
       const result = graph.validate();
       expect(result.errors).to.be.an("array");
@@ -472,15 +463,9 @@ describe("TraceabilityGraph - Extended Queries", () => {
       graph.addItem(createItem("REQ-001", "requirement", "A"));
       graph.addItem(createItem("REQ-002", "requirement", "B"));
       graph.addItem(createItem("REQ-003", "requirement", "C"));
-      graph.addRelationship(
-        createRel("R1", "REQ-001", "REQ-002", "addresses"),
-      );
-      graph.addRelationship(
-        createRel("R2", "REQ-002", "REQ-003", "addresses"),
-      );
-      graph.addRelationship(
-        createRel("R3", "REQ-003", "REQ-001", "addresses"),
-      );
+      graph.addRelationship(createRel("R1", "REQ-001", "REQ-002", "addresses"));
+      graph.addRelationship(createRel("R2", "REQ-002", "REQ-003", "addresses"));
+      graph.addRelationship(createRel("R3", "REQ-003", "REQ-001", "addresses"));
 
       const result = graph.validate();
       expect(result.errors.some((e) => e.includes("Circular"))).to.be.true;
@@ -491,12 +476,8 @@ describe("TraceabilityGraph - Extended Queries", () => {
       graph.addItem(createItem("REQ-001", "requirement", "A"));
       graph.addItem(createItem("REQ-002", "requirement", "B"));
       graph.addItem(createItem("REQ-003", "requirement", "C"));
-      graph.addRelationship(
-        createRel("R1", "REQ-001", "REQ-002", "addresses"),
-      );
-      graph.addRelationship(
-        createRel("R2", "REQ-002", "REQ-003", "addresses"),
-      );
+      graph.addRelationship(createRel("R1", "REQ-001", "REQ-002", "addresses"));
+      graph.addRelationship(createRel("R2", "REQ-002", "REQ-003", "addresses"));
 
       const result = graph.validate();
       // Graph might not be "valid" due to other checks but shouldn't have
@@ -510,9 +491,7 @@ describe("TraceabilityGraph - Extended Queries", () => {
     it("should detect self-referencing cycles", () => {
       const graph = new TraceabilityGraph();
       graph.addItem(createItem("REQ-001", "requirement", "A"));
-      graph.addRelationship(
-        createRel("R1", "REQ-001", "REQ-001", "addresses"),
-      );
+      graph.addRelationship(createRel("R1", "REQ-001", "REQ-001", "addresses"));
 
       const result = graph.validate();
       expect(result.errors.some((e) => e.includes("Circular"))).to.be.true;
@@ -541,9 +520,7 @@ describe("TraceabilityGraph - Extended Queries", () => {
       graph.addItem(createItem("ARC-001", "design", "Auth Module"));
       graph.addItem(createItem("REQ-001", "requirement", "Security"));
       // addresses → addressed-by is in INVERSE_MAP
-      graph.addRelationship(
-        createRel("R1", "ARC-001", "REQ-001", "addresses"),
-      );
+      graph.addRelationship(createRel("R1", "ARC-001", "REQ-001", "addresses"));
       graph.addRelationship(
         createRel("R2", "REQ-001", "ARC-001", "addressed-by"),
       );
@@ -559,9 +536,7 @@ describe("TraceabilityGraph - Extended Queries", () => {
       const graph = new TraceabilityGraph();
       graph.addItem(createItem("UC-003", "use_case", "Write Items"));
       graph.addItem(createItem("REQ-001", "requirement", "Next ID"));
-      graph.addRelationship(
-        createRel("R1", "UC-003", "REQ-001", "leads_to"),
-      );
+      graph.addRelationship(createRel("R1", "UC-003", "REQ-001", "leads_to"));
 
       const allRels = graph.getAllRelationships();
       expect(allRels).to.have.lengthOf(1);
@@ -572,13 +547,9 @@ describe("TraceabilityGraph - Extended Queries", () => {
       const graph = new TraceabilityGraph();
       graph.addItem(createItem("A", "requirement", "Item A"));
       graph.addItem(createItem("B", "design", "Item B"));
-      graph.addRelationship(
-        createRel("R1", "A", "B", "custom_widget"),
-      );
+      graph.addRelationship(createRel("R1", "A", "B", "custom_widget"));
       // Opposite direction with same type — no inverse mapping
-      graph.addRelationship(
-        createRel("R2", "B", "A", "custom_widget"),
-      );
+      graph.addRelationship(createRel("R2", "B", "A", "custom_widget"));
 
       // Not merged — two separate relationships
       const allRels = graph.getAllRelationships();
@@ -589,13 +560,9 @@ describe("TraceabilityGraph - Extended Queries", () => {
       const graph = new TraceabilityGraph();
       graph.addItem(createItem("A", "requirement", "Item A"));
       graph.addItem(createItem("B", "requirement", "Item B"));
-      graph.addRelationship(
-        createRel("R1", "A", "B", "depends"),
-      );
+      graph.addRelationship(createRel("R1", "A", "B", "depends"));
       // depends inverse is depended-by, but user wrote depends again
-      graph.addRelationship(
-        createRel("R2", "B", "A", "depends"),
-      );
+      graph.addRelationship(createRel("R2", "B", "A", "depends"));
 
       // Not merged — types are the same
       const allRels = graph.getAllRelationships();
@@ -608,12 +575,8 @@ describe("TraceabilityGraph - Extended Queries", () => {
       graph.addItem(createItem("A", "requirement", "Item A"));
       graph.addItem(createItem("B", "design", "Item B"));
       // depends → depended-by is in INVERSE_MAP
-      graph.addRelationship(
-        createRel("R1", "A", "B", "depends"),
-      );
-      graph.addRelationship(
-        createRel("R2", "B", "A", "depended-by"),
-      );
+      graph.addRelationship(createRel("R1", "A", "B", "depends"));
+      graph.addRelationship(createRel("R2", "B", "A", "depended-by"));
 
       const allRels = graph.getAllRelationships();
       expect(allRels).to.have.lengthOf(1);
@@ -788,9 +751,8 @@ describe("RequirementsTraceabilityExtension - API Methods", () => {
       const validation = extension.validate();
       expect(validation.errors).to.have.length(1);
       expect(validation.errors[0]).to.include("Duplicate item ID: REQ-001");
-      expect(
-        validation.warnings.filter((w) => w.type === "duplicate_node"),
-      ).to.be.empty;
+      expect(validation.warnings.filter((w) => w.type === "duplicate_node")).to
+        .be.empty;
     });
 
     it("should detect orphaned relationships via validate()", () => {
@@ -1212,5 +1174,69 @@ describe("RequirementsTraceabilityExtension - API Methods", () => {
       const rels = extension.getRelationshipsByRoles("design", "requirement");
       expect(rels).to.have.lengthOf(1);
     });
+  });
+});
+
+// ============================================================================
+// toConfigDot() — configuration graph rendering
+// ============================================================================
+
+describe("toConfigDot()", () => {
+  it("should generate a digraph DOT string", () => {
+    const dot = toConfigDot({
+      roles: ["requirement", "design"],
+      relations: { design: { requirement: ["addresses"] } },
+    });
+    expect(dot).to.include("digraph TraceabilityConfig");
+    expect(dot).to.include("rankdir=LR");
+  });
+
+  it("should include a node for every role", () => {
+    const dot = toConfigDot({
+      roles: ["requirement", "design", "test"],
+      relations: {},
+    });
+    expect(dot).to.include('"requirement"');
+    expect(dot).to.include('"design"');
+    expect(dot).to.include('"test"');
+  });
+
+  it("should include an edge per declared relation with type labels", () => {
+    const dot = toConfigDot({
+      roles: ["design", "requirement"],
+      relations: { design: { requirement: ["addresses", "satisfies"] } },
+    });
+    expect(dot).to.include(
+      '"design" -> "requirement" [label="addresses, satisfies"];',
+    );
+  });
+
+  it("should preserve self-loops", () => {
+    const dot = toConfigDot({
+      roles: ["requirement"],
+      relations: { requirement: { requirement: ["refines"] } },
+    });
+    expect(dot).to.include('"requirement" -> "requirement" [label="refines"];');
+  });
+
+  it("should render an isolated role as a node with no edges", () => {
+    const dot = toConfigDot({
+      roles: ["requirement", "constraint"],
+      relations: { requirement: { requirement: ["refines"] } },
+    });
+    expect(dot).to.include('"constraint"');
+    expect(dot).to.not.include('"constraint" ->');
+    expect(dot).to.not.include('-> "constraint"');
+  });
+
+  it("should not render inverseLabels-derived edges", () => {
+    const dot = toConfigDot({
+      roles: ["design", "requirement"],
+      relations: { design: { requirement: ["addresses"] } },
+      inverseLabels: { addresses: "addressed-by" },
+    });
+    expect(dot).to.include('"design" -> "requirement"');
+    expect(dot).to.not.include('"requirement" -> "design"');
+    expect(dot).to.not.include("addressed-by");
   });
 });

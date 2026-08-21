@@ -79,6 +79,22 @@ For a global coverage chart (all roles), place it outside any item block:
 traceability:graph-coverage[]
 ----
 
+== Add a configuration graph
+
+Place `traceability:config-graph[]` anywhere on a page to render the traceability *configuration* — the roles and the relations allowed between them — as a GraphViz diagram:
+
+[source,asciidoc]
+----
+= Our Model
+:traceability-graph: true
+
+traceability:config-graph[]
+----
+
+Unlike `traceability:graph[]`, which shows items, this macro shows the *model*: each configured role is a node, each declared relation is a labeled arrow.
+Only declared directions are drawn — inverse labels are not rendered.
+Roles declared with no relations still appear as isolated nodes, which makes orphaned roles visible.
+
 == Enabling relationship link macros
 
 For textual relationship lists (not diagrams), enable the link macros:

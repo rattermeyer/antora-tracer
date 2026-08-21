@@ -13,8 +13,8 @@
 
 import {
   existsSync,
-  mkdtempSync,
   mkdirSync,
+  mkdtempSync,
   readdirSync,
   readFileSync,
   rmSync,
@@ -116,7 +116,12 @@ satisfies:REQ-001[]
  * Create a content catalog event with traceable items.
  */
 function createContentClassifiedEvent(
-  files: Array<{ path: string; content: string; module?: string; component?: string }>,
+  files: Array<{
+    path: string;
+    content: string;
+    module?: string;
+    component?: string;
+  }>,
 ) {
   return {
     contentCatalog: {
@@ -447,7 +452,8 @@ A requirement from a page.
             path: "partials/shared-items.adoc",
             module: "ROOT",
             component: "test",
-            fileUri: "https://github.com/example/repo/blob/main/partials/shared-items.adoc",
+            fileUri:
+              "https://github.com/example/repo/blob/main/partials/shared-items.adoc",
           },
           contents: Buffer.from(`
 [#REQ-100, item, role=requirement, title="From Partial"]
@@ -492,16 +498,18 @@ A requirement from a partial file.
             path: "partials/with-macros.adoc",
             module: "ROOT",
             component: "test",
-            fileUri: "https://github.com/example/repo/blob/main/partials/with-macros.adoc",
+            fileUri:
+              "https://github.com/example/repo/blob/main/partials/with-macros.adoc",
           },
           contents: Buffer.from(
-`[#REQ-200, item, role=requirement, title="With Macros"]
+            `[#REQ-200, item, role=requirement, title="With Macros"]
 --
 Has outgoing macro in partial.
 
 traceability:outgoing[]
 --
-`),
+`,
+          ),
         },
       ];
 
@@ -539,7 +547,8 @@ traceability:outgoing[]
             path: "partials/empty.adoc",
             module: "ROOT",
             component: "test",
-            fileUri: "https://github.com/example/repo/blob/main/partials/empty.adoc",
+            fileUri:
+              "https://github.com/example/repo/blob/main/partials/empty.adoc",
           },
           contents: Buffer.from(`= No items here\n\nJust some text.`),
         },
@@ -1153,7 +1162,10 @@ contains:REQ-001[]
         contents: Buffer.from(content),
       };
       ctx.fireEvent("contentClassified", {
-        contentCatalog: { findBy: ({ family }: { family: string }) => (family === "page" ? [file] : []) },
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [file] : [],
+        },
       });
 
       expect(file.contents.toString("utf8")).to.include("Contained-in");
@@ -1186,7 +1198,10 @@ depends:REQ-001[]
         contents: Buffer.from(content),
       };
       ctx.fireEvent("contentClassified", {
-        contentCatalog: { findBy: ({ family }: { family: string }) => (family === "page" ? [file] : []) },
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [file] : [],
+        },
       });
 
       expect(file.contents.toString("utf8")).to.include("Depended-by");
@@ -1219,7 +1234,10 @@ foobar:REQ-001[]
         contents: Buffer.from(content),
       };
       ctx.fireEvent("contentClassified", {
-        contentCatalog: { findBy: ({ family }: { family: string }) => (family === "page" ? [file] : []) },
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [file] : [],
+        },
       });
 
       expect(file.contents.toString("utf8")).to.include("Foobar");
@@ -1488,7 +1506,10 @@ Description.
         contents: Buffer.from(content),
       };
       ctx.fireEvent("contentClassified", {
-        contentCatalog: { findBy: ({ family }: { family: string }) => (family === "page" ? [file] : []) },
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [file] : [],
+        },
       });
       return file.contents.toString("utf8");
     }
@@ -1777,9 +1798,15 @@ Description.
 --
 `;
 
-      const file = { src: { path: "test.adoc" }, contents: Buffer.from(content) };
+      const file = {
+        src: { path: "test.adoc" },
+        contents: Buffer.from(content),
+      };
       ctx.fireEvent("contentClassified", {
-        contentCatalog: { findBy: ({ family }: { family: string }) => (family === "page" ? [file] : []) },
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [file] : [],
+        },
       });
 
       const output = file.contents.toString("utf8");
@@ -1810,9 +1837,15 @@ Description.
 --
 `;
 
-      const file = { src: { path: "test.adoc" }, contents: Buffer.from(content) };
+      const file = {
+        src: { path: "test.adoc" },
+        contents: Buffer.from(content),
+      };
       ctx.fireEvent("contentClassified", {
-        contentCatalog: { findBy: ({ family }: { family: string }) => (family === "page" ? [file] : []) },
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [file] : [],
+        },
       });
 
       const output = file.contents.toString("utf8");
@@ -1844,9 +1877,15 @@ Description.
 
       process.env.KROKI_SERVER_URL = "http://env-server:9999";
       try {
-        const file = { src: { path: "test.adoc" }, contents: Buffer.from(content) };
+        const file = {
+          src: { path: "test.adoc" },
+          contents: Buffer.from(content),
+        };
         ctx.fireEvent("contentClassified", {
-          contentCatalog: { findBy: ({ family }: { family: string }) => (family === "page" ? [file] : []) },
+          contentCatalog: {
+            findBy: ({ family }: { family: string }) =>
+              family === "page" ? [file] : [],
+          },
         });
         const output = file.contents.toString("utf8");
         expect(output).to.include("image::http://env-server:9999/graphviz/");
@@ -1881,9 +1920,15 @@ Description.
 
       process.env.KROKI_SERVER_URL = "http://env-server:9999";
       try {
-        const file = { src: { path: "test.adoc" }, contents: Buffer.from(content) };
+        const file = {
+          src: { path: "test.adoc" },
+          contents: Buffer.from(content),
+        };
         ctx.fireEvent("contentClassified", {
-          contentCatalog: { findBy: ({ family }: { family: string }) => (family === "page" ? [file] : []) },
+          contentCatalog: {
+            findBy: ({ family }: { family: string }) =>
+              family === "page" ? [file] : [],
+          },
         });
         const output = file.contents.toString("utf8");
         expect(output).to.include("image::http://env-server:9999/graphviz/");
@@ -1917,15 +1962,114 @@ Description.
 --
 `;
 
-      const file = { src: { path: "test.adoc" }, contents: Buffer.from(content) };
+      const file = {
+        src: { path: "test.adoc" },
+        contents: Buffer.from(content),
+      };
       ctx.fireEvent("contentClassified", {
-        contentCatalog: { findBy: ({ family }: { family: string }) => (family === "page" ? [file] : []) },
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [file] : [],
+        },
       });
 
       const output = file.contents.toString("utf8");
       // Should NOT have double-slash after host
       expect(output).to.include("image::http://localhost:8000/graphviz/");
       expect(output).to.not.include("//graphviz");
+    });
+  });
+
+  // ========================================================================
+  // Config Graph Macro Expansion
+  // ========================================================================
+
+  describe("Config Graph Macro Expansion", () => {
+    it("should expand traceability:config-graph[] to a Kroki image when enabled", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const content = `:traceability-graph: true
+
+traceability:config-graph[]
+`;
+
+      const file = {
+        src: { path: "test.adoc" },
+        contents: Buffer.from(content),
+      };
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [file] : [],
+        },
+      });
+
+      const output = file.contents.toString("utf8");
+      expect(output).to.include("image::https://kroki.io/graphviz/");
+      expect(output).to.not.include("traceability:config-graph[");
+    });
+
+    it("should strip traceability:config-graph[] when graph not enabled", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const content = `traceability:config-graph[]
+`;
+
+      const file = {
+        src: { path: "test.adoc" },
+        contents: Buffer.from(content),
+      };
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [file] : [],
+        },
+      });
+
+      const output = file.contents.toString("utf8");
+      expect(output).to.not.include("traceability:config-graph[");
+      expect(output).to.not.include("image::");
+    });
+
+    it("should strip traceability:config-graph[] when config is unavailable", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any, {
+        config: {
+          configPath: "/nonexistent/traceability.yml",
+          preset: "nonexistent-preset",
+        },
+      });
+      await waitForInit();
+
+      const content = `:traceability-graph: true
+
+traceability:config-graph[]
+`;
+
+      const file = {
+        src: { path: "test.adoc" },
+        contents: Buffer.from(content),
+      };
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [file] : [],
+        },
+      });
+
+      const output = file.contents.toString("utf8");
+      expect(output).to.not.include("traceability:config-graph[");
+      expect(output).to.not.include("image::");
     });
   });
 
@@ -2047,8 +2191,16 @@ The system shall log authentication events.
         ctx.fireEvent(
           "contentClassified",
           createContentClassifiedEvent([
-            { path: "modules/ROOT/pages/a.adoc", content: fileA, component: "tracer" },
-            { path: "modules/ROOT/pages/b.adoc", content: fileB, component: "tracer" },
+            {
+              path: "modules/ROOT/pages/a.adoc",
+              content: fileA,
+              component: "tracer",
+            },
+            {
+              path: "modules/ROOT/pages/b.adoc",
+              content: fileB,
+              component: "tracer",
+            },
           ]),
         ),
       ).to.throw(/Duplicate item IDs detected/);
@@ -2078,8 +2230,16 @@ The system shall log authentication events.
         ctx.fireEvent(
           "contentClassified",
           createContentClassifiedEvent([
-            { path: "modules/ROOT/pages/a.adoc", content: fileA, component: "tracer" },
-            { path: "modules/ROOT/pages/b.adoc", content: fileB, component: "tracer" },
+            {
+              path: "modules/ROOT/pages/a.adoc",
+              content: fileA,
+              component: "tracer",
+            },
+            {
+              path: "modules/ROOT/pages/b.adoc",
+              content: fileB,
+              component: "tracer",
+            },
           ]),
         ),
       ).to.not.throw();
@@ -2131,8 +2291,18 @@ traceability:outgoing[]
       ctx.fireEvent(
         "contentClassified",
         createContentClassifiedEvent([
-          { path: "modules/ROOT/pages/architecture.adoc", content: rootContent, module: "ROOT", component: "tracer" },
-          { path: "modules/requirements/pages/index.adoc", content: reqContent, module: "requirements", component: "tracer" },
+          {
+            path: "modules/ROOT/pages/architecture.adoc",
+            content: rootContent,
+            module: "ROOT",
+            component: "tracer",
+          },
+          {
+            path: "modules/requirements/pages/index.adoc",
+            content: reqContent,
+            module: "requirements",
+            component: "tracer",
+          },
         ]),
       );
 
@@ -2156,7 +2326,13 @@ traceability:outgoing[]
 
       // Cross-module: current is requirements, target is ROOT → should include "ROOT:"
       const xref = buildXref(
-        { id: "ARC-001", title: "Auth Module", sourceFile: "architecture", component: "tracer", module: "ROOT" },
+        {
+          id: "ARC-001",
+          title: "Auth Module",
+          sourceFile: "architecture",
+          component: "tracer",
+          module: "ROOT",
+        },
         "index",
         "Auth Module",
         "tracer",
@@ -2202,7 +2378,13 @@ Description.
       // Same module (ROOT→ROOT): no prefix
       const buildXref = (ext as any).buildXref.bind(ext);
       const xref = buildXref(
-        { id: "ARC-002", title: "Session", sourceFile: "architecture", component: "tracer", module: "ROOT" },
+        {
+          id: "ARC-002",
+          title: "Session",
+          sourceFile: "architecture",
+          component: "tracer",
+          module: "ROOT",
+        },
         "architecture",
         "Session",
         "tracer",
@@ -2244,7 +2426,13 @@ Description.
 
       // Cross-component: current is tracer, target is other-comp
       const xref = buildXref(
-        { id: "ITEM-001", title: "Other Item", sourceFile: "page", component: "other-comp", module: "ROOT" },
+        {
+          id: "ITEM-001",
+          title: "Other Item",
+          sourceFile: "page",
+          component: "other-comp",
+          module: "ROOT",
+        },
         "my-page",
         "Other Item",
         "tracer",

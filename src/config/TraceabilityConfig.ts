@@ -7,6 +7,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { load as yamlLoad } from "js-yaml";
+import { ROLE_COLORS } from "../types.js";
 
 // ============================================================================
 // Configuration Interfaces
@@ -653,6 +654,43 @@ export function createConfigLoader(configPath?: string): ConfigLoader {
 
 export function loadConfig(configPath?: string): CompleteConfig {
   return new ConfigLoader().load(configPath);
+}
+
+/**
+ * Generate a GraphViz DOT representation of the traceability configuration.
+ * Renders declared roles as nodes and declared relations as labeled edges.
+ * Declared directions only — `inverseLabels` is not consulted, so no derived
+ * reverse edges appear. Roles with no declared relations still render as
+ * (isolated) nodes so orphaned roles are visible.
+ */
+export function toConfigDot(config: TraceabilityConfig): string {
+  const roles = config.roles || [];
+  const relations = config.relations || {};
+
+  const lines: string[] = [
+    "digraph TraceabilityConfig {",
+    "  rankdir=LR;",
+    '  node [shape=box, style="rounded,filled", fontname="Helvetica"];',
+    '  edge [fontname="Helvetica", fontsize=10];',
+  ];
+
+  for (const role of roles) {
+    const color = ROLE_COLORS[role] || "#AAAAAA";
+    lines.push(
+      `  "${role}" [fillcolor="${color}", fontcolor=white, label="${role}"];`,
+    );
+  }
+
+  for (const [source, targets] of Object.entries(relations)) {
+    for (const [target, types] of Object.entries(targets)) {
+      if (!types || types.length === 0) continue;
+      const label = types.join(", ");
+      lines.push(`  "${source}" -> "${target}" [label="${label}"];`);
+    }
+  }
+
+  lines.push("}");
+  return lines.join("\n");
 }
 
 // Default export

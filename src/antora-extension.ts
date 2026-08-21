@@ -13,14 +13,10 @@
  * }
  */
 
-import {
-  existsSync,
-  mkdirSync,
-  writeFileSync,
-} from "node:fs";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { isAbsolute, join } from "node:path";
 import { deflateSync } from "node:zlib";
-import { ConfigLoader } from "./config/TraceabilityConfig.js";
+import { ConfigLoader, toConfigDot } from "./config/TraceabilityConfig.js";
 import { RequirementsTraceabilityExtension } from "./index.js";
 import { LinkResolver } from "./LinkResolver.js";
 import { MatrixGenerator } from "./MatrixGenerator.js";
@@ -106,7 +102,8 @@ export class AntoraTraceabilityExtension {
       outputDir: rc.outputdir || rc.outputDir || "traceability",
       generateMatrices: rc.generateMatrices ?? rc.generatematrices ?? true,
       matrixFormats: rc.matrixFormats || rc.matrixformats || ["html", "csv"],
-      includeInNavigation: rc.includeInNavigation ?? rc.includeinnavigation ?? true,
+      includeInNavigation:
+        rc.includeInNavigation ?? rc.includeinnavigation ?? true,
       preset: rc.preset || "requirements-engineering",
       krokiImageFormat: rc.krokiImageFormat || rc.krokiimageformat || "svg",
       krokiServerUrl: rc.krokiServerUrl || rc.krokiserverurl || "",
@@ -151,9 +148,7 @@ export class AntoraTraceabilityExtension {
           ? this.config.configPath
           : join(playbookDir, this.config.configPath);
         configLoader.load(resolvedPath);
-        this.logger.info(
-          `Loaded configuration from: ${resolvedPath}`,
-        );
+        this.logger.info(`Loaded configuration from: ${resolvedPath}`);
         return new RequirementsTraceabilityExtension(configLoader, this.logger);
       } catch (error: any) {
         this.logger.warn(
@@ -325,7 +320,13 @@ export class AntoraTraceabilityExtension {
       const bodyEnd = content.indexOf("\n--\n", bodyStart);
       if (bodyEnd === -1) continue;
 
-      results.push({ itemId, headerStart: m.index, headerEnd: macroEnd + 1, bodyStart, bodyEnd });
+      results.push({
+        itemId,
+        headerStart: m.index,
+        headerEnd: macroEnd + 1,
+        bodyStart,
+        bodyEnd,
+      });
     }
 
     return results;
@@ -346,7 +347,8 @@ export class AntoraTraceabilityExtension {
       if (!content.includes(`traceability:${macroName}[]`)) return;
 
       const docAttrs = this.parseDocAttributes(content);
-      const linksEnabled = (file as any).__isPartial || this.isLinksEnabled(docAttrs);
+      const linksEnabled =
+        (file as any).__isPartial || this.isLinksEnabled(docAttrs);
       const style = this.getLinksStyle(docAttrs);
       const order = this.getLinksOrder(docAttrs);
       const collapsible = this.getCollapsible(docAttrs);
@@ -432,17 +434,11 @@ export class AntoraTraceabilityExtension {
     emptyStyle: "none" | "italic" | "admonition" = "none",
   ): string {
     const directions: RelationDirection[] =
-      macroName === "links"
-        ? ["outgoing", "incoming"]
-        : [macroName];
+      macroName === "links" ? ["outgoing", "incoming"] : [macroName];
 
     const parts: string[] = [];
     for (const direction of directions) {
-      const groups = this.buildRelationGroups(
-        itemId,
-        direction,
-        order,
-      );
+      const groups = this.buildRelationGroups(itemId, direction, order);
       if (groups.length > 0) {
         parts.push(
           this.generateLinksAsciiDoc(
@@ -490,9 +486,11 @@ export class AntoraTraceabilityExtension {
       // Incoming display uses the inverse label of the relation type.
       const groupKey = isOutgoing
         ? rel.type
-        : (this.traceability!.configLoader?.getConfig()?.inverseLabels?.[rel.type] ??
-            INVERSE_MAP[rel.type as keyof typeof INVERSE_MAP] ??
-            rel.type);
+        : (this.traceability!.configLoader?.getConfig()?.inverseLabels?.[
+            rel.type
+          ] ??
+          INVERSE_MAP[rel.type as keyof typeof INVERSE_MAP] ??
+          rel.type);
 
       if (!grouped.has(groupKey)) grouped.set(groupKey, []);
       grouped.get(groupKey)?.push({
@@ -519,7 +517,16 @@ export class AntoraTraceabilityExtension {
 
   private generateLinksAsciiDoc(
     grouped: Array<
-      [string, Array<{ id: string; title: string; sourceFile?: string; component?: string; module?: string }>]
+      [
+        string,
+        Array<{
+          id: string;
+          title: string;
+          sourceFile?: string;
+          component?: string;
+          module?: string;
+        }>,
+      ]
     >,
     style: "list" | "table" | "inline",
     currentFile: string,
@@ -528,14 +535,37 @@ export class AntoraTraceabilityExtension {
     currentModule?: string,
   ): string {
     if (grouped.length === 0) return "";
-    if (style === "table") return this.generateTableStyle(grouped, currentFile, currentComponent, currentModule);
+    if (style === "table")
+      return this.generateTableStyle(
+        grouped,
+        currentFile,
+        currentComponent,
+        currentModule,
+      );
     if (style === "inline")
-      return this.generateInlineStyle(grouped, currentFile, currentComponent, currentModule);
-    return this.generateListStyle(grouped, currentFile, collapsible, currentComponent, currentModule);
+      return this.generateInlineStyle(
+        grouped,
+        currentFile,
+        currentComponent,
+        currentModule,
+      );
+    return this.generateListStyle(
+      grouped,
+      currentFile,
+      collapsible,
+      currentComponent,
+      currentModule,
+    );
   }
 
   private buildXref(
-    item: { id: string; title: string; sourceFile?: string; component?: string; module?: string },
+    item: {
+      id: string;
+      title: string;
+      sourceFile?: string;
+      component?: string;
+      module?: string;
+    },
     currentFile: string,
     displayText: string,
     currentComponent?: string,
@@ -554,9 +584,17 @@ export class AntoraTraceabilityExtension {
       // Build the xref path with appropriate Antora prefix:
       // cross-component → component:module:page, cross-module → module:page, same → page
       let path = item.sourceFile;
-      if (item.component && currentComponent && item.component !== currentComponent) {
+      if (
+        item.component &&
+        currentComponent &&
+        item.component !== currentComponent
+      ) {
         path = `${item.component}:${item.module || ""}:${item.sourceFile}`;
-      } else if (item.module && currentModule && item.module !== currentModule) {
+      } else if (
+        item.module &&
+        currentModule &&
+        item.module !== currentModule
+      ) {
         path = `${item.module}:${item.sourceFile}`;
       }
       return `xref:${path}#${item.id}[${displayText}]`;
@@ -566,7 +604,16 @@ export class AntoraTraceabilityExtension {
 
   private generateListStyle(
     grouped: Array<
-      [string, Array<{ id: string; title: string; sourceFile?: string; component?: string; module?: string }>]
+      [
+        string,
+        Array<{
+          id: string;
+          title: string;
+          sourceFile?: string;
+          component?: string;
+          module?: string;
+        }>,
+      ]
     >,
     currentFile: string,
     collapsible: boolean,
@@ -588,7 +635,9 @@ export class AntoraTraceabilityExtension {
           .replace(/&/g, "&amp;")
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;");
-        lines.push(`* ${this.buildXref(item, currentFile, safeTitle, currentComponent, currentModule)}`);
+        lines.push(
+          `* ${this.buildXref(item, currentFile, safeTitle, currentComponent, currentModule)}`,
+        );
       }
       if (collapsible) {
         lines.push(`====`);
@@ -599,7 +648,16 @@ export class AntoraTraceabilityExtension {
 
   private generateTableStyle(
     grouped: Array<
-      [string, Array<{ id: string; title: string; sourceFile?: string; component?: string; module?: string }>]
+      [
+        string,
+        Array<{
+          id: string;
+          title: string;
+          sourceFile?: string;
+          component?: string;
+          module?: string;
+        }>,
+      ]
     >,
     currentFile: string,
     currentComponent?: string,
@@ -609,7 +667,13 @@ export class AntoraTraceabilityExtension {
     lines.push("| Relation | ID | Title");
     for (const [relType, items] of grouped) {
       for (const item of items) {
-        const xref = this.buildXref(item, currentFile, item.id, currentComponent, currentModule);
+        const xref = this.buildXref(
+          item,
+          currentFile,
+          item.id,
+          currentComponent,
+          currentModule,
+        );
         lines.push(
           "| " +
             relType +
@@ -626,7 +690,16 @@ export class AntoraTraceabilityExtension {
 
   private generateInlineStyle(
     grouped: Array<
-      [string, Array<{ id: string; title: string; sourceFile?: string; component?: string; module?: string }>]
+      [
+        string,
+        Array<{
+          id: string;
+          title: string;
+          sourceFile?: string;
+          component?: string;
+          module?: string;
+        }>,
+      ]
     >,
     currentFile: string,
     currentComponent?: string,
@@ -638,7 +711,17 @@ export class AntoraTraceabilityExtension {
         "\n" +
           this.capitalize(relType) +
           ": " +
-          items.map((i) => this.buildXref(i, currentFile, i.id, currentComponent, currentModule)).join(", "),
+          items
+            .map((i) =>
+              this.buildXref(
+                i,
+                currentFile,
+                i.id,
+                currentComponent,
+                currentModule,
+              ),
+            )
+            .join(", "),
       );
     }
     return `${lines.join("\n")}\n`;
@@ -658,8 +741,13 @@ export class AntoraTraceabilityExtension {
    * Uses deflate + base64url encoding.
    */
   private krokiUrl(type: string, source: string): string {
-    const serverUrl = (process.env.KROKI_SERVER_URL || this.config.krokiServerUrl || "https://kroki.io").replace(/\/$/, "");
-    const format = process.env.KROKI_IMAGE_FORMAT || this.config.krokiImageFormat || "svg";
+    const serverUrl = (
+      process.env.KROKI_SERVER_URL ||
+      this.config.krokiServerUrl ||
+      "https://kroki.io"
+    ).replace(/\/$/, "");
+    const format =
+      process.env.KROKI_IMAGE_FORMAT || this.config.krokiImageFormat || "svg";
     const compressed = deflateSync(Buffer.from(source, "utf-8"));
     const encoded = Buffer.from(compressed).toString("base64url");
     return `${serverUrl}/${type}/${format}/${encoded}`;
@@ -677,7 +765,8 @@ export class AntoraTraceabilityExtension {
       const docAttrs = this.parseDocAttributes(content);
       if (!content.includes("traceability:graph[")) return;
 
-      const graphEnabled = (file as any).__isPartial || this.isGraphEnabled(docAttrs);
+      const graphEnabled =
+        (file as any).__isPartial || this.isGraphEnabled(docAttrs);
       const blocks = this.findItemBlocks(content);
       const replacements: Array<{ start: number; end: number; text: string }> =
         [];
@@ -794,7 +883,8 @@ export class AntoraTraceabilityExtension {
       const docAttrs = this.parseDocAttributes(content);
       if (!content.includes("traceability:graph-coverage[")) return;
 
-      const graphEnabled = (file as any).__isPartial || this.isGraphEnabled(docAttrs);
+      const graphEnabled =
+        (file as any).__isPartial || this.isGraphEnabled(docAttrs);
       const blocks = this.findItemBlocks(content);
       const replacements: Array<{ start: number; end: number; text: string }> =
         [];
@@ -894,6 +984,75 @@ export class AntoraTraceabilityExtension {
     }
   }
 
+  /**
+   * Expand traceability:config-graph[] macros into Kroki GraphViz images.
+   * Renders the effective traceability configuration (roles + declared relations).
+   */
+  private expandConfigGraphMacros(file: any): void {
+    if (!this.traceability) return;
+    try {
+      const contentsBuffer = file.contents || file.src?.contents;
+      if (!contentsBuffer) return;
+      const content = contentsBuffer.toString("utf8");
+      if (!content.includes("traceability:config-graph[")) return;
+
+      const docAttrs = this.parseDocAttributes(content);
+      const graphEnabled =
+        (file as any).__isPartial || this.isGraphEnabled(docAttrs);
+
+      // Resolve the effective config once; unavailable config strips the macro.
+      let config: ReturnType<typeof this.traceability.getConfig>;
+      try {
+        config = this.traceability.getConfig();
+      } catch {
+        config = undefined;
+      }
+
+      const replacements: Array<{ start: number; end: number; text: string }> =
+        [];
+      const macroRegex = /traceability:config-graph\[\]/g;
+      const inlineRanges = this.getInlineCodeRanges(content);
+      let match: RegExpExecArray | null;
+
+      while ((match = macroRegex.exec(content)) !== null) {
+        if (this.isInsideRange(match.index, inlineRanges)) continue;
+        const macroStart = match.index;
+        const macroEnd = macroStart + match[0].length;
+
+        if (!graphEnabled || !config) {
+          replacements.push({ start: macroStart, end: macroEnd, text: "" });
+          continue;
+        }
+
+        const dotSource = toConfigDot(config);
+        const url = this.krokiUrl("graphviz", dotSource);
+        replacements.push({
+          start: macroStart,
+          end: macroEnd,
+          text: `\nimage::${url}[Traceability configuration graph]\n`,
+        });
+      }
+
+      if (replacements.length > 0) {
+        let modifiedContent = content;
+        for (let i = replacements.length - 1; i >= 0; i--) {
+          const r = replacements[i];
+          modifiedContent =
+            modifiedContent.slice(0, r.start) +
+            r.text +
+            modifiedContent.slice(r.end);
+        }
+        const buf = Buffer.from(modifiedContent, "utf8");
+        if (file.contents) file.contents = buf;
+        if (file.src?.contents) file.src.contents = buf;
+      }
+    } catch (error: any) {
+      this.logger.warn(
+        `Error expanding config graph in ${file.src?.path}: ${error.message}`,
+      );
+    }
+  }
+
   private registerContentClassifier(): void {
     this.context.on("contentClassified", (event: any) => {
       const contentCatalog = event.contentCatalog;
@@ -932,10 +1091,7 @@ export class AntoraTraceabilityExtension {
 
       const pageGroups = groupByVersion(adocFiles);
       const partialGroups = groupByVersion(adocPartials);
-      const allKeys = new Set([
-        ...pageGroups.keys(),
-        ...partialGroups.keys(),
-      ]);
+      const allKeys = new Set([...pageGroups.keys(), ...partialGroups.keys()]);
 
       const htmlStyle = event.playbook?.urls?.html_style;
 
@@ -960,7 +1116,8 @@ export class AntoraTraceabilityExtension {
         // Duplicate item IDs are merge-time conflicts, not recoverable state.
         // Fail the build so the collision surfaces instead of silently
         // dropping one definition, unless the site opts out.
-        const duplicates = this.traceability?.graph.getDuplicateWarnings() ?? [];
+        const duplicates =
+          this.traceability?.graph.getDuplicateWarnings() ?? [];
         if (duplicates.length > 0) {
           const details = duplicates.map((d) => d.message).join("\n");
           const summary = `Duplicate item IDs detected in component '${component}' version '${version}':\n${details}`;
@@ -978,6 +1135,7 @@ export class AntoraTraceabilityExtension {
           this.expandRelationMacros(file, "links");
           this.expandGraphMacros(file);
           this.expandCoverageMacros(file);
+          this.expandConfigGraphMacros(file);
         }
 
         // Expand macros on partials — mark them so expand methods default
@@ -989,6 +1147,7 @@ export class AntoraTraceabilityExtension {
           this.expandRelationMacros(file, "links");
           this.expandGraphMacros(file);
           this.expandCoverageMacros(file);
+          this.expandConfigGraphMacros(file);
         }
 
         // Substitute relationship macros with xrefs — both pages and partials
@@ -1100,7 +1259,11 @@ export class AntoraTraceabilityExtension {
       sourceFile = this.normalizeSourceFile(sourceFile);
       const component = file.src?.component || undefined;
       const moduleName = file.src?.module || undefined;
-      this.traceability.process(content, { sourceFile, component, module: moduleName });
+      this.traceability.process(content, {
+        sourceFile,
+        component,
+        module: moduleName,
+      });
     } catch (error: any) {
       this.logger.warn(`Error processing ${file.src?.path}: ${error.message}`);
     }
@@ -1371,16 +1534,15 @@ export class AntoraTraceabilityExtension {
         if (!this.config.generateMatrices) return;
         this.generateTraceabilityFiles(event);
       } catch (error: any) {
-        this.logger.error(
-          `Error in sitePublished handler: ${error.message}`,
-        );
+        this.logger.error(`Error in sitePublished handler: ${error.message}`);
       }
     });
   }
 
-  private generateMatrixFiles(
-    htmlStyle?: string,
-  ): { matrixNames: string[]; files: Array<{ fileName: string; content: string }> } {
+  private generateMatrixFiles(htmlStyle?: string): {
+    matrixNames: string[];
+    files: Array<{ fileName: string; content: string }>;
+  } {
     const files: Array<{ fileName: string; content: string }> = [];
     if (!this.traceability) return { matrixNames: [], files };
 

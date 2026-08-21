@@ -10,7 +10,7 @@
 
 import type { ConfigLoader } from "./config/TraceabilityConfig.js";
 import type { Item, ItemRelationship } from "./types.js";
-import { INVERSE_MAP, PRIMARY_MAP } from "./types.js";
+import { INVERSE_MAP, PRIMARY_MAP, ROLE_COLORS } from "./types.js";
 
 /**
  * Warning type for graph operations
@@ -792,16 +792,6 @@ export class TraceabilityGraph {
   // Visualization
   // ========================================================================
 
-  /** Role → GraphViz color mapping */
-  private static readonly ROLE_COLORS: Record<string, string> = {
-    requirement: "#4A90D9",
-    design: "#50B86C",
-    architecture: "#50B86C",
-    implementation: "#E8A838",
-    test: "#D94A4A",
-    document: "#8E6ECF",
-  };
-
   /**
    * Generate a GraphViz DOT representation of the subgraph around an item.
    * @param fromId The starting item ID
@@ -871,7 +861,7 @@ export class TraceabilityGraph {
     for (const id of visited) {
       const nodeItem = this.getItem(id);
       if (!nodeItem) continue;
-      const color = TraceabilityGraph.ROLE_COLORS[nodeItem.role] || "#AAAAAA";
+      const color = ROLE_COLORS[nodeItem.role] || "#AAAAAA";
       const label = `${nodeItem.id}\\n${(nodeItem.title || "").substring(0, 40)}`;
       lines.push(
         `  "${id}" [fillcolor="${color}", fontcolor=white, label="${label}"];`,
@@ -1035,7 +1025,8 @@ export class TraceabilityGraph {
         if (idx !== -1) typeRels.splice(idx, 1);
         if (typeRels.length === 0) fromIdx.delete(relationship.type);
       }
-      if (fromIdx.size === 0) this._relationshipIndex.delete(relationship.fromId);
+      if (fromIdx.size === 0)
+        this._relationshipIndex.delete(relationship.fromId);
     }
     const targetIdx = this._reverseRelationshipIndex.get(relationship.targetId);
     if (targetIdx) {
@@ -1045,7 +1036,8 @@ export class TraceabilityGraph {
         if (idx !== -1) typeRels.splice(idx, 1);
         if (typeRels.length === 0) targetIdx.delete(relationship.type);
       }
-      if (targetIdx.size === 0) this._reverseRelationshipIndex.delete(relationship.targetId);
+      if (targetIdx.size === 0)
+        this._reverseRelationshipIndex.delete(relationship.targetId);
     }
   }
 
