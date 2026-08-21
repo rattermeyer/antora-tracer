@@ -15,15 +15,15 @@ An item starts with the `[item]` block macro:
 [source,asciidoc]
 ----
 [#REQ-001, item, role=requirement, title="User authentication"]
-====
+--
 The system shall require authentication for all protected endpoints.
-====
+--
 ----
 
 - `#REQ-001` — unique ID. Use a consistent prefix convention (see <<Choose ID conventions>> below)
 - `role=requirement` — must match a role in your configuration
 - `title` — display title. Defaults to the ID if omitted
-- `====` delimiters — the block content goes between them
+- `--` delimiters — the block content goes between them
 
 == Add inline relationships
 
@@ -32,12 +32,12 @@ Inside the item block, add relationships using the `<type>:TARGET-ID[]` syntax:
 [source,asciidoc]
 ----
 [#IMP-001, item, role=implementation]
-====
+--
 JWT-based authentication service.
 
 satisfies:REQ-001[]           <1>
 depends_on:IMP-002[]          <2>
-====
+--
 ----
 <1> This implementation satisfies the requirement REQ-001
 <2> This implementation depends on another implementation IMP-002
@@ -86,9 +86,9 @@ Track the lifecycle of items with attributes:
 [source,asciidoc]
 ----
 [#REQ-001, item, role=requirement, title="Auth", status="draft", priority="high"]
-====
+--
 ...
-====
+--
 ----
 
 `status` and `priority` are free-form strings.
@@ -101,14 +101,14 @@ Use the `traceability:outgoing[]` and `traceability:incoming[]` macros to show r
 [source,asciidoc]
 ----
 [#IMP-001, item, role=implementation]
-====
+--
 JWT-based authentication.
 
 satisfies:REQ-001[]
 
 traceability:outgoing[]     <1>
 traceability:incoming[]     <2>
-====
+--
 ----
 <1> Renders a list of items this item points to
 <2> Renders a list of items that point to this item

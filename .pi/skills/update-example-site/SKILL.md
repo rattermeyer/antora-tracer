@@ -1,6 +1,6 @@
 ---
 name: update-example-site
-description: Update the self-traceability example site to reflect the current as-is state of the project. Scans all OpenSpec specs, design decisions, and test files to regenerate requirements, architecture, and test-plan documents. Run after archiving a change.
+description: Update the self-traceability example site to reflect the current as-is state of the project. Scans all OpenSpec specs, design decisions, and test files to regenerate requirements, architecture, and test-plan documents, and reviews prose pages for staleness. Run after archiving a change.
 ---
 
 # Update Example Site
@@ -181,7 +181,19 @@ Contains UC items (`role=use_case`) in Karl Wiegers tabular format.
 
 **Identify gaps** by cross-referencing user-facing capabilities in `how-to/` pages against existing use cases. Present a proposed outline (ID, actor, goal, key flows) for confirmation before writing new use cases.
 
-### 8. Check `traceability.yml`
+### 8. Review prose pages for staleness
+
+The steps above regenerate the traceability-typed documents (REQ, ARC, TST, UC). Prose pages — Tutorial, How-to, Reference, Explanation — are hand-written and not derivable from any source. Review them for drift against current behaviour:
+
+- **Item block examples** use the canonical `--` open-block delimiter (not `====`).
+- **Output paths** in examples match the current build output (`public/docs/`, matrices as attachments — not `public/traceability/index.html`).
+- **Claims about behaviour** (which matrices are generated, coverage reports, etc.) match what the build actually produces.
+- **Example relations** use roles and relation types present in `examples/traceability.yml`.
+- **Macro names and syntax** match the current reference.
+
+The machine-checkable parts (roles, relations, parseability) are automated by the `validate-doc-examples` change once implemented.
+
+### 9. Check `traceability.yml`
 
 File: `examples/traceability.yml`
 
@@ -191,7 +203,7 @@ Check that roles, relations, and matrix definitions still match what the documen
 - Relations: `addresses`, `verifies`, `validates`, `leads_to` (and their inverses)
 - Matrices: one per cross-cutting concern (requirements↔design, requirements↔tests, etc.)
 
-### 9. Regenerate Traceability Output
+### 10. Regenerate Traceability Output
 
 ```bash
 npm run build
@@ -200,7 +212,7 @@ node examples/run-example.js
 
 `run-example.js` reads matrix names from the config and generates CSV and HTML matrix files into `examples/tracer/modules/ROOT/attachments/traceability/`.
 
-### 10. Rebuild the Antora Site
+### 11. Rebuild the Antora Site
 
 ```bash
 npx antora antora-playbook.yml
@@ -208,7 +220,7 @@ npx antora antora-playbook.yml
 
 Check for xref warnings. Verify matrices are navigable and link to the correct requirement anchors.
 
-### 11. Commit
+### 12. Commit
 
 ```
 docs(example-site): update self-traceability to reflect current state

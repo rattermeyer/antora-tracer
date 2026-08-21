@@ -18,7 +18,7 @@ Place inside an item block:
 [source,asciidoc]
 ----
 [#REQ-001, item, role=requirement]
-====
+--
 Requirement description...
 
 traceability:outgoing[]

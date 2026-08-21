@@ -140,9 +140,9 @@ A requirement states what the system must do, never how:
 [source,asciidoc]
 ----
 [#REQ-001, item, role=requirement, title="Fail on duplicate IDs"]
-====
+--
 The build SHALL fail when two items define the same ID.
-====
+--
 ----
 
 Each requirement must be testable, atomic, and unambiguous.

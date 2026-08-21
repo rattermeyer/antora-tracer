@@ -120,24 +120,24 @@ Open `modules/ROOT/pages/index.adoc` and add three traceable items — a require
 :traceability-links: true
 
 [#REQ-001, item, role=requirement, title="User authentication required"]
-====
+--
 The system shall require authentication for all protected endpoints.
-====
+--
 
 [#IMP-001, item, role=implementation, title="JWT Auth Service"]
-====
+--
 JWT-based authentication with token refresh.
 
 satisfies:REQ-001[]
-====
+--
 
 [#TEST-001, item, role=test, title="Authentication integration tests"]
-====
+--
 Unit and integration tests for the auth service.
 
 tests:IMP-001[]
 verifies:REQ-001[]
-====
+--
 ----
 
 Here's what you wrote:
@@ -157,13 +157,10 @@ Build the site again:
 npx antora antora-playbook.yml
 ----
 
-Open `public/traceability/index.html`.
-You'll see:
+Open the built site and look at the *Traceability* section in the navigation.
+The `requirements-to-tests` matrix shows `REQ-001` covered by `TEST-001`.
 
-- A link to a traceability matrix — your three items appear in the `requirements-to-design` and `requirements-to-tests` matrices
-- A coverage report showing which roles have complete coverage
-
-Open `public/index.html` — the item blocks render as styled sections in the page.
+Open the site's `index.html` — the item blocks render as styled sections in the page.
 
 == Step 5: Explore what you've built
 
@@ -173,8 +170,7 @@ Here's what's happening under the hood:
 
 - The extension found your three `[item]` blocks and registered them in the traceability graph
 - The inline relationships (`satisfies:REQ-001[]`, `tests:IMP-001[]`, `verifies:REQ-001[]`) were validated against the preset's configuration and stored
-- Matrices were generated showing which requirements have implementations and tests
-- A coverage report shows a green status — all items have at least one relationship
+- The `requirements-to-tests` matrix links `REQ-001` to `TEST-001` through the `verifies` relationship
 
 == Next Steps
 

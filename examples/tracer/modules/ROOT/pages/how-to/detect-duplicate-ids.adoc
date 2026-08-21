@@ -26,15 +26,15 @@ Two items collide when both define the same ID, even in different files:
 ----
 // requirements/security.adoc (branch A)
 [#REQ-005, item, role=requirement, title="Rate limiting"]
-====
+--
 The system shall limit requests per client.
-====
+--
 
 // requirements/audit.adoc (branch B)
 [#REQ-005, item, role=requirement, title="Audit logging"]
-====
+--
 The system shall log all authentication events.
-====
+--
 ----
 
 The `validate` command reports the collision as an error naming both locations:

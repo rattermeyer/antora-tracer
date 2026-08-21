@@ -27,11 +27,11 @@ Place `traceability:graph[]` inside any item block:
 [source,asciidoc]
 ----
 [#REQ-001, item, role=requirement, title="User authentication"]
-====
+--
 The system shall require authentication.
 
 traceability:graph[]
-====
+--
 ----
 
 This renders a GraphViz DOT diagram showing the item and all directly related items (both outgoing and incoming).
@@ -60,9 +60,9 @@ Place `traceability:graph-coverage[]` inside any item block:
 [source,asciidoc]
 ----
 [#REQ-001, item, role=requirement]
-====
+--
 traceability:graph-coverage[]
-====
+--
 ----
 
 This renders a Vega-Lite bar chart showing per-relationship-type coverage for that item — which relations are present and which are missing.

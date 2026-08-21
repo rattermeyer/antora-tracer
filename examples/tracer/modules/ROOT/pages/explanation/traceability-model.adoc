@@ -54,9 +54,9 @@ Which direction you express depends on which item you're writing:
 [source,asciidoc]
 ----
 [#DES-001, item, role=design]     [#REQ-001, item, role=requirement]
-====                               ====
+--                               --
 satisfies:REQ-001[]                satisfied_by:DES-001[]
-====                               ====
+--                               --
 ----
 
 Both approaches produce the same graph edge.
