@@ -80,7 +80,7 @@ To build the same harness for another skill, follow the pattern above in three s
 . *Copy the runner.* Duplicate `evals/requirements-writing/run.mjs` into `evals/<skill-name>/`, point it at the new skill's `SKILL.md`, `rubric.schema.json`, and `cases.json`, and adjust the scoring keys to match the new schema.
 
 Keep Layer 1 mechanical and Layer 2 semantic.
-The runner is specific to `requirements-writing` today; copy it rather than generalizing until a second skill actually shares it.
+The runner is specific to `requirements-writing` today; copy it rather than generalizing until a second skill shares it.
 
 == When to run
 
