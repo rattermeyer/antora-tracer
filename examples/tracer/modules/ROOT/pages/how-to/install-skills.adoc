@@ -72,3 +72,5 @@ Confirm the three antora-tracer skills appear:
 * `requirements-writing`
 * `use-case-engineering`
 * `review-architecture-diagrams`
+
+See xref:explanation/product-structure.adoc[Product Structure] for how the skills relate to the core extension.

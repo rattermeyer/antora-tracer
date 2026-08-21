@@ -13,6 +13,7 @@
 ** xref:how-to/query-graph.adoc[Query the graph from the command line]
 ** xref:how-to/generate-docx.adoc[Generate DOCX output]
 ** xref:how-to/install-skills.adoc[Install the agent skills]
+** xref:how-to/evaluate-skills.adoc[Evaluate the agent skills]
 ** xref:how-to/contribute.adoc[Contribute to the project]
 ** xref:how-to/troubleshooting.adoc[Troubleshoot common issues]
 * Reference
@@ -27,6 +28,7 @@
 ** xref:explanation/traceability-model.adoc[The Traceability Model]
 ** xref:explanation/processing-pipeline.adoc[Processing Pipeline]
 ** xref:explanation/architecture.adoc[Architecture]
+** xref:explanation/product-structure.adoc[Product Structure]
 ** xref:explanation/adr/index.adoc[Architecture Decisions]
 ** xref:explanation/quality/index.adoc[Quality Attributes]
 ** xref:explanation/sphinx-comparison.adoc[Comparison with Sphinx Needs]

@@ -1,0 +1,51 @@
+= Product Structure
+:description: The boundary between the core traceability extension and the add-on agent skills, and where each lives in the repository
+:keywords: antora, traceability, skills, agent, architecture, structure
+:toc: macro
+
+toc::[]
+
+The `antora-tracer` package ships two independent capabilities that share one syntax.
+This page draws the boundary between them so readers and coding agents can tell core from add-on.
+
+== Core: the traceability extension
+
+The core is the Antora extension and its CLI.
+It parses `[item]` blocks, builds an in-memory graph, and generates matrices, visualizations, and exports.
+
+The core lives in `src/` and is documented in the Reference section and on the xref:explanation/architecture.adoc[Architecture] page.
+It works entirely without the agent skills.
+
+== Add-on: the agent skills
+
+The add-on is a set of xref:how-to/install-skills.adoc[Agent Skills] that teach an AI assistant how to write and review traceable content.
+The package ships three:
+
+* `requirements-writing` — create and review functional requirements in EARS style
+* `use-case-engineering` — create and review use case descriptions
+* `review-architecture-diagrams` — review architecture diagrams
+
+The skills live in `skills/` and are documented in the xref:how-to/install-skills.adoc[install] and xref:how-to/evaluate-skills.adoc[evaluate] how-to guides.
+They work independently of the extension — a skill guides an agent to produce correct `[item]` blocks, but the extension is not required to run the skill.
+
+== What they share
+
+Both capabilities use the same xref:reference/item-macro.adoc[`[item]` block syntax] and the same `traceability.yml` configuration model.
+A skill produces content the extension consumes, but neither depends on the other.
+
+== Naming note
+
+The `requirements` module in the example site is not the `requirements-writing` skill.
+The module holds the project's own requirements specification — REQ items produced as self-traceability data.
+The skill is a product feature that teaches an agent to write such requirements.
+The two share a name but are unrelated.
+
+== Repository map
+
+[source,text]
+----
+src/       core extension and CLI
+skills/    add-on agent skills
+evals/     deterministic and LLM-based skill testing
+examples/tracer/modules/requirements/   the project's own requirements spec (data, not product docs)
+----

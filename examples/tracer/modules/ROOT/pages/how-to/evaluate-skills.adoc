@@ -1,0 +1,90 @@
+= How to Evaluate the Agent Skills
+:description: Guide to running the deterministic grader and LLM rubric that test the antora-tracer agent skills
+:keywords: skills, eval, evaluation, testing, agent, llm, rubric, grader
+
+The `antora-tracer` package ships agent skills that teach an AI assistant how to write and review traceable content.
+Skills are prompts, so they cannot be unit tested like code.
+Instead the project evaluates them in two layers, split by what a computer can check — the pattern described in the https://developers.openai.com/blog/eval-skills[OpenAI guide to evaluating skills]:
+
+* *Layer 1 — deterministic checks* verify the mechanical rules (block syntax, one SHALL per requirement, EARS clause order) and run as part of `npm test`.
+* *Layer 2 — LLM rubric* grades the semantic rules (solution prescription, testability, unambiguity) by asking a model to review fixtures and return a structured verdict.
+
+== Run the deterministic checks
+
+The mechanical rules live in `test/support/requirements-grader.ts` and are covered by `test/requirements-grader.test.ts`.
+Run them with the regular test suite:
+
+[source,bash]
+----
+npm test
+----
+
+This layer runs in CI and does not call a model.
+
+== Run the LLM rubric
+
+The semantic rules are graded by an LLM.
+The rubric lives in `evals/requirements-writing/`:
+
+* `rubric.schema.json` — the structured verdict the model must return
+* `cases.json` — fixtures with expected results
+* `run.mjs` — the runner
+
+The runner calls an OpenAI-compatible chat completions endpoint, so it works with OpenAI or a LiteLLM gateway.
+Set the endpoint, key, and model, then run:
+
+[source,bash]
+----
+EVAL_BASE_URL=https://api.openai.com/v1 \
+EVAL_API_KEY=<your-key> \
+EVAL_MODEL=gpt-4o-mini \
+npm run eval:requirements -- --trials 5
+----
+
+`--trials N` runs each case N times and passes it on a strict majority.
+Agent output is nondeterministic, so use 3–5 trials for a stable signal, as recommended in https://www.philschmid.de/testing-skills[Phil Schmid's guide to testing skills].
+The default is one trial.
+
+This layer costs tokens and is not part of `npm test`.
+Run it manually when you change a skill.
+
+== Add a new case
+
+Add an object to `evals/requirements-writing/cases.json`:
+
+[source,json]
+----
+{
+  "id": "my-case",
+  "expect_prescription": null,
+  "expect_pass": true,
+  "block": "[#REQ-010, item, role=requirement, title=\"...\"]\n--\nThe system SHALL ...\n--"
+}
+----
+
+`expect_prescription` is the expected solution-prescription category (`technology`, `algorithm`, `component`, `event`, or `ui`), or `null` for none.
+`expect_pass` is the expected overall verdict.
+
+== Add a deterministic check
+
+Add a rule to `test/support/requirements-grader.ts` and a matching test in `test/requirements-grader.test.ts`.
+Keep Layer 1 limited to mechanical rules.
+Anything that needs judgement about meaning belongs in the LLM rubric.
+
+== Create an eval for a new skill
+
+To build the same harness for another skill, follow the pattern above in three steps:
+
+. *Choose the deterministic subset.* Read the skill and list its mechanical rules — things a regex or parser can check without judgement. For `requirements-writing` these were: a valid `[item]` block, one SHALL, no SHALL/SHALL NOT mix, and EARS clause order. A skill with no mechanical rules gets only a "valid input parses" check in Layer 1.
+. *Encode the checklist as a rubric schema.* Copy `evals/requirements-writing/rubric.schema.json` and reshape its fields to mirror the target skill's review checklist, so each rule the LLM must judge becomes a scorable field. Do not reuse the requirements-writing fields verbatim — they encode that skill's checklist, not the new one's.
+. *Copy the runner.* Duplicate `evals/requirements-writing/run.mjs` into `evals/<skill-name>/`, point it at the new skill's `SKILL.md`, `rubric.schema.json`, and `cases.json`, and adjust the scoring keys to match the new schema.
+
+Keep Layer 1 mechanical and Layer 2 semantic.
+The runner is specific to `requirements-writing` today; copy it rather than generalizing until a second skill actually shares it.
+
+== When to run
+
+Run the deterministic checks whenever you change a skill.
+Run the LLM rubric whenever you change a skill's instructions, description, or review checklist.
+
+See xref:explanation/product-structure.adoc[Product Structure] for how the skills relate to the core extension.

@@ -142,6 +142,13 @@ src/
     └── TraceabilityConfig.ts ConfigLoader, types, presets
 ```
 
+The package splits into core and add-on:
+
+- `src/` — core extension and CLI (documented in the example site's Reference + Architecture pages)
+- `skills/` — add-on agent skills (`requirements-writing`, `use-case-engineering`, `review-architecture-diagrams`)
+- `evals/` — skill testing: deterministic via `npm test`, LLM rubric via `npm run eval:requirements`
+- `examples/tracer/modules/requirements/` — the project's own REQ spec (data, not product docs)
+
 **Item syntax**: `[#REQ-001, item, role=requirement, title="Title"]`
 
 **ContentClassified Pass 2** (in antora-extension.ts):
