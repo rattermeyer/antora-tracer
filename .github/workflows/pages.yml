@@ -45,7 +45,7 @@ jobs:
 
       - name: Install Vale
         run: |
-          curl -sfL https://github.com/errata-ai/vale/releases/latest/download/vale_Linux_x86_64.tar.gz | tar xz -C /usr/local/bin vale
+          curl -sfL https://github.com/errata-ai/vale/releases/download/v3.15.1/vale_3.15.1_Linux_64-bit.tar.gz | tar xz -C /usr/local/bin vale
           vale --version
 
       - name: Build site
