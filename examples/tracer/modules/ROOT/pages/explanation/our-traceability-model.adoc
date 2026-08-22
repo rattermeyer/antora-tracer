@@ -18,6 +18,57 @@ traceability:config-graph[]
 
 == Roles
 
+=== user_need
+A user need is a specific, actionable requirement or desire that a user has when interacting with a system, product, or service. It represents the goal, problem, or task the user wants to accomplish, often framed from their perspective. User needs are the foundation for deriving use cases, which describe how the system should behave to fulfill those needs.
+
+Key Characteristics:
+
+* User-Centric: Focuses on what the user wants to achieve, not how the system works.
+* Actionable: Clearly defines a task or outcome (e.g., "I want to reset my password").
+* Problem-Oriented: Addresses a pain point or a job to be done.
+* Non-Technical: Avoids implementation details (e.g., "The system should use OAuth 2.0" is not a user need).
+
+.Example
+====
+"As a bank customer, I want to transfer money to another account so that I can pay my rent on time."
+====
+
+It follows the pattern <WHO> <WHAT> <WHY>
+
+=== Use Case
+
+.Example
+====
+[cols="1h,3a"]
+|===
+| Use Case Name | Transfer Funds
+| Primary Actor | Bank Customer
+| Description | Allows a customer to transfer money from their account to another account.
+| Preconditions |
+- Customer is logged in.
+- Customer has sufficient funds in their account.
+- Recipient account is valid and active.
+| Main Success Scenario |
+1. Customer selects "Transfer Money" from the dashboard.
+2. System prompts for recipient account details (account number, name).
+3. Customer enters the recipient details and the amount to transfer.
+4. System validates the recipient account and available balance.
+5. Customer confirms the transaction details.
+6. System processes the transfer.
+7. System sends a confirmation notification to the customer.
+8. System updates both the sender's and recipient's account balances.
+| Extensions |
+*3a. Invalid recipient account*: System displays an error message and prompts the customer to re-enter the details.
+*4a. Insufficient funds*: System notifies the customer and aborts the transfer.
+*5a. Customer cancels*: System returns to the dashboard without processing the transfer.
+| Postconditions |
+- Recipient account balance is increased by the transferred amount.
+- Sender's account balance is decreased by the transferred amount.
+- Transaction is recorded in both accounts' history.
+- Customer receives a confirmation receipt (email or in-app notification).
+|===
+====
+
 This project tracks eight roles.
 
 *requirement*::

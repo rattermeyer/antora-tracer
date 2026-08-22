@@ -30,7 +30,7 @@ They work independently of the extension — a skill guides an agent to produce 
 
 == What they share
 
-Both capabilities use the same xref:reference/item-macro.adoc[`[item]` block syntax] and the same `traceability.yml` configuration model.
+Both capabilities use the same `[item]` block syntax (xref:reference/item-macro.adoc[the item macro]) and the same `traceability.yml` configuration model.
 A skill produces content the extension consumes, but neither depends on the other.
 
 == Naming note
