@@ -60,18 +60,18 @@ A relationship is expressed as `<relation-type>:TARGET-ID[]` anywhere inside the
 
 [source,asciidoc]
 ----
-[#IMP-001, item, role=implementation]
+[#DES-001, item, role=design]
 --
 Auth Service
 
-implements:DES-001[]
-depends_on:IMP-002[]
+addresses:REQ-001[]
+depends_on:DES-002[]
 --
 ----
 
 === Syntax rules
 
-- Multiple targets per type: `satisfies:REQ-001,REQ-002,REQ-003[]`
+- Multiple targets per type: `addresses:REQ-001,REQ-002,REQ-003[]`
 - Multiple types per item: write each on its own line
 - The `TARGET-ID` must match the `id` of another item in the graph
 - Missing targets generate a warning, not an error

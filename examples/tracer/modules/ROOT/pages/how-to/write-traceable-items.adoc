@@ -31,20 +31,20 @@ Inside the item block, add relationships using the `<type>:TARGET-ID[]` syntax:
 
 [source,asciidoc]
 ----
-[#IMP-001, item, role=implementation]
+[#DES-001, item, role=design]
 --
 JWT-based authentication service.
 
-satisfies:REQ-001[]           <1>
-depends_on:IMP-002[]          <2>
+addresses:REQ-001[]           <1>
+depends_on:DES-002[]          <2>
 --
 ----
-<1> This implementation satisfies the requirement REQ-001
-<2> This implementation depends on another implementation IMP-002
+<1> This design addresses the requirement REQ-001
+<2> This design depends on another design DES-002
 
 Multiple targets in one type:
 
-    satisfies:REQ-001,REQ-002,REQ-003[]
+    addresses:REQ-001,REQ-002,REQ-003[]
 
 Inline relationship macros are *invisible* in rendered output — they are pure data markers for the traceability graph.
 
@@ -100,11 +100,11 @@ Use the `traceability:outgoing[]` and `traceability:incoming[]` macros to show r
 
 [source,asciidoc]
 ----
-[#IMP-001, item, role=implementation]
+[#DES-001, item, role=design]
 --
 JWT-based authentication.
 
-satisfies:REQ-001[]
+addresses:REQ-001[]
 
 traceability:outgoing[]     <1>
 traceability:incoming[]     <2>

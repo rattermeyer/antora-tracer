@@ -342,8 +342,9 @@ REQ-145,REQ-145 — All processing passes apply to partial files,requirement,,re
 Source: openspec/specs/partial-file-processing/spec.md
 
 traceability:links[]"""
-REQ-129,REQ-129 — Bidirectional relationship pairs are merged into a single edge,requirement,,requirements.adoc,"""The system SHALL detect when a newly added relationship forms a complementary pair with an existing relationship — the existing edge goes from B to A with a type that is the configured inverse of the new edge's type — and merge them into a single bidirectional edge instead of storing two directed edges.
-Merging SHALL follow first-writer-wins: the first relationship stored remains as the canonical entry, and the second relationship is not stored.
+REQ-129,REQ-129 — Bidirectional relationship pairs are merged into a single edge,requirement,,requirements.adoc,"""The system SHALL detect when a newly added relationship is authored with the reverse of an existing relationship's type — the existing edge goes from B to A with a type whose declared `reverse` equals the new edge's type — and SHALL NOT store a second edge.
+The canonical primary edge is retained with its original metadata (sourceFile, line), and no warning is emitted.
+Merging is driven by the `reverse` declaration in `relations` (config), not by `inverseLabels` or the compile-time `INVERSE_MAP`.
 
 Source: openspec/specs/bidirectional-relationship-merge/spec.md
 
@@ -427,7 +428,7 @@ REQ-066,REQ-066 — Incoming macro sort order,requirement,,requirements.adoc,"""
 Source: openspec/specs/incoming-links-macro/spec.md
 
 traceability:links[]"""
-REQ-067,REQ-067 — Inverse relation type labels,requirement,,requirements.adoc,"""The system SHALL transform relation type names to their inverse form for display in `traceability:incoming[]` using the built-in inverse label mapping.
+REQ-067,REQ-067 — Inverse relation type labels,requirement,,requirements.adoc,"""The system SHALL transform relation type names to their inverse form for display in `traceability:incoming[]` using the declared `reverse` of the relation type.
 
 [#REQ-147, item, role=requirement, title=""""Fallback to raw type name when no inverse mapping exists""""]"""
 REQ-147,REQ-147 — Fallback to raw type name when no inverse mapping exists,requirement,,requirements.adoc,"""If a relation type has no inverse mapping defined, then the system SHALL display the raw relation type name.
@@ -447,6 +448,26 @@ Items from one component version SHALL NOT appear in xrefs generated for pages i
 Source: openspec/specs/traceability-links-macro/spec.md
 
 traceability:links[]"""
+REQ-163,REQ-163 — Incoming macro PDF compatibility,requirement,,requirements.adoc,"""The generated output from `traceability:incoming[]` SHALL be standard AsciiDoc constructs — not raw HTML — ensuring compatibility with both HTML and PDF backends.
+
+Source: openspec/specs/incoming-links-macro/spec.md
+
+traceability:links[]"""
+REQ-164,REQ-164 — Source file not modified by incoming macro,requirement,,requirements.adoc,"""The system SHALL NOT modify the `.adoc` source file on disk when expanding `traceability:incoming[]`.
+
+Source: openspec/specs/incoming-links-macro/spec.md
+
+traceability:links[]"""
+REQ-165,REQ-165 — PDF compatibility,requirement,,requirements.adoc,"""The generated output from `traceability:outgoing[]` and `traceability:incoming[]` SHALL use standard AsciiDoc constructs, ensuring compatibility with both HTML and PDF rendering backends.
+
+Source: openspec/specs/traceability-links-macro/spec.md
+
+traceability:links[]"""
+REQ-166,REQ-166 — Source file not modified,requirement,,requirements.adoc,"""The system SHALL NOT modify the `.adoc` source file on disk when expanding `traceability:outgoing[]` or `traceability:incoming[]`.
+
+Source: openspec/specs/traceability-links-macro/spec.md
+
+traceability:links[]"""
 REQ-116,REQ-116 — Items carry component and module context from Antora,requirement,,requirements.adoc,"""When processing `.adoc` files through the Antora extension, the system SHALL store the Antora component and module names on each `Item` so that downstream xref and link generation can distinguish same-module from cross-module and cross-component references.
 
 Source: openspec/specs/cross-module-xref/spec.md
@@ -462,13 +483,18 @@ REQ-119,REQ-119 — Cross-module and cross-component xref resolution,requirement
 Source: openspec/specs/traceability-links-macro/spec.md
 
 traceability:links[]"""
-REQ-071,REQ-071 — Inverse labels are config-driven,requirement,,requirements.adoc,"""The system SHALL support `inverseLabels` in the traceability configuration YAML, mapping each relation type to its inverse display label for `traceability:incoming[]` rendering.
+REQ-071,REQ-071 — Relation display names are config-driven,requirement,,requirements.adoc,"""The system SHALL support `labels` in the traceability configuration YAML, mapping each relation type to a human-readable display name used for rendering (incoming/outgoing lists, matrix headers, graph labels).
+`labels` SHALL NOT affect graph structure, merge behavior, or validation.
 
-[#REQ-148, item, role=requirement, title=""""Fallback to built-in inverse label mapping""""]"""
-REQ-148,REQ-148 — Fallback to built-in inverse label mapping,requirement,,requirements.adoc,"""If no `inverseLabels` config entry is defined for a relation type, then the system SHALL use the built-in inverse label mapping for that type.
+Source: openspec/specs/inverse-labels/spec.md
 
-[#REQ-149, item, role=requirement, title=""""Fallback to raw type name when no mapping exists""""]"""
-REQ-149,REQ-149 — Fallback to raw type name when no mapping exists,requirement,,requirements.adoc,"""If a relation type has no entry in `inverseLabels` and no built-in inverse mapping, then the system SHALL display the raw relation type name.
+traceability:links[]"""
+REQ-161,REQ-161 — Default display name is the humanized type,requirement,,requirements.adoc,"""If a relation type has no entry in `labels`, the system SHALL display the type name humanized: underscores replaced with spaces and the result sentence-cased.
+
+Source: openspec/specs/inverse-labels/spec.md
+
+traceability:links[]"""
+REQ-162,REQ-162 — No compile-time fallback,requirement,,requirements.adoc,"""The system SHALL NOT consult a compile-time inverse map for display names; the pairing between primary and reverse types is derived solely from the `reverse` declaration in `relations`, and display text comes solely from `labels` or the humanized default.
 
 Source: openspec/specs/inverse-labels/spec.md
 
@@ -530,6 +556,21 @@ REQ-113,REQ-113 — Matrix template uses partials for structure,requirement,,req
 Source: openspec/specs/template-partials/spec.md
 
 traceability:links[]"""
+REQ-167,REQ-167 — Matrix renders one status column per row,requirement,,requirements.adoc,"""The HTML matrix SHALL render exactly one per-row status column, and SHALL NOT render a separate per-row coverage percentage column.
+
+Source: openspec/specs/matrix-status/spec.md
+
+traceability:links[]"""
+REQ-168,REQ-168 — Coverage summary remains,requirement,,requirements.adoc,"""The matrix SHALL still render a top-level coverage summary with the counts of done/partial/missing rows and an overall percentage of done rows.
+
+Source: openspec/specs/matrix-status/spec.md
+
+traceability:links[]"""
+REQ-169,REQ-169 — CSV output is unchanged,requirement,,requirements.adoc,"""The CSV export SHALL NOT render a per-row status or coverage column, matching its current behavior.
+
+Source: openspec/specs/matrix-status/spec.md
+
+traceability:links[]"""
 REQ-083,REQ-083 — Preset defines pairwise requirements-to-design matrix,requirement,,requirements.adoc,"""The `requirements-engineering` preset SHALL include a matrix named `requirements-to-design` with `requirement` rows and a single `design` column.
 
 Source: openspec/specs/pairwise-matrices-preset/spec.md
@@ -548,6 +589,53 @@ traceability:links[]"""
 REQ-086,REQ-086 — Preset does not define wide multi-column matrices,requirement,,requirements.adoc,"""The `requirements-engineering` preset SHALL NOT define matrices with more than one column role.
 
 Source: openspec/specs/pairwise-matrices-preset/spec.md
+
+traceability:links[]"""
+REQ-170,REQ-170 — Preset extends a parent by top-level `extends`,requirement,,requirements.adoc,"""A preset SHALL declare its parent with a top-level `extends` field (sibling of `name`, `version`, `description`).
+When a preset declares `extends`, the resolved preset SHALL include the parent's `traceability` deep-merged under the child's own `traceability`.
+
+Source: openspec/specs/preset-inheritance/spec.md
+
+traceability:links[]"""
+REQ-171,REQ-171 — Merge semantics match config-file `extends`,requirement,,requirements.adoc,"""Preset inheritance SHALL use the same merge rules as a config file extending a preset: roles are unioned, relations are deep-merged by source and target role, matrices are overridden by `name`, and `labels` are overridden key-by-key.
+
+Source: openspec/specs/preset-inheritance/spec.md
+
+traceability:links[]"""
+REQ-172,REQ-172 — Transitive inheritance,requirement,,requirements.adoc,"""Inheritance SHALL resolve transitively: a preset extending a preset that itself extends another SHALL include the roles, relations, and matrices of the full chain.
+
+Source: openspec/specs/preset-inheritance/spec.md
+
+traceability:links[]"""
+REQ-173,REQ-173 — Missing parent is reported,requirement,,requirements.adoc,"""When a preset's `extends` names a preset that cannot be resolved, loading SHALL fail with an error that names the missing preset.
+
+Source: openspec/specs/preset-inheritance/spec.md
+
+traceability:links[]"""
+REQ-174,REQ-174 — Circular inheritance is rejected,requirement,,requirements.adoc,"""A preset SHALL NOT extend itself, directly or transitively.
+Any inheritance cycle SHALL be detected and rejected with a clear error rather than looping indefinitely.
+
+Source: openspec/specs/preset-inheritance/spec.md
+
+traceability:links[]"""
+REQ-175,REQ-175 — Relations are declared keyed with a mandatory reverse,requirement,,requirements.adoc,"""The `relations` config SHALL map `sourceRole → targetRole → relationType → { reverse }`, where `reverse` is required and names the authorable reverse relation type.
+
+Source: openspec/specs/reverse-relations/spec.md
+
+traceability:links[]"""
+REQ-176,REQ-176 — Authoring the reverse name canonicalizes to the primary edge,requirement,,requirements.adoc,"""When an item authors a relationship using a reverse type, the graph SHALL store the canonical primary edge (primary direction and primary type), not the reverse-authored form.
+
+Source: openspec/specs/reverse-relations/spec.md
+
+traceability:links[]"""
+REQ-177,REQ-177 — Reverse direction is derived for validation,requirement,,requirements.adoc,"""`isRelationAllowed` SHALL allow a relation type that is the reverse of a relation declared in the opposite role direction, without an explicit `relations` entry for that direction.
+
+Source: openspec/specs/reverse-relations/spec.md
+
+traceability:links[]"""
+REQ-178,REQ-178 — Matrix coverage matches the canonical primary type,requirement,,requirements.adoc,"""A matrix `coverageRelations` entry SHALL name the canonical primary type, and a single entry SHALL count a relationship regardless of which name was authored.
+
+Source: openspec/specs/reverse-relations/spec.md
 
 traceability:links[]"""
 REQ-051,REQ-051 — Relationship graph via traceability:graph[] macro,requirement,,requirements.adoc,"""The system SHALL provide a `traceability:graph[]` inline macro that renders a relationship diagram for the enclosing item.
@@ -699,7 +787,8 @@ The playbook SHALL use the same content sources as the HTML playbook but output 
 Source: openspec/specs/pdf-output/spec.md
 
 traceability:links[]"""
-REQ-096,REQ-096 — PDF extension is a dev dependency,requirement,,requirements.adoc,"""The `@antora/pdf-extension` npm package SHALL be listed as a dev dependency in `package.json` so it is installed alongside other project dependencies.
+REQ-096,REQ-096 — PDF extension is a peer dependency,requirement,,requirements.adoc,"""The `@antora/pdf-extension` npm package SHALL be listed as a `peerDependency` (with `optional: true` in `peerDependenciesMeta`) so consumers who want PDF output are signalled to install it explicitly.
+It SHALL also remain in `devDependencies` for local development.
 
 Source: openspec/specs/pdf-output/spec.md
 
@@ -744,6 +833,40 @@ REQ-135,REQ-135 — DOCX output format is documented,requirement,,requirements.a
 Source: openspec/specs/docx-output/spec.md
 
 traceability:links[]"""
+REQ-179,REQ-179 — PDF playbook references extension by local path in development,requirement,,requirements.adoc,"""The `antora-playbook-pdf.yml` example playbook SHALL reference the PDF extension using a local path (`./lib/src/antora-pdf-extension.cjs`) since it is the project's own development playbook.
+Consumer documentation SHALL show the package subpath pattern (`antora-tracer/antora-pdf`).
+
+Source: openspec/specs/pdf-output/spec.md
+
+traceability:links[]"""
+REQ-180,REQ-180 — PDF extension is published and referenceable by package name,requirement,,requirements.adoc,"""The `antora-tracer` npm package SHALL include `lib/src/antora-pdf-extension.cjs` and export it under the subpath `antora-tracer/antora-pdf` so consumers can reference it in their playbooks without copying files from the repository.
+
+Source: openspec/specs/published-extensions/spec.md
+
+traceability:links[]"""
+REQ-181,REQ-181 — DOCX extension is published and referenceable by package name,requirement,,requirements.adoc,"""The `antora-tracer` npm package SHALL include `lib/src/antora-docx-extension.cjs` and `lib/src/antora-docx-converter.cjs` and export the extension under the subpath `antora-tracer/antora-docx`.
+
+Source: openspec/specs/published-extensions/spec.md
+
+traceability:links[]"""
+REQ-182,REQ-182 — Assembler packages declared as optional peer dependencies,requirement,,requirements.adoc,"""The `package.json` SHALL declare `@antora/assembler` and `@antora/pdf-extension` as `peerDependencies` with `optional: true` in `peerDependenciesMeta` so npm signals the requirement to consumers who use PDF or DOCX output without requiring them for consumers who do not.
+These packages SHALL also remain in `devDependencies` for local development builds.
+
+Source: openspec/specs/published-extensions/spec.md
+
+traceability:links[]"""
+REQ-183,REQ-183 — Assembler configs and adoc-to-docx script are example-site configuration,requirement,,requirements.adoc,"""The assembler config YMLs and `adoc-to-docx` script SHALL reside in `examples/` as reference consumer configuration, not at the project root and not in the npm package.
+The how-to documentation SHALL explain that consumers create their own configs modelled on these examples.
+
+Source: openspec/specs/published-extensions/spec.md
+
+traceability:links[]"""
+REQ-184,REQ-184 — DOCX playbook references extension by local path in development,process_requirement,,requirements.adoc,"""The `antora-playbook-pdf.yml` example playbook SHALL reference the DOCX extension using a local path (`./lib/src/antora-docx-extension.cjs`).
+Consumer documentation SHALL show the package subpath pattern (`antora-tracer/antora-docx`).
+
+Source: openspec/specs/docx-output/spec.md
+
+traceability:links[]"""
 REQ-151,REQ-151 — Vale lints page and partial source content during the build,requirement,,requirements.adoc,"""The system SHALL run Vale against the source AsciiDoc content of every page and partial file in the content catalog when the extension is enabled.
 
 Source: openspec/specs/vale-build-integration/spec.md
@@ -782,6 +905,118 @@ traceability:links[]"""
 REQ-158,REQ-158 — Rules are packaged with the extension,requirement,,requirements.adoc,"""The system SHALL ship the rule files and a sample configuration with the npm package, while remaining optional for users.
 
 Source: openspec/specs/documentation-style-rules/spec.md
+
+traceability:links[]"""
+REQ-185,REQ-185 — Item blocks use the open-block delimiter,requirement,,requirements.adoc,"""Item block examples in the documentation SHALL use the `--` open-block delimiter as the canonical form.
+The `====` example-block delimiter SHALL be documented as a valid alternative with its rendering difference.
+
+Source: openspec/specs/documentation-style-rules/spec.md
+
+traceability:links[]"""
+REQ-186,REQ-186 — Getting Started tutorial page,requirement,,requirements.adoc,"""The example site SHALL include a single Tutorial page (`getting-started.adoc`) that guides a first-time user from zero to a working traceability setup in numbered, sequential steps.
+
+Source: openspec/specs/doc-tutorial/spec.md
+
+traceability:links[]"""
+REQ-187,REQ-187 — Tutorial in navigation,requirement,,requirements.adoc,"""The example site navigation SHALL include a """"Tutorial"""" section as the first top-level item, containing the Getting Started page.
+
+Source: openspec/specs/doc-tutorial/spec.md
+
+traceability:links[]"""
+REQ-188,REQ-188 — How-to guide pages exist for key tasks,requirement,,requirements.adoc,"""The example site SHALL include How-to guide pages covering the following tasks:
+
+* Custom domain model definition
+* New project setup
+* Writing traceable items
+* Neo4j export
+* Using partial files with items
+* Adding traceability visualizations
+* Troubleshooting common issues
+* Contributing to the project (extracted from developer guide)
+
+Source: openspec/specs/doc-howto-guides/spec.md
+
+traceability:links[]"""
+REQ-189,REQ-189 — How-to guides link to Reference,requirement,,requirements.adoc,"""Each How-to guide page SHALL include links to relevant Reference pages for option details and syntax specifications.
+
+Source: openspec/specs/doc-howto-guides/spec.md
+
+traceability:links[]"""
+REQ-190,REQ-190 — How-to guides section in navigation,requirement,,requirements.adoc,"""The example site navigation SHALL include a """"How-to Guides"""" section containing all how-to pages, ordered by typical usage frequency.
+
+Source: openspec/specs/doc-howto-guides/spec.md
+
+traceability:links[]"""
+REQ-191,"""REQ-191 — Reference pages for macro syntax, configuration, CLI, presets, and API""",requirement,,requirements.adoc,"""The example site SHALL include Reference pages exhaustively documenting:
+
+* Item macro syntax and attributes
+* Traceability display macros (outgoing, incoming, links, graph, graph-coverage)
+* Configuration options (all playbook options, traceability.yml schema)
+* Built-in presets (complete definition of each)
+* CLI commands and flags
+* Public API surface (methods, signatures, data model interfaces)
+
+Source: openspec/specs/doc-reference/spec.md
+
+traceability:links[]"""
+REQ-192,REQ-192 — Reference pages cross-link to other modes,requirement,,requirements.adoc,"""Reference pages SHALL include links to relevant How-to guides, Explanation pages, and other Reference pages.
+
+Source: openspec/specs/doc-reference/spec.md
+
+traceability:links[]"""
+REQ-193,REQ-193 — Reference section in navigation,requirement,,requirements.adoc,"""The example site navigation SHALL include a """"Reference"""" section containing all reference pages, ordered from most-used to least-used.
+
+Source: openspec/specs/doc-reference/spec.md
+
+traceability:links[]"""
+REQ-194,"""REQ-194 — Explanation pages for concepts, architecture, and design rationale""",requirement,,requirements.adoc,"""The example site SHALL include Explanation pages covering:
+
+* The traceability model (roles, relations, matrices as concepts)
+* The processing pipeline (how passes work, the graph lifecycle)
+* The arc42 architecture document
+* Architecture Decision Records (ADRs)
+* Quality attributes
+* Comparison with Sphinx Needs (feature mapping)
+* Antora vs Sphinx publishing pipeline comparison
+
+Source: openspec/specs/doc-explanation/spec.md
+
+traceability:links[]"""
+REQ-195,REQ-195 — Explanation pages link to Reference and How-to,requirement,,requirements.adoc,"""Explanation pages SHALL include links to relevant Reference pages and How-to guides for readers who want to act on the understanding gained.
+
+Source: openspec/specs/doc-explanation/spec.md
+
+traceability:links[]"""
+REQ-196,REQ-196 — Explanation section in navigation,requirement,,requirements.adoc,"""The example site navigation SHALL include an """"Explanation"""" section containing all explanation pages.
+
+Source: openspec/specs/doc-explanation/spec.md
+
+traceability:links[]"""
+REQ-197,REQ-197 — Self-Traceability nav section groups demo pages,requirement,,requirements.adoc,"""The example site navigation SHALL include a """"Self-Traceability"""" section containing the pages that demonstrate the extension tracing its own development artifacts:
+
+* Requirements
+* Use Cases
+* Test Plan
+* Dashboard
+
+Source: openspec/specs/doc-self-traceability/spec.md
+
+traceability:links[]"""
+REQ-198,REQ-198 — Self-Traceability section is visually distinct,requirement,,requirements.adoc,"""The Self-Traceability section SHALL be clearly separated from the user-facing documentation sections, signaling to readers that these are demonstration artifacts, not documentation about using the tool.
+
+Source: openspec/specs/doc-self-traceability/spec.md
+
+traceability:links[]"""
+REQ-199,REQ-199 — Self-Traceability section preserves traceable items,requirement,,requirements.adoc,"""The restructuring SHALL NOT move any traceable `[item]` blocks out of their source files.
+All existing requirements (REQ), architecture (ARC), test (TST), use case (UC), and quality (QA) items SHALL remain in their current AsciiDoc files.
+
+Source: openspec/specs/doc-self-traceability/spec.md
+
+traceability:links[]"""
+REQ-200,REQ-200 — Doc examples validate against the traceability configuration,requirement,,requirements.adoc,"""The system SHALL provide a check that extracts `[item]` blocks from the example site's prose documentation pages and validates them against the example traceability configuration (`examples/traceability.yml`).
+The check SHALL fail on unknown roles, disallowed relations, and item blocks that fail to parse.
+
+Source: openspec/specs/doc-example-validation/spec.md
 
 traceability:links[]"""
 REQ-060,REQ-060 — Pages workflow generates PDFs,requirement,,requirements.adoc,"""The GitHub Pages workflow SHALL include Ruby setup and PDF generation steps so that requirements, architecture, and test-plan PDFs are built and deployed alongside the HTML site on every push to main.
@@ -1506,7 +1741,7 @@ TST-002,TST-002 — Antora Extension Tests,test,,self-traceability/test-plan.ado
 Tests the `AntoraTraceabilityExtension` — initialization with default config, preset, config path, and disabled state.
 Tests event handler registration, content processing via `contentClassified` event (in-memory only, never touches disk), matrix generation via `sitePublished` event and matrix registration in the content catalog via `contentClassified`, and API access patterns.
 Also tests `traceability:outgoing[]`, `traceability:incoming[]`, and `traceability:links[]` macro expansion with configurable display style, sort order, collapsible sections, empty-state messages (`:traceability-empty:`), and opt-in behavior.
-Tests incoming macro display styles, sort orders, inverse labels, PDF compatibility, and collapsible support.
+Tests incoming macro display styles, sort orders, reverse labels, PDF compatibility, and collapsible support.
 Tests `traceability:graph[]`, `traceability:graph-coverage[]`, and `traceability:config-graph[]` macro expansion with configurable Kroki image format and Kroki server URL (extension config option and `KROKI_SERVER_URL` env var override), graph-enabled and graph-disabled modes, including global coverage, explicit target IDs, and header exclusion.
 Tests automatic matrix registration in the content catalog during `contentClassified`.
 Tests partial file processing including item registration from partials, view URL as sourceFile, and macro expansion in Pass 2.
@@ -1532,8 +1767,8 @@ verifies:REQ-067[]
 verifies:REQ-070[]
 verifies:REQ-071[]
 verifies:REQ-147[]
-verifies:REQ-148[]
-verifies:REQ-149[]
+verifies:REQ-161[]
+verifies:REQ-162[]
 verifies:REQ-100[]
 verifies:REQ-102[]
 verifies:REQ-103[]
@@ -1559,12 +1794,19 @@ verifies:REQ-056[]
 traceability:links[]"""
 TST-004,TST-004 — ConfigLoader Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/config-loader.test.ts`
 
-Tests the `ConfigLoader` — initialization, built-in preset listing and loading, preset structure validation (including pairwise matrix definitions), configuration loading from file, missing file handling, invalid YAML handling, role and relation validation, matrix definition retrieval, configuration merging (including inverse label overrides), and error messages for invalid configurations and preset names.
+Tests the `ConfigLoader` — initialization, built-in preset listing and loading, preset structure validation (including pairwise matrix definitions), configuration loading from file, missing file handling, invalid YAML handling, role and relation validation, matrix definition retrieval, configuration merging (including label overrides), and error messages for invalid configurations and preset names.
 
 verifies:REQ-083[]
 verifies:REQ-084[]
 verifies:REQ-085[]
 verifies:REQ-086[]
+verifies:REQ-170[]
+verifies:REQ-171[]
+verifies:REQ-172[]
+verifies:REQ-173[]
+verifies:REQ-174[]
+verifies:REQ-175[]
+verifies:REQ-177[]
 
 traceability:links[]"""
 TST-005,TST-005 — Graph and API Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/graph-and-api.test.ts`
@@ -1578,11 +1820,12 @@ verifies:REQ-053[]
 verifies:REQ-160[]
 verifies:REQ-109[]
 verifies:REQ-129[]
+verifies:REQ-176[]
 
 traceability:links[]"""
 TST-006,TST-006 — MatrixGenerator Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/matrix-generator.test.ts`
 
-Tests the `MatrixGenerator` — basic matrix generation with empty graph, matrix generation with default and named configurations, role-based matrix rows and columns, coverage percentage calculation and status determination, coverage relation filtering, CSV export, HTML export, JSON export, coverage report generation, and edge cases (no matching items, missing titles, missing source files, unknown matrix names).
+Tests the `MatrixGenerator` — basic matrix generation with empty graph, matrix generation with default and named configurations, role-based matrix rows and columns, coverage percentage calculation and status determination (`done`/`partial`/`missing`), coverage relation filtering, CSV export, HTML export, JSON export, coverage report generation, and edge cases (no matching items, missing titles, missing source files, unknown matrix names).
 
 verifies:REQ-037[]
 verifies:REQ-038[]
@@ -1592,6 +1835,10 @@ verifies:REQ-043[]
 verifies:REQ-105[]
 verifies:REQ-128[]
 verifies:REQ-130[]
+verifies:REQ-167[]
+verifies:REQ-168[]
+verifies:REQ-169[]
+verifies:REQ-178[]
 
 traceability:links[]"""
 TST-007,TST-007 — Neo4jExporter Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/neo4j-exporter.test.ts`

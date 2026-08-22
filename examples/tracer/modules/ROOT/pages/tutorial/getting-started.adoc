@@ -124,18 +124,18 @@ Open `modules/ROOT/pages/index.adoc` and add three traceable items — a require
 The system shall require authentication for all protected endpoints.
 --
 
-[#IMP-001, item, role=implementation, title="JWT Auth Service"]
+[#DES-001, item, role=design, title="JWT Authentication Design"]
 --
 JWT-based authentication with token refresh.
 
-satisfies:REQ-001[]
+addresses:REQ-001[]
 --
 
 [#TEST-001, item, role=test, title="Authentication integration tests"]
 --
 Unit and integration tests for the auth service.
 
-tests:IMP-001[]
+validates:DES-001[]
 verifies:REQ-001[]
 --
 ----
@@ -143,8 +143,8 @@ verifies:REQ-001[]
 Here's what you wrote:
 
 - `REQ-001` — a requirement item. The `[#REQ-001, item, role=requirement]` block macro tells the extension this is a traceable item of role `requirement`.
-- `IMP-001` — an implementation. It declares `satisfies:REQ-001[]` — a relationship pointing from this implementation to the requirement it satisfies.
-- `TEST-001` — a test. It references both the implementation it tests (`tests:IMP-001[]`) and the requirement it verifies (`verifies:REQ-001[]`).
+- `DES-001` — a design. It declares `addresses:REQ-001[]` — a relationship pointing from this design to the requirement it addresses.
+- `TEST-001` — a test. It references both the design it validates (`validates:DES-001[]`) and the requirement it verifies (`verifies:REQ-001[]`).
 
 The `:traceability-links:` attribute enables the `traceability:outgoing[]` and `traceability:incoming[]` macros, which display relationship lists in the rendered output.
 
@@ -169,7 +169,7 @@ You have a working traceability setup.
 Here's what's happening under the hood:
 
 - The extension found your three `[item]` blocks and registered them in the traceability graph
-- The inline relationships (`satisfies:REQ-001[]`, `tests:IMP-001[]`, `verifies:REQ-001[]`) were validated against the preset's configuration and stored
+- The inline relationships (`addresses:REQ-001[]`, `validates:DES-001[]`, `verifies:REQ-001[]`) were validated against the preset's configuration and stored
 - The `requirements-to-tests` matrix links `REQ-001` to `TEST-001` through the `verifies` relationship
 
 == Next Steps
