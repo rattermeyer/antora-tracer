@@ -1,0 +1,44 @@
+= ADR-010: Identity-first graph diff over content-similarity rename detection
+:keywords: adr, architecture, decision, diff, delta, graph, versioning, rename
+
+*Status*: accepted +
+*Deciders*: Richard Attermeyer +
+*Date*: 2026-08-22
+
+== Context and Problem Statement
+
+A traceability delta between two releases of a documentation set was previously hand-written or absent, and hand-written deltas drift from reality.
+Antora already isolates the graph per component version and items carry stable IDs, so the delta between two snapshots is derivable.
+The open question was how to detect "the same requirement under a new ID" — i.e. whether to invest in rename heuristics.
+
+== Decision Drivers
+
+* Truthfulness: the delta must reflect what changed, never a manual declaration
+* Config-agnostic: it must work for any user's role and relation vocabulary, not this project's presets
+* Simplicity: avoid heuristics that can misclassify
+* Compatibility with supersession, which already records replacement explicitly
+
+== Considered Options
+
+* Hand-written delta (declared per change) — drifts from the code and documents
+* Content-similarity rename detection (match removed/added pairs by title and content hash) — heuristic, complex, and unnecessary when supersession is used
+* Identity-first diff by stable ID — chosen
+
+== Decision Outcome
+
+Chosen option: match items by stable ID.
+`diffGraphs(prev, next)` classifies items as added, removed, or modified; a surviving item is `modified` when a compared field (`title`, `content`, `role`, `status`, or `attributes`) differs.
+Relationship deltas are reported only between surviving items, except `supersedes` history links.
+A superseded pair appears as `removed` plus `added` with the `supersedes` relationship listed as a new relationship — no rename heuristic needed.
+
+=== Positive Consequences
+
+* The delta cannot drift: it is computed from the actual graph diff
+* Config-agnostic — no role names are hardcoded
+* Supersession makes deliberate renumbering explicit via the history relation
+
+=== Negative Consequences
+
+* An accidental renumber without a `supersedes` link is reported as removed + added, not a rename
+* Field-level granularity is limited to the stored item fields; prose changes inside scenarios are invisible unless scenarios become items
+* The delta is version-granular by default; finer atomic grouping is a later authorship concern

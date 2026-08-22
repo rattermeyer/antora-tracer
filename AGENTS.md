@@ -103,6 +103,21 @@ When **code** behavior change, check consistency cross these layer before commit
 
 After archive change, run `update-example-site` skill to refresh requirement, architecture, test-plan doc so they show full current project state.
 
+### Architecture Decision Records
+
+A durable architectural decision MUST be captured as an ADR in `examples/tracer/modules/ROOT/pages/explanation/adr/` (next number) and registered in `adr/index.adoc` — not left only in a change's `design.md`, which disappears into `openspec/changes/archive/`.
+
+Trigger — write an ADR when a change meets two or more of:
+
+- The decision is not obvious from the code (a reader would ask "why?")
+- Alternatives were genuinely considered and rejected
+- It has lasting consequences: schema, graph semantics, public API, distribution
+- A `design.md` "Decisions" section exists but would be buried by archiving
+
+Follow the MADR template (`adr/0004-zero-framework.adoc`).
+Cross-link the ARC item to the ADR (`see xref:explanation/adr/NNNN-slug.adoc[ADR-NNN]`).
+Run `npx antora antora-playbook.yml` after writing — ADRs are Vale-linted prose.
+
 ## Documentation Framework
 
 Example site doc follow https://diataxis.fr[Diátaxis] — framework that split doc into four mode, each serve different reader need. Every page in example site belong to exactly one mode:

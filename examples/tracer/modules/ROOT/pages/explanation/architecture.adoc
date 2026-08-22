@@ -276,6 +276,7 @@ A traceable item is superseded rather than mutated: the successor declares a `su
 `TraceabilityGraph.isSuperseded()` and `getSuccessors()` answer the direct questions, and splits (several successors) and merges (several predecessors) are first-class.
 Self-supersession, duplicate links, and cycles are validation errors; a functional link to a superseded item is an advisory `stale_link` warning.
 Current matrices omit superseded items via `getCurrentItemsByRole()`.
+See xref:explanation/adr/0009-supersede-not-mutate.adoc[ADR-009].
 
 addresses:REQ-201[]
 addresses:REQ-202[]
@@ -296,6 +297,7 @@ traceability:links[]
 --
 `GraphDiff.diffGraphs(prev, next)` compares two graph snapshots by stable item ID, classifying each item as added, removed, or modified without hardcoding any role name.
 A surviving item is `modified` when a compared field (`title`, `content`, `role`, `status`, or `attributes`) differs, and relationship deltas are reported only between surviving items, except `supersedes` history links.
+See xref:explanation/adr/0010-identity-first-graph-diff.adoc[ADR-010].
 
 addresses:REQ-212[]
 addresses:REQ-213[]

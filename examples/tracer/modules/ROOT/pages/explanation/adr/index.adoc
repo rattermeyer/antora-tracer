@@ -12,3 +12,6 @@ Each record follows the https://github.com/architecture-decision-record/architec
 * xref:explanation/adr/0006-dfs-circular-reference-detection.adoc[ADR-006 — DFS-based circular reference detection]
 * xref:explanation/adr/0007-partial-files-pass-1-only.adoc[ADR-007 — Partial files — Pass 1 only]
 * xref:explanation/adr/0008-docbook-pipeline-for-docx.adoc[ADR-008 — Assembled document output via asciidoctor docbook pipeline]
+* xref:explanation/adr/0009-supersede-not-mutate.adoc[ADR-009 — Requirements are superseded, never mutated]
+* xref:explanation/adr/0010-identity-first-graph-diff.adoc[ADR-010 — Identity-first graph diff over rename detection]
+* xref:explanation/adr/0011-reverse-relations.adoc[ADR-011 — Relations with a mandatory reverse and canonical primary storage]

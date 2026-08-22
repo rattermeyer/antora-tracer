@@ -1,0 +1,43 @@
+= ADR-009: Requirements are superseded, never mutated
+:keywords: adr, architecture, decision, supersession, immutability, audit, traceability
+
+*Status*: accepted +
+*Deciders*: Richard Attermeyer +
+*Date*: 2026-08-22
+
+== Context and Problem Statement
+
+Controlled environments (IEC 62304, ISO 13485) require baselined requirements to be immutable: a change creates a successor, it never edits the old item in place.
+Antora Tracer had no way to express "this requirement replaced that one", and nothing surfaced the designs and tests that still pointed at the old item.
+Two plausible mechanisms existed — a `status` attribute or an explicit relationship — and they had different drift and queryability properties.
+
+== Decision Drivers
+
+* Auditability: the full history of a requirement must be queryable in the graph and exported to Neo4j
+* No redundant state: "superseded" must not be stored in two places that can disagree
+* Impact visibility: links to a superseded item must be flagged, never silently dropped
+* Splits and merges must be representable (one predecessor → several successors, several predecessors → one successor)
+
+== Considered Options
+
+* In-place mutation with a version history — loses the graph trail; no way to link "old" to "new"
+* A `status=superseded` attribute on the old item — redundant with any successor relation and free to drift
+* A `supersedes` relation with the effective state derived from it — chosen
+
+== Decision Outcome
+
+Chosen option: a `supersedes` relation (successor → predecessor), with the predecessor's superseded state derived from the graph — an item is effectively superseded when at least one incoming `supersedes` relation targets it.
+Splits and merges are first-class; self-supersession, duplicate links, and cycles are validation errors; a functional link to a superseded item is an advisory `stale_link` warning, and current-state matrices omit superseded items.
+
+=== Positive Consequences
+
+* Single source of truth: superseded state cannot drift from the relationship
+* Queryable, exportable history via the `supersedes` / `superseded_by` chain
+* Stale design and verification links remain visible and are marked for review, making the required rework explicit
+* `supersession check <id>` is a read-only CLI worklist for authors and architects
+
+=== Negative Consequences
+
+* Superseded items remain in their source pages (rendered with a successor marker) rather than being physically archived
+* Cross-version supersession (`REQ-042@v1`) is deferred; supersession is within-version only for now
+* Warnings are advisory, not blocking; a strict release gate is a future option

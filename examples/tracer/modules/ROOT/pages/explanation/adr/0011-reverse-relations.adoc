@@ -1,0 +1,44 @@
+= ADR-011: Relations with a mandatory reverse and canonical primary storage
+:keywords: adr, architecture, decision, reverse, relations, canonical, graph, config
+
+*Status*: accepted +
+*Deciders*: Richard Attermeyer +
+*Date*: 2026-08-22
+
+== Context and Problem Statement
+
+A reversible relationship was declared in three places that had to be kept in sync by hand: `relations` listed both directions (`use_case → requirement: leads_to` and `requirement → use_case: is_derived_from`), `inverseLabels` separately paired them for graph merge and display, and the compile-time `INVERSE_MAP` used yet another naming convention.
+A reader could not see that `leads_to` and `is_derived_from` are one edge seen from two sides, and the three sources drifted.
+
+== Decision Drivers
+
+* One declaration per reversible edge, not three
+* The reverse name must always be authorable, and authoring either side must yield the same edge
+* The reverse direction must be allowed without a second `relations` entry
+* The pairing must be config-driven, eliminating the compile-time `INVERSE_MAP`
+
+== Considered Options
+
+* List relations plus a separate `inverseLabels` map — the status quo; pairing and allowance drift
+* Keyed relation with an optional reverse — reintroduces the authorable-vs-display ambiguity
+* Keyed relation with a mandatory `reverse` plus canonical primary storage — chosen
+
+== Decision Outcome
+
+Chosen option: `relations` is keyed as `sourceRole → targetRole → type → { reverse }`, with `reverse` mandatory.
+Authoring the reverse name canonicalizes to the primary edge — `is_derived_from:UC[]` stores `UC → REQ : leads_to` — so the graph holds exactly one direction regardless of which side authored it.
+`isRelationAllowed()` derives the reverse direction, `INVERSE_MAP`/`PRIMARY_MAP` are deleted, and bidirectional merge becomes canonicalize + dedupe.
+`inverseLabels` is replaced by display-only `labels` with a `humanize()` default.
+
+=== Positive Consequences
+
+* Single source of truth for the pairing — no drift between allowance and merge behaviour
+* Canonical storage keeps matrices, coverage, and Neo4j exports stable regardless of authoring side
+* Config-driven, so users define their own reverse vocabulary; no compile-time constant to maintain
+* The reverse direction is allowed automatically, removing redundant `relations` entries
+
+=== Negative Consequences
+
+* Mandatory reverse invents vocabulary — `depends_on` now implies `is_prerequisite_of`
+* One-way relations are not expressible; every relation is reversible
+* Breaking config change for existing `relations` (list form) and `inverseLabels`
