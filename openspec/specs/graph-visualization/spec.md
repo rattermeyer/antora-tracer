@@ -97,9 +97,9 @@ The system SHALL provide a `traceability:config-graph[]` macro that renders the 
 - **AND** the diagram contains one edge per declared relation, labeled with the relation type(s)
 
 #### Scenario: Declared directions only
-- **WHEN** the config declares `design` to `requirement` with relation `addresses` and `inverseLabels` maps `addresses` to `addressed-by`
+- **WHEN** the config declares `design` to `requirement` with relation `addresses` and reverse `addressed_by`
 - **THEN** the diagram shows only the `design` to `requirement` edge labeled `addresses`
-- **AND** no `addressed-by` edge from `requirement` to `design` appears
+- **AND** no `addressed_by` edge from `requirement` to `design` appears
 
 #### Scenario: Orphaned role appears as isolated node
 - **WHEN** a role is declared in `roles` but appears in no `relations` entry

@@ -267,13 +267,9 @@ Source: openspec/specs/incoming-links-macro/spec.md
 traceability:links[]
 --
 
-[#REQ-067, item, role=requirement, title="Inverse relation type labels"]
+[#REQ-067, item, role=requirement, title="Incoming groups use the reverse relation type"]
 --
-The system SHALL transform relation type names to their inverse form for display in `traceability:incoming[]` using the declared `reverse` of the relation type.
-
-[#REQ-147, item, role=requirement, title="Fallback to raw type name when no inverse mapping exists"]
---
-If a relation type has no inverse mapping defined, then the system SHALL display the raw relation type name.
+The system SHALL group incoming relationships in `traceability:incoming[]` by the reverse relation type — the declared `reverse` of the relationship's type — so each group heading names the relation from the target item's perspective.
 
 Source: openspec/specs/incoming-links-macro/spec.md
 

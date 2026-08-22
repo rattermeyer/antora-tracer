@@ -72,19 +72,8 @@ The system SHALL support the same sort orders for `traceability:incoming[]` as f
 - **WHEN** `:traceability-order: relation-type`
 - **THEN** inverse relation type groups are sorted alphabetically, with items within each group sorted by source ID
 
-### Requirement: Inverse relation type labels
-The system SHALL transform relation type names to their inverse form for display in `traceability:incoming[]` using the built-in inverse label mapping.
-
-### Requirement: Fallback to raw type name when no inverse mapping exists
-If a relation type has no inverse mapping defined, then the system SHALL display the raw relation type name.
-
-#### Scenario: Known relation type has inverse
-- **WHEN** a relationship of type `addresses` points to the enclosing item
-- **THEN** the section title displays as `Addressed by`
-
-#### Scenario: User-defined relation type without inverse
-- **WHEN** a relationship of a user-defined type (not in `INVERSE_MAP`) points to the enclosing item
-- **THEN** the raw relation type name is displayed, capitalized
+### Requirement: Incoming groups use the reverse relation type
+The system SHALL group incoming relationships in `traceability:incoming[]` by the reverse relation type — the declared `reverse` of the relationship's type — so each group heading names the relation from the target item's perspective.
 
 ### Requirement: Incoming macro PDF compatibility
 The generated output from `traceability:incoming[]` SHALL be standard AsciiDoc constructs — not raw HTML — ensuring compatibility with both HTML and PDF backends.

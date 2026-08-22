@@ -2,7 +2,7 @@
 
 ## Purpose
 
-A preset SHALL be able to extend another preset, deep-merging the parent's traceability configuration (roles, relations, matrices, inverse labels) under the child's, with the child taking precedence on conflict.
+A preset SHALL be able to extend another preset, deep-merging the parent's traceability configuration (roles, relations, matrices, labels) under the child's, with the child taking precedence on conflict.
 
 ## Requirements
 
@@ -15,11 +15,11 @@ A preset SHALL declare its parent with a top-level `extends` field (sibling of `
 - **AND** SHALL contain the parent's relations
 
 #### Scenario: Child overrides parent
-- **WHEN** a preset extends a parent and defines a role, relation, matrix, or inverse label that the parent also defines
+- **WHEN** a preset extends a parent and defines a role, relation, matrix, or label that the parent also defines
 - **THEN** the child's value SHALL take precedence
 
 ### Requirement: Merge semantics match config-file `extends`
-Preset inheritance SHALL use the same merge rules as a config file extending a preset: roles are unioned, relations are deep-merged by source and target role, matrices are overridden by `name`, and `inverseLabels` are overridden key-by-key.
+Preset inheritance SHALL use the same merge rules as a config file extending a preset: roles are unioned, relations are deep-merged by source and target role, matrices are overridden by `name`, and `labels` are overridden key-by-key.
 
 #### Scenario: Matrix with the same name is replaced
 - **WHEN** a child preset defines a matrix whose `name` matches a parent matrix

@@ -191,7 +191,7 @@ The system SHALL provide a `traceability:links[]` macro that expands to a combin
 
 #### Scenario: Macro in an item with only incoming relationships
 - **WHEN** an item block contains `traceability:links[]` but the item has only incoming relationships
-- **THEN** only the incoming groups render with inverse labels
+- **THEN** only the incoming groups render with reverse-type labels
 - **AND** when `:traceability-empty: none` (default), no empty outgoing section is present
 - **AND** when `:traceability-empty:` is `italic` or `admonition`, an empty-state message for the outgoing direction is rendered
 
