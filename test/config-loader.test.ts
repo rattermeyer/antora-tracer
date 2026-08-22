@@ -3,6 +3,7 @@
  */
 
 import * as fs from "node:fs";
+import * as os from "node:os";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect } from "chai";
@@ -478,6 +479,265 @@ matrices:
         configLoader.loadPreset("nonexistent-preset");
       }).to.throw;
     });
+  });
+});
+
+describe("Preset Inheritance", () => {
+  let loader: ConfigLoader;
+  let tempDir: string;
+  const originalCwd = process.cwd();
+
+  function writePreset(name: string, body: string): void {
+    const presetsDir = path.join(tempDir, "presets");
+    fs.mkdirSync(presetsDir, { recursive: true });
+    fs.writeFileSync(path.join(presetsDir, `${name}.yml`), body);
+  }
+
+  beforeEach(() => {
+    loader = new ConfigLoader();
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "preset-inheritance-"));
+    process.chdir(tempDir);
+  });
+
+  afterEach(() => {
+    process.chdir(originalCwd);
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  it("inherits roles and relations from a built-in parent preset", () => {
+    writePreset(
+      "inherit-child",
+      `name: inherit-child
+version: 1.0.0
+description: child
+extends: requirements-engineering
+traceability:
+  roles:
+    - custom_role
+`,
+    );
+
+    const preset = loader.loadPreset("inherit-child");
+
+    expect(preset.traceability.roles).to.include("requirement");
+    expect(preset.traceability.roles).to.include("design");
+    expect(preset.traceability.roles).to.include("custom_role");
+    expect(preset.traceability.relations).to.have.property("design");
+    expect(preset.traceability.relations!.design).to.have.property(
+      "requirement",
+    );
+  });
+
+  it("lets the child override relations, matrices, and inverse labels", () => {
+    writePreset(
+      "parent",
+      `name: parent
+version: 1.0.0
+description: parent
+traceability:
+  roles:
+    - a
+    - b
+  relations:
+    a:
+      b:
+        - relates
+  matrices:
+    - name: ab
+      rows: a
+      columns:
+        - b
+  inverseLabels:
+    relates: related_by
+`,
+    );
+    writePreset(
+      "child",
+      `name: child
+version: 1.0.0
+description: child
+extends: parent
+traceability:
+  roles:
+    - c
+  relations:
+    a:
+      b:
+        - refines
+  matrices:
+    - name: ab
+      rows: a
+      columns:
+        - c
+  inverseLabels:
+    relates: refined_by
+`,
+    );
+
+    const preset = loader.loadPreset("child");
+
+    expect(preset.traceability.roles).to.include.members(["a", "b", "c"]);
+    expect(preset.traceability.relations!.a.b).to.deep.equal(["refines"]);
+    expect(preset.traceability.inverseLabels!.relates).to.equal("refined_by");
+
+    const abMatrix = preset.traceability.matrices!.find((m) => m.name === "ab");
+    expect(abMatrix).to.exist;
+    expect(abMatrix!.columns).to.deep.equal(["c"]);
+  });
+
+  it("adds new matrices alongside inherited ones and replaces same-name matrices", () => {
+    writePreset(
+      "parent",
+      `name: parent
+version: 1.0.0
+description: parent
+traceability:
+  roles:
+    - a
+    - b
+  matrices:
+    - name: ab
+      description: parent matrix
+      rows: a
+      columns:
+        - b
+`,
+    );
+    writePreset(
+      "child",
+      `name: child
+version: 1.0.0
+description: child
+extends: parent
+traceability:
+  matrices:
+    - name: ab
+      description: child matrix
+      rows: a
+      columns:
+        - b
+    - name: ba
+      description: new matrix
+      rows: b
+      columns:
+        - a
+`,
+    );
+
+    const preset = loader.loadPreset("child");
+    const names = preset.traceability.matrices!.map((m) => m.name);
+
+    expect(names).to.have.members(["ab", "ba"]);
+    expect(names).to.have.lengthOf(2);
+
+    const abMatrix = preset.traceability.matrices!.find((m) => m.name === "ab");
+    expect(abMatrix!.description).to.equal("child matrix");
+  });
+
+  it("resolves transitive inheritance chains", () => {
+    writePreset(
+      "c",
+      `name: c
+version: 1.0.0
+description: c
+traceability:
+  roles:
+    - c_role
+`,
+    );
+    writePreset(
+      "b",
+      `name: b
+version: 1.0.0
+description: b
+extends: c
+traceability:
+  roles:
+    - b_role
+`,
+    );
+    writePreset(
+      "a",
+      `name: a
+version: 1.0.0
+description: a
+extends: b
+traceability:
+  roles:
+    - a_role
+`,
+    );
+
+    const preset = loader.loadPreset("a");
+
+    expect(preset.traceability.roles).to.include.members([
+      "a_role",
+      "b_role",
+      "c_role",
+    ]);
+  });
+
+  it("throws when the parent preset does not exist", () => {
+    writePreset(
+      "orphan",
+      `name: orphan
+version: 1.0.0
+description: orphan
+extends: does-not-exist
+traceability:
+  roles:
+    - x
+`,
+    );
+
+    expect(() => loader.loadPreset("orphan")).to.throw(/not found/);
+  });
+
+  it("throws on self-extension", () => {
+    writePreset(
+      "self",
+      `name: self
+version: 1.0.0
+description: self
+extends: self
+traceability:
+  roles:
+    - x
+`,
+    );
+
+    expect(() => loader.loadPreset("self")).to.throw(
+      /Circular preset inheritance/,
+    );
+  });
+
+  it("throws on mutual extension", () => {
+    writePreset(
+      "m1",
+      `name: m1
+version: 1.0.0
+description: m1
+extends: m2
+traceability:
+  roles:
+    - x
+`,
+    );
+    writePreset(
+      "m2",
+      `name: m2
+version: 1.0.0
+description: m2
+extends: m1
+traceability:
+  roles:
+    - y
+`,
+    );
+
+    expect(() => loader.loadPreset("m1")).to.throw(
+      /Circular preset inheritance/,
+    );
   });
 });
 

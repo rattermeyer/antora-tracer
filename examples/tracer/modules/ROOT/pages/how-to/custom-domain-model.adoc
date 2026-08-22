@@ -143,6 +143,45 @@ traceability:
 The `extends` field deep-merges — your roles are added, relations are merged, and matrices are appended.
 You only write what's different from the preset.
 
+== Extend a preset from another preset
+
+You can also compose presets: build one preset on top of another instead of copying it.
+In a preset YAML file, declare the parent with a top-level `extends` field next to `name`:
+
+[source,yaml]
+----
+name: medical-safety
+version: 1.0.0
+description: requirements-engineering plus use-case traceability
+extends: requirements-engineering   # <1>
+
+traceability:
+  roles:
+    - use_case
+
+  relations:
+    use_case:
+      requirement:
+        - leads_to
+
+  matrices:
+    - name: usecases-to-requirements
+      description: "Which requirements each use case motivates"
+      rows: use_case
+      columns:
+        - requirement
+      coverageRelations:
+        requirement:
+          - leads_to
+----
+<1> Deep-merges the parent's roles, relations, and matrices under this preset's overrides
+
+The same merge rules apply as config-level `extends`: roles are unioned, relations are merged, and matrices are replaced by name.
+The child wins on conflict.
+Inheritance chains resolve transitively, and a preset that extends itself — directly or through a chain — is rejected.
+
+Place your custom preset in a `presets/` directory, then reference it from `traceability.yml` with `extends:`.
+
 == Validate your config
 
 After editing `traceability.yml`, run a validation check:

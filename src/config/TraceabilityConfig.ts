@@ -147,6 +147,7 @@ export class ConfigLoader {
   private config: CompleteConfig | null = null;
   private configPath: string | null = null;
   private presetCache: Map<string, Preset> = new Map();
+  private presetChain: Set<string> = new Set();
 
   /**
    * Load configuration from a file path
@@ -389,23 +390,45 @@ export class ConfigLoader {
       return this.presetCache.get(presetName)!;
     }
 
-    // Load built-in preset
-    const presetPath = this.getPresetPath(presetName);
-    if (!presetPath) {
+    // Guard against circular inheritance
+    if (this.presetChain.has(presetName)) {
       throw new Error(
-        `Preset '${presetName}' not found. Available presets: ${BUILT_IN_PRESETS.join(", ")}`,
+        `Circular preset inheritance detected: '${presetName}' extends itself through its parent chain.`,
       );
     }
+    this.presetChain.add(presetName);
 
-    const presetContent = fs.readFileSync(presetPath, "utf8");
-    const preset = yamlLoad(presetContent) as Preset;
+    try {
+      // Load built-in preset
+      const presetPath = this.getPresetPath(presetName);
+      if (!presetPath) {
+        throw new Error(
+          `Preset '${presetName}' not found. Available presets: ${BUILT_IN_PRESETS.join(", ")}`,
+        );
+      }
 
-    // Validate preset
-    this.validatePreset(preset);
+      const presetContent = fs.readFileSync(presetPath, "utf8");
+      const preset = yamlLoad(presetContent) as Preset;
 
-    // Cache and return
-    this.presetCache.set(presetName, preset);
-    return preset;
+      // Resolve parent preset inheritance (child wins on conflict)
+      if (preset.extends) {
+        const parent = this.loadPreset(preset.extends);
+        preset.traceability = this.mergeConfig(
+          parent.traceability,
+          preset.traceability,
+        );
+        delete preset.extends;
+      }
+
+      // Validate the (merged) preset
+      this.validatePreset(preset);
+
+      // Cache and return
+      this.presetCache.set(presetName, preset);
+      return preset;
+    } finally {
+      this.presetChain.delete(presetName);
+    }
   }
 
   /**

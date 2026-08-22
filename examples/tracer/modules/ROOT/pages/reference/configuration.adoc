@@ -171,6 +171,24 @@ Your config is deep-merged on top:
 
 If `extends` is omitted, the config is standalone — no preset is loaded.
 
+Presets can themselves extend another preset.
+In a preset file, `extends` is a top-level field next to `name` and `version`:
+
+[source,yaml]
+----
+name: medical-safety
+version: 1.0.0
+extends: requirements-engineering   # <1>
+
+traceability:
+  roles:
+    - use_case
+----
+<1> The parent's roles, relations, matrices, and `inverseLabels` are deep-merged under the child
+
+Inheritance chains resolve transitively; circular inheritance is rejected.
+See xref:reference/presets.adoc[Presets Reference] for the preset schema.
+
 === `roles`
 
 Flat list of strings.

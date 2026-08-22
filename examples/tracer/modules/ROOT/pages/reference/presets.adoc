@@ -139,6 +139,10 @@ Each preset YAML file follows this structure:
 | semver
 | Independent version, separate from the extension
 
+| `extends`
+| string
+| Name of a parent preset to inherit from. The parent's roles, relations, matrices, and inverse labels are deep-merged under this preset (child wins on conflict).
+
 | `author`
 | string
 | Preset author or organization
