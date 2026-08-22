@@ -20,60 +20,32 @@ traceability:
     depends_on: "is-a-dependency-of"
     conflicts_with: "conflicting-with"
     addresses: "addressed-by"
-    satisfies: "satisfied-by"
-    refined_by: "refining"
-    realized_by: "realizing"
     validated_by: "validating"
-    documented_by: "documenting"
-    implements: "implemented-by"
-    uses: "used-by"
-    tested_by: "testing"
-    covers: "covered-by"
     verifies: "verified-by"
     validates: "validated-by"
-    tests: "tested-by"
-    contains: "contained-in"
-    describes: "described-by"
 
   roles:
     - requirement
     - design
-    - implementation
     - test
-    - document
 
   relations:
     # Requirement relations — only requirement-to-requirement.
-    # Downstream roles (design, implementation, test, document) declare their own
-    # relations back to requirements using active voice.
+    # Downstream roles (design, test) declare their own relations back to
+    # requirements using active voice.
     requirement:
-      requirement: [refines, depends_on, conflicts_with]
+      requirement: [refines]
 
     # Design relations
     design:
-      requirement: [addresses, satisfies]
-      design: [depends_on, composed_of, refined_by]
-      implementation: [realized_by]
+      requirement: [addresses]
+      design: [depends_on, refines]
       test: [validated_by]
-      document: [documented_by]
-
-    # Implementation relations
-    implementation:
-      requirement: [satisfies]
-      design: [implements]
-      implementation: [depends_on, uses]
-      test: [tested_by]
 
     # Test relations
     test:
-      requirement: [covers, verifies]
+      requirement: [verifies]
       design: [validates]
-      implementation: [tests]
-
-    # Document relations
-    document:
-      requirement: [contains]
-      design: [describes]
 
   matrices:
     - name: requirements-to-design
@@ -81,30 +53,23 @@ traceability:
       rows: requirement
       columns: [design]
       coverageRelations:
-        design: [addresses, satisfies]
-
-    - name: design-to-implementation
-      description: "Forward traceability from design elements to their implementations"
-      rows: design
-      columns: [implementation]
-      coverageRelations:
-        implementation: [implements, realized_by]
+        design: [addresses]
 
     - name: requirements-to-tests
       description: "Direct traceability from requirements to their tests"
       rows: requirement
       columns: [test]
       coverageRelations:
-        test: [covers, verifies]
+        test: [verifies]
 
 neo4j:
     queries:
       - name: uncovered-requirements
-        description: "Requirements without any implementation or test coverage"
+        description: "Requirements without any design or test coverage"
         cypher: |
           MATCH (r:Item {role: 'requirement'})
           WHERE NOT EXISTS {
-            MATCH (r)<-[:ADDRESSES|SATISFIES|IMPLEMENTS|COVERS|VERIFIES|TESTS|VALIDATES]-(:Item)
+            MATCH (r)<-[:ADDRESSES|VERIFIES]-(:Item)
           }
           RETURN r.id, r.title ORDER BY r.id
 
@@ -112,28 +77,26 @@ neo4j:
         description: "Design elements and their requirement/test coverage"
         cypher: |
           MATCH (d:Item {role: 'design'})
-          OPTIONAL MATCH (d)-[:ADDRESSES|SATISFIES]->(r:Item {role: 'requirement'})
-          OPTIONAL MATCH (d)-[:VALIDATED_BY|VALIDATES|TESTS]->(t:Item {role: 'test'})
+          OPTIONAL MATCH (d)-[:ADDRESSES]->(r:Item {role: 'requirement'})
+          OPTIONAL MATCH (d)-[:VALIDATED_BY]->(t:Item {role: 'test'})
           RETURN d.id, d.title, count(r) as requirements, count(t) as tests
           ORDER BY requirements DESC, tests DESC
 
       - name: traceability-chain
-        description: "Full traceability chain from requirement to implementation to test"
+        description: "Full traceability chain from requirement to design to test"
         cypher: |
-          MATCH path = (r:Item {role: 'requirement'})<-[:ADDRESSES|SATISFIES]-(d:Item {role: 'design'})
-                     -[:IMPLEMENTS|REALIZED_BY]->(i:Item {role: 'implementation'})
-                     -[:TESTED_BY|TESTS]->(t:Item {role: 'test'})
-          RETURN r.id as requirement, d.id as design, i.id as implementation, t.id as test
-          ORDER BY r.id, d.id, i.id, t.id
+          MATCH path = (r:Item {role: 'requirement'})<-[:ADDRESSES]-(d:Item {role: 'design'})
+                     <-[:VALIDATES]-(t:Item {role: 'test'})
+          RETURN r.id as requirement, d.id as design, t.id as test
+          ORDER BY r.id, d.id, t.id
 
       - name: impact-analysis
         description: "What would be affected by changing a requirement?"
         cypher: |
           MATCH (r:Item {id: $requirementId, role: 'requirement'})
-          OPTIONAL MATCH (r)<-[:ADDRESSES|SATISFIES]-(d:Item {role: 'design'})
-          OPTIONAL MATCH (d)-[:IMPLEMENTS|REALIZED_BY]->(i:Item {role: 'implementation'})
-          OPTIONAL MATCH (r)<-[:COVERS|VERIFIES]-(t:Item {role: 'test'})
-          RETURN r.id as requirement, collect(d.id) as designs, collect(i.id) as implementations, collect(t.id) as tests
+          OPTIONAL MATCH (r)<-[:ADDRESSES]-(d:Item {role: 'design'})
+          OPTIONAL MATCH (r)<-[:VERIFIES]-(t:Item {role: 'test'})
+          RETURN r.id as requirement, collect(d.id) as designs, collect(t.id) as tests
 
       - name: circular-dependencies
         description: "Find circular dependencies between requirements"
@@ -153,9 +116,7 @@ documentation:
     |------|-------------|-------------|
     | requirement | A functional or non-functional requirement | System requirements, software requirements |
     | design | A design element that addresses requirements | Architecture, components, modules |
-    | implementation | Code or implementation artifact | Classes, functions, services |
     | test | A verification or validation procedure | Unit tests, integration tests, system tests |
-    | document | External documentation or specification | Standards, specifications, design docs |
 
     ## Pairwise Matrices
 
@@ -164,13 +125,12 @@ documentation:
 
     | Matrix | From | To | Coverage Relations |
     |--------|------|----|-------------------|
-    | requirements-to-design | requirement | design | addresses, satisfies |
-    | design-to-implementation | design | implementation | implements, realized_by |
-    | requirements-to-tests | requirement | test | covers, verifies |
+    | requirements-to-design | requirement | design | addresses |
+    | requirements-to-tests | requirement | test | verifies |
 
     Use the CLI `matrix` command to generate matrices, or configure the Antora extension
     with `generateMatrices: true` in your playbook. For backward traceability (which tests
-    cover a design? which requirements does an implementation address?), use the Neo4j
+    cover a design? which requirements does a design address?), use the Neo4j
     export or add custom matrices to your project's `traceability.yml`.
 
     ## Common Workflow
@@ -178,10 +138,8 @@ documentation:
     1. Define requirements with `[item, id=REQ-001, role=requirement]`
     2. Create designs that address requirements with `[item, id=DES-001, role=design]`
     3. Add `addresses:REQ-001[]` inline macro in design
-    4. Implement designs with `[item, id=IMP-001, role=implementation]`
-    5. Add `implements:DES-001[]` inline macro in implementation
-    6. Create tests with `[item, id=TEST-001, role=test]`
-    7. Add `verifies:REQ-001[]` or `validates:DES-001[]` inline macros in test
+    4. Create tests with `[item, id=TEST-001, role=test]`
+    5. Add `verifies:REQ-001[]` or `validates:DES-001[]` inline macros in test
 
     ## Example
 
@@ -202,15 +160,6 @@ documentation:
     addresses:REQ-001[]
     ====
 
-    [item, id=IMP-001, role=implementation]
-    ====
-    AuthService Class
-
-    Implementation of JWT authentication.
-
-    implements:DES-001[]
-    ====
-
     [item, id=TEST-001, role=test]
     ====
     Authentication Tests
@@ -219,6 +168,5 @@ documentation:
 
     verifies:REQ-001[]
     validates:DES-001[]
-    tests:IMP-001[]
     ====
     ```
