@@ -30,7 +30,7 @@ execSync(`rm -rf "${PUBLIC}" && mkdir -p "${PUBLIC}"`, { stdio: 'inherit' });
 console.log('✓ cleaned public/');
 
 // 1. Build Antora docs
-run(`npx antora ${playbook}`, 'Build Antora docs');
+run(`npx antora --clean --fetch ${playbook}`, 'Build Antora docs');
 
 // 2. Build PDF
 function copyPDFs() {
