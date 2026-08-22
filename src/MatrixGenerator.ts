@@ -41,7 +41,7 @@ export interface MatrixRow {
   rowRole: string;
   cells: MatrixCell[];
   coverage: number; // 0-100 percentage
-  status: "complete" | "partial" | "missing";
+  status: "done" | "partial" | "missing";
 }
 
 /**
@@ -142,7 +142,7 @@ export class MatrixGenerator {
         columns: columnRoles.map((role) => ({ name: role, role })),
         coverage: {
           overall: 0,
-          complete: 0,
+          done: 0,
           partial: 0,
           missing: 0,
           total: 0,
@@ -213,8 +213,8 @@ export class MatrixGenerator {
       }
 
       const coverage = (coveredCount / totalColumns) * 100;
-      const status: "complete" | "partial" | "missing" =
-        coverage === 100 ? "complete" : coverage > 0 ? "partial" : "missing";
+      const status: "done" | "partial" | "missing" =
+        coverage === 100 ? "done" : coverage > 0 ? "partial" : "missing";
 
       rows.push({
         rowId: rowItem.id,
@@ -227,7 +227,7 @@ export class MatrixGenerator {
     }
 
     // Calculate overall coverage
-    const coveredRows = rows.filter((r) => r.status === "complete").length;
+    const coveredRows = rows.filter((r) => r.status === "done").length;
     const overallCoverage = (coveredRows / rows.length) * 100;
 
     return {
@@ -237,7 +237,7 @@ export class MatrixGenerator {
       columns: columnRoles.map((role) => ({ name: role, role })),
       coverage: {
         overall: overallCoverage,
-        complete: coveredRows,
+        done: coveredRows,
         partial: rows.filter((r) => r.status === "partial").length,
         missing: rows.filter((r) => r.status === "missing").length,
         total: rows.length,
@@ -319,7 +319,7 @@ export class MatrixGenerator {
         columns: columnRoles.map((role) => ({ name: role, role })),
         coverage: {
           overall: 0,
-          complete: 0,
+          done: 0,
           partial: 0,
           missing: 0,
           total: 0,
@@ -397,8 +397,8 @@ export class MatrixGenerator {
       }
 
       const coverage = (coveredCount / totalColumns) * 100;
-      const status: "complete" | "partial" | "missing" =
-        coverage === 100 ? "complete" : coverage > 0 ? "partial" : "missing";
+      const status: "done" | "partial" | "missing" =
+        coverage === 100 ? "done" : coverage > 0 ? "partial" : "missing";
 
       rows.push({
         rowId: rowItem.id,
@@ -410,7 +410,7 @@ export class MatrixGenerator {
       });
     }
 
-    const coveredRows = rows.filter((r) => r.status === "complete").length;
+    const coveredRows = rows.filter((r) => r.status === "done").length;
     const overallCoverage = (coveredRows / rows.length) * 100 || 0;
 
     return {
@@ -420,7 +420,7 @@ export class MatrixGenerator {
       columns: columnRoles.map((role) => ({ name: role, role })),
       coverage: {
         overall: overallCoverage,
-        complete: coveredRows,
+        done: coveredRows,
         partial: rows.filter((r) => r.status === "partial").length,
         missing: rows.filter((r) => r.status === "missing").length,
         total: rows.length,
@@ -524,7 +524,6 @@ export class MatrixGenerator {
         role: this.escapeHtml(cell.role),
       })),
       coverage: row.coverage,
-      coverageFormatted: (row.coverage ?? 0).toFixed(1),
       status: row.status,
       statusClass: `status-${row.status}`,
     };

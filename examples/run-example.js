@@ -97,7 +97,7 @@ for (const matrixName of matrixNames) {
   // Coverage
   const cov = matrix.coverage;
   console.log(
-    `${matrixName}: ${cov.overall.toFixed(1)}% overall (${cov.complete} complete, ${cov.partial} partial, ${cov.missing} missing)`,
+    `${matrixName}: ${cov.overall.toFixed(1)}% overall (${cov.done} done, ${cov.partial} partial, ${cov.missing} missing)`,
   );
 }
 

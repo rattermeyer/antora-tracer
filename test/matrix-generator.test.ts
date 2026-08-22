@@ -226,10 +226,10 @@ matrices:
       const matrix = generator.generateMatrix();
 
       for (const row of matrix.rows) {
-        expect(["complete", "partial", "missing"]).to.include(row.status);
+        expect(["done", "partial", "missing"]).to.include(row.status);
 
         if (row.coverage === 100) {
-          expect(row.status).to.equal("complete");
+          expect(row.status).to.equal("done");
         } else if (row.coverage > 0) {
           expect(row.status).to.equal("partial");
         } else {
@@ -242,7 +242,7 @@ matrices:
       const matrix = generator.generateMatrix();
       expect(matrix.coverage).to.exist;
       expect(matrix.coverage).to.have.property("overall");
-      expect(matrix.coverage).to.have.property("complete");
+      expect(matrix.coverage).to.have.property("done");
       expect(matrix.coverage).to.have.property("partial");
       expect(matrix.coverage).to.have.property("missing");
       expect(matrix.coverage).to.have.property("total");
@@ -361,7 +361,7 @@ matrices:
 
         // REQ-001 should be 100% covered (both columns have relationships)
         expect(req1Row?.coverage).to.equal(100);
-        expect(req1Row?.status).to.equal("complete");
+        expect(req1Row?.status).to.equal("done");
 
         // REQ-002 should have no coverage
         const req2Row = matrix.rows.find((r) => r.rowId === "REQ-002");
@@ -369,7 +369,7 @@ matrices:
         expect(req2Row?.status).to.equal("missing");
 
         expect(matrix.coverage.overall).to.equal(50);
-        expect(matrix.coverage.complete).to.equal(1);
+        expect(matrix.coverage.done).to.equal(1);
         expect(matrix.coverage.missing).to.equal(1);
       } finally {
         fs.rmSync(tempConfig, { force: true });
@@ -459,7 +459,7 @@ matrices:
 
         const imp1Row = matrix.rows.find((r) => r.rowId === "IMP-001");
         expect(imp1Row?.coverage).to.equal(100);
-        expect(imp1Row?.status).to.equal("complete");
+        expect(imp1Row?.status).to.equal("done");
 
         const imp2Row = matrix.rows.find((r) => r.rowId === "IMP-002");
         expect(imp2Row?.coverage).to.equal(100);
