@@ -93,9 +93,11 @@ roles:
 relations:
   requirement:
     implementation:
-      - implements
+      implements:
+        reverse: implemented_by
     test:
-      - tests
+      tests:
+        reverse: tested_by
 
 matrices:
   - name: requirements-implementations
@@ -170,7 +172,8 @@ roles:
 relations:
   requirement:
     implementation:
-      - implements
+      implements:
+        reverse: implemented_by
 matrices:
   - name: test-matrix
     rows: requirement
@@ -205,11 +208,15 @@ roles:
 relations:
   requirement:
     implementation:
-      - implements
-      - satisfies
+      implements:
+        reverse: implemented_by
+      satisfies:
+        reverse: satisfied_by
     test:
-      - verifies
-      - tests
+      verifies:
+        reverse: verified_by
+      tests:
+        reverse: tested_by
 `;
 
       fs.writeFileSync(configPath, configContent);
@@ -241,11 +248,14 @@ roles:
 relations:
   requirement:
     implementation:
-      - implements
+      implements:
+        reverse: implemented_by
     test:
-      - tests
+      tests:
+        reverse: tested_by
     design:
-      - addresses
+      addresses:
+        reverse: addressed_by
 matrices:
   - name: req-impl
     description: Requirements to Implementations
@@ -295,9 +305,11 @@ roles:
 relations:
   requirement:
     implementation:
-      - implements
+      implements:
+        reverse: implemented_by
     test:
-      - tests
+      tests:
+        reverse: tested_by
 `;
 
       fs.writeFileSync(configPath, configContent);
@@ -329,7 +341,8 @@ roles:
 relations:
   requirement:
     implementation:
-      - implements
+      implements:
+        reverse: implemented_by
 `;
 
       fs.writeFileSync(configPath, configContent);
@@ -369,8 +382,10 @@ roles:
 relations:
   requirement:
     implementation:
-      - implements
-      - satisfies
+      implements:
+        reverse: implemented_by
+      satisfies:
+        reverse: satisfied_by
 `;
 
       fs.writeFileSync(configPath, configContent);
@@ -405,9 +420,11 @@ roles:
 relations:
   requirement:
     implementation:
-      - implements
+      implements:
+        reverse: implemented_by
     test:
-      - tests
+      tests:
+        reverse: tested_by
 matrices:
   - name: req-impl
     rows: requirement
@@ -528,7 +545,7 @@ traceability:
     );
   });
 
-  it("lets the child override relations, matrices, and inverse labels", () => {
+  it("lets the child override relation reverses and labels", () => {
     writePreset(
       "parent",
       `name: parent
@@ -541,14 +558,15 @@ traceability:
   relations:
     a:
       b:
-        - relates
+        relates:
+          reverse: related_by
   matrices:
     - name: ab
       rows: a
       columns:
         - b
-  inverseLabels:
-    relates: related_by
+  labels:
+    relates: Related to
 `,
     );
     writePreset(
@@ -563,22 +581,25 @@ traceability:
   relations:
     a:
       b:
-        - refines
+        relates:
+          reverse: refined_by
   matrices:
     - name: ab
       rows: a
       columns:
         - c
-  inverseLabels:
-    relates: refined_by
+  labels:
+    relates: Refined
 `,
     );
 
     const preset = loader.loadPreset("child");
 
     expect(preset.traceability.roles).to.include.members(["a", "b", "c"]);
-    expect(preset.traceability.relations!.a.b).to.deep.equal(["refines"]);
-    expect(preset.traceability.inverseLabels!.relates).to.equal("refined_by");
+    expect(preset.traceability.relations!.a.b.relates).to.deep.equal({
+      reverse: "refined_by",
+    });
+    expect(preset.traceability.labels!.relates).to.equal("Refined");
 
     const abMatrix = preset.traceability.matrices!.find((m) => m.name === "ab");
     expect(abMatrix).to.exist;
@@ -756,7 +777,8 @@ roles:
 relations:
   requirement:
     implementation:
-      - implements
+      implements:
+        reverse: implemented_by
 `;
 
     fs.writeFileSync(configPath, configContent);

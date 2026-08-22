@@ -13,28 +13,6 @@ compatibility:
   minExtensionVersion: 2.0.0
 
 traceability:
-  inverseLabels:
-    contains: "contained-in"
-    validated_by: "validating"
-    broken_down_into: "broken-down-from"
-    verified_by: "verifying"
-    part_of: "containing"
-    has: "belongs-to"
-    requires: "required-by"
-    affected_by: "affecting"
-    belongs_to: "having"
-    implements: "implemented-by"
-    affects: "affected-by"
-    fixes: "fixed-by"
-    investigates: "investigated-by"
-    results_in: "result-of"
-    blocks: "blocked-by"
-    fixed_by: "fixing"
-    reproduced_by: "reproducing"
-    verifies: "verified-by"
-    validates: "validated-by"
-    tests: "tested-by"
-
   roles:
     - epic
     - feature
@@ -48,55 +26,111 @@ traceability:
   relations:
     # Epic relations
     epic:
-      feature: [contains]
-      user_story: [contains]
-      test: [validated_by]
+      feature:
+        contains:
+          reverse: contained_in
+      user_story:
+        contains:
+          reverse: contained_in
+      test:
+        validated_by:
+          reverse: validates
 
     # Feature relations
     feature:
-      user_story: [broken_down_into]
-      test: [verified_by]
+      user_story:
+        broken_down_into:
+          reverse: broken_down_from
+      test:
+        verified_by:
+          reverse: verifies
 
     # User story relations
     user_story:
-      epic: [part_of]
-      feature: [part_of]
-      acceptance_criterion: [has]
-      task: [broken_down_into]
-      spike: [requires]
-      test: [verified_by]
-      bug: [affected_by]
+      epic:
+        part_of:
+          reverse: contains
+      feature:
+        part_of:
+          reverse: contains
+      acceptance_criterion:
+        has:
+          reverse: belongs_to
+      task:
+        broken_down_into:
+          reverse: broken_down_from
+      spike:
+        requires:
+          reverse: required_by
+      test:
+        verified_by:
+          reverse: verifies
+      bug:
+        affected_by:
+          reverse: affects
 
     # Acceptance criterion relations
     acceptance_criterion:
-      user_story: [belongs_to]
-      test: [validated_by]
+      user_story:
+        belongs_to:
+          reverse: has
+      test:
+        validated_by:
+          reverse: validates
 
     # Task relations
     task:
-      user_story: [implements]
-      spike: [implements]
-      test: [affects]
-      bug: [fixes]
+      user_story:
+        implements:
+          reverse: implemented_by
+      spike:
+        implements:
+          reverse: implemented_by
+      test:
+        affects:
+          reverse: affected_by
+      bug:
+        fixes:
+          reverse: fixed_by
 
     # Spike relations
     spike:
-      user_story: [investigates]
-      task: [results_in]
+      user_story:
+        investigates:
+          reverse: investigated_by
+      task:
+        results_in:
+          reverse: result_of
 
     # Bug relations
     bug:
-      user_story: [blocks]
-      task: [fixed_by]
-      test: [reproduced_by]
+      user_story:
+        blocks:
+          reverse: blocked_by
+      task:
+        fixed_by:
+          reverse: fixes
+      test:
+        reproduced_by:
+          reverse: reproduces
 
     # Test relations
     test:
-      user_story: [verifies]
-      acceptance_criterion: [validates]
-      task: [tests]
-      spike: [tests]
-      bug: [reproduces]
+      user_story:
+        verifies:
+          reverse: verified_by
+      acceptance_criterion:
+        validates:
+          reverse: validated_by
+      task:
+        tests:
+          reverse: tested_by
+      spike:
+        tests:
+          reverse: tested_by
+      bug:
+        reproduces:
+          reverse: reproduced_by
 
   matrices:
     - name: epic-progress

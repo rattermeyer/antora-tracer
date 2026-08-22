@@ -9,11 +9,16 @@ roles:
 
 relations:
   use_case:
-    requirement: ["leads_to"]
-  requirement:
-    use_case: ["is_derived_from"]
-  design:
-    process_requirement: ["considers"]
+    requirement:
+      leads_to:
+        reverse: is_derived_from
+  process_requirement:
+    requirement:
+      validates:
+        reverse: validated_by
+    design:
+      considered_by:
+        reverse: considers
 
 matrices:
   - name: usecases-to-requirements
@@ -34,7 +39,3 @@ matrices:
     columns: [design]
     coverageRelations:
       design: [considered_by]
-
-inverseLabels:
-  leads_to: "is_derived_from"
-  considered_by: "considers"

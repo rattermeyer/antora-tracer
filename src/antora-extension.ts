@@ -20,7 +20,6 @@ import { ConfigLoader, toConfigDot } from "./config/TraceabilityConfig.js";
 import { RequirementsTraceabilityExtension } from "./index.js";
 import { LinkResolver } from "./LinkResolver.js";
 import { MatrixGenerator } from "./MatrixGenerator.js";
-import { INVERSE_MAP } from "./types.js";
 
 /**
  * Antora Extension Configuration
@@ -483,13 +482,10 @@ export class AntoraTraceabilityExtension {
       const related = graph.getItem(targetId);
       if (!related) continue;
 
-      // Incoming display uses the inverse label of the relation type.
+      // Incoming display uses the reverse type of the relation.
       const groupKey = isOutgoing
         ? rel.type
-        : (this.traceability!.configLoader?.getConfig()?.inverseLabels?.[
-            rel.type
-          ] ??
-          INVERSE_MAP[rel.type as keyof typeof INVERSE_MAP] ??
+        : (this.traceability!.configLoader?.getInverseType(rel.type) ??
           rel.type);
 
       if (!grouped.has(groupKey)) grouped.set(groupKey, []);
@@ -622,7 +618,7 @@ export class AntoraTraceabilityExtension {
   ): string {
     const lines: string[] = [];
     for (const [relType, items] of grouped) {
-      const title = this.capitalize(relType);
+      const title = this.displayLabel(relType);
       if (collapsible) {
         lines.push(`\n[%collapsible]`);
         lines.push(`.${title}`);
@@ -709,7 +705,7 @@ export class AntoraTraceabilityExtension {
     for (const [relType, items] of grouped) {
       lines.push(
         "\n" +
-          this.capitalize(relType) +
+          this.displayLabel(relType) +
           ": " +
           items
             .map((i) =>
@@ -727,8 +723,20 @@ export class AntoraTraceabilityExtension {
     return `${lines.join("\n")}\n`;
   }
 
-  private capitalize(s: string): string {
-    return s.charAt(0).toUpperCase() + s.slice(1).replace(/_/g, "-");
+  /**
+   * Humanize a relation type: underscores to spaces, sentence case.
+   */
+  private humanize(type: string): string {
+    const s = type.replace(/_/g, " ");
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
+
+  /**
+   * Display name for a relation type: `labels` override, else humanized type.
+   */
+  private displayLabel(type: string): string {
+    const labels = this.traceability?.configLoader?.getConfig()?.labels;
+    return labels?.[type] ?? this.humanize(type);
   }
 
   private isGraphEnabled(attrs: Record<string, string>): boolean {

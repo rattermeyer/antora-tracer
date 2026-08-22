@@ -27,7 +27,7 @@ traceability:outgoing[]
 === traceability:incoming[]
 
 Lists items that point to this item (incoming relationships).
-Uses inverse labels (e.g., `addresses` displays as "Addressed by"):
+Uses the reverse relation's display label (e.g., an incoming `addresses` edge displays as "Addressed by"):
 
 [source,asciidoc]
 ----

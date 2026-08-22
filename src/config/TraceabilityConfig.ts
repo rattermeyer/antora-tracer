@@ -71,6 +71,14 @@ export interface Preset extends PresetMetadata {
 }
 
 /**
+ * A single relation declaration: a primary type and its mandatory reverse.
+ */
+export interface RelationDef {
+  /** The authorable relation type in the reverse direction. */
+  reverse: string;
+}
+
+/**
  * Main traceability configuration
  */
 export interface TraceabilityConfig {
@@ -80,9 +88,9 @@ export interface TraceabilityConfig {
   roles: string[];
 
   /**
-   * Relationship definitions: sourceRole -> { targetRole -> [relationTypes] }
+   * Relationship definitions: sourceRole -> { targetRole -> { type -> { reverse } } }
    */
-  relations?: Record<string, Record<string, string[]>>;
+  relations?: Record<string, Record<string, Record<string, RelationDef>>>;
 
   /**
    * Matrix definitions for generation
@@ -90,11 +98,10 @@ export interface TraceabilityConfig {
   matrices?: MatrixDefinition[];
 
   /**
-   * Inverse labels for relationship types (config-driven).
-   * Maps a relation type to its display label for incoming display.
-   * Falls back to types.ts INVERSE_MAP, then raw type name.
+   * Display names for relation types (display-only, never affects the graph).
+   * Maps a relation type to a human-readable name. Falls back to humanize(type).
    */
-  inverseLabels?: Record<string, string>;
+  labels?: Record<string, string>;
 
   /**
    * Extend from a preset
@@ -262,23 +269,31 @@ export class ConfigLoader {
       config.relations = {};
     }
 
-    // Normalize relations structure
-    const normalizedRelations: Record<string, Record<string, string[]>> = {};
+    // Normalize relations structure (keyed: type -> { reverse })
+    const normalizedRelations: Record<
+      string,
+      Record<string, Record<string, RelationDef>>
+    > = {};
     for (const [sourceRole, targets] of Object.entries(config.relations)) {
       const source = sourceRole.toLowerCase();
       normalizedRelations[source] = {};
 
       if (typeof targets === "object" && targets !== null) {
-        for (const [targetRole, relationTypes] of Object.entries(
+        for (const [targetRole, typeMap] of Object.entries(
           targets as Record<string, unknown>,
         )) {
           const target = targetRole.toLowerCase();
-          if (Array.isArray(relationTypes)) {
-            normalizedRelations[source][target] = relationTypes.map(
-              (r: unknown) => (r as string).toString().toLowerCase(),
-            );
-          } else if (typeof relationTypes === "string") {
-            normalizedRelations[source][target] = [relationTypes.toLowerCase()];
+          normalizedRelations[source][target] = {};
+          if (typeof typeMap === "object" && typeMap !== null) {
+            for (const [type, def] of Object.entries(
+              typeMap as Record<string, unknown>,
+            )) {
+              const d = def as { reverse?: unknown };
+              normalizedRelations[source][target][type.toLowerCase()] = {
+                reverse:
+                  typeof d?.reverse === "string" ? d.reverse.toLowerCase() : "",
+              };
+            }
           }
         }
       }
@@ -330,17 +345,30 @@ export class ConfigLoader {
           continue;
         }
 
-        for (const [targetRole, relationTypes] of Object.entries(targets)) {
+        for (const [targetRole, typeMap] of Object.entries(targets)) {
           if (!config.roles.includes(targetRole)) {
             errors.push(
               `Relation target role '${targetRole}' is not defined in roles (in relations for '${sourceRole}')`,
             );
           }
 
-          if (!Array.isArray(relationTypes)) {
+          if (typeof typeMap !== "object" || typeMap === null) {
             errors.push(
-              `Relation types for '${sourceRole}' -> '${targetRole}' must be an array`,
+              `Relations for '${sourceRole}' -> '${targetRole}' must be a map of type -> { reverse }`,
             );
+            continue;
+          }
+
+          for (const [type, def] of Object.entries(typeMap)) {
+            if (
+              !def ||
+              typeof def.reverse !== "string" ||
+              def.reverse.trim() === ""
+            ) {
+              errors.push(
+                `Relation type '${type}' ('${sourceRole}' -> '${targetRole}') must declare a 'reverse'`,
+              );
+            }
           }
         }
       }
@@ -516,25 +544,18 @@ export class ConfigLoader {
       result.roles = Array.from(baseRoles);
     }
 
-    // Merge relations: deep merge
+    // Merge relations: deep merge (child type defs override by key)
     if (override.relations) {
       result.relations = { ...base.relations };
       for (const [sourceRole, targets] of Object.entries(override.relations)) {
         if (!result.relations[sourceRole]) {
           result.relations[sourceRole] = {};
         }
-        if (targets && typeof targets === "object") {
-          const targetsObj = targets as Record<string, unknown>;
-          for (const [targetRole, relationTypes] of Object.entries(
-            targetsObj,
-          )) {
-            if (Array.isArray(relationTypes)) {
-              result.relations[sourceRole][targetRole] =
-                relationTypes as string[];
-            } else if (typeof relationTypes === "string") {
-              result.relations[sourceRole][targetRole] = [relationTypes];
-            }
+        for (const [targetRole, typeMap] of Object.entries(targets)) {
+          if (!result.relations[sourceRole][targetRole]) {
+            result.relations[sourceRole][targetRole] = {};
           }
+          Object.assign(result.relations[sourceRole][targetRole], typeMap);
         }
       }
     }
@@ -556,10 +577,10 @@ export class ConfigLoader {
       result.matrices = Array.from(matrixMap.values());
     }
 
-    // Merge inverseLabels: user overrides preset values
-    result.inverseLabels = {
-      ...(base.inverseLabels || {}),
-      ...(override.inverseLabels || {}),
+    // Merge labels: user overrides preset values
+    result.labels = {
+      ...(base.labels || {}),
+      ...(override.labels || {}),
     };
 
     return result;
@@ -614,17 +635,23 @@ export class ConfigLoader {
       return true;
     }
 
-    const sourceRelations = config.relations?.[source];
-    if (!sourceRelations) {
-      return false;
+    // Direct primary declaration in the authored direction
+    const direct = config.relations?.[source]?.[target];
+    if (direct && relation in direct) {
+      return true;
     }
 
-    const allowedRelations = sourceRelations[target];
-    if (!allowedRelations) {
-      return false;
+    // Derived reverse: type is the reverse of a relation declared target -> source
+    const opposite = config.relations?.[target]?.[source];
+    if (opposite) {
+      for (const def of Object.values(opposite)) {
+        if (def.reverse === relation) {
+          return true;
+        }
+      }
     }
 
-    return allowedRelations.includes(relation);
+    return false;
   }
 
   /**
@@ -635,12 +662,82 @@ export class ConfigLoader {
     const source = sourceRole.toLowerCase();
     const target = targetRole.toLowerCase();
 
-    const sourceRelations = config.relations?.[source];
-    if (!sourceRelations) {
-      return [];
+    const allowed = new Set<string>();
+
+    const direct = config.relations?.[source]?.[target];
+    if (direct) {
+      for (const type of Object.keys(direct)) {
+        allowed.add(type);
+      }
     }
 
-    return sourceRelations[target] || [];
+    // Reverse types derived from declarations in the opposite direction
+    const opposite = config.relations?.[target]?.[source];
+    if (opposite) {
+      for (const def of Object.values(opposite)) {
+        allowed.add(def.reverse);
+      }
+    }
+
+    return Array.from(allowed);
+  }
+
+  /**
+   * If `type` authored from sourceRole -> targetRole is a reverse type,
+   * return the canonical primary form (direction and type to store).
+   * Returns null when the authored form is already canonical (or unknown).
+   */
+  canonicalizeRelation(
+    sourceRole: string,
+    targetRole: string,
+    type: string,
+  ): { primary: string; sourceRole: string; targetRole: string } | null {
+    const config = this.getConfig();
+    const source = sourceRole.toLowerCase();
+    const target = targetRole.toLowerCase();
+    const relation = type.toLowerCase();
+
+    // Primary in the authored direction? Already canonical.
+    const direct = config.relations?.[source]?.[target];
+    if (direct && relation in direct) {
+      return null;
+    }
+
+    // Reverse of a relation declared in the opposite direction? Flip it.
+    const opposite = config.relations?.[target]?.[source];
+    if (opposite) {
+      for (const [primary, def] of Object.entries(opposite)) {
+        if (def.reverse === relation) {
+          return { primary, sourceRole: target, targetRole: source };
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Resolve the inverse type for a relation type, driven by `reverse` declarations.
+   * Returns the reverse type for a primary, or the primary for a reverse.
+   */
+  getInverseType(type: string): string | undefined {
+    const config = this.getConfig();
+    const relation = type.toLowerCase();
+
+    for (const targets of Object.values(config.relations || {})) {
+      for (const typeMap of Object.values(targets)) {
+        for (const [primary, def] of Object.entries(typeMap)) {
+          if (def.reverse === relation) {
+            return primary;
+          }
+          if (primary === relation) {
+            return def.reverse;
+          }
+        }
+      }
+    }
+
+    return undefined;
   }
 
   /**
@@ -682,7 +779,7 @@ export function loadConfig(configPath?: string): CompleteConfig {
 /**
  * Generate a GraphViz DOT representation of the traceability configuration.
  * Renders declared roles as nodes and declared relations as labeled edges.
- * Declared directions only — `inverseLabels` is not consulted, so no derived
+ * Declared directions only — `labels` is not consulted, so no derived
  * reverse edges appear. Roles with no declared relations still render as
  * (isolated) nodes so orphaned roles are visible.
  */
@@ -705,8 +802,9 @@ export function toConfigDot(config: TraceabilityConfig): string {
   }
 
   for (const [source, targets] of Object.entries(relations)) {
-    for (const [target, types] of Object.entries(targets)) {
-      if (!types || types.length === 0) continue;
+    for (const [target, typeMap] of Object.entries(targets)) {
+      const types = Object.keys(typeMap);
+      if (types.length === 0) continue;
       const label = types.join(", ");
       lines.push(`  "${source}" -> "${target}" [label="${label}"];`);
     }

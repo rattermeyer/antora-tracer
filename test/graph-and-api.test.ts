@@ -6,7 +6,7 @@
  * config access, lifecycle).
  */
 
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect } from "chai";
@@ -516,13 +516,22 @@ describe("TraceabilityGraph - Extended Queries", () => {
 
   describe("bidirectional relationship merge", () => {
     it("should merge inverse pair into single bidirectional edge", () => {
-      const graph = new TraceabilityGraph();
+      const dir = mkdtempSync(join(tmpdir(), "cfg-"));
+      const cfgPath = join(dir, "config.yml");
+      writeFileSync(
+        cfgPath,
+        `roles:\n  - requirement\n  - design\nrelations:\n  design:\n    requirement:\n      addresses:\n        reverse: addressed_by\n`,
+      );
+      const loader = new ConfigLoader();
+      loader.load(cfgPath);
+      rmSync(dir, { recursive: true, force: true });
+
+      const graph = new TraceabilityGraph(loader);
       graph.addItem(createItem("ARC-001", "design", "Auth Module"));
       graph.addItem(createItem("REQ-001", "requirement", "Security"));
-      // addresses → addressed-by is in INVERSE_MAP
       graph.addRelationship(createRel("R1", "ARC-001", "REQ-001", "addresses"));
       graph.addRelationship(
-        createRel("R2", "REQ-001", "ARC-001", "addressed-by"),
+        createRel("R2", "REQ-001", "ARC-001", "addressed_by"),
       );
 
       const allRels = graph.getAllRelationships();
@@ -570,16 +579,29 @@ describe("TraceabilityGraph - Extended Queries", () => {
       expect(allRels.some((r) => r.bidirectional)).to.be.false;
     });
 
-    it("should use INVERSE_MAP fallback when no config inverseLabels", () => {
-      const graph = new TraceabilityGraph();
-      graph.addItem(createItem("A", "requirement", "Item A"));
-      graph.addItem(createItem("B", "design", "Item B"));
-      // depends → depended-by is in INVERSE_MAP
-      graph.addRelationship(createRel("R1", "A", "B", "depends"));
-      graph.addRelationship(createRel("R2", "B", "A", "depended-by"));
+    it("should canonicalize reverse-authored edges via config reverse", () => {
+      const dir = mkdtempSync(join(tmpdir(), "cfg-"));
+      const cfgPath = join(dir, "config.yml");
+      writeFileSync(
+        cfgPath,
+        `roles:\n  - requirement\n  - design\nrelations:\n  design:\n    requirement:\n      addresses:\n        reverse: addressed_by\n`,
+      );
+      const loader = new ConfigLoader();
+      loader.load(cfgPath);
+      rmSync(dir, { recursive: true, force: true });
+
+      const graph = new TraceabilityGraph(loader);
+      graph.addItem(createItem("ARC-001", "design", "Auth Module"));
+      graph.addItem(createItem("REQ-001", "requirement", "Security"));
+      // Authoring only the reverse name canonicalizes to the primary edge.
+      graph.addRelationship(
+        createRel("R1", "REQ-001", "ARC-001", "addressed_by"),
+      );
 
       const allRels = graph.getAllRelationships();
       expect(allRels).to.have.lengthOf(1);
+      expect(allRels[0].fromId).to.equal("ARC-001");
+      expect(allRels[0].type).to.equal("addresses");
       expect(allRels[0].bidirectional).to.be.true;
     });
   });
@@ -838,7 +860,7 @@ describe("RequirementsTraceabilityExtension - API Methods", () => {
       expect(invalidError).to.include("at test.adoc:7");
       expect(invalidError).to.include("(requirement) declares addresses ->");
       expect(invalidError).to.include(
-        "Allowed: [refines, depends_on, conflicts_with]",
+        "Allowed: [refines, depends_on, conflicts_with",
       );
     });
 
@@ -847,14 +869,14 @@ describe("RequirementsTraceabilityExtension - API Methods", () => {
         await RequirementsTraceabilityExtension.createWithPreset(
           "requirements-engineering",
         );
-      extension.graph.addItem(createItem("REQ-001", "requirement"));
-      extension.graph.addItem(createItem("DOC-001", "document"));
-      // The preset defines no requirement->document relations at all
+      extension.graph.addItem(createItem("TST-001", "test"));
+      extension.graph.addItem(createItem("TST-002", "test"));
+      // The preset defines no test->test relations at all
       extension.graph.addRelationship({
         id: "R1",
-        fromId: "REQ-001",
-        targetId: "DOC-001",
-        type: "describes",
+        fromId: "TST-001",
+        targetId: "TST-002",
+        type: "validates",
         sourceFile: "test.adoc",
       });
 
@@ -864,7 +886,7 @@ describe("RequirementsTraceabilityExtension - API Methods", () => {
       );
       expect(invalidError).to.exist;
       expect(invalidError).to.include(
-        "No relations allowed from 'requirement' to 'document'",
+        "No relations allowed from 'test' to 'test'",
       );
     });
   });
@@ -1185,7 +1207,9 @@ describe("toConfigDot()", () => {
   it("should generate a digraph DOT string", () => {
     const dot = toConfigDot({
       roles: ["requirement", "design"],
-      relations: { design: { requirement: ["addresses"] } },
+      relations: {
+        design: { requirement: { addresses: { reverse: "addressed_by" } } },
+      },
     });
     expect(dot).to.include("digraph TraceabilityConfig");
     expect(dot).to.include("rankdir=LR");
@@ -1204,7 +1228,14 @@ describe("toConfigDot()", () => {
   it("should include an edge per declared relation with type labels", () => {
     const dot = toConfigDot({
       roles: ["design", "requirement"],
-      relations: { design: { requirement: ["addresses", "satisfies"] } },
+      relations: {
+        design: {
+          requirement: {
+            addresses: { reverse: "addressed_by" },
+            satisfies: { reverse: "satisfied_by" },
+          },
+        },
+      },
     });
     expect(dot).to.include(
       '"design" -> "requirement" [label="addresses, satisfies"];',
@@ -1214,7 +1245,9 @@ describe("toConfigDot()", () => {
   it("should preserve self-loops", () => {
     const dot = toConfigDot({
       roles: ["requirement"],
-      relations: { requirement: { requirement: ["refines"] } },
+      relations: {
+        requirement: { requirement: { refines: { reverse: "refined_by" } } },
+      },
     });
     expect(dot).to.include('"requirement" -> "requirement" [label="refines"];');
   });
@@ -1222,21 +1255,25 @@ describe("toConfigDot()", () => {
   it("should render an isolated role as a node with no edges", () => {
     const dot = toConfigDot({
       roles: ["requirement", "constraint"],
-      relations: { requirement: { requirement: ["refines"] } },
+      relations: {
+        requirement: { requirement: { refines: { reverse: "refined_by" } } },
+      },
     });
     expect(dot).to.include('"constraint"');
     expect(dot).to.not.include('"constraint" ->');
     expect(dot).to.not.include('-> "constraint"');
   });
 
-  it("should not render inverseLabels-derived edges", () => {
+  it("should not render reverse-derived edges", () => {
     const dot = toConfigDot({
       roles: ["design", "requirement"],
-      relations: { design: { requirement: ["addresses"] } },
-      inverseLabels: { addresses: "addressed-by" },
+      relations: {
+        design: { requirement: { addresses: { reverse: "addressed_by" } } },
+      },
+      labels: { addresses: "Addresses" },
     });
     expect(dot).to.include('"design" -> "requirement"');
     expect(dot).to.not.include('"requirement" -> "design"');
-    expect(dot).to.not.include("addressed-by");
+    expect(dot).to.not.include("addressed_by");
   });
 });

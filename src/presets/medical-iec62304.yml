@@ -15,29 +15,6 @@ compatibility:
   minExtensionVersion: 2.0.0
 
 traceability:
-  inverseLabels:
-    allocated_to: "allocated-from"
-    mitigated_by: "mitigating"
-    derived_from: "derived-into"
-    complies_with: "complied-with-by"
-    refines: "refined-by"
-    depends_on: "is-a-dependency-of"
-    implemented_by: "implementing"
-    addresses: "addressed-by"
-    verified_by: "verifying"
-    uses: "used-by"
-    satisfies: "satisfied-by"
-    composed_of: "composed-of-by"
-    validated_by: "validating"
-    implements: "implemented-by"
-    part_of: "containing"
-    tested_by: "testing"
-    caused_by: "causing"
-    requires: "required-by"
-    poses: "posed-by"
-    mitigates: "mitigated-by"
-    informs: "informed-by"
-
   roles:
     - system_requirement
     - software_requirement
@@ -56,86 +33,176 @@ traceability:
   relations:
     # System requirement relations
     system_requirement:
-      software_requirement: [allocated_to]
-      risk: [mitigated_by]
-      regulation: [derived_from]
-      standard: [complies_with]
+      software_requirement:
+        allocated_to:
+          reverse: allocated_from
+      risk:
+        mitigated_by:
+          reverse: mitigates
+      regulation:
+        derived_from:
+          reverse: derived_into
+      standard:
+        complies_with:
+          reverse: complied_with_by
 
     # Software requirement relations
     software_requirement:
-      software_requirement: [refines, depends_on]
-      software_item: [implemented_by]
-      software_unit: [implemented_by]
-      risk: [addresses]
-      test_procedure: [verified_by]
-      soi: [uses]
+      software_requirement:
+        refines:
+          reverse: refined_by
+        depends_on:
+          reverse: is_prerequisite_of
+      software_item:
+        implemented_by:
+          reverse: implements
+      software_unit:
+        implemented_by:
+          reverse: implements
+      risk:
+        addresses:
+          reverse: addressed_by
+      test_procedure:
+        verified_by:
+          reverse: verifies
+      soi:
+        uses:
+          reverse: used_by
 
     # Software item relations
     software_item:
-      software_requirement: [satisfies]
-      software_unit: [composed_of]
-      risk: [addresses]
-      test_procedure: [validated_by]
+      software_requirement:
+        satisfies:
+          reverse: satisfied_by
+      software_unit:
+        composed_of:
+          reverse: composed_of_by
+      risk:
+        addresses:
+          reverse: addressed_by
+      test_procedure:
+        validated_by:
+          reverse: validates
 
     # Software unit relations
     software_unit:
-      software_requirement: [implements]
-      software_item: [part_of]
-      test_procedure: [tested_by]
+      software_requirement:
+        implements:
+          reverse: implemented_by
+      software_item:
+        part_of:
+          reverse: contains
+      test_procedure:
+        tested_by:
+          reverse: tests
 
     # Risk relations
     risk:
-      hazard: [caused_by]
-      mitigation: [mitigated_by]
-      software_requirement: [requires]
-      system_requirement: [requires]
-      test_procedure: [verified_by]
+      hazard:
+        caused_by:
+          reverse: causes
+      mitigation:
+        mitigated_by:
+          reverse: mitigates
+      software_requirement:
+        requires:
+          reverse: required_by
+      system_requirement:
+        requires:
+          reverse: required_by
+      test_procedure:
+        verified_by:
+          reverse: verifies
 
     # Hazard relations
     hazard:
-      risk: [poses]
-      mitigation: [mitigated_by]
+      risk:
+        poses:
+          reverse: posed_by
+      mitigation:
+        mitigated_by:
+          reverse: mitigates
 
     # Mitigation relations
     mitigation:
-      risk: [mitigates]
-      hazard: [addresses]
-      software_requirement: [implements]
+      risk:
+        mitigates:
+          reverse: mitigated_by
+      hazard:
+        addresses:
+          reverse: addressed_by
+      software_requirement:
+        implements:
+          reverse: implemented_by
 
     # Regulation relations
     regulation:
-      system_requirement: [requires]
-      software_requirement: [requires]
+      system_requirement:
+        requires:
+          reverse: required_by
+      software_requirement:
+        requires:
+          reverse: required_by
 
     # Standard relations
     standard:
-      system_requirement: [informs]
-      software_requirement: [informs]
+      system_requirement:
+        informs:
+          reverse: informed_by
+      software_requirement:
+        informs:
+          reverse: informed_by
 
     # Test procedure relations
     test_procedure:
-      software_requirement: [verifies]
-      software_item: [validates]
-      software_unit: [tests]
-      risk: [validates]
-      mitigation: [validates]
-      test_case: [contains]
-      test_report: [generates]
+      software_requirement:
+        verifies:
+          reverse: verified_by
+      software_item:
+        validates:
+          reverse: validated_by
+      software_unit:
+        tests:
+          reverse: tested_by
+      risk:
+        validates:
+          reverse: validated_by
+      mitigation:
+        validates:
+          reverse: validated_by
+      test_case:
+        contains:
+          reverse: contained_in
+      test_report:
+        generates:
+          reverse: generated_by
 
     # Test case relations
     test_case:
-      test_procedure: [part_of]
-      software_requirement: [traces_to]
+      test_procedure:
+        part_of:
+          reverse: contains
+      software_requirement:
+        traces_to:
+          reverse: traced_by
 
     # Test report relations
     test_report:
-      test_procedure: [documents]
-      test_case: [documents]
+      test_procedure:
+        documents:
+          reverse: documented_by
+      test_case:
+        documents:
+          reverse: documented_by
 
     # SOI relations
     soi:
-      software_requirement: [fulfills]
-      regulation: [complies_with]
+      software_requirement:
+        fulfills:
+          reverse: fulfilled_by
+      regulation:
+        complies_with:
+          reverse: complied_with_by
 
   matrices:
     - name: risk-mitigation

@@ -18,6 +18,7 @@ import {
   readdirSync,
   readFileSync,
   rmSync,
+  writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -1135,51 +1136,26 @@ Description.
       expect(incoming[0].type).to.equal("addresses");
     });
 
-    it("should render config-defined inverse label for incoming macro", async () => {
+    it("should render config-defined label for incoming macro", async () => {
+      const cfgPath = join(tempDir, "labels-config.yml");
+      writeFileSync(
+        cfgPath,
+        `roles:\n  - requirement\n  - design\nrelations:\n  design:\n    requirement:\n      addresses:\n        reverse: addressed_by\nlabels:\n  addressed_by: "Addressed By Config"\n`,
+      );
       const ctx = createMockContext({
-        playbook: { output: { dir: tempDir }, extensions: [] },
-      });
-      const ext = new AntoraTraceabilityExtension(ctx as any);
-      await waitForInit();
-
-      // `contains` has an inverse label only in the preset config
-      // ("contained-in"), not in the compile-time INVERSE_MAP.
-      const content = `:traceability-links: true
-
-[#REQ-001, item, role=requirement, title="User Auth"]
---
-traceability:incoming[]
---
-
-[#DOC-001, item, role=document, title="Spec"]
---
-contains:REQ-001[]
---
-`;
-
-      const file = {
-        src: { path: "test.adoc" },
-        contents: Buffer.from(content),
-      };
-      ctx.fireEvent("contentClassified", {
-        contentCatalog: {
-          findBy: ({ family }: { family: string }) =>
-            family === "page" ? [file] : [],
+        playbook: {
+          output: { dir: tempDir },
+          extensions: [
+            {
+              name: "antora-requirements-traceability",
+              config: { configPath: cfgPath },
+            },
+          ],
         },
       });
-
-      expect(file.contents.toString("utf8")).to.include("Contained-in");
-    });
-
-    it("should fall back to compile-time inverse label when config has no entry", async () => {
-      const ctx = createMockContext({
-        playbook: { output: { dir: tempDir }, extensions: [] },
-      });
       const ext = new AntoraTraceabilityExtension(ctx as any);
       await waitForInit();
 
-      // `depends` has no entry in the preset config inverseLabels,
-      // but INVERSE_MAP maps it to "depended-by".
       const content = `:traceability-links: true
 
 [#REQ-001, item, role=requirement, title="User Auth"]
@@ -1189,7 +1165,7 @@ traceability:incoming[]
 
 [#DES-001, item, role=design, title="Design"]
 --
-depends:REQ-001[]
+addresses:REQ-001[]
 --
 `;
 
@@ -1204,7 +1180,41 @@ depends:REQ-001[]
         },
       });
 
-      expect(file.contents.toString("utf8")).to.include("Depended-by");
+      expect(file.contents.toString("utf8")).to.include("Addressed By Config");
+    });
+
+    it("should humanize the reverse label when no labels config", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const content = `:traceability-links: true
+
+[#REQ-001, item, role=requirement, title="User Auth"]
+--
+traceability:incoming[]
+--
+
+[#DES-001, item, role=design, title="Design"]
+--
+addresses:REQ-001[]
+--
+`;
+
+      const file = {
+        src: { path: "test.adoc" },
+        contents: Buffer.from(content),
+      };
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [file] : [],
+        },
+      });
+
+      expect(file.contents.toString("utf8")).to.include("Addressed by");
     });
 
     it("should fall back to raw relation type when no inverse label exists", async () => {

@@ -117,42 +117,33 @@ When using a custom configuration, create a `traceability.yml` file:
 
 [source,yaml]
 ----
-traceability:
-  extends: requirements-engineering   # optional
+extends: requirements-engineering   # optional
 
-  roles:
-    - requirement
-    - design
-    - implementation
-    - test
+roles:
+  - requirement
+  - design
+  - test
 
-  relations:
+relations:
+  design:
     requirement:
-      design: [addresses, satisfied_by]
-      implementation: [implemented_by]
-      test: [verified_by]
+      addresses:
+        reverse: addressed_by
+  test:
+    requirement:
+      verifies:
+        reverse: verified_by
 
-    design:
-      requirement: [implements]
-      implementation: [realized_by]
-      test: [validated_by]
+matrices:
+  - name: requirements-to-design
+    description: "Forward traceability from requirements to design"
+    rows: requirement
+    columns: [design]
+    coverageRelations:
+      design: [addresses]
 
-    implementation:
-      requirement: [satisfies]
-      design: [implements]
-      test: [tested_by]
-
-    test:
-      requirement: [covers, verifies]
-      implementation: [tests]
-
-  matrices:
-    - name: requirements-to-design
-      description: "Forward traceability from requirements to design"
-      rows: requirement
-      columns: [design]
-      coverageRelations:
-        design: [addresses, satisfies]
+labels:              # optional display names
+  addresses: "Addresses"
 ----
 
 === `extends`
@@ -184,7 +175,7 @@ traceability:
   roles:
     - use_case
 ----
-<1> The parent's roles, relations, matrices, and `inverseLabels` are deep-merged under the child
+<1> The parent's roles, relations, matrices, and `labels` are deep-merged under the child
 
 Inheritance chains resolve transitively; circular inheritance is rejected.
 See xref:reference/presets.adoc[Presets Reference] for the preset schema.
@@ -198,12 +189,48 @@ Unknown roles generate warnings.
 
 === `relations`
 
-Nested map: `source_role → target_role → [allowed_types]`.
-Each entry says "items with role X can use relation types [A, B, C] to point at items with role Y."
+Nested map: `source_role → target_role → type → { reverse }`.
+Each relation type is a key with a mandatory `reverse` — the authorable name for the same edge seen from the other side.
 
-If a relation type is used that isn't in this map, the extension reports an error with the allowed alternatives.
+[source,yaml]
+----
+relations:
+  design:
+    requirement:
+      addresses:
+        reverse: addressed_by
+----
 
-TIP: Define bidirectional relations — if `design → requirement: [implements]`, also define `requirement → design: [implemented_by]` so items in both directions can express the relationship in their natural direction.
+Both names are authorable: a design may write `addresses:REQ-001[]`, or a requirement may write `addressed_by:DES-001[]`.
+Either authoring stores the same canonical edge (`design → requirement : addresses`).
+
+The reverse direction is allowed automatically — you do not declare `requirement → design` separately.
+Symmetric relations declare themselves as their own reverse:
+
+[source,yaml]
+----
+relations:
+  requirement:
+    requirement:
+      conflicts_with:
+        reverse: conflicts_with
+----
+
+If a relation type is used that is not declared (or derived as a reverse), the extension reports an error with the allowed alternatives.
+
+=== `labels`
+
+Optional display-only map: `type → human-readable name`.
+Never affects graph structure, merge behavior, or validation.
+
+[source,yaml]
+----
+labels:
+  leads_to: "Leads to"
+  is_derived_from: "Is derived from"
+----
+
+If a type has no `labels` entry, the humanized type name is used: underscores become spaces, sentence-cased (`is_derived_from` → "Is derived from").
 
 === `matrices`
 

@@ -95,7 +95,8 @@ roles:
 relations:
   requirement:
     implementation:
-      - implements
+      implements:
+        reverse: implemented_by
 matrices:
   - name: simple-matrix
     rows: requirement
@@ -323,10 +324,12 @@ roles:
 relations:
   architecture:
     requirement:
-      - addresses
+      addresses:
+        reverse: addressed_by
   test:
     requirement:
-      - verifies
+      verifies:
+        reverse: verified_by
 matrices:
   - name: requirements-coverage
     rows: requirement
@@ -435,7 +438,8 @@ roles:
 relations:
   implementation:
     requirement:
-      - satisfies
+      satisfies:
+        reverse: satisfied_by
 matrices:
   - name: impl-coverage
     rows: implementation

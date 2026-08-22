@@ -447,9 +447,12 @@ presetProgram
       const relations = preset.traceability.relations || {};
       for (const [sourceRole, targets] of Object.entries(relations)) {
         console.log(`  ${sourceRole}:`);
-        const targetsObj = targets as Record<string, string[]>;
-        for (const [targetRole, relationTypes] of Object.entries(targetsObj)) {
-          console.log(`    -> ${targetRole}: [${relationTypes.join(", ")}]`);
+        for (const [targetRole, typeMap] of Object.entries(
+          targets as Record<string, Record<string, { reverse: string }>>,
+        )) {
+          console.log(
+            `    -> ${targetRole}: [${Object.keys(typeMap).join(", ")}]`,
+          );
         }
       }
       console.log("");

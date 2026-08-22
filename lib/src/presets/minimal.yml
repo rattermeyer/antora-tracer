@@ -13,22 +13,23 @@ compatibility:
   minExtensionVersion: 2.0.0
 
 traceability:
-  inverseLabels:
-    depends_on: "is-a-dependency-of"
-    verified_by: "verifying"
-    covers: "covered-by"
-
   roles:
     - requirement
     - test
 
   relations:
     requirement:
-      requirement: [depends_on]
-      test: [verified_by]
+      requirement:
+        depends_on:
+          reverse: is_prerequisite_of
+      test:
+        verified_by:
+          reverse: verifies
 
     test:
-      requirement: [covers]
+      requirement:
+        covers:
+          reverse: covered_by
 
   matrices:
     - name: requirements-tests

@@ -41,83 +41,6 @@ export interface ItemRelationship {
 }
 
 // ============================================================================
-// Relationship Type Mappings
-// ============================================================================
-
-/**
- * Primary relationship types (forward direction)
- */
-export type PrimaryRelationshipType =
-  | "implements"
-  | "satisfies"
-  | "tests"
-  | "verifies"
-  | "documents"
-  | "depends"
-  | "requires"
-  | "addresses"
-  | "composed-of"
-  | "depends-on"
-  | "refines"
-  | "leads-to";
-
-/**
- * Inverse relationship types (backward direction)
- */
-export type InverseRelationshipType =
-  | "implemented-by"
-  | "satisfied-by"
-  | "tested-by"
-  | "verified-by"
-  | "documented-by"
-  | "depended-by"
-  | "required-by"
-  | "addressed-by"
-  | "part-of"
-  | "is-a-dependency-of"
-  | "refined-by"
-  | "led-by";
-
-/**
- * Maps each primary relationship type to its inverse
- */
-export const INVERSE_MAP: Record<
-  PrimaryRelationshipType,
-  InverseRelationshipType
-> = {
-  implements: "implemented-by",
-  satisfies: "satisfied-by",
-  tests: "tested-by",
-  verifies: "verified-by",
-  documents: "documented-by",
-  depends: "depended-by",
-  requires: "required-by",
-  addresses: "addressed-by",
-  "composed-of": "part-of",
-  "depends-on": "is-a-dependency-of",
-  refines: "refined-by",
-  "leads-to": "led-by",
-};
-
-export const PRIMARY_MAP: Record<
-  InverseRelationshipType,
-  PrimaryRelationshipType
-> = {
-  "implemented-by": "implements",
-  "satisfied-by": "satisfies",
-  "tested-by": "tests",
-  "verified-by": "verifies",
-  "documented-by": "documents",
-  "depended-by": "depends",
-  "required-by": "requires",
-  "addressed-by": "addresses",
-  "part-of": "composed-of",
-  "is-a-dependency-of": "depends-on",
-  "refined-by": "refines",
-  "led-by": "leads-to",
-} as const;
-
-// ============================================================================
 // Role Colors
 // ============================================================================
 
@@ -245,28 +168,6 @@ export interface DetailedTraceabilityMatrix {
 }
 
 // ============================================================================
-// Type Guards
-// ============================================================================
-
-/**
- * Check if a relationship type is primary
- */
-export function isPrimaryRelationshipType(
-  type: string,
-): type is PrimaryRelationshipType {
-  return type in INVERSE_MAP;
-}
-
-/**
- * Check if a relationship type is inverse
- */
-export function isInverseRelationshipType(
-  type: string,
-): type is InverseRelationshipType {
-  return type in PRIMARY_MAP;
-}
-
-// ============================================================================
 // Processing Options
 // ============================================================================
 
@@ -287,7 +188,10 @@ export interface ProcessOptions {
  */
 export interface TraceabilityConfigRef {
   roles: string[];
-  relations?: Record<string, Record<string, string[]>>;
+  relations?: Record<
+    string,
+    Record<string, Record<string, { reverse: string }>>
+  >;
   matrices?: any[];
 }
 

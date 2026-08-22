@@ -15,15 +15,6 @@ compatibility:
   minExtensionVersion: 2.0.0
 
 traceability:
-  inverseLabels:
-    refines: "refined-by"
-    depends_on: "is-a-dependency-of"
-    conflicts_with: "conflicting-with"
-    addresses: "addressed-by"
-    validated_by: "validating"
-    verifies: "verified-by"
-    validates: "validated-by"
-
   roles:
     - requirement
     - design
@@ -31,21 +22,34 @@ traceability:
 
   relations:
     # Requirement relations — only requirement-to-requirement.
-    # Downstream roles (design, test) declare their own relations back to
-    # requirements using active voice.
     requirement:
-      requirement: [refines]
+      requirement:
+        refines:
+          reverse: refined_by
+        depends_on:
+          reverse: is_prerequisite_of
+        conflicts_with:
+          reverse: conflicts_with
 
     # Design relations
     design:
-      requirement: [addresses]
-      design: [depends_on, refines]
-      test: [validated_by]
+      requirement:
+        addresses:
+          reverse: addressed_by
+      design:
+        depends_on:
+          reverse: is_prerequisite_of
+        refines:
+          reverse: refined_by
+      test:
+        validated_by:
+          reverse: validates
 
     # Test relations
     test:
-      requirement: [verifies]
-      design: [validates]
+      requirement:
+        verifies:
+          reverse: verified_by
 
   matrices:
     - name: requirements-to-design

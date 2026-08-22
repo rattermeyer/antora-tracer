@@ -29,43 +29,33 @@ Add a `use_case` role:
 
 [source,yaml]
 ----
-traceability:
-  roles:
-    - requirement
-    - design
-    - implementation
-    - test
-    - document
-    - use_case       # <1>
+roles:
+  - requirement
+  - design
+  - test
+  - use_case       # <1>
 ----
 <1> New role added to the preset's existing list
 
 == Define relations for the new role
 
-Define which relations connect `use_case` to other roles:
+Define which relations connect `use_case` to other roles.
+Each relation declares a `reverse` — the authorable name for the same edge seen from the other side:
 
 [source,yaml]
 ----
-traceability:
-  relations:
-    # ... existing relations from preset ...
+relations:
+  # ... existing relations from preset ...
 
-    use_case:
-      requirement:
-        - leads_to
-      design:
-        - informs
-
+  use_case:
     requirement:
-      # ... existing relations ...
-      use_case:       # <1>
-        - motivated_by
+      leads_to:
+        reverse: is_derived_from   # <1>
 ----
-<1> Bidirectional: when you add a new role, also add reverse relations from existing roles to it
+<1> The reverse name. A requirement can author `is_derived_from:UC-001[]` — it is allowed automatically.
 
-The `leads_to` and `informs` relations are now valid from `use_case` items.
-The `motivated_by` relation is valid from `requirement` back to `use_case`.
-The extension will validate that only these relation types are used between these roles.
+The `leads_to` relation is now valid from `use_case` items.
+The reverse `is_derived_from` is valid from `requirement` back to `use_case`, without declaring it separately.
 
 == Add a custom matrix
 
@@ -73,17 +63,16 @@ Add a matrix that cross-references use cases against requirements:
 
 [source,yaml]
 ----
-traceability:
-  matrices:
-    # ... existing matrices from preset ...
-    - name: usecases-to-requirements
-      description: "Which requirements each use case motivates"
-      rows: use_case
-      columns:
-        - requirement
-      coverageRelations:
-        requirement:
-          - leads_to
+matrices:
+  # ... existing matrices from preset ...
+  - name: usecases-to-requirements
+    description: "Which requirements each use case motivates"
+    rows: use_case
+    columns:
+      - requirement
+    coverageRelations:
+      requirement:
+        - leads_to
 ----
 
 == Point your playbook at the custom config
@@ -109,38 +98,30 @@ Use `extends` to only declare what you're changing:
 
 [source,yaml]
 ----
-traceability:
-  extends: requirements-engineering   # <1>
+extends: requirements-engineering   # <1>
 
-  roles:
-    - requirement
-    - design
-    - implementation
-    - test
-    - document
-    - use_case
+roles:
+  - use_case
 
-  relations:
-    use_case:
+relations:
+  use_case:
+    requirement:
+      leads_to:
+        reverse: is_derived_from
+
+matrices:
+  - name: usecases-to-requirements
+    description: "Which requirements each use case motivates"
+    rows: use_case
+    columns:
+      - requirement
+    coverageRelations:
       requirement:
         - leads_to
-    requirement:
-      use_case:
-        - motivated_by
-
-  matrices:
-    - name: usecases-to-requirements
-      description: "Which requirements each use case motivates"
-      rows: use_case
-      columns:
-        - requirement
-      coverageRelations:
-        requirement:
-          - leads_to
 ----
 <1> Pulls in the full `requirements-engineering` preset, then merges your changes on top
 
-The `extends` field deep-merges — your roles are added, relations are merged, and matrices are appended.
+The `extends` field deep-merges — your roles are added, relations are merged, and matrices are replaced by name.
 You only write what's different from the preset.
 
 == Extend a preset from another preset
@@ -162,7 +143,8 @@ traceability:
   relations:
     use_case:
       requirement:
-        - leads_to
+        leads_to:
+          reverse: is_derived_from
 
   matrices:
     - name: usecases-to-requirements
@@ -194,7 +176,7 @@ npx antora-tracer validate -i modules/ --config ./config/traceability.yml
 This catches:
 - Unknown roles referenced in relations
 - Invalid matrix row/column roles
-- Missing `coverageRelations` fields
+- Missing `reverse` declarations
 
 == Related
 

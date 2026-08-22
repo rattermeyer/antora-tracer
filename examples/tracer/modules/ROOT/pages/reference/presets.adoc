@@ -12,26 +12,32 @@ Each is a self-contained YAML configuration defining roles, allowed relations, a
 == requirements-engineering
 
 Systems and software engineering.
-Five roles with comprehensive relation coverage.
+Three roles with comprehensive relation coverage.
 
 [width=100%, cols="20,80"]
 |===
-| Roles | `requirement`, `design`, `implementation`, `test`, `document`
-| Matrices | `requirements-to-design`, `design-to-implementation`, `requirements-to-tests`
+| Roles | `requirement`, `design`, `test`
+| Matrices | `requirements-to-design`, `requirements-to-tests`
 | Version | 1.0.0
 |===
 
 *Relations:*
 
-- `design → requirement`: `addresses`, `satisfies`
-- `implementation → requirement`: `satisfies`
-- `implementation → design`: `implements`
-- `test → requirement`: `covers`, `verifies`
-- `test → implementation`: `tests`
-- `requirement → requirement`: `refines`, `depends_on`, `conflicts_with`
+[width=100%, cols="40,30,30"]
+|===
+| Relation | Forward | Reverse
 
-The `requirement` role defines only requirement-to-requirement relations.
-Downstream roles (design, implementation, test) declare their own relations back to requirements.
+| `requirement → requirement` | `refines` | `refined_by`
+| `requirement → requirement` | `depends_on` | `is_prerequisite_of`
+| `requirement → requirement` | `conflicts_with` | `conflicts_with`
+| `design → requirement` | `addresses` | `addressed_by`
+| `design → design` | `depends_on` | `is_prerequisite_of`
+| `design → design` | `refines` | `refined_by`
+| `design → test` | `validated_by` | `validates`
+| `test → requirement` | `verifies` | `verified_by`
+|===
+
+Each pair is declared once; the reverse direction is allowed automatically.
 
 *Matrices:*
 
@@ -42,10 +48,6 @@ Downstream roles (design, implementation, test) declare their own relations back
 | `requirements-to-design`
 | requirement
 | design
-
-| `design-to-implementation`
-| design
-| implementation
 
 | `requirements-to-tests`
 | requirement
@@ -67,15 +69,39 @@ Eight roles mapping the Scrum backlog.
 
 *Relations:*
 
-- `epic → feature`: `contains`
-- `feature → user_story`: `contains`
-- `user_story → task`: `broken_down_into`
-- `user_story → acceptance_criterion`: `verified_by`
-- `task → user_story`: `implements`
-- `task → bug`: `fixes`
-- `test → user_story`: `verified_by`
-- `test → task`: `tests`
-- `spike → user_story`: `investigates`
+[width=100%, cols="40,30,30"]
+|===
+| Relation | Forward | Reverse
+
+| `epic → feature` | `contains` | `contained_in`
+| `epic → user_story` | `contains` | `contained_in`
+| `epic → test` | `validated_by` | `validates`
+| `feature → user_story` | `broken_down_into` | `broken_down_from`
+| `feature → test` | `verified_by` | `verifies`
+| `user_story → epic` | `part_of` | `contains`
+| `user_story → feature` | `part_of` | `contains`
+| `user_story → acceptance_criterion` | `has` | `belongs_to`
+| `user_story → task` | `broken_down_into` | `broken_down_from`
+| `user_story → spike` | `requires` | `required_by`
+| `user_story → test` | `verified_by` | `verifies`
+| `user_story → bug` | `affected_by` | `affects`
+| `acceptance_criterion → user_story` | `belongs_to` | `has`
+| `acceptance_criterion → test` | `validated_by` | `validates`
+| `task → user_story` | `implements` | `implemented_by`
+| `task → spike` | `implements` | `implemented_by`
+| `task → test` | `affects` | `affected_by`
+| `task → bug` | `fixes` | `fixed_by`
+| `spike → user_story` | `investigates` | `investigated_by`
+| `spike → task` | `results_in` | `result_of`
+| `bug → user_story` | `blocks` | `blocked_by`
+| `bug → task` | `fixed_by` | `fixes`
+| `bug → test` | `reproduced_by` | `reproduces`
+| `test → user_story` | `verifies` | `verified_by`
+| `test → acceptance_criterion` | `validates` | `validated_by`
+| `test → task` | `tests` | `tested_by`
+| `test → spike` | `tests` | `tested_by`
+| `test → bug` | `reproduces` | `reproduced_by`
+|===
 
 [[medical-iec62304]]
 == medical-iec62304
@@ -85,21 +111,63 @@ Safety classification support.
 
 [width=100%, cols="20,80"]
 |===
-| Roles | `system_requirement`, `software_requirement`, `software_item`, `software_unit`, `risk`, `hazard`, `mitigation`
-| Matrices | `risk-mitigation`
+| Roles | `system_requirement`, `software_requirement`, `software_item`, `software_unit`, `risk`, `hazard`, `mitigation`, `regulation`, `standard`, `test_procedure`, `test_case`, `test_report`, `soi`
+| Matrices | `risk-mitigation`, `requirements-allocation`, `software-verification`, `test-traceability`, `soi-traceability`
 | Version | 1.0.0
 |===
 
 *Relations:*
 
-- `system_requirement → software_requirement`: `allocated_to`
-- `system_requirement → risk`: `mitigated_by`
-- `software_requirement → software_requirement`: `refines`, `depends_on`
-- `mitigation → risk`: `mitigates`
-- `hazard → risk`: `poses`
-- `software_item → software_requirement`: `implements`
-- `software_unit → software_item`: `composes`
-- `test → software_requirement`: `verifies`
+[width=100%, cols="40,30,30"]
+|===
+| Relation | Forward | Reverse
+
+| `system_requirement → software_requirement` | `allocated_to` | `allocated_from`
+| `system_requirement → risk` | `mitigated_by` | `mitigates`
+| `system_requirement → regulation` | `derived_from` | `derived_into`
+| `system_requirement → standard` | `complies_with` | `complied_with_by`
+| `software_requirement → software_requirement` | `refines` | `refined_by`
+| `software_requirement → software_requirement` | `depends_on` | `is_prerequisite_of`
+| `software_requirement → software_item` | `implemented_by` | `implements`
+| `software_requirement → software_unit` | `implemented_by` | `implements`
+| `software_requirement → risk` | `addresses` | `addressed_by`
+| `software_requirement → test_procedure` | `verified_by` | `verifies`
+| `software_requirement → soi` | `uses` | `used_by`
+| `software_item → software_requirement` | `satisfies` | `satisfied_by`
+| `software_item → software_unit` | `composed_of` | `composed_of_by`
+| `software_item → risk` | `addresses` | `addressed_by`
+| `software_item → test_procedure` | `validated_by` | `validates`
+| `software_unit → software_requirement` | `implements` | `implemented_by`
+| `software_unit → software_item` | `part_of` | `contains`
+| `software_unit → test_procedure` | `tested_by` | `tests`
+| `risk → hazard` | `caused_by` | `causes`
+| `risk → mitigation` | `mitigated_by` | `mitigates`
+| `risk → software_requirement` | `requires` | `required_by`
+| `risk → system_requirement` | `requires` | `required_by`
+| `risk → test_procedure` | `verified_by` | `verifies`
+| `hazard → risk` | `poses` | `posed_by`
+| `hazard → mitigation` | `mitigated_by` | `mitigates`
+| `mitigation → risk` | `mitigates` | `mitigated_by`
+| `mitigation → hazard` | `addresses` | `addressed_by`
+| `mitigation → software_requirement` | `implements` | `implemented_by`
+| `regulation → system_requirement` | `requires` | `required_by`
+| `regulation → software_requirement` | `requires` | `required_by`
+| `standard → system_requirement` | `informs` | `informed_by`
+| `standard → software_requirement` | `informs` | `informed_by`
+| `test_procedure → software_requirement` | `verifies` | `verified_by`
+| `test_procedure → software_item` | `validates` | `validated_by`
+| `test_procedure → software_unit` | `tests` | `tested_by`
+| `test_procedure → risk` | `validates` | `validated_by`
+| `test_procedure → mitigation` | `validates` | `validated_by`
+| `test_procedure → test_case` | `contains` | `contained_in`
+| `test_procedure → test_report` | `generates` | `generated_by`
+| `test_case → test_procedure` | `part_of` | `contains`
+| `test_case → software_requirement` | `traces_to` | `traced_by`
+| `test_report → test_procedure` | `documents` | `documented_by`
+| `test_report → test_case` | `documents` | `documented_by`
+| `soi → software_requirement` | `fulfills` | `fulfilled_by`
+| `soi → regulation` | `complies_with` | `complied_with_by`
+|===
 
 [[minimal]]
 == minimal
@@ -115,9 +183,14 @@ Two roles — the simplest possible setup.
 
 *Relations:*
 
-- `test → requirement`: `covers`
-- `test → requirement`: `verified_by`
-- `requirement → requirement`: `depends_on`
+[width=100%, cols="40,30,30"]
+|===
+| Relation | Forward | Reverse
+
+| `requirement → requirement` | `depends_on` | `is_prerequisite_of`
+| `requirement → test` | `verified_by` | `verifies`
+| `test → requirement` | `covers` | `covered_by`
+|===
 
 == Preset metadata schema
 
@@ -141,7 +214,7 @@ Each preset YAML file follows this structure:
 
 | `extends`
 | string
-| Name of a parent preset to inherit from. The parent's roles, relations, matrices, and inverse labels are deep-merged under this preset (child wins on conflict).
+| Name of a parent preset to inherit from. The parent's roles, relations, matrices, and labels are deep-merged under this preset (child wins on conflict).
 
 | `author`
 | string
@@ -161,7 +234,11 @@ Each preset YAML file follows this structure:
 
 | `traceability.relations`
 | map
-| `sourceRole → targetRole → [relationTypes]`
+| `sourceRole → targetRole → type → { reverse }`. Each relation type has a mandatory `reverse` (the authorable name from the other side).
+
+| `traceability.labels`
+| map
+| Display-only `type → human-readable name`. Optional; defaults to the humanized type name.
 
 | `traceability.matrices`
 | object[]

@@ -3,9 +3,9 @@
  * Tests the CLI module exports and basic functionality
  */
 
+import { execFileSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 
@@ -412,7 +412,7 @@ implements:DES-001[]
   });
 
   describe("Config precedence over default preset", () => {
-    it("should load --config (inverseLabels) instead of the default preset", () => {
+    it("should load --config (reverse) instead of the default preset", () => {
       const tempDir = path.join(__dirname, "temp-cli-precedence");
       fs.mkdirSync(tempDir, { recursive: true });
       const configPath = path.join(tempDir, "traceability.yml");
@@ -423,11 +423,9 @@ implements:DES-001[]
           "roles: [requirement, use_case]",
           "relations:",
           "  use_case:",
-          "    requirement: [leads_to]",
-          "  requirement:",
-          "    use_case: [is_derived_from]",
-          "inverseLabels:",
-          "  leads_to: is_derived_from",
+          "    requirement:",
+          "      leads_to:",
+          "        reverse: is_derived_from",
           "",
         ].join("\n"),
       );
@@ -454,9 +452,7 @@ implements:DES-001[]
           { encoding: "utf8" },
         );
         // A complementary leads_to/is_derived_from pair must merge (via the
-        // config's inverseLabels) and NOT be flagged as circular. With the
-        // old bug, --config was ignored and the preset (no inverseLabels)
-        // produced a false circular reference and a non-zero exit.
+        // config's reverse declaration) and NOT be flagged as circular.
         expect(out).to.not.contain("Circular reference");
       } finally {
         fs.rmSync(tempDir, { recursive: true, force: true });
@@ -730,7 +726,7 @@ ${preset.traceability.roles.map((r) => `  - ${r}`).join("\n")}
         expect(written).to.include("roles");
         expect(written).to.include("requirement");
         expect(written).to.include("design");
-        expect(written).to.include("implementation");
+        expect(written).to.include("test");
 
         // Verify we can load the written config
         const loader2 = new ConfigLoader();
