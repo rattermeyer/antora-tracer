@@ -12,7 +12,7 @@ UC-001,UC-001 — Team member writes traceable items in AsciiDoc,use_case,,self-
 . Team member identifies a concept that needs to be traceable — a requirement, a design decision, a test specification, or a dependency
 . Team member determines the next available ID for the item's prefix using the CLI: `antora-tracer next-id --prefix <PREFIX> -i <path>`
 . Team member assigns the concept to a role defined in the project's traceability domain model (requirement, design, test, etc.)
-. Team member writes the item using the `[#ID, item, role=...]` block macro with a description between `====` delimiters
+. Team member writes the item using the `[#ID, item, role=...]` block macro with a description between `--` delimiters
 . Team member links the concept to related items already in the traceability graph using inline relationship macros (e.g., `addresses:REQ-001[]`)
 . Team member includes rendering macros (`traceability:links[]`, `traceability:outgoing[]`, `traceability:incoming[]`) to display relationship lists in the rendered output
 . Team member commits the file And triggers an Antora build

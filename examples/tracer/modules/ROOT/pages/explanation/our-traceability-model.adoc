@@ -53,16 +53,16 @@ This role is inherited from the preset and not yet populated by this project's a
 Relations are directional and typed: each states one fact per item, reading source → target.
 The sections below follow the source role, mirroring how the configuration declares them.
 
-=== requirement → requirement
 
-`refines`::
-The requirement narrows a broader requirement.
+[cols="1,1,1,3"]
+|===
+|From | Relation | To | Description
 
-`depends_on`::
-The requirement can only be satisfied after another requirement.
+|Requirement | refines | Requirement | The requirement narrows a broader requirement.
+|Requirement | depends on | Requirement | The requirement can only be satisfied after another requirement.
+|Requirement | conflicts with | Requirement | Two requirements cannot both be satisfied as stated.
+|===
 
-`conflicts_with`::
-Two requirements cannot both be satisfied as stated.
 
 === design → requirement
 
