@@ -1,0 +1,6 @@
+= Requirements Model
+
+[excalidraw]
+----
+include::image$traceability-model.excalidraw[]
+----
