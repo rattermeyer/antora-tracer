@@ -158,6 +158,21 @@ addresses:QA-057[]
 traceability:links[]
 --
 
+[#ARC-036, item, role=design, title="Preset inheritance and config merge"]
+--
+A preset may declare a top-level `extends` field naming a parent preset.
+`ConfigLoader.loadPreset()` recursively loads the parent and deep-merges it under the child via `mergeConfig()`: roles are unioned, relations deep-merged, matrices overridden by name, and `labels` overridden key-by-key.
+Inheritance resolves transitively; a missing parent raises a "not found" error, and a circular chain raises a circular-inheritance error.
+
+addresses:REQ-170[]
+addresses:REQ-171[]
+addresses:REQ-172[]
+addresses:REQ-173[]
+addresses:REQ-174[]
+
+traceability:links[]
+--
+
 [#ARC-028, item, role=design, title="Circular reference detection in graph validation"]
 --
 The `validate()` method calls `findCircularReferences()`, a DFS-based cycle
@@ -239,6 +254,22 @@ addresses:REQ-160[]
 traceability:links[]
 --
 
+[#ARC-035, item, role=design, title="Relation reverse declaration and canonical storage"]
+--
+The `relations` map is keyed as `sourceRole → targetRole → type → { reverse }`, each relation type declaring its authorable reverse name.
+`TraceabilityGraph.addRelationship()` canonicalizes a reverse-authored edge to the primary direction — authoring `is_derived_from` from a requirement stores `UC → REQ : leads_to`.
+Authoring the same logical edge from both sides deduplicates into one `bidirectional` edge driven by the `reverse` declaration.
+`ConfigLoader.isRelationAllowed()` derives the reverse direction, so the reverse type is allowed without a second `relations` entry.
+
+addresses:REQ-129[]
+addresses:REQ-175[]
+addresses:REQ-176[]
+addresses:REQ-177[]
+addresses:REQ-178[]
+
+traceability:links[]
+--
+
 === AntoraTraceabilityExtension
 
 [#ARC-016, item, role=design, title="Event-driven Antora integration"]
@@ -294,6 +325,19 @@ addresses:REQ-100[]
 addresses:REQ-102[]
 addresses:REQ-104[]
 addresses:QA-060[]
+traceability:links[]
+--
+
+[#ARC-037, item, role=design, title="Display labels with humanize default"]
+--
+Relation types are displayed through a `labels` map in the config, mapping a type to a human-readable name.
+The map is display-only and never affects graph structure, merge, or validation.
+When a type has no `labels` entry, `humanize(type)` renders it: underscores become spaces, sentence-cased (`is_derived_from` → "Is derived from").
+Incoming links use the reverse type's label.
+
+addresses:REQ-161[]
+addresses:REQ-162[]
+
 traceability:links[]
 --
 
@@ -380,6 +424,20 @@ addresses:REQ-083[]
 addresses:REQ-084[]
 addresses:REQ-085[]
 addresses:REQ-086[]
+traceability:links[]
+--
+
+[#ARC-038, item, role=design, title="Matrix status column"]
+--
+The HTML matrix renders a single per-row status column with values `done`, `partial`, and `missing`, derived from the row's column coverage.
+The per-row coverage percentage is no longer rendered as a separate column.
+The top coverage summary (done/partial/missing counts plus overall percentage) is preserved.
+CSV output is unchanged.
+
+addresses:REQ-167[]
+addresses:REQ-168[]
+addresses:REQ-169[]
+
 traceability:links[]
 --
 

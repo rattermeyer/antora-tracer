@@ -82,16 +82,16 @@
 </head>
 <body>
     <h1>requirements-to-design</h1>
-    <p class="metadata">Type: requirement-design | Generated: 2026-08-22T09:32:14.779Z</p>
+    <p class="metadata">Type: requirement-design | Generated: 2026-08-22T11:25:32.297Z</p>
 
     <div class="coverage-summary">
         <h3>Coverage Summary</h3>
         <p>
-            <span class="coverage-badge coverage-done">Done: 83 / 154</span>
+            <span class="coverage-badge coverage-done">Done: 98 / 153</span>
             <span class="coverage-badge coverage-partial">Partial: 0</span>
-            <span class="coverage-badge coverage-missing">Missing: 71</span>
+            <span class="coverage-badge coverage-missing">Missing: 55</span>
             <br>
-            <strong>Overall Coverage: 53.9%</strong>
+            <strong>Overall Coverage: 64.1%</strong>
         </p>
     </div>
 
@@ -218,15 +218,19 @@
                                     </td>
                                     <td><span class="coverage-badge coverage-done">done</span></td>
                                 </tr>
-                                <tr class="status-missing role-requirement">
+                                <tr class="status-done role-requirement">
                                     <td>
                                         <a href="..&#x2F;..&#x2F;requirements&#x2F;#REQ-129">REQ-129</a>
                                     </td>
                                     <td>REQ-129 — Bidirectional relationship pairs are merged into a single edge</td>
-                                    <td>
-                                            <span class="empty-cell">-</span>
+                                    <td class="role-design">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;explanation&#x2F;architecture.html#ARC-035" title="Source: explanation&#x2F;architecture.adoc"><strong>ARC-035</strong></a>
+                                                : ARC-035 — Relation reverse declaration and canonical storage
+                                                <small class="source-ref">[explanation&#x2F;architecture.adoc]</small>
+                                            </div>
                                     </td>
-                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                    <td><span class="coverage-badge coverage-done">done</span></td>
                                 </tr>
                                 <tr class="status-done role-requirement">
                                     <td>
@@ -430,7 +434,7 @@
                                     <td>
                                         <a href="..&#x2F;..&#x2F;requirements&#x2F;#REQ-067">REQ-067</a>
                                     </td>
-                                    <td>REQ-067 — Inverse relation type labels</td>
+                                    <td>REQ-067 — Incoming groups use the reverse relation type</td>
                                     <td class="role-design">
                                             <div>
                                                 <a href="..&#x2F;..&#x2F;explanation&#x2F;architecture.html#ARC-024" title="Source: explanation&#x2F;architecture.adoc"><strong>ARC-024</strong></a>
@@ -439,16 +443,6 @@
                                             </div>
                                     </td>
                                     <td><span class="coverage-badge coverage-done">done</span></td>
-                                </tr>
-                                <tr class="status-missing role-requirement">
-                                    <td>
-                                        <a href="..&#x2F;..&#x2F;requirements&#x2F;#REQ-147">REQ-147</a>
-                                    </td>
-                                    <td>REQ-147 — Fallback to raw type name when no inverse mapping exists</td>
-                                    <td>
-                                            <span class="empty-cell">-</span>
-                                    </td>
-                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
                                 </tr>
                                 <tr class="status-done role-requirement">
                                     <td>
@@ -562,25 +556,33 @@
                                     </td>
                                     <td><span class="coverage-badge coverage-done">done</span></td>
                                 </tr>
-                                <tr class="status-missing role-requirement">
+                                <tr class="status-done role-requirement">
                                     <td>
                                         <a href="..&#x2F;..&#x2F;requirements&#x2F;#REQ-161">REQ-161</a>
                                     </td>
                                     <td>REQ-161 — Default display name is the humanized type</td>
-                                    <td>
-                                            <span class="empty-cell">-</span>
+                                    <td class="role-design">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;explanation&#x2F;architecture.html#ARC-037" title="Source: explanation&#x2F;architecture.adoc"><strong>ARC-037</strong></a>
+                                                : ARC-037 — Display labels with humanize default
+                                                <small class="source-ref">[explanation&#x2F;architecture.adoc]</small>
+                                            </div>
                                     </td>
-                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                    <td><span class="coverage-badge coverage-done">done</span></td>
                                 </tr>
-                                <tr class="status-missing role-requirement">
+                                <tr class="status-done role-requirement">
                                     <td>
                                         <a href="..&#x2F;..&#x2F;requirements&#x2F;#REQ-162">REQ-162</a>
                                     </td>
                                     <td>REQ-162 — No compile-time fallback</td>
-                                    <td>
-                                            <span class="empty-cell">-</span>
+                                    <td class="role-design">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;explanation&#x2F;architecture.html#ARC-037" title="Source: explanation&#x2F;architecture.adoc"><strong>ARC-037</strong></a>
+                                                : ARC-037 — Display labels with humanize default
+                                                <small class="source-ref">[explanation&#x2F;architecture.adoc]</small>
+                                            </div>
                                     </td>
-                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                    <td><span class="coverage-badge coverage-done">done</span></td>
                                 </tr>
                                 <tr class="status-done role-requirement">
                                     <td>
@@ -728,35 +730,47 @@
                                     </td>
                                     <td><span class="coverage-badge coverage-missing">missing</span></td>
                                 </tr>
-                                <tr class="status-missing role-requirement">
+                                <tr class="status-done role-requirement">
                                     <td>
                                         <a href="..&#x2F;..&#x2F;requirements&#x2F;#REQ-167">REQ-167</a>
                                     </td>
                                     <td>REQ-167 — Matrix renders one status column per row</td>
-                                    <td>
-                                            <span class="empty-cell">-</span>
+                                    <td class="role-design">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;explanation&#x2F;architecture.html#ARC-038" title="Source: explanation&#x2F;architecture.adoc"><strong>ARC-038</strong></a>
+                                                : ARC-038 — Matrix status column
+                                                <small class="source-ref">[explanation&#x2F;architecture.adoc]</small>
+                                            </div>
                                     </td>
-                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                    <td><span class="coverage-badge coverage-done">done</span></td>
                                 </tr>
-                                <tr class="status-missing role-requirement">
+                                <tr class="status-done role-requirement">
                                     <td>
                                         <a href="..&#x2F;..&#x2F;requirements&#x2F;#REQ-168">REQ-168</a>
                                     </td>
                                     <td>REQ-168 — Coverage summary remains</td>
-                                    <td>
-                                            <span class="empty-cell">-</span>
+                                    <td class="role-design">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;explanation&#x2F;architecture.html#ARC-038" title="Source: explanation&#x2F;architecture.adoc"><strong>ARC-038</strong></a>
+                                                : ARC-038 — Matrix status column
+                                                <small class="source-ref">[explanation&#x2F;architecture.adoc]</small>
+                                            </div>
                                     </td>
-                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                    <td><span class="coverage-badge coverage-done">done</span></td>
                                 </tr>
-                                <tr class="status-missing role-requirement">
+                                <tr class="status-done role-requirement">
                                     <td>
                                         <a href="..&#x2F;..&#x2F;requirements&#x2F;#REQ-169">REQ-169</a>
                                     </td>
                                     <td>REQ-169 — CSV output is unchanged</td>
-                                    <td>
-                                            <span class="empty-cell">-</span>
+                                    <td class="role-design">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;explanation&#x2F;architecture.html#ARC-038" title="Source: explanation&#x2F;architecture.adoc"><strong>ARC-038</strong></a>
+                                                : ARC-038 — Matrix status column
+                                                <small class="source-ref">[explanation&#x2F;architecture.adoc]</small>
+                                            </div>
                                     </td>
-                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                    <td><span class="coverage-badge coverage-done">done</span></td>
                                 </tr>
                                 <tr class="status-done role-requirement">
                                     <td>
@@ -814,95 +828,131 @@
                                     </td>
                                     <td><span class="coverage-badge coverage-done">done</span></td>
                                 </tr>
-                                <tr class="status-missing role-requirement">
+                                <tr class="status-done role-requirement">
                                     <td>
                                         <a href="..&#x2F;..&#x2F;requirements&#x2F;#REQ-170">REQ-170</a>
                                     </td>
                                     <td>REQ-170 — Preset extends a parent by top-level &#x60;extends&#x60;</td>
-                                    <td>
-                                            <span class="empty-cell">-</span>
+                                    <td class="role-design">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;explanation&#x2F;architecture.html#ARC-036" title="Source: explanation&#x2F;architecture.adoc"><strong>ARC-036</strong></a>
+                                                : ARC-036 — Preset inheritance and config merge
+                                                <small class="source-ref">[explanation&#x2F;architecture.adoc]</small>
+                                            </div>
                                     </td>
-                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                    <td><span class="coverage-badge coverage-done">done</span></td>
                                 </tr>
-                                <tr class="status-missing role-requirement">
+                                <tr class="status-done role-requirement">
                                     <td>
                                         <a href="..&#x2F;..&#x2F;requirements&#x2F;#REQ-171">REQ-171</a>
                                     </td>
                                     <td>REQ-171 — Merge semantics match config-file &#x60;extends&#x60;</td>
-                                    <td>
-                                            <span class="empty-cell">-</span>
+                                    <td class="role-design">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;explanation&#x2F;architecture.html#ARC-036" title="Source: explanation&#x2F;architecture.adoc"><strong>ARC-036</strong></a>
+                                                : ARC-036 — Preset inheritance and config merge
+                                                <small class="source-ref">[explanation&#x2F;architecture.adoc]</small>
+                                            </div>
                                     </td>
-                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                    <td><span class="coverage-badge coverage-done">done</span></td>
                                 </tr>
-                                <tr class="status-missing role-requirement">
+                                <tr class="status-done role-requirement">
                                     <td>
                                         <a href="..&#x2F;..&#x2F;requirements&#x2F;#REQ-172">REQ-172</a>
                                     </td>
                                     <td>REQ-172 — Transitive inheritance</td>
-                                    <td>
-                                            <span class="empty-cell">-</span>
+                                    <td class="role-design">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;explanation&#x2F;architecture.html#ARC-036" title="Source: explanation&#x2F;architecture.adoc"><strong>ARC-036</strong></a>
+                                                : ARC-036 — Preset inheritance and config merge
+                                                <small class="source-ref">[explanation&#x2F;architecture.adoc]</small>
+                                            </div>
                                     </td>
-                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                    <td><span class="coverage-badge coverage-done">done</span></td>
                                 </tr>
-                                <tr class="status-missing role-requirement">
+                                <tr class="status-done role-requirement">
                                     <td>
                                         <a href="..&#x2F;..&#x2F;requirements&#x2F;#REQ-173">REQ-173</a>
                                     </td>
                                     <td>REQ-173 — Missing parent is reported</td>
-                                    <td>
-                                            <span class="empty-cell">-</span>
+                                    <td class="role-design">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;explanation&#x2F;architecture.html#ARC-036" title="Source: explanation&#x2F;architecture.adoc"><strong>ARC-036</strong></a>
+                                                : ARC-036 — Preset inheritance and config merge
+                                                <small class="source-ref">[explanation&#x2F;architecture.adoc]</small>
+                                            </div>
                                     </td>
-                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                    <td><span class="coverage-badge coverage-done">done</span></td>
                                 </tr>
-                                <tr class="status-missing role-requirement">
+                                <tr class="status-done role-requirement">
                                     <td>
                                         <a href="..&#x2F;..&#x2F;requirements&#x2F;#REQ-174">REQ-174</a>
                                     </td>
                                     <td>REQ-174 — Circular inheritance is rejected</td>
-                                    <td>
-                                            <span class="empty-cell">-</span>
+                                    <td class="role-design">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;explanation&#x2F;architecture.html#ARC-036" title="Source: explanation&#x2F;architecture.adoc"><strong>ARC-036</strong></a>
+                                                : ARC-036 — Preset inheritance and config merge
+                                                <small class="source-ref">[explanation&#x2F;architecture.adoc]</small>
+                                            </div>
                                     </td>
-                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                    <td><span class="coverage-badge coverage-done">done</span></td>
                                 </tr>
-                                <tr class="status-missing role-requirement">
+                                <tr class="status-done role-requirement">
                                     <td>
                                         <a href="..&#x2F;..&#x2F;requirements&#x2F;#REQ-175">REQ-175</a>
                                     </td>
                                     <td>REQ-175 — Relations are declared keyed with a mandatory reverse</td>
-                                    <td>
-                                            <span class="empty-cell">-</span>
+                                    <td class="role-design">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;explanation&#x2F;architecture.html#ARC-035" title="Source: explanation&#x2F;architecture.adoc"><strong>ARC-035</strong></a>
+                                                : ARC-035 — Relation reverse declaration and canonical storage
+                                                <small class="source-ref">[explanation&#x2F;architecture.adoc]</small>
+                                            </div>
                                     </td>
-                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                    <td><span class="coverage-badge coverage-done">done</span></td>
                                 </tr>
-                                <tr class="status-missing role-requirement">
+                                <tr class="status-done role-requirement">
                                     <td>
                                         <a href="..&#x2F;..&#x2F;requirements&#x2F;#REQ-176">REQ-176</a>
                                     </td>
                                     <td>REQ-176 — Authoring the reverse name canonicalizes to the primary edge</td>
-                                    <td>
-                                            <span class="empty-cell">-</span>
+                                    <td class="role-design">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;explanation&#x2F;architecture.html#ARC-035" title="Source: explanation&#x2F;architecture.adoc"><strong>ARC-035</strong></a>
+                                                : ARC-035 — Relation reverse declaration and canonical storage
+                                                <small class="source-ref">[explanation&#x2F;architecture.adoc]</small>
+                                            </div>
                                     </td>
-                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                    <td><span class="coverage-badge coverage-done">done</span></td>
                                 </tr>
-                                <tr class="status-missing role-requirement">
+                                <tr class="status-done role-requirement">
                                     <td>
                                         <a href="..&#x2F;..&#x2F;requirements&#x2F;#REQ-177">REQ-177</a>
                                     </td>
                                     <td>REQ-177 — Reverse direction is derived for validation</td>
-                                    <td>
-                                            <span class="empty-cell">-</span>
+                                    <td class="role-design">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;explanation&#x2F;architecture.html#ARC-035" title="Source: explanation&#x2F;architecture.adoc"><strong>ARC-035</strong></a>
+                                                : ARC-035 — Relation reverse declaration and canonical storage
+                                                <small class="source-ref">[explanation&#x2F;architecture.adoc]</small>
+                                            </div>
                                     </td>
-                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                    <td><span class="coverage-badge coverage-done">done</span></td>
                                 </tr>
-                                <tr class="status-missing role-requirement">
+                                <tr class="status-done role-requirement">
                                     <td>
                                         <a href="..&#x2F;..&#x2F;requirements&#x2F;#REQ-178">REQ-178</a>
                                     </td>
                                     <td>REQ-178 — Matrix coverage matches the canonical primary type</td>
-                                    <td>
-                                            <span class="empty-cell">-</span>
+                                    <td class="role-design">
+                                            <div>
+                                                <a href="..&#x2F;..&#x2F;explanation&#x2F;architecture.html#ARC-035" title="Source: explanation&#x2F;architecture.adoc"><strong>ARC-035</strong></a>
+                                                : ARC-035 — Relation reverse declaration and canonical storage
+                                                <small class="source-ref">[explanation&#x2F;architecture.adoc]</small>
+                                            </div>
                                     </td>
-                                    <td><span class="coverage-badge coverage-missing">missing</span></td>
+                                    <td><span class="coverage-badge coverage-done">done</span></td>
                                 </tr>
                                 <tr class="status-done role-requirement">
                                     <td>

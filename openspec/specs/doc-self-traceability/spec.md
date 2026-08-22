@@ -31,3 +31,10 @@ The Self-Traceability section SHALL be clearly separated from the user-facing do
 #### Scenario: Section description differentiates from user docs
 - **WHEN** a reader views the navigation
 - **THEN** the Self-Traceability section SHALL be visually or positionally distinct from Tutorial / How-to / Reference / Explanation
+
+### Requirement: Design concepts address functional requirements
+Every functional requirement (REQ) in the self-traceability example SHALL be addressed by at least one design concept (ARC item) via an `addresses:REQ-NNN[]` link.
+
+#### Scenario: Each functional requirement has a design concept
+- **WHEN** the self-traceability requirements index and architecture document are reconciled
+- **THEN** every `role=requirement` item SHALL be referenced by at least one `addresses:REQ-NNN[]` link in `architecture.adoc`

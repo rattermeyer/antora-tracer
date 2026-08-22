@@ -23,8 +23,7 @@ REQ-102,REQ-102 — Collapsible list-style output via document attribute,TST-002
 REQ-064,REQ-064 — Incoming macro respects document attributes,TST-002: TST-002 — Antora Extension Tests
 REQ-065,REQ-065 — Incoming macro display styles,TST-002: TST-002 — Antora Extension Tests
 REQ-066,REQ-066 — Incoming macro sort order,TST-002: TST-002 — Antora Extension Tests
-REQ-067,REQ-067 — Inverse relation type labels,TST-002: TST-002 — Antora Extension Tests
-REQ-147,REQ-147 — Fallback to raw type name when no inverse mapping exists,TST-002: TST-002 — Antora Extension Tests
+REQ-067,REQ-067 — Incoming groups use the reverse relation type,TST-002: TST-002 — Antora Extension Tests
 REQ-070,REQ-070 — Incoming macro supports collapsible output,TST-002: TST-002 — Antora Extension Tests
 REQ-103,REQ-103 — Graph isolation per component version,TST-002: TST-002 — Antora Extension Tests
 REQ-163,REQ-163 — Incoming macro PDF compatibility,
@@ -154,5 +153,5 @@ REQ-122,REQ-122 — Process-to-product matrix exists,
 REQ-114,REQ-114 — Dead design-matrix template is removed,
 REQ-115,REQ-115 — Dead MatrixGenerator methods are removed,
 
-Total 154 rows
-Coverage: 52.6%
+Total 153 rows
+Coverage: 52.3%

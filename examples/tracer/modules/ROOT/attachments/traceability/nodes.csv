@@ -428,10 +428,7 @@ REQ-066,REQ-066 — Incoming macro sort order,requirement,,requirements.adoc,"""
 Source: openspec/specs/incoming-links-macro/spec.md
 
 traceability:links[]"""
-REQ-067,REQ-067 — Inverse relation type labels,requirement,,requirements.adoc,"""The system SHALL transform relation type names to their inverse form for display in `traceability:incoming[]` using the declared `reverse` of the relation type.
-
-[#REQ-147, item, role=requirement, title=""""Fallback to raw type name when no inverse mapping exists""""]"""
-REQ-147,REQ-147 — Fallback to raw type name when no inverse mapping exists,requirement,,requirements.adoc,"""If a relation type has no inverse mapping defined, then the system SHALL display the raw relation type name.
+REQ-067,REQ-067 — Incoming groups use the reverse relation type,requirement,,requirements.adoc,"""The system SHALL group incoming relationships in `traceability:incoming[]` by the reverse relation type — the declared `reverse` of the relationship's type — so each group heading names the relation from the target item's perspective.
 
 Source: openspec/specs/incoming-links-macro/spec.md
 
@@ -1231,6 +1228,17 @@ addresses:QA-056[]
 addresses:QA-057[]
 
 traceability:links[]"""
+ARC-036,ARC-036 — Preset inheritance and config merge,design,,explanation/architecture.adoc,"""A preset may declare a top-level `extends` field naming a parent preset.
+`ConfigLoader.loadPreset()` recursively loads the parent and deep-merges it under the child via `mergeConfig()`: roles are unioned, relations deep-merged, matrices overridden by name, and `labels` overridden key-by-key.
+Inheritance resolves transitively; a missing parent raises a """"not found"""" error, and a circular chain raises a circular-inheritance error.
+
+addresses:REQ-170[]
+addresses:REQ-171[]
+addresses:REQ-172[]
+addresses:REQ-173[]
+addresses:REQ-174[]
+
+traceability:links[]"""
 ARC-028,ARC-028 — Circular reference detection in graph validation,design,,explanation/architecture.adoc,"""The `validate()` method calls `findCircularReferences()`, a DFS-based cycle
 detector that traverses all items and their outgoing relationships.
 A path stack
@@ -1294,6 +1302,18 @@ encoded into Kroki URLs for rendering.
 addresses:REQ-053[]
 addresses:REQ-160[]
 traceability:links[]"""
+ARC-035,ARC-035 — Relation reverse declaration and canonical storage,design,,explanation/architecture.adoc,"""The `relations` map is keyed as `sourceRole → targetRole → type → { reverse }`, each relation type declaring its authorable reverse name.
+`TraceabilityGraph.addRelationship()` canonicalizes a reverse-authored edge to the primary direction — authoring `is_derived_from` from a requirement stores `UC → REQ : leads_to`.
+Authoring the same logical edge from both sides deduplicates into one `bidirectional` edge driven by the `reverse` declaration.
+`ConfigLoader.isRelationAllowed()` derives the reverse direction, so the reverse type is allowed without a second `relations` entry.
+
+addresses:REQ-129[]
+addresses:REQ-175[]
+addresses:REQ-176[]
+addresses:REQ-177[]
+addresses:REQ-178[]
+
+traceability:links[]"""
 ARC-016,ARC-016 — Event-driven Antora integration,design,,explanation/architecture.adoc,"""The extension hooks into Antora's event pipeline via `register()`:
 `contentClassified` triggers parsing, macro expansion, and matrix
 registration in the content catalog; `sitePublished` writes the standalone
@@ -1341,6 +1361,15 @@ addresses:REQ-100[]
 addresses:REQ-102[]
 addresses:REQ-104[]
 addresses:QA-060[]
+traceability:links[]"""
+ARC-037,ARC-037 — Display labels with humanize default,design,,explanation/architecture.adoc,"""Relation types are displayed through a `labels` map in the config, mapping a type to a human-readable name.
+The map is display-only and never affects graph structure, merge, or validation.
+When a type has no `labels` entry, `humanize(type)` renders it: underscores become spaces, sentence-cased (`is_derived_from` → """"Is derived from"""").
+Incoming links use the reverse type's label.
+
+addresses:REQ-161[]
+addresses:REQ-162[]
+
 traceability:links[]"""
 ARC-025,"""ARC-025 — traceability:graph[], traceability:graph-coverage[], and traceability:config-graph[] visualization macros""",design,,explanation/architecture.adoc,"""The `expandGraphMacros()`, `expandCoverageMacros()`, and `expandConfigGraphMacros()` methods replace
 `traceability:graph[]`, `traceability:graph-coverage[]`, and `traceability:config-graph[]` placeholders with
@@ -1407,6 +1436,16 @@ addresses:REQ-083[]
 addresses:REQ-084[]
 addresses:REQ-085[]
 addresses:REQ-086[]
+traceability:links[]"""
+ARC-038,ARC-038 — Matrix status column,design,,explanation/architecture.adoc,"""The HTML matrix renders a single per-row status column with values `done`, `partial`, and `missing`, derived from the row's column coverage.
+The per-row coverage percentage is no longer rendered as a separate column.
+The top coverage summary (done/partial/missing counts plus overall percentage) is preserved.
+CSV output is unchanged.
+
+addresses:REQ-167[]
+addresses:REQ-168[]
+addresses:REQ-169[]
+
 traceability:links[]"""
 ARC-020,ARC-020 — Mustache template rendering for HTML output,design,,explanation/architecture.adoc,"""The `TemplateRenderer` wraps Mustache for HTML matrix output.
 Built-in templates
@@ -1766,7 +1805,6 @@ verifies:REQ-066[]
 verifies:REQ-067[]
 verifies:REQ-070[]
 verifies:REQ-071[]
-verifies:REQ-147[]
 verifies:REQ-161[]
 verifies:REQ-162[]
 verifies:REQ-100[]
