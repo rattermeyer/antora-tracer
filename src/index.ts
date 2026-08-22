@@ -578,6 +578,13 @@ export type {
   ParserResult,
   ParserWarning,
 } from "./DocumentParser.js";
+// Graph diff
+export {
+  diffGraphs,
+  type GraphDiff,
+  type ItemDelta,
+  type RelationshipDelta,
+} from "./GraphDiff.js";
 // Matrix Generator
 export {
   type GeneratedMatrix,
@@ -587,7 +594,6 @@ export {
   type MatrixGeneratorOptions,
   type MatrixRow,
 } from "./MatrixGenerator.js";
-
 // Exporters
 export {
   Neo4jExporter,

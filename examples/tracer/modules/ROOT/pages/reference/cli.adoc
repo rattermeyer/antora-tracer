@@ -327,6 +327,39 @@ The command is read-only: it never modifies source files.
 A superseded item is identified by an incoming `supersedes` relationship, not by a `status` attribute.
 History relationships (`supersedes` / `superseded_by`) are excluded from the review list.
 
+== diff
+
+Diff two sets of AsciiDoc sources into a traceability delta.
+Builds two graphs (baseline and changed) and reports items added, removed, and modified, plus relationship changes on surviving items.
+
+[source,bash]
+----
+npx antora-tracer diff --from docs-v1 --to docs-v2
+npx antora-tracer diff --from docs-v1 --to docs-v2 --json
+----
+
+[width=100%, cols="25,15,60"]
+|===
+| Option | Type | Description
+
+| `--from <path>`
+| string
+| Baseline input file or directory (default: `.`)
+
+| `--to <path>`
+| string
+| Changed input file or directory (default: `.`)
+
+| `--json`
+| flag
+| Output machine-readable JSON instead of a table
+|===
+
+Items are matched by stable ID, so the diff works with any role or relation vocabulary.
+A `modified` item lists the changed fields (`title`, `content`, `role`, `status`, `attributes`).
+Relationship changes are reported only for items that survive the diff, except `supersedes` history links.
+The command never modifies source files.
+
 == Related
 
 - xref:how-to/write-traceable-items.adoc[How to write traceable items] — using next-id in workflow

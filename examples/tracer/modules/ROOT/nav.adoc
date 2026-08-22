@@ -11,6 +11,7 @@
 ** xref:how-to/partials.adoc[Use partial files with items]
 ** xref:how-to/neo4j-export.adoc[Export to Neo4j]
 ** xref:how-to/query-graph.adoc[Query the graph from the command line]
+** xref:how-to/diff-versions.adoc[Diff two versions of your docs]
 ** xref:how-to/generate-docx.adoc[Generate DOCX output]
 ** xref:how-to/install-skills.adoc[Install the agent skills]
 ** xref:how-to/evaluate-skills.adoc[Evaluate the agent skills]

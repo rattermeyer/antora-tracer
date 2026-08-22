@@ -18,6 +18,7 @@ import { program } from "commander";
 import {
   BUILT_IN_PRESETS,
   ConfigLoader,
+  diffGraphs,
   RequirementsTraceabilityExtension,
 } from "./index.js";
 
@@ -1074,6 +1075,50 @@ supersessionProgram
           `Transitive impact: ${impact.length > 0 ? impact.join(", ") : "(none)"}`,
         );
       }
+    }
+  });
+
+program
+  .command("diff")
+  .description("Diff two sets of AsciiDoc sources into a traceability delta")
+  .option("--from <path>", "Baseline input file or directory", ".")
+  .option("--to <path>", "Changed input file or directory", ".")
+  .option("--json", "Output machine-readable JSON")
+  .action(async (options: any) => {
+    const fromExtension = await createExtension({});
+    fromExtension.processFiles(collectAdocFiles(options.from));
+    const toExtension = await createExtension({});
+    toExtension.processFiles(collectAdocFiles(options.to));
+
+    const delta = diffGraphs(fromExtension.graph, toExtension.graph);
+
+    if (options.json) {
+      console.log(JSON.stringify(delta, null, 2));
+      return;
+    }
+
+    if (delta.items.length === 0 && delta.relationships.length === 0) {
+      console.log("No changes.");
+      return;
+    }
+
+    const itemRows = delta.items.map((d) => [
+      d.kind,
+      d.id,
+      d.role,
+      d.changedFields.join(", "),
+    ]);
+    console.log(
+      formatTable(["Kind", "ID", "Role", "Changed fields"], itemRows),
+    );
+
+    if (delta.relationships.length > 0) {
+      console.log("");
+      const relRows = delta.relationships.map((r) => [
+        r.kind,
+        `${r.rel.fromId} --${r.rel.type}--> ${r.rel.targetId}`,
+      ]);
+      console.log(formatTable(["Kind", "Relationship"], relRows));
     }
   });
 

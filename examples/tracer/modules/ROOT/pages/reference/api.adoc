@@ -227,6 +227,38 @@ export class ConfigLoader {
 }
 ----
 
+== GraphDiff
+
+`src/GraphDiff.ts` — derives a delta between two graph snapshots by stable item ID.
+Config-agnostic: no role names are hardcoded.
+
+[source,typescript]
+----
+export interface ItemDelta {
+  id: string;
+  kind: "added" | "removed" | "modified";
+  role: string;
+  old?: Item;
+  new?: Item;
+  changedFields: string[];
+}
+
+export interface RelationshipDelta {
+  kind: "added" | "removed";
+  rel: ItemRelationship;
+}
+
+export interface GraphDiff {
+  items: ItemDelta[];
+  relationships: RelationshipDelta[];
+}
+
+export function diffGraphs(prev: TraceabilityGraph, next: TraceabilityGraph): GraphDiff;
+----
+
+Items are matched by ID: present only in `next` are `added`, only in `prev` are `removed`, and survivors are compared field-by-field (`title`, `content`, `role`, `status`, `attributes`) for `modified`.
+Relationship changes are reported only for surviving items, except `supersedes` history links.
+
 == Data Model
 
 `src/types.ts`:

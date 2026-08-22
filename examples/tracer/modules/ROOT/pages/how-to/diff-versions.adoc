@@ -1,0 +1,44 @@
+= How to Diff Two Versions of Your Docs
+:description: Compare two snapshots of your traceability docs and review what changed
+:keywords: antora, asciidoc, traceability, diff, changelog
+:toc: macro
+
+toc::[]
+
+The `diff` command compares two sets of AsciiDoc sources and reports which traceable items were added, removed, or modified.
+
+== Prerequisites
+
+- The `antora-tracer` CLI installed.
+- Two snapshots of your docs — for example two directories, or two git worktrees/refs checked out side by side.
+
+== Run the diff
+
+[source,bash]
+----
+npx antora-tracer diff --from docs-v1 --to docs-v2
+----
+
+The output lists each changed item:
+
+----
+Kind     ID       Role         Changed fields
+added    REQ-043  requirement
+removed  REQ-041  requirement
+modified REQ-042  requirement  content
+----
+
+Add `--json` for machine-readable output.
+
+== How the diff works
+
+- Items are matched by stable ID, so it works with any role or relation vocabulary.
+- A surviving item is `modified` when its `title`, `content`, `role`, `status`, or `attributes` changed; the changed fields are listed.
+- Relationship changes are reported only for items that survive the diff.
+- A superseded requirement appears as `removed` plus its successor `added`, with the `supersedes` link listed as a new relationship.
+
+== Related
+
+- xref:reference/cli.adoc[CLI Reference] — `diff` and `supersession check` options
+- xref:reference/api.adoc[API Reference] — `diffGraphs()` and the delta types
+- xref:how-to/write-traceable-items.adoc[How to write traceable items] — superseding requirements
