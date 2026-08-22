@@ -1,0 +1,31 @@
+= Quality Model
+
+In this project we adhere to the https://quality.arc42.org/dimensions/[Quality 42] quality model.
+
+It defines the following quality dimensions:
+
+* efficient
+* flexible
+* operable
+* maintainable
+* reliable
+* safe
+* secure
+* suitable
+* usable
+
+Dimensions are overlapping and need further specification by Quality Characteristics.
+
+The concrete quality characteristic is documented using the following sections
+
+* Context
+* Trigger
+* Acceptance Criteria
+
+see also https://quality.arc42.org/requirements/[Requirements] for examples.
+For the source code look at https://github.com/arc42/quality.arc42.org-site/[Github].
+
+== References
+
+* https://www.iso.org/obp/ui/#iso:std:iso-iec:25010:ed-2:v1:en[ISO 25010:2023]
+
