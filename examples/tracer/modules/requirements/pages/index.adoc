@@ -103,9 +103,19 @@ traceability:links[]
 --
 The system SHALL process items defined in AsciiDoc partial files alongside page files, registering them in the traceability graph.
 
+Source: openspec/specs/partial-file-processing/spec.md
+
+traceability:links[]
+--
+
 [#REQ-144, item, role=requirement, title="Partial items use view URL as source reference"]
 --
 Items from partial files SHALL use the file's view URL as their source file reference, enabling traceability matrix links to resolve to the source repository.
+
+Source: openspec/specs/partial-file-processing/spec.md
+
+traceability:links[]
+--
 
 [#REQ-145, item, role=requirement, title="All processing passes apply to partial files"]
 --
@@ -167,6 +177,11 @@ traceability:links[]
 [#REQ-044, item, role=requirement, title="traceability:outgoing[] macro renders outgoing links"]
 --
 The system SHALL provide a `traceability:outgoing[]` macro that expands to a formatted list of all outgoing relationships for the enclosing item.
+
+Source: openspec/specs/traceability-links-macro/spec.md
+
+traceability:links[]
+--
 
 [#REQ-146, item, role=requirement, title="Empty-state message when item has no outgoing relationships"]
 --
