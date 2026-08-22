@@ -1001,6 +1001,82 @@ queryProgram
     }
   });
 
+const supersessionProgram = program
+  .command("supersession")
+  .description("Inspect supersession relationships (no Antora build required)")
+  .option("-i, --input <path>", "Input file or directory to scan", ".")
+  .option("--json", "Output machine-readable JSON");
+
+supersessionProgram
+  .command("check <id>")
+  .description(
+    "Report successors and functional links requiring review for an item",
+  )
+  .option("--impact", "Include the transitive impact radius")
+  .action(async (id: string, options: any, cmd: any) => {
+    const { json } = cmd.parent.opts();
+    const extension = await buildQueryGraph(cmd);
+    const graph = extension.graph;
+    if (!graph.getItem(id)) {
+      console.error(chalk.red(`Item not found: ${id}`));
+      process.exit(1);
+    }
+
+    const successors = graph.getSuccessors(id);
+    const staleRels = graph
+      .getReverseRelationships(id)
+      .filter((rel) => !graph.isHistoryRelation(rel.type));
+
+    if (json) {
+      console.log(
+        JSON.stringify(
+          {
+            id,
+            superseded: graph.isSuperseded(id),
+            successors: successors.map((s) => s.id),
+            staleLinks: staleRels.map((rel) => ({
+              from: rel.fromId,
+              type: rel.type,
+            })),
+            impact: options.impact ? graph.getImpactAnalysis(id) : undefined,
+          },
+          null,
+          2,
+        ),
+      );
+    } else {
+      console.log(chalk.bold(`Supersession check: ${id}`));
+      console.log(`Superseded: ${graph.isSuperseded(id) ? "yes" : "no"}`);
+      if (successors.length > 0) {
+        console.log(`Successors: ${successors.map((s) => s.id).join(", ")}`);
+      }
+      if (staleRels.length > 0) {
+        console.log(chalk.yellow("Functional links requiring review:"));
+        const rows = staleRels.map((rel) => {
+          const item = graph.getItem(rel.fromId);
+          return [
+            rel.fromId,
+            item?.role ?? "",
+            rel.type,
+            rel.sourceFile ?? "",
+            rel.line !== undefined ? String(rel.line) : "",
+          ];
+        });
+        console.log(
+          formatTable(["ID", "Role", "Relation", "File", "Line"], rows),
+        );
+      } else {
+        console.log("No functional links require review.");
+      }
+      if (options.impact) {
+        const impact = graph.getImpactAnalysis(id);
+        console.log(
+          `Transitive impact: ${impact.length > 0 ? impact.join(", ") : "(none)"}`,
+        );
+      }
+    }
+  });
+
 if (process.argv.length <= 2) {
   program.help();
 }

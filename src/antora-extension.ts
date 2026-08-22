@@ -489,9 +489,18 @@ export class AntoraTraceabilityExtension {
           rel.type);
 
       if (!grouped.has(groupKey)) grouped.set(groupKey, []);
+      const successors = graph.isSuperseded(related.id)
+        ? graph
+            .getSuccessors(related.id)
+            .map((s) => s.id)
+            .join(", ")
+        : "";
+      const title =
+        (related.title || related.id) +
+        (successors ? ` (superseded by ${successors})` : "");
       grouped.get(groupKey)?.push({
         id: related.id,
-        title: related.title || related.id,
+        title,
         sourceFile: related.sourceFile,
         component: related.component,
         module: related.module,
@@ -1417,8 +1426,17 @@ export class AntoraTraceabilityExtension {
       const fixedMacro = fullMacro.replace(
         /title="([^"]*)"/,
         (_titleMatch: string, titleVal: string) => {
-          if (titleVal.startsWith(`${id} \u2014 `)) return _titleMatch;
-          return `title="${id} \u2014 ${titleVal}"`;
+          const base = titleVal.startsWith(`${id} \u2014 `)
+            ? titleVal
+            : `${id} \u2014 ${titleVal}`;
+          const successors = this.traceability!.graph.isSuperseded(id)
+            ? this.traceability!.graph.getSuccessors(id)
+                .map((s) => s.id)
+                .join(", ")
+            : "";
+          const suffix = successors ? ` (superseded by ${successors})` : "";
+          if (suffix && base.endsWith(suffix)) return `title="${base}"`;
+          return `title="${base}${suffix}"`;
         },
       );
 

@@ -131,8 +131,8 @@ export class MatrixGenerator {
     const rowRole = config.rows;
     const columnRoles = config.columns;
 
-    // Get all items with the row role
-    const rowItems = this.graph.getItemsByRole(rowRole);
+    // Get current items with the row role (superseded excluded)
+    const rowItems = this.graph.getCurrentItemsByRole(rowRole);
 
     if (rowItems.length === 0) {
       return {
@@ -154,7 +154,7 @@ export class MatrixGenerator {
     // Pre-compute: role -> Set of item IDs for fast lookup
     const roleItemIds = new Map<string, Set<string>>();
     for (const role of [rowRole, ...columnRoles]) {
-      const items = this.graph.getItemsByRole(role);
+      const items = this.graph.getCurrentItemsByRole(role);
       roleItemIds.set(role, new Set(items.map((i) => i.id)));
     }
 
@@ -309,7 +309,7 @@ export class MatrixGenerator {
       columnRoles = allRoles.slice(1, 4);
     }
 
-    const rowItems = this.graph.getItemsByRole(rowRole);
+    const rowItems = this.graph.getCurrentItemsByRole(rowRole);
 
     if (rowItems.length === 0) {
       return {
@@ -333,7 +333,7 @@ export class MatrixGenerator {
 
     // Group items by column role
     for (const colRole of columnRoles) {
-      columnItems.set(colRole, this.graph.getItemsByRole(colRole));
+      columnItems.set(colRole, this.graph.getCurrentItemsByRole(colRole));
     }
 
     // Build rows

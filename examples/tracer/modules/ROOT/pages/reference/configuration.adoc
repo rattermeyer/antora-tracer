@@ -218,6 +218,28 @@ relations:
 
 If a relation type is used that is not declared (or derived as a reverse), the extension reports an error with the allowed alternatives.
 
+=== Supersession
+
+A baselined item is superseded rather than edited in place.
+The successor declares `supersedes` (reverse `superseded_by`) to the item it replaces.
+
+[source,yaml]
+----
+relations:
+  requirement:
+    requirement:
+      supersedes:
+        reverse: superseded_by
+----
+
+An item is superseded when one or more incoming `supersedes` relationships target it — no `status` attribute is required.
+Splits (one predecessor, several successors) and merges (one successor, several predecessors) are supported.
+Self-supersession, duplicate links, and cycles are validation errors.
+
+Current-state matrices omit superseded items.
+Functional links to a superseded item remain visible and are marked for review.
+See xref:reference/cli.adoc[`supersession check`] for the read-only impact report.
+
 === `labels`
 
 Optional display-only map: `type → human-readable name`.

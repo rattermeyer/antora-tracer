@@ -30,6 +30,8 @@ traceability:
           reverse: is_prerequisite_of
         conflicts_with:
           reverse: conflicts_with
+        supersedes:
+          reverse: superseded_by
 
     # Design relations
     design:

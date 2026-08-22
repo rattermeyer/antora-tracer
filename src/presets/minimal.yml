@@ -22,6 +22,8 @@ traceability:
       requirement:
         depends_on:
           reverse: is_prerequisite_of
+        supersedes:
+          reverse: superseded_by
       test:
         verified_by:
           reverse: verifies

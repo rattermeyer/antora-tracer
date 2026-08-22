@@ -41,6 +41,22 @@ export interface ItemRelationship {
 }
 
 // ============================================================================
+// Supersession Semantics
+// ============================================================================
+
+/** The forward supersession relation type (successor → predecessor). */
+export const SUPERSEDES = "supersedes";
+
+/** The reverse supersession relation type (predecessor → successor). */
+export const SUPERSEDED_BY = "superseded_by";
+
+/**
+ * Relation types that record history rather than current-state links.
+ * These are excluded from stale-link warnings and impact review worklists.
+ */
+export const HISTORY_RELATION_TYPES = new Set([SUPERSEDES, SUPERSEDED_BY]);
+
+// ============================================================================
 // Role Colors
 // ============================================================================
 

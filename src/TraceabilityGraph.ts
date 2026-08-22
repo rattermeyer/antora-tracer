@@ -10,13 +10,13 @@
 
 import type { ConfigLoader } from "./config/TraceabilityConfig.js";
 import type { Item, ItemRelationship } from "./types.js";
-import { ROLE_COLORS } from "./types.js";
+import { HISTORY_RELATION_TYPES, ROLE_COLORS, SUPERSEDES } from "./types.js";
 
 /**
  * Warning type for graph operations
  */
 export interface GraphWarning {
-  type: "unknown_role" | "invalid_relation" | "duplicate_node";
+  type: "unknown_role" | "invalid_relation" | "duplicate_node" | "stale_link";
   message: string;
   file?: string;
   line?: number;
@@ -140,6 +140,15 @@ export class TraceabilityGraph {
     const roleMap = this._itemsByRole.get(role);
     if (!roleMap) return [];
     return Array.from(roleMap.values());
+  }
+
+  /**
+   * Get all items with a specific role, excluding superseded items.
+   */
+  getCurrentItemsByRole(role: string): Item[] {
+    return this.getItemsByRole(role).filter(
+      (item) => !this.isSuperseded(item.id),
+    );
   }
 
   /**
@@ -364,6 +373,34 @@ export class TraceabilityGraph {
       return Array.from(targetIndex.values()).flat();
     }
     return [];
+  }
+
+  // ========================================================================
+  // Supersession
+  // ========================================================================
+
+  /**
+   * Whether a relationship type records history rather than current state.
+   */
+  isHistoryRelation(type: string): boolean {
+    return HISTORY_RELATION_TYPES.has(type);
+  }
+
+  /**
+   * Whether an item has been replaced: at least one incoming `supersedes`
+   * relationship targets it.
+   */
+  isSuperseded(itemId: string): boolean {
+    return this.getReverseRelationships(itemId, SUPERSEDES).length > 0;
+  }
+
+  /**
+   * The direct successors of an item — the items that `supersedes` it.
+   */
+  getSuccessors(itemId: string): Item[] {
+    return this.getReverseRelationships(itemId, SUPERSEDES)
+      .map((rel) => this.getItem(rel.fromId))
+      .filter((item): item is Item => item !== undefined);
   }
 
   /**
@@ -646,7 +683,106 @@ export class TraceabilityGraph {
       }
     }
 
+    // Supersession validation: self-reference, duplicates, and cycles are
+    // errors; functional links to superseded items are advisory warnings.
+    const supersessionIssues = this.findSupersessionIssues();
+    errors.push(...supersessionIssues.errors);
+    warnings.push(...supersessionIssues.warnings);
+
     return { errors, warnings };
+  }
+
+  /**
+   * Validate the supersession graph. Self-supersession, duplicate history
+   * links, and cycles are errors; functional links to superseded items are
+   * advisory warnings.
+   */
+  private findSupersessionIssues(): {
+    errors: string[];
+    warnings: GraphWarning[];
+  } {
+    const errors: string[] = [];
+    const warnings: GraphWarning[] = [];
+
+    const successorMap = new Map<string, Set<string>>();
+    const seen = new Set<string>();
+
+    for (const rel of this._relationships.values()) {
+      if (rel.type !== SUPERSEDES) continue;
+
+      if (rel.fromId === rel.targetId) {
+        errors.push(`Self-supersession: '${rel.fromId}' supersedes itself.`);
+        continue;
+      }
+
+      const key = `${rel.fromId}->${rel.targetId}`;
+      if (seen.has(key)) {
+        errors.push(
+          `Duplicate supersedes: '${rel.fromId}' supersedes '${rel.targetId}' more than once.`,
+        );
+      }
+      seen.add(key);
+
+      if (!successorMap.has(rel.fromId)) {
+        successorMap.set(rel.fromId, new Set());
+      }
+      successorMap.get(rel.fromId)!.add(rel.targetId);
+    }
+
+    errors.push(...this.findSupersessionCycles(successorMap));
+
+    // Functional links to superseded items require review.
+    for (const rel of this._relationships.values()) {
+      if (HISTORY_RELATION_TYPES.has(rel.type)) continue;
+      if (!this.isSuperseded(rel.targetId)) continue;
+      const successors = this.getSuccessors(rel.targetId)
+        .map((s) => s.id)
+        .sort();
+      warnings.push({
+        type: "stale_link",
+        message: `Relation '${rel.type}' from '${rel.fromId}' targets '${rel.targetId}', which is superseded by ${successors.join(", ")}.`,
+        file: rel.sourceFile,
+        line: rel.line,
+      });
+    }
+
+    return { errors, warnings };
+  }
+
+  /**
+   * Detect cycles in the supersession graph (successor → predecessor).
+   */
+  private findSupersessionCycles(
+    successorMap: Map<string, Set<string>>,
+  ): string[] {
+    const errors: string[] = [];
+    const visited = new Set<string>();
+    const inStack = new Set<string>();
+
+    const visit = (node: string, path: string[]) => {
+      if (inStack.has(node)) {
+        const start = path.indexOf(node);
+        errors.push(
+          `Supersession cycle: ${path.slice(start).join(" -> ")} -> ${node}`,
+        );
+        return;
+      }
+      if (visited.has(node)) return;
+      visited.add(node);
+      inStack.add(node);
+      path.push(node);
+      for (const next of successorMap.get(node) ?? []) {
+        visit(next, path);
+      }
+      path.pop();
+      inStack.delete(node);
+    };
+
+    for (const node of successorMap.keys()) {
+      visit(node, []);
+    }
+
+    return errors;
   }
 
   /**

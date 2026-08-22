@@ -306,6 +306,23 @@ grep -rn '{{ID_PREFIX}}-NNN' .
 
 Project-specific layouts need a project-specific sweep. Identify where requirements, design, tests, and coverage documents live in your project and update them together.
 
+## Superseding Requirements
+
+When a baselined requirement must change, do not edit it in place. Create a new requirement that supersedes the old one and link it back.
+
+1. Create the successor with a fresh ID.
+2. Declare the link in the successor: `supersedes:{{ID_PREFIX}}-OLD[]`.
+3. Do not mark the old item `status=superseded` by hand — the graph derives it from the `supersedes` link.
+4. Run `antora-tracer supersession check {{ID_PREFIX}}-OLD` and review every functional link (`addresses`, `verifies`, `depends_on`) that still targets the old item.
+5. For each link, decide explicitly and record the decision: revise the linked artifact, supersede it too, repoint it when the change is non-semantic, or retain it if the old item still applies.
+6. Never auto-repoint. The superseded item stays in the graph and its source page for audit.
+
+### Splits and merges
+
+- A requirement may be split: several successors each `supersedes` the old one.
+- A requirement may be merged: one successor `supersedes` several predecessors.
+- Self-supersession, duplicate links, and cycles are validation errors.
+
 ## Related Commands
 
 ```bash

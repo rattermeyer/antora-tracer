@@ -293,6 +293,40 @@ Subcommands:
 
 Exit codes: `0` for success (including empty results), `1` for an unknown item ID or when no path exists.
 
+== supersession
+
+Inspect supersession relationships without an Antora build.
+The `check` subcommand reports whether an item has been superseded, its direct successors, and every functional link that still targets it and therefore requires review.
+
+[source,bash]
+----
+npx antora-tracer supersession check REQ-042
+npx antora-tracer supersession check REQ-042 -i docs/
+npx antora-tracer supersession check REQ-042 --impact
+npx antora-tracer supersession check REQ-042 --json
+----
+
+[width=100%, cols="25,15,60"]
+|===
+| Option | Type | Description
+
+| `-i, --input <path>`
+| string
+| Input file or directory to scan (default: `.`)
+
+| `--json`
+| flag
+| Output machine-readable JSON instead of a table
+
+| `--impact`
+| flag
+| Also report the transitive impact radius
+|===
+
+The command is read-only: it never modifies source files.
+A superseded item is identified by an incoming `supersedes` relationship, not by a `status` attribute.
+History relationships (`supersedes` / `superseded_by`) are excluded from the review list.
+
 == Related
 
 - xref:how-to/write-traceable-items.adoc[How to write traceable items] — using next-id in workflow
