@@ -32,6 +32,8 @@ antora:
       enabled: true
       valeConfig: lib/src/vale/.vale.ini
       minLevel: warning
+      exclude:
+        - documentation-style-guide.adoc
 
 ui:
   bundle:

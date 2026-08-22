@@ -20,6 +20,8 @@ export type ValeLevel = "suggestion" | "warning" | "error";
 export interface AntoraValeConfig {
   valeConfig?: string;
   minLevel?: ValeLevel;
+  /** Path substrings to skip during linting (matched with `includes`). */
+  exclude?: string[];
 }
 
 interface ValeFinding {
@@ -71,6 +73,9 @@ export class AntoraValeExtension {
         raw.valeConfig ?? raw.valeconfig ?? raw.vale_config ?? "",
       ),
       minLevel: normalizeLevel(raw.minLevel ?? raw.minlevel ?? "warning"),
+      exclude: Array.isArray(raw.exclude)
+        ? raw.exclude.map((pattern: unknown) => String(pattern))
+        : [],
     };
     context.on("contentClassified", (event) => this.onContentClassified(event));
   }
@@ -82,7 +87,14 @@ export class AntoraValeExtension {
     const adocFiles = [
       ...(contentCatalog.findBy({ family: "page" }) || []),
       ...(contentCatalog.findBy({ family: "partial" }) || []),
-    ].filter((file: any) => file.src?.path?.endsWith(".adoc"));
+    ]
+      .filter((file: any) => file.src?.path?.endsWith(".adoc"))
+      .filter(
+        (file: any) =>
+          !this.config.exclude.some((pattern) =>
+            file.src?.path?.includes(pattern),
+          ),
+      );
 
     if (adocFiles.length === 0) return;
 
@@ -100,8 +112,7 @@ export class AntoraValeExtension {
 
       for (const finding of this.lintContent(contents, sourcePath)) {
         const check = finding.Check ? `${finding.Check}: ` : "";
-        const message =
-          `${sourcePath}:${finding.Line}: [${finding.Severity}] ${check}${finding.Message}`;
+        const message = `${sourcePath}:${finding.Line}: [${finding.Severity}] ${check}${finding.Message}`;
         if (LEVEL_RANK[finding.Severity] >= LEVEL_RANK[this.config.minLevel]) {
           errors.push(message);
         } else {
@@ -120,7 +131,12 @@ export class AntoraValeExtension {
   }
 
   private lintContent(contents: Buffer, sourcePath: string): ValeFinding[] {
-    const args = ["--output=JSON", "--no-wrap", "--no-exit", "--minAlertLevel=suggestion"];
+    const args = [
+      "--output=JSON",
+      "--no-wrap",
+      "--no-exit",
+      "--minAlertLevel=suggestion",
+    ];
     const valeConfig = this.resolveValeConfig();
     if (valeConfig) args.push("--config", valeConfig);
     args.push("--path", sourcePath);

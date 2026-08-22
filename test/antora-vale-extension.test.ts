@@ -1,7 +1,7 @@
-import { expect } from "chai";
 import { chmodSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { expect } from "chai";
 import { AntoraValeExtension, register } from "../src/antora-vale-extension.js";
 
 // Fake `vale` executable that emits a configurable JSON finding.
@@ -168,8 +168,9 @@ describe("AntoraValeExtension", () => {
     try {
       const ctx = createMockContext();
       new AntoraValeExtension(ctx as any);
-      expect(() => ctx.fire("contentClassified", createEvent([], []))).to.not
-        .throw();
+      expect(() =>
+        ctx.fire("contentClassified", createEvent([], [])),
+      ).to.not.throw();
     } finally {
       cleanup();
     }
@@ -233,16 +234,40 @@ describe("AntoraValeExtension", () => {
       const ctx = createMockContext();
       // Antora lowercases YAML keys, so the playbook's minLevel arrives as
       // minlevel. The extension must still honor it.
-      new AntoraValeExtension(ctx as any, {
-        minlevel: "suggestion",
-        valeconfig: ".vale.ini",
-      } as any);
+      new AntoraValeExtension(
+        ctx as any,
+        {
+          minlevel: "suggestion",
+          valeconfig: ".vale.ini",
+        } as any,
+      );
       expect(() =>
         ctx.fire(
           "contentClassified",
           createEvent(["modules/ROOT/pages/index.adoc"], []),
         ),
       ).to.throw(/level 'suggestion'/);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it("skips files matching an exclude pattern", () => {
+    const cleanup = installFakeBinaries();
+    try {
+      const ctx = createMockContext();
+      new AntoraValeExtension(ctx as any, {
+        exclude: ["documentation-style-guide.adoc"],
+      });
+      expect(() =>
+        ctx.fire(
+          "contentClassified",
+          createEvent(
+            ["modules/ROOT/pages/reference/documentation-style-guide.adoc"],
+            [],
+          ),
+        ),
+      ).to.not.throw();
     } finally {
       cleanup();
     }
