@@ -333,10 +333,14 @@ Source: openspec/specs/parser-verbatim-skip/spec.md
 traceability:links[]"""
 REQ-110,REQ-110 — Items defined in partials are registered in the graph,requirement,,requirements.adoc,"""The system SHALL process items defined in AsciiDoc partial files alongside page files, registering them in the traceability graph.
 
-[#REQ-144, item, role=requirement, title=""""Partial items use view URL as source reference""""]"""
+Source: openspec/specs/partial-file-processing/spec.md
+
+traceability:links[]"""
 REQ-144,REQ-144 — Partial items use view URL as source reference,requirement,,requirements.adoc,"""Items from partial files SHALL use the file's view URL as their source file reference, enabling traceability matrix links to resolve to the source repository.
 
-[#REQ-145, item, role=requirement, title=""""All processing passes apply to partial files""""]"""
+Source: openspec/specs/partial-file-processing/spec.md
+
+traceability:links[]"""
 REQ-145,REQ-145 — All processing passes apply to partial files,requirement,,requirements.adoc,"""The system SHALL apply graph population, macro expansion, and link substitution passes to partial files in the same way as page files, because partial content is inlined into pages and reaches the browser.
 
 Source: openspec/specs/partial-file-processing/spec.md
@@ -372,7 +376,9 @@ Source: openspec/specs/file-preparation-cache/spec.md
 traceability:links[]"""
 REQ-044,REQ-044 — traceability:outgoing[] macro renders outgoing links,requirement,,requirements.adoc,"""The system SHALL provide a `traceability:outgoing[]` macro that expands to a formatted list of all outgoing relationships for the enclosing item.
 
-[#REQ-146, item, role=requirement, title=""""Empty-state message when item has no outgoing relationships""""]"""
+Source: openspec/specs/traceability-links-macro/spec.md
+
+traceability:links[]"""
 REQ-146,REQ-146 — Empty-state message when item has no outgoing relationships,requirement,,requirements.adoc,"""If the enclosing item has no outgoing relationships, then the `traceability:outgoing[]` macro SHALL render a configurable empty-state message controlled by the `:traceability-empty:` document attribute.
 
 Source: openspec/specs/traceability-links-macro/spec.md
@@ -759,6 +765,92 @@ Elements outside the article body (navigation, TOC, footer) SHALL NOT be indexed
 Source: openspec/specs/lunr-item-anchor-indexing/spec.md
 
 traceability:links[]"""
+REQ-201,REQ-201 — A successor declares a supersedes relationship,requirement,,requirements.adoc,"""When a traceable item replaces another item, the successor SHALL declare a `supersedes` relationship to the predecessor.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]"""
+REQ-202,REQ-202 — The reverse superseded_by relationship is derivable,requirement,,requirements.adoc,"""When a successor declares a `supersedes` relationship, the predecessor's `superseded_by` relationship SHALL be derivable from the graph.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]"""
+REQ-203,REQ-203 — Superseded state is derived from relationships,requirement,,requirements.adoc,"""An item SHALL be effectively superseded when at least one valid incoming `supersedes` relationship targets it.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]"""
+REQ-204,REQ-204 — Invalid supersession structures are rejected,requirement,,requirements.adoc,"""If the supersession graph contains a self-reference, duplicate relationship, or cycle, then validation SHALL report an error.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]"""
+REQ-205,REQ-205 — Current-state matrices omit superseded items,requirement,,requirements.adoc,"""When a current-state matrix is generated, the system SHALL omit effectively superseded items from both rows and columns by default.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]"""
+REQ-206,REQ-206 — Functional links to superseded items remain visible,requirement,,requirements.adoc,"""When a relationship macro renders a functional relationship targeting a superseded item, the system SHALL retain the relationship and identify it as requiring review, naming every direct successor.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]"""
+REQ-207,REQ-207 — History links are excluded from review worklists,requirement,,requirements.adoc,"""Supersession history relationships SHALL NOT be classified as stale functional links.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]"""
+REQ-208,REQ-208 — Superseded item blocks link to successors,requirement,,requirements.adoc,"""When a superseded item's source block is rendered, the system SHALL display a superseded marker that links to every direct successor.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]"""
+REQ-209,REQ-209 — CLI reports supersession impact,requirement,,requirements.adoc,"""When a supersession check is requested, the CLI SHALL report direct successors and incoming functional relationships requiring review.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]"""
+REQ-210,REQ-210 — Supersession checks do not modify source files,requirement,,requirements.adoc,"""When a supersession check is requested, the CLI SHALL NOT modify any source file.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]"""
+REQ-211,REQ-211 — Validation warns about stale functional links,requirement,,requirements.adoc,"""When a functional relationship targets an effectively superseded item, validation SHALL emit a non-blocking warning naming the source item, relation type, predecessor, and all direct successors.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]"""
+REQ-212,REQ-212 — Diff classifies items by stable ID,requirement,,requirements.adoc,"""When two graph snapshots are compared, the diff SHALL classify each item as added, removed, or modified based on its stable ID.
+
+Source: openspec/specs/graph-diff/spec.md
+
+traceability:links[]"""
+REQ-213,REQ-213 — Modified items report changed fields,requirement,,requirements.adoc,"""A surviving item SHALL be reported as modified when its `title`, `content`, `role`, `status`, or `attributes` differs between the snapshots, and the delta SHALL name the changed fields.
+
+Source: openspec/specs/graph-diff/spec.md
+
+traceability:links[]"""
+REQ-214,REQ-214 — Relationship deltas are limited to surviving items,requirement,,requirements.adoc,"""The diff SHALL report relationship changes only between items that exist in both snapshots.
+
+Source: openspec/specs/graph-diff/spec.md
+
+traceability:links[]"""
+REQ-215,REQ-215 — Supersession appears as added and removed,requirement,,requirements.adoc,"""The diff SHALL NOT attempt content-similarity rename detection.
+A superseded predecessor SHALL appear as removed and its successor as added, with the `supersedes` relationship reported as a new relationship.
+
+Source: openspec/specs/graph-diff/spec.md
+
+traceability:links[]"""
+REQ-216,"""REQ-216 — Diff is a public, config-agnostic API""",requirement,,requirements.adoc,"""The diff SHALL be exposed as a public function usable with any configured role or relation vocabulary, without hardcoding any role name.
+
+Source: openspec/specs/graph-diff/spec.md
+
+traceability:links[]"""
+REQ-217,REQ-217 — CLI diff is read-only,requirement,,requirements.adoc,"""A `diff` CLI command SHALL scan two source paths, build two graphs, and print the delta without modifying any source file.
+
+Source: openspec/specs/graph-diff/spec.md
+
+traceability:links[]"""
 QA-057,QA-057 — Fail-fast with clear diagnostics,requirement,,requirements.adoc,include::ROOT:partial$quality/qa-fail-fast-diagnostics.adoc[]
 QA-058,QA-058 — No side effects on source files,requirement,,requirements.adoc,include::ROOT:partial$quality/qa-no-side-effects.adoc[]
 QA-062,QA-062 — Query and indexing performance,requirement,,requirements.adoc,include::ROOT:partial$quality/qa-performance.adoc[]
@@ -1006,6 +1098,11 @@ Source: openspec/specs/doc-self-traceability/spec.md
 traceability:links[]"""
 REQ-199,REQ-199 — Self-Traceability section preserves traceable items,requirement,,requirements.adoc,"""The restructuring SHALL NOT move any traceable `[item]` blocks out of their source files.
 All existing requirements (REQ), architecture (ARC), test (TST), use case (UC), and quality (QA) items SHALL remain in their current AsciiDoc files.
+
+Source: openspec/specs/doc-self-traceability/spec.md
+
+traceability:links[]"""
+REQ-218,REQ-218 — Design concepts address functional requirements,requirement,,requirements.adoc,"""Every functional requirement (REQ) in the self-traceability example SHALL be addressed by at least one design concept (ARC item) via an `addresses:REQ-NNN[]` link.
 
 Source: openspec/specs/doc-self-traceability/spec.md
 
@@ -1312,6 +1409,35 @@ addresses:REQ-175[]
 addresses:REQ-176[]
 addresses:REQ-177[]
 addresses:REQ-178[]
+
+traceability:links[]"""
+ARC-039,ARC-039 — Supersession semantics,design,,explanation/architecture.adoc,"""A traceable item is superseded rather than mutated: the successor declares a `supersedes` relationship, and the graph derives the predecessor's superseded state from that relationship rather than a `status` attribute.
+`TraceabilityGraph.isSuperseded()` and `getSuccessors()` answer the direct questions, and splits (several successors) and merges (several predecessors) are first-class.
+Self-supersession, duplicate links, and cycles are validation errors; a functional link to a superseded item is an advisory `stale_link` warning.
+Current matrices omit superseded items via `getCurrentItemsByRole()`.
+
+addresses:REQ-201[]
+addresses:REQ-202[]
+addresses:REQ-203[]
+addresses:REQ-204[]
+addresses:REQ-205[]
+addresses:REQ-206[]
+addresses:REQ-207[]
+addresses:REQ-208[]
+addresses:REQ-209[]
+addresses:REQ-210[]
+addresses:REQ-211[]
+
+traceability:links[]"""
+ARC-040,ARC-040 — Graph diff,design,,explanation/architecture.adoc,"""`GraphDiff.diffGraphs(prev, next)` compares two graph snapshots by stable item ID, classifying each item as added, removed, or modified without hardcoding any role name.
+A surviving item is `modified` when a compared field (`title`, `content`, `role`, `status`, or `attributes`) differs, and relationship deltas are reported only between surviving items, except `supersedes` history links.
+
+addresses:REQ-212[]
+addresses:REQ-213[]
+addresses:REQ-214[]
+addresses:REQ-215[]
+addresses:REQ-216[]
+addresses:REQ-217[]
 
 traceability:links[]"""
 ARC-016,ARC-016 — Event-driven Antora integration,design,,explanation/architecture.adoc,"""The extension hooks into Antora's event pipeline via `register()`:
@@ -1912,6 +2038,30 @@ verifies:REQ-152[]
 verifies:REQ-154[]
 verifies:REQ-155[]
 verifies:REQ-156[]
+
+traceability:links[]"""
+TST-011,TST-011 — Supersession Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/supersession.test.ts`
+
+Tests requirement supersession: deriving superseded state and successors from the `supersedes` relation, split and merge support, self-supersession and cycle validation errors, advisory stale-link warnings, and that superseded items are excluded from current-item queries and matrices.
+
+verifies:REQ-201[]
+verifies:REQ-202[]
+verifies:REQ-203[]
+verifies:REQ-204[]
+verifies:REQ-205[]
+verifies:REQ-206[]
+verifies:REQ-207[]
+verifies:REQ-211[]
+
+traceability:links[]"""
+TST-012,TST-012 — Graph Diff Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/graph-diff.test.ts`
+
+Tests `diffGraphs`: added/removed/unmodified classification, field-level modification reporting, suppression of removed items' relationships, relationship deltas on surviving items, and that a superseded pair appears as removed plus added with the `supersedes` link.
+
+verifies:REQ-212[]
+verifies:REQ-213[]
+verifies:REQ-214[]
+verifies:REQ-215[]
 
 traceability:links[]"""
 PRQ-001,PRQ-001 — CI workflows trigger on push and PR,process_requirement,,self-traceability/delivery-process.adoc,"""The GitHub Actions CI workflow SHALL trigger on every push to `main` and every pull request.

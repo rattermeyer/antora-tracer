@@ -270,6 +270,43 @@ addresses:REQ-178[]
 traceability:links[]
 --
 
+[#ARC-039, item, role=design, title="Supersession semantics"]
+--
+A traceable item is superseded rather than mutated: the successor declares a `supersedes` relationship, and the graph derives the predecessor's superseded state from that relationship rather than a `status` attribute.
+`TraceabilityGraph.isSuperseded()` and `getSuccessors()` answer the direct questions, and splits (several successors) and merges (several predecessors) are first-class.
+Self-supersession, duplicate links, and cycles are validation errors; a functional link to a superseded item is an advisory `stale_link` warning.
+Current matrices omit superseded items via `getCurrentItemsByRole()`.
+
+addresses:REQ-201[]
+addresses:REQ-202[]
+addresses:REQ-203[]
+addresses:REQ-204[]
+addresses:REQ-205[]
+addresses:REQ-206[]
+addresses:REQ-207[]
+addresses:REQ-208[]
+addresses:REQ-209[]
+addresses:REQ-210[]
+addresses:REQ-211[]
+
+traceability:links[]
+--
+
+[#ARC-040, item, role=design, title="Graph diff"]
+--
+`GraphDiff.diffGraphs(prev, next)` compares two graph snapshots by stable item ID, classifying each item as added, removed, or modified without hardcoding any role name.
+A surviving item is `modified` when a compared field (`title`, `content`, `role`, `status`, or `attributes`) differs, and relationship deltas are reported only between surviving items, except `supersedes` history links.
+
+addresses:REQ-212[]
+addresses:REQ-213[]
+addresses:REQ-214[]
+addresses:REQ-215[]
+addresses:REQ-216[]
+addresses:REQ-217[]
+
+traceability:links[]
+--
+
 === AntoraTraceabilityExtension
 
 [#ARC-016, item, role=design, title="Event-driven Antora integration"]

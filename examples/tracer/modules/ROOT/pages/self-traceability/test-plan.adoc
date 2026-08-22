@@ -205,6 +205,38 @@ verifies:REQ-156[]
 traceability:links[]
 --
 
+[#TST-011, item, role=test, title="Supersession Tests"]
+--
+Test file: `test/supersession.test.ts`
+
+Tests requirement supersession: deriving superseded state and successors from the `supersedes` relation, split and merge support, self-supersession and cycle validation errors, advisory stale-link warnings, and that superseded items are excluded from current-item queries and matrices.
+
+verifies:REQ-201[]
+verifies:REQ-202[]
+verifies:REQ-203[]
+verifies:REQ-204[]
+verifies:REQ-205[]
+verifies:REQ-206[]
+verifies:REQ-207[]
+verifies:REQ-211[]
+
+traceability:links[]
+--
+
+[#TST-012, item, role=test, title="Graph Diff Tests"]
+--
+Test file: `test/graph-diff.test.ts`
+
+Tests `diffGraphs`: added/removed/unmodified classification, field-level modification reporting, suppression of removed items' relationships, relationship deltas on surviving items, and that a superseded pair appears as removed plus added with the `supersedes` link.
+
+verifies:REQ-212[]
+verifies:REQ-213[]
+verifies:REQ-214[]
+verifies:REQ-215[]
+
+traceability:links[]
+--
+
 ifdef::ssembler-backend-pdf[]
 == Changelog
 [cols="1,2,2,3"]

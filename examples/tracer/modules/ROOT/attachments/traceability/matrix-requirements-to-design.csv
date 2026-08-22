@@ -84,6 +84,23 @@ REQ-079,REQ-079 — Non-heading elements with IDs are indexed as navigable ancho
 REQ-080,REQ-080 — Item title is extracted from `.title` child element,ARC-032: ARC-032 — Lunr search extension customization for item anchor indexing
 REQ-081,REQ-081 — Heading elements are excluded from item indexing,ARC-032: ARC-032 — Lunr search extension customization for item anchor indexing
 REQ-082,REQ-082 — Item indexing is scoped to article body,ARC-032: ARC-032 — Lunr search extension customization for item anchor indexing
+REQ-201,REQ-201 — A successor declares a supersedes relationship,ARC-039: ARC-039 — Supersession semantics
+REQ-202,REQ-202 — The reverse superseded_by relationship is derivable,ARC-039: ARC-039 — Supersession semantics
+REQ-203,REQ-203 — Superseded state is derived from relationships,ARC-039: ARC-039 — Supersession semantics
+REQ-204,REQ-204 — Invalid supersession structures are rejected,ARC-039: ARC-039 — Supersession semantics
+REQ-205,REQ-205 — Current-state matrices omit superseded items,ARC-039: ARC-039 — Supersession semantics
+REQ-206,REQ-206 — Functional links to superseded items remain visible,ARC-039: ARC-039 — Supersession semantics
+REQ-207,REQ-207 — History links are excluded from review worklists,ARC-039: ARC-039 — Supersession semantics
+REQ-208,REQ-208 — Superseded item blocks link to successors,ARC-039: ARC-039 — Supersession semantics
+REQ-209,REQ-209 — CLI reports supersession impact,ARC-039: ARC-039 — Supersession semantics
+REQ-210,REQ-210 — Supersession checks do not modify source files,ARC-039: ARC-039 — Supersession semantics
+REQ-211,REQ-211 — Validation warns about stale functional links,ARC-039: ARC-039 — Supersession semantics
+REQ-212,REQ-212 — Diff classifies items by stable ID,ARC-040: ARC-040 — Graph diff
+REQ-213,REQ-213 — Modified items report changed fields,ARC-040: ARC-040 — Graph diff
+REQ-214,REQ-214 — Relationship deltas are limited to surviving items,ARC-040: ARC-040 — Graph diff
+REQ-215,REQ-215 — Supersession appears as added and removed,ARC-040: ARC-040 — Graph diff
+REQ-216,"""REQ-216 — Diff is a public, config-agnostic API""",ARC-040: ARC-040 — Graph diff
+REQ-217,REQ-217 — CLI diff is read-only,ARC-040: ARC-040 — Graph diff
 QA-057,QA-057 — Fail-fast with clear diagnostics,ARC-018: ARC-018 — Config-driven validation
 QA-058,QA-058 — No side effects on source files,ARC-015: ARC-015 — In-memory processing with no side effects
 QA-062,QA-062 — Query and indexing performance,
@@ -128,6 +145,7 @@ REQ-196,REQ-196 — Explanation section in navigation,
 REQ-197,REQ-197 — Self-Traceability nav section groups demo pages,
 REQ-198,REQ-198 — Self-Traceability section is visually distinct,
 REQ-199,REQ-199 — Self-Traceability section preserves traceable items,
+REQ-218,REQ-218 — Design concepts address functional requirements,
 REQ-200,REQ-200 — Doc examples validate against the traceability configuration,
 REQ-060,REQ-060 — Pages workflow generates PDFs,ARC-030: ARC-030 — CI/CD PDF build and deployment pipeline
 REQ-061,REQ-061 — Site links to PDF downloads,ARC-030: ARC-030 — CI/CD PDF build and deployment pipeline
@@ -153,5 +171,5 @@ REQ-122,REQ-122 — Process-to-product matrix exists,
 REQ-114,REQ-114 — Dead design-matrix template is removed,
 REQ-115,REQ-115 — Dead MatrixGenerator methods are removed,
 
-Total 153 rows
-Coverage: 64.1%
+Total 171 rows
+Coverage: 67.3%

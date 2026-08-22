@@ -871,6 +871,164 @@ Source: openspec/specs/lunr-item-anchor-indexing/spec.md
 traceability:links[]
 --
 
+=== Supersession
+
+[#REQ-201, item, role=requirement, title="A successor declares a supersedes relationship"]
+--
+When a traceable item replaces another item, the successor SHALL declare a `supersedes` relationship to the predecessor.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]
+--
+
+[#REQ-202, item, role=requirement, title="The reverse superseded_by relationship is derivable"]
+--
+When a successor declares a `supersedes` relationship, the predecessor's `superseded_by` relationship SHALL be derivable from the graph.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]
+--
+
+[#REQ-203, item, role=requirement, title="Superseded state is derived from relationships"]
+--
+An item SHALL be effectively superseded when at least one valid incoming `supersedes` relationship targets it.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]
+--
+
+[#REQ-204, item, role=requirement, title="Invalid supersession structures are rejected"]
+--
+If the supersession graph contains a self-reference, duplicate relationship, or cycle, then validation SHALL report an error.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]
+--
+
+[#REQ-205, item, role=requirement, title="Current-state matrices omit superseded items"]
+--
+When a current-state matrix is generated, the system SHALL omit effectively superseded items from both rows and columns by default.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]
+--
+
+[#REQ-206, item, role=requirement, title="Functional links to superseded items remain visible"]
+--
+When a relationship macro renders a functional relationship targeting a superseded item, the system SHALL retain the relationship and identify it as requiring review, naming every direct successor.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]
+--
+
+[#REQ-207, item, role=requirement, title="History links are excluded from review worklists"]
+--
+Supersession history relationships SHALL NOT be classified as stale functional links.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]
+--
+
+[#REQ-208, item, role=requirement, title="Superseded item blocks link to successors"]
+--
+When a superseded item's source block is rendered, the system SHALL display a superseded marker that links to every direct successor.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]
+--
+
+[#REQ-209, item, role=requirement, title="CLI reports supersession impact"]
+--
+When a supersession check is requested, the CLI SHALL report direct successors and incoming functional relationships requiring review.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]
+--
+
+[#REQ-210, item, role=requirement, title="Supersession checks do not modify source files"]
+--
+When a supersession check is requested, the CLI SHALL NOT modify any source file.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]
+--
+
+[#REQ-211, item, role=requirement, title="Validation warns about stale functional links"]
+--
+When a functional relationship targets an effectively superseded item, validation SHALL emit a non-blocking warning naming the source item, relation type, predecessor, and all direct successors.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]
+--
+
+=== Graph Diff
+
+[#REQ-212, item, role=requirement, title="Diff classifies items by stable ID"]
+--
+When two graph snapshots are compared, the diff SHALL classify each item as added, removed, or modified based on its stable ID.
+
+Source: openspec/specs/graph-diff/spec.md
+
+traceability:links[]
+--
+
+[#REQ-213, item, role=requirement, title="Modified items report changed fields"]
+--
+A surviving item SHALL be reported as modified when its `title`, `content`, `role`, `status`, or `attributes` differs between the snapshots, and the delta SHALL name the changed fields.
+
+Source: openspec/specs/graph-diff/spec.md
+
+traceability:links[]
+--
+
+[#REQ-214, item, role=requirement, title="Relationship deltas are limited to surviving items"]
+--
+The diff SHALL report relationship changes only between items that exist in both snapshots.
+
+Source: openspec/specs/graph-diff/spec.md
+
+traceability:links[]
+--
+
+[#REQ-215, item, role=requirement, title="Supersession appears as added and removed"]
+--
+The diff SHALL NOT attempt content-similarity rename detection.
+A superseded predecessor SHALL appear as removed and its successor as added, with the `supersedes` relationship reported as a new relationship.
+
+Source: openspec/specs/graph-diff/spec.md
+
+traceability:links[]
+--
+
+[#REQ-216, item, role=requirement, title="Diff is a public, config-agnostic API"]
+--
+The diff SHALL be exposed as a public function usable with any configured role or relation vocabulary, without hardcoding any role name.
+
+Source: openspec/specs/graph-diff/spec.md
+
+traceability:links[]
+--
+
+[#REQ-217, item, role=requirement, title="CLI diff is read-only"]
+--
+A `diff` CLI command SHALL scan two source paths, build two graphs, and print the delta without modifying any source file.
+
+Source: openspec/specs/graph-diff/spec.md
+
+traceability:links[]
+--
+
 == Quality Requirements
 
 Quality attributes follow the https://quality.arc42.org/[arc42 Quality Model] format.
@@ -1362,6 +1520,15 @@ traceability:links[]
 --
 The restructuring SHALL NOT move any traceable `[item]` blocks out of their source files.
 All existing requirements (REQ), architecture (ARC), test (TST), use case (UC), and quality (QA) items SHALL remain in their current AsciiDoc files.
+
+Source: openspec/specs/doc-self-traceability/spec.md
+
+traceability:links[]
+--
+
+[#REQ-218, item, role=requirement, title="Design concepts address functional requirements"]
+--
+Every functional requirement (REQ) in the self-traceability example SHALL be addressed by at least one design concept (ARC item) via an `addresses:REQ-NNN[]` link.
 
 Source: openspec/specs/doc-self-traceability/spec.md
 

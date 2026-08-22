@@ -84,6 +84,23 @@ REQ-079,REQ-079 — Non-heading elements with IDs are indexed as navigable ancho
 REQ-080,REQ-080 — Item title is extracted from `.title` child element,
 REQ-081,REQ-081 — Heading elements are excluded from item indexing,
 REQ-082,REQ-082 — Item indexing is scoped to article body,
+REQ-201,REQ-201 — A successor declares a supersedes relationship,TST-011: TST-011 — Supersession Tests
+REQ-202,REQ-202 — The reverse superseded_by relationship is derivable,TST-011: TST-011 — Supersession Tests
+REQ-203,REQ-203 — Superseded state is derived from relationships,TST-011: TST-011 — Supersession Tests
+REQ-204,REQ-204 — Invalid supersession structures are rejected,TST-011: TST-011 — Supersession Tests
+REQ-205,REQ-205 — Current-state matrices omit superseded items,TST-011: TST-011 — Supersession Tests
+REQ-206,REQ-206 — Functional links to superseded items remain visible,TST-011: TST-011 — Supersession Tests
+REQ-207,REQ-207 — History links are excluded from review worklists,TST-011: TST-011 — Supersession Tests
+REQ-208,REQ-208 — Superseded item blocks link to successors,
+REQ-209,REQ-209 — CLI reports supersession impact,
+REQ-210,REQ-210 — Supersession checks do not modify source files,
+REQ-211,REQ-211 — Validation warns about stale functional links,TST-011: TST-011 — Supersession Tests
+REQ-212,REQ-212 — Diff classifies items by stable ID,TST-012: TST-012 — Graph Diff Tests
+REQ-213,REQ-213 — Modified items report changed fields,TST-012: TST-012 — Graph Diff Tests
+REQ-214,REQ-214 — Relationship deltas are limited to surviving items,TST-012: TST-012 — Graph Diff Tests
+REQ-215,REQ-215 — Supersession appears as added and removed,TST-012: TST-012 — Graph Diff Tests
+REQ-216,"""REQ-216 — Diff is a public, config-agnostic API""",
+REQ-217,REQ-217 — CLI diff is read-only,
 QA-057,QA-057 — Fail-fast with clear diagnostics,
 QA-058,QA-058 — No side effects on source files,TST-002: TST-002 — Antora Extension Tests
 QA-062,QA-062 — Query and indexing performance,
@@ -128,6 +145,7 @@ REQ-196,REQ-196 — Explanation section in navigation,
 REQ-197,REQ-197 — Self-Traceability nav section groups demo pages,
 REQ-198,REQ-198 — Self-Traceability section is visually distinct,
 REQ-199,REQ-199 — Self-Traceability section preserves traceable items,
+REQ-218,REQ-218 — Design concepts address functional requirements,
 REQ-200,REQ-200 — Doc examples validate against the traceability configuration,
 REQ-060,REQ-060 — Pages workflow generates PDFs,
 REQ-061,REQ-061 — Site links to PDF downloads,
@@ -153,5 +171,5 @@ REQ-122,REQ-122 — Process-to-product matrix exists,
 REQ-114,REQ-114 — Dead design-matrix template is removed,
 REQ-115,REQ-115 — Dead MatrixGenerator methods are removed,
 
-Total 153 rows
-Coverage: 52.3%
+Total 171 rows
+Coverage: 53.8%
