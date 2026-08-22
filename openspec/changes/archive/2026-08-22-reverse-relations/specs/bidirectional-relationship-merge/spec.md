@@ -1,10 +1,4 @@
-# bidirectional-relationship-merge
-
-## Purpose
-
-Detect complementary directed relationship pairs (e.g., A `leads_to` B and B `is_derived_from` A) and merge them into a single bidirectional edge. Prevents double-counting in coverage stats, false circular-reference warnings, and duplicate edges in Neo4j exports and GraphViz diagrams.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Bidirectional relationship pairs are merged into a single edge
 The system SHALL detect when a newly added relationship is authored with the reverse of an existing relationship's type — the existing edge goes from B to A with a type whose declared `reverse` equals the new edge's type — and SHALL NOT store a second edge. The canonical primary edge is retained with its original metadata (sourceFile, line), and no warning is emitted.
