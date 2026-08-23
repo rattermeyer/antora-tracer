@@ -17,6 +17,12 @@ repos:
         language: node
         files: \.(json)$
 
+      - id: vale-adoc
+        name: vale (AsciiDoc prose lint)
+        entry: vale --config src/vale/.vale.ini
+        language: system
+        files: \.adoc$
+
   # Ensure no large files are committed
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0

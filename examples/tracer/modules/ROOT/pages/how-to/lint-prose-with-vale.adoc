@@ -73,6 +73,15 @@ npx antora antora-playbook.yml
 The extension writes the content catalog to a temporary directory, runs Vale against each page and partial, and reports findings with source file and line references.
 Findings at or above `minLevel` fail the build; findings below are logged.
 
+== Run Vale in pre-commit
+
+The repository's `.pre-commit-config.yaml` runs Vale on staged `.adoc` files with `--config src/vale/.vale.ini`, so prose issues are caught at commit time before the build:
+
+[source,bash]
+----
+pre-commit run vale-adoc --all-files
+----
+
 == Vale vs the source-layout checker
 
 Vale and `check-one-sentence-per-line.js` check different layers:

@@ -24,7 +24,7 @@ Two tsconfig:
 - `tsconfig.json` — production build (`src/` → `lib/`)
 - `tsconfig.test.json` — test build (`src/` + `test/` → `lib/`)
 
-Pre-commit hook: biome lint + format via `pre-commit`.
+Pre-commit hook: biome lint + format and Vale prose lint via `pre-commit`.
 
 ## Commit Convention
 

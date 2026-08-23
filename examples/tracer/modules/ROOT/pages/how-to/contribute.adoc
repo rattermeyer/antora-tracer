@@ -34,7 +34,7 @@ Two TypeScript configurations:
 
 The build script (`scripts/build.js`) copies templates, presets, and CJS extension files to `lib/src/` for npm distribution.
 
-Pre-commit hooks: biome lint + format via `pre-commit`.
+Pre-commit hooks: biome lint + format and Vale prose lint via `pre-commit`.
 
 == Preview the example site
 
