@@ -2555,5 +2555,41 @@ supersedes:REQ-042[]
       expect(out).to.include("REQ-043");
       expect((ext as any).traceability.graph.getItem("REQ-042")).to.exist;
     });
+
+    it("hides superseded item blocks delimited by ==== fences", async () => {
+      const ctx = createMockContext();
+      const ext = new AntoraTraceabilityExtension(ctx as any, {
+        config: { renderSuperseded: false },
+      });
+      await waitForInit();
+
+      const content = `
+[#REQ-042, item, role=requirement, title="Old"]
+====
+Old requirement.
+====
+
+[#REQ-043, item, role=requirement, title="New"]
+====
+New requirement.
+
+supersedes:REQ-042[]
+====
+`;
+      const file = {
+        src: { path: "test.adoc" },
+        contents: Buffer.from(content),
+      };
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [file] : [],
+        },
+      });
+
+      const out = file.contents.toString("utf8");
+      expect(out).to.not.include("REQ-042");
+      expect(out).to.include("REQ-043");
+    });
   });
 });

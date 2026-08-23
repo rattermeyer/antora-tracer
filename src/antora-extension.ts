@@ -1842,7 +1842,7 @@ export class AntoraTraceabilityExtension {
     if (!this.traceability) return content;
     const graph = this.traceability.graph;
     return content.replace(
-      /^\[#([A-Za-z0-9_-]+),\s*item,[^\]]*\]\n--\n[\s\S]*?\n--\n?/gm,
+      /^\[#([A-Za-z0-9_-]+),\s*item,[^\]]*\]\n(--|====)\n[\s\S]*?\n\2\n?/gm,
       (match: string, id: string) => (graph.isSuperseded(id) ? "" : match),
     );
   }

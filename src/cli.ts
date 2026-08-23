@@ -168,7 +168,12 @@ function resolveSourceFilePath(
   if (!sourceFile) {
     throw new Error("Item has no source file recorded");
   }
-  return resolve(process.cwd(), input, sourceFile);
+  const root = resolve(process.cwd(), input);
+  const full = resolve(root, sourceFile);
+  if (full !== root && !full.startsWith(root + sep)) {
+    throw new Error(`Source file escapes input directory: ${sourceFile}`);
+  }
+  return full;
 }
 
 /**
