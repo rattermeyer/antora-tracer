@@ -62,17 +62,22 @@ This pass also runs `injectTitleIds()` (prepends ID to title for visible display
 
 == Graph lifecycle
 
-The traceability graph has a defined lifecycle — understanding which operations are valid in each state explains why pass ordering matters:
+The extension maintains two graphs with distinct lifecycles:
 
-. **Creation**: The extension initializes the graph synchronously in its constructor. Config/preset loading is a synchronous file read.
+* **Working graph** — cleared and rebuilt per component version during `contentClassified`, so xrefs stay version-scoped (REQ-103).
+* **Full graph** — accumulated across all components and versions by merging each version's working graph; the `sitePublished` generation passes (matrices, coverage, overview) read this graph.
 
-. **Population** (Pass 1): Items and relationships are added. Validation runs on each `addRelationship()` call — source exists, target exists, relation allowed by config.
+The working graph's lifecycle:
 
-. **Quiescent** (between Pass 1 and Pass 2): The graph is complete. All items and relationships from all files are loaded. Queries and macro expansion are safe.
+. **Creation**: The extension initializes both graphs synchronously in its constructor. Config/preset loading is a synchronous file read.
 
-. **Macro expansion** (Pass 2/2b/3): The graph is read-only. Macros query the graph to generate output. No new items or relationships are added.
+. **Population** (Pass 1, per version): The working graph is cleared, then items and relationships are added for that version. Validation runs on each `addRelationship()` call. After each version, the working graph is merged into the full graph.
 
-. **Finalization**: Matrices are generated from each version's graph during `contentClassified` and registered in the content catalog as attachments; the standalone output directory is written at `sitePublished`.
+. **Quiescent** (between Pass 1 and Pass 2, within a version): The working graph is complete for that version. Queries and macro expansion are safe.
+
+. **Macro expansion** (Pass 2/2b/3): The working graph is read-only. Macros query it to generate output. No new items or relationships are added.
+
+. **Finalization**: The standalone output directory (matrices, coverage, overview) is written at `sitePublished` from the full graph, so it spans every component and version.
 
 == Component interaction
 

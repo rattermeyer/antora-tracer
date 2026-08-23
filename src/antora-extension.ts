@@ -18,6 +18,7 @@ import { isAbsolute, join } from "node:path";
 import { deflateSync } from "node:zlib";
 import { ConfigLoader, toConfigDot } from "./config/TraceabilityConfig.js";
 import { RequirementsTraceabilityExtension } from "./index.js";
+import { TraceabilityGraph } from "./TraceabilityGraph.js";
 import { LinkResolver } from "./LinkResolver.js";
 import { MatrixGenerator } from "./MatrixGenerator.js";
 
@@ -82,6 +83,7 @@ type RelationDirection = "outgoing" | "incoming";
 
 export class AntoraTraceabilityExtension {
   private traceability: RequirementsTraceabilityExtension | null = null;
+  private fullGraph: TraceabilityGraph | null = null;
   private config: Required<AntoraTraceabilityConfig>;
   private readonly logger: ReturnType<AntoraExtensionContext["getLogger"]>;
 
@@ -134,6 +136,7 @@ export class AntoraTraceabilityExtension {
     // this.traceability being ready before any Antora event fires.
     // Config and preset loading are synchronous file reads — no need for async.
     this.traceability = this.createTraceabilityExtension();
+    this.fullGraph = new TraceabilityGraph(this.traceability.configLoader);
     this.logger.debug("Requirements traceability extension fully initialized");
 
     // Register event handlers after initialization to avoid a race where
@@ -1118,6 +1121,10 @@ export class AntoraTraceabilityExtension {
 
       const htmlStyle = event.playbook?.urls?.html_style;
 
+      // Reset the accumulated full graph — rebuilt below by merging each
+      // version's working graph.
+      this.fullGraph?.clear();
+
       for (const key of allKeys) {
         const [component, version] = key.split("@");
         const pageFilesForVersion = pageGroups.get(key) || [];
@@ -1134,6 +1141,12 @@ export class AntoraTraceabilityExtension {
         }
         for (const file of partialFilesForVersion) {
           this.processAsciiDocFile(file, file.src?.fileUri);
+        }
+
+        // Accumulate this version's items into the full graph used by the
+        // sitePublished generation passes.
+        if (this.fullGraph && this.traceability) {
+          this.fullGraph.merge(this.traceability.graph);
         }
 
         // Duplicate item IDs are merge-time conflicts, not recoverable state.
@@ -1582,19 +1595,18 @@ export class AntoraTraceabilityExtension {
     files: Array<{ fileName: string; content: string }>;
   } {
     const files: Array<{ fileName: string; content: string }> = [];
-    if (!this.traceability) return { matrixNames: [], files };
+    if (!this.traceability || !this.fullGraph)
+      return { matrixNames: [], files };
 
     const matrices =
       this.traceability.configLoader?.getConfig()?.matrices || [];
     const matrixNames =
       matrices.length > 0
         ? matrices.map((m: any) => m.name)
-        : this.generateDefaultMatrixNames(
-            this.traceability.graph.getAllRoles(),
-          );
+        : this.generateDefaultMatrixNames(this.fullGraph!.getAllRoles());
 
     const generator = new MatrixGenerator(
-      this.traceability.graph,
+      this.fullGraph!,
       this.traceability.configLoader,
       {
         linkResolver: new LinkResolver({
@@ -1632,7 +1644,7 @@ export class AntoraTraceabilityExtension {
   }
 
   private generateTraceabilityFiles(event: any): void {
-    if (!this.traceability) {
+    if (!this.traceability || !this.fullGraph) {
       this.logger.warn(
         "Traceability extension not initialized, skipping file generation",
       );
@@ -1644,7 +1656,7 @@ export class AntoraTraceabilityExtension {
       const traceabilityDir = join(outputDir, this.config.outputDir);
       this.logger.info(`Writing traceability files to ${traceabilityDir}`);
       mkdirSync(traceabilityDir, { recursive: true });
-      if (this.traceability.graph.getAllItems().length === 0) {
+      if (this.fullGraph!.getAllItems().length === 0) {
         this.logger.warn(
           "No traceable items found. Skipping matrix generation.",
         );
@@ -1700,16 +1712,16 @@ export class AntoraTraceabilityExtension {
   }
 
   private generateCoverageReport(traceabilityDir: string): void {
-    if (!this.traceability) {
+    if (!this.traceability || !this.fullGraph) {
       this.logger.warn(
         "Traceability extension not initialized, skipping coverage report",
       );
       return;
     }
     try {
-      const stats = this.traceability.graph.getRoleStatistics();
+      const stats = this.fullGraph!.getRoleStatistics();
       const generator = new MatrixGenerator(
-        this.traceability.graph,
+        this.fullGraph!,
         this.traceability.configLoader,
       );
       const coverage = generator.getCoverageReport();
@@ -1805,8 +1817,8 @@ export class AntoraTraceabilityExtension {
   }
 
   private generateOverviewContent(): string {
-    if (!this.traceability) return "";
-    const graph = this.traceability.graph;
+    if (!this.fullGraph) return "";
+    const graph = this.fullGraph;
     const esc = (s: string) =>
       s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 

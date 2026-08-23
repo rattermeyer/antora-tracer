@@ -2491,6 +2491,37 @@ addresses:REQ-999[]
       expect(html).to.include("addresses");
     });
 
+    it("accumulates a full graph across components for generation", async () => {
+      const ctx = createMockContext();
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const fileA = {
+        src: { path: "a.adoc", component: "comp-a", version: "1.0" },
+        contents: Buffer.from(
+          `[#REQ-001, item, role=requirement, title="A"]\n--\nA.\n--\n`,
+        ),
+      };
+      const fileB = {
+        src: { path: "b.adoc", component: "comp-b", version: "1.0" },
+        contents: Buffer.from(
+          `[#REQ-002, item, role=requirement, title="B"]\n--\nB.\n--\n`,
+        ),
+      };
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [fileA, fileB] : [],
+        },
+      });
+
+      const ids = (ext as any).fullGraph
+        .getAllItems()
+        .map((i: any) => i.id)
+        .sort();
+      expect(ids).to.deep.equal(["REQ-001", "REQ-002"]);
+    });
+
     it("hides superseded item blocks when renderSuperseded is false", async () => {
       const ctx = createMockContext();
       const ext = new AntoraTraceabilityExtension(ctx as any, {
