@@ -79,6 +79,10 @@ verifies:REQ-145[]
 verifies:REQ-146[]
 verifies:QA-058[]
 verifies:QA-060[]
+verifies:REQ-163[]
+verifies:REQ-164[]
+verifies:REQ-165[]
+verifies:REQ-166[]
 
 traceability:links[]
 --
@@ -90,6 +94,7 @@ Test file: `test/cli.test.ts`
 Tests the Commander-based CLI — process command (valid content, empty content, invalid paths, malformed macros), matrix command (generation, empty graph), validate command (invalid graph state), export command (empty graph), stats command (empty statistics), preset commands (invalid names, init, listing), help command, and next-id command (sequential ID generation, padding preservation, prefix matching).
 
 verifies:REQ-056[]
+verifies:REQ-150[]
 
 traceability:links[]
 --
@@ -153,6 +158,9 @@ verifies:REQ-167[]
 verifies:REQ-168[]
 verifies:REQ-169[]
 verifies:REQ-178[]
+verifies:REQ-113[]
+verifies:REQ-114[]
+verifies:REQ-115[]
 
 traceability:links[]
 --
@@ -205,6 +213,7 @@ verifies:REQ-152[]
 verifies:REQ-154[]
 verifies:REQ-155[]
 verifies:REQ-156[]
+verifies:REQ-153[]
 
 traceability:links[]
 --
@@ -240,6 +249,7 @@ verifies:REQ-213[]
 verifies:REQ-214[]
 verifies:REQ-225[]
 verifies:REQ-226[]
+verifies:REQ-216[]
 
 traceability:links[]
 --
@@ -269,6 +279,17 @@ verifies:REQ-230[]
 verifies:REQ-231[]
 verifies:REQ-232[]
 verifies:REQ-233[]
+
+traceability:links[]
+--
+
+[#TST-015, item, role=test, title="Documentation Example Validation Tests"]
+--
+Test file: `test/doc-example-validation.test.ts`
+
+Tests that every `[item]` example in the documentation uses known roles and relation types allowed by the traceability configuration.
+
+verifies:REQ-200[]
 
 traceability:links[]
 --

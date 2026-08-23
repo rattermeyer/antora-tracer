@@ -27,10 +27,10 @@ REQ-066,REQ-066 — Incoming macro sort order,TST-002: TST-002 — Antora Extens
 REQ-067,REQ-067 — Incoming groups use the reverse relation type,TST-002: TST-002 — Antora Extension Tests
 REQ-070,REQ-070 — Incoming macro supports collapsible output,TST-002: TST-002 — Antora Extension Tests
 REQ-103,REQ-103 — Graph isolation per component version,TST-002: TST-002 — Antora Extension Tests
-REQ-163,REQ-163 — Incoming macro PDF compatibility,
-REQ-164,REQ-164 — Source file not modified by incoming macro,
-REQ-165,REQ-165 — PDF compatibility,
-REQ-166,REQ-166 — Source file not modified,
+REQ-163,REQ-163 — Incoming macro PDF compatibility,TST-002: TST-002 — Antora Extension Tests
+REQ-164,REQ-164 — Source file not modified by incoming macro,TST-002: TST-002 — Antora Extension Tests
+REQ-165,REQ-165 — PDF compatibility,TST-002: TST-002 — Antora Extension Tests
+REQ-166,REQ-166 — Source file not modified,TST-002: TST-002 — Antora Extension Tests
 REQ-116,REQ-116 — Items carry component and module context from Antora,TST-002: TST-002 — Antora Extension Tests
 REQ-117,REQ-117 — Cross-module and cross-component xref includes correct prefix,TST-002: TST-002 — Antora Extension Tests
 REQ-119,REQ-119 — Cross-module and cross-component xref resolution,TST-002: TST-002 — Antora Extension Tests
@@ -48,7 +48,7 @@ REQ-043,REQ-043 — Non-HTML matrix outputs unchanged,TST-006: TST-006 — Matri
 REQ-128,REQ-128 — Matrix links include module path for module-aware items,TST-006: TST-006 — MatrixGenerator Tests
 REQ-108,REQ-108 — Matrix files registered in the content catalog,TST-002: TST-002 — Antora Extension Tests
 REQ-130,REQ-130 — Matrix links are compatible with Antora indexify URL style,TST-006: TST-006 — MatrixGenerator Tests
-REQ-113,REQ-113 — Matrix template uses partials for structure,
+REQ-113,REQ-113 — Matrix template uses partials for structure,TST-006: TST-006 — MatrixGenerator Tests
 REQ-167,REQ-167 — Matrix renders one status column per row,TST-006: TST-006 — MatrixGenerator Tests
 REQ-168,REQ-168 — Coverage summary remains,TST-006: TST-006 — MatrixGenerator Tests
 REQ-169,REQ-169 — CSV output is unchanged,TST-006: TST-006 — MatrixGenerator Tests
@@ -83,7 +83,7 @@ REQ-139,REQ-139 — query isolated — find items with no relationships,TST-009:
 REQ-227,REQ-227 — query orphaned — find superseded items with no incoming functional links,TST-009: TST-009 — Query Command Tests
 REQ-140,REQ-140 — query path — find the shortest path between two items,TST-009: TST-009 — Query Command Tests
 REQ-141,REQ-141 — JSON output flag,TST-009: TST-009 — Query Command Tests
-REQ-150,REQ-150 — CLI exposes a validate command,
+REQ-150,REQ-150 — CLI exposes a validate command,TST-003: TST-003 — CLI Tests
 REQ-079,REQ-079 — Non-heading elements with IDs are indexed as navigable anchors,
 REQ-080,REQ-080 — Item title is extracted from `.title` child element,
 REQ-081,REQ-081 — Heading elements are excluded from item indexing,
@@ -115,7 +115,7 @@ REQ-213,REQ-213 — Modified items report changed fields,TST-012: TST-012 — Gr
 REQ-214,REQ-214 — Relationship deltas are limited to surviving items,TST-012: TST-012 — Graph Diff Tests
 REQ-225,REQ-225 — The diff does not attempt rename detection,TST-012: TST-012 — Graph Diff Tests
 REQ-226,REQ-226 — A superseded predecessor is reported as removed and its successor as added,TST-012: TST-012 — Graph Diff Tests
-REQ-216,"""REQ-216 — Diff is a public, config-agnostic API""",
+REQ-216,"""REQ-216 — Diff is a public, config-agnostic API""",TST-012: TST-012 — Graph Diff Tests
 REQ-217,REQ-217 — CLI diff is read-only,
 QA-057,QA-057 — Fail-fast with clear diagnostics,
 QA-058,QA-058 — No side effects on source files,TST-002: TST-002 — Antora Extension Tests
@@ -140,7 +140,7 @@ REQ-182,REQ-182 — Assembler packages declared as optional peer dependencies,
 REQ-183,REQ-183 — Assembler configs and adoc-to-docx script are example-site configuration,
 REQ-151,REQ-151 — Vale lints page and partial source content during the build,TST-010: TST-010 — Vale Extension Tests
 REQ-152,REQ-152 — The build gates on a configurable minimum severity,TST-010: TST-010 — Vale Extension Tests
-REQ-153,REQ-153 — The extension reports the Vale configuration source,
+REQ-153,REQ-153 — The extension reports the Vale configuration source,TST-010: TST-010 — Vale Extension Tests
 REQ-154,REQ-154 — Missing executables fail with an actionable message,TST-010: TST-010 — Vale Extension Tests
 REQ-155,REQ-155 — The extension is opt-in,TST-010: TST-010 — Vale Extension Tests
 REQ-156,REQ-156 — Source layout is out of scope,TST-010: TST-010 — Vale Extension Tests
@@ -162,7 +162,7 @@ REQ-197,REQ-197 — Self-Traceability nav section groups demo pages,
 REQ-198,REQ-198 — Self-Traceability section is visually distinct,
 REQ-199,REQ-199 — Self-Traceability section preserves traceable items,
 REQ-218,REQ-218 — Design concepts address functional requirements,
-REQ-200,REQ-200 — Doc examples validate against the traceability configuration,
+REQ-200,REQ-200 — Doc examples validate against the traceability configuration,TST-015: TST-015 — Documentation Example Validation Tests
 REQ-060,REQ-060 — Pages workflow generates PDFs,
 REQ-061,REQ-061 — Site links to PDF downloads,
 REQ-062,REQ-062 — Local PDF workflow is unchanged,
@@ -184,8 +184,8 @@ REQ-107,REQ-107 — usecase-requirements matrix is generated,
 REQ-120,REQ-120 — Process requirements are traceable to product requirements,
 REQ-121,REQ-121 — Process requirements document follows site conventions,
 REQ-122,REQ-122 — Process-to-product matrix exists,
-REQ-114,REQ-114 — Dead design-matrix template is removed,
-REQ-115,REQ-115 — Dead MatrixGenerator methods are removed,
+REQ-114,REQ-114 — Dead design-matrix template is removed,TST-006: TST-006 — MatrixGenerator Tests
+REQ-115,REQ-115 — Dead MatrixGenerator methods are removed,TST-006: TST-006 — MatrixGenerator Tests
 
 Total 187 rows
-Coverage: 57.8%
+Coverage: 63.6%
