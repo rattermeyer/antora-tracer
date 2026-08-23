@@ -1,0 +1,62 @@
+= ADR-013: Pin PDF/assembler extensions to beta.20 for Antora 3.1 compatibility
+:keywords: adr, architecture, decision, pdf, assembler, antora, dependency, version-pin
+
+*Status*: accepted +
+*Deciders*: Richard Attermeyer +
+*Date*: 2026-08-23
+
+== Context and Problem Statement
+
+The example site generates PDF and DOCX output through `@antora/pdf-extension`
+and its peer `@antora/assembler`.
+Both packages are pre-1.0, so a `beta`/`rc` bump is a breaking change despite
+looking semver-compatible.
+
+The `rc.8` release of the assembler (and the matching `pdf-extension` rc) reads
+`contentCatalog.publishableFamilies`, a property that only exists in Antora
+3.2+.
+The project builds with Antora 3.1
+(`@antora/cli@3.1`, `@antora/site-generator@3.1`), so any rc release ≥ rc.8
+fails at runtime against the 3.1 content catalog.
+
+Dependency tooling adds noise: `npm audit` flags `1.0.0-beta.20` as vulnerable
+(transitive `js-yaml`) and suggests `1.0.0-rc.10` as the "fix", which would
+break the build.
+
+== Decision Drivers
+
+* The docs build must keep working on Antora 3.1 until 3.2 is adopted
+* A pre-1.0 version bump must be treated as a breaking change, not a patch
+* The pin and its reason must be discoverable, not buried in a commit message
+
+== Considered Options
+
+* Pin to exact `1.0.0-beta.20` — chosen
+* Allow `^1.0.0-beta.20` (caret range) — rejected: pre-1.0 caret ranges can
+  still resolve to newer betas/rcs and break against 3.1
+* Upgrade to `1.0.0-rc.10` as audit suggests — rejected: requires
+  `contentCatalog.publishableFamilies`, unavailable in Antora 3.1
+* Upgrade Antora to 3.2 now — deferred: larger migration, out of scope
+
+== Decision Outcome
+
+Chosen option: pin both `@antora/pdf-extension` and `@antora/assembler` to the
+exact version `1.0.0-beta.20` in `devDependencies` and in the optional
+`peerDependencies`.
+The wrapper `src/antora-pdf-extension.cjs` carries a comment recording why the
+pin must not be lifted.
+The pin is revisited together with the Antora 3.2 upgrade, which bumps the
+extensions and Antora in one change.
+
+== Positive Consequences
+
+* The PDF/DOCX build is stable on Antora 3.1 and immune to accidental
+  rc resolution
+* The reason for the pin is visible next to the consuming code and in this ADR
+* A future maintainer sees the constraint instead of re-discovering the breakage
+
+== Negative Consequences
+
+* `npm audit` keeps reporting the transitive `js-yaml` issue in beta.20 until
+  Antora 3.2 ships and the pin is lifted
+* The pin is easy to overlook as an outdated version without this record

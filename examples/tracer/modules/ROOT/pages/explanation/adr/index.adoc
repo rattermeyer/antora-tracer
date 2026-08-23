@@ -16,3 +16,4 @@ Each record follows the https://github.com/architecture-decision-record/architec
 * xref:explanation/adr/0010-identity-first-graph-diff.adoc[ADR-010 — Identity-first graph diff over rename detection]
 * xref:explanation/adr/0011-reverse-relations.adoc[ADR-011 — Relations with a mandatory reverse and canonical primary storage]
 * xref:explanation/adr/0012-cli-mutation-boundary.adoc[ADR-012 — CLI owns source mutation; the extension stays read-only]
+* xref:explanation/adr/0013-pin-assembler-beta20-antora31.adoc[ADR-013 — Pin PDF/assembler extensions to beta.20 for Antora 3.1 compatibility]
