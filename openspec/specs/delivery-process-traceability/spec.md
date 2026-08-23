@@ -17,8 +17,8 @@ The example site SHALL include a `delivery-process.adoc` document containing pro
 The example site configuration SHALL define a `process-to-product` matrix with `process_requirement` as rows, `requirement` as columns, and `validates` as the coverage relation.
 
 #### Scenario: Process matrix is generated
-- **WHEN** `run-example.js` is executed
-- **THEN** a `matrix-process-to-product.html` file SHALL be generated
+- **WHEN** the example site is built
+- **THEN** the extension SHALL generate a `matrix-process-to-product.html` file
 - **AND** the matrix SHALL show which process requirements cover which product requirements
 
 ### Requirement: Process requirements document follows site conventions

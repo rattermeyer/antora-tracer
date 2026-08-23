@@ -58,10 +58,6 @@ The system SHALL generate matrix links that resolve correctly regardless of wher
 - **WHEN** matrices are generated during Antora build
 - **THEN** links use `../../` prefix to navigate from `_attachments/traceability/` to component root
 
-#### Scenario: Link generation in CLI context
-- **WHEN** matrices are generated via CLI (run-example.js)
-- **THEN** links use `../../` prefix since matrices are served from the Antora output site
-
 ---
 
 ### Requirement: Source file paths are normalized
