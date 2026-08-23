@@ -101,6 +101,42 @@ describe("Supersession", () => {
     expect(graph.isOrphaned("REQ-043")).to.be.false;
   });
 
+  it("reports dangling references and classifies them by history type", () => {
+    const { graph } = setup();
+    add(graph, "REQ-043", "requirement");
+    add(graph, "ARC-001", "design");
+    graph.addRelationship({
+      id: "r1",
+      fromId: "REQ-043",
+      targetId: "REQ-042",
+      type: "supersedes",
+    });
+    graph.addRelationship({
+      id: "r2",
+      fromId: "ARC-001",
+      targetId: "REQ-999",
+      type: "addresses",
+    });
+
+    expect(
+      graph
+        .getDanglingReferences()
+        .map((r) => r.id)
+        .sort(),
+    ).to.deep.equal(["r1", "r2"]);
+
+    const validation = graph.validate();
+    // Functional dangling reference stays an error.
+    expect(validation.errors.some((e) => e.includes("REQ-999"))).to.be.true;
+    // History dangling reference is advisory, not an error.
+    expect(validation.errors.some((e) => e.includes("REQ-042"))).to.be.false;
+    expect(
+      validation.warnings.some(
+        (w) => w.type === "dangling_link" && w.message.includes("REQ-042"),
+      ),
+    ).to.be.true;
+  });
+
   it("supports splits and merges", () => {
     const { graph } = setup();
     for (const id of ["REQ-041", "REQ-042", "REQ-043", "REQ-044"]) {

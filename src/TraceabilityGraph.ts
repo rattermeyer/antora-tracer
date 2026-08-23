@@ -16,7 +16,7 @@ import { HISTORY_RELATION_TYPES, ROLE_COLORS, SUPERSEDES } from "./types.js";
  * Warning type for graph operations
  */
 export interface GraphWarning {
-  type: "unknown_role" | "invalid_relation" | "duplicate_node" | "stale_link";
+  type: "unknown_role" | "invalid_relation" | "duplicate_node" | "stale_link" | "dangling_link";
   message: string;
   file?: string;
   line?: number;
@@ -415,6 +415,26 @@ export class TraceabilityGraph {
   }
 
   /**
+   * Relationships whose target item no longer exists.
+   */
+  getDanglingReferences(): ItemRelationship[] {
+    const dangling: ItemRelationship[] = [];
+    for (const rel of this._relationships.values()) {
+      if (!this.getItem(rel.targetId)) {
+        dangling.push(rel);
+      }
+    }
+    return dangling;
+  }
+
+  /**
+   * Items that are effectively superseded.
+   */
+  getSupersededItems(): Item[] {
+    return this.getAllItems().filter((item) => this.isSuperseded(item.id));
+  }
+
+  /**
    * Get relationships by type
    */
   getRelationshipsByType(type: string): ItemRelationship[] {
@@ -593,17 +613,26 @@ export class TraceabilityGraph {
       return true;
     });
 
-    // Check for orphaned relationships
+    // Check for orphaned relationships (dangling references)
     for (const rel of this._relationships.values()) {
       const location = rel.sourceFile
         ? ` at ${rel.sourceFile}${rel.line !== undefined ? `:${rel.line}` : ""}`
         : "";
+      const isHistory = HISTORY_RELATION_TYPES.has(rel.type);
       if (!this.getItem(rel.fromId)) {
         const targetItem = this.getItem(rel.targetId);
         const targetDetail = targetItem ? ` (role: ${targetItem.role})` : "";
-        errors.push(
-          `Dangling reference${location}: '${rel.fromId}' declares ${rel.type} -> '${rel.targetId}'${targetDetail} but source '${rel.fromId}' does not exist.`,
-        );
+        const message = `Dangling reference${location}: '${rel.fromId}' declares ${rel.type} -> '${rel.targetId}'${targetDetail} but source '${rel.fromId}' does not exist.`;
+        if (isHistory) {
+          warnings.push({
+            type: "dangling_link",
+            message,
+            file: rel.sourceFile,
+            line: rel.line,
+          });
+        } else {
+          errors.push(message);
+        }
       }
       if (!this.getItem(rel.targetId)) {
         // Build expected target role hint from config
@@ -629,9 +658,17 @@ export class TraceabilityGraph {
           }
         }
         const sourceRole = sourceItem ? ` (role: ${sourceItem.role})` : "";
-        errors.push(
-          `Dangling reference${location}: '${rel.fromId}'${sourceRole} declares ${rel.type} -> '${rel.targetId}' but target '${rel.targetId}' does not exist${expectedRole}.`,
-        );
+        const message = `Dangling reference${location}: '${rel.fromId}'${sourceRole} declares ${rel.type} -> '${rel.targetId}' but target '${rel.targetId}' does not exist${expectedRole}.`;
+        if (isHistory) {
+          warnings.push({
+            type: "dangling_link",
+            message,
+            file: rel.sourceFile,
+            line: rel.line,
+          });
+        } else {
+          errors.push(message);
+        }
       }
     }
 

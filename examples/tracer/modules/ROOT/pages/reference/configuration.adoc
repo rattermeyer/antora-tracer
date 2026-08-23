@@ -72,6 +72,16 @@ antora:
 | boolean
 | `false`
 | When `false` (default), the build fails if two items define the same ID. Set to `true` to log a warning and keep the first definition instead
+
+| `renderSuperseded`
+| boolean
+| `true`
+| When `true` (default), superseded item blocks render with a superseded marker. Set to `false` to omit superseded blocks and their `supersedes` links from rendered output (display-only — the graph and matrices are unaffected)
+
+| `generateOverview`
+| boolean
+| `true`
+| Generate the supersession overview page (totals, per-role statistics, and the dangling-reference worklist) into the output directory
 |===
 
 The `KROKI_SERVER_URL` environment variable overrides the `krokiServerUrl` option.

@@ -78,6 +78,12 @@ Without this attribute, the macro text is stripped from output.
 | Wrap output in collapsible `<details>` sections by relation type (HTML only)
 |===
 
+=== Superseded items
+
+When an item is superseded, its block renders with a `(superseded by <successor>)` marker.
+Set `renderSuperseded: false` in the extension config to omit superseded item blocks and their `supersedes` links from rendered output.
+This is display-only — the graph and matrices are unaffected.
+
 === PDF and DOCX compatibility
 
 The macros generate standard AsciiDoc constructs (xrefs, lists, tables) — compatible with HTML, PDF, and DOCX backends.

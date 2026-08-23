@@ -35,6 +35,8 @@ export interface AntoraTraceabilityConfig {
   krokiImageFormat?: "svg" | "png";
   krokiServerUrl?: string;
   allowDuplicateIds?: boolean;
+  renderSuperseded?: boolean;
+  generateOverview?: boolean;
 }
 
 const DEFAULT_CONFIG: Required<AntoraTraceabilityConfig> = {
@@ -48,6 +50,8 @@ const DEFAULT_CONFIG: Required<AntoraTraceabilityConfig> = {
   krokiImageFormat: "svg",
   krokiServerUrl: "",
   allowDuplicateIds: false,
+  renderSuperseded: true,
+  generateOverview: true,
 };
 
 export interface AntoraExtensionContext {
@@ -107,6 +111,8 @@ export class AntoraTraceabilityExtension {
       krokiImageFormat: rc.krokiImageFormat || rc.krokiimageformat || "svg",
       krokiServerUrl: rc.krokiServerUrl || rc.krokiserverurl || "",
       allowDuplicateIds: rc.allowDuplicateIds ?? rc.allowduplicateids ?? false,
+      renderSuperseded: rc.renderSuperseded ?? rc.rendersuperseded ?? true,
+      generateOverview: rc.generateOverview ?? rc.generateoverview ?? true,
     };
 
     // Fallback: if no configPath is set, try the example site config
@@ -1303,6 +1309,10 @@ export class AntoraTraceabilityExtension {
       // Asciidoctor doesn't treat them as literal blocks.
       let modifiedContent = this.unindentItemMacros(content);
 
+      if (!this.config.renderSuperseded) {
+        modifiedContent = this.stripSupersededBlocks(modifiedContent);
+      }
+
       // Strip inline macros (always invisible)
       modifiedContent = this.substituteRelationshipLinks(modifiedContent);
 
@@ -1557,7 +1567,9 @@ export class AntoraTraceabilityExtension {
   private registerPageProcessor(): void {
     this.context.on("sitePublished", (event: any) => {
       try {
-        if (!this.config.generateMatrices) return;
+        if (!this.config.generateMatrices && !this.config.generateOverview) {
+          return;
+        }
         this.generateTraceabilityFiles(event);
       } catch (error: any) {
         this.logger.error(`Error in sitePublished handler: ${error.message}`);
@@ -1642,12 +1654,22 @@ export class AntoraTraceabilityExtension {
       const { matrixNames, files } = this.generateMatrixFiles(
         event.playbook?.urls?.html_style,
       );
-      for (const { fileName, content } of files) {
-        writeFileSync(join(traceabilityDir, fileName), content, "utf8");
-        this.logger.info(`Generated ${fileName}`);
+      if (this.config.generateMatrices) {
+        for (const { fileName, content } of files) {
+          writeFileSync(join(traceabilityDir, fileName), content, "utf8");
+          this.logger.info(`Generated ${fileName}`);
+        }
+        this.generateCoverageReport(traceabilityDir);
       }
 
-      this.generateCoverageReport(traceabilityDir);
+      if (this.config.generateOverview) {
+        writeFileSync(
+          join(traceabilityDir, "overview.html"),
+          this.generateOverviewContent(),
+          "utf8",
+        );
+        this.logger.info("Generated overview.html");
+      }
       const indexContent = this.generateIndexContent(matrixNames);
       writeFileSync(join(traceabilityDir, "index.html"), indexContent, "utf8");
       this.logger.info("Generated index.html");
@@ -1773,8 +1795,78 @@ export class AntoraTraceabilityExtension {
     `;
   }
 
+  private stripSupersededBlocks(content: string): string {
+    if (!this.traceability) return content;
+    const graph = this.traceability.graph;
+    return content.replace(
+      /^\[#([A-Za-z0-9_-]+),\s*item,[^\]]*\]\n--\n[\s\S]*?\n--\n?/gm,
+      (match: string, id: string) => (graph.isSuperseded(id) ? "" : match),
+    );
+  }
+
+  private generateOverviewContent(): string {
+    if (!this.traceability) return "";
+    const graph = this.traceability.graph;
+    const esc = (s: string) =>
+      s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+    const all = graph.getAllItems();
+    const superseded = graph.getSupersededItems();
+    const supersededIds = new Set(superseded.map((i) => i.id));
+    const activeCount = all.length - supersededIds.size;
+    const roles = graph.getAllRoles().sort();
+
+    const roleRows = roles
+      .map((role) => {
+        const roleAll = all.filter((i) => i.role === role);
+        const roleSup = superseded.filter((i) => i.role === role).length;
+        return `<tr><td>${esc(role)}</td><td>${roleAll.length}</td><td>${
+          roleAll.length - roleSup
+        }</td><td>${roleSup}</td></tr>`;
+      })
+      .join("\n");
+
+    const danglingRows = graph
+      .getDanglingReferences()
+      .map((rel) => {
+        const source = graph.getItem(rel.fromId);
+        const sourceLabel = source
+          ? `${source.id} \u2014 ${source.title}`
+          : rel.fromId;
+        return `<tr><td>${esc(sourceLabel)}</td><td>${esc(rel.type)}</td><td>${esc(rel.targetId)}</td></tr>`;
+      })
+      .join("\n");
+
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supersession Overview</title>
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+.container { max-width: 1000px; margin: 0 auto; }
+h1, h2 { color: #333; }
+.card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; padding: 8px; border-bottom: 1px solid #eee; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Supersession Overview</h1>
+<div class="card"><h2>Totals</h2><table><tr><th>Managed</th><th>Active</th><th>Superseded</th></tr><tr><td>${all.length}</td><td>${activeCount}</td><td>${supersededIds.size}</td></tr></table></div>
+<div class="card"><h2>Per-role statistics</h2><table><tr><th>Role</th><th>Total</th><th>Active</th><th>Superseded</th></tr>${roleRows}</table></div>
+<div class="card"><h2>Dangling references</h2><table><tr><th>Source</th><th>Relation</th><th>Missing target</th></tr>${danglingRows}</table></div>
+</div>
+</body>
+</html>`;
+  }
+
   private generateIndexContent(matrixNames: string[]): string {
     const formats = this.config.matrixFormats;
+    const overviewLink = this.config.generateOverview
+      ? `<li><a href="overview.html">Supersession Overview</a></li>`
+      : "";
     const links = matrixNames
       .flatMap((name) => {
         const safeName = name.replace(/[^a-zA-Z0-9-]/g, "-").toLowerCase();
@@ -1808,7 +1900,7 @@ export class AntoraTraceabilityExtension {
 <body>
   <header><div class="container"><h1>Requirements Traceability</h1></div></header>
   <div class="container">
-    <div class="card"><h2>Traceability Artifacts</h2><p>Browse traceability matrices and reports:</p><ul>${links}</ul></div>
+    <div class="card"><h2>Traceability Artifacts</h2><p>Browse traceability matrices and reports:</p><ul>${overviewLink}${links}</ul></div>
     <footer><p>Antora Requirements Traceability Extension</p></footer>
   </div>
 </body>

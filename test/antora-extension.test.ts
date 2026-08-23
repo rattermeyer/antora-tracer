@@ -2451,4 +2451,78 @@ Description.
       expect(xref).to.equal("xref:other-comp:ROOT:page#ITEM-001[Other Item]");
     });
   });
+
+  describe("supersession overview and render toggle", () => {
+    it("generates overview content with totals, per-role stats, and dangling references", async () => {
+      const ctx = createMockContext();
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const content = `
+[#REQ-042, item, role=requirement, title="Old"]
+--
+Old requirement.
+--
+
+[#REQ-043, item, role=requirement, title="New"]
+--
+New requirement.
+
+supersedes:REQ-042[]
+--
+
+[#ARC-001, item, role=design, title="Dangling Design"]
+--
+addresses:REQ-999[]
+--
+`;
+      const file = { src: { path: "test.adoc" }, contents: Buffer.from(content) };
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [file] : [],
+        },
+      });
+
+      const html = (ext as any).generateOverviewContent();
+      expect(html).to.include("Supersession Overview");
+      expect(html).to.include("<td>3</td><td>2</td><td>1</td>");
+      expect(html).to.include("REQ-999");
+      expect(html).to.include("addresses");
+    });
+
+    it("hides superseded item blocks when renderSuperseded is false", async () => {
+      const ctx = createMockContext();
+      const ext = new AntoraTraceabilityExtension(ctx as any, {
+        config: { renderSuperseded: false },
+      });
+      await waitForInit();
+
+      const content = `
+[#REQ-042, item, role=requirement, title="Old"]
+--
+Old requirement.
+--
+
+[#REQ-043, item, role=requirement, title="New"]
+--
+New requirement.
+
+supersedes:REQ-042[]
+--
+`;
+      const file = { src: { path: "test.adoc" }, contents: Buffer.from(content) };
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [file] : [],
+        },
+      });
+
+      const out = file.contents.toString("utf8");
+      expect(out).to.not.include("REQ-042");
+      expect(out).to.include("REQ-043");
+      expect((ext as any).traceability.graph.getItem("REQ-042")).to.exist;
+    });
+  });
 });
