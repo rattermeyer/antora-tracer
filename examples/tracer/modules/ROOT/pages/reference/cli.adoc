@@ -331,6 +331,52 @@ The command is read-only: it never modifies source files.
 A superseded item is identified by an incoming `supersedes` relationship, not by a `status` attribute.
 History relationships (`supersedes` / `superseded_by`) are excluded from the review list.
 
+== archive
+
+Move a superseded item's block to the module's parallel `superseded.adoc` page.
+The block is removed from its source file and appended to `superseded.adoc` in the same directory, which is created with a heading if missing.
+
+[source,bash]
+----
+npx antora-tracer archive REQ-129
+npx antora-tracer archive REQ-129 -i docs/
+----
+
+[width=100%, cols="25,15,60"]
+|===
+| Option | Type | Description
+
+| `-i, --input <path>`
+| string
+| Input file or directory to scan (default: `.`)
+|===
+
+Only superseded items can be archived — a non-superseded or unknown ID is rejected with no file change.
+
+== remove
+
+Remove an orphaned or isolated item's block from its source file.
+Orphaned items (superseded, no incoming functional links) are removed after a `y/N` confirmation; isolated items (no relationships at all) require typing the item ID verbatim.
+
+[source,bash]
+----
+npx antora-tracer remove REQ-129
+npx antora-tracer remove REQ-129 -i docs/
+----
+
+[width=100%, cols="25,15,60"]
+|===
+| Option | Type | Description
+
+| `-i, --input <path>`
+| string
+| Input file or directory to scan (default: `.`)
+|===
+
+The command previews the block before prompting.
+Any other item (neither orphaned nor isolated) is rejected with no file change.
+Git preserves history, so removal is safe once an item is orphaned.
+
 == diff
 
 Diff two sets of AsciiDoc sources into a traceability delta.
