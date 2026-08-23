@@ -1055,6 +1055,62 @@ Source: openspec/specs/traceable-item-supersession/spec.md
 traceability:links[]
 --
 
+[#REQ-233, item, role=requirement, title="Superseded items and links can be hidden"]
+--
+The system SHALL support a display-only `renderSuperseded` option. When set to false, superseded item blocks and the `supersedes`-related links in their successors SHALL be omitted from rendered output, without affecting the graph or matrices.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]
+--
+
+[#REQ-234, item, role=requirement, title="Dangling history links are advisory"]
+--
+A dangling link whose type is `supersedes` or `superseded_by` SHALL be reported as an advisory worklist item, not a validation error. A dangling link of any other type SHALL remain a validation error.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]
+--
+
+=== Supersession Overview
+
+[#REQ-229, item, role=requirement, title="Overview page generation is opt-in and configurable"]
+--
+When the extension is configured with an overview target, the system SHALL generate an overview page reporting supersession statistics and dangling references.
+
+Source: openspec/specs/supersession-overview/spec.md
+
+traceability:links[]
+--
+
+[#REQ-230, item, role=requirement, title="Overview page reports graph totals"]
+--
+The overview page SHALL report the number of managed items, the number of active items, and the number of superseded items.
+
+Source: openspec/specs/supersession-overview/spec.md
+
+traceability:links[]
+--
+
+[#REQ-231, item, role=requirement, title="Overview page reports per-role statistics"]
+--
+The overview page SHALL report a per-role table with columns role, total, active, and superseded.
+
+Source: openspec/specs/supersession-overview/spec.md
+
+traceability:links[]
+--
+
+[#REQ-232, item, role=requirement, title="Overview page lists dangling references"]
+--
+The overview page SHALL list every dangling reference — a link whose target item does not exist — showing the source item as an xref, the relation type, and the missing target ID.
+
+Source: openspec/specs/supersession-overview/spec.md
+
+traceability:links[]
+--
+
 === Graph Diff
 
 [#REQ-212, item, role=requirement, title="Diff classifies items by stable ID"]

@@ -871,6 +871,36 @@ REQ-211,REQ-211 — Validation warns about stale functional links,requirement,,r
 Source: openspec/specs/traceable-item-supersession/spec.md
 
 traceability:links[]"""
+REQ-233,REQ-233 — Superseded items and links can be hidden,requirement,,requirements.adoc,"""The system SHALL support a display-only `renderSuperseded` option. When set to false, superseded item blocks and the `supersedes`-related links in their successors SHALL be omitted from rendered output, without affecting the graph or matrices.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]"""
+REQ-234,REQ-234 — Dangling history links are advisory,requirement,,requirements.adoc,"""A dangling link whose type is `supersedes` or `superseded_by` SHALL be reported as an advisory worklist item, not a validation error. A dangling link of any other type SHALL remain a validation error.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]"""
+REQ-229,REQ-229 — Overview page generation is opt-in and configurable,requirement,,requirements.adoc,"""When the extension is configured with an overview target, the system SHALL generate an overview page reporting supersession statistics and dangling references.
+
+Source: openspec/specs/supersession-overview/spec.md
+
+traceability:links[]"""
+REQ-230,REQ-230 — Overview page reports graph totals,requirement,,requirements.adoc,"""The overview page SHALL report the number of managed items, the number of active items, and the number of superseded items.
+
+Source: openspec/specs/supersession-overview/spec.md
+
+traceability:links[]"""
+REQ-231,REQ-231 — Overview page reports per-role statistics,requirement,,requirements.adoc,"""The overview page SHALL report a per-role table with columns role, total, active, and superseded.
+
+Source: openspec/specs/supersession-overview/spec.md
+
+traceability:links[]"""
+REQ-232,REQ-232 — Overview page lists dangling references,requirement,,requirements.adoc,"""The overview page SHALL list every dangling reference — a link whose target item does not exist — showing the source item as an xref, the relation type, and the missing target ID.
+
+Source: openspec/specs/supersession-overview/spec.md
+
+traceability:links[]"""
 REQ-212,REQ-212 — Diff classifies items by stable ID,requirement,,requirements.adoc,"""When two graph snapshots are compared, the diff SHALL classify each item as added, removed, or modified based on its stable ID.
 
 Source: openspec/specs/graph-diff/spec.md

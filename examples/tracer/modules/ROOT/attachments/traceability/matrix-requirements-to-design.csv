@@ -100,6 +100,12 @@ REQ-208,REQ-208 — Superseded item blocks link to successors,ARC-039: ARC-039 �
 REQ-209,REQ-209 — CLI reports supersession impact,ARC-039: ARC-039 — Supersession semantics
 REQ-210,REQ-210 — Supersession checks do not modify source files,ARC-039: ARC-039 — Supersession semantics
 REQ-211,REQ-211 — Validation warns about stale functional links,ARC-039: ARC-039 — Supersession semantics
+REQ-233,REQ-233 — Superseded items and links can be hidden,
+REQ-234,REQ-234 — Dangling history links are advisory,
+REQ-229,REQ-229 — Overview page generation is opt-in and configurable,
+REQ-230,REQ-230 — Overview page reports graph totals,
+REQ-231,REQ-231 — Overview page reports per-role statistics,
+REQ-232,REQ-232 — Overview page lists dangling references,
 REQ-212,REQ-212 — Diff classifies items by stable ID,ARC-040: ARC-040 — Graph diff
 REQ-213,REQ-213 — Modified items report changed fields,ARC-040: ARC-040 — Graph diff
 REQ-214,REQ-214 — Relationship deltas are limited to surviving items,ARC-040: ARC-040 — Graph diff
@@ -177,5 +183,5 @@ REQ-122,REQ-122 — Process-to-product matrix exists,
 REQ-114,REQ-114 — Dead design-matrix template is removed,
 REQ-115,REQ-115 — Dead MatrixGenerator methods are removed,
 
-Total 177 rows
-Coverage: 67.2%
+Total 183 rows
+Coverage: 65.0%
