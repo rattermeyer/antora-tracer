@@ -21,6 +21,7 @@ import { RequirementsTraceabilityExtension } from "./index.js";
 import { TraceabilityGraph } from "./TraceabilityGraph.js";
 import { LinkResolver } from "./LinkResolver.js";
 import { MatrixGenerator } from "./MatrixGenerator.js";
+import type { Item } from "./types.js";
 
 /**
  * Antora Extension Configuration
@@ -1851,6 +1852,14 @@ export class AntoraTraceabilityExtension {
     const graph = this.fullGraph;
     const esc = (s: string) =>
       s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const linkResolver = new LinkResolver({
+      relativePathPrefix: "../../",
+      indexify: true,
+    });
+    const itemLink = (item: Item | undefined, label: string): string => {
+      if (!item?.sourceFile) return esc(label);
+      return `<a href="${esc(linkResolver.generateItemLink(item))}">${esc(label)}</a>`;
+    };
 
     const all = graph.getAllItems();
     const superseded = graph.getSupersededItems();
@@ -1868,14 +1877,20 @@ export class AntoraTraceabilityExtension {
       })
       .join("\n");
 
+    const supersededRows = superseded
+      .slice()
+      .sort((a, b) => a.id.localeCompare(b.id))
+      .map(
+        (item) =>
+          `<tr><td>${itemLink(item, item.id)}</td><td>${esc(item.title)}</td></tr>`,
+      )
+      .join("\n");
+
     const danglingRows = graph
       .getDanglingReferences()
       .map((rel) => {
         const source = graph.getItem(rel.fromId);
-        const sourceLabel = source
-          ? `${source.id} \u2014 ${source.title}`
-          : rel.fromId;
-        return `<tr><td>${esc(sourceLabel)}</td><td>${esc(rel.type)}</td><td>${esc(rel.targetId)}</td></tr>`;
+        return `<tr><td>${itemLink(source, rel.fromId)}</td><td>${esc(rel.type)}</td><td>${esc(rel.targetId)}</td></tr>`;
       })
       .join("\n");
 
@@ -1883,7 +1898,7 @@ export class AntoraTraceabilityExtension {
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Supersession Overview</title>
+<title>Traceability Overview</title>
 <style>
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
 .container { max-width: 1000px; margin: 0 auto; }
@@ -1895,9 +1910,10 @@ th, td { text-align: left; padding: 8px; border-bottom: 1px solid #eee; }
 </head>
 <body>
 <div class="container">
-<h1>Supersession Overview</h1>
+<h1>Traceability Overview</h1>
 <div class="card"><h2>Totals</h2><table><tr><th>Managed</th><th>Active</th><th>Superseded</th></tr><tr><td>${all.length}</td><td>${activeCount}</td><td>${supersededIds.size}</td></tr></table></div>
 <div class="card"><h2>Per-role statistics</h2><table><tr><th>Role</th><th>Total</th><th>Active</th><th>Superseded</th></tr>${roleRows}</table></div>
+<div class="card"><h2>Superseded items</h2><table><tr><th>ID</th><th>Title</th></tr>${supersededRows}</table></div>
 <div class="card"><h2>Dangling references</h2><table><tr><th>Source</th><th>Relation</th><th>Missing target</th></tr>${danglingRows}</table></div>
 </div>
 </body>
@@ -1907,7 +1923,7 @@ th, td { text-align: left; padding: 8px; border-bottom: 1px solid #eee; }
   private generateIndexContent(matrixNames: string[]): string {
     const formats = this.config.matrixFormats;
     const overviewLink = this.config.generateOverview
-      ? `<li><a href="overview.html">Supersession Overview</a></li>`
+      ? `<li><a href="overview.html">Traceability Overview</a></li>`
       : "";
     const links = matrixNames
       .flatMap((name) => {

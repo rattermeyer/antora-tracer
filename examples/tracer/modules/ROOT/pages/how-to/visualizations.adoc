@@ -128,8 +128,8 @@ This works for air-gapped environments and avoids external network dependencies.
 
 == Generated overview page
 
-In addition to the per-page macros, the extension generates a supersession overview into the output directory (`traceability/overview.html` by default), linked from the traceability dashboard `index.html`.
-The page reports managed/active/superseded totals, a per-role table, and a dangling-reference worklist (links whose target item no longer exists).
+In addition to the per-page macros, the extension generates a traceability overview into the output directory (`traceability/overview.html` by default), linked from the traceability dashboard `index.html`.
+The page reports managed/active/superseded totals, a per-role table, a superseded-items list with links, and a dangling-reference worklist (links whose target item no longer exists).
 
 The overview is also registered as a site attachment at `overviewTarget` (default `traceability/overview.html`), so it is navigable via `xref:attachment$traceability/overview.html[]`.
 Disable it with `generateOverview: false` in the extension config.

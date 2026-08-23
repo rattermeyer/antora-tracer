@@ -2485,7 +2485,7 @@ addresses:REQ-999[]
       });
 
       const html = (ext as any).generateOverviewContent();
-      expect(html).to.include("Supersession Overview");
+      expect(html).to.include("Traceability Overview");
       expect(html).to.include("<td>3</td><td>2</td><td>1</td>");
       expect(html).to.include("REQ-999");
       expect(html).to.include("addresses");

@@ -44,7 +44,7 @@
 ** xref:self-traceability/dashboard.adoc[Dashboard]
 * Traceability
 ** xref:traceability/index.adoc[Overview]
-** xref:attachment$traceability/overview.html[Supersession Overview]
+** xref:attachment$traceability/overview.html[Traceability Overview]
 ** xref:attachment$traceability/matrix-usecases-to-requirements.html[UC → Req]
 ** xref:attachment$traceability/matrix-requirements-to-design.html[Req → Design]
 ** xref:attachment$traceability/matrix-requirements-to-tests.html[Req → Tests]

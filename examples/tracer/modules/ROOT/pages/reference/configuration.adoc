@@ -81,7 +81,7 @@ antora:
 | `generateOverview`
 | boolean
 | `true`
-| Generate the supersession overview page (totals, per-role statistics, and the dangling-reference worklist) into the output directory
+| Generate the traceability overview page (totals, per-role statistics, a superseded-items list, and the dangling-reference worklist) into the output directory
 
 | `overviewTarget`
 | string
