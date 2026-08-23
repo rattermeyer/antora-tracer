@@ -326,8 +326,7 @@ traceability:links[]
 
 [#REQ-103, item, role=requirement, title="Graph isolation per component version"]
 --
-When building a site with multiple component versions, relationship macro expansion SHALL be scoped per version.
-Items from one component version SHALL NOT appear in xrefs generated for pages in a different component version.
+Relationship macro expansion SHALL produce xrefs only to items in the same component version as the enclosing page.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 

@@ -158,7 +158,7 @@ The system SHALL support a `:traceability-collapsible:` document attribute that,
 ---
 
 ### Requirement: Graph isolation per component version
-When building a site with multiple component versions, relationship macro expansion SHALL be scoped per version. Items from one component version SHALL NOT appear in xrefs generated for pages in a different component version.
+Relationship macro expansion SHALL produce xrefs only to items in the same component version as the enclosing page.
 
 #### Scenario: Cross-version xref is not generated
 - **WHEN** a site is built with two component versions (`v0.10.x` and `v0.11.x`)
