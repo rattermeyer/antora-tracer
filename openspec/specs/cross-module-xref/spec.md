@@ -30,7 +30,7 @@ When processing `.adoc` files through the Antora extension, the system SHALL sto
 ---
 
 ### Requirement: Cross-module and cross-component xref includes correct prefix
-When `buildXref` generates an Antora xref for an item in a different module or component than the current page, the system SHALL include the appropriate prefix matching Antora's xref resolution hierarchy: `component:module:` for cross-component, `module:` for cross-module, and no prefix for same-module.
+When `buildXref` generates an Antora xref for an item in a different module or component than the current page, the system SHALL include the correct Antora xref prefix: `component:module:` for cross-component, `module:` for cross-module, and no prefix for same-module.
 
 #### Scenario: Same-module xref has no prefix
 - **WHEN** `buildXref` is called for a target item with `component: "tracer"`, `module: "ROOT"` and the current page is also in component `tracer`, module `ROOT`

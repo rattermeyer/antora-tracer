@@ -37,7 +37,7 @@ When an item authors a relationship using a reverse type, the graph SHALL store 
 - **THEN** the stored edge SHALL be `UC-001 → REQ-001 : leads_to`
 
 ### Requirement: Reverse direction is derived for validation
-`isRelationAllowed` SHALL allow a relation type that is the reverse of a relation declared in the opposite role direction, without an explicit `relations` entry for that direction.
+The system SHALL allow a relation type that is the reverse of a relation declared in the opposite role direction, without an explicit `relations` entry for that direction.
 
 #### Scenario: Reverse type passes validation without a second declaration
 - **WHEN** config declares only `relations.use_case.requirement.leads_to.reverse = is_derived_from`
