@@ -272,13 +272,14 @@ traceability:links[]
 --
 Test file: `test/antora-extension.test.ts` (supersession overview and render toggle)
 
-Tests the generated supersession overview content — totals, per-role statistics, and the dangling-reference worklist — and the display-only `renderSuperseded` toggle that omits superseded item blocks from rendered output without affecting the graph.
+Tests the generated supersession overview content — totals, per-role statistics, and the dangling-reference worklist — the display-only `renderSuperseded` toggle that omits superseded item blocks from rendered output without affecting the graph, and the full-graph accumulation across components used by the generation passes.
 
 verifies:REQ-229[]
 verifies:REQ-230[]
 verifies:REQ-231[]
 verifies:REQ-232[]
 verifies:REQ-233[]
+verifies:REQ-239[]
 
 traceability:links[]
 --

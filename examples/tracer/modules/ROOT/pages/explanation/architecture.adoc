@@ -367,6 +367,16 @@ addresses:REQ-233[]
 traceability:links[]
 --
 
+[#ARC-045, item, role=design, title="Full graph for generation, working graph for xrefs"]
+--
+The extension keeps two graphs: a working graph cleared per component version for version-scoped xref generation (REQ-103), and an accumulated full graph merged after each version and read by the `sitePublished` generation passes.
+This split resolves the conflict between per-version xref isolation and full-site matrix/overview generation.
+
+addresses:REQ-239[]
+
+traceability:links[]
+--
+
 [#ARC-024, item, role=design, title="traceability:links[] and traceability:incoming[] link rendering"]
 --
 The `expandRelationMacros()` method in the Antora extension (not the

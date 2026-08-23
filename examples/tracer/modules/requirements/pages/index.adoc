@@ -1149,6 +1149,17 @@ Source: openspec/specs/item-lifecycle/spec.md
 traceability:links[]
 --
 
+=== Graph Lifecycle
+
+[#REQ-239, item, role=requirement, title="Generation passes use the complete graph across all components and versions"]
+--
+When the extension generates matrices, coverage, and the supersession overview at `sitePublished`, it SHALL use a graph containing every item from every component and version of the site.
+
+Source: openspec/specs/graph-lifecycle/spec.md
+
+traceability:links[]
+--
+
 === Graph Diff
 
 [#REQ-212, item, role=requirement, title="Diff classifies items by stable ID"]

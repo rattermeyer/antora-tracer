@@ -921,6 +921,11 @@ REQ-238,REQ-238 — Block extent is detected before mutation,requirement,,requir
 Source: openspec/specs/item-lifecycle/spec.md
 
 traceability:links[]"""
+REQ-239,REQ-239 — Generation passes use the complete graph across all components and versions,requirement,,requirements.adoc,"""When the extension generates matrices, coverage, and the supersession overview at `sitePublished`, it SHALL use a graph containing every item from every component and version of the site.
+
+Source: openspec/specs/graph-lifecycle/spec.md
+
+traceability:links[]"""
 REQ-212,REQ-212 — Diff classifies items by stable ID,requirement,,requirements.adoc,"""When two graph snapshots are compared, the diff SHALL classify each item as added, removed, or modified based on its stable ID.
 
 Source: openspec/specs/graph-diff/spec.md
@@ -1596,6 +1601,12 @@ The graph and matrices are unaffected — superseded items remain in the graph f
 addresses:REQ-233[]
 
 traceability:links[]"""
+ARC-045,"""ARC-045 — Full graph for generation, working graph for xrefs""",design,,explanation/architecture.adoc,"""The extension keeps two graphs: a working graph cleared per component version for version-scoped xref generation (REQ-103), and an accumulated full graph merged after each version and read by the `sitePublished` generation passes.
+This split resolves the conflict between per-version xref isolation and full-site matrix/overview generation.
+
+addresses:REQ-239[]
+
+traceability:links[]"""
 ARC-024,ARC-024 — traceability:links[] and traceability:incoming[] link rendering,design,,explanation/architecture.adoc,"""The `expandRelationMacros()` method in the Antora extension (not the
 DocumentParser) replaces `traceability:links[]` and
 `traceability:incoming[]` placeholders with formatted AsciiDoc content
@@ -2249,13 +2260,14 @@ verifies:REQ-238[]
 traceability:links[]"""
 TST-014,TST-014 — Supersession Overview and Render Toggle Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/antora-extension.test.ts` (supersession overview and render toggle)
 
-Tests the generated supersession overview content — totals, per-role statistics, and the dangling-reference worklist — and the display-only `renderSuperseded` toggle that omits superseded item blocks from rendered output without affecting the graph.
+Tests the generated supersession overview content — totals, per-role statistics, and the dangling-reference worklist — the display-only `renderSuperseded` toggle that omits superseded item blocks from rendered output without affecting the graph, and the full-graph accumulation across components used by the generation passes.
 
 verifies:REQ-229[]
 verifies:REQ-230[]
 verifies:REQ-231[]
 verifies:REQ-232[]
 verifies:REQ-233[]
+verifies:REQ-239[]
 
 traceability:links[]"""
 TST-015,TST-015 — Documentation Example Validation Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/doc-example-validation.test.ts`

@@ -110,6 +110,7 @@ REQ-235,REQ-235 — archive moves a superseded item to the module's superseded p
 REQ-236,REQ-236 — remove deletes an orphaned item,ARC-044: ARC-044 — Item lifecycle CLI: archive and remove
 REQ-237,REQ-237 — remove deletes an isolated item with a stronger confirmation,ARC-044: ARC-044 — Item lifecycle CLI: archive and remove
 REQ-238,REQ-238 — Block extent is detected before mutation,ARC-044: ARC-044 — Item lifecycle CLI: archive and remove
+REQ-239,REQ-239 — Generation passes use the complete graph across all components and versions,"ARC-045: ARC-045 — Full graph for generation, working graph for xrefs"
 REQ-212,REQ-212 — Diff classifies items by stable ID,ARC-040: ARC-040 — Graph diff
 REQ-213,REQ-213 — Modified items report changed fields,ARC-040: ARC-040 — Graph diff
 REQ-214,REQ-214 — Relationship deltas are limited to surviving items,ARC-040: ARC-040 — Graph diff
@@ -187,5 +188,5 @@ REQ-122,REQ-122 — Process-to-product matrix exists,
 REQ-114,REQ-114 — Dead design-matrix template is removed,
 REQ-115,REQ-115 — Dead MatrixGenerator methods are removed,
 
-Total 187 rows
-Coverage: 70.1%
+Total 188 rows
+Coverage: 70.2%

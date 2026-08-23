@@ -110,6 +110,7 @@ REQ-235,REQ-235 — archive moves a superseded item to the module's superseded p
 REQ-236,REQ-236 — remove deletes an orphaned item,TST-013: TST-013 — Item Lifecycle Tests
 REQ-237,REQ-237 — remove deletes an isolated item with a stronger confirmation,TST-013: TST-013 — Item Lifecycle Tests
 REQ-238,REQ-238 — Block extent is detected before mutation,TST-013: TST-013 — Item Lifecycle Tests
+REQ-239,REQ-239 — Generation passes use the complete graph across all components and versions,TST-014: TST-014 — Supersession Overview and Render Toggle Tests
 REQ-212,REQ-212 — Diff classifies items by stable ID,TST-012: TST-012 — Graph Diff Tests
 REQ-213,REQ-213 — Modified items report changed fields,TST-012: TST-012 — Graph Diff Tests
 REQ-214,REQ-214 — Relationship deltas are limited to surviving items,TST-012: TST-012 — Graph Diff Tests
@@ -187,5 +188,5 @@ REQ-122,REQ-122 — Process-to-product matrix exists,
 REQ-114,REQ-114 — Dead design-matrix template is removed,TST-006: TST-006 — MatrixGenerator Tests
 REQ-115,REQ-115 — Dead MatrixGenerator methods are removed,TST-006: TST-006 — MatrixGenerator Tests
 
-Total 187 rows
-Coverage: 63.6%
+Total 188 rows
+Coverage: 63.8%
