@@ -99,15 +99,7 @@ They appear in the traceability graph and Neo4j export.
 When an item replaces another, the successor declares a `supersedes` relationship — no `status` attribute is needed.
 Superseded items leave current matrices and render a `(superseded by ...)` marker.
 
-Once a superseded item has no incoming functional links, it is *orphaned* and can be moved or removed:
-
-[source,bash]
-----
-npx antora-tracer archive REQ-129   <1>
-npx antora-tracer remove REQ-129    <2>
-----
-<1> Moves the block to the module's `superseded.adoc` page
-<2> Deletes the block after confirmation (git preserves history)
+For the full lifecycle — re-pointing links, archiving, and removing — see xref:how-to/supersede-items.adoc[How to Supersede an Item].
 
 == Display relationships in rendered output
 

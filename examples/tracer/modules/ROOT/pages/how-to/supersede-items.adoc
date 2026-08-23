@@ -1,0 +1,84 @@
+= How to Supersede an Item
+:description: Replace a traceable item with a successor, re-point its links, and retire the old block with the antora-tracer CLI
+:keywords: antora, asciidoc, traceability, supersede, archive, remove, orphaned
+:toc: macro
+
+toc::[]
+
+When an item is replaced, you supersede it rather than editing it in place.
+The graph keeps the full history: the old item stays traceable, current matrices drop it, and a `(superseded by ...)` marker links to the successor.
+
+== Declare the successor
+
+In the new item's block, declare a `supersedes` relationship to the item it replaces:
+
+[source,asciidoc]
+----
+[#REQ-043, item, role=requirement, title="Authenticate users"]
+--
+The system SHALL ...
+
+supersedes:REQ-042[]
+----
+
+The old item's superseded state is derived from this relationship — do not add a `status` attribute.
+
+== Find what still points at the old item
+
+Anything that still references the old item needs attention:
+
+[source,bash]
+----
+npx antora-tracer query reverse REQ-042
+npx antora-tracer supersession check REQ-042
+----
+
+The check names the successor and every functional link that still targets the old item.
+
+== Re-point or supersede the referrers
+
+For each referrer, either:
+
+- *Re-point it* to the successor when the relationship is unaffected, or
+- *Supersede it too* when the referrer is itself obsolete.
+
+Edit the source blocks accordingly, then rebuild.
+
+== Confirm the old item is orphaned
+
+Once nothing functional points at the old item, `query orphaned` lists it as safe to retire:
+
+[source,bash]
+----
+npx antora-tracer query orphaned
+----
+
+== Archive the old block (optional)
+
+Move the old block out of the main flow to the module's `superseded.adoc` page:
+
+[source,bash]
+----
+npx antora-tracer archive REQ-042
+----
+
+Only superseded items can be archived.
+
+== Remove the old block
+
+When you are done with the record, delete it:
+
+[source,bash]
+----
+npx antora-tracer remove REQ-042
+----
+
+`remove` confirms before deleting an orphaned item.
+Git preserves the history.
+
+== Related
+
+- xref:reference/cli.adoc[CLI Reference] — `archive`, `remove`, and `supersession check`
+- xref:reference/item-macro.adoc[Item Macro Reference] — the `supersedes` relationship
+- xref:how-to/query-graph.adoc[How to Query the Graph] — `query reverse` and `query orphaned`
+- xref:explanation/adr/0009-supersede-not-mutate.adoc[ADR-009] — why items are superseded, never mutated
