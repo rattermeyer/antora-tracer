@@ -5,7 +5,7 @@ description: Release antora-tracer — mechanically bump the npm version AND the
 
 # Publish a Release
 
-Releasing `antora-tracer` touches **three files**, a git tag, and a docs build
+Releasing `antora-tracer` touches **four files**, a git tag, and a docs build
 ref. `npm publish` alone covers none of the version plumbing correctly. This
 skill makes the agent perform the mechanical edits — do not just tell the user
 to do them.
@@ -20,6 +20,7 @@ uses the `edit` tool on each:
 | `package.json` | `"version": "0.19.0"` |
 | `examples/tracer/antora.yml` | `version: 0.19`, and remove `prerelease: '-wip'` for the stable release |
 | `antora-playbook-ci.yml` | content sources → `branches: ['main', 'v0.19.0']` |
+| `CHANGELOG.md` | new `## [0.19.0] — <date>` entry at the top (see below) |
 
 **Version mapping (no exceptions):**
 
@@ -34,6 +35,45 @@ uses the `edit` tool on each:
 `version: 0.13` + `prerelease: '-wip'` since release `v0.16.0`, while npm
 reached `0.19.0`. The component version never got bumped because `npm version`
 only touches `package.json`. Never skip the antora.yml edit.
+
+## Changelog
+
+Write or extend `CHANGELOG.md` (Keep a Changelog style) as part of the
+release. This is mechanical too — the agent derives the entries, not the user.
+
+1. List changes since the previous tag:
+
+   ```bash
+   git log v0.18.0..HEAD --oneline
+   ```
+
+2. Group each conventional-commit message into one of the changelog sections
+   and write a plain sentence per bullet (drop the type/scope prefix):
+
+   | Commit type | Section |
+   |-------------|---------|
+   | `feat` | `### Added` |
+   | `fix` | `### Fixed` |
+   | behavior change / `refactor` | `### Changed` |
+   | removal | `### Removed` |
+
+   `chore`, `docs`, `test`, `ci`, and `style` commits are usually omitted from
+   the changelog unless user-visible.
+
+3. Format — new entry at the top, date as `YYYY-MM-DD`:
+
+   ```markdown
+   ## [0.19.0] — 2026-08-19
+
+   ### Added
+   - ...
+
+   ### Changed
+   - ...
+
+   ### Fixed
+   - ...
+   ```
 
 ## What the docs build
 
@@ -69,12 +109,12 @@ npm run build && npm test && npm run lint
 git status --short          # must be empty
 ```
 
-2. Agent edits the three files above (mechanically, exact values).
-3. Commit both version files together, then tag:
+2. Agent edits the four files above (mechanically, exact values).
+3. Commit the version files and changelog together, then tag:
 
 ```bash
-# 3. Single commit: package.json + antora.yml (playbook change can join or follow)
-git add package.json package-lock.json examples/tracer/antora.yml antora-playbook-ci.yml
+# 3. Single commit: package.json + antora.yml + CHANGELOG.md (playbook can join or follow)
+git add package.json package-lock.json examples/tracer/antora.yml CHANGELOG.md antora-playbook-ci.yml
 git commit -m "chore(release): v0.19.0"
 
 # 4. Tag on that commit (must NOT precede the antora.yml edit)
