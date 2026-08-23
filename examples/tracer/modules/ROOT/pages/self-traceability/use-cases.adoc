@@ -318,7 +318,7 @@ traceability:links[]
 . *The target ID does not exist:* The command exits 1 with an "Item not found" warning. Developer verifies the ID spelling or confirms the item was already removed.
 . *Developer needs machine-readable output:* Developer adds `--json` for structured output consumable by scripts or AI coding agents.
 . *Developer needs the chain between two specific items:* Developer runs `query path <from> <to>`. The shortest relationship path prints, or the command exits 1 with "No path found".
-. *Developer wants to find items with no relationships:* Developer runs `query orphaned`, optionally filtered with `--role`.
+. *Developer wants to find items with no relationships:* Developer runs `query isolated`, optionally filtered with `--role`.
 . *Developer wants to limit the search:* Developer passes `-i <path>` to scan a specific directory or file instead of the current directory.
 | Postconditions | The developer has identified every item that references the target And no Antora build was required And no source files were modified (query is read-only) And the change can proceed with all referencing items accounted for
 | Priority | Medium

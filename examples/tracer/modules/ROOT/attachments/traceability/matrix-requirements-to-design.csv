@@ -79,7 +79,8 @@ REQ-056,REQ-056 — CLI next-id command returns next available ID,ARC-023: ARC-0
 REQ-136,REQ-136 — CLI exposes a query subcommand,
 REQ-137,REQ-137 — query reverse — find all items that point at a given ID,
 REQ-138,REQ-138 — query impact — find all items connected to a given ID,
-REQ-139,REQ-139 — query orphaned — find items with no relationships,
+REQ-139,REQ-139 — query isolated — find items with no relationships,
+REQ-227,REQ-227 — query orphaned — find superseded items with no incoming functional links,
 REQ-140,REQ-140 — query path — find the shortest path between two items,
 REQ-141,REQ-141 — JSON output flag,
 REQ-150,REQ-150 — CLI exposes a validate command,
@@ -90,6 +91,7 @@ REQ-082,REQ-082 — Item indexing is scoped to article body,ARC-032: ARC-032 —
 REQ-201,REQ-201 — A successor declares a supersedes relationship,ARC-039: ARC-039 — Supersession semantics
 REQ-202,REQ-202 — The reverse superseded_by relationship is derivable,ARC-039: ARC-039 — Supersession semantics
 REQ-203,REQ-203 — Superseded state is derived from relationships,ARC-039: ARC-039 — Supersession semantics
+REQ-228,REQ-228 — Orphaned state is derived from supersession and incoming functional links,
 REQ-204,REQ-204 — Invalid supersession structures are rejected,ARC-039: ARC-039 — Supersession semantics
 REQ-205,REQ-205 — Current-state matrices omit superseded items,ARC-039: ARC-039 — Supersession semantics
 REQ-206,REQ-206 — Functional links to superseded items remain visible,ARC-039: ARC-039 — Supersession semantics
@@ -175,5 +177,5 @@ REQ-122,REQ-122 — Process-to-product matrix exists,
 REQ-114,REQ-114 — Dead design-matrix template is removed,
 REQ-115,REQ-115 — Dead MatrixGenerator methods are removed,
 
-Total 175 rows
-Coverage: 68.0%
+Total 177 rows
+Coverage: 67.2%

@@ -278,7 +278,7 @@ UC-010,UC-010 — Developer assesses impact before changing a traceable item,use
 . *The target ID does not exist:* The command exits 1 with an """"Item not found"""" warning. Developer verifies the ID spelling or confirms the item was already removed.
 . *Developer needs machine-readable output:* Developer adds `--json` for structured output consumable by scripts or AI coding agents.
 . *Developer needs the chain between two specific items:* Developer runs `query path <from> <to>`. The shortest relationship path prints, or the command exits 1 with """"No path found"""".
-. *Developer wants to find items with no relationships:* Developer runs `query orphaned`, optionally filtered with `--role`.
+. *Developer wants to find items with no relationships:* Developer runs `query isolated`, optionally filtered with `--role`.
 . *Developer wants to limit the search:* Developer passes `-i <path>` to scan a specific directory or file instead of the current directory.
 | Postconditions | The developer has identified every item that references the target And no Antora build was required And no source files were modified (query is read-only) And the change can proceed with all referencing items accounted for
 | Priority | Medium
@@ -460,8 +460,7 @@ When enabled, each inverse relation-type group in list-style incoming output SHA
 Source: openspec/specs/incoming-links-macro/spec.md
 
 traceability:links[]"""
-REQ-103,REQ-103 — Graph isolation per component version,requirement,,requirements.adoc,"""When building a site with multiple component versions, relationship macro expansion SHALL be scoped per version.
-Items from one component version SHALL NOT appear in xrefs generated for pages in a different component version.
+REQ-103,REQ-103 — Graph isolation per component version,requirement,,requirements.adoc,"""Relationship macro expansion SHALL produce xrefs only to items in the same component version as the enclosing page.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
@@ -763,7 +762,12 @@ REQ-138,REQ-138 — query impact — find all items connected to a given ID,requ
 Source: openspec/specs/cli-query/spec.md
 
 traceability:links[]"""
-REQ-139,REQ-139 — query orphaned — find items with no relationships,requirement,,requirements.adoc,"""The CLI SHALL provide `query orphaned` that returns all items that have neither incoming nor outgoing relationships in the graph.
+REQ-139,REQ-139 — query isolated — find items with no relationships,requirement,,requirements.adoc,"""The CLI SHALL provide `query isolated` that returns all items that have neither incoming nor outgoing relationships in the graph.
+
+Source: openspec/specs/cli-query/spec.md
+
+traceability:links[]"""
+REQ-227,REQ-227 — query orphaned — find superseded items with no incoming functional links,requirement,,requirements.adoc,"""The CLI SHALL provide `query orphaned` that returns all effectively superseded items that have no incoming functional (non-history) relationships.
 
 Source: openspec/specs/cli-query/spec.md
 
@@ -778,7 +782,7 @@ REQ-141,REQ-141 — JSON output flag,requirement,,requirements.adoc,"""All `quer
 Source: openspec/specs/cli-query/spec.md
 
 traceability:links[]"""
-REQ-150,REQ-150 — CLI exposes a validate command,requirement,,requirements.adoc,"""The CLI SHALL provide a `validate` command that reads AsciiDoc source files and reports validation errors — invalid relation types, orphaned relationships, duplicate item IDs, and circular references — with diagnostics naming the source and target item IDs with roles, the invalid relation type, and the allowed alternatives.
+REQ-150,REQ-150 — CLI exposes a validate command,requirement,,requirements.adoc,"""The CLI SHALL provide a `validate` command that reads AsciiDoc source files and reports validation errors — invalid relation types, dangling references, duplicate item IDs, and circular references — with diagnostics naming the source and target item IDs with roles, the invalid relation type, and the allowed alternatives.
 No Antora build SHALL be required.
 The command SHALL exit with a non-zero code when errors are found and code 0 when the input is valid.
 
@@ -818,6 +822,11 @@ Source: openspec/specs/traceable-item-supersession/spec.md
 
 traceability:links[]"""
 REQ-203,REQ-203 — Superseded state is derived from relationships,requirement,,requirements.adoc,"""An item SHALL be effectively superseded when at least one valid incoming `supersedes` relationship targets it.
+
+Source: openspec/specs/traceable-item-supersession/spec.md
+
+traceability:links[]"""
+REQ-228,REQ-228 — Orphaned state is derived from supersession and incoming functional links,requirement,,requirements.adoc,"""An effectively superseded item SHALL be considered orphaned when no incoming functional (non-history) relationship targets it.
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
@@ -2039,7 +2048,7 @@ traceability:links[]"""
 TST-005,TST-005 — Graph and API Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/graph-and-api.test.ts`
 
 Tests the `TraceabilityGraph` (extended queries: merge, getRelatedItems, getItemsWithRelationTo, getRelationshipsByRoles, findPath, getImpactAnalysis) and graph visualization methods (`toDot`, `toVegaLite`, `toConfigDot`).
-Tests graph integrity validation including circular reference detection (direct, indirect, self-referencing cycles, bidirectional pair exclusion), orphaned relationship detection with source location and expected-role hints, and invalid relation type reporting with allowed-relations hints.
+Tests graph integrity validation including circular reference detection (direct, indirect, self-referencing cycles, bidirectional pair exclusion), dangling reference detection with source location and expected-role hints, and invalid relation type reporting with allowed-relations hints.
 Tests bidirectional relationship merge.
 Also tests `RequirementsTraceabilityExtension` API methods (processFiles, validate, export, coverage, config access, preset management, lifecycle).
 
@@ -2077,12 +2086,12 @@ traceability:links[]"""
 TST-008,TST-008 — Relationship Link Substitution Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/relationship-link-substitution.test.ts`
 
 Tests the in-memory regex substitution that replaces relationship macros with Asciidoctor xrefs.
-Covers same-page xref generation, cross-page xref generation with basename path resolution, orphan reference handling, non-relationship text preservation, hyphenated/dotted IDs, missing sourceFile fallback, and surrounding text preservation.
+Covers same-page xref generation, cross-page xref generation with basename path resolution, dangling reference handling, non-relationship text preservation, hyphenated/dotted IDs, missing sourceFile fallback, and surrounding text preservation.
 
 traceability:links[]"""
 TST-009,TST-009 — Query Command Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/query-command.test.ts`
 
-Tests the `query` CLI subcommand end-to-end — reverse (inbound relationships, empty results, unknown ID), impact (connected items, disconnected items), orphaned (relationship-less items, role filter), path (chain output, no path, unknown ID), and the `--json` flag (valid JSON, empty array).
+Tests the `query` CLI subcommand end-to-end — reverse (inbound relationships, empty results, unknown ID), impact (connected items, disconnected items), isolated (relationship-less items, role filter), orphaned (superseded items without incoming functional links), path (chain output, no path, unknown ID), and the `--json` flag (valid JSON, empty array).
 Spawns the compiled CLI binary against a temporary fixture directory.
 
 verifies:REQ-136[]
@@ -2091,6 +2100,7 @@ verifies:REQ-138[]
 verifies:REQ-139[]
 verifies:REQ-140[]
 verifies:REQ-141[]
+verifies:REQ-227[]
 
 traceability:links[]"""
 TST-010,TST-010 — Vale Extension Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/antora-vale-extension.test.ts`

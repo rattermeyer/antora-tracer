@@ -121,7 +121,7 @@ traceability:links[]
 Test file: `test/graph-and-api.test.ts`
 
 Tests the `TraceabilityGraph` (extended queries: merge, getRelatedItems, getItemsWithRelationTo, getRelationshipsByRoles, findPath, getImpactAnalysis) and graph visualization methods (`toDot`, `toVegaLite`, `toConfigDot`).
-Tests graph integrity validation including circular reference detection (direct, indirect, self-referencing cycles, bidirectional pair exclusion), orphaned relationship detection with source location and expected-role hints, and invalid relation type reporting with allowed-relations hints.
+Tests graph integrity validation including circular reference detection (direct, indirect, self-referencing cycles, bidirectional pair exclusion), dangling reference detection with source location and expected-role hints, and invalid relation type reporting with allowed-relations hints.
 Tests bidirectional relationship merge.
 Also tests `RequirementsTraceabilityExtension` API methods (processFiles, validate, export, coverage, config access, preset management, lifecycle).
 
@@ -171,7 +171,7 @@ traceability:links[]
 Test file: `test/relationship-link-substitution.test.ts`
 
 Tests the in-memory regex substitution that replaces relationship macros with Asciidoctor xrefs.
-Covers same-page xref generation, cross-page xref generation with basename path resolution, orphan reference handling, non-relationship text preservation, hyphenated/dotted IDs, missing sourceFile fallback, and surrounding text preservation.
+Covers same-page xref generation, cross-page xref generation with basename path resolution, dangling reference handling, non-relationship text preservation, hyphenated/dotted IDs, missing sourceFile fallback, and surrounding text preservation.
 
 traceability:links[]
 --
@@ -180,7 +180,7 @@ traceability:links[]
 --
 Test file: `test/query-command.test.ts`
 
-Tests the `query` CLI subcommand end-to-end — reverse (inbound relationships, empty results, unknown ID), impact (connected items, disconnected items), orphaned (relationship-less items, role filter), path (chain output, no path, unknown ID), and the `--json` flag (valid JSON, empty array).
+Tests the `query` CLI subcommand end-to-end — reverse (inbound relationships, empty results, unknown ID), impact (connected items, disconnected items), isolated (relationship-less items, role filter), orphaned (superseded items without incoming functional links), path (chain output, no path, unknown ID), and the `--json` flag (valid JSON, empty array).
 Spawns the compiled CLI binary against a temporary fixture directory.
 
 verifies:REQ-136[]
@@ -189,6 +189,7 @@ verifies:REQ-138[]
 verifies:REQ-139[]
 verifies:REQ-140[]
 verifies:REQ-141[]
+verifies:REQ-227[]
 
 traceability:links[]
 --
