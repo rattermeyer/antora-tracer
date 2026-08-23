@@ -313,6 +313,18 @@ addresses:REQ-217[]
 traceability:links[]
 --
 
+[#ARC-041, item, role=design, title="Supersession lifecycle states and queries"]
+--
+The supersession lifecycle has three graph-level states: `isolated` (no relationships), `orphaned` (superseded with no incoming functional links), and `dangling reference` (a link whose target no longer exists).
+`TraceabilityGraph.isOrphaned()`, `getSupersededItems()`, and `getDanglingReferences()` expose them, and `validate()` classifies a dangling link as an advisory `dangling_link` warning when its type is a history relation (`supersedes`/`superseded_by`) and an error otherwise.
+
+addresses:REQ-227[]
+addresses:REQ-228[]
+addresses:REQ-234[]
+
+traceability:links[]
+--
+
 === AntoraTraceabilityExtension
 
 [#ARC-016, item, role=design, title="Event-driven Antora integration"]
@@ -329,6 +341,29 @@ the CLI outside Antora, demonstrating the event handlers are optional.
 
 addresses:REQ-103[]
 addresses:QA-055[]
+traceability:links[]
+--
+
+[#ARC-042, item, role=design, title="Generated supersession overview page"]
+--
+`generateOverviewContent()` runs in the `sitePublished` handler (gated by `generateOverview`) and writes `overview.html` into the traceability output directory, linked from the dashboard `index.html`.
+It reports managed/active/superseded totals, a per-role table, and a dangling-reference worklist built from `getDanglingReferences()`.
+
+addresses:REQ-229[]
+addresses:REQ-230[]
+addresses:REQ-231[]
+addresses:REQ-232[]
+
+traceability:links[]
+--
+
+[#ARC-043, item, role=design, title="Display-only superseded render toggle"]
+--
+`renderSuperseded` (default true) is a display-only toggle: when false, `stripSupersededBlocks()` removes superseded item blocks during the `contentClassified` pass before macro substitution.
+The graph and matrices are unaffected — superseded items remain in the graph for link resolution and are still omitted from current matrices.
+
+addresses:REQ-233[]
+
 traceability:links[]
 --
 
@@ -564,6 +599,20 @@ The CLI
 operates standalone — it does not require an Antora build pipeline.
 
 addresses:REQ-056[]
+traceability:links[]
+--
+
+[#ARC-044, item, role=design, title="Item lifecycle CLI: archive and remove"]
+--
+The `archive` and `remove` commands are the first source-mutating CLI commands, enabled by block-extent detection that locates an item's full block (header through the closing delimiter) and refuses ambiguous edits.
+`archive <ID>` moves a superseded block to the module's `superseded.adoc`; `remove <ID>` deletes an orphaned block after a `y/N` prompt or an isolated block after typing the ID.
+Mutation lives in the CLI, never the extension, which remains read-only on source files.
+
+addresses:REQ-235[]
+addresses:REQ-236[]
+addresses:REQ-237[]
+addresses:REQ-238[]
+
 traceability:links[]
 --
 

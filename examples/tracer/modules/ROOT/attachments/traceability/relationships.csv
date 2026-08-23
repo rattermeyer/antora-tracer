@@ -65,8 +65,16 @@ ARC-040-addresses-REQ-225,ARC-040,REQ-225,addresses,explanation/architecture.ado
 ARC-040-addresses-REQ-226,ARC-040,REQ-226,addresses,explanation/architecture.adoc,false
 ARC-040-addresses-REQ-216,ARC-040,REQ-216,addresses,explanation/architecture.adoc,false
 ARC-040-addresses-REQ-217,ARC-040,REQ-217,addresses,explanation/architecture.adoc,false
+ARC-041-addresses-REQ-227,ARC-041,REQ-227,addresses,explanation/architecture.adoc,false
+ARC-041-addresses-REQ-228,ARC-041,REQ-228,addresses,explanation/architecture.adoc,false
+ARC-041-addresses-REQ-234,ARC-041,REQ-234,addresses,explanation/architecture.adoc,false
 ARC-016-addresses-REQ-103,ARC-016,REQ-103,addresses,explanation/architecture.adoc,false
 ARC-016-addresses-QA-055,ARC-016,QA-055,addresses,explanation/architecture.adoc,false
+ARC-042-addresses-REQ-229,ARC-042,REQ-229,addresses,explanation/architecture.adoc,false
+ARC-042-addresses-REQ-230,ARC-042,REQ-230,addresses,explanation/architecture.adoc,false
+ARC-042-addresses-REQ-231,ARC-042,REQ-231,addresses,explanation/architecture.adoc,false
+ARC-042-addresses-REQ-232,ARC-042,REQ-232,addresses,explanation/architecture.adoc,false
+ARC-043-addresses-REQ-233,ARC-043,REQ-233,addresses,explanation/architecture.adoc,false
 ARC-024-addresses-REQ-044,ARC-024,REQ-044,addresses,explanation/architecture.adoc,false
 ARC-024-addresses-REQ-045,ARC-024,REQ-045,addresses,explanation/architecture.adoc,false
 ARC-024-addresses-REQ-047,ARC-024,REQ-047,addresses,explanation/architecture.adoc,false
@@ -109,6 +117,10 @@ ARC-021-addresses-REQ-042,ARC-021,REQ-042,addresses,explanation/architecture.ado
 ARC-021-addresses-REQ-043,ARC-021,REQ-043,addresses,explanation/architecture.adoc,false
 ARC-021-addresses-REQ-128,ARC-021,REQ-128,addresses,explanation/architecture.adoc,false
 ARC-023-addresses-REQ-056,ARC-023,REQ-056,addresses,explanation/architecture.adoc,false
+ARC-044-addresses-REQ-235,ARC-044,REQ-235,addresses,explanation/architecture.adoc,false
+ARC-044-addresses-REQ-236,ARC-044,REQ-236,addresses,explanation/architecture.adoc,false
+ARC-044-addresses-REQ-237,ARC-044,REQ-237,addresses,explanation/architecture.adoc,false
+ARC-044-addresses-REQ-238,ARC-044,REQ-238,addresses,explanation/architecture.adoc,false
 ARC-030-addresses-REQ-060,ARC-030,REQ-060,addresses,explanation/architecture.adoc,false
 ARC-030-addresses-REQ-061,ARC-030,REQ-061,addresses,explanation/architecture.adoc,false
 ARC-030-addresses-REQ-062,ARC-030,REQ-062,addresses,explanation/architecture.adoc,false
