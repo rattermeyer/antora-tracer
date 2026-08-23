@@ -185,3 +185,6 @@ build/
 # Python bytecode
 __pycache__/
 *.pyc
+
+# Vale package-sync cache
+src/vale/.vale/
