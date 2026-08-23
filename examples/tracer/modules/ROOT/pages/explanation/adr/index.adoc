@@ -15,3 +15,4 @@ Each record follows the https://github.com/architecture-decision-record/architec
 * xref:explanation/adr/0009-supersede-not-mutate.adoc[ADR-009 — Requirements are superseded, never mutated]
 * xref:explanation/adr/0010-identity-first-graph-diff.adoc[ADR-010 — Identity-first graph diff over rename detection]
 * xref:explanation/adr/0011-reverse-relations.adoc[ADR-011 — Relations with a mandatory reverse and canonical primary storage]
+* xref:explanation/adr/0012-cli-mutation-boundary.adoc[ADR-012 — CLI owns source mutation; the extension stays read-only]

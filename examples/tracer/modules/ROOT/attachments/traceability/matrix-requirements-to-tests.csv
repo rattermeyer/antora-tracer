@@ -91,7 +91,7 @@ REQ-082,REQ-082 — Item indexing is scoped to article body,
 REQ-201,REQ-201 — A successor declares a supersedes relationship,TST-011: TST-011 — Supersession Tests
 REQ-202,REQ-202 — The reverse superseded_by relationship is derivable,TST-011: TST-011 — Supersession Tests
 REQ-203,REQ-203 — Superseded state is derived from relationships,TST-011: TST-011 — Supersession Tests
-REQ-228,REQ-228 — Orphaned state is derived from supersession and incoming functional links,
+REQ-228,REQ-228 — Orphaned state is derived from supersession and incoming functional links,TST-011: TST-011 — Supersession Tests
 REQ-204,REQ-204 — Invalid supersession structures are rejected,TST-011: TST-011 — Supersession Tests
 REQ-205,REQ-205 — Current-state matrices omit superseded items,TST-011: TST-011 — Supersession Tests
 REQ-206,REQ-206 — Functional links to superseded items remain visible,TST-011: TST-011 — Supersession Tests
@@ -100,16 +100,16 @@ REQ-208,REQ-208 — Superseded item blocks link to successors,
 REQ-209,REQ-209 — CLI reports supersession impact,
 REQ-210,REQ-210 — Supersession checks do not modify source files,
 REQ-211,REQ-211 — Validation warns about stale functional links,TST-011: TST-011 — Supersession Tests
-REQ-233,REQ-233 — Superseded items and links can be hidden,
-REQ-234,REQ-234 — Dangling history links are advisory,
-REQ-229,REQ-229 — Overview page generation is opt-in and configurable,
-REQ-230,REQ-230 — Overview page reports graph totals,
-REQ-231,REQ-231 — Overview page reports per-role statistics,
-REQ-232,REQ-232 — Overview page lists dangling references,
-REQ-235,REQ-235 — archive moves a superseded item to the module's superseded page,
-REQ-236,REQ-236 — remove deletes an orphaned item,
-REQ-237,REQ-237 — remove deletes an isolated item with a stronger confirmation,
-REQ-238,REQ-238 — Block extent is detected before mutation,
+REQ-233,REQ-233 — Superseded items and links can be hidden,TST-014: TST-014 — Supersession Overview and Render Toggle Tests
+REQ-234,REQ-234 — Dangling history links are advisory,TST-011: TST-011 — Supersession Tests
+REQ-229,REQ-229 — Overview page generation is opt-in and configurable,TST-014: TST-014 — Supersession Overview and Render Toggle Tests
+REQ-230,REQ-230 — Overview page reports graph totals,TST-014: TST-014 — Supersession Overview and Render Toggle Tests
+REQ-231,REQ-231 — Overview page reports per-role statistics,TST-014: TST-014 — Supersession Overview and Render Toggle Tests
+REQ-232,REQ-232 — Overview page lists dangling references,TST-014: TST-014 — Supersession Overview and Render Toggle Tests
+REQ-235,REQ-235 — archive moves a superseded item to the module's superseded page,TST-013: TST-013 — Item Lifecycle Tests
+REQ-236,REQ-236 — remove deletes an orphaned item,TST-013: TST-013 — Item Lifecycle Tests
+REQ-237,REQ-237 — remove deletes an isolated item with a stronger confirmation,TST-013: TST-013 — Item Lifecycle Tests
+REQ-238,REQ-238 — Block extent is detected before mutation,TST-013: TST-013 — Item Lifecycle Tests
 REQ-212,REQ-212 — Diff classifies items by stable ID,TST-012: TST-012 — Graph Diff Tests
 REQ-213,REQ-213 — Modified items report changed fields,TST-012: TST-012 — Graph Diff Tests
 REQ-214,REQ-214 — Relationship deltas are limited to surviving items,TST-012: TST-012 — Graph Diff Tests
@@ -188,4 +188,4 @@ REQ-114,REQ-114 — Dead design-matrix template is removed,
 REQ-115,REQ-115 — Dead MatrixGenerator methods are removed,
 
 Total 187 rows
-Coverage: 51.9%
+Coverage: 57.8%

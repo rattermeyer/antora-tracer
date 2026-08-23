@@ -2202,7 +2202,7 @@ verifies:REQ-156[]
 traceability:links[]"""
 TST-011,TST-011 — Supersession Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/supersession.test.ts`
 
-Tests requirement supersession: deriving superseded state and successors from the `supersedes` relation, split and merge support, self-supersession and cycle validation errors, advisory stale-link warnings, and that superseded items are excluded from current-item queries and matrices.
+Tests requirement supersession: deriving superseded state and successors from the `supersedes` relation, split and merge support, self-supersession and cycle validation errors, advisory stale-link warnings, orphaned-state derivation, dangling-reference detection with history/functional classification, and that superseded items are excluded from current-item queries and matrices.
 
 verifies:REQ-201[]
 verifies:REQ-202[]
@@ -2212,6 +2212,8 @@ verifies:REQ-205[]
 verifies:REQ-206[]
 verifies:REQ-207[]
 verifies:REQ-211[]
+verifies:REQ-228[]
+verifies:REQ-234[]
 
 traceability:links[]"""
 TST-012,TST-012 — Graph Diff Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/graph-diff.test.ts`
@@ -2223,6 +2225,27 @@ verifies:REQ-213[]
 verifies:REQ-214[]
 verifies:REQ-225[]
 verifies:REQ-226[]
+
+traceability:links[]"""
+TST-013,TST-013 — Item Lifecycle Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/item-lifecycle.test.ts`
+
+Tests the `archive` and `remove` CLI commands end-to-end: moving a superseded block to `superseded.adoc` with content preserved, rejecting non-superseded and unknown IDs, removing an orphaned item after confirmation, declining on a non-y answer, removing an isolated item only after typing the ID, declining on ID mismatch, and rejecting a non-orphaned/non-isolated item.
+
+verifies:REQ-235[]
+verifies:REQ-236[]
+verifies:REQ-237[]
+verifies:REQ-238[]
+
+traceability:links[]"""
+TST-014,TST-014 — Supersession Overview and Render Toggle Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/antora-extension.test.ts` (supersession overview and render toggle)
+
+Tests the generated supersession overview content — totals, per-role statistics, and the dangling-reference worklist — and the display-only `renderSuperseded` toggle that omits superseded item blocks from rendered output without affecting the graph.
+
+verifies:REQ-229[]
+verifies:REQ-230[]
+verifies:REQ-231[]
+verifies:REQ-232[]
+verifies:REQ-233[]
 
 traceability:links[]"""
 PRQ-001,PRQ-001 — CI workflows trigger on push and PR,process_requirement,,self-traceability/delivery-process.adoc,"""The GitHub Actions CI workflow SHALL trigger on every push to `main` and every pull request.

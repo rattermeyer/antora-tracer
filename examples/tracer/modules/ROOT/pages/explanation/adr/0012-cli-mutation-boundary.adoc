@@ -1,0 +1,44 @@
+= ADR-012: CLI owns source mutation; the extension stays read-only
+:keywords: adr, architecture, decision, cli, mutation, read-only, lifecycle, archive, remove
+
+*Status*: accepted +
+*Deciders*: Richard Attermeyer +
+*Date*: 2026-08-23
+
+== Context and Problem Statement
+
+The supersession lifecycle needs to change source files: `archive` moves a superseded item's block to a parallel `superseded.adoc` page, and `remove` deletes an orphaned or isolated block.
+Two places could own this mutation: the Antora extension (which already parses items during the build) or the CLI (which the author invokes explicitly).
+
+The extension carries a hard requirement that it SHALL NOT modify `.adoc` source files on disk — its passes operate on in-memory buffers and never write back.
+An extension pass that relocates blocks during the build would break that guarantee and surprise authors with silent file changes mid-build.
+
+== Decision Drivers
+
+* Source mutation must be an explicit, author-invoked action, never a build side effect
+* The extension's read-only guarantee must hold
+* Git history, not the tool, is the safety net for deletion
+
+== Considered Options
+
+* Extension pass that auto-archives superseded items during `contentClassified` — rejected: violates the read-only guarantee and mutates files mid-build with no preview
+* CLI commands (`archive`, `remove`) that mutate source on explicit invocation — chosen
+* No automation, hand-edited moves — rejected: error-prone, with no guard that only superseded items are touched
+
+== Decision Outcome
+
+Chosen option: source mutation lives in the CLI only.
+`archive <ID>` and `remove <ID>` parse the graph, locate the item's full block (header through the closing delimiter), and mutate the file only after validation — superseded for archive, orphaned or isolated for remove — and, for removal, explicit confirmation.
+Block-extent detection refuses ambiguous edits.
+The extension remains read-only on source files; every future mutation feature (prune, relink, rename) belongs in the CLI.
+
+== Positive Consequences
+
+* The extension's read-only guarantee is preserved — builds can never alter source
+* Mutation is intentional and previewable; `remove` shows the block and requires confirmation
+* Guards make unsafe edits impossible: `archive` rejects non-superseded IDs, `remove` rejects non-orphaned/non-isolated IDs
+
+== Negative Consequences
+
+* Authors must remember to run the CLI; the build will not clean up for them
+* Block relocation is line-based and brittle to unusual AsciiDoc formatting; ambiguous extents are refused rather than guessed
