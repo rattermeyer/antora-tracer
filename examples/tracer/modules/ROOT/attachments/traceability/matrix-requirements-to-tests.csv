@@ -106,6 +106,10 @@ REQ-229,REQ-229 — Overview page generation is opt-in and configurable,
 REQ-230,REQ-230 — Overview page reports graph totals,
 REQ-231,REQ-231 — Overview page reports per-role statistics,
 REQ-232,REQ-232 — Overview page lists dangling references,
+REQ-235,REQ-235 — archive moves a superseded item to the module's superseded page,
+REQ-236,REQ-236 — remove deletes an orphaned item,
+REQ-237,REQ-237 — remove deletes an isolated item with a stronger confirmation,
+REQ-238,REQ-238 — Block extent is detected before mutation,
 REQ-212,REQ-212 — Diff classifies items by stable ID,TST-012: TST-012 — Graph Diff Tests
 REQ-213,REQ-213 — Modified items report changed fields,TST-012: TST-012 — Graph Diff Tests
 REQ-214,REQ-214 — Relationship deltas are limited to surviving items,TST-012: TST-012 — Graph Diff Tests
@@ -183,5 +187,5 @@ REQ-122,REQ-122 — Process-to-product matrix exists,
 REQ-114,REQ-114 — Dead design-matrix template is removed,
 REQ-115,REQ-115 — Dead MatrixGenerator methods are removed,
 
-Total 183 rows
-Coverage: 53.0%
+Total 187 rows
+Coverage: 51.9%

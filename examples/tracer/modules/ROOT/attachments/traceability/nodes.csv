@@ -901,6 +901,26 @@ REQ-232,REQ-232 — Overview page lists dangling references,requirement,,require
 Source: openspec/specs/supersession-overview/spec.md
 
 traceability:links[]"""
+REQ-235,REQ-235 — archive moves a superseded item to the module's superseded page,requirement,,requirements.adoc,"""The CLI SHALL provide `archive <ID>` that moves a superseded item's full block to a `superseded.adoc` page in the same module as the source file.
+
+Source: openspec/specs/item-lifecycle/spec.md
+
+traceability:links[]"""
+REQ-236,REQ-236 — remove deletes an orphaned item,requirement,,requirements.adoc,"""The CLI SHALL provide `remove <ID>` that deletes an orphaned item's block after a normal confirmation prompt.
+
+Source: openspec/specs/item-lifecycle/spec.md
+
+traceability:links[]"""
+REQ-237,REQ-237 — remove deletes an isolated item with a stronger confirmation,requirement,,requirements.adoc,"""The CLI SHALL provide a path to delete an isolated item's block only after the user types the item ID verbatim.
+
+Source: openspec/specs/item-lifecycle/spec.md
+
+traceability:links[]"""
+REQ-238,REQ-238 — Block extent is detected before mutation,requirement,,requirements.adoc,"""Before mutating a file, the CLI SHALL locate the item's full block from its `[#ID, item, …]` header to the matching closing `--` delimiter, and SHALL refuse to mutate when the extent is ambiguous.
+
+Source: openspec/specs/item-lifecycle/spec.md
+
+traceability:links[]"""
 REQ-212,REQ-212 — Diff classifies items by stable ID,requirement,,requirements.adoc,"""When two graph snapshots are compared, the diff SHALL classify each item as added, removed, or modified based on its stable ID.
 
 Source: openspec/specs/graph-diff/spec.md
@@ -1722,7 +1742,10 @@ traceability:links[]"""
 ARC-023,ARC-023 — Commander-based CLI with subcommands,design,,explanation/architecture.adoc,"""The CLI is built on https://www.npmjs.com/package/commander[Commander] with
 subcommands for processing (`process`), matrix generation (`matrix`)
 validation (`validate`), Neo4j export (`export neo4j`), statistics
-(`stats`), preset management (`preset`), and ID allocation (`next-id`).
+(`stats`), preset management (`preset`), ID allocation (`next-id`),
+graph querying (`query`), supersession inspection (`supersession`),
+graph diffing (`diff`), and item lifecycle management (`archive`,
+`remove`).
 Global `--config` and `--preset` flags apply to all commands.
 The CLI
 operates standalone — it does not require an Antora build pipeline.

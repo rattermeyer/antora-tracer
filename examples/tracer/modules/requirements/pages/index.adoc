@@ -1111,6 +1111,44 @@ Source: openspec/specs/supersession-overview/spec.md
 traceability:links[]
 --
 
+=== Item Lifecycle
+
+[#REQ-235, item, role=requirement, title="archive moves a superseded item to the module's superseded page"]
+--
+The CLI SHALL provide `archive <ID>` that moves a superseded item's full block to a `superseded.adoc` page in the same module as the source file.
+
+Source: openspec/specs/item-lifecycle/spec.md
+
+traceability:links[]
+--
+
+[#REQ-236, item, role=requirement, title="remove deletes an orphaned item"]
+--
+The CLI SHALL provide `remove <ID>` that deletes an orphaned item's block after a normal confirmation prompt.
+
+Source: openspec/specs/item-lifecycle/spec.md
+
+traceability:links[]
+--
+
+[#REQ-237, item, role=requirement, title="remove deletes an isolated item with a stronger confirmation"]
+--
+The CLI SHALL provide a path to delete an isolated item's block only after the user types the item ID verbatim.
+
+Source: openspec/specs/item-lifecycle/spec.md
+
+traceability:links[]
+--
+
+[#REQ-238, item, role=requirement, title="Block extent is detected before mutation"]
+--
+Before mutating a file, the CLI SHALL locate the item's full block from its `[#ID, item, …]` header to the matching closing `--` delimiter, and SHALL refuse to mutate when the extent is ambiguous.
+
+Source: openspec/specs/item-lifecycle/spec.md
+
+traceability:links[]
+--
+
 === Graph Diff
 
 [#REQ-212, item, role=requirement, title="Diff classifies items by stable ID"]
