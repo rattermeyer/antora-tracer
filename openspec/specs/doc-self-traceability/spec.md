@@ -18,7 +18,7 @@ The example site navigation SHALL include a "Self-Traceability" section containi
 - **AND** the section SHALL appear after the four user-facing documentation sections
 
 ### Requirement: Self-Traceability section preserves traceable items
-The restructuring SHALL NOT move any traceable `[item]` blocks out of their source files. All existing requirements (REQ), architecture (ARC), test (TST), use case (UC), and quality (QA) items SHALL remain in their current AsciiDoc files.
+The restructuring SHALL keep every traceable `[item]` block in its current AsciiDoc file.
 
 #### Scenario: Traceability graph is unchanged after restructuring
 - **WHEN** the example site is rebuilt after restructuring

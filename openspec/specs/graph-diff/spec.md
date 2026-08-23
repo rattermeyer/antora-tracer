@@ -40,8 +40,15 @@ The diff SHALL report relationship changes only between items that exist in both
 - **AND** `DES-007` `addresses` a new target in graph B
 - **THEN** the delta SHALL report the new relationship
 
-### Requirement: Supersession appears as added and removed
-The diff SHALL NOT attempt content-similarity rename detection. A superseded predecessor SHALL appear as removed and its successor as added, with the `supersedes` relationship reported as a new relationship.
+### Requirement: The diff does not attempt rename detection
+The diff SHALL NOT attempt content-similarity rename detection.
+
+#### Scenario: No rename heuristic
+- **WHEN** two graphs differ only in a renumbered item with similar content
+- **THEN** the diff SHALL NOT infer a rename
+
+### Requirement: A superseded predecessor is reported as removed and its successor as added
+A superseded predecessor SHALL appear as removed and its successor as added, with the `supersedes` relationship reported as a new relationship.
 
 #### Scenario: Superseded pair
 - **WHEN** graph B contains `REQ-043` with `supersedes:REQ-042[]`

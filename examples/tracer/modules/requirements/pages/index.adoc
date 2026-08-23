@@ -82,8 +82,7 @@ traceability:links[]
 
 [#REQ-091, item, role=requirement, title="Inline macros inside verbatim blocks are preserved in rendered output"]
 --
-The system SHALL NOT strip inline relationship macros (`relation:TARGET[]`) from inside AsciiDoc verbatim blocks during the content substitution pass.
-Such macros are example code and SHALL remain visible in the rendered output.
+The system SHALL preserve inline relationship macros (`relation:TARGET[]`) inside AsciiDoc verbatim blocks so they remain visible in the rendered output.
 
 Source: openspec/specs/parser-verbatim-skip/spec.md
 
@@ -132,7 +131,31 @@ traceability:links[]
 --
 The system SHALL detect when a newly added relationship is authored with the reverse of an existing relationship's type — the existing edge goes from B to A with a type whose declared `reverse` equals the new edge's type — and SHALL NOT store a second edge.
 The canonical primary edge is retained with its original metadata (sourceFile, line), and no warning is emitted.
-Merging is driven by the `reverse` declaration in `relations` (config), not by `inverseLabels` or the compile-time `INVERSE_MAP`.
+Merging is driven by the `reverse` declaration in `relations` (config).
+
+Source: openspec/specs/bidirectional-relationship-merge/spec.md
+
+traceability:links[]
+--
+
+[#REQ-219, item, role=requirement, title="Reverse-authored relationships are detected"]
+--
+The system SHALL detect when a newly added relationship is authored with the reverse of an existing relationship's type — the existing edge goes from B to A with a type whose declared `reverse` equals the new edge's type.
+
+supersedes:REQ-129[]
+
+Source: openspec/specs/bidirectional-relationship-merge/spec.md
+
+traceability:links[]
+--
+
+[#REQ-220, item, role=requirement, title="No second edge is stored for a complementary pair"]
+--
+If a newly added relationship forms a complementary pair with an existing relationship, then the system SHALL NOT store a second edge.
+The canonical primary edge is retained with its original metadata (sourceFile, line), and no warning is emitted.
+Merging is driven by the `reverse` declaration in `relations` (config).
+
+supersedes:REQ-129[]
 
 Source: openspec/specs/bidirectional-relationship-merge/spec.md
 
@@ -388,6 +411,28 @@ Source: openspec/specs/inverse-labels/spec.md
 traceability:links[]
 --
 
+[#REQ-221, item, role=requirement, title="Relation display names are configurable"]
+--
+The system SHALL support `labels` in the traceability configuration YAML, mapping each relation type to a human-readable display name used for rendering (incoming/outgoing lists, matrix headers, graph labels).
+
+supersedes:REQ-071[]
+
+Source: openspec/specs/inverse-labels/spec.md
+
+traceability:links[]
+--
+
+[#REQ-222, item, role=requirement, title="Labels do not affect the graph"]
+--
+`labels` SHALL NOT affect graph structure, merge behavior, or validation.
+
+supersedes:REQ-071[]
+
+Source: openspec/specs/inverse-labels/spec.md
+
+traceability:links[]
+--
+
 [#REQ-161, item, role=requirement, title="Default display name is the humanized type"]
 --
 If a relation type has no entry in `labels`, the system SHALL display the type name humanized: underscores replaced with spaces and the result sentence-cased.
@@ -511,7 +556,7 @@ traceability:links[]
 
 [#REQ-167, item, role=requirement, title="Matrix renders one status column per row"]
 --
-The HTML matrix SHALL render exactly one per-row status column, and SHALL NOT render a separate per-row coverage percentage column.
+The HTML matrix SHALL render exactly one per-row status column.
 
 Source: openspec/specs/matrix-status/spec.md
 
@@ -615,6 +660,28 @@ traceability:links[]
 --
 A preset SHALL NOT extend itself, directly or transitively.
 Any inheritance cycle SHALL be detected and rejected with a clear error rather than looping indefinitely.
+
+Source: openspec/specs/preset-inheritance/spec.md
+
+traceability:links[]
+--
+
+[#REQ-223, item, role=requirement, title="A preset does not extend itself"]
+--
+A preset SHALL NOT extend itself, directly or transitively.
+
+supersedes:REQ-174[]
+
+Source: openspec/specs/preset-inheritance/spec.md
+
+traceability:links[]
+--
+
+[#REQ-224, item, role=requirement, title="Inheritance cycles are detected and rejected"]
+--
+When a preset inheritance chain forms a cycle, the system SHALL detect it and report a clear error rather than looping indefinitely.
+
+supersedes:REQ-174[]
 
 Source: openspec/specs/preset-inheritance/spec.md
 
@@ -863,8 +930,7 @@ traceability:links[]
 
 [#REQ-082, item, role=requirement, title="Item indexing is scoped to article body"]
 --
-The item anchor indexing SHALL only traverse elements within `<article class="doc">`.
-Elements outside the article body (navigation, TOC, footer) SHALL NOT be indexed.
+The item anchor indexing SHALL traverse only elements within `<article class="doc">`.
 
 Source: openspec/specs/lunr-item-anchor-indexing/spec.md
 
@@ -1005,6 +1071,28 @@ traceability:links[]
 --
 The diff SHALL NOT attempt content-similarity rename detection.
 A superseded predecessor SHALL appear as removed and its successor as added, with the `supersedes` relationship reported as a new relationship.
+
+Source: openspec/specs/graph-diff/spec.md
+
+traceability:links[]
+--
+
+[#REQ-225, item, role=requirement, title="The diff does not attempt rename detection"]
+--
+The diff SHALL NOT attempt content-similarity rename detection.
+
+supersedes:REQ-215[]
+
+Source: openspec/specs/graph-diff/spec.md
+
+traceability:links[]
+--
+
+[#REQ-226, item, role=requirement, title="A superseded predecessor is reported as removed and its successor as added"]
+--
+A superseded predecessor SHALL appear as removed and its successor as added, with the `supersedes` relationship reported as a new relationship.
+
+supersedes:REQ-215[]
 
 Source: openspec/specs/graph-diff/spec.md
 
@@ -1518,8 +1606,7 @@ traceability:links[]
 
 [#REQ-199, item, role=requirement, title="Self-Traceability section preserves traceable items"]
 --
-The restructuring SHALL NOT move any traceable `[item]` blocks out of their source files.
-All existing requirements (REQ), architecture (ARC), test (TST), use case (UC), and quality (QA) items SHALL remain in their current AsciiDoc files.
+The restructuring SHALL keep every traceable `[item]` block in its current AsciiDoc file.
 
 Source: openspec/specs/doc-self-traceability/spec.md
 

@@ -6,10 +6,8 @@ Detect complementary directed relationship pairs (e.g., A `leads_to` B and B `is
 
 ## Requirements
 
-### Requirement: Bidirectional relationship pairs are merged into a single edge
-The system SHALL detect when a newly added relationship is authored with the reverse of an existing relationship's type — the existing edge goes from B to A with a type whose declared `reverse` equals the new edge's type — and SHALL NOT store a second edge. The canonical primary edge is retained with its original metadata (sourceFile, line), and no warning is emitted.
-
-Merging is driven by the `reverse` declaration in `relations` (config), not by `inverseLabels` or the compile-time `INVERSE_MAP`.
+### Requirement: Reverse-authored relationships are detected
+The system SHALL detect when a newly added relationship is authored with the reverse of an existing relationship's type — the existing edge goes from B to A with a type whose declared `reverse` equals the new edge's type.
 
 #### Scenario: Reverse-authored edge canonicalizes to the existing primary edge
 - **WHEN** `relations` declares `leads_to` with reverse `is_derived_from`
@@ -18,6 +16,11 @@ Merging is driven by the `reverse` declaration in `relations` (config), not by `
 - **THEN** no second edge is stored
 - **AND** the existing `UC-003 leads_to REQ-001` relationship is marked `bidirectional: true`
 - **AND** no warning is emitted
+
+### Requirement: No second edge is stored for a complementary pair
+If a newly added relationship forms a complementary pair with an existing relationship, then the system SHALL NOT store a second edge. The canonical primary edge is retained with its original metadata (sourceFile, line), and no warning is emitted.
+
+Merging is driven by the `reverse` declaration in `relations` (config).
 
 #### Scenario: Single-direction relationship is stored normally
 - **WHEN** `addRelationship` is called with `{ fromId: "UC-003", type: "leads_to", targetId: "REQ-001" }`

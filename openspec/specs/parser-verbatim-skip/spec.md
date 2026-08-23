@@ -57,7 +57,7 @@ The system SHALL detect verbatim blocks by matching opening and closing fence li
 ---
 
 ### Requirement: Inline macros inside verbatim blocks are preserved in rendered output
-The system SHALL NOT strip inline relationship macros (`relation:TARGET[]`) from inside AsciiDoc verbatim blocks during the content substitution pass. Such macros are example code and SHALL remain visible in the rendered output.
+The system SHALL preserve inline relationship macros (`relation:TARGET[]`) inside AsciiDoc verbatim blocks so they remain visible in the rendered output.
 
 #### Scenario: Inline macro inside a source block
 - **WHEN** a `[source,asciidoc]` block contains `satisfies:REQ-001[]` as example code

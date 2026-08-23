@@ -64,7 +64,7 @@ Before modifying `index.adoc`, show what will change:
 2. Extract existing REQ item titles from `examples/tracer/modules/requirements/pages/index.adoc`
 3. Compare:
    - **New**: titles in specs but not in index
-   - **Removed**: titles in index but not in specs
+   - **Removed**: titles in index but not in specs (superseded items — those receiving `supersedes:` links — are exempt and stay)
    - **Title mismatch**: same ID but different title text
 
 Present the diff to the user for confirmation before applying changes.
@@ -76,7 +76,7 @@ File: `examples/tracer/modules/requirements/pages/index.adoc`
 **Merge strategy (preserve traceability links):**
 
 - **Keep** existing items whose spec source still exists. Do not change their IDs.
-- **Remove** items whose spec source no longer exists.
+- **Remove** items whose spec source no longer exists — except superseded items (those receiving `supersedes:` links), which stay as historical records.
 - **Add** new items for requirements found in specs that don't have a matching REQ-NNN yet. Assign fresh IDs sequentially using `antora-tracer next-id --prefix REQ`.
 - **Update** body text for kept items if the spec text changed.
 
@@ -236,6 +236,7 @@ Matrices: regenerated
 - **Preserve IDs** — never change an existing REQ-NNN, ARC-NNN, TST-NNN, or UC-NNN. Traceability links depend on stable IDs.
 - **As-is, not diff** — documents describe the complete current state, not what recently changed.
 - **Grounded in specs** — every requirement must trace back to a spec file. Do not invent requirements.
+- **Superseded items stay** — a superseded item (one receiving `supersedes:` links) remains in the index as a historical record. Its state is derived from the graph, so never add a `status=` attribute. It is excluded from current matrices and rendered with a successor marker. Do not delete superseded items, and do not flag them as "Removed" in the diff.
 - **Grounded in code** — TST items must match actual test files. ARC items must match actual source layout and class names.
 - **Title matching** — REQ item titles MUST match the spec's `### Requirement:` heading exactly.
 - **Run the consistency sweep** — after updating requirements, check architecture docs, test `it()` descriptions, and test-plan `verifies:` links. The `requirements-writing` skill's "After Changing Requirements" section gives the generic principle; the detailed project-specific sweep is the steps in this skill.

@@ -320,8 +320,7 @@ REQ-090,REQ-090 — Verbatim block detection handles standard AsciiDoc fences,re
 Source: openspec/specs/parser-verbatim-skip/spec.md
 
 traceability:links[]"""
-REQ-091,REQ-091 — Inline macros inside verbatim blocks are preserved in rendered output,requirement,,requirements.adoc,"""The system SHALL NOT strip inline relationship macros (`relation:TARGET[]`) from inside AsciiDoc verbatim blocks during the content substitution pass.
-Such macros are example code and SHALL remain visible in the rendered output.
+REQ-091,REQ-091 — Inline macros inside verbatim blocks are preserved in rendered output,requirement,,requirements.adoc,"""The system SHALL preserve inline relationship macros (`relation:TARGET[]`) inside AsciiDoc verbatim blocks so they remain visible in the rendered output.
 
 Source: openspec/specs/parser-verbatim-skip/spec.md
 
@@ -348,7 +347,23 @@ Source: openspec/specs/partial-file-processing/spec.md
 traceability:links[]"""
 REQ-129,REQ-129 — Bidirectional relationship pairs are merged into a single edge,requirement,,requirements.adoc,"""The system SHALL detect when a newly added relationship is authored with the reverse of an existing relationship's type — the existing edge goes from B to A with a type whose declared `reverse` equals the new edge's type — and SHALL NOT store a second edge.
 The canonical primary edge is retained with its original metadata (sourceFile, line), and no warning is emitted.
-Merging is driven by the `reverse` declaration in `relations` (config), not by `inverseLabels` or the compile-time `INVERSE_MAP`.
+Merging is driven by the `reverse` declaration in `relations` (config).
+
+Source: openspec/specs/bidirectional-relationship-merge/spec.md
+
+traceability:links[]"""
+REQ-219,REQ-219 — Reverse-authored relationships are detected,requirement,,requirements.adoc,"""The system SHALL detect when a newly added relationship is authored with the reverse of an existing relationship's type — the existing edge goes from B to A with a type whose declared `reverse` equals the new edge's type.
+
+supersedes:REQ-129[]
+
+Source: openspec/specs/bidirectional-relationship-merge/spec.md
+
+traceability:links[]"""
+REQ-220,REQ-220 — No second edge is stored for a complementary pair,requirement,,requirements.adoc,"""If a newly added relationship forms a complementary pair with an existing relationship, then the system SHALL NOT store a second edge.
+The canonical primary edge is retained with its original metadata (sourceFile, line), and no warning is emitted.
+Merging is driven by the `reverse` declaration in `relations` (config).
+
+supersedes:REQ-129[]
 
 Source: openspec/specs/bidirectional-relationship-merge/spec.md
 
@@ -476,7 +491,7 @@ REQ-116,REQ-116 — Items carry component and module context from Antora,require
 Source: openspec/specs/cross-module-xref/spec.md
 
 traceability:links[]"""
-REQ-117,REQ-117 — Cross-module and cross-component xref includes correct prefix,requirement,,requirements.adoc,"""When `buildXref` generates an Antora xref for an item in a different module or component than the current page, the system SHALL include the appropriate prefix matching Antora's xref resolution hierarchy: `component:module:` for cross-component, `module:` for cross-module, and no prefix for same-module.
+REQ-117,REQ-117 — Cross-module and cross-component xref includes correct prefix,requirement,,requirements.adoc,"""When `buildXref` generates an Antora xref for an item in a different module or component than the current page, the system SHALL include the correct Antora xref prefix: `component:module:` for cross-component, `module:` for cross-module, and no prefix for same-module.
 
 Source: openspec/specs/cross-module-xref/spec.md
 
@@ -488,6 +503,20 @@ Source: openspec/specs/traceability-links-macro/spec.md
 traceability:links[]"""
 REQ-071,REQ-071 — Relation display names are config-driven,requirement,,requirements.adoc,"""The system SHALL support `labels` in the traceability configuration YAML, mapping each relation type to a human-readable display name used for rendering (incoming/outgoing lists, matrix headers, graph labels).
 `labels` SHALL NOT affect graph structure, merge behavior, or validation.
+
+Source: openspec/specs/inverse-labels/spec.md
+
+traceability:links[]"""
+REQ-221,REQ-221 — Relation display names are configurable,requirement,,requirements.adoc,"""The system SHALL support `labels` in the traceability configuration YAML, mapping each relation type to a human-readable display name used for rendering (incoming/outgoing lists, matrix headers, graph labels).
+
+supersedes:REQ-071[]
+
+Source: openspec/specs/inverse-labels/spec.md
+
+traceability:links[]"""
+REQ-222,REQ-222 — Labels do not affect the graph,requirement,,requirements.adoc,"""`labels` SHALL NOT affect graph structure, merge behavior, or validation.
+
+supersedes:REQ-071[]
 
 Source: openspec/specs/inverse-labels/spec.md
 
@@ -559,7 +588,7 @@ REQ-113,REQ-113 — Matrix template uses partials for structure,requirement,,req
 Source: openspec/specs/template-partials/spec.md
 
 traceability:links[]"""
-REQ-167,REQ-167 — Matrix renders one status column per row,requirement,,requirements.adoc,"""The HTML matrix SHALL render exactly one per-row status column, and SHALL NOT render a separate per-row coverage percentage column.
+REQ-167,REQ-167 — Matrix renders one status column per row,requirement,,requirements.adoc,"""The HTML matrix SHALL render exactly one per-row status column.
 
 Source: openspec/specs/matrix-status/spec.md
 
@@ -621,6 +650,20 @@ Any inheritance cycle SHALL be detected and rejected with a clear error rather t
 Source: openspec/specs/preset-inheritance/spec.md
 
 traceability:links[]"""
+REQ-223,REQ-223 — A preset does not extend itself,requirement,,requirements.adoc,"""A preset SHALL NOT extend itself, directly or transitively.
+
+supersedes:REQ-174[]
+
+Source: openspec/specs/preset-inheritance/spec.md
+
+traceability:links[]"""
+REQ-224,REQ-224 — Inheritance cycles are detected and rejected,requirement,,requirements.adoc,"""When a preset inheritance chain forms a cycle, the system SHALL detect it and report a clear error rather than looping indefinitely.
+
+supersedes:REQ-174[]
+
+Source: openspec/specs/preset-inheritance/spec.md
+
+traceability:links[]"""
 REQ-175,REQ-175 — Relations are declared keyed with a mandatory reverse,requirement,,requirements.adoc,"""The `relations` config SHALL map `sourceRole → targetRole → relationType → { reverse }`, where `reverse` is required and names the authorable reverse relation type.
 
 Source: openspec/specs/reverse-relations/spec.md
@@ -631,7 +674,7 @@ REQ-176,REQ-176 — Authoring the reverse name canonicalizes to the primary edge
 Source: openspec/specs/reverse-relations/spec.md
 
 traceability:links[]"""
-REQ-177,REQ-177 — Reverse direction is derived for validation,requirement,,requirements.adoc,"""`isRelationAllowed` SHALL allow a relation type that is the reverse of a relation declared in the opposite role direction, without an explicit `relations` entry for that direction.
+REQ-177,REQ-177 — Reverse direction is derived for validation,requirement,,requirements.adoc,"""The system SHALL allow a relation type that is the reverse of a relation declared in the opposite role direction, without an explicit `relations` entry for that direction.
 
 Source: openspec/specs/reverse-relations/spec.md
 
@@ -759,8 +802,7 @@ REQ-081,REQ-081 — Heading elements are excluded from item indexing,requirement
 Source: openspec/specs/lunr-item-anchor-indexing/spec.md
 
 traceability:links[]"""
-REQ-082,REQ-082 — Item indexing is scoped to article body,requirement,,requirements.adoc,"""The item anchor indexing SHALL only traverse elements within `<article class=""""doc"""">`.
-Elements outside the article body (navigation, TOC, footer) SHALL NOT be indexed.
+REQ-082,REQ-082 — Item indexing is scoped to article body,requirement,,requirements.adoc,"""The item anchor indexing SHALL traverse only elements within `<article class=""""doc"""">`.
 
 Source: openspec/specs/lunr-item-anchor-indexing/spec.md
 
@@ -837,6 +879,20 @@ Source: openspec/specs/graph-diff/spec.md
 traceability:links[]"""
 REQ-215,REQ-215 — Supersession appears as added and removed,requirement,,requirements.adoc,"""The diff SHALL NOT attempt content-similarity rename detection.
 A superseded predecessor SHALL appear as removed and its successor as added, with the `supersedes` relationship reported as a new relationship.
+
+Source: openspec/specs/graph-diff/spec.md
+
+traceability:links[]"""
+REQ-225,REQ-225 — The diff does not attempt rename detection,requirement,,requirements.adoc,"""The diff SHALL NOT attempt content-similarity rename detection.
+
+supersedes:REQ-215[]
+
+Source: openspec/specs/graph-diff/spec.md
+
+traceability:links[]"""
+REQ-226,REQ-226 — A superseded predecessor is reported as removed and its successor as added,requirement,,requirements.adoc,"""A superseded predecessor SHALL appear as removed and its successor as added, with the `supersedes` relationship reported as a new relationship.
+
+supersedes:REQ-215[]
 
 Source: openspec/specs/graph-diff/spec.md
 
@@ -1096,8 +1152,7 @@ REQ-198,REQ-198 — Self-Traceability section is visually distinct,requirement,,
 Source: openspec/specs/doc-self-traceability/spec.md
 
 traceability:links[]"""
-REQ-199,REQ-199 — Self-Traceability section preserves traceable items,requirement,,requirements.adoc,"""The restructuring SHALL NOT move any traceable `[item]` blocks out of their source files.
-All existing requirements (REQ), architecture (ARC), test (TST), use case (UC), and quality (QA) items SHALL remain in their current AsciiDoc files.
+REQ-199,REQ-199 — Self-Traceability section preserves traceable items,requirement,,requirements.adoc,"""The restructuring SHALL keep every traceable `[item]` block in its current AsciiDoc file.
 
 Source: openspec/specs/doc-self-traceability/spec.md
 
@@ -1320,7 +1375,8 @@ targets.
 Error messages include file path, line number, and allowed
 alternatives (see xref:explanation/adr/0004-zero-framework.adoc[ADR-004]).
 
-addresses:REQ-071[]
+addresses:REQ-221[]
+addresses:REQ-222[]
 addresses:QA-056[]
 addresses:QA-057[]
 
@@ -1333,7 +1389,8 @@ addresses:REQ-170[]
 addresses:REQ-171[]
 addresses:REQ-172[]
 addresses:REQ-173[]
-addresses:REQ-174[]
+addresses:REQ-223[]
+addresses:REQ-224[]
 
 traceability:links[]"""
 ARC-028,ARC-028 — Circular reference detection in graph validation,design,,explanation/architecture.adoc,"""The `validate()` method calls `findCircularReferences()`, a DFS-based cycle
@@ -1404,7 +1461,8 @@ ARC-035,ARC-035 — Relation reverse declaration and canonical storage,design,,e
 Authoring the same logical edge from both sides deduplicates into one `bidirectional` edge driven by the `reverse` declaration.
 `ConfigLoader.isRelationAllowed()` derives the reverse direction, so the reverse type is allowed without a second `relations` entry.
 
-addresses:REQ-129[]
+addresses:REQ-219[]
+addresses:REQ-220[]
 addresses:REQ-175[]
 addresses:REQ-176[]
 addresses:REQ-177[]
@@ -1415,6 +1473,7 @@ ARC-039,ARC-039 — Supersession semantics,design,,explanation/architecture.adoc
 `TraceabilityGraph.isSuperseded()` and `getSuccessors()` answer the direct questions, and splits (several successors) and merges (several predecessors) are first-class.
 Self-supersession, duplicate links, and cycles are validation errors; a functional link to a superseded item is an advisory `stale_link` warning.
 Current matrices omit superseded items via `getCurrentItemsByRole()`.
+See xref:explanation/adr/0009-supersede-not-mutate.adoc[ADR-009].
 
 addresses:REQ-201[]
 addresses:REQ-202[]
@@ -1431,11 +1490,13 @@ addresses:REQ-211[]
 traceability:links[]"""
 ARC-040,ARC-040 — Graph diff,design,,explanation/architecture.adoc,"""`GraphDiff.diffGraphs(prev, next)` compares two graph snapshots by stable item ID, classifying each item as added, removed, or modified without hardcoding any role name.
 A surviving item is `modified` when a compared field (`title`, `content`, `role`, `status`, or `attributes`) differs, and relationship deltas are reported only between surviving items, except `supersedes` history links.
+See xref:explanation/adr/0010-identity-first-graph-diff.adoc[ADR-010].
 
 addresses:REQ-212[]
 addresses:REQ-213[]
 addresses:REQ-214[]
-addresses:REQ-215[]
+addresses:REQ-225[]
+addresses:REQ-226[]
 addresses:REQ-216[]
 addresses:REQ-217[]
 
@@ -1930,7 +1991,8 @@ verifies:REQ-065[]
 verifies:REQ-066[]
 verifies:REQ-067[]
 verifies:REQ-070[]
-verifies:REQ-071[]
+verifies:REQ-221[]
+verifies:REQ-222[]
 verifies:REQ-161[]
 verifies:REQ-162[]
 verifies:REQ-100[]
@@ -1968,7 +2030,8 @@ verifies:REQ-170[]
 verifies:REQ-171[]
 verifies:REQ-172[]
 verifies:REQ-173[]
-verifies:REQ-174[]
+verifies:REQ-223[]
+verifies:REQ-224[]
 verifies:REQ-175[]
 verifies:REQ-177[]
 
@@ -1983,7 +2046,8 @@ Also tests `RequirementsTraceabilityExtension` API methods (processFiles, valida
 verifies:REQ-053[]
 verifies:REQ-160[]
 verifies:REQ-109[]
-verifies:REQ-129[]
+verifies:REQ-219[]
+verifies:REQ-220[]
 verifies:REQ-176[]
 
 traceability:links[]"""
@@ -2061,7 +2125,8 @@ Tests `diffGraphs`: added/removed/unmodified classification, field-level modific
 verifies:REQ-212[]
 verifies:REQ-213[]
 verifies:REQ-214[]
-verifies:REQ-215[]
+verifies:REQ-225[]
+verifies:REQ-226[]
 
 traceability:links[]"""
 PRQ-001,PRQ-001 — CI workflows trigger on push and PR,process_requirement,,self-traceability/delivery-process.adoc,"""The GitHub Actions CI workflow SHALL trigger on every push to `main` and every pull request.

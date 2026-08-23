@@ -44,12 +44,15 @@ When a preset's `extends` names a preset that cannot be resolved, loading SHALL 
 - **THEN** `loadPreset` SHALL throw an error stating the preset was not found
 - **AND** the resolved preset SHALL NOT be returned or cached
 
-### Requirement: Circular inheritance is rejected
-A preset SHALL NOT extend itself, directly or transitively. Any inheritance cycle SHALL be detected and rejected with a clear error rather than looping indefinitely.
+### Requirement: A preset does not extend itself
+A preset SHALL NOT extend itself, directly or transitively.
 
 #### Scenario: Self-extension
 - **WHEN** a preset declares `extends` with its own name
 - **THEN** loading SHALL throw a circular-inheritance error
+
+### Requirement: Inheritance cycles are detected and rejected
+When a preset inheritance chain forms a cycle, the system SHALL detect it and report a clear error rather than looping indefinitely.
 
 #### Scenario: Mutual extension
 - **WHEN** preset A extends B and preset B extends A

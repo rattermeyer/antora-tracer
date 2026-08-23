@@ -7,7 +7,7 @@ A matrix row SHALL render a single status value (`done`, `partial`, or `missing`
 ## Requirements
 
 ### Requirement: Matrix renders one status column per row
-The HTML matrix SHALL render exactly one per-row status column, and SHALL NOT render a separate per-row coverage percentage column.
+The HTML matrix SHALL render exactly one per-row status column.
 
 #### Scenario: Single status column replaces Coverage and Status
 - **WHEN** a matrix is exported to HTML

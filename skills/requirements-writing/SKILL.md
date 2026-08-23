@@ -81,6 +81,26 @@ The "how" belongs in design documents, ADRs, or architecture records.
 
 The concrete class and event names above are antora-tracer internals used as illustration. When reviewing a different project, substitute its actual component names.
 
+## Atomicity Convention
+
+One requirement, one SHALL — and one obligation only.
+
+- **One SHALL per block.** Multiple SHALLs usually means multiple requirements — split them.
+- **SHALL NOT is a separate requirement.** A prohibition is its own Unwanted Behaviour requirement, never paired with a positive SHALL in the same block.
+- **Exception:** "and" is fine when it joins aspects of one observable outcome ("displays X and Y in the same view").
+
+Example:
+
+```asciidoc
+# Wrong — positive and negative obligations in one block
+The system SHALL store the relationship and SHALL NOT modify the source file.
+
+# Right — two requirements
+The system SHALL store the relationship.
+The system SHALL NOT modify the source file.   # <1>
+```
+<1> The `SHALL NOT` becomes its own Unwanted Behaviour (`If … then`) requirement.
+
 ## Solution Prescription Categories
 
 When reviewing, check for these specific patterns:

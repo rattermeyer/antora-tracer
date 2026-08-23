@@ -38,7 +38,7 @@ Elements that are HTML headings (`h1` through `h6`) SHALL be skipped by the item
 - **AND** the heading SHALL only appear as a section chunk from the existing `processNodes` function
 
 ### Requirement: Item indexing is scoped to article body
-The item anchor indexing SHALL only traverse elements within `<article class="doc">`. Elements outside the article body (navigation, TOC, footer) SHALL NOT be indexed.
+The item anchor indexing SHALL traverse only elements within `<article class="doc">`.
 
 #### Scenario: Navigation elements outside article are excluded
 - **WHEN** a page has `<nav class="pagination"><a id="next-page">Next</a></nav>` outside `<article class="doc">`

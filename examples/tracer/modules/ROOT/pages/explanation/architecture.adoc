@@ -151,7 +151,8 @@ targets.
 Error messages include file path, line number, and allowed
 alternatives (see xref:explanation/adr/0004-zero-framework.adoc[ADR-004]).
 
-addresses:REQ-071[]
+addresses:REQ-221[]
+addresses:REQ-222[]
 addresses:QA-056[]
 addresses:QA-057[]
 
@@ -168,7 +169,8 @@ addresses:REQ-170[]
 addresses:REQ-171[]
 addresses:REQ-172[]
 addresses:REQ-173[]
-addresses:REQ-174[]
+addresses:REQ-223[]
+addresses:REQ-224[]
 
 traceability:links[]
 --
@@ -261,7 +263,8 @@ The `relations` map is keyed as `sourceRole → targetRole → type → { revers
 Authoring the same logical edge from both sides deduplicates into one `bidirectional` edge driven by the `reverse` declaration.
 `ConfigLoader.isRelationAllowed()` derives the reverse direction, so the reverse type is allowed without a second `relations` entry.
 
-addresses:REQ-129[]
+addresses:REQ-219[]
+addresses:REQ-220[]
 addresses:REQ-175[]
 addresses:REQ-176[]
 addresses:REQ-177[]
@@ -302,7 +305,8 @@ See xref:explanation/adr/0010-identity-first-graph-diff.adoc[ADR-010].
 addresses:REQ-212[]
 addresses:REQ-213[]
 addresses:REQ-214[]
-addresses:REQ-215[]
+addresses:REQ-225[]
+addresses:REQ-226[]
 addresses:REQ-216[]
 addresses:REQ-217[]
 

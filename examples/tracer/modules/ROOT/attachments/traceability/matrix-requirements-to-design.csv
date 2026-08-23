@@ -7,7 +7,8 @@ REQ-092,REQ-092 — Inline macros inside backtick code spans are not parsed,ARC-
 REQ-110,REQ-110 — Items defined in partials are registered in the graph,ARC-029: ARC-029 — Partial file processing with source-repo links
 REQ-144,REQ-144 — Partial items use view URL as source reference,ARC-029: ARC-029 — Partial file processing with source-repo links
 REQ-145,REQ-145 — All processing passes apply to partial files,ARC-029: ARC-029 — Partial file processing with source-repo links
-REQ-129,REQ-129 — Bidirectional relationship pairs are merged into a single edge,ARC-035: ARC-035 — Relation reverse declaration and canonical storage
+REQ-219,REQ-219 — Reverse-authored relationships are detected,ARC-035: ARC-035 — Relation reverse declaration and canonical storage
+REQ-220,REQ-220 — No second edge is stored for a complementary pair,ARC-035: ARC-035 — Relation reverse declaration and canonical storage
 REQ-109,REQ-109 — Circular reference detection in graph validation,ARC-028: ARC-028 — Circular reference detection in graph validation
 REQ-111,REQ-111 — File state is prepared once per file,
 REQ-112,REQ-112 — PreparedFile carries all needed state,
@@ -33,7 +34,8 @@ REQ-166,REQ-166 — Source file not modified,
 REQ-116,REQ-116 — Items carry component and module context from Antora,
 REQ-117,REQ-117 — Cross-module and cross-component xref includes correct prefix,
 REQ-119,REQ-119 — Cross-module and cross-component xref resolution,
-REQ-071,REQ-071 — Relation display names are config-driven,ARC-018: ARC-018 — Config-driven validation
+REQ-221,REQ-221 — Relation display names are configurable,ARC-018: ARC-018 — Config-driven validation
+REQ-222,REQ-222 — Labels do not affect the graph,ARC-018: ARC-018 — Config-driven validation
 REQ-161,REQ-161 — Default display name is the humanized type,ARC-037: ARC-037 — Display labels with humanize default
 REQ-162,REQ-162 — No compile-time fallback,ARC-037: ARC-037 — Display labels with humanize default
 REQ-037,REQ-037 — Matrix displays row items as clickable links,ARC-021: ARC-021 — Path resolution for matrix-to-item links
@@ -58,7 +60,8 @@ REQ-170,REQ-170 — Preset extends a parent by top-level `extends`,ARC-036: ARC-
 REQ-171,REQ-171 — Merge semantics match config-file `extends`,ARC-036: ARC-036 — Preset inheritance and config merge
 REQ-172,REQ-172 — Transitive inheritance,ARC-036: ARC-036 — Preset inheritance and config merge
 REQ-173,REQ-173 — Missing parent is reported,ARC-036: ARC-036 — Preset inheritance and config merge
-REQ-174,REQ-174 — Circular inheritance is rejected,ARC-036: ARC-036 — Preset inheritance and config merge
+REQ-223,REQ-223 — A preset does not extend itself,ARC-036: ARC-036 — Preset inheritance and config merge
+REQ-224,REQ-224 — Inheritance cycles are detected and rejected,ARC-036: ARC-036 — Preset inheritance and config merge
 REQ-175,REQ-175 — Relations are declared keyed with a mandatory reverse,ARC-035: ARC-035 — Relation reverse declaration and canonical storage
 REQ-176,REQ-176 — Authoring the reverse name canonicalizes to the primary edge,ARC-035: ARC-035 — Relation reverse declaration and canonical storage
 REQ-177,REQ-177 — Reverse direction is derived for validation,ARC-035: ARC-035 — Relation reverse declaration and canonical storage
@@ -98,7 +101,8 @@ REQ-211,REQ-211 — Validation warns about stale functional links,ARC-039: ARC-0
 REQ-212,REQ-212 — Diff classifies items by stable ID,ARC-040: ARC-040 — Graph diff
 REQ-213,REQ-213 — Modified items report changed fields,ARC-040: ARC-040 — Graph diff
 REQ-214,REQ-214 — Relationship deltas are limited to surviving items,ARC-040: ARC-040 — Graph diff
-REQ-215,REQ-215 — Supersession appears as added and removed,ARC-040: ARC-040 — Graph diff
+REQ-225,REQ-225 — The diff does not attempt rename detection,ARC-040: ARC-040 — Graph diff
+REQ-226,REQ-226 — A superseded predecessor is reported as removed and its successor as added,ARC-040: ARC-040 — Graph diff
 REQ-216,"""REQ-216 — Diff is a public, config-agnostic API""",ARC-040: ARC-040 — Graph diff
 REQ-217,REQ-217 — CLI diff is read-only,ARC-040: ARC-040 — Graph diff
 QA-057,QA-057 — Fail-fast with clear diagnostics,ARC-018: ARC-018 — Config-driven validation
@@ -171,5 +175,5 @@ REQ-122,REQ-122 — Process-to-product matrix exists,
 REQ-114,REQ-114 — Dead design-matrix template is removed,
 REQ-115,REQ-115 — Dead MatrixGenerator methods are removed,
 
-Total 171 rows
-Coverage: 67.3%
+Total 175 rows
+Coverage: 68.0%

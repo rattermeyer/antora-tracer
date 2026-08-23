@@ -7,7 +7,8 @@ REQ-092,REQ-092 — Inline macros inside backtick code spans are not parsed,TST-
 REQ-110,REQ-110 — Items defined in partials are registered in the graph,TST-002: TST-002 — Antora Extension Tests
 REQ-144,REQ-144 — Partial items use view URL as source reference,TST-002: TST-002 — Antora Extension Tests
 REQ-145,REQ-145 — All processing passes apply to partial files,TST-002: TST-002 — Antora Extension Tests
-REQ-129,REQ-129 — Bidirectional relationship pairs are merged into a single edge,TST-005: TST-005 — Graph and API Tests
+REQ-219,REQ-219 — Reverse-authored relationships are detected,TST-005: TST-005 — Graph and API Tests
+REQ-220,REQ-220 — No second edge is stored for a complementary pair,TST-005: TST-005 — Graph and API Tests
 REQ-109,REQ-109 — Circular reference detection in graph validation,TST-005: TST-005 — Graph and API Tests
 REQ-111,REQ-111 — File state is prepared once per file,
 REQ-112,REQ-112 — PreparedFile carries all needed state,
@@ -33,7 +34,8 @@ REQ-166,REQ-166 — Source file not modified,
 REQ-116,REQ-116 — Items carry component and module context from Antora,TST-002: TST-002 — Antora Extension Tests
 REQ-117,REQ-117 — Cross-module and cross-component xref includes correct prefix,TST-002: TST-002 — Antora Extension Tests
 REQ-119,REQ-119 — Cross-module and cross-component xref resolution,TST-002: TST-002 — Antora Extension Tests
-REQ-071,REQ-071 — Relation display names are config-driven,TST-002: TST-002 — Antora Extension Tests
+REQ-221,REQ-221 — Relation display names are configurable,TST-002: TST-002 — Antora Extension Tests
+REQ-222,REQ-222 — Labels do not affect the graph,TST-002: TST-002 — Antora Extension Tests
 REQ-161,REQ-161 — Default display name is the humanized type,TST-002: TST-002 — Antora Extension Tests
 REQ-162,REQ-162 — No compile-time fallback,TST-002: TST-002 — Antora Extension Tests
 REQ-037,REQ-037 — Matrix displays row items as clickable links,TST-006: TST-006 — MatrixGenerator Tests
@@ -58,7 +60,8 @@ REQ-170,REQ-170 — Preset extends a parent by top-level `extends`,TST-004: TST-
 REQ-171,REQ-171 — Merge semantics match config-file `extends`,TST-004: TST-004 — ConfigLoader Tests
 REQ-172,REQ-172 — Transitive inheritance,TST-004: TST-004 — ConfigLoader Tests
 REQ-173,REQ-173 — Missing parent is reported,TST-004: TST-004 — ConfigLoader Tests
-REQ-174,REQ-174 — Circular inheritance is rejected,TST-004: TST-004 — ConfigLoader Tests
+REQ-223,REQ-223 — A preset does not extend itself,TST-004: TST-004 — ConfigLoader Tests
+REQ-224,REQ-224 — Inheritance cycles are detected and rejected,TST-004: TST-004 — ConfigLoader Tests
 REQ-175,REQ-175 — Relations are declared keyed with a mandatory reverse,TST-004: TST-004 — ConfigLoader Tests
 REQ-176,REQ-176 — Authoring the reverse name canonicalizes to the primary edge,TST-005: TST-005 — Graph and API Tests
 REQ-177,REQ-177 — Reverse direction is derived for validation,TST-004: TST-004 — ConfigLoader Tests
@@ -98,7 +101,8 @@ REQ-211,REQ-211 — Validation warns about stale functional links,TST-011: TST-0
 REQ-212,REQ-212 — Diff classifies items by stable ID,TST-012: TST-012 — Graph Diff Tests
 REQ-213,REQ-213 — Modified items report changed fields,TST-012: TST-012 — Graph Diff Tests
 REQ-214,REQ-214 — Relationship deltas are limited to surviving items,TST-012: TST-012 — Graph Diff Tests
-REQ-215,REQ-215 — Supersession appears as added and removed,TST-012: TST-012 — Graph Diff Tests
+REQ-225,REQ-225 — The diff does not attempt rename detection,TST-012: TST-012 — Graph Diff Tests
+REQ-226,REQ-226 — A superseded predecessor is reported as removed and its successor as added,TST-012: TST-012 — Graph Diff Tests
 REQ-216,"""REQ-216 — Diff is a public, config-agnostic API""",
 REQ-217,REQ-217 — CLI diff is read-only,
 QA-057,QA-057 — Fail-fast with clear diagnostics,
@@ -171,5 +175,5 @@ REQ-122,REQ-122 — Process-to-product matrix exists,
 REQ-114,REQ-114 — Dead design-matrix template is removed,
 REQ-115,REQ-115 — Dead MatrixGenerator methods are removed,
 
-Total 171 rows
-Coverage: 53.8%
+Total 175 rows
+Coverage: 54.9%
