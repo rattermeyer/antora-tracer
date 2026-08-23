@@ -18,7 +18,8 @@ const CLI = path.join(__dirname, "..", "src", "cli.js");
 const TEST_DIR = path.join(__dirname, "temp-query");
 
 // Chain: TST-001 ->tests-> IMP-001 ->implements-> DES-001 ->addresses-> REQ-001
-// Plus two disconnected items (REQ-999 orphan, REQ-002 orphan).
+// Plus two disconnected items (REQ-999 isolated, REQ-002 isolated),
+// and supersession fixtures: REQ-010 (orphaned), REQ-020 (superseded but still referenced).
 const SAMPLE = `= Test
 
 [#REQ-001, item, role=requirement, title="Req 1"]
@@ -55,6 +56,37 @@ Orphan requirement.
 [#REQ-002, item, role=requirement, title="Req 2"]
 ====
 Requirement two.
+====
+
+[#REQ-010, item, role=requirement, title="Superseded Req"]
+====
+Old requirement.
+====
+
+[#REQ-011, item, role=requirement, title="Successor Req"]
+====
+New requirement.
+
+supersedes:REQ-010[]
+====
+
+[#REQ-020, item, role=requirement, title="Superseded Req In Use"]
+====
+Old requirement still referenced.
+====
+
+[#ARC-020, item, role=design, title="Design still referencing"]
+====
+Still addresses the old requirement.
+
+addresses:REQ-020[]
+====
+
+[#REQ-021, item, role=requirement, title="Successor of REQ-020"]
+====
+New requirement.
+
+supersedes:REQ-020[]
 ====
 `;
 
@@ -143,11 +175,37 @@ describe("Query Command", () => {
     });
   });
 
-  describe("query orphaned", () => {
+  describe("query isolated", () => {
     it("lists items with no relationships", () => {
-      const result = jsonOf(["orphaned", "--json", ...input()]);
+      const result = jsonOf(["isolated", "--json", ...input()]);
       const ids = (result as any[]).map((i) => i.id).sort();
       expect(ids).to.deep.equal(["REQ-002", "REQ-999"]);
+    });
+
+    it("filters isolated items by role", () => {
+      const result = jsonOf([
+        "isolated",
+        "--role",
+        "requirement",
+        "--json",
+        ...input(),
+      ]);
+      const ids = (result as any[]).map((i) => i.id).sort();
+      expect(ids).to.deep.equal(["REQ-002", "REQ-999"]);
+    });
+  });
+
+  describe("query orphaned", () => {
+    it("lists superseded items with no incoming functional links", () => {
+      const result = jsonOf(["orphaned", "--json", ...input()]);
+      const ids = (result as any[]).map((i) => i.id).sort();
+      expect(ids).to.deep.equal(["REQ-010"]);
+    });
+
+    it("excludes superseded items that are still referenced", () => {
+      const result = jsonOf(["orphaned", "--json", ...input()]);
+      const ids = (result as any[]).map((i) => i.id).sort();
+      expect(ids).to.not.include("REQ-020");
     });
 
     it("filters orphaned items by role", () => {
@@ -159,7 +217,7 @@ describe("Query Command", () => {
         ...input(),
       ]);
       const ids = (result as any[]).map((i) => i.id).sort();
-      expect(ids).to.deep.equal(["REQ-002", "REQ-999"]);
+      expect(ids).to.deep.equal(["REQ-010"]);
     });
   });
 

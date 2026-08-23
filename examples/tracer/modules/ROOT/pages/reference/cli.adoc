@@ -83,7 +83,7 @@ npx antora-tracer matrix -t requirements-to-design -f csv -o matrix.csv
 
 == validate
 
-Validate the traceability graph for orphaned items, missing targets, invalid relations, duplicate item IDs, and circular references.
+Validate the traceability graph for dangling references (missing targets), invalid relations, duplicate item IDs, and circular references.
 
 [source,bash]
 ----
@@ -251,7 +251,8 @@ Parses your `.adoc` source files and answers one structural question per invocat
 npx antora-tracer query reverse REQ-005
 npx antora-tracer query reverse REQ-005 -i docs/
 npx antora-tracer query impact REQ-005 --json
-npx antora-tracer query orphaned --role requirement
+npx antora-tracer query isolated --role requirement
+npx antora-tracer query orphaned
 npx antora-tracer query path TST-001 REQ-001
 ----
 
@@ -269,7 +270,7 @@ npx antora-tracer query path TST-001 REQ-001
 
 | `--role <role>`
 | string
-| For `orphaned`: filter results by role
+| For `isolated` and `orphaned`: filter results by role
 |===
 
 Subcommands:
@@ -284,8 +285,11 @@ Subcommands:
 | `impact <id>`
 | List every item transitively connected to `<id>`
 
-| `orphaned`
+| `isolated`
 | List items with no relationships (optionally `--role <role>`)
+
+| `orphaned`
+| List superseded items with no incoming functional links (optionally `--role <role>`)
 
 | `path <from> <to>`
 | Print the shortest relationship path between two items

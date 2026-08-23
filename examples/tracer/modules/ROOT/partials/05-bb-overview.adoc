@@ -27,7 +27,7 @@ include::example$bb-overview.puml[]
 | `ConfigLoader` (optional — for role validation)
 
 | `TraceabilityGraph`
-| In-memory directed graph. Forward and reverse relationship indexes for O(1) lookups. Provides query methods (`findPath`, `getImpactAnalysis`), validation (orphaned refs, circular refs), visualization (`toDot`, `toVegaLite`), and ID allocation (`getNextId`).
+| In-memory directed graph. Forward and reverse relationship indexes for O(1) lookups. Provides query methods (`findPath`, `getImpactAnalysis`), validation (dangling refs, circular refs), visualization (`toDot`, `toVegaLite`), and ID allocation (`getNextId`).
 | `ConfigLoader` (optional — for relation validation)
 
 | `ConfigLoader`

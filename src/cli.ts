@@ -932,7 +932,7 @@ queryProgram
   });
 
 queryProgram
-  .command("orphaned")
+  .command("isolated")
   .description("List items with no relationships")
   .option("--role <role>", "Filter by role")
   .action(async (options: any, cmd: any) => {
@@ -959,6 +959,42 @@ queryProgram
         item.sourceFile ?? "",
       ]);
       console.log(formatTable(["ID", "Role", "Title", "File"], rows));
+    }
+  });
+
+queryProgram
+  .command("orphaned")
+  .description("List superseded items with no incoming functional links")
+  .option("--role <role>", "Filter by role")
+  .action(async (options: any, cmd: any) => {
+    const { json } = cmd.parent.opts();
+    const extension = await buildQueryGraph(cmd);
+    const graph = extension.graph;
+    const orphaned = graph
+      .getAllItems()
+      .filter((item) => graph.isOrphaned(item.id));
+    const filtered = options.role
+      ? orphaned.filter((i) => i.role === options.role)
+      : orphaned;
+    if (json) {
+      console.log(JSON.stringify(filtered, null, 2));
+    } else {
+      const rows = filtered.map((item) => {
+        const successors = graph.getSuccessors(item.id).map((s) => s.id);
+        return [
+          item.id,
+          item.role,
+          item.title,
+          successors.join(", "),
+          item.sourceFile ?? "",
+        ];
+      });
+      console.log(
+        formatTable(
+          ["ID", "Role", "Title", "Superseded by", "File"],
+          rows,
+        ),
+      );
     }
   });
 

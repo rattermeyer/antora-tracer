@@ -37,7 +37,7 @@ RequirementsTraceabilityExtension.createWithPreset(presetName: string): Requirem
 | `getRelationships(id, type?)` | Relationships from an item, optionally filtered by type
 | `getRelatedItems(id, type?)` | Items targeted by relationships from an item
 | `getRoleStatistics()` | Item counts per role
-| `validate()` | Run graph validation (orphaned references, missing targets, circular references)
+| `validate()` | Run graph validation (dangling references, circular references)
 | `getCoverageReport()` | Per-role item counts and matrix-specific coverage
 | `getConfigErrors()` | Configuration validation errors
 | `createNeo4jExporter()` | Create a Neo4jExporter for the current graph

@@ -777,7 +777,7 @@ describe("RequirementsTraceabilityExtension - API Methods", () => {
         .be.empty;
     });
 
-    it("should detect orphaned relationships via validate()", () => {
+    it("should detect dangling references via validate()", () => {
       const extension = new RequirementsTraceabilityExtension();
       // Add items and a relationship where both endpoints exist
       extension.graph.addItem(createItem("REQ-001", "requirement"));
@@ -791,7 +791,7 @@ describe("RequirementsTraceabilityExtension - API Methods", () => {
         line: 5,
       });
 
-      // Now remove the target item to create an orphan
+      // Now remove the target item to create a dangling reference
       // Access the internal map to bypass validation
       (extension.graph as any)._items.delete("REQ-001");
 
@@ -801,12 +801,13 @@ describe("RequirementsTraceabilityExtension - API Methods", () => {
         e.includes("does not exist"),
       );
       expect(orphanError).to.exist;
+      expect(orphanError).to.include("Dangling reference");
       // Error message carries the sourceFile:line location for usability
       expect(orphanError).to.include("at test.adoc:5");
       expect(orphanError).to.include("declares addresses");
     });
 
-    it("should include expected target role hint in orphaned relationship error", async () => {
+    it("should include expected target role hint in dangling reference error", async () => {
       const extension =
         await RequirementsTraceabilityExtension.createWithPreset(
           "requirements-engineering",
@@ -822,7 +823,7 @@ describe("RequirementsTraceabilityExtension - API Methods", () => {
         line: 42,
       });
 
-      // Remove the target to orphan the relationship
+      // Remove the target to create a dangling reference
       (extension.graph as any)._items.delete("REQ-001");
 
       const validation = extension.validate();

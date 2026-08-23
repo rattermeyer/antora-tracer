@@ -1,10 +1,4 @@
-# CLI Validate
-
-## Purpose
-
-Provide a `validate` command on the CLI that checks the traceability graph for errors — invalid relation types, dangling references, duplicate item IDs, and circular references — and reports them with actionable diagnostics, without requiring an Antora build.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: CLI exposes a validate command
 The CLI SHALL provide a `validate` command that reads AsciiDoc source files (via `-i/--input`) and the traceability configuration (via `--config`) and reports validation errors.

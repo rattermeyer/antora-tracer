@@ -404,6 +404,17 @@ export class TraceabilityGraph {
   }
 
   /**
+   * Whether a superseded item is orphaned: superseded AND no incoming
+   * functional (non-history) relationships target it.
+   */
+  isOrphaned(itemId: string): boolean {
+    if (!this.isSuperseded(itemId)) return false;
+    return this.getReverseRelationships(itemId).every((rel) =>
+      this.isHistoryRelation(rel.type),
+    );
+  }
+
+  /**
    * Get relationships by type
    */
   getRelationshipsByType(type: string): ItemRelationship[] {
@@ -591,7 +602,7 @@ export class TraceabilityGraph {
         const targetItem = this.getItem(rel.targetId);
         const targetDetail = targetItem ? ` (role: ${targetItem.role})` : "";
         errors.push(
-          `Orphaned relationship${location}: '${rel.fromId}' declares ${rel.type} -> '${rel.targetId}'${targetDetail} but source '${rel.fromId}' does not exist.`,
+          `Dangling reference${location}: '${rel.fromId}' declares ${rel.type} -> '${rel.targetId}'${targetDetail} but source '${rel.fromId}' does not exist.`,
         );
       }
       if (!this.getItem(rel.targetId)) {
@@ -619,7 +630,7 @@ export class TraceabilityGraph {
         }
         const sourceRole = sourceItem ? ` (role: ${sourceItem.role})` : "";
         errors.push(
-          `Orphaned relationship${location}: '${rel.fromId}'${sourceRole} declares ${rel.type} -> '${rel.targetId}' but target '${rel.targetId}' does not exist${expectedRole}.`,
+          `Dangling reference${location}: '${rel.fromId}'${sourceRole} declares ${rel.type} -> '${rel.targetId}' but target '${rel.targetId}' does not exist${expectedRole}.`,
         );
       }
     }

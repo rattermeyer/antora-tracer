@@ -73,6 +73,34 @@ describe("Supersession", () => {
     expect(graph.isHistoryRelation("addresses")).to.be.false;
   });
 
+  it("derives orphaned state from supersession and incoming functional links", () => {
+    const { graph } = setup();
+    add(graph, "REQ-042", "requirement");
+    add(graph, "REQ-043", "requirement");
+    add(graph, "ARC-001", "design");
+    graph.addRelationship({
+      id: "r1",
+      fromId: "REQ-043",
+      targetId: "REQ-042",
+      type: "supersedes",
+    });
+
+    // Only the history link targets REQ-042, so it is orphaned.
+    expect(graph.isOrphaned("REQ-042")).to.be.true;
+
+    // A functional link keeps it in use, so it is no longer orphaned.
+    graph.addRelationship({
+      id: "r2",
+      fromId: "ARC-001",
+      targetId: "REQ-042",
+      type: "addresses",
+    });
+    expect(graph.isOrphaned("REQ-042")).to.be.false;
+
+    // Non-superseded items are never orphaned.
+    expect(graph.isOrphaned("REQ-043")).to.be.false;
+  });
+
   it("supports splits and merges", () => {
     const { graph } = setup();
     for (const id of ["REQ-041", "REQ-042", "REQ-043", "REQ-044"]) {

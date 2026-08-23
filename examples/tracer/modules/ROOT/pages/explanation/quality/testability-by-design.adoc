@@ -21,7 +21,7 @@ Isolated test files::
   Each module has a dedicated test file (`test/<module-name>.test.ts`) with no cross-module test dependencies; source: test file listing; horizon: every test run.
 
 Graph introspection::
-  The `TraceabilityGraph` exposes internal state (`_items`, `_relationships`, `_warnings`) for test access without requiring public API surface for every query; source: `_items.delete()` pattern in orphaned-relationship tests; horizon: every test run.
+  The `TraceabilityGraph` exposes internal state (`_items`, `_relationships`, `_warnings`) for test access without requiring public API surface for every query; source: `_items.delete()` pattern in dangling-reference tests; horizon: every test run.
 
 Fast feedback::
   The full test suite (200+ tests) completes in under 500 ms on a developer machine; source: Mocha test runner timing output; horizon: every `npm test` execution.

@@ -41,9 +41,19 @@ npx antora-tracer query reverse REQ-005 --json
 npx antora-tracer query impact REQ-005
 ----
 
+== Find isolated items
+
+`isolated` lists items with no relationships in either direction:
+
+[source,bash]
+----
+npx antora-tracer query isolated
+npx antora-tracer query isolated --role requirement
+----
+
 == Find orphaned items
 
-`orphaned` lists items with no relationships in either direction:
+`orphaned` lists superseded items with no incoming functional links — the items that are safe to archive or remove:
 
 [source,bash]
 ----
