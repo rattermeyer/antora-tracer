@@ -35,4 +35,4 @@ The system SHALL NOT consult a compile-time inverse map for display names; the p
 
 #### Scenario: Removed type renders as its raw humanized name
 - **WHEN** a relation type has no `labels` entry
-- **THEN** the humanized type name is displayed, and no `INVERSE_MAP` lookup occurs
+- **THEN** the humanized type name is displayed, and no compile-time inverse map is consulted

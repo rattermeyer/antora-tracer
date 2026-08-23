@@ -55,7 +55,7 @@ async function createExtension(options: any) {
   try {
     // An explicit --config takes precedence over the (defaulted) --preset,
     // otherwise the preset default silently swallows the config file and its
-    // inverseLabels/custom roles never load.
+    // labels/custom roles never load.
     if (mergedOptions.config) {
       const configLoader = new ConfigLoader();
       configLoader.load(mergedOptions.config);

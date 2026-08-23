@@ -1224,7 +1224,7 @@ addresses:REQ-001[]
       const ext = new AntoraTraceabilityExtension(ctx as any);
       await waitForInit();
 
-      // `foobar` has no entry in config inverseLabels or INVERSE_MAP,
+      // `foobar` has no entry in the `labels` config,
       // so the raw relation type is displayed as-is.
       const content = `:traceability-links: true
 
