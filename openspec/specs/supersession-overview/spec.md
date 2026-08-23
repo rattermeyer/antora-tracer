@@ -7,15 +7,20 @@ Provide a generated overview page that reports supersession statistics and dangl
 ## Requirements
 
 ### Requirement: Overview page generation is opt-in and configurable
-When the extension is configured with an overview target, the system SHALL generate an overview page reporting supersession statistics and dangling references.
+When `generateOverview` is enabled, the system SHALL register the overview as a content-catalog attachment at the configured `overviewTarget` (default `traceability/overview.html`), reporting supersession statistics and dangling references.
 
-#### Scenario: Configured target generates a page
-- **WHEN** the extension config specifies an overview target (`component:module:page`)
-- **THEN** the build SHALL produce the overview page at that location
+#### Scenario: Overview is registered as a navigable attachment
+- **WHEN** `generateOverview` is true
+- **AND** `overviewTarget` is `traceability/overview.html`
+- **THEN** the build SHALL register the overview at `attachment$traceability/overview.html`
 
-#### Scenario: Not configured means no page
-- **WHEN** no overview target is configured
-- **THEN** no overview page SHALL be generated
+#### Scenario: Custom target is honored
+- **WHEN** `overviewTarget` is `reports/supersession.html`
+- **THEN** the build SHALL register the overview at `attachment$reports/supersession.html`
+
+#### Scenario: Disabled means no overview
+- **WHEN** `generateOverview` is false
+- **THEN** no overview SHALL be generated or registered
 
 ### Requirement: Overview page reports graph totals
 The overview page SHALL report the number of managed items, the number of active items, and the number of superseded items.

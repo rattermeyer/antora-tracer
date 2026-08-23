@@ -1077,7 +1077,7 @@ traceability:links[]
 
 [#REQ-229, item, role=requirement, title="Overview page generation is opt-in and configurable"]
 --
-When the extension is configured with an overview target, the system SHALL generate an overview page reporting supersession statistics and dangling references.
+When `generateOverview` is enabled, the system SHALL register the overview as a content-catalog attachment at the configured `overviewTarget` (default `traceability/overview.html`), reporting supersession statistics and dangling references.
 
 Source: openspec/specs/supersession-overview/spec.md
 

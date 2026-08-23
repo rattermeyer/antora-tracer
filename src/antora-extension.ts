@@ -38,6 +38,7 @@ export interface AntoraTraceabilityConfig {
   allowDuplicateIds?: boolean;
   renderSuperseded?: boolean;
   generateOverview?: boolean;
+  overviewTarget?: string;
 }
 
 const DEFAULT_CONFIG: Required<AntoraTraceabilityConfig> = {
@@ -53,6 +54,7 @@ const DEFAULT_CONFIG: Required<AntoraTraceabilityConfig> = {
   allowDuplicateIds: false,
   renderSuperseded: true,
   generateOverview: true,
+  overviewTarget: "traceability/overview.html",
 };
 
 export interface AntoraExtensionContext {
@@ -115,6 +117,7 @@ export class AntoraTraceabilityExtension {
       allowDuplicateIds: rc.allowDuplicateIds ?? rc.allowduplicateids ?? false,
       renderSuperseded: rc.renderSuperseded ?? rc.rendersuperseded ?? true,
       generateOverview: rc.generateOverview ?? rc.generateoverview ?? true,
+      overviewTarget: rc.overviewTarget || rc.overviewtarget || "traceability/overview.html",
     };
 
     // Fallback: if no configPath is set, try the example site config
@@ -1099,6 +1102,12 @@ export class AntoraTraceabilityExtension {
         file.src?.path?.endsWith(".adoc"),
       );
 
+      const allModules = new Set<string>();
+      for (const file of [...adocFiles, ...adocPartials]) {
+        allModules.add(file.src?.module || "ROOT");
+      }
+      if (allModules.size === 0) allModules.add("ROOT");
+
       // Group files by component version so each version's graph is isolated.
       // Antora xrefs are version-scoped — an xref from v0.10.x cannot resolve
       // to a page in v0.11.x. Clearing the graph between versions prevents
@@ -1204,6 +1213,27 @@ export class AntoraTraceabilityExtension {
           pageFilesForVersion.concat(partialFilesForVersion),
           htmlStyle,
         );
+      }
+
+      // Register the supersession overview as an attachment so it is navigable
+      // via xref:attachment$... — the full graph is complete only after the loop.
+      if (this.config.generateOverview && this.fullGraph) {
+        const overviewContent = this.generateOverviewContent();
+        const overviewPath =
+          this.config.overviewTarget || "traceability/overview.html";
+        for (const key of allKeys) {
+          const [component, version] = key.split("@");
+          for (const module of allModules) {
+            this.registerAttachmentInCatalog(
+              contentCatalog,
+              component,
+              version,
+              module,
+              overviewPath,
+              overviewContent,
+            );
+          }
+        }
       }
     });
   }

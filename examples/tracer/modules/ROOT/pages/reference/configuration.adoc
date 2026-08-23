@@ -82,6 +82,11 @@ antora:
 | boolean
 | `true`
 | Generate the supersession overview page (totals, per-role statistics, and the dangling-reference worklist) into the output directory
+
+| `overviewTarget`
+| string
+| `traceability/overview.html`
+| Attachment relative path for the generated overview, so it is navigable via `xref:attachment$...`
 |===
 
 The `KROKI_SERVER_URL` environment variable overrides the `krokiServerUrl` option.
