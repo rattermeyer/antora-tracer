@@ -19,7 +19,7 @@ uses the `edit` tool on each:
 |------|--------|
 | `package.json` | `"version": "0.19.0"` |
 | `examples/tracer/antora.yml` | `version: 0.19`, and remove `prerelease: '-wip'` for the stable release |
-| `antora-playbook-ci.yml` | content sources → `branches: ['main', 'v0.19.0']` |
+| `antora-playbook-ci.yml` | content sources → `branches: ['main']`, `tags: ['v0.19.0']` |
 | `CHANGELOG.md` | new `## [0.19.0] — <date>` entry at the top (see below) |
 
 **Version mapping (no exceptions):**
@@ -85,7 +85,8 @@ content:
   sources:
     - url: https://github.com/rattermeyer/antora-tracer.git
       start_path: examples/tracer
-      branches: ['main', 'v0.19.0']
+      branches: ['main']
+      tags: ['v0.19.0']
     - url: https://github.com/rattermeyer/antora-tracer.git
       start_path: blog
       branches: ['main']
@@ -146,8 +147,7 @@ git push origin main
 - Never `npm publish` before `npm run build` — the package ships compiled
   `lib/src`; stale output would be published.
 - Never tag before the antora.yml version matches the release.
-- The CI playbook always lists `['main', '<current release tag>']` — never
-  `['main']` alone for a published release.
+- The CI playbook always lists the release tag under `tags`, never under `branches`: `branches: ['main']` and `tags: ['<current release tag>']`. A tag name in `branches` is silently ignored.
 - Don't bump `blog/antora.yml` unless blog content changed; it's versioned
   independently.
 - If the version selector still shows the old version after deploy, the tag is
