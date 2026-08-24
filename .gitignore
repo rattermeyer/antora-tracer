@@ -188,3 +188,4 @@ __pycache__/
 
 # Vale package-sync cache
 src/vale/.vale/
+lib/src/vale/.vale/
