@@ -42,7 +42,7 @@ Rules:
 - How-to pages use the `How to <verb> <object>` format, such as `How to Write Traceable Items`.
 - Reference pages use a noun phrase, such as `Item Macro`.
 - Explanation pages name the concept, such as `The Traceability Model`.
-- Use sentence case for headings.
+- Use title case for page titles (`= Title`) and sentence case for section headings (`==` and below).
 
 == Scannable content
 
