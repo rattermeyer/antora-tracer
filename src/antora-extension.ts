@@ -1118,7 +1118,7 @@ export class AntoraTraceabilityExtension {
       const groupByVersion = (files: any[]) => {
         const groups = new Map<string, any[]>();
         for (const file of files) {
-          const key = `${file.src?.component || "unknown"}@${file.src?.version || "unknown"}`;
+          const key = `${file.src?.component ?? "unknown"}@${file.src?.version ?? "unknown"}`;
           if (!groups.has(key)) groups.set(key, []);
           groups.get(key)!.push(file);
         }

@@ -2148,6 +2148,48 @@ The system shall authenticate users.
       expect(matrixFiles[0].contents).to.be.instanceOf(Buffer);
     });
 
+    it("should register matrix attachments under an empty-string version for unversioned components", async () => {
+      const addedFiles: any[] = [];
+      const contentCatalog = createCatalog({
+        findBy: ({ family }: { family: string }) => {
+          if (family === "page") {
+            return [
+              {
+                src: {
+                  path: "test.adoc",
+                  module: "ROOT",
+                  component: "test-component",
+                  version: "",
+                },
+                contents: Buffer.from(itemContent),
+              },
+            ];
+          }
+          return [];
+        },
+        addFile: (file: any) => {
+          addedFiles.push(file);
+          return file;
+        },
+      });
+
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      ctx.fireEvent("contentClassified", { contentCatalog });
+
+      const matrixFiles = addedFiles.filter(
+        (f: any) =>
+          f.src?.family === "attachment" &&
+          f.src?.relative?.startsWith("traceability/matrix-"),
+      );
+      expect(matrixFiles.length).to.be.greaterThan(0);
+      expect(matrixFiles[0].src.version).to.equal("");
+    });
+
     it("should replace contents of an existing committed matrix attachment", async () => {
       const existing = { contents: Buffer.from("stale") };
       const addedFiles: any[] = [];
