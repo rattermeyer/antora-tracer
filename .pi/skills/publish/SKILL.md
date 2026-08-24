@@ -1,6 +1,6 @@
 ---
 name: publish
-description: Release antora-tracer — mechanically bump the npm version AND the Antora component version, set the docs build to main + the release tag, tag, publish to npm. Use when the user says "publish", "release", "ship", "npm publish", "cut a release", "bump version", "new version", or "tag the release".
+description: Release antora-tracer — mechanically bump the npm version AND the Antora component version, build docs from main + a maintenance branch at the release tag, tag, publish to npm. Use when the user says "publish", "release", "ship", "npm publish", "cut a release", "bump version", "new version", or "tag the release".
 ---
 
 # Publish a Release
@@ -19,7 +19,7 @@ uses the `edit` tool on each:
 |------|--------|
 | `package.json` | `"version": "0.19.0"` |
 | `examples/tracer/antora.yml` | `version: 0.19`, and remove `prerelease: '-wip'` for the stable release |
-| `antora-playbook-ci.yml` | content sources → `branches: ['main']`, `tags: ['v0.19.0']` |
+| `antora-playbook-ci.yml` | content sources → `branches: ['main', 'v0.19.x']` (a maintenance branch at the tag) |
 | `CHANGELOG.md` | new `## [0.19.0] — <date>` entry at the top (see below) |
 
 **Version mapping (no exceptions):**
@@ -77,7 +77,7 @@ release. This is mechanical too — the agent derives the entries, not the user.
 
 ## What the docs build
 
-The Antora content source builds **`main` AND the release tag** — both, always:
+The Antora content source builds **`main` AND a maintenance branch at the release tag** — both, always:
 
 ```yaml
 # antora-playbook-ci.yml
@@ -85,15 +85,18 @@ content:
   sources:
     - url: https://github.com/rattermeyer/antora-tracer.git
       start_path: examples/tracer
-      branches: ['main']
-      tags: ['v0.19.0']
+      branches: ['main', 'v0.19.x']
     - url: https://github.com/rattermeyer/antora-tracer.git
       start_path: blog
       branches: ['main']
 ```
 
 - `main` → the WIP/next prerelease (keeps `-wip`).
-- `v0.19.0` → the stable release docs (no prerelease), shown as `latest`.
+- `v0.19.x` → the stable release docs (no prerelease), shown as `latest`.
+
+Build the branch, not the tag: a tag is immutable, so it cannot receive the
+AsciiDoc/vale doc fixes that the build lints. Create `v0.19.x` at the tag and
+cherry-pick doc fixes onto it.
 
 The local playbook (`antora-playbook.yml`) uses `branches: HEAD` and is
 preview-only; do not edit its refs.
@@ -120,7 +123,9 @@ git commit -m "chore(release): v0.19.0"
 
 # 4. Tag on that commit (must NOT precede the antora.yml edit)
 git tag v0.19.0
-git push origin main v0.19.0
+git checkout -b v0.19.x v0.19.0
+git push origin main v0.19.0 v0.19.x
+git checkout main
 
 # 5. Publish to npm — build first, lib/src is the shipped artifact
 npm run build
@@ -147,7 +152,7 @@ git push origin main
 - Never `npm publish` before `npm run build` — the package ships compiled
   `lib/src`; stale output would be published.
 - Never tag before the antora.yml version matches the release.
-- The CI playbook always lists the release tag under `tags`, never under `branches`: `branches: ['main']` and `tags: ['<current release tag>']`. A tag name in `branches` is silently ignored.
+- The stable docs build from a maintenance branch (`vX.Y.x`) created at the release tag, never from the tag itself — a tag is immutable and cannot receive the doc fixes that vale lints.
 - Don't bump `blog/antora.yml` unless blog content changed; it's versioned
   independently.
 - If the version selector still shows the old version after deploy, the tag is
