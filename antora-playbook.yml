@@ -39,9 +39,7 @@ ui:
     url: https://github.com/rattermeyer/antora-ui-conemso/releases/download/v1.1.3/ui-bundle.zip
 
 urls:
-  latest_version_segment: latest
   redirect_facility: static
-  latest_prerelease_version_segment: unstable
 
 
 output:
