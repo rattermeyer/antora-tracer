@@ -6,10 +6,12 @@ description: Release antora-tracer — bump the npm version, tag, create a maint
 # Publish a Release
 
 The Antora component version is **derived from the git refname**, so there is
-no hand-maintained version to drift. `main` is unversioned (`version: ~`) and
-is always the "latest" docs. A maintenance branch (`vX.Y.x`) carries a refname
-projection that derives its version (e.g. `v0.20.x` → `0.20`). A release
-consistency check validates the remaining hand-maintained pieces.
+no hand-maintained version to drift. `main` is a named prerelease
+(`version: main` + `prerelease: true`) served at `/main/`. A maintenance branch
+(`vX.Y.x`) carries a refname projection that derives its version (e.g. `v0.20.x`
+→ `0.20`), and `latest_version_segment: stable` points `/stable/` at the newest
+release. A release consistency check validates the remaining hand-maintained
+pieces.
 
 ## The mechanic part (agent must do this, not remind about it)
 
@@ -21,7 +23,7 @@ the `edit` tool on each:
 | `package.json` | `"version": "0.19.0"` |
 | `CHANGELOG.md` | new `## [0.19.0] — <date>` entry at the top (see below) |
 | `antora-playbook-ci.yml` | content sources → `branches: ['main', 'v0.19.x']` |
-| `examples/tracer/antora.yml` | leave `version: ~` on `main` (unchanged) |
+| `examples/tracer/antora.yml` | leave `version: main` + `prerelease: true` on `main` (unchanged) |
 
 **Version mapping (no exceptions):**
 
@@ -35,8 +37,8 @@ the `edit` tool on each:
 
 The `antora.yml` component version is **not** hand-maintained anymore. The
 previous model drifted (stuck at `0.13` while npm reached `0.19.0`). With
-`version: ~` on `main` and a projection on each maintenance branch, the version
-can never disagree with the ref it came from.
+`version: main` + `prerelease: true` on `main` and a projection on each
+maintenance branch, the version can never disagree with the ref it came from.
 
 ## Changelog
 
@@ -94,8 +96,11 @@ content:
       branches: ['main']
 ```
 
-- `main` → unversioned (`version: ~`), served at the component root, treated as "latest".
-- `v0.19.x` → derived `0.19` via the projection, served under its own version segment.
+- `main` → named prerelease (`version: main` + `prerelease: true`), served at `/main/`.
+- `v0.19.x` → derived `0.19` via the projection; as the latest stable it is served at `/stable/`.
+
+The playbook's `urls` sets `latest_version_segment: stable`, so `/stable/` points
+at the newest stable release and moves automatically when a newer one ships.
 
 The maintenance branch's `antora.yml` carries the projection:
 
@@ -134,8 +139,8 @@ git commit -m "chore(release): v0.19.0"
 git tag v0.19.0
 git checkout -b v0.19.x v0.19.0
 
-# 5. Set the projection on the branch's antora.yml (replace "version: ~" with
-#    the projection map above), commit and push
+# 5. Set the projection on the branch's antora.yml (replace "version: main"
+#    and "prerelease: true" with the projection map above), commit and push
 git add examples/tracer/antora.yml
 git commit -m "feat(antora): derive component version from refname via projection"
 git push origin main v0.19.0 v0.19.x

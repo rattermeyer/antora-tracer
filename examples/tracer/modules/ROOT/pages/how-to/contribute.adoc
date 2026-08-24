@@ -131,7 +131,8 @@ npx mocha 'lib/test/graph-and-api.test.js'
 == Build and release
 
 The Antora component version is derived from the git refname, not hand-maintained:
-`main` is unversioned (`version: ~`), and each maintenance branch (`vX.Y.x`) carries a refname projection that derives its version.
+`main` is a named prerelease (`version: main` + `prerelease: true`) served at `/main/`, and each maintenance branch (`vX.Y.x`) carries a refname projection that derives its version.
+The playbook's `latest_version_segment: stable` points `/stable/` at the newest release.
 
 A release touches `package.json`, `CHANGELOG.md`, and the CI playbook, then tags and branches:
 

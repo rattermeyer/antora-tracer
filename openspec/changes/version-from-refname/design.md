@@ -2,10 +2,10 @@
 
 The example site's Antora component version is hand-maintained as a literal in `examples/tracer/antora.yml`. This literal has drifted from the real release — it sat at `0.13` while npm reached `0.19.0`. The release process also produced a tag that could not be built because a tag is immutable and the Vale lint (added later, running from `main`'s rules) flags the frozen content.
 
-Antora 3.1 offers two native mechanisms (verified in the docs):
-- `version: ~` (or `version: null`) marks a component version as **unversioned**, which Antora *always* treats as the latest version.
+Antora 3.1 offers native versioning mechanisms (verified in the docs and spike):
+- `version: main` with `prerelease: true` marks a named version as a prerelease, which Antora excludes from "latest stable" selection.
 - A **refname projection** derives the version from the git refname via a pattern→replacement map (e.g. `v0.20.x` → `0.20`).
-- Symbolic segments (`latest_version_segment`, `latest_prerelease_version_segment`) never apply to unversioned components.
+- `latest_version_segment` (symbolic version) replaces the latest stable version's URL segment (e.g. `stable`).
 
 ## Goals / Non-Goals
 
@@ -20,11 +20,11 @@ Antora 3.1 offers two native mechanisms (verified in the docs):
 
 ## Decisions
 
-### D1: `main` is unversioned (`version: ~`)
+### D1: `main` is a named prerelease (`version: main` + `prerelease: true`)
 
-`main`'s `antora.yml` sets `version: ~`, a constant that never changes. Antora treats an unversioned component as always-latest, so the current docs live at the component root with no version segment.
+`main`'s `antora.yml` sets `version: main` with `prerelease: true`, a constant that never changes. As a prerelease, `main` is excluded from "latest stable" selection, so it serves the development docs at `/main/` without stealing the `stable` designation from the newest release.
 
-*Alternatives considered:* `version: true` (refname as version) → yields `main`, a named identifier that sorts lexicographically and isn't a clean "latest" signal; rejected. A literal prerelease version (`0.21-wip`) → reintroduces the drift; rejected.
+*Alternatives considered:* `version: ~` (unversioned) → always treated as "latest", which would shadow the stable releases and make `latest_version_segment` a no-op; rejected. A literal prerelease version (`0.21-wip`) → reintroduces the drift; rejected.
 
 ### D2: Release branches/tags use a refname projection
 
@@ -44,31 +44,29 @@ After D1+D2, the remaining hand-maintained edges are naming-convention and exist
 
 *Alternatives considered:* relying on the `publish` skill prose → already drifted once; rejected. CI-only check → should also run before commit; rejected.
 
-### D4: Drop the `latest`/`unstable` symbolic segments and the prerelease demo
+### D4: A stable URL via `latest_version_segment: stable`
 
-Symbolic segments never apply to unversioned components, so with `main` unversioned the `latest`/`unstable` machinery no longer decorates `main`. Remove the two `urls` keys and the `-wip` prerelease (or relocate the prerelease demo — see Open Questions).
+The playbook sets `latest_version_segment: stable`, so the latest stable (non-prerelease) release is served at `/stable/`. The symbolic segment replaces that version's own URL segment. When a newer release is added, `/stable/` moves to it automatically with no playbook change; the previously-latest release reverts to its own version segment.
 
 ## Risks / Trade-offs
 
-- [Risk: unversioned `main` loses the prerelease/`unstable` demo] → Mitigation: accept as a deliberate demo tradeoff, or relocate prerelease to a dedicated `release/*` branch.
+- [Risk: `stable` replaces the latest version's segment (no `/0.21/` alongside `/stable/`)] → Mitigation: accepted — older versions keep their own segments; document the URL scheme.
 - [Risk: refname projection syntax is Antora-version-sensitive] → Mitigation: spike the projection against Antora 3.1 before finalizing; keep it in `antora.yml` so it travels with content.
-- [Risk: `latest` segment interaction with unversioned main is subtle] → Mitigation: confirm behavior in the spike; document the resulting URL scheme.
+- [Risk: `main` as a named prerelease must be visibly marked as development] → Mitigation: `prerelease: true` plus the `/main/` URL segment make it explicit.
 - [Risk: existing URLs/bookmarks break] → Mitigation: use Antora's static redirect facility; mark the URL change BREAKING in the changelog.
 
 ## Migration Plan
 
-1. Spike unversioned-`main` + projection in a throwaway playbook; confirm URL scheme and selector ordering.
-2. Edit `examples/tracer/antora.yml` (`version: ~` on `main`; projection for branches/tags) and `antora-playbook-ci.yml` (build `main` + maintenance branch).
+1. Spike named-prerelease `main` + projection + `stable` segment in a throwaway playbook; confirm URL scheme and selector ordering.
+2. Edit `examples/tracer/antora.yml` (`version: main` + `prerelease: true` on `main`; projection for branches) and `antora-playbook-ci.yml` (`latest_version_segment: stable`, build `main` + maintenance branch).
 3. Add the release-consistency script; wire it into CI (and optionally pre-commit).
 4. Update the `publish` skill and explanation/reference docs.
-5. Rebuild the site; verify the selector shows main (default/latest) plus each released version.
+5. Rebuild the site; verify `/main/`, `/stable/`, and each released version segment.
 
 ## Open Questions
-
-- Where does the prerelease demo go, if anywhere — a dedicated `release/*` branch, or drop it?
 
 Resolved by the spike (Antora 3.1):
 
 - Projection syntax: `v(?<v>+({0..9}).+({0..9})).x: $<v>` derives `0.20` from branch `v0.20.x` (Antora's pattern syntax, not regex).
-- `version: ~` on `main` produces unversioned content at the component root, treated as latest.
-- `latest_version_segment` is a no-op with unversioned `main` — remove it (and `latest_prerelease_version_segment`).
+- `version: main` + `prerelease: true` serves the dev docs at `/main/` and is excluded from "latest stable".
+- `latest_version_segment: stable` points `/stable/` at the latest stable release; it auto-moves when a newer release is added, and the latest release is served only at `/stable/` (its own segment appears once it is no longer latest).
