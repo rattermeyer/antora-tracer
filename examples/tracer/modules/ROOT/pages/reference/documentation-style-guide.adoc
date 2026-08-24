@@ -160,6 +160,38 @@ The build SHALL fail when two items define the same ID.
 Each requirement must be testable, atomic, and unambiguous.
 See the `requirements-writing` skill for a full checklist.
 
+== Automatic prose checks
+
+Vale lints the documentation in two places:
+
+- The `vale` pre-commit hook runs on staged `.adoc` files.
+- The `antora-vale` extension runs during the Antora build and fails it at `minLevel: warning`.
+
+The configuration lives in `src/vale/.vale.ini`.
+Every `.adoc` file is checked with two styles:
+
+- `antora-tracer` — the custom prose rules (filler words, inclusive language, non-militaristic language).
+- `AsciiDoc` — AsciiDoc syntax rules (closed blocks, quoted IDs, image alt text, callouts).
+
+The prose-heavy sections — `articles`, `explanation`, and `how-to` — additionally apply the `Google` and `neighbor` styles for voice, tone, and inclusive terminology.
+
+=== Disabled rules
+
+Some upstream rules conflict with this project's conventions and are disabled by removing the rule file from `src/vale/styles/`:
+
+[width=100%, cols="30,70"]
+|===
+| Rule | Reason
+| `Google.EmDash` | The project uses spaced em-dashes (" — ") as punctuation.
+| `Google.Headings` | Flags legitimate proper nouns (Kroki) and acronyms (PDF), and the title-case `How to <verb> <object>` page titles.
+| `Google.WordListCase` | Prescribes word substitutions the project does not adopt wholesale.
+| `neighbor.DirectionalLanguage` | Flags legitimate layout terms such as "bar chart".
+| `Readability.*` | Grade-level thresholds (Flesch-Kincaid, Gunning-Fog) are too strict for technical reference and explanation content.
+| `AsciiDoc.UnsetAttributes` | Document-header attributes (`:keywords:`, `:toc:`) are set once and never unset; the rule assumes a set-then-unset module pattern.
+|===
+
+Do not re-enable a disabled rule without updating this table.
+
 == Commit messages
 
 Commits follow https://www.conventionalcommits.org/[Conventional Commits]:
