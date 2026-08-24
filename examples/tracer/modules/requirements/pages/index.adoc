@@ -1783,6 +1783,91 @@ Source: openspec/specs/ci-pdf-deploy/spec.md
 traceability:links[]
 --
 
+=== Component Versioning
+
+[#REQ-240, item, role=requirement, title="main is a named prerelease"]
+--
+The `main` branch's component version descriptor SHALL declare `version: main` with `prerelease: true`, so `main` serves the development docs at `/main/` and is excluded from "latest stable" selection.
+
+Source: openspec/specs/component-versioning/spec.md
+
+traceability:links[]
+--
+
+[#REQ-241, item, role=requirement, title="Release versions derive from the git refname"]
+--
+A maintenance branch SHALL derive its component version from the git refname using a projection in the component version descriptor, so no hand-maintained literal version exists on release refs.
+
+Source: openspec/specs/component-versioning/spec.md
+
+traceability:links[]
+--
+
+[#REQ-242, item, role=requirement, title="Version selector shows main plus released versions"]
+--
+The component version selector SHALL list the `main` prerelease and the released semantic versions in descending order.
+
+Source: openspec/specs/component-versioning/spec.md
+
+traceability:links[]
+--
+
+[#REQ-243, item, role=requirement, title="Stable URL points at the latest release"]
+--
+The playbook SHALL set `latest_version_segment: stable`, so the latest stable (non-prerelease) release is served at `/stable/`.
+
+Source: openspec/specs/component-versioning/spec.md
+
+traceability:links[]
+--
+
+[#REQ-244, item, role=requirement, title="Extension handles unversioned components"]
+--
+The extension SHALL treat an unversioned component version (an empty string) as a valid version rather than substituting a placeholder, so generated attachments resolve via xref from unversioned content.
+
+Source: openspec/specs/component-versioning/spec.md
+
+traceability:links[]
+--
+
+=== Release Consistency
+
+[#REQ-245, item, role=requirement, title="Release consistency is checkable"]
+--
+The project SHALL provide a script that verifies the release invariants across `package.json`, git tags, maintenance branches, playbook content-source refs, and the changelog, and SHALL exit non-zero on any mismatch.
+
+Source: openspec/specs/release-consistency/spec.md
+
+traceability:links[]
+--
+
+[#REQ-246, item, role=requirement, title="Version is consistent across sources"]
+--
+The script SHALL require that the `package.json` version, the git tag name, and the changelog entry version all refer to the same `major.minor.patch` release.
+
+Source: openspec/specs/release-consistency/spec.md
+
+traceability:links[]
+--
+
+[#REQ-247, item, role=requirement, title="Maintenance branch follows the tag"]
+--
+The script SHALL require a maintenance branch named `v<major>.<minor>.x` for the released `v<major>.<minor>.0` tag.
+
+Source: openspec/specs/release-consistency/spec.md
+
+traceability:links[]
+--
+
+[#REQ-248, item, role=requirement, title="Playbook refs exist in the repository"]
+--
+The script SHALL verify that every branch and tag referenced by the CI playbook content sources exists in the repository.
+
+Source: openspec/specs/release-consistency/spec.md
+
+traceability:links[]
+--
+
 === Landing Page
 
 [#REQ-072, item, role=requirement, title="Landing page at GitHub Pages root"]
