@@ -1,0 +1,62 @@
+= ADR-014: Derive the component version from the git refname
+:keywords: adr, architecture, decision, antora, versioning, docs, refname, prerelease, stable
+
+*Status*: accepted +
+*Deciders*: Richard Attermeyer +
+*Date*: 2026-08-24
+
+== Context and Problem Statement
+
+The example site's Antora component version was hand-maintained as a literal in `examples/tracer/antora.yml`.
+This literal drifted from the real release — it sat at `0.13` while npm reached `0.19.0`.
+Building the release tag also failed because a tag is immutable and the Vale lint, running from `main`'s current rules, flags the frozen content.
+The release process needs a versioning model that cannot drift, while still demonstrating multi-version support.
+
+== Decision Drivers
+
+* The component version must be derivable from the git ref, not hand-maintained
+* The docs site must demonstrate multi-version support (3+ versions are planned)
+* A stable entry point (`/stable/`) must auto-point at the newest release
+* `main` must not steal the "latest stable" designation from released versions
+
+== Considered Options
+
+* Unversioned `main` (`version: ~`) — Antora always treats it as latest, which makes `latest_version_segment` a no-op and shadows the stable releases; rejected after a spike
+* Refname as version (`version: true`) — yields named identifiers such as `v0.20.x`, which sort lexicographically and break semver "latest" detection; rejected
+* Literal versions in `antora.yml` — reintroduces the drift that caused the original bug; rejected
+* Named prerelease `main` plus a refname projection plus a stable symbolic segment — chosen
+
+== Decision Outcome
+
+`main` declares `version: main` with `prerelease: true`, a constant that never changes.
+As a prerelease, `main` is excluded from "latest stable" selection and serves the development docs at `/main/`.
+
+Each maintenance branch carries a refname projection that derives a clean semantic version from the branch name:
+
+```yaml
+version:
+  v(?<v>+({0..9}).+({0..9})).x: $<v>
+```
+
+`v0.20.x` derives `0.20`.
+The playbook sets `latest_version_segment: stable`, so the newest stable release is served at `/stable/` and the symbolic segment moves to it automatically when a newer release ships.
+
+The resulting URL scheme:
+
+* `/main/` — development docs (prerelease)
+* `/stable/` — the newest stable release
+* `/0.20/` — older releases, under their own version segment
+
+A release-consistency script (`scripts/release-check.js`) validates the remaining hand-maintained invariants — `package.json` version, git tag, maintenance branch, playbook refs, and changelog.
+
+== Positive Consequences
+
+* The version cannot disagree with the ref it came from; the drift bug is structurally impossible
+* `/stable/` moves to the newest release with no playbook change
+* The prerelease and symbolic-segment mechanisms are demonstrated, which suits a self-traceability example site
+* The maintenance branch is mutable, so it can receive the doc fixes that Vale lint requires
+
+== Negative Consequences
+
+* The latest release is served only at `/stable/`; its own version segment appears only once a newer release takes over `stable`
+* The projection syntax is Antora-specific and must be re-verified on Antora upgrades
