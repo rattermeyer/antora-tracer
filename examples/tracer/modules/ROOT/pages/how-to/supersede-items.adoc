@@ -19,6 +19,7 @@ In the new item's block, declare a `supersedes` relationship to the item it repl
 The system SHALL ...
 
 supersedes:REQ-042[]
+--
 ----
 
 The old item's superseded state is derived from this relationship — do not add a `status` attribute.

@@ -42,9 +42,10 @@ For deeper graphs, pass a depth parameter:
 
 [source,asciidoc]
 ----
-traceability:graph[REQ-001, 2]   <1>
+traceability:graph[REQ-001, 2]
 ----
-<1> Shows the item and items within two hops
+
+The `2` limits the graph to items within two hops.
 
 Reference any item by ID — useful outside item blocks:
 
