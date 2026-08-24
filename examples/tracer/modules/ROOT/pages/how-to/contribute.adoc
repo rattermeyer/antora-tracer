@@ -130,13 +130,26 @@ npx mocha 'lib/test/graph-and-api.test.js'
 
 == Build and release
 
+The Antora component version is derived from the git refname, not hand-maintained:
+`main` is unversioned (`version: ~`), and each maintenance branch (`vX.Y.x`) carries a refname projection that derives its version.
+
+A release touches `package.json`, `CHANGELOG.md`, and the CI playbook, then tags and branches:
+
 [source,bash]
 ----
-npm run build        # Compile
-npm test             # Verify all tests pass
-npm version 0.7.0    # Bump version
-npm publish          # Publish to npm
+npm run build          # Compile
+npm test               # Verify all tests pass
+npm version 0.7.0 --no-git-tag-version   # Bump version (no commit/tag yet)
+# edit CHANGELOG.md and antora-playbook-ci.yml (branches: ['main', 'v0.7.x'])
+git commit -am "chore(release): v0.7.0"
+git tag v0.7.0
+git checkout -b v0.7.x v0.7.0
+# set the projection on the branch's antora.yml, commit, push
+node scripts/release-check.js   # verify consistency
+npm publish              # Publish to npm
 ----
+
+See the `publish` skill for the complete checklist.
 
 == Related
 

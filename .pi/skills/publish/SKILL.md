@@ -1,40 +1,42 @@
 ---
 name: publish
-description: Release antora-tracer — mechanically bump the npm version AND the Antora component version, build docs from main + a maintenance branch at the release tag, tag, publish to npm. Use when the user says "publish", "release", "ship", "npm publish", "cut a release", "bump version", "new version", or "tag the release".
+description: Release antora-tracer — bump the npm version, tag, create a maintenance branch, publish to npm, and verify release consistency. The Antora component version is derived from the git refname, not hand-maintained. Use when the user says "publish", "release", "ship", "npm publish", "cut a release", "bump version", "new version", or "tag the release".
 ---
 
 # Publish a Release
 
-Releasing `antora-tracer` touches **four files**, a git tag, and a docs build
-ref. `npm publish` alone covers none of the version plumbing correctly. This
-skill makes the agent perform the mechanical edits — do not just tell the user
-to do them.
+The Antora component version is **derived from the git refname**, so there is
+no hand-maintained version to drift. `main` is unversioned (`version: ~`) and
+is always the "latest" docs. A maintenance branch (`vX.Y.x`) carries a refname
+projection that derives its version (e.g. `v0.20.x` → `0.20`). A release
+consistency check validates the remaining hand-maintained pieces.
 
 ## The mechanic part (agent must do this, not remind about it)
 
-For a release `0.19.0`, edit these three files with the exact values. The agent
-uses the `edit` tool on each:
+For a release `0.19.0`, edit these files with the exact values. The agent uses
+the `edit` tool on each:
 
 | File | Change |
 |------|--------|
 | `package.json` | `"version": "0.19.0"` |
-| `examples/tracer/antora.yml` | `version: 0.19`, and remove `prerelease: '-wip'` for the stable release |
-| `antora-playbook-ci.yml` | content sources → `branches: ['main', 'v0.19.x']` (a maintenance branch at the tag) |
 | `CHANGELOG.md` | new `## [0.19.0] — <date>` entry at the top (see below) |
+| `antora-playbook-ci.yml` | content sources → `branches: ['main', 'v0.19.x']` |
+| `examples/tracer/antora.yml` | leave `version: ~` on `main` (unchanged) |
 
 **Version mapping (no exceptions):**
 
 | Where | Format | Example for 0.19.0 |
 |-------|--------|--------------------|
 | `package.json` `version` | `major.minor.patch` | `0.19.0` |
-| `examples/tracer/antora.yml` `version` | `major.minor` (drop patch) | `0.19` |
 | git tag | `v` + npm version | `v0.19.0` |
+| maintenance branch | `v` + `major.minor` + `.x` | `v0.19.x` |
+| component version | derived from refname via projection | `0.19` |
 | `blog/antora.yml` `version` | independent — leave at `0.1` unless blog changed | — |
 
-**Why this is explicit:** `examples/tracer/antora.yml` has been stuck at
-`version: 0.13` + `prerelease: '-wip'` since release `v0.16.0`, while npm
-reached `0.19.0`. The component version never got bumped because `npm version`
-only touches `package.json`. Never skip the antora.yml edit.
+The `antora.yml` component version is **not** hand-maintained anymore. The
+previous model drifted (stuck at `0.13` while npm reached `0.19.0`). With
+`version: ~` on `main` and a projection on each maintenance branch, the version
+can never disagree with the ref it came from.
 
 ## Changelog
 
@@ -77,7 +79,8 @@ release. This is mechanical too — the agent derives the entries, not the user.
 
 ## What the docs build
 
-The Antora content source builds **`main` AND a maintenance branch at the release tag** — both, always:
+The Antora content source builds **`main` AND the maintenance branch** — both,
+always:
 
 ```yaml
 # antora-playbook-ci.yml
@@ -91,21 +94,27 @@ content:
       branches: ['main']
 ```
 
-- `main` → the WIP/next prerelease (keeps `-wip`).
-- `v0.19.x` → the stable release docs (no prerelease), shown as `latest`.
+- `main` → unversioned (`version: ~`), served at the component root, treated as "latest".
+- `v0.19.x` → derived `0.19` via the projection, served under its own version segment.
 
-Build the branch, not the tag: a tag is immutable, so it cannot receive the
-AsciiDoc/vale doc fixes that the build lints. Create `v0.19.x` at the tag and
-cherry-pick doc fixes onto it.
+The maintenance branch's `antora.yml` carries the projection:
+
+```yaml
+version:
+  v(?<v>+({0..9}).+({0..9})).x: $<v>
+```
+
+Build the branch, not the tag: a tag is immutable and cannot receive doc fixes
+that the vale lint requires. Create `v0.19.x` at the tag and backport fixes onto
+it.
 
 The local playbook (`antora-playbook.yml`) uses `branches: HEAD` and is
 preview-only; do not edit its refs.
 
 ## Release sequence
 
-Run from a clean tree on `main`. Order matters: the antora.yml change must be
-**in the tagged commit**, otherwise the tag points at a commit whose docs still
-carry the old version.
+Run from a clean tree on `main`. Order matters: the maintenance branch must be
+created at the tagged commit.
 
 ```bash
 # 1. Pre-flight — everything green
@@ -113,46 +122,44 @@ npm run build && npm test && npm run lint
 git status --short          # must be empty
 ```
 
-2. Agent edits the four files above (mechanically, exact values).
-3. Commit the version files and changelog together, then tag:
+2. Agent edits the files above (mechanically, exact values).
+3. Commit, then tag and branch:
 
 ```bash
-# 3. Single commit: package.json + antora.yml + CHANGELOG.md (playbook can join or follow)
-git add package.json package-lock.json examples/tracer/antora.yml CHANGELOG.md antora-playbook-ci.yml
+# 3. Single commit: package.json + package-lock.json + CHANGELOG.md + playbook
+git add package.json package-lock.json CHANGELOG.md antora-playbook-ci.yml
 git commit -m "chore(release): v0.19.0"
 
-# 4. Tag on that commit (must NOT precede the antora.yml edit)
+# 4. Tag, then create the maintenance branch at the tag
 git tag v0.19.0
 git checkout -b v0.19.x v0.19.0
+
+# 5. Set the projection on the branch's antora.yml (replace "version: ~" with
+#    the projection map above), commit and push
+git add examples/tracer/antora.yml
+git commit -m "feat(antora): derive component version from refname via projection"
 git push origin main v0.19.0 v0.19.x
 git checkout main
 
-# 5. Publish to npm — build first, lib/src is the shipped artifact
+# 6. Verify release consistency, then publish
+node scripts/release-check.js
 npm run build
 npm publish
 ```
 
 **Why not plain `npm version`:** it commits and tags immediately, which would
-tag a commit *before* the antora.yml edit if run out of order. Edit all files
+tag a commit *before* the other edits if run out of order. Edit all files
 first, commit, then tag.
-
-## Post-release: move main to the next WIP version
-
-After the tag, `main` must build the next prerelease so its docs are marked
-not-yet-released:
-
-```bash
-# edit examples/tracer/antora.yml: version: 0.20, restore "prerelease: '-wip'"
-git commit -am "chore(release): start 0.20-wip on main"
-git push origin main
-```
 
 ## Guardrails
 
 - Never `npm publish` before `npm run build` — the package ships compiled
   `lib/src`; stale output would be published.
-- Never tag before the antora.yml version matches the release.
-- The stable docs build from a maintenance branch (`vX.Y.x`) created at the release tag, never from the tag itself — a tag is immutable and cannot receive the doc fixes that vale lints.
+- Never tag before the changelog and playbook edits are committed.
+- The stable docs build from a maintenance branch (`vX.Y.x`), never from the
+  tag itself — a tag is immutable.
+- Run `node scripts/release-check.js` before publish; it fails loudly on a
+  version/tag/branch/changelog mismatch.
 - Don't bump `blog/antora.yml` unless blog content changed; it's versioned
   independently.
 - If the version selector still shows the old version after deploy, the tag is

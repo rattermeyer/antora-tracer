@@ -19,6 +19,6 @@
 
 ## 4. Docs and skill
 
-- [ ] 4.1 Update the `publish` skill to teach the refname versioning model and the consistency check
-- [ ] 4.2 Update explanation/reference docs for the new versioning model and URL scheme
-- [ ] 4.3 Rebuild the site and verify the selector shows main plus each released version
+- [x] 4.1 Update the `publish` skill to teach the refname versioning model and the consistency check
+- [x] 4.2 Update explanation/reference docs for the new versioning model and URL scheme
+- [x] 4.3 Rebuild the site and verify the selector shows main plus each released version
