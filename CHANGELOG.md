@@ -2,6 +2,14 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.21.1] — 2026-08-25
+
+### Fixed
+- Release-consistency check now reads remote refs, so it passes in shallow CI checkouts that lack the maintenance branch and tag locally
+
+### Changed
+- `write-item` skill now names the guidance page it followed when presenting a draft
+
 ## [0.21.0] — 2026-08-25
 
 ### Added
