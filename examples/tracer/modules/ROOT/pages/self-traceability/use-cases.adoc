@@ -335,3 +335,36 @@ leads_to:REQ-141[]
 
 traceability:links[]
 --
+
+[#UC-011, item, role=use_case, title="Requirements Engineer writes a use case"]
+--
+.Use Case: Requirements Engineer writes a use case
+[width=100%, cols="25h,75a"]
+|===
+| ID | UC-011
+| Title | Requirements Engineer writes a use case
+| Goal | Requirements Engineer writes a use case item so that a user goal is captured in a testable, traceable form that links to the requirements it motivates
+| Primary Actor | Requirements Engineer
+| Preconditions | The Antora Tracer extension is installed And the project config defines a `use_case` role And the Requirements Engineer has write access to the `.adoc` files And the `use_case` role has authoring guidance (a `roleGuidance` page) or the Karl Wiegers template is known
+| Trigger | Requirements Engineer identifies a user workflow that needs to be documented as a use case
+| Basic Flow |
+. Requirements Engineer resolves the `use_case` authoring guidance with `antora-tracer role-guidance use_case` to obtain the item template
+. Requirements Engineer determines the next available ID with `antora-tracer next-id --prefix UC -i <path>`
+. Requirements Engineer writes the use case item block (`[#UC-NNN, item, role=use_case, ...]`) following the Karl Wiegers template — actor, goal, preconditions, postconditions, main flow, and alternate flows
+. Requirements Engineer links the use case to the requirements it motivates with `leads_to:REQ-NNN[]` inline macros
+. Requirements Engineer includes `traceability:links[]` to render the relationship list
+. Requirements Engineer commits the file And triggers an Antora build
+. The extension registers the use case item And the `leads_to` relationships appear in the traceability matrix
+| Alternate Flows |
+. *The `use_case` role is not in the config:* The extension registers the item with a warning. The use case is not part of the configured domain model until the role is added.
+. *The role has no authoring guidance:* The Requirements Engineer falls back to the generic Karl Wiegers template.
+. *A precondition or postcondition is not testable:* The use case is revised so both are measurable.
+. *The Requirements Engineer links to a requirement that does not exist:* The extension stores the relationship with a warning. The matrix shows a partial link.
+| Postconditions | The traceability graph contains the use case item And the `leads_to` relationships are registered And the use case appears in use-case-to-requirement matrices And the rendered page shows the use case description
+| Priority | High
+| Frequency | Per user goal — added when a new workflow is identified
+| Notes | ⚠ Actor "Requirements Engineer" does not yet have a persona definition. The use case template and quality rules live in the `use_case` role guidance (`antora-tracer role-guidance use_case`), not in this prose.
+|===
+
+traceability:links[]
+--
