@@ -79,6 +79,17 @@ export interface RelationDef {
 }
 
 /**
+ * Per-role authoring guidance: an AsciiDoc page describing how to write
+ * items of this role, plus an optional ID prefix fallback.
+ */
+export interface RoleGuidance {
+  /** Path to an AsciiDoc page with the role's authoring guidance. */
+  page: string;
+  /** ID prefix fallback (e.g. REQ). Advisory, not authoritative. */
+  idPrefix?: string;
+}
+
+/**
  * Main traceability configuration
  */
 export interface TraceabilityConfig {
@@ -102,6 +113,12 @@ export interface TraceabilityConfig {
    * Maps a relation type to a human-readable name. Falls back to humanize(type).
    */
   labels?: Record<string, string>;
+
+  /**
+   * Per-role authoring guidance: role name -> { page, idPrefix }.
+   * The page is an AsciiDoc page describing how to write items of that role.
+   */
+  roleGuidance?: Record<string, RoleGuidance>;
 
   /**
    * Extend from a preset
@@ -183,6 +200,9 @@ export class ConfigLoader {
 
     // Validate and normalize the configuration
     this.config = this.normalizeConfig(rawConfig, resolvedPath);
+
+    // Resolve roleGuidance page paths relative to the config file
+    this.resolveGuidancePaths(this.config, path.dirname(resolvedPath));
 
     // If config extends a preset, merge with preset
     if (this.config.extends) {
@@ -299,6 +319,23 @@ export class ConfigLoader {
       }
     }
     config.relations = normalizedRelations;
+
+    // Normalize roleGuidance keys to lowercase
+    if (config.roleGuidance) {
+      const normalizedGuidance: Record<string, RoleGuidance> = {};
+      for (const [role, guidance] of Object.entries(config.roleGuidance)) {
+        if (guidance && typeof guidance === "object") {
+          const g = guidance as Partial<RoleGuidance>;
+          normalizedGuidance[role.toLowerCase()] = {
+            page: typeof g.page === "string" ? g.page : "",
+            ...(typeof g.idPrefix === "string" && g.idPrefix
+              ? { idPrefix: g.idPrefix }
+              : {}),
+          };
+        }
+      }
+      config.roleGuidance = normalizedGuidance;
+    }
 
     // Initialize matrices if not present
     if (!config.matrices) {
@@ -438,6 +475,11 @@ export class ConfigLoader {
       const presetContent = fs.readFileSync(presetPath, "utf8");
       const preset = yamlLoad(presetContent) as Preset;
 
+      // Resolve this preset's own roleGuidance page paths relative to the preset file
+      if (preset.traceability) {
+        this.resolveGuidancePaths(preset.traceability, path.dirname(presetPath));
+      }
+
       // Resolve parent preset inheritance (child wins on conflict)
       if (preset.extends) {
         const parent = this.loadPreset(preset.extends);
@@ -524,6 +566,21 @@ export class ConfigLoader {
   }
 
   /**
+   * Resolve relative roleGuidance page paths to absolute paths against baseDir.
+   */
+  private resolveGuidancePaths(
+    config: TraceabilityConfig,
+    baseDir: string,
+  ): void {
+    if (!config.roleGuidance) return;
+    for (const guidance of Object.values(config.roleGuidance)) {
+      if (guidance.page && !path.isAbsolute(guidance.page)) {
+        guidance.page = path.resolve(baseDir, guidance.page);
+      }
+    }
+  }
+
+  /**
    * Merge two configurations (preset + override)
    */
   private mergeConfig(
@@ -581,6 +638,12 @@ export class ConfigLoader {
     result.labels = {
       ...(base.labels || {}),
       ...(override.labels || {}),
+    };
+
+    // Merge roleGuidance: user overrides preset values per role
+    result.roleGuidance = {
+      ...(base.roleGuidance || {}),
+      ...(override.roleGuidance || {}),
     };
 
     return result;

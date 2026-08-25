@@ -1,0 +1,31 @@
+= Writing Test Items
+
+A `test` item describes a test plan or case that verifies one or more requirements.
+
+== Item template
+
+[source,asciidoc]
+----
+[#TST-NNN, item, role=test, title="Short title"]
+--
+Test file: `test/<name>.test.ts`
+
+<What is tested and how.>
+
+verifies:REQ-NNN[]
+
+traceability:links[]
+--
+----
+
+== Writing rules
+
+* Reference the requirement it verifies with `verifies:REQ-NNN[]`.
+* State the observable outcome the test asserts.
+* Name the test file when the item traces an automated test.
+
+== Quality checklist
+
+* Traceable — linked to at least one requirement via `verifies:`.
+* Concrete — describes what is asserted, not vague coverage claims.
+* Grounded — matches an actual test file or test procedure.

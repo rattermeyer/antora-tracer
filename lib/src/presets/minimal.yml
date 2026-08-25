@@ -17,6 +17,14 @@ traceability:
     - requirement
     - test
 
+  roleGuidance:
+    requirement:
+      page: guidance/requirement.adoc
+      idPrefix: REQ
+    test:
+      page: guidance/test.adoc
+      idPrefix: TST
+
   relations:
     requirement:
       requirement:

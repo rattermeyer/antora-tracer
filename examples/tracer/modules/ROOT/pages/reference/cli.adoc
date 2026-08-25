@@ -241,6 +241,31 @@ If `REQ-001` and `REQ-002` exist, returns `REQ-003`.
 If `TST-0001` exists, returns `TST-0002`.
 With no existing items matching the prefix, defaults to 3-digit padding (`REQ-001`).
 
+== role-guidance
+
+Resolve and report the authoring guidance for a role.
+Prints the resolved guidance page path and the ID prefix fallback:
+
+[source,console]
+----
+$ antora-tracer role-guidance requirement --preset requirements-engineering
+page: /path/to/guidance/requirement.adoc
+idPrefix: REQ
+----
+
+|===
+| Option | Description
+
+| `<role>`
+| The role name to resolve (positional)
+
+| `--content`
+| Also output the full guidance page content
+|===
+
+Exits non-zero with "No guidance for role" when the role has no `roleGuidance` entry.
+The `idPrefix` is advisory; existing project conventions win.
+
 == query
 
 Query the traceability graph directly from the command line — no Antora build required.

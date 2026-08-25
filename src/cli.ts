@@ -918,6 +918,37 @@ program
     }
   });
 
+program
+  .command("role-guidance <role>")
+  .description("Resolve and report authoring guidance for a role")
+  .option("--content", "Also output the guidance page content")
+  .action(async (role: string, options: any) => {
+    try {
+      const extension = await createExtension(options);
+      const config = extension.configLoader?.getConfig();
+      if (!config) {
+        console.error(chalk.red("Error: configuration not loaded"));
+        process.exit(1);
+      }
+      const guidance = config.roleGuidance?.[role.toLowerCase()];
+      if (!guidance) {
+        console.error(chalk.yellow(`No guidance for role '${role}'`));
+        process.exit(1);
+      }
+      console.log(`page: ${guidance.page}`);
+      if (guidance.idPrefix) {
+        console.log(`idPrefix: ${guidance.idPrefix}`);
+      }
+      if (options.content && guidance.page) {
+        console.log("");
+        console.log(readFileSync(guidance.page, "utf8"));
+      }
+    } catch (error: any) {
+      console.error(chalk.red("Error:", error.message));
+      process.exit(1);
+    }
+  });
+
 // ========================================================================
 // Query command
 // ========================================================================

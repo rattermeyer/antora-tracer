@@ -1,0 +1,32 @@
+= Writing Design Items
+
+A `design` item captures an architectural decision or a component of the system.
+
+== Item template
+
+[source,asciidoc]
+----
+[#ARC-NNN, item, role=design, title="Short title"]
+--
+<Component or decision description.>
+
+Rationale: <why this design was chosen>
+
+addresses:REQ-NNN[]
+
+traceability:links[]
+--
+----
+
+== Writing rules
+
+* Name the component or decision in the title.
+* State the rationale so a reader understands why the design is the way it is.
+* Cross-link to the requirements it addresses with `addresses:REQ-NNN[]`.
+* One decision or component per item.
+
+== Quality checklist
+
+* Rationale present — the "why" is stated, not implied.
+* Traceable — linked to at least one requirement.
+* Grounded — describes the actual system, not an aspiration.

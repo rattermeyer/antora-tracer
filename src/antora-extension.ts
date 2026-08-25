@@ -13,9 +13,10 @@
  * }
  */
 
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { isAbsolute, join } from "node:path";
 import { deflateSync } from "node:zlib";
+import asciidoctor from "@asciidoctor/core";
 import { ConfigLoader, toConfigDot } from "./config/TraceabilityConfig.js";
 import { RequirementsTraceabilityExtension } from "./index.js";
 import { TraceabilityGraph } from "./TraceabilityGraph.js";
@@ -1236,7 +1237,56 @@ export class AntoraTraceabilityExtension {
           }
         }
       }
+
+      // Register role authoring guidance pages as attachments so they render
+      // in the site and are navigable via xref:attachment$traceability/guidance/...
+      const guidanceEntries = this.resolveGuidanceEntries();
+      if (guidanceEntries.length > 0) {
+        for (const key of allKeys) {
+          const [component, version] = key.split("@");
+          for (const module of allModules) {
+            for (const { role, html } of guidanceEntries) {
+              this.registerAttachmentInCatalog(
+                contentCatalog,
+                component,
+                version,
+                module,
+                `traceability/guidance/${role}.html`,
+                html,
+              );
+            }
+          }
+        }
+      }
     });
+  }
+
+  /**
+   * Render each resolved role guidance page to HTML for registration in the
+   * content catalog. Returns an empty list when the config has no guidance.
+   */
+  private resolveGuidanceEntries(): Array<{ role: string; html: string }> {
+    const config = this.traceability?.configLoader?.getConfig();
+    if (!config?.roleGuidance) return [];
+    const entries: Array<{ role: string; html: string }> = [];
+    // @asciidoctor/core's runtime default export is a factory function, but its
+    // bundled types model a namespace; cast to the runtime shape.
+    const Asciidoctor = (
+      asciidoctor as unknown as () => { convert(content: string): string }
+    )();
+    for (const [role, guidance] of Object.entries(config.roleGuidance)) {
+      if (!guidance.page || !existsSync(guidance.page)) continue;
+      try {
+        const adoc = readFileSync(guidance.page, "utf8");
+        const html = Asciidoctor.convert(adoc);
+        if (html) entries.push({ role, html: String(html) });
+      } catch (error: any) {
+        this.logger.warn(
+          `Failed to render guidance for role '${role}': ${error.message}`,
+        );
+      }
+    }
+    return entries;
   }
 
   /**

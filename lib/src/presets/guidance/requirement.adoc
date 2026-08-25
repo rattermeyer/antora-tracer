@@ -1,0 +1,42 @@
+= Writing Requirement Items
+
+A `requirement` item states what the system must do — never how.
+
+== Item template
+
+[source,asciidoc]
+----
+[#REQ-NNN, item, role=requirement, title="Short title"]
+--
+The system SHALL <verb> <object>.
+
+<constraints or boundary conditions>
+
+traceability:links[]
+--
+----
+
+== Writing rules
+
+* One observable behaviour per item. Split multiple SHALL statements into separate items.
+* Use the present tense: "The build fails", not "The build will fail".
+* Use EARS patterns for structure:
+
+[cols="30,70"]
+|===
+| Pattern | Shape
+| Ubiquitous | The system SHALL <verb> <object>.
+| Event-driven | WHEN <trigger>, the system SHALL <verb> <object>.
+| State-driven | WHILE <state>, the system SHALL <verb> <object>.
+| Unwanted | IF <condition>, THEN the system SHALL <verb> <object>.
+| Optional | WHERE <feature>, the system SHALL <verb> <object>.
+|===
+
+* State what, never how. Do not name technologies, algorithms, or internal components.
+
+== Quality checklist
+
+* Testable — a test can verify the behaviour.
+* Atomic — one behaviour, one item.
+* Unambiguous — no "should", "may", or "appropriately".
+* No solution prescription — no technology or implementation names.

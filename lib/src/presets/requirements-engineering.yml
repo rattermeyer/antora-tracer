@@ -20,6 +20,17 @@ traceability:
     - design
     - test
 
+  roleGuidance:
+    requirement:
+      page: guidance/requirement.adoc
+      idPrefix: REQ
+    design:
+      page: guidance/design.adoc
+      idPrefix: ARC
+    test:
+      page: guidance/test.adoc
+      idPrefix: TST
+
   relations:
     # Requirement relations — only requirement-to-requirement.
     requirement:

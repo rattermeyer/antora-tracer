@@ -298,6 +298,39 @@ An array of matrix definitions:
 | Which relation types count as "coverage" per column role. `coverageRelations: design: [addresses, satisfies]` means only `addresses` and `satisfies` from row items to design items count
 |===
 
+=== `roleGuidance`
+
+Per-role authoring guidance for AI agents and humans.
+Each entry maps a role to an AsciiDoc page describing how to write items of that role, plus an optional ID prefix fallback:
+
+[source,yaml]
+----
+roleGuidance:
+  requirement:
+    page: guidance/requirement.adoc
+    idPrefix: REQ
+  design:
+    page: guidance/design.adoc
+    idPrefix: ARC
+----
+
+[width=100%, cols="25,20,55"]
+|===
+| Key | Type | Description
+
+| `page`
+| string
+| Path to an AsciiDoc page with the role's authoring guidance, resolved relative to the file that declares it
+
+| `idPrefix`
+| string
+| ID prefix fallback (advisory, never authoritative)
+|===
+
+Built-in presets ship default guidance pages.
+A project's `roleGuidance` overrides the preset per role.
+Resolve guidance from the CLI with `antora-tracer role-guidance <role>`.
+
 == Configuration Resolution
 
 When both `preset` and `configPath` are provided, `configPath` takes precedence:
