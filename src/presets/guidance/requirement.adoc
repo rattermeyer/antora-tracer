@@ -18,7 +18,7 @@ traceability:links[]
 
 == Writing rules
 
-* One observable behaviour per item. Split multiple SHALL statements into separate items.
+* One observable behaviour per item. Split multiple SHALL-statements into separate items.
 * Use the present tense: "The build fails", not "The build will fail".
 * Use EARS patterns for structure:
 
