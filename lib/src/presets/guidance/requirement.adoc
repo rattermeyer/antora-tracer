@@ -1,26 +1,60 @@
-= Writing Requirement Items
+= Writing Requirements
 
 A `requirement` item states what the system must do — never how.
 
-== Item template
+== Traceability
 
-[source,asciidoc]
+A `requirement` is a traceable item.
+Check the traceability configuration for the relations a requirement can author and the roles that reference it.
+In the `requirements-engineering` preset a requirement relates to other requirements (`refines`, `depends_on`, `conflicts_with`, `supersedes`), and is referenced by design (`addresses`) and test (`verifies`) items.
+Use cases link to requirements via `leads_to` — a requirement links back only if the config defines an inverse.
+
+Do not invent role or relation names — take them from the config.
+
+== Guardrails
+
+**Do not guess.** When information is missing or ambiguous, ask the user:
+
+- Vague outcome → "What would a tester observe after this passes?"
+- Solution prescription (technology, algorithm, component, event hook) → "This names a solution — can we state the observable behaviour instead?"
+- Positive and negative obligations mixed → split them into separate items.
+- Unclear trigger or state → "Is this always true, triggered by an event, or dependent on a state?"
+- Missing scope or boundary → "What does this apply to — per file, per build, per component version?"
+
+Never fabricate relation or target IDs. If no target ID was given, leave the traceability link out and note it.
+
+== Creating a Requirement
+
+=== Step 1: Get the Next ID
+
+```bash
+antora-tracer next-id --prefix <requirement-prefix> -i <docs-dir>
+```
+
+=== Step 2: Write the Item Block
+
+One SHALL statement plus any boundary conditions:
+
+[asciidoc]
 ----
-[#REQ-NNN, item, role=requirement, title="Short title"]
+[#<requirement-id>, item, role=requirement, title="<short title>"]
 --
-The system SHALL <verb> <object>.
+The system SHALL <observable behaviour>.
 
-<constraints or boundary conditions>
+<boundary conditions or scope>
 
 traceability:links[]
 --
 ----
 
-== Writing rules
+Then follow the writing rules below.
 
-* One observable behaviour per item. Split multiple SHALL-statements into separate items.
-* Use the present tense: "The build fails", not "The build will fail".
-* Use EARS patterns for structure:
+== Writing Rules
+
+=== EARS Patterns
+
+Every requirement SHALL use an EARS pattern (Alistair Mavin, IEEE RE 2009).
+Choose by whether the behaviour is always active, event-triggered, state-dependent, an error response, or scoped to an optional feature.
 
 [cols="30,70"]
 |===
@@ -28,15 +62,79 @@ traceability:links[]
 | Ubiquitous | The system SHALL <verb> <object>.
 | Event-driven | WHEN <trigger>, the system SHALL <verb> <object>.
 | State-driven | WHILE <state>, the system SHALL <verb> <object>.
-| Unwanted | IF <condition>, THEN the system SHALL <verb> <object>.
-| Optional | WHERE <feature>, the system SHALL <verb> <object>.
+| Unwanted behaviour | IF <condition>, THEN the system SHALL <verb> <object>.
+| Optional feature | WHERE <feature>, the system SHALL <verb> <object>.
+| Complex | WHILE <precondition>, WHEN <trigger>, the system SHALL <verb> <object>.
 |===
 
-* State what, never how. Do not name technologies, algorithms, or internal components.
+Do not use the EARS keywords interchangeably — `WHEN` for events, `WHILE` for states, `WHERE` for optional features, `IF … THEN` for unwanted behaviour.
 
-== Quality checklist
+=== What, Not How
 
-* Testable — a test can verify the behaviour.
-* Atomic — one behaviour, one item.
-* Unambiguous — no "should", "may", or "appropriately".
-* No solution prescription — no technology or implementation names.
+State the observable behaviour, outcome, or constraint — never the mechanism.
+The "how" belongs in design documents and ADRs.
+
+[cols="50,50"]
+|===
+| Wrong — prescribes solution | Right — states behaviour
+| The system SHALL use regex to parse items | The system SHALL detect item declarations in AsciiDoc source files
+| The system SHALL render a GraphViz diagram | The system SHALL render a relationship diagram for the enclosing item
+| The `DocumentParser` SHALL skip … | The system SHALL NOT register …
+| During the `contentClassified` event, the system SHALL … | The system SHALL compute X exactly once per page file
+|===
+
+Flag these prescription categories: technology names (tool, library, framework), algorithm or data-structure names (`regex`, `BFS`, `in-memory`), internal component or method names, internal event or lifecycle hooks, and UI values (hex codes, fonts).
+Exception: when the integration IS the feature — "Neo4j export", "Antora extension" — naming it is acceptable because it defines scope.
+
+=== Atomicity
+
+* One SHALL per block. Multiple SHALLs usually mean multiple requirements — split them.
+* A SHALL NOT (prohibition) is its own Unwanted Behaviour requirement, never paired with a positive SHALL.
+* Exception: "and" is fine when it joins aspects of one observable outcome ("displays X and Y in the same view").
+
+=== SHALL Statement
+
+* Subject is "the system" or a user-facing feature name, never an internal component.
+* Verb is observable — "provide", "display", "generate", "register", "validate" — not "define a type", "build a graph", "use a library".
+* Object is a user-visible outcome, not an internal data structure.
+* Avoid "by" clauses and technology qualifiers.
+
+== Reviewing a Requirement
+
+**When reviewing, if content is vague or prescriptive, do not silently accept it.** Flag it with a specific question and a suggested rewrite. Do not rewrite without asking.
+
+=== EARS pattern
+- [ ] Uses a recognised EARS pattern
+- [ ] `WHEN` for events, `IF … THEN` for unwanted behaviour, `WHILE` for states, `WHERE` for optional features
+- [ ] Clauses in order: `WHILE … WHEN … the system SHALL …`
+- [ ] No trigger clause when the behaviour is ubiquitous
+
+=== Solution prescription
+- [ ] No technology name unless the technology IS the feature
+- [ ] No algorithm or data-structure name
+- [ ] No internal component, method, constant, or file path
+- [ ] No internal event or lifecycle hook
+- [ ] No UI detail (hex code, font, CDN URL)
+
+=== Testability
+- [ ] A tester can verify pass/fail without reading source code
+- [ ] No vague terms — "user-friendly", "fast", "appropriate", "reasonable"
+- [ ] Quantified where measurable — "responds within 200ms", not "low latency"
+
+=== Atomicity
+- [ ] One SHALL, one observable behaviour
+- [ ] Exception: "and" joining aspects of the same outcome is acceptable
+
+=== Unambiguity
+- [ ] Only one interpretation possible
+- [ ] Scope is clear — "per page file", "for the enclosing item", "across all component versions"
+
+=== Completeness
+- [ ] All aspects of the behaviour covered — nothing implied
+- [ ] Each error or edge case has an Unwanted Behaviour requirement, or is noted as missing
+- [ ] Scope boundaries explicit
+
+=== Traceability
+- [ ] `traceability:links[]` present
+- [ ] All referenced IDs exist
+- [ ] Relation types come from the config, not from memory
