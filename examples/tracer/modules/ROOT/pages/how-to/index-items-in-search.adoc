@@ -1,0 +1,53 @@
+= How to Index Traceable Items in Site Search
+:description: Make traceable item anchors searchable in the lunr search index
+:keywords: antora, asciidoc, traceability, search, lunr
+:toc: macro
+
+toc::[]
+
+By default, the site's lunr search indexes page headings but skips traceable items.
+A traceable item renders as a plain element with an `id` attribute (for example `<div id="REQ-002">`), which lunr does not treat as a navigable anchor.
+
+The `antora-tracer` package ships a patch that makes lunr index item anchors as separate search results.
+Apply it so items like `REQ-001` are discoverable in search.
+
+== Prerequisites
+
+The `@antora/lunr-extension` is registered in your Antora playbook.
+
+== Apply the patch
+
+. Install `patch-package` and the lunr extension version the patch targets:
++
+[source,bash]
+----
+npm i -D patch-package @antora/lunr-extension@1.0.0-alpha.13
+----
+. Copy the patch that ships with `antora-tracer` into your project:
++
+[source,bash]
+----
+mkdir -p patches
+cp node_modules/antora-tracer/patches/@antora+lunr-extension+1.0.0-alpha.13.patch patches/
+----
+. Register `patch-package` as your `postinstall` script:
++
+[source,bash]
+----
+npm pkg set scripts.postinstall="patch-package"
+----
++
+If you already have a `postinstall` script, append `patch-package` to it instead of replacing it.
+. Reinstall to apply the patch:
++
+[source,bash]
+----
+npm install
+----
+
+The patch stays applied across installs because `postinstall` re-runs `patch-package`.
+
+== Verify
+
+Build the site and search for an item ID such as `REQ-001`.
+The search should return the item as its own result linking directly to the item's anchor.

@@ -9,6 +9,7 @@
 ** xref:how-to/detect-duplicate-ids.adoc[Detect and resolve duplicate item IDs]
 ** xref:how-to/lint-prose-with-vale.adoc[Lint prose with Vale]
 ** xref:how-to/visualizations.adoc[Add traceability visualizations]
+** xref:how-to/index-items-in-search.adoc[Index traceable items in site search]
 ** xref:how-to/partials.adoc[Use partial files with items]
 ** xref:how-to/neo4j-export.adoc[Export to Neo4j]
 ** xref:how-to/query-graph.adoc[Query the graph from the command line]
