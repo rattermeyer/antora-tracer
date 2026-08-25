@@ -2,6 +2,11 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.22.1] — 2026-08-25
+
+### Fixed
+- Correct matrix and overview link prefixes for non-ROOT modules, which produced doubled module names in traceability matrix URLs
+
 ## [0.22.0] — 2026-08-25
 
 ### Added
