@@ -2,6 +2,22 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.21.0] — 2026-08-25
+
+### Added
+- `role-guidance` CLI command and per-role authoring guidance pages (`requirement`, `design`, `test`, `use_case`) with EARS and Karl Wiegers templates and review checklists
+- Agent skills (`write-item`, `use-case-engineering`, `requirements-writing`) that enforce a draft → review → explicit-confirmation flow before writing traceable items
+- Release-consistency check script validating version, tag, maintenance branch, playbook refs, and changelog agreement, wired into CI
+- Vale prose linting extended with Google, Readability, and neighbor styles, plus an AsciiDoc syntax lint style
+
+### Changed
+- The Antora component version is now derived from the git refname via a projection; `main` is an unversioned named prerelease served at `/main/`, with the newest maintenance branch serving `/stable/`
+
+### Fixed
+- Preserve empty-string versions for unversioned components
+- Build stable docs from the maintenance branch rather than the immutable release tag
+- Close unterminated item blocks in example documentation
+
 ## [0.20.0] — 2026-08-23
 
 ### Added
