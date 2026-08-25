@@ -69,6 +69,8 @@ user and wait for an explicit go-ahead (for example, "yes", "write it",
 If anything is still TBD or ambiguous, present it as a question and wait for
 the answer — do not fill in the blanks yourself.
 
+Name the guidance page the draft followed (the `page:` value from step 2).
+
 ## Guardrails
 
 **Do not guess.** When information is missing or ambiguous, ask the user.
