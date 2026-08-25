@@ -2148,6 +2148,64 @@ The system shall authenticate users.
       expect(matrixFiles[0].contents).to.be.instanceOf(Buffer);
     });
 
+    it("uses a deeper link prefix for non-ROOT module matrix attachments", async () => {
+      const addedFiles: any[] = [];
+      const contentCatalog = createCatalog({
+        findBy: ({ family }: { family: string }) => {
+          if (family === "page") {
+            return [
+              {
+                src: {
+                  path: "test.adoc",
+                  module: "my-module",
+                  component: "test-component",
+                  version: "1.0.0",
+                },
+                contents: Buffer.from(itemContent),
+              },
+            ];
+          }
+          return [];
+        },
+        addFile: (file: any) => {
+          addedFiles.push(file);
+          return file;
+        },
+      });
+
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      ctx.fireEvent("contentClassified", { contentCatalog });
+
+      const matrixFiles = addedFiles.filter(
+        (f: any) =>
+          f.src?.family === "attachment" &&
+          f.src?.relative?.startsWith("traceability/matrix-") &&
+          f.src?.module === "my-module",
+      );
+      expect(matrixFiles.length).to.be.greaterThan(0);
+
+      const htmlFile = matrixFiles.find((f: any) =>
+        f.src?.relative?.endsWith(".html"),
+      );
+      expect(htmlFile).to.exist;
+      const html = htmlFile.contents.toString();
+      // The template HTML-escapes "/" in hrefs as "&#x2F;". A non-ROOT module
+      // attachment sits one directory deeper, so its links must climb three
+      // levels (../../../) before appending the module path — two levels
+      // (../../) would reach only the module root and double the module name.
+      expect(html).to.include(
+        'href="..&#x2F;..&#x2F;..&#x2F;my-module&#x2F;test.html#REQ-001"',
+      );
+      expect(html).to.not.include(
+        'href="..&#x2F;..&#x2F;my-module&#x2F;test.html',
+      );
+    });
+
     it("should register matrix attachments under an empty-string version for unversioned components", async () => {
       const addedFiles: any[] = [];
       const contentCatalog = createCatalog({

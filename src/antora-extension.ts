@@ -1220,12 +1220,15 @@ export class AntoraTraceabilityExtension {
       // Register the supersession overview as an attachment so it is navigable
       // via xref:attachment$... — the full graph is complete only after the loop.
       if (this.config.generateOverview && this.fullGraph) {
-        const overviewContent = this.generateOverviewContent();
         const overviewPath =
           this.config.overviewTarget || "traceability/overview.html";
         for (const key of allKeys) {
           const [component, version] = key.split("@");
           for (const module of allModules) {
+            const relativePathPrefix =
+              module === "ROOT" ? "../../" : "../../../";
+            const overviewContent =
+              this.generateOverviewContent(relativePathPrefix);
             this.registerAttachmentInCatalog(
               contentCatalog,
               component,
@@ -1314,8 +1317,12 @@ export class AntoraTraceabilityExtension {
     }
     if (modules.size === 0) modules.add("ROOT");
 
-    const { files: matrixFiles } = this.generateMatrixFiles(htmlStyle);
     for (const module of modules) {
+      const relativePathPrefix = module === "ROOT" ? "../../" : "../../../";
+      const { files: matrixFiles } = this.generateMatrixFiles(
+        htmlStyle,
+        relativePathPrefix,
+      );
       for (const { fileName, content } of matrixFiles) {
         this.registerAttachmentInCatalog(
           contentCatalog,
@@ -1671,7 +1678,10 @@ export class AntoraTraceabilityExtension {
     });
   }
 
-  private generateMatrixFiles(htmlStyle?: string): {
+  private generateMatrixFiles(
+    htmlStyle?: string,
+    relativePathPrefix = "../../",
+  ): {
     matrixNames: string[];
     files: Array<{ fileName: string; content: string }>;
   } {
@@ -1691,7 +1701,7 @@ export class AntoraTraceabilityExtension {
       this.traceability.configLoader,
       {
         linkResolver: new LinkResolver({
-          relativePathPrefix: "../../",
+          relativePathPrefix,
           indexify: htmlStyle !== "default",
         }),
       },
@@ -1897,13 +1907,13 @@ export class AntoraTraceabilityExtension {
     );
   }
 
-  private generateOverviewContent(): string {
+  private generateOverviewContent(relativePathPrefix = "../../"): string {
     if (!this.fullGraph) return "";
     const graph = this.fullGraph;
     const esc = (s: string) =>
       s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     const linkResolver = new LinkResolver({
-      relativePathPrefix: "../../",
+      relativePathPrefix,
       indexify: true,
     });
     const itemLink = (item: Item | undefined, label: string): string => {
