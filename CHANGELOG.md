@@ -2,6 +2,11 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.22.0] — 2026-08-25
+
+### Added
+- Ship the `@antora/lunr-extension` item-anchor patch in the npm package, with a how-to guide for applying it so traceability items appear as individual search results
+
 ## [0.21.1] — 2026-08-25
 
 ### Fixed
