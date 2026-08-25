@@ -10,6 +10,13 @@ Help the user create or review use case descriptions following the Karl Wiegers 
 
 This skill is project-agnostic: the Karl Wiegers template, actor discipline, and testable pre/post-condition rules are universal. Only the role names, relation types, and ID prefix vary per project — those are discovered from the project's own `traceability.yml` (see below).
 
+> **Write nothing without explicit user confirmation.**
+> The steps below gather information and produce a *draft*.
+> Mandatory flow: draft → subagent review → present → confirm → write.
+> Skip no step. Present the draft and wait for the user to say to write it.
+> Re-sending the request, re-attaching the skill, or silence is **not**
+> confirmation — treat it as "keep asking", not "go ahead".
+
 ## When to Use
 
 - User asks to "write a use case" or "create a use case"
@@ -63,6 +70,13 @@ Do not invent role or relation names — take them from the config. If the proje
 - Steps contain implementation details (syntax, button names, field types) → Push back. "This reads like a design specification, not a use case. Would a Business Analyst describe it this way? Can we describe the goal rather than the mechanism?" Requirements own the details; use cases describe the interaction.
 
 Never fabricate actors, steps, conditions, or priorities. If the user cannot answer, mark the section with `TBD` and a note.
+
+**Do not self-review the draft.** Hand it to a read-only reviewer subagent and
+apply its findings before presenting to the user.
+
+**Never write without explicit confirmation.** The user re-sending the request,
+re-attaching the skill, or staying silent is **not** confirmation. Treat it as
+"keep asking", not "go ahead".
 
 ## Creating a Use Case
 
@@ -175,6 +189,21 @@ Describe the **state of the system after successful completion**, in past tense:
 
 - "The next sequential ID for the prefix is displayed on stdout" And "Exit code is 0"
 - "The extension's graph is unchanged" And "No files are modified on disk"
+
+### Step 4: Review the draft with another agent
+
+Do not self-review — delegate. Send the draft to a **read-only reviewer
+subagent** along with the "Reviewing a Use Case" checklist below. The
+reviewer reports findings only; it must not edit files. Apply the findings
+that matter before moving on. This is mandatory, not optional.
+
+### Step 5: Get explicit confirmation before writing
+
+Everything above produces a **draft**, not a file edit. Show the draft to the
+user and wait for an explicit go-ahead (for example, "yes", "write it",
+"looks good"). Write the block to the file **only after** that confirmation.
+If anything is still TBD or ambiguous, present it as a question and wait for
+the answer — do not fill in the blanks yourself.
 
 ## Reviewing a Use Case
 
