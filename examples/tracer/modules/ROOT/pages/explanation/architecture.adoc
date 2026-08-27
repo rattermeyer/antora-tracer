@@ -260,8 +260,10 @@ traceability:links[]
 --
 The `relations` map is keyed as `sourceRole → targetRole → type → { reverse }`, each relation type declaring its authorable reverse name.
 `TraceabilityGraph.addRelationship()` canonicalizes a reverse-authored edge to the primary direction — authoring `is_derived_from` from a requirement stores `UC → REQ : leads_to`.
+A reverse edge whose target is defined in a later file is stored in its authored direction until all of the component version's items are collected, then `canonicalizeRelationships()` re-resolves every edge once so the reverse is never left as a second edge.
 Authoring the same logical edge from both sides deduplicates into one `bidirectional` edge driven by the `reverse` declaration.
 `ConfigLoader.isRelationAllowed()` derives the reverse direction, so the reverse type is allowed without a second `relations` entry.
+See xref:explanation/adr/0015-deferred-canonicalization.adoc[ADR-015].
 
 addresses:REQ-219[]
 addresses:REQ-220[]

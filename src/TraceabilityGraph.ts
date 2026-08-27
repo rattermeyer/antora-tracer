@@ -331,6 +331,23 @@ export class TraceabilityGraph {
   }
 
   /**
+   * Re-resolve relationship direction after all items have been collected.
+   * Cross-file relationships can be added before their target item exists,
+   * which makes immediate reverse canonicalization impossible.
+   */
+  canonicalizeRelationships(): void {
+    const relationships = this.getAllRelationships().map((rel) => ({ ...rel }));
+    this._relationships.clear();
+    this._relationshipIndex.clear();
+    this._reverseRelationshipIndex.clear();
+    this._allRelationshipsCache = null;
+
+    for (const relationship of relationships) {
+      this.addRelationship(relationship);
+    }
+  }
+
+  /**
    * Get a relationship by ID
    */
   getRelationship(id: string): ItemRelationship | undefined {

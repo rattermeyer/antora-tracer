@@ -1,0 +1,52 @@
+= ADR-015: Deferred relationship canonicalization
+:keywords: adr, architecture, decision, canonical, graph, reverse, relations, two-phase
+
+*Status*: accepted +
+*Deciders*: Richard Attermeyer +
+*Date*: 2026-08-27
+
+== Context and Problem Statement
+
+`TraceabilityGraph.addRelationship()` canonicalizes a reverse-authored edge to its primary direction — `is_derived_from:UC-007[]` stores `UC-007 → REQ : leads_to` — but the flip requires both nodes to already exist in the graph.
+Antora streams files one at a time across modules, in no guaranteed order: a requirement page can author `is_derived_from:UC-007[]` before the page that defines `UC-007` is processed.
+When the target is unknown at add time, the flip is skipped and the edge is stored in its authored direction; the `leads_to` authored later in the other file then stores a second edge.
+One logical edge becomes two, breaking the canonical-storage invariant that matrices, coverage, and Neo4j export rely on.
+
+== Decision Drivers
+
+* The canonical-storage invariant must hold regardless of file processing order
+* Reverse-direction resolution must happen once, after the node set is complete, not per `addRelationship` call
+* Incremental graph queries must keep working during ingestion
+* The fix must cover both the CLI/library path (`processFiles`) and the Antora path without changing their public signatures
+
+== Considered Options
+
+* Buffer every relationship and add none until all files are read — defers the whole relationship phase but removes incremental queries during ingestion
+* Canonicalize only at `TraceabilityGraph.merge()` time in the Antora full graph — fixes export and matrices but leaves the per-version working graph non-canonical for macro expansion
+* Re-run `addRelationship` over a snapshot of all edges once items are complete — chosen
+* Leave the behaviour as-is and deduplicate at export time — patches symptoms in each consumer instead of the shared graph
+
+== Decision Outcome
+
+Chosen option: two-phase graph population.
+Phase 1 ingests items and relationships incrementally, keeping the existing best-effort canonicalization for edges whose target is already known.
+Phase 2 runs `TraceabilityGraph.canonicalizeRelationships()` at the collection boundary — after `processFiles()` has read every file, and after each component version's pages and partials are processed in `contentClassified`.
+The pass snapshots every edge, clears the relationship maps and indexes, and re-adds each edge; `addRelationship`'s existing flip-and-dedupe logic then resolves every reverse edge to its single canonical primary form.
+The pass is idempotent, so it is safe to run once per boundary.
+
+=== Positive Consequences
+
+* Canonical storage holds regardless of file order — one logical edge, one stored edge
+* A single reconciliation point reuses the existing flip-and-dedupe path instead of a second canonicalization implementation
+* `process()`, `processFiles()`, and the Antora extension keep their signatures; the reconciliation is internal to the graph
+
+=== Negative Consequences
+
+* During phase 1 the graph can transiently hold a non-canonical edge, so code that reads the graph mid-ingestion must not rely on canonical direction until reconciliation has run
+* The pass re-adds every edge and can re-emit pending/dangling warnings; `validate()` filters stale pending warnings, but the reconciliation is O(E) per boundary
+
+== Links
+
+* xref:explanation/adr/0011-reverse-relations.adoc[ADR-011] — the canonical-primary decision this complements
+* `TraceabilityGraph.canonicalizeRelationships()`
+* xref:explanation/architecture.adoc#ARC-035[ARC-035] — relation reverse declaration and canonical storage

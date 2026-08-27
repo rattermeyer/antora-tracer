@@ -18,3 +18,4 @@ Each record follows the https://github.com/architecture-decision-record/architec
 * xref:explanation/adr/0012-cli-mutation-boundary.adoc[ADR-012 — CLI owns source mutation; the extension stays read-only]
 * xref:explanation/adr/0013-pin-assembler-beta20-antora31.adoc[ADR-013 — Pin PDF/assembler extensions to beta.20 for Antora 3.1 compatibility]
 * xref:explanation/adr/0014-refname-derived-versioning.adoc[ADR-014 — Derive the component version from the git refname]
+* xref:explanation/adr/0015-deferred-canonicalization.adoc[ADR-015 — Deferred relationship canonicalization]

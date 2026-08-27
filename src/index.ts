@@ -229,6 +229,10 @@ export class RequirementsTraceabilityExtension {
       }
     }
 
+    // Canonicalize only after every file's items are known so reverse
+    // relationships can be resolved across file boundaries.
+    this.graph.canonicalizeRelationships();
+
     return {
       result: {
         items: allItems,

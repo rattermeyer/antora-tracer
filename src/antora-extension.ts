@@ -1154,6 +1154,11 @@ export class AntoraTraceabilityExtension {
           this.processAsciiDocFile(file, file.src?.fileUri);
         }
 
+        // Items are collected across files before canonicalizing relationships;
+        // otherwise a reverse relation whose target is in a later file is kept
+        // in its authored direction.
+        this.traceability?.graph.canonicalizeRelationships();
+
         // Accumulate this version's items into the full graph used by the
         // sitePublished generation passes.
         if (this.fullGraph && this.traceability) {

@@ -668,6 +668,43 @@ describe("RequirementsTraceabilityExtension - API Methods", () => {
       expect(result.fileResults).to.be.an("array").that.is.empty;
       expect(result.result.items).to.have.lengthOf(0);
     });
+
+    it("canonicalizes reverse relationships authored before the target is known", () => {
+      const configPath = join(tempDir, "traceability.yml");
+      writeFileSync(
+        configPath,
+        [
+          "roles: [requirement, use_case]",
+          "relations:",
+          "  use_case:",
+          "    requirement:",
+          "      leads_to:",
+          "        reverse: is_derived_from",
+          "",
+        ].join("\n"),
+      );
+      const configLoader = new ConfigLoader();
+      configLoader.load(configPath);
+      const extension = new RequirementsTraceabilityExtension(configLoader);
+
+      extension.processFiles([
+        {
+          path: "reqs.adoc",
+          content: `\n[#REQ-0001, item, role=requirement]\n====\nis_derived_from:OBJ-0305[]\n====\n`,
+        },
+        {
+          path: "objects.adoc",
+          content: `\n[#OBJ-0305, item, role=use_case]\n====\nleads_to:REQ-0001[]\n====\n`,
+        },
+      ]);
+
+      // Both directions must collapse to the single canonical primary edge.
+      const rels = extension.getAllRelationships();
+      expect(rels).to.have.lengthOf(1);
+      expect(rels[0].fromId).to.equal("OBJ-0305");
+      expect(rels[0].targetId).to.equal("REQ-0001");
+      expect(rels[0].type).to.equal("leads_to");
+    });
   });
 
   // 5.2

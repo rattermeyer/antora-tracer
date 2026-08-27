@@ -36,6 +36,12 @@ When an item authors a relationship using a reverse type, the graph SHALL store 
 - **WHEN** a use case authors `leads_to:REQ-001[]`
 - **THEN** the stored edge SHALL be `UC-001 → REQ-001 : leads_to`
 
+#### Scenario: Reverse name authored before the target item is collected
+- **WHEN** a requirement authors `is_derived_from:UC-001[]` in a file processed before `UC-001` is defined
+- **AND** a later file defines `UC-001` and authors `leads_to:REQ-001[]`
+- **THEN** once all files are collected, the graph SHALL contain exactly one edge `UC-001 → REQ-001 : leads_to`
+- **AND** no `is_derived_from`-typed edge SHALL be stored
+
 ### Requirement: Reverse direction is derived for validation
 The system SHALL allow a relation type that is the reverse of a relation declared in the opposite role direction, without an explicit `relations` entry for that direction.
 
