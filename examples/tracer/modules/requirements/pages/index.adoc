@@ -172,8 +172,6 @@ Relationships marked as bidirectional SHALL also be skipped during cycle detecti
 
 Source: openspec/specs/circular-reference-detection/spec.md
 
-is_derived_from:UC-007[]
-
 traceability:links[]
 --
 
@@ -732,8 +730,6 @@ The diagram SHALL show the item and its related items as labeled nodes and edges
 An optional depth parameter SHALL control the number of relationship hops shown.
 
 Source: openspec/specs/graph-visualization/spec.md
-
-is_derived_from:UC-009[]
 
 traceability:links[]
 --

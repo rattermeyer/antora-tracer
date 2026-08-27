@@ -38,6 +38,37 @@ Each use case traces into the requirements it motivates via `leads_to` relations
 |===
 
 leads_to:REQ-056[]
+leads_to:REQ-087[]
+leads_to:REQ-088[]
+leads_to:REQ-090[]
+leads_to:REQ-091[]
+leads_to:REQ-092[]
+leads_to:REQ-044[]
+leads_to:REQ-045[]
+leads_to:REQ-047[]
+leads_to:REQ-048[]
+leads_to:REQ-055[]
+leads_to:REQ-064[]
+leads_to:REQ-065[]
+leads_to:REQ-066[]
+leads_to:REQ-067[]
+leads_to:REQ-070[]
+leads_to:REQ-100[]
+leads_to:REQ-102[]
+leads_to:REQ-103[]
+leads_to:REQ-104[]
+leads_to:REQ-116[]
+leads_to:REQ-117[]
+leads_to:REQ-119[]
+leads_to:REQ-146[]
+leads_to:REQ-161[]
+leads_to:REQ-162[]
+leads_to:REQ-163[]
+leads_to:REQ-164[]
+leads_to:REQ-165[]
+leads_to:REQ-166[]
+leads_to:REQ-221[]
+leads_to:REQ-222[]
 
 traceability:links[]
 --
@@ -72,6 +103,18 @@ traceability:links[]
 | Notes | ⚠ Actor "Requirements Engineer" does not yet have a persona definition. The `extends:` mechanism is documented in the User Guide (Configuration section).
 |===
 
+leads_to:REQ-086[]
+leads_to:REQ-170[]
+leads_to:REQ-171[]
+leads_to:REQ-172[]
+leads_to:REQ-173[]
+leads_to:REQ-175[]
+leads_to:REQ-176[]
+leads_to:REQ-177[]
+leads_to:REQ-178[]
+leads_to:REQ-223[]
+leads_to:REQ-224[]
+
 traceability:links[]
 --
 
@@ -103,6 +146,8 @@ traceability:links[]
 |===
 
 leads_to:REQ-110[]
+leads_to:REQ-144[]
+leads_to:REQ-145[]
 
 traceability:links[]
 --
@@ -139,6 +184,18 @@ traceability:links[]
 
 leads_to:REQ-037[]
 leads_to:REQ-038[]
+leads_to:REQ-039[]
+leads_to:REQ-040[]
+leads_to:REQ-041[]
+leads_to:REQ-042[]
+leads_to:REQ-043[]
+leads_to:REQ-108[]
+leads_to:REQ-113[]
+leads_to:REQ-128[]
+leads_to:REQ-130[]
+leads_to:REQ-167[]
+leads_to:REQ-168[]
+leads_to:REQ-169[]
 
 traceability:links[]
 --
@@ -224,6 +281,11 @@ traceability:links[]
 |===
 
 leads_to:REQ-109[]
+leads_to:REQ-111[]
+leads_to:REQ-112[]
+leads_to:REQ-150[]
+leads_to:REQ-219[]
+leads_to:REQ-220[]
 
 traceability:links[]
 --
@@ -290,7 +352,13 @@ traceability:links[]
 
 leads_to:REQ-051[]
 leads_to:REQ-052[]
+leads_to:REQ-053[]
 leads_to:REQ-054[]
+leads_to:REQ-063[]
+leads_to:REQ-142[]
+leads_to:REQ-143[]
+leads_to:REQ-159[]
+leads_to:REQ-160[]
 
 traceability:links[]
 --
@@ -332,6 +400,7 @@ leads_to:REQ-138[]
 leads_to:REQ-139[]
 leads_to:REQ-140[]
 leads_to:REQ-141[]
+leads_to:REQ-227[]
 
 traceability:links[]
 --
@@ -365,6 +434,140 @@ traceability:links[]
 | Frequency | Per user goal — added when a new workflow is identified
 | Notes | ⚠ Actor "Requirements Engineer" does not yet have a persona definition. The use case template and quality rules live in the `use_case` role guidance (`antora-tracer role-guidance use_case`), not in this prose.
 |===
+
+leads_to:REQ-056[]
+
+traceability:links[]
+--
+
+[#UC-012, item, role=use_case, title="Reader finds a traceable item through site search"]
+--
+.Use Case: Reader finds a traceable item through site search
+[width=100%, cols="25h,75a"]
+|===
+| ID | UC-012
+| Title | Reader finds a traceable item through site search
+| Goal | Reader searches the published documentation so that they can jump directly to a specific traceable item instead of scrolling through pages
+| Primary Actor | Reader — any team member, reviewer, or auditor browsing the published site
+| Preconditions | The published site has search enabled And traceable item anchors are included in the search index And the Reader has access to the published site
+| Trigger | Reader opens the site search and enters a query to locate a specific traceable item
+| Basic Flow |
+. Reader opens the site search on the published site
+. Reader enters a query matching the traceable item's ID or title
+. The search returns matching results, including the traceable item
+. Reader selects the result that points to the item
+. The browser navigates directly to the item's anchor on the page
+| Alternate Flows |
+. *The result points to a section heading rather than an item:* The heading is indexed by the site's existing section search, so the Reader lands on the heading instead.
+. *No result matches the query:* Reader refines the query or browses the navigation instead.
+| Postconditions | The Reader has navigated directly to the traceable item's anchor
+| Priority | Medium
+| Frequency | Ad hoc — whenever a reader needs to locate a specific item
+| Notes | Distinct from UC-005 (browsing matrices for coverage): this use case covers locating a single item via full-text search. Items are indexed by their element anchors within the article body; headings and elements outside the article body are handled by the site's existing indexing. No persona defined for the reader roles.
+|===
+
+leads_to:REQ-079[]
+leads_to:REQ-080[]
+leads_to:REQ-081[]
+leads_to:REQ-082[]
+
+traceability:links[]
+--
+
+[#UC-013, item, role=use_case, title="Requirements Engineer retires an obsolete traceable item"]
+--
+.Use Case: Requirements Engineer retires an obsolete traceable item
+[width=100%, cols="25h,75a"]
+|===
+| ID | UC-013
+| Title | Requirements Engineer retires an obsolete traceable item
+| Goal | Requirements Engineer marks an obsolete item as superseded And cleans it out of the active set so that current-state views reflect the successor while the item's history is preserved
+| Primary Actor | Requirements Engineer, Developer, or Tech Lead
+| Preconditions | An obsolete traceable item exists in the graph And (a replacement successor has been authored Or the item is isolated with no relationships) And the Antora Tracer CLI is available And the Requirements Engineer has write access to the source `.adoc` files
+| Trigger | Requirements Engineer determines that an existing item is obsolete and must be replaced or removed
+| Basic Flow |
+. Requirements Engineer marks the successor as replacing the obsolete predecessor
+. Requirements Engineer runs the supersession check for the predecessor to list direct successors And incoming functional relationships requiring review
+. Requirements Engineer runs validation to confirm the supersession structure is valid — no self-reference, duplicate, or cycle — And to review stale functional-link warnings
+. The build renders the superseded item with a marker linking to every direct successor And current-state matrices omit the superseded item
+. Requirements Engineer reviews functional relationships that still target the obsolete item And updates them to the successor
+. When cleanup is due, Requirements Engineer archives the superseded item out of the active pages or removes an orphaned or isolated item after confirmation
+| Alternate Flows |
+. *Supersession structure is invalid (self-reference, duplicate, or cycle):* Validation reports an error And the Requirements Engineer fixes the relationship.
+. *A functional link still targets the superseded item:* The link is retained And flagged as requiring review, naming every direct successor; validation warns without failing.
+. *A dangling link of type `supersedes` or `superseded_by`:* Reported as an advisory worklist item, not a validation error.
+. *Hide superseded items from rendered output:* The Requirements Engineer disables rendering of superseded items; the graph And matrices are unaffected.
+. *Item is not superseded:* The archive command refuses to move it.
+. *Item is isolated (no relationships at all):* Removal requires typing the item ID verbatim as a stronger confirmation.
+| Postconditions | The successor is registered as replacing the predecessor And the obsolete item is marked superseded And current-state matrices And views show only active items And the obsolete item's history is preserved via successor links And the archive or remove command has confirmed the target item before mutating the file
+| Priority | High
+| Frequency | Whenever an item is replaced — during refactoring or requirement changes
+| Notes | The `supersedes` relation And the archive destination page are defined by the requirements this use case traces to. Covers the supersession overview as an optional reporting aid. Actor "Requirements Engineer" does not yet have a persona definition. The supersession check is read-only; only the archive And remove commands mutate source files.
+|===
+
+leads_to:REQ-201[]
+leads_to:REQ-202[]
+leads_to:REQ-203[]
+leads_to:REQ-228[]
+leads_to:REQ-204[]
+leads_to:REQ-205[]
+leads_to:REQ-206[]
+leads_to:REQ-207[]
+leads_to:REQ-208[]
+leads_to:REQ-209[]
+leads_to:REQ-210[]
+leads_to:REQ-211[]
+leads_to:REQ-233[]
+leads_to:REQ-234[]
+leads_to:REQ-229[]
+leads_to:REQ-230[]
+leads_to:REQ-231[]
+leads_to:REQ-232[]
+leads_to:REQ-235[]
+leads_to:REQ-236[]
+leads_to:REQ-237[]
+leads_to:REQ-238[]
+leads_to:REQ-239[]
+
+traceability:links[]
+--
+
+[#UC-014, item, role=use_case, title="Developer compares traceability across two versions"]
+--
+.Use Case: Developer compares traceability across two versions
+[width=100%, cols="25h,75a"]
+|===
+| ID | UC-014
+| Title | Developer compares traceability across two versions
+| Goal | Developer diffs two sets of AsciiDoc sources so that they can see exactly which items and relationships changed between versions before merging or auditing
+| Primary Actor | Developer or Requirements Engineer
+| Preconditions | Two source paths (for example, a base branch and a revision) are available locally And the Antora Tracer CLI is installed And the Developer has read access to both source paths
+| Trigger | Developer prepares to merge, release, or audit a change And runs the diff command
+| Basic Flow |
+. Developer identifies the two source paths to compare — the base and the revision
+. Developer runs the diff command with both paths
+. The CLI prints the delta between the two graphs
+. Developer reviews items classified as added, removed, or modified by stable ID, with modified items naming the changed fields
+. Developer reviews relationship changes limited to items that survive in both snapshots
+. Developer uses the delta to plan the merge or document the change
+| Alternate Flows |
+. *An item was renamed without a supersedes relationship:* The diff performs no rename detection — the old ID appears as removed And the new ID as added.
+. *A superseded item:* Its predecessor appears as removed And its successor as added, with the supersession relationship reported as a new relationship.
+. *A relationship touches an item present in only one snapshot:* The relationship delta is not reported.
+. *The two snapshots are identical:* An empty delta is printed And the command exits successfully.
+| Postconditions | The delta — added, removed, and modified items plus relationship changes — has been printed And no source file has been modified
+| Priority | Medium
+| Frequency | Before merges, during release reviews, or when auditing traceability drift
+| Notes | The diff is read-only And config-agnostic — it works with any role or relation vocabulary. No persona defined for the actor roles.
+|===
+
+leads_to:REQ-212[]
+leads_to:REQ-213[]
+leads_to:REQ-214[]
+leads_to:REQ-225[]
+leads_to:REQ-226[]
+leads_to:REQ-216[]
+leads_to:REQ-217[]
 
 traceability:links[]
 --
