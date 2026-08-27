@@ -2,6 +2,15 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.23.0] — 2026-08-27
+
+### Added
+- Resolve cross-component relationship xrefs — items in sibling components at the same version now render `component:module:` xrefs in relationship lists
+
+### Fixed
+- Matrix links to items in other components now resolve from the site root instead of pointing at the matrix's own component
+- Comma-separated inline macro targets (`addresses:REQ-001,REQ-002[]`) now parse as multiple relationships, matching the documented syntax
+
 ## [0.22.2] — 2026-08-27
 
 ### Fixed
