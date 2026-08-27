@@ -341,7 +341,7 @@ parameter.
 The same `RequirementsTraceabilityExtension` class is used by
 the CLI outside Antora, demonstrating the event handlers are optional.
 
-addresses:REQ-103[]
+addresses:REQ-249[]
 addresses:QA-055[]
 traceability:links[]
 --
@@ -371,7 +371,7 @@ traceability:links[]
 
 [#ARC-045, item, role=design, title="Full graph for generation, working graph for xrefs"]
 --
-The extension keeps two graphs: a working graph cleared per version for version-scoped xref generation (REQ-103), and an accumulated full graph merged after each version and read by the `sitePublished` generation passes.
+The extension keeps two graphs: a working graph cleared per version for version-scoped xref generation (REQ-249), and an accumulated full graph merged after each version and read by the `sitePublished` generation passes.
 This split resolves the conflict between per-version xref isolation and full-site matrix/overview generation.
 
 addresses:REQ-239[]
@@ -549,28 +549,15 @@ traceability:links[]
 
 [#ARC-021, item, role=design, title="Path resolution for matrix-to-item links"]
 --
-The `LinkResolver` generates relative link paths from matrix output to component
-root.
-It normalizes `sourceFile` values by stripping the `pages/` prefix and
-`.adoc` extension, producing `../../page.html#ID` links.
-When an item carries a
-`module` attribute, the module name is prepended to the path
-(`../../requirements/index.html#ID`) so links resolve across modules in a
-multi-module Antora site; the `ROOT` module is skipped because Antora serves it
-directly under the component version directory.
-With Antora's
-default `indexify` URL style, pages at the module root produce
-`pagename/index.html` instead of `pagename.html`.
-The `relativePathPrefix`
-option allows configurable base paths, and the `indexify` option (default
-`true`) controls whether root-level pages use `index.html`.
-When no
-`LinkResolver` is provided, items render as plain text without links.
+The `LinkResolver` generates links from matrix output to item pages.
+In an Antora build, each item carries its published `pubUrl` (for example, `/tracer/stable/index.html`), and the resolver prepends a `siteRootPath` — the matrix attachment's distance to the site root — so same-component and cross-component targets both resolve.
+Outside Antora (CLI), items carry no `pubUrl`, so the resolver falls back to a `relativePathPrefix` plus the normalized `sourceFile`: it strips the `pages/` prefix and `.adoc` extension, prepends the module name (skipping `ROOT`), and applies the `indexify` URL style.
+When no `LinkResolver` is provided, items render as plain text without links.
 
 addresses:REQ-037[]
 addresses:REQ-038[]
 addresses:REQ-039[]
-addresses:REQ-040[]
+addresses:REQ-250[]
 addresses:REQ-041[]
 addresses:REQ-042[]
 addresses:REQ-043[]

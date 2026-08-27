@@ -43,7 +43,7 @@ Tests automatic matrix registration in the content catalog during `contentClassi
 Tests partial file processing including item registration from partials, view URL as sourceFile, and macro expansion in Pass 2.
 Tests cross-module and cross-component xref prefix generation.
 
-verifies:REQ-040[]
+verifies:REQ-250[]
 verifies:REQ-041[]
 verifies:REQ-044[]
 verifies:REQ-045[]
@@ -67,7 +67,7 @@ verifies:REQ-161[]
 verifies:REQ-162[]
 verifies:REQ-100[]
 verifies:REQ-102[]
-verifies:REQ-103[]
+verifies:REQ-249[]
 verifies:REQ-104[]
 verifies:REQ-108[]
 verifies:REQ-110[]

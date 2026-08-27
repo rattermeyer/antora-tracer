@@ -309,9 +309,20 @@ Source: openspec/specs/incoming-links-macro/spec.md
 traceability:links[]
 --
 
-[#REQ-103, item, role=requirement, title="Graph isolation per version"]
+[#REQ-103, item, role=requirement, title="Graph isolation per component version"]
+--
+Relationship macro expansion SHALL produce xrefs only to items in the same component version as the enclosing page.
+
+Source: openspec/specs/traceability-links-macro/spec.md
+
+traceability:links[]
+--
+
+[#REQ-249, item, role=requirement, title="Graph isolation per version"]
 --
 Relationship macro expansion SHALL produce xrefs only to items in the same version as the enclosing page, spanning components at that version.
+
+supersedes:REQ-103[]
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
@@ -467,6 +478,17 @@ traceability:links[]
 [#REQ-040, item, role=requirement, title="Matrix links resolve correctly from site output location"]
 --
 The system SHALL generate matrix links that resolve correctly regardless of where the matrix file is served within the Antora site output.
+
+Source: openspec/specs/matrix-item-linking/spec.md
+
+traceability:links[]
+--
+
+[#REQ-250, item, role=requirement, title="Matrix links resolve correctly from site output location"]
+--
+The system SHALL generate matrix links that resolve correctly regardless of where the matrix file is served within the Antora site output, resolving each item from the site root via its published URL so same-component and cross-component targets both resolve.
+
+supersedes:REQ-040[]
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
@@ -1137,6 +1159,15 @@ traceability:links[]
 [#REQ-239, item, role=requirement, title="Generation passes use the complete graph across all components and versions"]
 --
 When the extension generates matrices, coverage, and the supersession overview at `sitePublished`, it SHALL use a graph containing every item from every component and version of the site.
+
+Source: openspec/specs/graph-lifecycle/spec.md
+
+traceability:links[]
+--
+
+[#REQ-251, item, role=requirement, title="Working graph spans components within a version"]
+--
+The `contentClassified` working graph SHALL include items from every component at the same version, so relationship macros resolve cross-component xrefs. Cross-version isolation is unchanged.
 
 Source: openspec/specs/graph-lifecycle/spec.md
 

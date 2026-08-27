@@ -30,6 +30,37 @@ UC-001,UC-001 — Team member writes traceable items in AsciiDoc,use_case,,self-
 |===
 
 leads_to:REQ-056[]
+leads_to:REQ-087[]
+leads_to:REQ-088[]
+leads_to:REQ-090[]
+leads_to:REQ-091[]
+leads_to:REQ-092[]
+leads_to:REQ-044[]
+leads_to:REQ-045[]
+leads_to:REQ-047[]
+leads_to:REQ-048[]
+leads_to:REQ-055[]
+leads_to:REQ-064[]
+leads_to:REQ-065[]
+leads_to:REQ-066[]
+leads_to:REQ-067[]
+leads_to:REQ-070[]
+leads_to:REQ-100[]
+leads_to:REQ-102[]
+leads_to:REQ-249[]
+leads_to:REQ-104[]
+leads_to:REQ-116[]
+leads_to:REQ-117[]
+leads_to:REQ-119[]
+leads_to:REQ-146[]
+leads_to:REQ-161[]
+leads_to:REQ-162[]
+leads_to:REQ-163[]
+leads_to:REQ-164[]
+leads_to:REQ-165[]
+leads_to:REQ-166[]
+leads_to:REQ-221[]
+leads_to:REQ-222[]
 
 traceability:links[]"""
 UC-002,UC-002 — Requirements Engineer defines custom domain model via config,use_case,,self-traceability/use-cases.adoc,""".Use Case: Requirements Engineer defines custom domain model via config
@@ -60,6 +91,18 @@ UC-002,UC-002 — Requirements Engineer defines custom domain model via config,u
 | Notes | ⚠ Actor """"Requirements Engineer"""" does not yet have a persona definition. The `extends:` mechanism is documented in the User Guide (Configuration section).
 |===
 
+leads_to:REQ-086[]
+leads_to:REQ-170[]
+leads_to:REQ-171[]
+leads_to:REQ-172[]
+leads_to:REQ-173[]
+leads_to:REQ-175[]
+leads_to:REQ-176[]
+leads_to:REQ-177[]
+leads_to:REQ-178[]
+leads_to:REQ-223[]
+leads_to:REQ-224[]
+
 traceability:links[]"""
 UC-004,UC-004 — Requirements Engineer organizes items in partial files,use_case,,self-traceability/use-cases.adoc,""".Use Case: Requirements Engineer organizes items in partial files
 [width=100%, cols=""""25h,75a""""]
@@ -87,6 +130,8 @@ UC-004,UC-004 — Requirements Engineer organizes items in partial files,use_cas
 |===
 
 leads_to:REQ-110[]
+leads_to:REQ-144[]
+leads_to:REQ-145[]
 
 traceability:links[]"""
 UC-005,UC-005 — Reviewer browses traceability matrices for coverage,use_case,,self-traceability/use-cases.adoc,""".Use Case: Reviewer browses traceability matrices for coverage
@@ -119,6 +164,18 @@ UC-005,UC-005 — Reviewer browses traceability matrices for coverage,use_case,,
 
 leads_to:REQ-037[]
 leads_to:REQ-038[]
+leads_to:REQ-039[]
+leads_to:REQ-250[]
+leads_to:REQ-041[]
+leads_to:REQ-042[]
+leads_to:REQ-043[]
+leads_to:REQ-108[]
+leads_to:REQ-113[]
+leads_to:REQ-128[]
+leads_to:REQ-130[]
+leads_to:REQ-167[]
+leads_to:REQ-168[]
+leads_to:REQ-169[]
 
 traceability:links[]"""
 UC-006,UC-006 — Project lead bootstraps traceability for a new project,use_case,,self-traceability/use-cases.adoc,""".Use Case: Project lead bootstraps traceability for a new project
@@ -196,6 +253,11 @@ UC-007,UC-007 — Developer validates traceability in CI pipeline,use_case,,self
 |===
 
 leads_to:REQ-109[]
+leads_to:REQ-111[]
+leads_to:REQ-112[]
+leads_to:REQ-150[]
+leads_to:REQ-219[]
+leads_to:REQ-220[]
 
 traceability:links[]"""
 UC-008,UC-008 — Data analyst explores traceability in Neo4j,use_case,,self-traceability/use-cases.adoc,""".Use Case: Data analyst explores traceability in Neo4j
@@ -254,7 +316,13 @@ UC-009,UC-009 — Architect visualizes relationship dependencies,use_case,,self-
 
 leads_to:REQ-051[]
 leads_to:REQ-052[]
+leads_to:REQ-053[]
 leads_to:REQ-054[]
+leads_to:REQ-063[]
+leads_to:REQ-142[]
+leads_to:REQ-143[]
+leads_to:REQ-159[]
+leads_to:REQ-160[]
 
 traceability:links[]"""
 UC-010,UC-010 — Developer assesses impact before changing a traceable item,use_case,,self-traceability/use-cases.adoc,""".Use Case: Developer assesses impact before changing a traceable item
@@ -292,6 +360,158 @@ leads_to:REQ-138[]
 leads_to:REQ-139[]
 leads_to:REQ-140[]
 leads_to:REQ-141[]
+leads_to:REQ-227[]
+
+traceability:links[]"""
+UC-011,UC-011 — Requirements Engineer writes a use case,use_case,,self-traceability/use-cases.adoc,""".Use Case: Requirements Engineer writes a use case
+[width=100%, cols=""""25h,75a""""]
+|===
+| ID | UC-011
+| Title | Requirements Engineer writes a use case
+| Goal | Requirements Engineer writes a use case item so that a user goal is captured in a testable, traceable form that links to the requirements it motivates
+| Primary Actor | Requirements Engineer
+| Preconditions | The Antora Tracer extension is installed And the project config defines a `use_case` role And the Requirements Engineer has write access to the `.adoc` files And the `use_case` role has authoring guidance (a `roleGuidance` page) or the Karl Wiegers template is known
+| Trigger | Requirements Engineer identifies a user workflow that needs to be documented as a use case
+| Basic Flow |
+. Requirements Engineer resolves the `use_case` authoring guidance with `antora-tracer role-guidance use_case` to obtain the item template
+. Requirements Engineer determines the next available ID with `antora-tracer next-id --prefix UC -i <path>`
+. Requirements Engineer writes the use case item block (`[#UC-NNN, item, role=use_case, ...]`) following the Karl Wiegers template — actor, goal, preconditions, postconditions, main flow, and alternate flows
+. Requirements Engineer links the use case to the requirements it motivates with `leads_to:REQ-NNN[]` inline macros
+. Requirements Engineer includes `traceability:links[]` to render the relationship list
+. Requirements Engineer commits the file And triggers an Antora build
+. The extension registers the use case item And the `leads_to` relationships appear in the traceability matrix
+| Alternate Flows |
+. *The `use_case` role is not in the config:* The extension registers the item with a warning. The use case is not part of the configured domain model until the role is added.
+. *The role has no authoring guidance:* The Requirements Engineer falls back to the generic Karl Wiegers template.
+. *A precondition or postcondition is not testable:* The use case is revised so both are measurable.
+. *The Requirements Engineer links to a requirement that does not exist:* The extension stores the relationship with a warning. The matrix shows a partial link.
+| Postconditions | The traceability graph contains the use case item And the `leads_to` relationships are registered And the use case appears in use-case-to-requirement matrices And the rendered page shows the use case description
+| Priority | High
+| Frequency | Per user goal — added when a new workflow is identified
+| Notes | ⚠ Actor """"Requirements Engineer"""" does not yet have a persona definition. The use case template and quality rules live in the `use_case` role guidance (`antora-tracer role-guidance use_case`), not in this prose.
+|===
+
+leads_to:REQ-056[]
+
+traceability:links[]"""
+UC-012,UC-012 — Reader finds a traceable item through site search,use_case,,self-traceability/use-cases.adoc,""".Use Case: Reader finds a traceable item through site search
+[width=100%, cols=""""25h,75a""""]
+|===
+| ID | UC-012
+| Title | Reader finds a traceable item through site search
+| Goal | Reader searches the published documentation so that they can jump directly to a specific traceable item instead of scrolling through pages
+| Primary Actor | Reader — any team member, reviewer, or auditor browsing the published site
+| Preconditions | The published site has search enabled And traceable item anchors are included in the search index And the Reader has access to the published site
+| Trigger | Reader opens the site search and enters a query to locate a specific traceable item
+| Basic Flow |
+. Reader opens the site search on the published site
+. Reader enters a query matching the traceable item's ID or title
+. The search returns matching results, including the traceable item
+. Reader selects the result that points to the item
+. The browser navigates directly to the item's anchor on the page
+| Alternate Flows |
+. *The result points to a section heading rather than an item:* The heading is indexed by the site's existing section search, so the Reader lands on the heading instead.
+. *No result matches the query:* Reader refines the query or browses the navigation instead.
+| Postconditions | The Reader has navigated directly to the traceable item's anchor
+| Priority | Medium
+| Frequency | Ad hoc — whenever a reader needs to locate a specific item
+| Notes | Distinct from UC-005 (browsing matrices for coverage): this use case covers locating a single item via full-text search. Items are indexed by their element anchors within the article body; headings and elements outside the article body are handled by the site's existing indexing. No persona defined for the reader roles.
+|===
+
+leads_to:REQ-079[]
+leads_to:REQ-080[]
+leads_to:REQ-081[]
+leads_to:REQ-082[]
+
+traceability:links[]"""
+UC-013,UC-013 — Requirements Engineer retires an obsolete traceable item,use_case,,self-traceability/use-cases.adoc,""".Use Case: Requirements Engineer retires an obsolete traceable item
+[width=100%, cols=""""25h,75a""""]
+|===
+| ID | UC-013
+| Title | Requirements Engineer retires an obsolete traceable item
+| Goal | Requirements Engineer marks an obsolete item as superseded And cleans it out of the active set so that current-state views reflect the successor while the item's history is preserved
+| Primary Actor | Requirements Engineer, Developer, or Tech Lead
+| Preconditions | An obsolete traceable item exists in the graph And (a replacement successor has been authored Or the item is isolated with no relationships) And the Antora Tracer CLI is available And the Requirements Engineer has write access to the source `.adoc` files
+| Trigger | Requirements Engineer determines that an existing item is obsolete and must be replaced or removed
+| Basic Flow |
+. Requirements Engineer marks the successor as replacing the obsolete predecessor
+. Requirements Engineer runs the supersession check for the predecessor to list direct successors And incoming functional relationships requiring review
+. Requirements Engineer runs validation to confirm the supersession structure is valid — no self-reference, duplicate, or cycle — And to review stale functional-link warnings
+. The build renders the superseded item with a marker linking to every direct successor And current-state matrices omit the superseded item
+. Requirements Engineer reviews functional relationships that still target the obsolete item And updates them to the successor
+. When cleanup is due, Requirements Engineer archives the superseded item out of the active pages or removes an orphaned or isolated item after confirmation
+| Alternate Flows |
+. *Supersession structure is invalid (self-reference, duplicate, or cycle):* Validation reports an error And the Requirements Engineer fixes the relationship.
+. *A functional link still targets the superseded item:* The link is retained And flagged as requiring review, naming every direct successor; validation warns without failing.
+. *A dangling link of type `supersedes` or `superseded_by`:* Reported as an advisory worklist item, not a validation error.
+. *Hide superseded items from rendered output:* The Requirements Engineer disables rendering of superseded items; the graph And matrices are unaffected.
+. *Item is not superseded:* The archive command refuses to move it.
+. *Item is isolated (no relationships at all):* Removal requires typing the item ID verbatim as a stronger confirmation.
+| Postconditions | The successor is registered as replacing the predecessor And the obsolete item is marked superseded And current-state matrices And views show only active items And the obsolete item's history is preserved via successor links And the archive or remove command has confirmed the target item before mutating the file
+| Priority | High
+| Frequency | Whenever an item is replaced — during refactoring or requirement changes
+| Notes | The `supersedes` relation And the archive destination page are defined by the requirements this use case traces to. Covers the supersession overview as an optional reporting aid. Actor """"Requirements Engineer"""" does not yet have a persona definition. The supersession check is read-only; only the archive And remove commands mutate source files.
+|===
+
+leads_to:REQ-201[]
+leads_to:REQ-202[]
+leads_to:REQ-203[]
+leads_to:REQ-228[]
+leads_to:REQ-204[]
+leads_to:REQ-205[]
+leads_to:REQ-206[]
+leads_to:REQ-207[]
+leads_to:REQ-208[]
+leads_to:REQ-209[]
+leads_to:REQ-210[]
+leads_to:REQ-211[]
+leads_to:REQ-233[]
+leads_to:REQ-234[]
+leads_to:REQ-229[]
+leads_to:REQ-230[]
+leads_to:REQ-231[]
+leads_to:REQ-232[]
+leads_to:REQ-235[]
+leads_to:REQ-236[]
+leads_to:REQ-237[]
+leads_to:REQ-238[]
+leads_to:REQ-239[]
+
+traceability:links[]"""
+UC-014,UC-014 — Developer compares traceability across two versions,use_case,,self-traceability/use-cases.adoc,""".Use Case: Developer compares traceability across two versions
+[width=100%, cols=""""25h,75a""""]
+|===
+| ID | UC-014
+| Title | Developer compares traceability across two versions
+| Goal | Developer diffs two sets of AsciiDoc sources so that they can see exactly which items and relationships changed between versions before merging or auditing
+| Primary Actor | Developer or Requirements Engineer
+| Preconditions | Two source paths (for example, a base branch and a revision) are available locally And the Antora Tracer CLI is installed And the Developer has read access to both source paths
+| Trigger | Developer prepares to merge, release, or audit a change And runs the diff command
+| Basic Flow |
+. Developer identifies the two source paths to compare — the base and the revision
+. Developer runs the diff command with both paths
+. The CLI prints the delta between the two graphs
+. Developer reviews items classified as added, removed, or modified by stable ID, with modified items naming the changed fields
+. Developer reviews relationship changes limited to items that survive in both snapshots
+. Developer uses the delta to plan the merge or document the change
+| Alternate Flows |
+. *An item was renamed without a supersedes relationship:* The diff performs no rename detection — the old ID appears as removed And the new ID as added.
+. *A superseded item:* Its predecessor appears as removed And its successor as added, with the supersession relationship reported as a new relationship.
+. *A relationship touches an item present in only one snapshot:* The relationship delta is not reported.
+. *The two snapshots are identical:* An empty delta is printed And the command exits successfully.
+| Postconditions | The delta — added, removed, and modified items plus relationship changes — has been printed And no source file has been modified
+| Priority | Medium
+| Frequency | Before merges, during release reviews, or when auditing traceability drift
+| Notes | The diff is read-only And config-agnostic — it works with any role or relation vocabulary. No persona defined for the actor roles.
+|===
+
+leads_to:REQ-212[]
+leads_to:REQ-213[]
+leads_to:REQ-214[]
+leads_to:REQ-225[]
+leads_to:REQ-226[]
+leads_to:REQ-216[]
+leads_to:REQ-217[]
 
 traceability:links[]"""
 CON-001,CON-001 — Antora extension integration,constraint,,requirements.adoc,"""The system SHALL be implemented as an Antora extension, integrating via the Antora extension API (`contentClassified` and `sitePublished` events).
@@ -366,17 +586,6 @@ Merging is driven by the `reverse` declaration in `relations` (config).
 supersedes:REQ-129[]
 
 Source: openspec/specs/bidirectional-relationship-merge/spec.md
-
-traceability:links[]"""
-REQ-109,REQ-109 — Circular reference detection in graph validation,requirement,,requirements.adoc,"""The system SHALL detect circular references in the traceability graph during validation.
-A circular reference is a cycle in the directed relationship graph (e.g., A → B → A, or A → B → C → A).
-Self-referencing relationships (A → A) SHALL also be detected as cycles.
-Auto-generated inverse relationships SHALL be skipped during cycle detection to avoid false positives.
-Relationships marked as bidirectional SHALL also be skipped during cycle detection.
-
-Source: openspec/specs/circular-reference-detection/spec.md
-
-is_derived_from:UC-007[]
 
 traceability:links[]"""
 REQ-111,REQ-111 — File state is prepared once per file,requirement,,requirements.adoc,"""The system SHALL compute file content, document attributes, and item block positions exactly once per page file, and SHALL reuse the computed values across all macro-expansion passes for that file.
@@ -465,6 +674,13 @@ REQ-103,REQ-103 — Graph isolation per component version,requirement,,requireme
 Source: openspec/specs/traceability-links-macro/spec.md
 
 traceability:links[]"""
+REQ-249,REQ-249 — Graph isolation per version,requirement,,requirements.adoc,"""Relationship macro expansion SHALL produce xrefs only to items in the same version as the enclosing page, spanning components at that version.
+
+supersedes:REQ-103[]
+
+Source: openspec/specs/traceability-links-macro/spec.md
+
+traceability:links[]"""
 REQ-163,REQ-163 — Incoming macro PDF compatibility,requirement,,requirements.adoc,"""The generated output from `traceability:incoming[]` SHALL be standard AsciiDoc constructs — not raw HTML — ensuring compatibility with both HTML and PDF backends.
 
 Source: openspec/specs/incoming-links-macro/spec.md
@@ -546,6 +762,13 @@ Source: openspec/specs/matrix-item-linking/spec.md
 
 traceability:links[]"""
 REQ-040,REQ-040 — Matrix links resolve correctly from site output location,requirement,,requirements.adoc,"""The system SHALL generate matrix links that resolve correctly regardless of where the matrix file is served within the Antora site output.
+
+Source: openspec/specs/matrix-item-linking/spec.md
+
+traceability:links[]"""
+REQ-250,REQ-250 — Matrix links resolve correctly from site output location,requirement,,requirements.adoc,"""The system SHALL generate matrix links that resolve correctly regardless of where the matrix file is served within the Antora site output, resolving each item from the site root via its published URL so same-component and cross-component targets both resolve.
+
+supersedes:REQ-040[]
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
@@ -688,8 +911,6 @@ The diagram SHALL show the item and its related items as labeled nodes and edges
 An optional depth parameter SHALL control the number of relationship hops shown.
 
 Source: openspec/specs/graph-visualization/spec.md
-
-is_derived_from:UC-009[]
 
 traceability:links[]"""
 REQ-052,REQ-052 — Coverage chart via traceability:graph-coverage[] macro,requirement,,requirements.adoc,"""The system SHALL provide a `traceability:graph-coverage[]` inline macro that renders a coverage chart.
@@ -922,6 +1143,11 @@ Source: openspec/specs/item-lifecycle/spec.md
 
 traceability:links[]"""
 REQ-239,REQ-239 — Generation passes use the complete graph across all components and versions,requirement,,requirements.adoc,"""When the extension generates matrices, coverage, and the supersession overview at `sitePublished`, it SHALL use a graph containing every item from every component and version of the site.
+
+Source: openspec/specs/graph-lifecycle/spec.md
+
+traceability:links[]"""
+REQ-251,REQ-251 — Working graph spans components within a version,requirement,,requirements.adoc,"""The `contentClassified` working graph SHALL include items from every component at the same version, so relationship macros resolve cross-component xrefs. Cross-version isolation is unchanged.
 
 Source: openspec/specs/graph-lifecycle/spec.md
 
@@ -1394,6 +1620,13 @@ REQ-115,REQ-115 — Dead MatrixGenerator methods are removed,requirement,,requir
 Source: openspec/specs/template-partials/spec.md
 
 traceability:links[]"""
+REQ-109,REQ-109 — Circular reference detection in graph validation,requirement,,demo/index.adoc,"""The system SHALL detect circular references in the traceability graph during validation.
+A circular reference is a cycle in the directed relationship graph (e.g., A → B → A, or A → B → C → A).
+Self-referencing relationships (A → A) SHALL also be detected as cycles.
+Auto-generated inverse relationships SHALL be skipped during cycle detection to avoid false positives.
+Relationships marked as bidirectional SHALL also be skipped during cycle detection.
+
+traceability:links[]"""
 ARC-001,ARC-001 — Project scope and architectural goals,design,,explanation/architecture.adoc,"""*Project scope and architectural goals*
 
 The Antora Tracer is an Antora extension that adds role-based requirements traceability to AsciiDoc documentation.
@@ -1431,7 +1664,7 @@ versioned configuration that users can extend or override.
 
 | `name`
 | string
-| Unique preset identifier (e.g., `requirements-engineering`). Used by `--preset` CLI flag and `preset` playbook option.
+| Unique preset identifier (for example, `requirements-engineering`). Used by `--preset` CLI flag and `preset` playbook option.
 
 | `description`
 | multiline string
@@ -1447,7 +1680,7 @@ versioned configuration that users can extend or override.
 
 | `tags`
 | string[]
-| Keywords for categorisation (e.g., `[software, ieee, medical]`).
+| Keywords for categorisation (for example, `[software, ieee, medical]`).
 
 | `compatibility`
 | object
@@ -1507,7 +1740,7 @@ detector that traverses all items and their outgoing relationships.
 A path stack
 and recursion set track visited nodes; when a node is encountered twice in the
 same path, a circular reference error is reported with the full cycle path
-(e.g., """"REQ-001 → REQ-002 → REQ-001"""").
+(for example, """"REQ-001 → REQ-002 → REQ-001"""").
 Auto-generated inverse relationships
 are skipped to avoid false positives.
 
@@ -1517,7 +1750,7 @@ ARC-029,ARC-029 — Partial file processing with source-repo links,design,,expla
 `family: partial` files.
 Partial items use Antora's pre-computed `fileUri`
 as their `sourceFile`, making traceability matrix links point directly to the
-partial source in the content repository (e.g., GitHub blob URL).
+partial source in the content repository (for example, GitHub blob URL).
 The
 `LinkResolver` detects URL `sourceFile` values and returns them unchanged,
 skipping the HTML path conversion.
@@ -1567,8 +1800,10 @@ addresses:REQ-160[]
 traceability:links[]"""
 ARC-035,ARC-035 — Relation reverse declaration and canonical storage,design,,explanation/architecture.adoc,"""The `relations` map is keyed as `sourceRole → targetRole → type → { reverse }`, each relation type declaring its authorable reverse name.
 `TraceabilityGraph.addRelationship()` canonicalizes a reverse-authored edge to the primary direction — authoring `is_derived_from` from a requirement stores `UC → REQ : leads_to`.
+A reverse edge whose target is defined in a later file is stored in its authored direction until all of the component version's items are collected, then `canonicalizeRelationships()` re-resolves every edge once so the reverse is never left as a second edge.
 Authoring the same logical edge from both sides deduplicates into one `bidirectional` edge driven by the `reverse` declaration.
 `ConfigLoader.isRelationAllowed()` derives the reverse direction, so the reverse type is allowed without a second `relations` entry.
+See xref:explanation/adr/0015-deferred-canonicalization.adoc[ADR-015].
 
 addresses:REQ-219[]
 addresses:REQ-220[]
@@ -1628,7 +1863,7 @@ parameter.
 The same `RequirementsTraceabilityExtension` class is used by
 the CLI outside Antora, demonstrating the event handlers are optional.
 
-addresses:REQ-103[]
+addresses:REQ-249[]
 addresses:QA-055[]
 traceability:links[]"""
 ARC-042,ARC-042 — Generated supersession overview page,design,,explanation/architecture.adoc,"""`generateOverviewContent()` runs in the `sitePublished` handler (gated by `generateOverview`) and writes `overview.html` into the traceability output directory, linked from the dashboard `index.html`.
@@ -1646,7 +1881,7 @@ The graph and matrices are unaffected — superseded items remain in the graph f
 addresses:REQ-233[]
 
 traceability:links[]"""
-ARC-045,"""ARC-045 — Full graph for generation, working graph for xrefs""",design,,explanation/architecture.adoc,"""The extension keeps two graphs: a working graph cleared per component version for version-scoped xref generation (REQ-103), and an accumulated full graph merged after each version and read by the `sitePublished` generation passes.
+ARC-045,"""ARC-045 — Full graph for generation, working graph for xrefs""",design,,explanation/architecture.adoc,"""The extension keeps two graphs: a working graph cleared per version for version-scoped xref generation (REQ-249), and an accumulated full graph merged after each version and read by the `sitePublished` generation passes.
 This split resolves the conflict between per-version xref isolation and full-site matrix/overview generation.
 
 addresses:REQ-239[]
@@ -1658,7 +1893,7 @@ DocumentParser) replaces `traceability:links[]` and
 showing the item's relationships.
 All three rendering macros (`outgoing`
 `incoming`, and `links`) share this single scan/render pipeline; only the
-relationship direction(s) they emit differ.
+relationship directions they emit differ.
 The DocumentParser's inline
 macro regex excludes these via a `traceability:` namespace guard; they are
 NOT parsed as relationships.
@@ -1780,28 +2015,15 @@ directory — the renderer falls back to built-in templates for any files not fo
 in the custom directory.
 
 traceability:links[]"""
-ARC-021,ARC-021 — Path resolution for matrix-to-item links,design,,explanation/architecture.adoc,"""The `LinkResolver` generates relative link paths from matrix output to component
-root.
-It normalizes `sourceFile` values by stripping the `pages/` prefix and
-`.adoc` extension, producing `../../page.html#ID` links.
-When an item carries a
-`module` attribute, the module name is prepended to the path
-(`../../requirements/index.html#ID`) so links resolve across modules in a
-multi-module Antora site; the `ROOT` module is skipped because Antora serves it
-directly under the component version directory.
-With Antora's
-default `indexify` URL style, pages at the module root produce
-`pagename/index.html` instead of `pagename.html`.
-The `relativePathPrefix`
-option allows configurable base paths, and the `indexify` option (default
-`true`) controls whether root-level pages use `index.html`.
-When no
-`LinkResolver` is provided, items render as plain text without links.
+ARC-021,ARC-021 — Path resolution for matrix-to-item links,design,,explanation/architecture.adoc,"""The `LinkResolver` generates links from matrix output to item pages.
+In an Antora build, each item carries its published `pubUrl` (for example, `/tracer/stable/index.html`), and the resolver prepends a `siteRootPath` — the matrix attachment's distance to the site root — so same-component and cross-component targets both resolve.
+Outside Antora (CLI), items carry no `pubUrl`, so the resolver falls back to a `relativePathPrefix` plus the normalized `sourceFile`: it strips the `pages/` prefix and `.adoc` extension, prepends the module name (skipping `ROOT`), and applies the `indexify` URL style.
+When no `LinkResolver` is provided, items render as plain text without links.
 
 addresses:REQ-037[]
 addresses:REQ-038[]
 addresses:REQ-039[]
-addresses:REQ-040[]
+addresses:REQ-250[]
 addresses:REQ-041[]
 addresses:REQ-042[]
 addresses:REQ-043[]
@@ -1893,7 +2115,7 @@ that traverses non-heading elements with `id` attributes inside
 `<article class=""""doc"""">`.
 Each such element becomes a separate search
 chunk with its `id` as the `hash`, enabling search results to link
-directly to item anchors (e.g., `#REQ-002`).
+directly to item anchors (for example, `#REQ-002`).
 Child elements with CSS
 class `title` provide the chunk title; elements without a `.title`
 child fall back to the `id`.
@@ -2127,7 +2349,7 @@ Tests automatic matrix registration in the content catalog during `contentClassi
 Tests partial file processing including item registration from partials, view URL as sourceFile, and macro expansion in Pass 2.
 Tests cross-module and cross-component xref prefix generation.
 
-verifies:REQ-040[]
+verifies:REQ-250[]
 verifies:REQ-041[]
 verifies:REQ-044[]
 verifies:REQ-045[]
@@ -2151,7 +2373,7 @@ verifies:REQ-161[]
 verifies:REQ-162[]
 verifies:REQ-100[]
 verifies:REQ-102[]
-verifies:REQ-103[]
+verifies:REQ-249[]
 verifies:REQ-104[]
 verifies:REQ-108[]
 verifies:REQ-110[]

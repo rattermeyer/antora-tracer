@@ -26,6 +26,7 @@ const extension = new RequirementsTraceabilityExtension(configLoader);
 const files = [
   "self-traceability/use-cases.adoc",
   { adoc: "requirements.adoc", realPath: resolve(__dirname, "tracer/modules/requirements/pages/index.adoc") },
+  { adoc: "demo/index.adoc", realPath: resolve(__dirname, "demo/modules/ROOT/pages/index.adoc") },
   "explanation/architecture.adoc", "self-traceability/test-plan.adoc", "self-traceability/delivery-process.adoc",
   "explanation/quality/zero-operational-overhead.adoc", "explanation/quality/configurable-without-code.adoc",
   "explanation/quality/fail-fast-diagnostics.adoc", "explanation/quality/no-side-effects.adoc",
