@@ -1584,7 +1584,8 @@ export class AntoraTraceabilityExtension {
   private substituteRelationshipLinks(content: string): string {
     // Inline macros are always invisible — pure data markers.
     // Exclude traceability:outgoing[] and traceability:incoming[] (the rendering macros).
-    const relRegex = /\b(?!traceability:)(\w+):([\w][-.\w]*)\[\]/g;
+    const relRegex =
+      /\b(?!traceability:)(\w+):([\w][-.\w]*(?:\s*,\s*[\w][-.\w]*)*)\[\]/g;
 
     // Find verbatim block ranges so we can preserve example code inside them
     const ranges = this.findVerbatimRanges(content);

@@ -236,6 +236,30 @@ addresses:REQ-001[]
       expect(result.relationships).to.have.lengthOf(1);
       expect(result.relationships[0].type).to.equal("addresses");
     });
+
+    it("should parse comma-separated multiple targets", () => {
+      const parser = new DocumentParser({});
+      const content = `
+[#REQ-001, item, role=requirement]
+====
+Req 1
+====
+
+[#DES-001, item, role=design]
+====
+Design 1
+
+addresses:REQ-001,REQ-002,REQ-003[]
+====
+`;
+      const result = parser.parse(content, "test.adoc");
+      expect(result.relationships).to.have.lengthOf(3);
+      expect(result.relationships.map((r) => r.targetId)).to.have.members([
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+      ]);
+    });
   });
 });
 

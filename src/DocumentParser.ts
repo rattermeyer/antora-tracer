@@ -393,10 +393,11 @@ export class DocumentParser {
       const backtickRanges = this.getBacktickRanges(itemContent);
 
       // Parse inline relationship macros: relationType:targetId[]
-      // Example: satisfies:REQ-001[], addresses:DES-001[], implemented_by:IMP-001[]
+      // Multiple targets per type are comma-separated: addresses:REQ-001,REQ-002[]
       // Exclude traceability: namespace — those are link/rendering macros, not relationships
       // Escape with backslash before the colon: relation\:TARGET[] is ignored
-      const inlineMacroRegex = /(?<!\\)(?!traceability:)([a-zA-Z][a-zA-Z0-9_-]*:[A-Z0-9_-]+)\[/g;
+      const inlineMacroRegex =
+        /(?<!\\)(?!traceability:)([a-zA-Z][a-zA-Z0-9_-]*:[A-Z0-9_-]+(?:\s*,\s*[A-Z0-9_-]+)*)\[/g;
       let match: RegExpExecArray | null;
 
       while ((match = inlineMacroRegex.exec(itemContent)) !== null) {
@@ -412,23 +413,29 @@ export class DocumentParser {
         if (colonIndex === -1) continue;
 
         const relationType = macro.substring(0, colonIndex);
-        const targetId = macro.substring(colonIndex + 1);
+        const targetIds = macro
+          .substring(colonIndex + 1)
+          .split(",")
+          .map((t) => t.trim())
+          .filter(Boolean);
 
-        if (!relationType || !targetId) continue;
+        if (!relationType) continue;
 
-        // Create relationship: source is the current item, target is the referenced ID
-        const relationship: ItemRelationship = {
-          id: `${item.id}-${relationType}-${targetId}`,
-          fromId: item.id,
-          targetId,
-          type: relationType,
-          sourceFile,
-          line,
-        };
+        for (const targetId of targetIds) {
+          // Create relationship: source is the current item, target is the referenced ID
+          const relationship: ItemRelationship = {
+            id: `${item.id}-${relationType}-${targetId}`,
+            fromId: item.id,
+            targetId,
+            type: relationType,
+            sourceFile,
+            line,
+          };
 
-        // Note: Relation validation is deferred to the extension level where the full graph is available.
-        // The parser only extracts relationships; it doesn't validate them against config.
-        result.relationships.push(relationship);
+          // Note: Relation validation is deferred to the extension level where the full graph is available.
+          // The parser only extracts relationships; it doesn't validate them against config.
+          result.relationships.push(relationship);
+        }
       }
     }
   }
