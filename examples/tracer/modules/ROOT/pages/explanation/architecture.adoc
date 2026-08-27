@@ -64,7 +64,7 @@ versioned configuration that users can extend or override.
 
 | `name`
 | string
-| Unique preset identifier (e.g., `requirements-engineering`). Used by `--preset` CLI flag and `preset` playbook option.
+| Unique preset identifier (for example, `requirements-engineering`). Used by `--preset` CLI flag and `preset` playbook option.
 
 | `description`
 | multiline string
@@ -80,7 +80,7 @@ versioned configuration that users can extend or override.
 
 | `tags`
 | string[]
-| Keywords for categorisation (e.g., `[software, ieee, medical]`).
+| Keywords for categorisation (for example, `[software, ieee, medical]`).
 
 | `compatibility`
 | object
@@ -182,7 +182,7 @@ detector that traverses all items and their outgoing relationships.
 A path stack
 and recursion set track visited nodes; when a node is encountered twice in the
 same path, a circular reference error is reported with the full cycle path
-(e.g., "REQ-001 → REQ-002 → REQ-001").
+(for example, "REQ-001 → REQ-002 → REQ-001").
 Auto-generated inverse relationships
 are skipped to avoid false positives.
 
@@ -196,7 +196,7 @@ The `registerContentClassifier()` handler processes both `family: page` and
 `family: partial` files.
 Partial items use Antora's pre-computed `fileUri`
 as their `sourceFile`, making traceability matrix links point directly to the
-partial source in the content repository (e.g., GitHub blob URL).
+partial source in the content repository (for example, GitHub blob URL).
 The
 `LinkResolver` detects URL `sourceFile` values and returns them unchanged,
 skipping the HTML path conversion.
@@ -371,7 +371,7 @@ traceability:links[]
 
 [#ARC-045, item, role=design, title="Full graph for generation, working graph for xrefs"]
 --
-The extension keeps two graphs: a working graph cleared per component version for version-scoped xref generation (REQ-103), and an accumulated full graph merged after each version and read by the `sitePublished` generation passes.
+The extension keeps two graphs: a working graph cleared per version for version-scoped xref generation (REQ-103), and an accumulated full graph merged after each version and read by the `sitePublished` generation passes.
 This split resolves the conflict between per-version xref isolation and full-site matrix/overview generation.
 
 addresses:REQ-239[]
@@ -387,7 +387,7 @@ DocumentParser) replaces `traceability:links[]` and
 showing the item's relationships.
 All three rendering macros (`outgoing`
 `incoming`, and `links`) share this single scan/render pipeline; only the
-relationship direction(s) they emit differ.
+relationship directions they emit differ.
 The DocumentParser's inline
 macro regex excludes these via a `traceability:` namespace guard; they are
 NOT parsed as relationships.
@@ -690,7 +690,7 @@ that traverses non-heading elements with `id` attributes inside
 `<article class="doc">`.
 Each such element becomes a separate search
 chunk with its `id` as the `hash`, enabling search results to link
-directly to item anchors (e.g., `#REQ-002`).
+directly to item anchors (for example, `#REQ-002`).
 Child elements with CSS
 class `title` provide the chunk title; elements without a `.title`
 child fall back to the `id`.

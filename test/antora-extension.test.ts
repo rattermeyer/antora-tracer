@@ -2622,6 +2622,45 @@ addresses:REQ-999[]
       expect(ids).to.deep.equal(["REQ-001", "REQ-002"]);
     });
 
+    it("renders cross-component relationship xrefs within a version", async () => {
+      const ctx = createMockContext();
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const reqFile = {
+        src: {
+          path: "modules/ROOT/pages/reqs.adoc",
+          component: "comp-a",
+          version: "1.0",
+          module: "ROOT",
+        },
+        contents: Buffer.from(
+          `= Requirements\n\n[#REQ-001, item, role=requirement, title="Requirement in A"]\n--\nA requirement.\n--\n`,
+        ),
+      };
+      const designFile = {
+        src: {
+          path: "modules/ROOT/pages/design.adoc",
+          component: "comp-b",
+          version: "1.0",
+          module: "ROOT",
+        },
+        contents: Buffer.from(
+          `= Design\n:traceability-links: true\n\n[#DES-001, item, role=design, title="Design in B"]\n--\nDesign.\n\naddresses:REQ-001[]\n\ntraceability:links[]\n--\n`,
+        ),
+      };
+
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [reqFile, designFile] : [],
+        },
+      });
+
+      const out = designFile.contents.toString("utf8");
+      expect(out).to.include("xref:comp-a:ROOT:reqs.adoc#REQ-001");
+    });
+
     it("hides superseded item blocks when renderSuperseded is false", async () => {
       const ctx = createMockContext();
       const ext = new AntoraTraceabilityExtension(ctx as any, {

@@ -64,7 +64,7 @@ This pass also runs `injectTitleIds()` (prepends ID to title for visible display
 
 The extension maintains two graphs with distinct lifecycles:
 
-* **Working graph** — cleared and rebuilt per component version during `contentClassified`, so xrefs stay version-scoped (REQ-103).
+* **Working graph** — cleared and rebuilt per version during `contentClassified` (spanning components at the same version), so xrefs stay version-scoped (REQ-103).
 * **Full graph** — accumulated across all components and versions by merging each version's working graph; the `sitePublished` generation passes (matrices, coverage, overview) read this graph.
 
 The working graph's lifecycle:

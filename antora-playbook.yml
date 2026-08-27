@@ -10,6 +10,9 @@ content:
       start_path: examples/tracer
       branches: HEAD
     - url: .
+      start_path: examples/demo
+      branches: HEAD
+    - url: .
       start_path: blog
       branches: HEAD
 

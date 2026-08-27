@@ -162,19 +162,6 @@ Source: openspec/specs/bidirectional-relationship-merge/spec.md
 traceability:links[]
 --
 
-[#REQ-109, item, role=requirement, title="Circular reference detection in graph validation"]
---
-The system SHALL detect circular references in the traceability graph during validation.
-A circular reference is a cycle in the directed relationship graph (e.g., A → B → A, or A → B → C → A).
-Self-referencing relationships (A → A) SHALL also be detected as cycles.
-Auto-generated inverse relationships SHALL be skipped during cycle detection to avoid false positives.
-Relationships marked as bidirectional SHALL also be skipped during cycle detection.
-
-Source: openspec/specs/circular-reference-detection/spec.md
-
-traceability:links[]
---
-
 [#REQ-111, item, role=requirement, title="File state is prepared once per file"]
 --
 The system SHALL compute file content, document attributes, and item block positions exactly once per page file, and SHALL reuse the computed values across all macro-expansion passes for that file.
@@ -322,9 +309,9 @@ Source: openspec/specs/incoming-links-macro/spec.md
 traceability:links[]
 --
 
-[#REQ-103, item, role=requirement, title="Graph isolation per component version"]
+[#REQ-103, item, role=requirement, title="Graph isolation per version"]
 --
-Relationship macro expansion SHALL produce xrefs only to items in the same component version as the enclosing page.
+Relationship macro expansion SHALL produce xrefs only to items in the same version as the enclosing page, spanning components at that version.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 

@@ -1110,16 +1110,16 @@ export class AntoraTraceabilityExtension {
       }
       if (allModules.size === 0) allModules.add("ROOT");
 
-      // Group files by component version so each version's graph is isolated.
+      // Group files by version so each version's graph is isolated while
+      // items from different components at the same version can still
+      // cross-reference each other (cross-component xrefs, REQ-117/REQ-119).
       // Antora xrefs are version-scoped — an xref from v0.10.x cannot resolve
       // to a page in v0.11.x. Clearing the graph between versions prevents
       // items from one version leaking into another version's xref generation.
-      // The key includes the component because two components may share a
-      // version string (e.g. "latest").
       const groupByVersion = (files: any[]) => {
         const groups = new Map<string, any[]>();
         for (const file of files) {
-          const key = `${file.src?.component ?? "unknown"}@${file.src?.version ?? "unknown"}`;
+          const key = file.src?.version ?? "unknown";
           if (!groups.has(key)) groups.set(key, []);
           groups.get(key)!.push(file);
         }
@@ -1130,16 +1130,28 @@ export class AntoraTraceabilityExtension {
       const partialGroups = groupByVersion(adocPartials);
       const allKeys = new Set([...pageGroups.keys(), ...partialGroups.keys()]);
 
+      // Map each version to the components that publish it, so generated
+      // attachments (matrices, overview, guidance) register per component+version.
+      const versionComponents = new Map<string, Set<string>>();
+      for (const file of [...adocFiles, ...adocPartials]) {
+        const version = file.src?.version ?? "unknown";
+        const component = file.src?.component ?? "unknown";
+        if (!versionComponents.has(version)) {
+          versionComponents.set(version, new Set());
+        }
+        versionComponents.get(version)!.add(component);
+      }
+
       const htmlStyle = event.playbook?.urls?.html_style;
 
       // Reset the accumulated full graph — rebuilt below by merging each
       // version's working graph.
       this.fullGraph?.clear();
 
-      for (const key of allKeys) {
-        const [component, version] = key.split("@");
-        const pageFilesForVersion = pageGroups.get(key) || [];
-        const partialFilesForVersion = partialGroups.get(key) || [];
+      for (const version of allKeys) {
+        const pageFilesForVersion = pageGroups.get(version) || [];
+        const partialFilesForVersion = partialGroups.get(version) || [];
+        const components = [...(versionComponents.get(version) ?? ["unknown"])];
 
         // Clear the graph so each version is self-contained
         if (this.traceability) {
@@ -1172,7 +1184,7 @@ export class AntoraTraceabilityExtension {
           this.traceability?.graph.getDuplicateWarnings() ?? [];
         if (duplicates.length > 0) {
           const details = duplicates.map((d) => d.message).join("\n");
-          const summary = `Duplicate item IDs detected in component '${component}' version '${version}':\n${details}`;
+          const summary = `Duplicate item IDs detected in version '${version}' (components: ${components.join(", ")}):\n${details}`;
           if (this.config.allowDuplicateIds) {
             this.logger.warn(summary);
           } else {
@@ -1213,13 +1225,16 @@ export class AntoraTraceabilityExtension {
         // Register generated matrices in the content catalog as attachments so
         // xref:attachment$traceability/matrix-*.{format}[...] resolves during
         // document conversion (which happens after this contentClassified event).
-        this.registerMatricesInCatalog(
-          contentCatalog,
-          component,
-          version,
-          pageFilesForVersion.concat(partialFilesForVersion),
-          htmlStyle,
-        );
+        const versionFiles = pageFilesForVersion.concat(partialFilesForVersion);
+        for (const component of components) {
+          this.registerMatricesInCatalog(
+            contentCatalog,
+            component,
+            version,
+            versionFiles,
+            htmlStyle,
+          );
+        }
       }
 
       // Register the supersession overview as an attachment so it is navigable
@@ -1227,21 +1242,24 @@ export class AntoraTraceabilityExtension {
       if (this.config.generateOverview && this.fullGraph) {
         const overviewPath =
           this.config.overviewTarget || "traceability/overview.html";
-        for (const key of allKeys) {
-          const [component, version] = key.split("@");
-          for (const module of allModules) {
-            const relativePathPrefix =
-              module === "ROOT" ? "../../" : "../../../";
-            const overviewContent =
-              this.generateOverviewContent(relativePathPrefix);
-            this.registerAttachmentInCatalog(
-              contentCatalog,
-              component,
-              version,
-              module,
-              overviewPath,
-              overviewContent,
-            );
+        for (const version of allKeys) {
+          for (const component of versionComponents.get(version) ?? [
+            "unknown",
+          ]) {
+            for (const module of allModules) {
+              const relativePathPrefix =
+                module === "ROOT" ? "../../" : "../../../";
+              const overviewContent =
+                this.generateOverviewContent(relativePathPrefix);
+              this.registerAttachmentInCatalog(
+                contentCatalog,
+                component,
+                version,
+                module,
+                overviewPath,
+                overviewContent,
+              );
+            }
           }
         }
       }
@@ -1250,18 +1268,21 @@ export class AntoraTraceabilityExtension {
       // in the site and are navigable via xref:attachment$traceability/guidance/...
       const guidanceEntries = this.resolveGuidanceEntries();
       if (guidanceEntries.length > 0) {
-        for (const key of allKeys) {
-          const [component, version] = key.split("@");
-          for (const module of allModules) {
-            for (const { role, html } of guidanceEntries) {
-              this.registerAttachmentInCatalog(
-                contentCatalog,
-                component,
-                version,
-                module,
-                `traceability/guidance/${role}.html`,
-                html,
-              );
+        for (const version of allKeys) {
+          for (const component of versionComponents.get(version) ?? [
+            "unknown",
+          ]) {
+            for (const module of allModules) {
+              for (const { role, html } of guidanceEntries) {
+                this.registerAttachmentInCatalog(
+                  contentCatalog,
+                  component,
+                  version,
+                  module,
+                  `traceability/guidance/${role}.html`,
+                  html,
+                );
+              }
             }
           }
         }
