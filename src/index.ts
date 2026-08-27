@@ -134,7 +134,12 @@ export class RequirementsTraceabilityExtension {
    */
   process(
     content: string,
-    options: { sourceFile?: string; component?: string; module?: string } = {},
+    options: {
+      sourceFile?: string;
+      component?: string;
+      module?: string;
+      pubUrl?: string;
+    } = {},
   ): ParserResult & { graph: TraceabilityGraph } {
     this.currentFile = options.sourceFile || "input";
     this.logger.debug(`Processing: ${this.currentFile}`);
@@ -147,6 +152,7 @@ export class RequirementsTraceabilityExtension {
       this.currentFile,
       options.component,
       options.module,
+      options.pubUrl,
     );
 
     // Add parsed items to the graph

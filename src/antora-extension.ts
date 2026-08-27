@@ -1348,6 +1348,7 @@ export class AntoraTraceabilityExtension {
       const { files: matrixFiles } = this.generateMatrixFiles(
         htmlStyle,
         relativePathPrefix,
+        `${relativePathPrefix}../../`,
       );
       for (const { fileName, content } of matrixFiles) {
         this.registerAttachmentInCatalog(
@@ -1413,6 +1414,7 @@ export class AntoraTraceabilityExtension {
         sourceFile,
         component,
         module: moduleName,
+        pubUrl: file.pub?.url,
       });
     } catch (error: any) {
       this.logger.warn(`Error processing ${file.src?.path}: ${error.message}`);
@@ -1708,6 +1710,7 @@ export class AntoraTraceabilityExtension {
   private generateMatrixFiles(
     htmlStyle?: string,
     relativePathPrefix = "../../",
+    siteRootPath?: string,
   ): {
     matrixNames: string[];
     files: Array<{ fileName: string; content: string }>;
@@ -1729,6 +1732,7 @@ export class AntoraTraceabilityExtension {
       {
         linkResolver: new LinkResolver({
           relativePathPrefix,
+          siteRootPath,
           indexify: htmlStyle !== "default",
         }),
       },
@@ -1783,6 +1787,8 @@ export class AntoraTraceabilityExtension {
 
       const { matrixNames, files } = this.generateMatrixFiles(
         event.playbook?.urls?.html_style,
+        "../../",
+        "../",
       );
       if (this.config.generateMatrices) {
         for (const { fileName, content } of files) {

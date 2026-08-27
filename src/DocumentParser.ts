@@ -69,6 +69,7 @@ export class DocumentParser {
   private errors: ParserError[] = [];
   private component?: string;
   private module?: string;
+  private pubUrl?: string;
 
   constructor(options: ParserOptions = {}) {
     this.currentFile = options.sourceFile || "";
@@ -79,7 +80,13 @@ export class DocumentParser {
    * Parse an AsciiDoc string and return all traceability elements found within it.
    * Returns items with roles and relationships.
    */
-  parse(content: string, sourceFile?: string, component?: string, module?: string): ParserResult {
+  parse(
+    content: string,
+    sourceFile?: string,
+    component?: string,
+    module?: string,
+    pubUrl?: string,
+  ): ParserResult {
     // Validate input
     if (typeof content !== "string") {
       throw new TypeError("Content must be a string");
@@ -88,6 +95,7 @@ export class DocumentParser {
     this.currentFile = sourceFile?.trim() || "unknown";
     this.component = component;
     this.module = module;
+    this.pubUrl = pubUrl;
 
     this.warnings = [];
     this.errors = [];
@@ -291,6 +299,7 @@ export class DocumentParser {
         sourceLine: line,
         component: this.component,
         module: this.module,
+        pubUrl: this.pubUrl,
       };
 
       result.items.push(item);

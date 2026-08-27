@@ -841,5 +841,26 @@ matrices:
       const link = resolver.generateItemLink(item);
       expect(link).to.equal("../../self-traceability/use-cases.html#UC-001");
     });
+
+    it("should resolve cross-component links from the site root", () => {
+      const resolver = new LinkResolver({
+        relativePathPrefix: "../../",
+        siteRootPath: "../../../../",
+      });
+
+      const item = {
+        id: "REQ-109",
+        title: "Test",
+        role: "requirement",
+        attributes: {},
+        sourceFile: "index",
+        module: "ROOT",
+        component: "demo",
+        pubUrl: "/demo/stable/index.html",
+      };
+
+      const link = resolver.generateItemLink(item);
+      expect(link).to.equal("../../../../demo/stable/index.html#REQ-109");
+    });
   });
 });

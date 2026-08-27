@@ -12,11 +12,18 @@ import type { Item } from "./types.js";
  */
 export interface LinkResolverOptions {
   /**
-   * Relative path prefix from matrix output directory to pages directory.
+   * Relative path prefix from matrix output directory to the component
+   * version root.
    * - Antora: '../../' (from _attachments/traceability/ to component root)
    * - CLI: '../../pages/' (from attachments/traceability/ to pages/)
    */
   relativePathPrefix: string;
+  /**
+   * Relative path from the matrix output directory to the site root.
+   * When set together with an item's `pubUrl`, links resolve from the site
+   * root so cross-component and cross-version targets are reachable.
+   */
+  siteRootPath?: string;
   /**
    * Whether Antora's indexify URL style is used (default: true).
    * When true, pages at the module root (no directory separator in path)
@@ -49,6 +56,11 @@ export class LinkResolver {
     // If the path is a full URL, return it directly with the fragment
     if (htmlPath.includes("://")) {
       return `${htmlPath}#${item.id}`;
+    }
+    // Antora build: resolve from the site root using the item's published URL
+    // so cross-component and cross-version targets resolve correctly.
+    if (this.options.siteRootPath && item.pubUrl) {
+      return `${this.options.siteRootPath}${item.pubUrl.replace(/^\//, "")}#${item.id}`;
     }
     return `${this.options.relativePathPrefix + htmlPath}#${item.id}`;
   }

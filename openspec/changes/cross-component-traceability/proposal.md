@@ -18,6 +18,7 @@ Cross-component references are specified (REQ-117 `component:module:` xref prefi
 
 - `graph-lifecycle`: the working graph now spans components within a version; cross-version isolation is unchanged.
 - `traceability-links-macro`: the graph-isolation requirement is reworded from "per component version" to "per version" (cross-component within a version is allowed).
+- `matrix-item-linking`: matrix links resolve from the site root via each item's published URL, so cross-component targets resolve.
 
 ## Impact
 

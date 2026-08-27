@@ -15,3 +15,10 @@
 - [x] 3.2 Rebuild with `npx antora antora-playbook.yml` and verify cross-component xrefs resolve
 - [x] 3.3 Update `explanation/processing-pipeline.adoc` prose about the graph lifecycle
 - [x] 3.4 Reword REQ-103 ("per version") in the requirements index, its spec delta, and `explanation/architecture.adoc`
+
+## 4. Cross-component matrix links
+
+- [x] 4.1 Store each item's published `pubUrl` (from `file.pub.url`)
+- [x] 4.2 Make `LinkResolver` resolve from the site root when `siteRootPath` and `pubUrl` are present
+- [x] 4.3 Pass the correct `siteRootPath` for per-component matrices and the standalone output
+- [x] 4.4 Add a LinkResolver test for cross-component resolution
