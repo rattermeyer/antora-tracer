@@ -2,6 +2,11 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.22.2] — 2026-08-27
+
+### Fixed
+- Reverse relationships (such as `is_derived_from`) are canonicalized after all items are collected, so a reverse edge authored before its target is defined no longer leaves a second edge alongside the primary relation
+
 ## [0.22.1] — 2026-08-25
 
 ### Fixed

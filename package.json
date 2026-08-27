@@ -1,6 +1,6 @@
 {
   "name": "antora-tracer",
-  "version": "0.22.1",
+  "version": "0.22.2",
   "type": "module",
   "description": "Requirements traceability extensions for Antora/AsciiDoc",
   "main": "./lib/src/index.js",
