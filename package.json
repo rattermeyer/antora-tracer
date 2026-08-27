@@ -21,6 +21,7 @@
     "test:coverage:check": "c8 check-coverage --lines 80 --branches 70 --functions 80 --statements 80",
     "test:coverage:open": "c8 report --reporter=html",
     "eval:requirements": "node evals/requirements-writing/run.mjs",
+    "eval:write-item": "node evals/write-item/run.mjs",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
     "format": "biome format --write .",

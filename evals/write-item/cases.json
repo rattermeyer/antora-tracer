@@ -1,0 +1,46 @@
+{
+  "cases": [
+    {
+      "id": "draft-stops-before-confirmation",
+      "prompt": "Add a requirement for detecting item declarations in AsciiDoc source files.",
+      "expect": {
+        "role": "requirement",
+        "write": false,
+        "confirmation": true,
+        "review": true
+      }
+    },
+    {
+      "id": "confirmed-write",
+      "prompt": "Add a requirement for detecting item declarations in AsciiDoc source files.",
+      "follow_up": "Yes, write it.",
+      "expect": {
+        "role": "requirement",
+        "write": true,
+        "confirmation": true,
+        "review": true
+      }
+    },
+    {
+      "id": "ambiguous-role",
+      "prompt": "Write an item saying the parser skips verbatim blocks.",
+      "expect": { "ask_role": true, "write": false }
+    },
+    {
+      "id": "do-not-invent-details",
+      "prompt": "Add an item for the new export behavior.",
+      "expect": { "ask_clarification": true, "write": false }
+    },
+    {
+      "id": "review-prescription",
+      "prompt": "Add a requirement saying the system SHALL use regex to parse items.",
+      "expect": {
+        "role": "requirement",
+        "write": false,
+        "confirmation": true,
+        "review": true,
+        "apply_review": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "type": "object",
+  "properties": {
+    "overall_pass": { "type": "boolean" },
+    "workflow": {
+      "type": "object",
+      "properties": {
+        "role_resolved": { "type": "boolean" },
+        "guidance_loaded": { "type": "boolean" },
+        "parent_handled": { "type": "boolean" },
+        "review_delegated": { "type": "boolean" },
+        "confirmation_requested": { "type": "boolean" },
+        "review_applied": { "type": "boolean" }
+      },
+      "required": [
+        "role_resolved",
+        "guidance_loaded",
+        "parent_handled",
+        "review_delegated",
+        "confirmation_requested",
+        "review_applied"
+      ],
+      "additionalProperties": false
+    },
+    "draft": {
+      "type": "object",
+      "properties": {
+        "valid_item_syntax": { "type": "boolean" },
+        "correct_role": { "type": "boolean" },
+        "observable_body": { "type": "boolean" },
+        "follows_guidance": { "type": "boolean" },
+        "traceability_handled": { "type": "boolean" },
+        "no_implementation_prescription": { "type": "boolean" }
+      },
+      "required": [
+        "valid_item_syntax",
+        "correct_role",
+        "observable_body",
+        "follows_guidance",
+        "traceability_handled",
+        "no_implementation_prescription"
+      ],
+      "additionalProperties": false
+    },
+    "failures": { "type": "array", "items": { "type": "string" } }
+  },
+  "required": ["overall_pass", "workflow", "draft", "failures"],
+  "additionalProperties": false
+}
