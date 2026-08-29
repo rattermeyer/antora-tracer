@@ -14,7 +14,7 @@ Rationale: <why this design was chosen>
 
 addresses:REQ-NNN[]
 
-traceability:links[]
+tracer:links[]
 --
 ----
 

@@ -41,7 +41,7 @@ Fix: either use an allowed relation type, or add the missing type to your `trace
 
 [source,yaml]
 ----
-traceability:
+tracer:
   relations:
     design:
       requirement:

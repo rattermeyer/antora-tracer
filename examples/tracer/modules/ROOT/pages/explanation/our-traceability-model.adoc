@@ -1,4 +1,4 @@
-= Our Traceability Model
+= The Traceability Model
 :description: The roles and relations Antora Tracer uses to trace its own development artifacts
 :keywords: antora, traceability, model, roles, relations, self-traceability
 :toc: macro
@@ -14,7 +14,7 @@ Each node is a role.
 Each arrow is a relation the configuration permits, labeled with its relation types.
 Only declared directions are drawn: the diagram does not add the inverse direction that the extension derives for traversal.
 
-traceability:config-graph[]
+tracer:config-graph[]
 
 == Roles
 
@@ -23,10 +23,12 @@ A user need is a specific, actionable requirement or desire that a user has when
 
 Key Characteristics:
 
+pass:[<!-- vale off -->]
 * User-Centric: Focuses on what the user wants to achieve, not how the system works.
-* Actionable: Clearly defines a task or outcome (e.g., "I want to reset my password").
+* Actionable: Clearly defines a task or outcome (for example "I want to reset my password").
 * Problem-Oriented: Addresses a pain point or a job to be done.
-* Non-Technical: Avoids implementation details (e.g., "The system should use OAuth 2.0" is not a user need).
+* Non-Technical: Avoids implementation details (for example "The system should use OAuth 2.0" is not a user need).
+pass:[<!-- vale on -->]
 
 .Example
 ====

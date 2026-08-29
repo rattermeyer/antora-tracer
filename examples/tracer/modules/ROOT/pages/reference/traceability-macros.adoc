@@ -1,5 +1,5 @@
 = Traceability Macros Reference
-:description: Complete reference for traceability:outgoing[], traceability:incoming[], traceability:links[], traceability:graph[], and traceability:graph-coverage[] macros
+:description: Complete reference for tracer:outgoing[], tracer:incoming[], tracer:links[], tracer:graph[], and tracer:graph-coverage[] macros
 :keywords: antora, asciidoc, traceability, macros, reference
 :toc: macro
 
@@ -19,7 +19,7 @@ tracer:graph[]
 tracer:graph-coverage[]
 ----
 
-`traceability:` remains fully supported and is not deprecated.
+`tracer:` remains fully supported and is not deprecated.
 New content may use either prefix.
 
 == Relationship Link Macros
@@ -27,7 +27,7 @@ New content may use either prefix.
 These macros display relationship lists as formatted text.
 They are gated by the `:traceability-links:` document attribute.
 
-=== traceability:outgoing[]
+=== tracer:outgoing[]
 
 Lists items that this item points to (outgoing relationships).
 Place inside an item block:
@@ -38,27 +38,27 @@ Place inside an item block:
 --
 Requirement description...
 
-traceability:outgoing[]
+tracer:outgoing[]
 --
 ----
 
-=== traceability:incoming[]
+=== tracer:incoming[]
 
 Lists items that point to this item (incoming relationships).
 Uses the reverse relation's display label (e.g., an incoming `addresses` edge displays as "Addressed by"):
 
 [source,asciidoc]
 ----
-traceability:incoming[]
+tracer:incoming[]
 ----
 
-=== traceability:links[]
+=== tracer:links[]
 
 Shows both outgoing and incoming relationships in one call:
 
 [source,asciidoc]
 ----
-traceability:links[]
+tracer:links[]
 ----
 
 === Enabling
@@ -112,7 +112,7 @@ The `@antora/pdf-extension` renders them identically in PDF; the `@antora/assemb
 These macros render diagrams.
 They are gated by the `:traceability-graph:` document attribute.
 
-=== traceability:graph[]
+=== tracer:graph[]
 
 Renders a relationship graph diagram.
 
@@ -125,7 +125,7 @@ Renders a relationship graph diagram.
 \--
 Requirement description...
 
-traceability:graph[]
+tracer:graph[]
 \--
 ----
 
@@ -138,7 +138,7 @@ Reference any item by passing an explicit ID:
 
 [source,asciidoc]
 ----
-traceability:graph[REQ-001]
+tracer:graph[REQ-001]
 ----
 
 === Depth parameter
@@ -147,10 +147,10 @@ Pass a depth to control how many hops are shown (default `1`):
 
 [source,asciidoc]
 ----
-traceability:graph[REQ-001, 2]
+tracer:graph[REQ-001, 2]
 ----
 
-=== traceability:graph-coverage[]
+=== tracer:graph-coverage[]
 
 Renders a coverage bar chart.
 
@@ -158,7 +158,7 @@ Inside an item — per-relationship-type coverage:
 
 [source,asciidoc]
 ----
-traceability:graph-coverage[]
+tracer:graph-coverage[]
 ----
 
 Outside any item — global role-based coverage:
@@ -168,7 +168,7 @@ Outside any item — global role-based coverage:
 = Dashboard
 :traceability-graph: true
 
-traceability:graph-coverage[]
+tracer:graph-coverage[]
 ----
 
 Renders a Kroki-generated Vega-Lite bar chart.

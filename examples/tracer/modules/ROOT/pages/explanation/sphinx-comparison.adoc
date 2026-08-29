@@ -117,7 +117,7 @@ The key differences are in their markup languages and hosting platforms: Sphinx 
 
 | Link rendering
 | Inline via directives
-| `traceability:outgoing[]` and `traceability:incoming[]` macros with configurable style (list, table, inline)
+| `tracer:outgoing[]` and `tracer:incoming[]` macros with configurable style (list, table, inline)
 | Antora Tracer separates data (inline macros) from rendering (links macro)
 
 | Matrix navigation
@@ -148,7 +148,7 @@ Both are language-agnostic — they document projects written in any programming
 *Sphinx Needs* defines need types via `needs_types` configuration — each type gets its own directive name (`.. req::`, `.. spec::`, etc.). *Antora Tracer* uses a single `[item]` macro with a `role` attribute — one syntax for all types.
 Both let you define your own domain model.
 
-*Sphinx-Needs* provides `needflow` for in-page graph visualization with PlantUML or Graphviz. *Antora Tracer* provides `traceability:graph[]` and `traceability:graph-coverage[]` macros for in-page graphviz/DOT visualization, plus Neo4j export for external graph queries.
+*Sphinx-Needs* provides `needflow` for in-page graph visualization with PlantUML or Graphviz. *Antora Tracer* provides `tracer:graph[]` and `tracer:graph-coverage[]` macros for in-page graphviz/DOT visualization, plus Neo4j export for external graph queries.
 
 *Sphinx Needs* is mature and well-established. *Antora Tracer* is newer but follows the same traceability principles with a more flexible, config-driven approach.
 Choose based on your documentation toolchain: Sphinx (reStructuredText/Markdown) or Antora (AsciiDoc).

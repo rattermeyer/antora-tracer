@@ -18,11 +18,11 @@ Add the `:traceability-graph:` document attribute to any page where you want vis
 :traceability-graph: true
 ----
 
-Without this attribute, the `traceability:graph[]` and `traceability:graph-coverage[]` placeholders are stripped from output.
+Without this attribute, the `tracer:graph[]` and `tracer:graph-coverage[]` placeholders are stripped from output.
 
 == Add a relationship graph
 
-Place `traceability:graph[]` inside any item block:
+Place `tracer:graph[]` inside any item block:
 
 [source,asciidoc]
 ----
@@ -30,7 +30,7 @@ Place `traceability:graph[]` inside any item block:
 --
 The system shall require authentication.
 
-traceability:graph[]
+tracer:graph[]
 --
 ----
 
@@ -42,7 +42,7 @@ For deeper graphs, pass a depth parameter:
 
 [source,asciidoc]
 ----
-traceability:graph[REQ-001, 2]
+tracer:graph[REQ-001, 2]
 ----
 
 The `2` limits the graph to items within two hops.
@@ -51,18 +51,18 @@ Reference any item by ID — useful outside item blocks:
 
 [source,asciidoc]
 ----
-traceability:graph[REQ-001]
+tracer:graph[REQ-001]
 ----
 
 == Add a coverage chart
 
-Place `traceability:graph-coverage[]` inside any item block:
+Place `tracer:graph-coverage[]` inside any item block:
 
 [source,asciidoc]
 ----
 [#REQ-001, item, role=requirement]
 --
-traceability:graph-coverage[]
+tracer:graph-coverage[]
 --
 ----
 
@@ -77,22 +77,22 @@ For a global coverage chart (all roles), place it outside any item block:
 
 == Global Coverage
 
-traceability:graph-coverage[]
+tracer:graph-coverage[]
 ----
 
 == Add a configuration graph
 
-Place `traceability:config-graph[]` anywhere on a page to render the traceability *configuration* — the roles and the relations allowed between them — as a GraphViz diagram:
+Place `tracer:config-graph[]` anywhere on a page to render the traceability *configuration* — the roles and the relations allowed between them — as a GraphViz diagram:
 
 [source,asciidoc]
 ----
 = Our Model
 :traceability-graph: true
 
-traceability:config-graph[]
+tracer:config-graph[]
 ----
 
-Unlike `traceability:graph[]`, which shows items, this macro shows the *model*: each configured role is a node, each declared relation is a labeled arrow.
+Unlike `tracer:graph[]`, which shows items, this macro shows the *model*: each configured role is a node, each declared relation is a labeled arrow.
 Only declared directions are drawn — reverse-derived edges are not rendered.
 Roles declared with no relations still appear as isolated nodes, which makes orphaned roles visible.
 
@@ -108,7 +108,7 @@ For textual relationship lists (not diagrams), enable the link macros:
 :traceability-order: target-id
 ----
 
-Then use `traceability:outgoing[]` and `traceability:incoming[]` inside item blocks.
+Then use `tracer:outgoing[]` and `tracer:incoming[]` inside item blocks.
 See xref:reference/traceability-macros.adoc[Traceability Macros Reference] for all options.
 
 === Local Kroki server

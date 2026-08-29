@@ -16,7 +16,7 @@ The CI pipeline ensures that every change is validated against the full test sui
 
 considered_by:ARC-031[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#PRQ-002, item, role=process_requirement, title="Test suite runs as merge gate"]
@@ -29,7 +29,7 @@ validates:REQ-087[]
 validates:REQ-088[]
 considered_by:ARC-031[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#PRQ-003, item, role=process_requirement, title="Example site builds without errors"]
@@ -42,7 +42,7 @@ The site build exercises the full extension pipeline — parsing, macro expansio
 
 considered_by:ARC-031[]
 
-traceability:links[]
+tracer:links[]
 --
 
 == Deployment
@@ -58,7 +58,7 @@ The deployed site serves as the project's public documentation and a live demons
 validates:REQ-072[]
 considered_by:ARC-033[]
 
-traceability:links[]
+tracer:links[]
 --
 
 == Release
@@ -73,7 +73,7 @@ Versioning follows https://semver.org/[Semantic Versioning]: MAJOR for breaking 
 
 considered_by:ARC-031[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#PRQ-006, item, role=process_requirement, title="PDF artifacts are generated alongside HTML"]
@@ -87,5 +87,5 @@ validates:REQ-060[]
 validates:REQ-093[]
 considered_by:ARC-031[]
 
-traceability:links[]
+tracer:links[]
 --

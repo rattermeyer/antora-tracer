@@ -15,5 +15,5 @@ Self-referencing relationships (A → A) SHALL also be detected as cycles.
 Auto-generated inverse relationships SHALL be skipped during cycle detection to avoid false positives.
 Relationships marked as bidirectional SHALL also be skipped during cycle detection.
 
-traceability:links[]
+tracer:links[]
 --

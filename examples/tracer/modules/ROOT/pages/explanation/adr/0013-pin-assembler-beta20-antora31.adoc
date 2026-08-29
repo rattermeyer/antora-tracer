@@ -20,7 +20,7 @@ The project builds with Antora 3.1
 fails at runtime against the 3.1 content catalog.
 
 Dependency tooling adds noise: `npm audit` flags `1.0.0-beta.20` as vulnerable
-(transitive `js-yaml`) and suggests `1.0.0-rc.10` as the "fix", which would
+(transitive `js-yaml`) and suggests `1.0.0-rc.10` as the _fix_, which would
 break the build.
 
 == Decision Drivers

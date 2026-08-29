@@ -74,7 +74,7 @@ Use the Karl Wiegers tabular template. The `[item]` block body contains a table 
 
 <traceability-relations>
 
-traceability:links[]
+tracer:links[]
 --
 ----
 
@@ -180,7 +180,7 @@ When asked to review a use case, check the following. Do NOT stop at formatting 
 === Traceability
 - [ ] At least one traceability relationship
 - [ ] All referenced requirement IDs exist in the requirements document
-- [ ] `traceability:links[]` is present
+- [ ] `tracer:links[]` is present
 
 === Consistency
 - [ ] Title style matches other use cases in the project

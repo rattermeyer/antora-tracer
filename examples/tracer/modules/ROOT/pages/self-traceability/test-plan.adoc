@@ -25,9 +25,9 @@ verifies:REQ-090[]
 verifies:REQ-091[]
 verifies:REQ-092[]
 
-traceability:links[]
+tracer:links[]
 
-traceability:graph[]
+tracer:graph[]
 --
 
 [#TST-002, item, role=test, title="Antora Extension Tests"]
@@ -36,9 +36,9 @@ Test file: `test/antora-extension.test.ts`
 
 Tests the `AntoraTraceabilityExtension` — initialization with default config, preset, config path, and disabled state.
 Tests event handler registration, content processing via `contentClassified` event (in-memory only, never touches disk), matrix generation via `sitePublished` event and matrix registration in the content catalog via `contentClassified`, and API access patterns.
-Also tests `traceability:outgoing[]`, `traceability:incoming[]`, and `traceability:links[]` macro expansion with configurable display style, sort order, collapsible sections, empty-state messages (`:traceability-empty:`), and opt-in behavior.
+Also tests `tracer:outgoing[]`, `tracer:incoming[]`, and `tracer:links[]` macro expansion with configurable display style, sort order, collapsible sections, empty-state messages (`:traceability-empty:`), and opt-in behavior.
 Tests incoming macro display styles, sort orders, reverse labels, PDF compatibility, and collapsible support.
-Tests `traceability:graph[]`, `traceability:graph-coverage[]`, and `traceability:config-graph[]` macro expansion with configurable Kroki image format and Kroki server URL (extension config option and `KROKI_SERVER_URL` env var override), graph-enabled and graph-disabled modes, including global coverage, explicit target IDs, and header exclusion.
+Tests `tracer:graph[]`, `tracer:graph-coverage[]`, and `tracer:config-graph[]` macro expansion with configurable Kroki image format and Kroki server URL (extension config option and `KROKI_SERVER_URL` env var override), graph-enabled and graph-disabled modes, including global coverage, explicit target IDs, and header exclusion.
 Tests automatic matrix registration in the content catalog during `contentClassified`.
 Tests partial file processing including item registration from partials, view URL as sourceFile, and macro expansion in Pass 2.
 Tests cross-module and cross-component xref prefix generation.
@@ -85,7 +85,7 @@ verifies:REQ-165[]
 verifies:REQ-166[]
 verifies:REQ-244[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#TST-003, item, role=test, title="CLI Tests"]
@@ -97,7 +97,7 @@ Tests the Commander-based CLI — process command (valid content, empty content,
 verifies:REQ-056[]
 verifies:REQ-150[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#TST-004, item, role=test, title="ConfigLoader Tests"]
@@ -119,7 +119,7 @@ verifies:REQ-224[]
 verifies:REQ-175[]
 verifies:REQ-177[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#TST-005, item, role=test, title="Graph and API Tests"]
@@ -138,7 +138,7 @@ verifies:REQ-219[]
 verifies:REQ-220[]
 verifies:REQ-176[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#TST-006, item, role=test, title="MatrixGenerator Tests"]
@@ -163,7 +163,7 @@ verifies:REQ-113[]
 verifies:REQ-114[]
 verifies:REQ-115[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#TST-007, item, role=test, title="Neo4jExporter Tests"]
@@ -172,7 +172,7 @@ Test file: `test/neo4j-exporter.test.ts`
 
 Tests the `Neo4jExporter` — empty graph CSV export, items and relationships in CSV, all attributes in export, special character escaping, empty graph Cypher export, items and relationships in Cypher, `includeContent` option, `includeAllAttributes` option, output directory creation, multiple role types, and export result counts and file paths.
 
-traceability:links[]
+tracer:links[]
 --
 
 [#TST-008, item, role=test, title="Relationship Link Substitution Tests"]
@@ -182,7 +182,7 @@ Test file: `test/relationship-link-substitution.test.ts`
 Tests the in-memory regex substitution that replaces relationship macros with Asciidoctor xrefs.
 Covers same-page xref generation, cross-page xref generation with basename path resolution, dangling reference handling, non-relationship text preservation, hyphenated/dotted IDs, missing sourceFile fallback, and surrounding text preservation.
 
-traceability:links[]
+tracer:links[]
 --
 
 [#TST-009, item, role=test, title="Query Command Tests"]
@@ -200,7 +200,7 @@ verifies:REQ-140[]
 verifies:REQ-141[]
 verifies:REQ-227[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#TST-010, item, role=test, title="Vale Extension Tests"]
@@ -216,7 +216,7 @@ verifies:REQ-155[]
 verifies:REQ-156[]
 verifies:REQ-153[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#TST-011, item, role=test, title="Supersession Tests"]
@@ -236,7 +236,7 @@ verifies:REQ-211[]
 verifies:REQ-228[]
 verifies:REQ-234[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#TST-012, item, role=test, title="Graph Diff Tests"]
@@ -252,7 +252,7 @@ verifies:REQ-225[]
 verifies:REQ-226[]
 verifies:REQ-216[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#TST-013, item, role=test, title="Item Lifecycle Tests"]
@@ -266,7 +266,7 @@ verifies:REQ-236[]
 verifies:REQ-237[]
 verifies:REQ-238[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#TST-014, item, role=test, title="Supersession Overview and Render Toggle Tests"]
@@ -282,7 +282,7 @@ verifies:REQ-232[]
 verifies:REQ-233[]
 verifies:REQ-239[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#TST-015, item, role=test, title="Documentation Example Validation Tests"]
@@ -293,7 +293,7 @@ Tests that every `[item]` example in the documentation uses known roles and rela
 
 verifies:REQ-200[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#TST-016, item, role=test, title="Release Consistency Tests"]
@@ -307,7 +307,7 @@ verifies:REQ-246[]
 verifies:REQ-247[]
 verifies:REQ-248[]
 
-traceability:links[]
+tracer:links[]
 --
 
 ifdef::ssembler-backend-pdf[]

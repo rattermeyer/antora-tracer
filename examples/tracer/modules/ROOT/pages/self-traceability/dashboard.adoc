@@ -6,21 +6,21 @@ This page provides visual overviews of the Antora Tracer traceability data.
 
 == Global Coverage
 
-traceability:graph-coverage[]
+tracer:graph-coverage[]
 
 == Key Requirement Graphs
 
 === UC-001 — Single item macro
-traceability:graph[UC-001, 2]
+tracer:graph[UC-001, 2]
 
 === REQ-001 — Single item macro
 
-traceability:graph[REQ-001, 2]
+tracer:graph[REQ-001, 2]
 
 === ARC-002 — Component Architecture
 
-traceability:graph[ARC-002, 2]
+tracer:graph[ARC-002, 2]
 
 === ARC-004 — Architecture Decisions
 
-traceability:graph[ARC-004, 2]
+tracer:graph[ARC-004, 2]

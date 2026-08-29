@@ -82,9 +82,9 @@ Inline relationship macros are *always invisible* in rendered output.
 They are pure data markers stored in the traceability graph.
 To display relationships in documentation, use:
 
-- `traceability:outgoing[]` — lists items this item points to
-- `traceability:incoming[]` — lists items that point to this item
-- `traceability:links[]` — shows both directions
+- `tracer:outgoing[]` — lists items this item points to
+- `tracer:incoming[]` — lists items that point to this item
+- `tracer:links[]` — shows both directions
 
 Each display macro also accepts the `tracer:` prefix as an alias (e.g. `tracer:links[]`).
 

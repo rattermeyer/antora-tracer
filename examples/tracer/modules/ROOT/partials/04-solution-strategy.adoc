@@ -13,7 +13,7 @@ no external services, and a minimal dependency tree
 Optional features like Neo4j export degrade gracefully without warnings.
 
 addresses:QA-055[]
-traceability:links[]
+tracer:links[]
 --
 
 [#ARC-006, item, role=design, title="Configurable without code changes"]
@@ -26,7 +26,7 @@ Items with unknown roles generate warnings, not errors — enabling
 incremental domain model adoption.
 
 addresses:QA-056[]
-traceability:links[]
+tracer:links[]
 --
 
 [#ARC-007, item, role=design, title="Fail-fast with clear diagnostics"]
@@ -38,7 +38,7 @@ Error messages
 include file, line, item IDs with roles, and allowed alternatives.
 
 addresses:QA-057[]
-traceability:links[]
+tracer:links[]
 --
 
 [#ARC-008, item, role=design, title="No side effects on source files"]
@@ -50,7 +50,7 @@ Source `.adoc` files are never written to.
 Processing is idempotent.
 
 addresses:QA-058[]
-traceability:links[]
+tracer:links[]
 --
 
 [#ARC-009, item, role=design, title="Testability by design"]
@@ -62,7 +62,7 @@ The regex-based parser (xref:explanation/adr/0002-regex-parser-over-ast.adoc[ADR
 is decoupled from Asciidoctor's API.
 
 addresses:QA-059[]
-traceability:links[]
+tracer:links[]
 
 --
 
@@ -74,7 +74,7 @@ and a Node.js 20+ baseline (xref:explanation/adr/0005-typescript-strict-node20.a
 The zero-framework policy avoids dependency on libraries with short upgrade cycles.
 
 addresses:QA-061[]
-traceability:links[]
+tracer:links[]
 --
 
 [#ARC-011, item, role=design, title="Performance through indexing"]
@@ -84,6 +84,6 @@ relationship indexes (O(1) lookup), result caching with invalidation
 on mutation, and BFS path finding with configurable `maxDepth`.
 
 addresses:QA-062[]
-traceability:links[]
+tracer:links[]
 --
 

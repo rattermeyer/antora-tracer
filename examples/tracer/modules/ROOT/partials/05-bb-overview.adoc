@@ -23,7 +23,7 @@ include::example$bb-overview.puml[]
 | `DocumentParser`, `TraceabilityGraph`, `MatrixGenerator`, `Neo4jExporter`, `ConfigLoader`
 
 | `DocumentParser`
-| Regex-based AsciiDoc parser. Extracts `[#ID, item, role=XXX]` blocks and inline `relation:TARGET[]` macros. Excludes `traceability:` namespace. Verbatim blocks pre-scanned.
+| Regex-based AsciiDoc parser. Extracts `[#ID, item, role=XXX]` blocks and inline `relation:TARGET[]` macros. Excludes `tracer:` namespace. Verbatim blocks pre-scanned.
 | `ConfigLoader` (optional — for role validation)
 
 | `TraceabilityGraph`

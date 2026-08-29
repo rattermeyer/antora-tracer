@@ -308,7 +308,7 @@ export interface MatrixDefinition {
 }
 
 export interface Preset extends PresetMetadata {
-  traceability: TraceabilityConfig;
+  tracer: TraceabilityConfig;
   neo4j?: { queries: Neo4jQuery[] };
   documentation?: { description: string };
 }

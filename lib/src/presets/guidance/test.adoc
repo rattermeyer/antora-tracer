@@ -14,7 +14,7 @@ Test file: `test/<name>.test.ts`
 
 verifies:REQ-NNN[]
 
-traceability:links[]
+tracer:links[]
 --
 ----
 

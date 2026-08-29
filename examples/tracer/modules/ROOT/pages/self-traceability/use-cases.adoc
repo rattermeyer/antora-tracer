@@ -22,7 +22,7 @@ Each use case traces into the requirements it motivates via `leads_to` relations
 . Team member assigns the concept to a role defined in the project's traceability domain model (requirement, design, test, etc.)
 . Team member writes the item using the `[#ID, item, role=...]` block macro with a description between `--` delimiters
 . Team member links the concept to related items already in the traceability graph using inline relationship macros (e.g., `addresses:REQ-001[]`)
-. Team member includes rendering macros (`traceability:links[]`, `traceability:outgoing[]`, `traceability:incoming[]`) to display relationship lists in the rendered output
+. Team member includes rendering macros (`tracer:links[]`, `tracer:outgoing[]`, `tracer:incoming[]`) to display relationship lists in the rendered output
 . Team member commits the file And triggers an Antora build
 . The extension registers the item in the traceability graph And its relationships appear in the traceability matrix
 | Alternate Flows |
@@ -70,7 +70,7 @@ leads_to:REQ-166[]
 leads_to:REQ-221[]
 leads_to:REQ-222[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#UC-002, item, role=use_case, title="Requirements Engineer defines custom domain model via config"]
@@ -115,7 +115,7 @@ leads_to:REQ-178[]
 leads_to:REQ-223[]
 leads_to:REQ-224[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#UC-004, item, role=use_case, title="Requirements Engineer organizes items in partial files"]
@@ -149,7 +149,7 @@ leads_to:REQ-110[]
 leads_to:REQ-144[]
 leads_to:REQ-145[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#UC-005, item, role=use_case, title="Reviewer browses traceability matrices for coverage"]
@@ -197,7 +197,7 @@ leads_to:REQ-167[]
 leads_to:REQ-168[]
 leads_to:REQ-169[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#UC-006, item, role=use_case, title="Project lead bootstraps traceability for a new project"]
@@ -245,7 +245,7 @@ leads_to:REQ-083[]
 leads_to:REQ-084[]
 leads_to:REQ-085[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#UC-007, item, role=use_case, title="Developer validates traceability in CI pipeline"]
@@ -287,7 +287,7 @@ leads_to:REQ-150[]
 leads_to:REQ-219[]
 leads_to:REQ-220[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#UC-008, item, role=use_case, title="Data analyst explores traceability in Neo4j"]
@@ -318,7 +318,7 @@ traceability:links[]
 | Notes | The `cypher` format includes `:Item` and role-specific labels on nodes, and type-specific labels on relationships. The `includeContent` option controls whether item body text is included in the export.
 |===
 
-traceability:links[]
+tracer:links[]
 --
 
 [#UC-009, item, role=use_case, title="Architect visualizes relationship dependencies"]
@@ -334,14 +334,14 @@ traceability:links[]
 | Trigger | Architect wants to provide visual context — showing how a key requirement connects to downstream artifacts, or displaying global coverage status on a dashboard page
 | Basic Flow |
 . Architect adds `:traceability-graph: true` to a page's document header
-. Architect embeds `traceability:graph[]` inside an item block to render a GraphViz diagram of that item's direct relationships (colored by role, with labeled edges)
-. Architect embeds `traceability:graph-coverage[]` inside or outside item blocks to render Vega-Lite bar charts showing coverage
+. Architect embeds `tracer:graph[]` inside an item block to render a GraphViz diagram of that item's direct relationships (colored by role, with labeled edges)
+. Architect embeds `tracer:graph-coverage[]` inside or outside item blocks to render Vega-Lite bar charts showing coverage
 . Architect builds the Antora site — macros are replaced with Kroki image URLs (SVG by default, PNG configurable)
 . Stakeholders view the page — the diagram shows the item's dependency neighborhood and the bar chart shows coverage status
 . Stakeholders can click through from the diagram description to related items via xrefs
 | Alternate Flows |
-. *Architect uses `traceability:graph[ITEM-ID, 2]` with a depth of 2:* The graph shows two hops of relationships instead of one.
-. *Architect places `traceability:graph-coverage[]` outside an item block:* The chart shows global coverage by role instead of per-item coverage.
+. *Architect uses `tracer:graph[ITEM-ID, 2]` with a depth of 2:* The graph shows two hops of relationships instead of one.
+. *Architect places `tracer:graph-coverage[]` outside an item block:* The chart shows global coverage by role instead of per-item coverage.
 . *The project builds PDFs:* Architect sets `krokiImageFormat: png` in the playbook config — PNG images render correctly in PDF output where SVGs do not.
 . *Kroki is unavailable or misconfigured:* The macros render as fallback text with the item IDs, still providing value.
 | Postconditions | The documentation page contains embedded relationship graphs and/or coverage charts And stakeholders can visually explore dependencies And the graphs are navigable via xrefs to related items
@@ -360,7 +360,7 @@ leads_to:REQ-143[]
 leads_to:REQ-159[]
 leads_to:REQ-160[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#UC-010, item, role=use_case, title="Developer assesses impact before changing a traceable item"]
@@ -402,7 +402,7 @@ leads_to:REQ-140[]
 leads_to:REQ-141[]
 leads_to:REQ-227[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#UC-011, item, role=use_case, title="Requirements Engineer writes a use case"]
@@ -421,7 +421,7 @@ traceability:links[]
 . Requirements Engineer determines the next available ID with `antora-tracer next-id --prefix UC -i <path>`
 . Requirements Engineer writes the use case item block (`[#UC-NNN, item, role=use_case, ...]`) following the Karl Wiegers template — actor, goal, preconditions, postconditions, main flow, and alternate flows
 . Requirements Engineer links the use case to the requirements it motivates with `leads_to:REQ-NNN[]` inline macros
-. Requirements Engineer includes `traceability:links[]` to render the relationship list
+. Requirements Engineer includes `tracer:links[]` to render the relationship list
 . Requirements Engineer commits the file And triggers an Antora build
 . The extension registers the use case item And the `leads_to` relationships appear in the traceability matrix
 | Alternate Flows |
@@ -437,7 +437,7 @@ traceability:links[]
 
 leads_to:REQ-056[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#UC-012, item, role=use_case, title="Reader finds a traceable item through site search"]
@@ -471,7 +471,7 @@ leads_to:REQ-080[]
 leads_to:REQ-081[]
 leads_to:REQ-082[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#UC-013, item, role=use_case, title="Requirements Engineer retires an obsolete traceable item"]
@@ -529,7 +529,7 @@ leads_to:REQ-237[]
 leads_to:REQ-238[]
 leads_to:REQ-239[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#UC-014, item, role=use_case, title="Developer compares traceability across two versions"]
@@ -569,5 +569,5 @@ leads_to:REQ-226[]
 leads_to:REQ-216[]
 leads_to:REQ-217[]
 
-traceability:links[]
+tracer:links[]
 --

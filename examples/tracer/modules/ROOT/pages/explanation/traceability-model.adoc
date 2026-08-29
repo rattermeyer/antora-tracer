@@ -10,7 +10,7 @@ Understanding how they work together is key to defining a domain model that fits
 
 == Roles
 
-A *role* is a category of traceable item — a type label like "requirement", "design", "test", "user_story", or "risk_control".
+A *role* is a category of traceable item — a type label like `requirement`, `design`, `test`, `user_story`, or `risk_control`.
 Roles are purely user-defined — the extension has no built-in roles.
 You define them in your configuration, and every `[item]` gets a `role` attribute.
 

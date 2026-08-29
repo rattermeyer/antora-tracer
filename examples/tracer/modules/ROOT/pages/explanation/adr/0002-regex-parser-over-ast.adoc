@@ -26,7 +26,7 @@ The choice affects accuracy, complexity, and maintainability.
 == Decision Outcome
 
 Chosen option: regex-based parser, because it is simpler, version-independent, and easier to test.
-Known limitations (e.g., `]` inside quoted attribute values) have proven fixable and the pattern is well-understood.
+Known limitations (for example `]` inside quoted attribute values) have proven fixable and the pattern is well-understood.
 
 === Positive Consequences
 
@@ -37,7 +37,7 @@ Known limitations (e.g., `]` inside quoted attribute values) have proven fixable
 
 === Negative Consequences
 
-* Fragile — each edge case requires a regex fix (e.g., `]` in titles, indented macros, escaped colons)
+* Fragile — each edge case requires a regex fix (for example `]` in titles, indented macros, escaped colons)
 * Cannot leverage Asciidoctor's built-in parsing for complex constructs
 * Verbatim block handling requires a separate pre-scan
 

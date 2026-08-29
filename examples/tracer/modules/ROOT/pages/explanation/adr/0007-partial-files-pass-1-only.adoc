@@ -14,7 +14,7 @@ But partials do not produce standalone HTML pages — they are assembly-time inc
 The extension processes files in two passes during `contentClassified`:
 
 * *Pass 1*: Parse items and inline macros → populate the graph
-* *Pass 2*: Expand `traceability:outgoing[]`, `traceability:incoming[]`, and `traceability:links[]` macros → substitute inline macros with xrefs
+* *Pass 2*: Expand `tracer:outgoing[]`, `tracer:incoming[]`, and `tracer:links[]` macros → substitute inline macros with xrefs
 
 == Decision Drivers
 
@@ -55,6 +55,6 @@ Items with `sourceFile` containing `/partials/` fall back to same-page anchors (
 
 === Negative Consequences
 
-* `traceability:outgoing[]` and `traceability:incoming[]` are not expanded in partials — users must place those macros in the including page
+* `tracer:outgoing[]` and `tracer:incoming[]` are not expanded in partials — users must place those macros in the including page
 * Xrefs from page A to a partial item in page B resolve to page B's anchor, even if the partial is included in multiple pages
 * Testing coverage for partial processing is lighter than for page processing

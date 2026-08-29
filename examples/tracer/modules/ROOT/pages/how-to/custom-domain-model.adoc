@@ -136,7 +136,7 @@ version: 1.0.0
 description: requirements-engineering plus use-case traceability
 extends: requirements-engineering   # <1>
 
-traceability:
+tracer:
   roles:
     - use_case
 

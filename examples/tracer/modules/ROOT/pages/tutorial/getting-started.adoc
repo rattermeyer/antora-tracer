@@ -146,7 +146,7 @@ Here's what you wrote:
 - `DES-001` — a design. It declares `addresses:REQ-001[]` — a relationship pointing from this design to the requirement it addresses.
 - `TEST-001` — a test. It references both the design it validates (`validates:DES-001[]`) and the requirement it verifies (`verifies:REQ-001[]`).
 
-The `:traceability-links:` attribute enables the `traceability:outgoing[]` and `traceability:incoming[]` macros, which display relationship lists in the rendered output.
+The `:traceability-links:` attribute enables the `tracer:outgoing[]` and `tracer:incoming[]` macros, which display relationship lists in the rendered output.
 
 == Step 4: Build and see the results
 

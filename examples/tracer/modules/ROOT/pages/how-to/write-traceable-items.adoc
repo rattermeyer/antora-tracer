@@ -103,7 +103,7 @@ For the full lifecycle — re-pointing links, archiving, and removing — see xr
 
 == Display relationships in rendered output
 
-Use the `traceability:outgoing[]` and `traceability:incoming[]` macros to show relationship lists:
+Use the `tracer:outgoing[]` and `tracer:incoming[]` macros to show relationship lists:
 
 [source,asciidoc]
 ----
@@ -113,8 +113,8 @@ JWT-based authentication.
 
 addresses:REQ-001[]
 
-traceability:outgoing[]     <1>
-traceability:incoming[]     <2>
+tracer:outgoing[]     <1>
+tracer:incoming[]     <2>
 --
 ----
 <1> Renders a list of items this item points to

@@ -59,7 +59,7 @@ The system SHALL NOT register item declarations (`[#ID, item, role=...]`) found 
 
 Source: openspec/specs/parser-verbatim-skip/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-088, item, role=requirement, title="Inline macros inside verbatim blocks are not parsed"]
@@ -68,7 +68,7 @@ The system SHALL NOT register inline relationship macros (`relation:TARGET[]`) w
 
 Source: openspec/specs/parser-verbatim-skip/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-090, item, role=requirement, title="Verbatim block detection handles standard AsciiDoc fences"]
@@ -77,7 +77,7 @@ The system SHALL detect verbatim blocks by matching opening and closing fence li
 
 Source: openspec/specs/parser-verbatim-skip/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-091, item, role=requirement, title="Inline macros inside verbatim blocks are preserved in rendered output"]
@@ -86,7 +86,7 @@ The system SHALL preserve inline relationship macros (`relation:TARGET[]`) insid
 
 Source: openspec/specs/parser-verbatim-skip/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-092, item, role=requirement, title="Inline macros inside backtick code spans are not parsed"]
@@ -95,7 +95,7 @@ The system SHALL NOT register inline relationship macros (`relation:ID[]`) that 
 
 Source: openspec/specs/parser-verbatim-skip/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-110, item, role=requirement, title="Items defined in partials are registered in the graph"]
@@ -104,7 +104,7 @@ The system SHALL process items defined in AsciiDoc partial files alongside page 
 
 Source: openspec/specs/partial-file-processing/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-144, item, role=requirement, title="Partial items use view URL as source reference"]
@@ -113,7 +113,7 @@ Items from partial files SHALL use the file's view URL as their source file refe
 
 Source: openspec/specs/partial-file-processing/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-145, item, role=requirement, title="All processing passes apply to partial files"]
@@ -122,7 +122,7 @@ The system SHALL apply graph population, macro expansion, and link substitution 
 
 Source: openspec/specs/partial-file-processing/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 === Traceability Graph
@@ -135,7 +135,7 @@ Merging is driven by the `reverse` declaration in `relations` (config).
 
 Source: openspec/specs/bidirectional-relationship-merge/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-219, item, role=requirement, title="Reverse-authored relationships are detected"]
@@ -146,7 +146,7 @@ supersedes:REQ-129[]
 
 Source: openspec/specs/bidirectional-relationship-merge/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-220, item, role=requirement, title="No second edge is stored for a complementary pair"]
@@ -159,7 +159,7 @@ supersedes:REQ-129[]
 
 Source: openspec/specs/bidirectional-relationship-merge/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-111, item, role=requirement, title="File state is prepared once per file"]
@@ -168,7 +168,7 @@ The system SHALL compute file content, document attributes, and item block posit
 
 Source: openspec/specs/file-preparation-cache/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-112, item, role=requirement, title="PreparedFile carries all needed state"]
@@ -177,81 +177,81 @@ The system SHALL cache the parsed state of each source file — including its fu
 
 Source: openspec/specs/file-preparation-cache/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 === Relationship Macros
 
-[#REQ-044, item, role=requirement, title="traceability:outgoing[] macro renders outgoing links"]
+[#REQ-044, item, role=requirement, title="tracer:outgoing[] macro renders outgoing links"]
 --
-The system SHALL provide a `traceability:outgoing[]` macro that expands to a formatted list of all outgoing relationships for the enclosing item.
+The system SHALL provide a `tracer:outgoing[]` macro that expands to a formatted list of all outgoing relationships for the enclosing item.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-146, item, role=requirement, title="Empty-state message when item has no outgoing relationships"]
 --
-If the enclosing item has no outgoing relationships, then the `traceability:outgoing[]` macro SHALL render a configurable empty-state message controlled by the `:traceability-empty:` document attribute.
+If the enclosing item has no outgoing relationships, then the `tracer:outgoing[]` macro SHALL render a configurable empty-state message controlled by the `:traceability-empty:` document attribute.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
-[#REQ-055, item, role=requirement, title="traceability:incoming[] macro renders incoming links"]
+[#REQ-055, item, role=requirement, title="tracer:incoming[] macro renders incoming links"]
 --
-The system SHALL provide a `traceability:incoming[]` macro that expands to a formatted list of all relationships pointing to the enclosing item (reverse relationships).
+The system SHALL provide a `tracer:incoming[]` macro that expands to a formatted list of all relationships pointing to the enclosing item (reverse relationships).
 
 Source: openspec/specs/incoming-links-macro/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
-[#REQ-104, item, role=requirement, title="traceability:links[] macro renders combined outgoing and incoming links"]
+[#REQ-104, item, role=requirement, title="tracer:links[] macro renders combined outgoing and incoming links"]
 --
-The system SHALL provide a `traceability:links[]` macro that expands to a combined list of all outgoing and incoming relationships for the enclosing item, with outgoing groups rendered first followed by incoming groups.
+The system SHALL provide a `tracer:links[]` macro that expands to a combined list of all outgoing and incoming relationships for the enclosing item, with outgoing groups rendered first followed by incoming groups.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-045, item, role=requirement, title="Opt-in via AsciiDoc attribute"]
 --
-The system SHALL only expand `traceability:outgoing[]` and `traceability:incoming[]` when the `:traceability-links:` document attribute is set to a truthy value.
+The system SHALL only expand `tracer:outgoing[]` and `tracer:incoming[]` when the `:traceability-links:` document attribute is set to a truthy value.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-100, item, role=requirement, title="Inline macros suppressed when links macros are active"]
 --
-When `:traceability-links:` is enabled, the system SHALL suppress the individual rendering of inline relationship macros within item blocks that contain a `traceability:outgoing[]` or `traceability:incoming[]` macro.
+When `:traceability-links:` is enabled, the system SHALL suppress the individual rendering of inline relationship macros within item blocks that contain a `tracer:outgoing[]` or `tracer:incoming[]` macro.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-047, item, role=requirement, title="Configurable display style"]
 --
-The system SHALL support configurable display styles via the `:traceability-style:` document attribute for both `traceability:outgoing[]` and `traceability:incoming[]` macros.
+The system SHALL support configurable display styles via the `:traceability-style:` document attribute for both `tracer:outgoing[]` and `tracer:incoming[]` macros.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-048, item, role=requirement, title="Configurable sort order"]
 --
-The system SHALL support configurable sort order via the `:traceability-order:` document attribute for both `traceability:outgoing[]` and `traceability:incoming[]` macros, defaulting to sort by target ID for outgoing and source ID for incoming.
+The system SHALL support configurable sort order via the `:traceability-order:` document attribute for both `tracer:outgoing[]` and `tracer:incoming[]` macros, defaulting to sort by target ID for outgoing and source ID for incoming.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-102, item, role=requirement, title="Collapsible list-style output via document attribute"]
@@ -260,53 +260,53 @@ The system SHALL support a `:traceability-collapsible:` document attribute that,
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-064, item, role=requirement, title="Incoming macro respects document attributes"]
 --
-The system SHALL gate `traceability:incoming[]` expansion on the same `:traceability-links:` document attribute as the outgoing macro.
+The system SHALL gate `tracer:incoming[]` expansion on the same `:traceability-links:` document attribute as the outgoing macro.
 
 Source: openspec/specs/incoming-links-macro/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-065, item, role=requirement, title="Incoming macro display styles"]
 --
-The system SHALL support the same display styles for `traceability:incoming[]` as for the outgoing macro, via the `:traceability-style:` document attribute.
+The system SHALL support the same display styles for `tracer:incoming[]` as for the outgoing macro, via the `:traceability-style:` document attribute.
 
 Source: openspec/specs/incoming-links-macro/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-066, item, role=requirement, title="Incoming macro sort order"]
 --
-The system SHALL support the same sort orders for `traceability:incoming[]` as for the outgoing macro, via the `:traceability-order:` document attribute, defaulting to sort by source ID.
+The system SHALL support the same sort orders for `tracer:incoming[]` as for the outgoing macro, via the `:traceability-order:` document attribute, defaulting to sort by source ID.
 
 Source: openspec/specs/incoming-links-macro/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-067, item, role=requirement, title="Incoming groups use the reverse relation type"]
 --
-The system SHALL group incoming relationships in `traceability:incoming[]` by the reverse relation type — the declared `reverse` of the relationship's type — so each group heading names the relation from the target item's perspective.
+The system SHALL group incoming relationships in `tracer:incoming[]` by the reverse relation type — the declared `reverse` of the relationship's type — so each group heading names the relation from the target item's perspective.
 
 Source: openspec/specs/incoming-links-macro/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-070, item, role=requirement, title="Incoming macro supports collapsible output"]
 --
-The system SHALL apply the same `:traceability-collapsible:` document attribute to `traceability:incoming[]` output as it does for `traceability:outgoing[]`.
+The system SHALL apply the same `:traceability-collapsible:` document attribute to `tracer:incoming[]` output as it does for `tracer:outgoing[]`.
 When enabled, each inverse relation-type group in list-style incoming output SHALL be wrapped in a `[%collapsible]` block.
 
 Source: openspec/specs/incoming-links-macro/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-103, item, role=requirement, title="Graph isolation per component version"]
@@ -315,7 +315,7 @@ Relationship macro expansion SHALL produce xrefs only to items in the same compo
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-249, item, role=requirement, title="Graph isolation per version"]
@@ -326,43 +326,43 @@ supersedes:REQ-103[]
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-163, item, role=requirement, title="Incoming macro PDF compatibility"]
 --
-The generated output from `traceability:incoming[]` SHALL be standard AsciiDoc constructs — not raw HTML — ensuring compatibility with both HTML and PDF backends.
+The generated output from `tracer:incoming[]` SHALL be standard AsciiDoc constructs — not raw HTML — ensuring compatibility with both HTML and PDF backends.
 
 Source: openspec/specs/incoming-links-macro/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-164, item, role=requirement, title="Source file not modified by incoming macro"]
 --
-The system SHALL NOT modify the `.adoc` source file on disk when expanding `traceability:incoming[]`.
+The system SHALL NOT modify the `.adoc` source file on disk when expanding `tracer:incoming[]`.
 
 Source: openspec/specs/incoming-links-macro/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-165, item, role=requirement, title="PDF compatibility"]
 --
-The generated output from `traceability:outgoing[]` and `traceability:incoming[]` SHALL use standard AsciiDoc constructs, ensuring compatibility with both HTML and PDF rendering backends.
+The generated output from `tracer:outgoing[]` and `tracer:incoming[]` SHALL use standard AsciiDoc constructs, ensuring compatibility with both HTML and PDF rendering backends.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-166, item, role=requirement, title="Source file not modified"]
 --
-The system SHALL NOT modify the `.adoc` source file on disk when expanding `traceability:outgoing[]` or `traceability:incoming[]`.
+The system SHALL NOT modify the `.adoc` source file on disk when expanding `tracer:outgoing[]` or `tracer:incoming[]`.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 === Cross-Module and Cross-Component References
@@ -373,7 +373,7 @@ When processing `.adoc` files through the Antora extension, the system SHALL sto
 
 Source: openspec/specs/cross-module-xref/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-117, item, role=requirement, title="Cross-module and cross-component xref includes correct prefix"]
@@ -382,16 +382,16 @@ When `buildXref` generates an Antora xref for an item in a different module or c
 
 Source: openspec/specs/cross-module-xref/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-119, item, role=requirement, title="Cross-module and cross-component xref resolution"]
 --
-When an item in one module has relationships to items in other modules or components, the `traceability:outgoing[]` and `traceability:incoming[]` macros SHALL generate xrefs with the correct Antora prefix (`component:module:` or `module:`) so Antora can resolve them correctly.
+When an item in one module has relationships to items in other modules or components, the `tracer:outgoing[]` and `tracer:incoming[]` macros SHALL generate xrefs with the correct Antora prefix (`component:module:` or `module:`) so Antora can resolve them correctly.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 === Inverse Labels
@@ -403,7 +403,7 @@ The system SHALL support `labels` in the traceability configuration YAML, mappin
 
 Source: openspec/specs/inverse-labels/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-221, item, role=requirement, title="Relation display names are configurable"]
@@ -414,7 +414,7 @@ supersedes:REQ-071[]
 
 Source: openspec/specs/inverse-labels/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-222, item, role=requirement, title="Labels do not affect the graph"]
@@ -425,7 +425,7 @@ supersedes:REQ-071[]
 
 Source: openspec/specs/inverse-labels/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-161, item, role=requirement, title="Default display name is the humanized type"]
@@ -434,7 +434,7 @@ If a relation type has no entry in `labels`, the system SHALL display the type n
 
 Source: openspec/specs/inverse-labels/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-162, item, role=requirement, title="No compile-time fallback"]
@@ -443,7 +443,7 @@ The system SHALL NOT consult a compile-time inverse map for display names; the p
 
 Source: openspec/specs/inverse-labels/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 === Matrix Generation
@@ -454,7 +454,7 @@ The matrix SHALL render row item IDs as hyperlinks that navigate to the item's d
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-038, item, role=requirement, title="Matrix displays cell items as clickable links"]
@@ -463,7 +463,7 @@ The matrix SHALL render cell item IDs as hyperlinks that navigate to the item's 
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-039, item, role=requirement, title="Links include source file tooltip"]
@@ -472,7 +472,7 @@ The matrix SHALL display the source file name as a tooltip when users hover over
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-040, item, role=requirement, title="Matrix links resolve correctly from site output location"]
@@ -481,7 +481,7 @@ The system SHALL generate matrix links that resolve correctly regardless of wher
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-250, item, role=requirement, title="Matrix links resolve correctly from site output location"]
@@ -492,7 +492,7 @@ supersedes:REQ-040[]
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-041, item, role=requirement, title="Source file paths are normalized"]
@@ -501,7 +501,7 @@ The system SHALL normalize item source file references so that matrix links reso
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-042, item, role=requirement, title="Matrix renders correctly without link resolution configured"]
@@ -510,7 +510,7 @@ The system SHALL maintain existing matrix rendering behaviour when link resoluti
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-043, item, role=requirement, title="Non-HTML matrix outputs unchanged"]
@@ -519,7 +519,7 @@ The system SHALL NOT modify CSV and JSON matrix outputs to include links.
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-128, item, role=requirement, title="Matrix links include module path for module-aware items"]
@@ -528,7 +528,7 @@ When an item has module information, the system SHALL generate HTML links that i
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-108, item, role=requirement, title="Matrix files registered in the content catalog"]
@@ -539,7 +539,7 @@ A committed copy, if present, SHALL have its contents refreshed in place.
 
 Source: openspec/specs/matrix-attachment-sync/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-130, item, role=requirement, title="Matrix links are compatible with Antora indexify URL style"]
@@ -548,7 +548,7 @@ When Antora's `indexify` URL style is active (root-level pages are served as `pa
 
 Source: openspec/specs/matrix-generation/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-113, item, role=requirement, title="Matrix template uses partials for structure"]
@@ -557,7 +557,7 @@ The HTML matrix template SHALL be split into a main template and four reusable p
 
 Source: openspec/specs/template-partials/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-167, item, role=requirement, title="Matrix renders one status column per row"]
@@ -566,7 +566,7 @@ The HTML matrix SHALL render exactly one per-row status column.
 
 Source: openspec/specs/matrix-status/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-168, item, role=requirement, title="Coverage summary remains"]
@@ -575,7 +575,7 @@ The matrix SHALL still render a top-level coverage summary with the counts of do
 
 Source: openspec/specs/matrix-status/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-169, item, role=requirement, title="CSV output is unchanged"]
@@ -584,7 +584,7 @@ The CSV export SHALL NOT render a per-row status or coverage column, matching it
 
 Source: openspec/specs/matrix-status/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 === Configuration and Presets
@@ -595,7 +595,7 @@ The `requirements-engineering` preset SHALL include a matrix named `requirements
 
 Source: openspec/specs/pairwise-matrices-preset/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-084, item, role=requirement, title="Preset defines pairwise design-to-implementation matrix"]
@@ -604,7 +604,7 @@ The `requirements-engineering` preset SHALL include a matrix named `design-to-im
 
 Source: openspec/specs/pairwise-matrices-preset/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-085, item, role=requirement, title="Preset defines pairwise requirements-to-tests matrix"]
@@ -613,7 +613,7 @@ The `requirements-engineering` preset SHALL include a matrix named `requirements
 
 Source: openspec/specs/pairwise-matrices-preset/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-086, item, role=requirement, title="Preset does not define wide multi-column matrices"]
@@ -622,7 +622,7 @@ The `requirements-engineering` preset SHALL NOT define matrices with more than o
 
 Source: openspec/specs/pairwise-matrices-preset/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-170, item, role=requirement, title="Preset extends a parent by top-level `extends`"]
@@ -632,7 +632,7 @@ When a preset declares `extends`, the resolved preset SHALL include the parent's
 
 Source: openspec/specs/preset-inheritance/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-171, item, role=requirement, title="Merge semantics match config-file `extends`"]
@@ -641,7 +641,7 @@ Preset inheritance SHALL use the same merge rules as a config file extending a p
 
 Source: openspec/specs/preset-inheritance/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-172, item, role=requirement, title="Transitive inheritance"]
@@ -650,7 +650,7 @@ Inheritance SHALL resolve transitively: a preset extending a preset that itself 
 
 Source: openspec/specs/preset-inheritance/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-173, item, role=requirement, title="Missing parent is reported"]
@@ -659,7 +659,7 @@ When a preset's `extends` names a preset that cannot be resolved, loading SHALL 
 
 Source: openspec/specs/preset-inheritance/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-174, item, role=requirement, title="Circular inheritance is rejected"]
@@ -669,7 +669,7 @@ Any inheritance cycle SHALL be detected and rejected with a clear error rather t
 
 Source: openspec/specs/preset-inheritance/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-223, item, role=requirement, title="A preset does not extend itself"]
@@ -680,7 +680,7 @@ supersedes:REQ-174[]
 
 Source: openspec/specs/preset-inheritance/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-224, item, role=requirement, title="Inheritance cycles are detected and rejected"]
@@ -691,7 +691,7 @@ supersedes:REQ-174[]
 
 Source: openspec/specs/preset-inheritance/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-175, item, role=requirement, title="Relations are declared keyed with a mandatory reverse"]
@@ -700,7 +700,7 @@ The `relations` config SHALL map `sourceRole → targetRole → relationType →
 
 Source: openspec/specs/reverse-relations/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-176, item, role=requirement, title="Authoring the reverse name canonicalizes to the primary edge"]
@@ -709,7 +709,7 @@ When an item authors a relationship using a reverse type, the graph SHALL store 
 
 Source: openspec/specs/reverse-relations/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-177, item, role=requirement, title="Reverse direction is derived for validation"]
@@ -718,7 +718,7 @@ The system SHALL allow a relation type that is the reverse of a relation declare
 
 Source: openspec/specs/reverse-relations/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-178, item, role=requirement, title="Matrix coverage matches the canonical primary type"]
@@ -727,31 +727,31 @@ A matrix `coverageRelations` entry SHALL name the canonical primary type, and a 
 
 Source: openspec/specs/reverse-relations/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 === Graph Visualization
 
-[#REQ-051, item, role=requirement, title="Relationship graph via traceability:graph[] macro"]
+[#REQ-051, item, role=requirement, title="Relationship graph via tracer:graph[] macro"]
 --
-The system SHALL provide a `traceability:graph[]` inline macro that renders a relationship diagram for the enclosing item.
+The system SHALL provide a `tracer:graph[]` inline macro that renders a relationship diagram for the enclosing item.
 The diagram SHALL show the item and its related items as labeled nodes and edges, colored by role.
 An optional depth parameter SHALL control the number of relationship hops shown.
 
 Source: openspec/specs/graph-visualization/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
-[#REQ-052, item, role=requirement, title="Coverage chart via traceability:graph-coverage[] macro"]
+[#REQ-052, item, role=requirement, title="Coverage chart via tracer:graph-coverage[] macro"]
 --
-The system SHALL provide a `traceability:graph-coverage[]` inline macro that renders a coverage chart.
+The system SHALL provide a `tracer:graph-coverage[]` inline macro that renders a coverage chart.
 When used inside an item block, it SHALL show per-relationship-type coverage for that item.
 When used outside an item block, it SHALL show global coverage by role.
 
 Source: openspec/specs/graph-visualization/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-053, item, role=requirement, title="Graph model supports traversal-bounded subgraph and coverage queries"]
@@ -762,7 +762,7 @@ The graph model SHALL also support producing coverage data for a given item, or 
 
 Source: openspec/specs/graph-visualization/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-054, item, role=requirement, title="Dashboard page in example site"]
@@ -771,7 +771,7 @@ The example site SHALL include a dashboard page with a global coverage chart and
 
 Source: openspec/specs/graph-visualization/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-063, item, role=requirement, title="Configurable Kroki image format"]
@@ -782,17 +782,17 @@ The configured `krokiServerUrl` (or its default `https://kroki.io`) SHALL be use
 
 Source: openspec/specs/graph-visualization/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
-[#REQ-159, item, role=requirement, title="Configuration graph via traceability:config-graph[] macro"]
+[#REQ-159, item, role=requirement, title="Configuration graph via tracer:config-graph[] macro"]
 --
-The system SHALL provide a `traceability:config-graph[]` macro that renders the effective traceability configuration as a Kroki GraphViz diagram.
+The system SHALL provide a `tracer:config-graph[]` macro that renders the effective traceability configuration as a Kroki GraphViz diagram.
 The diagram SHALL show each configured role as a node colored by role and each declared relation as a labeled edge, using declared directions only.
 
 Source: openspec/specs/graph-visualization/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-160, item, role=requirement, title="Config graph generator renders configuration as DOT"]
@@ -801,17 +801,17 @@ The system SHALL provide a DOT generator for the traceability configuration that
 
 Source: openspec/specs/graph-visualization/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-142, item, role=requirement, title="Configurable Kroki server URL via extension config"]
 --
-The `krokiServerUrl` extension config option SHALL set the base URL used by `traceability:graph[]` and `traceability:graph-coverage[]` macros when generating Kroki image URLs.
+The `krokiServerUrl` extension config option SHALL set the base URL used by `tracer:graph[]` and `tracer:graph-coverage[]` macros when generating Kroki image URLs.
 When set, the system SHALL use this URL instead of the default `https://kroki.io`.
 
 Source: openspec/specs/kroki-server-url-config/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-143, item, role=requirement, title="Kroki server URL via environment variable"]
@@ -821,7 +821,7 @@ When set, the system SHALL use its value as the Kroki server base URL.
 
 Source: openspec/specs/kroki-server-url-config/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 === CLI
@@ -832,7 +832,7 @@ The CLI SHALL provide a `next-id` command that accepts a `--prefix` and `-i/--in
 
 Source: openspec/specs/next-id/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-136, item, role=requirement, title="CLI exposes a query subcommand"]
@@ -842,7 +842,7 @@ No Antora build SHALL be required.
 
 Source: openspec/specs/cli-query/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-137, item, role=requirement, title="query reverse — find all items that point at a given ID"]
@@ -851,7 +851,7 @@ The CLI SHALL provide `query reverse <id>` that returns all items whose relation
 
 Source: openspec/specs/cli-query/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-138, item, role=requirement, title="query impact — find all items connected to a given ID"]
@@ -860,7 +860,7 @@ The CLI SHALL provide `query impact <id>` that returns all items transitively co
 
 Source: openspec/specs/cli-query/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-139, item, role=requirement, title="query isolated — find items with no relationships"]
@@ -869,7 +869,7 @@ The CLI SHALL provide `query isolated` that returns all items that have neither 
 
 Source: openspec/specs/cli-query/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-227, item, role=requirement, title="query orphaned — find superseded items with no incoming functional links"]
@@ -878,7 +878,7 @@ The CLI SHALL provide `query orphaned` that returns all effectively superseded i
 
 Source: openspec/specs/cli-query/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-140, item, role=requirement, title="query path — find the shortest path between two items"]
@@ -887,7 +887,7 @@ The CLI SHALL provide `query path <from-id> <to-id>` that returns the shortest r
 
 Source: openspec/specs/cli-query/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-141, item, role=requirement, title="JSON output flag"]
@@ -896,7 +896,7 @@ All `query` subcommands SHALL accept a `--json` flag that switches output to a m
 
 Source: openspec/specs/cli-query/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-150, item, role=requirement, title="CLI exposes a validate command"]
@@ -907,7 +907,7 @@ The command SHALL exit with a non-zero code when errors are found and code 0 whe
 
 Source: openspec/specs/cli-validate/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 === Search Integration
@@ -919,7 +919,7 @@ Each chunk SHALL use the element's `id` as its `hash`, enabling search result li
 
 Source: openspec/specs/lunr-item-anchor-indexing/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-080, item, role=requirement, title="Item title is extracted from `.title` child element"]
@@ -929,7 +929,7 @@ If no `.title` child exists, the element's `id` SHALL be used as the title.
 
 Source: openspec/specs/lunr-item-anchor-indexing/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-081, item, role=requirement, title="Heading elements are excluded from item indexing"]
@@ -938,7 +938,7 @@ Elements that are HTML headings (`h1` through `h6`) SHALL be skipped by the item
 
 Source: openspec/specs/lunr-item-anchor-indexing/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-082, item, role=requirement, title="Item indexing is scoped to article body"]
@@ -947,7 +947,7 @@ The item anchor indexing SHALL traverse only elements within `<article class="do
 
 Source: openspec/specs/lunr-item-anchor-indexing/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 === Supersession
@@ -958,7 +958,7 @@ When a traceable item replaces another item, the successor SHALL declare a `supe
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-202, item, role=requirement, title="The reverse superseded_by relationship is derivable"]
@@ -967,7 +967,7 @@ When a successor declares a `supersedes` relationship, the predecessor's `supers
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-203, item, role=requirement, title="Superseded state is derived from relationships"]
@@ -976,7 +976,7 @@ An item SHALL be effectively superseded when at least one valid incoming `supers
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-228, item, role=requirement, title="Orphaned state is derived from supersession and incoming functional links"]
@@ -985,7 +985,7 @@ An effectively superseded item SHALL be considered orphaned when no incoming fun
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-204, item, role=requirement, title="Invalid supersession structures are rejected"]
@@ -994,7 +994,7 @@ If the supersession graph contains a self-reference, duplicate relationship, or 
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-205, item, role=requirement, title="Current-state matrices omit superseded items"]
@@ -1003,7 +1003,7 @@ When a current-state matrix is generated, the system SHALL omit effectively supe
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-206, item, role=requirement, title="Functional links to superseded items remain visible"]
@@ -1012,7 +1012,7 @@ When a relationship macro renders a functional relationship targeting a supersed
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-207, item, role=requirement, title="History links are excluded from review worklists"]
@@ -1021,7 +1021,7 @@ Supersession history relationships SHALL NOT be classified as stale functional l
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-208, item, role=requirement, title="Superseded item blocks link to successors"]
@@ -1030,7 +1030,7 @@ When a superseded item's source block is rendered, the system SHALL display a su
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-209, item, role=requirement, title="CLI reports supersession impact"]
@@ -1039,7 +1039,7 @@ When a supersession check is requested, the CLI SHALL report direct successors a
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-210, item, role=requirement, title="Supersession checks do not modify source files"]
@@ -1048,7 +1048,7 @@ When a supersession check is requested, the CLI SHALL NOT modify any source file
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-211, item, role=requirement, title="Validation warns about stale functional links"]
@@ -1057,7 +1057,7 @@ When a functional relationship targets an effectively superseded item, validatio
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-233, item, role=requirement, title="Superseded items and links can be hidden"]
@@ -1066,7 +1066,7 @@ The system SHALL support a display-only `renderSuperseded` option. When set to f
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-234, item, role=requirement, title="Dangling history links are advisory"]
@@ -1075,7 +1075,7 @@ A dangling link whose type is `supersedes` or `superseded_by` SHALL be reported 
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 === Supersession Overview
@@ -1086,7 +1086,7 @@ When `generateOverview` is enabled, the system SHALL register the overview as a 
 
 Source: openspec/specs/supersession-overview/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-230, item, role=requirement, title="Overview page reports graph totals"]
@@ -1095,7 +1095,7 @@ The overview page SHALL report the number of managed items, the number of active
 
 Source: openspec/specs/supersession-overview/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-231, item, role=requirement, title="Overview page reports per-role statistics"]
@@ -1104,7 +1104,7 @@ The overview page SHALL report a per-role table with columns role, total, active
 
 Source: openspec/specs/supersession-overview/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-232, item, role=requirement, title="Overview page lists dangling references"]
@@ -1113,7 +1113,7 @@ The overview page SHALL list every dangling reference — a link whose target it
 
 Source: openspec/specs/supersession-overview/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 === Item Lifecycle
@@ -1124,7 +1124,7 @@ The CLI SHALL provide `archive <ID>` that moves a superseded item's full block t
 
 Source: openspec/specs/item-lifecycle/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-236, item, role=requirement, title="remove deletes an orphaned item"]
@@ -1133,7 +1133,7 @@ The CLI SHALL provide `remove <ID>` that deletes an orphaned item's block after 
 
 Source: openspec/specs/item-lifecycle/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-237, item, role=requirement, title="remove deletes an isolated item with a stronger confirmation"]
@@ -1142,7 +1142,7 @@ The CLI SHALL provide a path to delete an isolated item's block only after the u
 
 Source: openspec/specs/item-lifecycle/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-238, item, role=requirement, title="Block extent is detected before mutation"]
@@ -1151,7 +1151,7 @@ Before mutating a file, the CLI SHALL locate the item's full block from its `[#I
 
 Source: openspec/specs/item-lifecycle/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 === Graph Lifecycle
@@ -1162,7 +1162,7 @@ When the extension generates matrices, coverage, and the supersession overview a
 
 Source: openspec/specs/graph-lifecycle/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-251, item, role=requirement, title="Working graph spans components within a version"]
@@ -1171,7 +1171,7 @@ The `contentClassified` working graph SHALL include items from every component a
 
 Source: openspec/specs/graph-lifecycle/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 === Graph Diff
@@ -1182,7 +1182,7 @@ When two graph snapshots are compared, the diff SHALL classify each item as adde
 
 Source: openspec/specs/graph-diff/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-213, item, role=requirement, title="Modified items report changed fields"]
@@ -1191,7 +1191,7 @@ A surviving item SHALL be reported as modified when its `title`, `content`, `rol
 
 Source: openspec/specs/graph-diff/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-214, item, role=requirement, title="Relationship deltas are limited to surviving items"]
@@ -1200,7 +1200,7 @@ The diff SHALL report relationship changes only between items that exist in both
 
 Source: openspec/specs/graph-diff/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-215, item, role=requirement, title="Supersession appears as added and removed"]
@@ -1210,7 +1210,7 @@ A superseded predecessor SHALL appear as removed and its successor as added, wit
 
 Source: openspec/specs/graph-diff/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-225, item, role=requirement, title="The diff does not attempt rename detection"]
@@ -1221,7 +1221,7 @@ supersedes:REQ-215[]
 
 Source: openspec/specs/graph-diff/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-226, item, role=requirement, title="A superseded predecessor is reported as removed and its successor as added"]
@@ -1232,7 +1232,7 @@ supersedes:REQ-215[]
 
 Source: openspec/specs/graph-diff/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-216, item, role=requirement, title="Diff is a public, config-agnostic API"]
@@ -1241,7 +1241,7 @@ The diff SHALL be exposed as a public function usable with any configured role o
 
 Source: openspec/specs/graph-diff/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-217, item, role=requirement, title="CLI diff is read-only"]
@@ -1250,7 +1250,7 @@ A `diff` CLI command SHALL scan two source paths, build two graphs, and print th
 
 Source: openspec/specs/graph-diff/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 == Quality Requirements
@@ -1344,7 +1344,7 @@ The init hook SHALL run `npm install` and `bundle install` automatically.
 
 Source: openspec/specs/pdf-output/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-094, item, role=requirement, title="Gemfile locks asciidoctor-pdf version"]
@@ -1353,7 +1353,7 @@ The project SHALL include a `Gemfile` that specifies `asciidoctor-pdf` and `asci
 
 Source: openspec/specs/pdf-output/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-095, item, role=requirement, title="PDF playbook generates PDF from example site"]
@@ -1363,7 +1363,7 @@ The playbook SHALL use the same content sources as the HTML playbook but output 
 
 Source: openspec/specs/pdf-output/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-096, item, role=requirement, title="PDF extension is a peer dependency"]
@@ -1373,7 +1373,7 @@ It SHALL also remain in `devDependencies` for local development.
 
 Source: openspec/specs/pdf-output/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-097, item, role=requirement, title="Assembler profiles produce separate PDFs per document"]
@@ -1382,7 +1382,7 @@ The component descriptor SHALL define assembler profiles with dedicated nav file
 
 Source: openspec/specs/split-pdf-documents/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-098, item, role=requirement, title="Custom nav files select single documents"]
@@ -1391,7 +1391,7 @@ Each profile SHALL reference a custom nav file that contains a single xref to th
 
 Source: openspec/specs/split-pdf-documents/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-099, item, role=requirement, title="Single-PDF output is preserved"]
@@ -1400,7 +1400,7 @@ The existing single-PDF configuration SHALL remain available via `antora-assembl
 
 Source: openspec/specs/split-pdf-documents/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-131, item, role=process_requirement, title="DOCX wrapper script converts assembled AsciiDoc to DOCX"]
@@ -1409,7 +1409,7 @@ The project SHALL include an `adoc-to-docx` shell script that reads assembled As
 
 Source: openspec/specs/docx-output/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-132, item, role=process_requirement, title="DOCX assembler configs mirror PDF assembler configs"]
@@ -1418,7 +1418,7 @@ For each existing PDF assembler configuration, a corresponding DOCX assembler co
 
 Source: openspec/specs/docx-output/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-133, item, role=process_requirement, title="PDF playbook includes DOCX assembler configurations"]
@@ -1427,7 +1427,7 @@ The `antora-playbook-pdf.yml` SHALL register DOCX assembler configs alongside PD
 
 Source: openspec/specs/docx-output/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-134, item, role=process_requirement, title="pandoc is available in the build environment"]
@@ -1436,7 +1436,7 @@ The project SHALL declare `pandoc` as a dependency in `devbox.json` so that `dev
 
 Source: openspec/specs/docx-output/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-135, item, role=requirement, title="DOCX output format is documented"]
@@ -1445,7 +1445,7 @@ The project documentation SHALL include a how-to guide for generating DOCX outpu
 
 Source: openspec/specs/docx-output/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-179, item, role=requirement, title="PDF playbook references extension by local path in development"]
@@ -1455,7 +1455,7 @@ Consumer documentation SHALL show the package subpath pattern (`antora-tracer/an
 
 Source: openspec/specs/pdf-output/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-180, item, role=requirement, title="PDF extension is published and referenceable by package name"]
@@ -1464,7 +1464,7 @@ The `antora-tracer` npm package SHALL include `lib/src/antora-pdf-extension.cjs`
 
 Source: openspec/specs/published-extensions/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-181, item, role=requirement, title="DOCX extension is published and referenceable by package name"]
@@ -1473,7 +1473,7 @@ The `antora-tracer` npm package SHALL include `lib/src/antora-docx-extension.cjs
 
 Source: openspec/specs/published-extensions/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-182, item, role=requirement, title="Assembler packages declared as optional peer dependencies"]
@@ -1483,7 +1483,7 @@ These packages SHALL also remain in `devDependencies` for local development buil
 
 Source: openspec/specs/published-extensions/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-183, item, role=requirement, title="Assembler configs and adoc-to-docx script are example-site configuration"]
@@ -1493,7 +1493,7 @@ The how-to documentation SHALL explain that consumers create their own configs m
 
 Source: openspec/specs/published-extensions/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-184, item, role=process_requirement, title="DOCX playbook references extension by local path in development"]
@@ -1503,7 +1503,7 @@ Consumer documentation SHALL show the package subpath pattern (`antora-tracer/an
 
 Source: openspec/specs/docx-output/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 === Vale Prose Linting
@@ -1514,7 +1514,7 @@ The system SHALL run Vale against the source AsciiDoc content of every page and 
 
 Source: openspec/specs/vale-build-integration/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-152, item, role=requirement, title="The build gates on a configurable minimum severity"]
@@ -1523,7 +1523,7 @@ The system SHALL fail the build when Vale reports a finding at or above the conf
 
 Source: openspec/specs/vale-build-integration/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-153, item, role=requirement, title="The extension reports the Vale configuration source"]
@@ -1532,7 +1532,7 @@ The system SHALL load Vale's configuration from the path supplied in the playboo
 
 Source: openspec/specs/vale-build-integration/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-154, item, role=requirement, title="Missing executables fail with an actionable message"]
@@ -1541,7 +1541,7 @@ When the extension is enabled, if the `vale` or `asciidoctor` executable is unav
 
 Source: openspec/specs/vale-build-integration/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-155, item, role=requirement, title="The extension is opt-in"]
@@ -1550,7 +1550,7 @@ The system SHALL NOT run Vale unless the extension is explicitly registered in t
 
 Source: openspec/specs/vale-build-integration/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-156, item, role=requirement, title="Source layout is out of scope"]
@@ -1559,7 +1559,7 @@ The system SHALL NOT enforce source line layout such as one sentence per line; t
 
 Source: openspec/specs/vale-build-integration/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 === Documentation Style Rules
@@ -1570,7 +1570,7 @@ The system SHALL provide a set of Vale rule files that encode the machine-checka
 
 Source: openspec/specs/documentation-style-rules/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-158, item, role=requirement, title="Rules are packaged with the extension"]
@@ -1579,7 +1579,7 @@ The system SHALL ship the rule files and a sample configuration with the npm pac
 
 Source: openspec/specs/documentation-style-rules/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-185, item, role=requirement, title="Item blocks use the open-block delimiter"]
@@ -1589,7 +1589,7 @@ The `====` example-block delimiter SHALL be documented as a valid alternative wi
 
 Source: openspec/specs/documentation-style-rules/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 === Documentation Structure
@@ -1600,7 +1600,7 @@ The example site SHALL include a single Tutorial page (`getting-started.adoc`) t
 
 Source: openspec/specs/doc-tutorial/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-187, item, role=requirement, title="Tutorial in navigation"]
@@ -1609,7 +1609,7 @@ The example site navigation SHALL include a "Tutorial" section as the first top-
 
 Source: openspec/specs/doc-tutorial/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-188, item, role=requirement, title="How-to guide pages exist for key tasks"]
@@ -1627,7 +1627,7 @@ The example site SHALL include How-to guide pages covering the following tasks:
 
 Source: openspec/specs/doc-howto-guides/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-189, item, role=requirement, title="How-to guides link to Reference"]
@@ -1636,7 +1636,7 @@ Each How-to guide page SHALL include links to relevant Reference pages for optio
 
 Source: openspec/specs/doc-howto-guides/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-190, item, role=requirement, title="How-to guides section in navigation"]
@@ -1645,7 +1645,7 @@ The example site navigation SHALL include a "How-to Guides" section containing a
 
 Source: openspec/specs/doc-howto-guides/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-191, item, role=requirement, title="Reference pages for macro syntax, configuration, CLI, presets, and API"]
@@ -1661,7 +1661,7 @@ The example site SHALL include Reference pages exhaustively documenting:
 
 Source: openspec/specs/doc-reference/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-192, item, role=requirement, title="Reference pages cross-link to other modes"]
@@ -1670,7 +1670,7 @@ Reference pages SHALL include links to relevant How-to guides, Explanation pages
 
 Source: openspec/specs/doc-reference/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-193, item, role=requirement, title="Reference section in navigation"]
@@ -1679,7 +1679,7 @@ The example site navigation SHALL include a "Reference" section containing all r
 
 Source: openspec/specs/doc-reference/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-194, item, role=requirement, title="Explanation pages for concepts, architecture, and design rationale"]
@@ -1696,7 +1696,7 @@ The example site SHALL include Explanation pages covering:
 
 Source: openspec/specs/doc-explanation/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-195, item, role=requirement, title="Explanation pages link to Reference and How-to"]
@@ -1705,7 +1705,7 @@ Explanation pages SHALL include links to relevant Reference pages and How-to gui
 
 Source: openspec/specs/doc-explanation/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-196, item, role=requirement, title="Explanation section in navigation"]
@@ -1714,7 +1714,7 @@ The example site navigation SHALL include an "Explanation" section containing al
 
 Source: openspec/specs/doc-explanation/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-197, item, role=requirement, title="Self-Traceability nav section groups demo pages"]
@@ -1728,7 +1728,7 @@ The example site navigation SHALL include a "Self-Traceability" section containi
 
 Source: openspec/specs/doc-self-traceability/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-198, item, role=requirement, title="Self-Traceability section is visually distinct"]
@@ -1737,7 +1737,7 @@ The Self-Traceability section SHALL be clearly separated from the user-facing do
 
 Source: openspec/specs/doc-self-traceability/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-199, item, role=requirement, title="Self-Traceability section preserves traceable items"]
@@ -1746,7 +1746,7 @@ The restructuring SHALL keep every traceable `[item]` block in its current Ascii
 
 Source: openspec/specs/doc-self-traceability/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-218, item, role=requirement, title="Design concepts address functional requirements"]
@@ -1755,7 +1755,7 @@ Every functional requirement (REQ) in the self-traceability example SHALL be add
 
 Source: openspec/specs/doc-self-traceability/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-200, item, role=requirement, title="Doc examples validate against the traceability configuration"]
@@ -1765,7 +1765,7 @@ The check SHALL fail on unknown roles, disallowed relations, and item blocks tha
 
 Source: openspec/specs/doc-example-validation/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 === CI and Deployment
@@ -1776,7 +1776,7 @@ The GitHub Pages workflow SHALL include Ruby setup and PDF generation steps so t
 
 Source: openspec/specs/ci-pdf-deploy/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-061, item, role=requirement, title="Site links to PDF downloads"]
@@ -1785,7 +1785,7 @@ The example site's index page SHALL include download links to the three core PDF
 
 Source: openspec/specs/ci-pdf-deploy/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-062, item, role=requirement, title="Local PDF workflow is unchanged"]
@@ -1794,7 +1794,7 @@ The existing local PDF build workflow (`devbox shell` + `npx antora antora-playb
 
 Source: openspec/specs/ci-pdf-deploy/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 === Component Versioning
@@ -1805,7 +1805,7 @@ The `main` branch's component version descriptor SHALL declare `version: main` w
 
 Source: openspec/specs/component-versioning/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-241, item, role=requirement, title="Release versions derive from the git refname"]
@@ -1814,7 +1814,7 @@ A maintenance branch SHALL derive its component version from the git refname usi
 
 Source: openspec/specs/component-versioning/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-242, item, role=requirement, title="Version selector shows main plus released versions"]
@@ -1823,7 +1823,7 @@ The component version selector SHALL list the `main` prerelease and the released
 
 Source: openspec/specs/component-versioning/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-243, item, role=requirement, title="Stable URL points at the latest release"]
@@ -1832,7 +1832,7 @@ The playbook SHALL set `latest_version_segment: stable`, so the latest stable (n
 
 Source: openspec/specs/component-versioning/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-244, item, role=requirement, title="Extension handles unversioned components"]
@@ -1841,7 +1841,7 @@ The extension SHALL treat an unversioned component version (an empty string) as 
 
 Source: openspec/specs/component-versioning/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 === Release Consistency
@@ -1852,7 +1852,7 @@ The project SHALL provide a script that verifies the release invariants across `
 
 Source: openspec/specs/release-consistency/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-246, item, role=requirement, title="Version is consistent across sources"]
@@ -1861,7 +1861,7 @@ The script SHALL require that the `package.json` version, the git tag name, and 
 
 Source: openspec/specs/release-consistency/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-247, item, role=requirement, title="Maintenance branch follows the tag"]
@@ -1870,7 +1870,7 @@ The script SHALL require a maintenance branch named `v<major>.<minor>.x` for the
 
 Source: openspec/specs/release-consistency/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-248, item, role=requirement, title="Playbook refs exist in the repository"]
@@ -1879,7 +1879,7 @@ The script SHALL verify that every branch and tag referenced by the CI playbook 
 
 Source: openspec/specs/release-consistency/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 === Landing Page
@@ -1890,7 +1890,7 @@ The system SHALL serve a landing page at the GitHub Pages root URL (`/`) that in
 
 Source: openspec/specs/landing-page/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-073, item, role=requirement, title="Two-persona feature presentation"]
@@ -1899,7 +1899,7 @@ The landing page SHALL present project features in a way that resonates with bot
 
 Source: openspec/specs/landing-page/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-074, item, role=requirement, title="Traceability visualization preview"]
@@ -1908,7 +1908,7 @@ The landing page SHALL include a visual preview of traceability output that link
 
 Source: openspec/specs/landing-page/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-075, item, role=requirement, title="Deployment integration"]
@@ -1917,7 +1917,7 @@ The GitHub Pages deployment workflow SHALL place the landing page at the root an
 
 Source: openspec/specs/landing-page/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-076, item, role=requirement, title="Minimal tooling"]
@@ -1926,7 +1926,7 @@ The landing page SHALL require no build step or installed dependencies to deploy
 
 Source: openspec/specs/landing-page/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-077, item, role=requirement, title="Landing page uses conemso color palette"]
@@ -1936,7 +1936,7 @@ Primary brand elements (buttons, links, icons, section backgrounds) SHALL use th
 
 Source: openspec/specs/landing-page/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-078, item, role=requirement, title="Landing page uses Roboto font"]
@@ -1945,7 +1945,7 @@ The landing page SHALL use a consistent font family matching the documentation s
 
 Source: openspec/specs/landing-page/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 === Architecture Documentation
@@ -1956,7 +1956,7 @@ The architecture document SHALL include a class-level diagram showing the public
 
 Source: openspec/specs/architecture-diagram-checklist/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-124, item, role=requirement, title="Architecture document includes DocumentParser activity diagram"]
@@ -1965,7 +1965,7 @@ The architecture document SHALL include an activity diagram showing the parser's
 
 Source: openspec/specs/architecture-diagram-checklist/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-125, item, role=requirement, title="Architecture document includes TraceabilityGraph state diagram"]
@@ -1974,7 +1974,7 @@ The architecture document SHALL include a state diagram showing the graph lifecy
 
 Source: openspec/specs/architecture-diagram-checklist/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-126, item, role=requirement, title="Architecture document includes PreparedFile caching flow diagram"]
@@ -1983,7 +1983,7 @@ The architecture document SHALL include an activity diagram showing the file-sta
 
 Source: openspec/specs/architecture-diagram-checklist/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-127, item, role=requirement, title="update-example-site skill includes diagram checklist"]
@@ -1992,7 +1992,7 @@ The `update-example-site` skill SHALL include a diagram checklist per arc42 sect
 
 Source: openspec/specs/architecture-diagram-checklist/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 === Self-Traceability Example
@@ -2003,16 +2003,16 @@ The example site SHALL demonstrate config extension by adding a `use_case` role 
 
 Source: openspec/specs/use-case-example/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-106, item, role=requirement, title="Use-case page renders with traceability links"]
 --
-The `use-cases.adoc` page SHALL render `traceability:outgoing[]` and `traceability:incoming[]` macros for each use-case item, showing its requirement links.
+The `use-cases.adoc` page SHALL render `tracer:outgoing[]` and `tracer:incoming[]` macros for each use-case item, showing its requirement links.
 
 Source: openspec/specs/use-case-example/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-107, item, role=requirement, title="usecase-requirements matrix is generated"]
@@ -2021,7 +2021,7 @@ The example site SHALL generate a `usecase-requirements` matrix with use-case ro
 
 Source: openspec/specs/use-case-example/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-120, item, role=requirement, title="Process requirements are traceable to product requirements"]
@@ -2031,16 +2031,16 @@ Each process requirement SHALL trace to the product requirements it validates vi
 
 Source: openspec/specs/delivery-process-traceability/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-121, item, role=requirement, title="Process requirements document follows site conventions"]
 --
-The `delivery-process.adoc` SHALL use the same `[item]` macro format, `[#PRQ-XXX, item, role=process_requirement]` IDs, and `traceability:links[]` rendering macros as other example documents.
+The `delivery-process.adoc` SHALL use the same `[item]` macro format, `[#PRQ-XXX, item, role=process_requirement]` IDs, and `tracer:links[]` rendering macros as other example documents.
 
 Source: openspec/specs/delivery-process-traceability/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-122, item, role=requirement, title="Process-to-product matrix exists"]
@@ -2049,7 +2049,7 @@ The example site configuration SHALL define a `process-to-product` matrix with `
 
 Source: openspec/specs/delivery-process-traceability/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-114, item, role=requirement, title="Dead design-matrix template is removed"]
@@ -2058,7 +2058,7 @@ The unused design-matrix HTML template and its associated partials SHALL be remo
 
 Source: openspec/specs/template-partials/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 [#REQ-115, item, role=requirement, title="Dead MatrixGenerator methods are removed"]
@@ -2067,7 +2067,7 @@ The unused matrix generation methods (`generateRequirementsMatrix`, `generateDes
 
 Source: openspec/specs/template-partials/spec.md
 
-traceability:links[]
+tracer:links[]
 --
 
 ifdef::assembler-backend-pdf[]

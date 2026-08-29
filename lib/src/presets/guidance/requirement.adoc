@@ -43,7 +43,7 @@ The system SHALL <observable behaviour>.
 
 <boundary conditions or scope>
 
-traceability:links[]
+tracer:links[]
 --
 ----
 
@@ -135,6 +135,6 @@ Exception: when the integration IS the feature — "Neo4j export", "Antora exten
 - [ ] Scope boundaries explicit
 
 === Traceability
-- [ ] `traceability:links[]` present
+- [ ] `tracer:links[]` present
 - [ ] All referenced IDs exist
 - [ ] Relation types come from the config, not from memory

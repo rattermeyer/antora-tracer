@@ -33,7 +33,7 @@ This is why Pass 1 processes *all* files before moving on.
 
 === Pass 2: Expand relation macros (pages and partials)
 
-`traceability:outgoing[]`, `traceability:incoming[]`, and `traceability:links[]` placeholders are replaced with formatted relationship lists.
+`tracer:outgoing[]`, `tracer:incoming[]`, and `tracer:links[]` placeholders are replaced with formatted relationship lists.
 The expansion queries the graph to enumerate relationships for each item.
 
 This pass is opt-in: only files with `:traceability-links: true` get macro expansion.
@@ -44,7 +44,7 @@ Display style (list, table, inline), sort order (target-id, target-title, relati
 
 === Pass 2b: Expand graph macros (pages and partials)
 
-`traceability:graph[]`, `traceability:graph-coverage[]`, and `traceability:config-graph[]` placeholders are replaced with rendered diagram image references.
+`tracer:graph[]`, `tracer:graph-coverage[]`, and `tracer:config-graph[]` placeholders are replaced with rendered diagram image references.
 The graph's `toDot()` and `toVegaLite()` methods generate the item and coverage diagram source; `toConfigDot()` renders the configuration model.
 
 This pass is opt-in via `:traceability-graph: true`.

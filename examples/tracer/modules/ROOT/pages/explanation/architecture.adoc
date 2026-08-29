@@ -26,9 +26,9 @@ Architectural goals:
 - Integrate with Antora's event pipeline without imposing runtime dependencies on users who don't need specific features
 - Provide a standalone CLI for use outside Antora
 
-traceability:links[]
+tracer:links[]
 
-traceability:graph[]
+tracer:graph[]
 --
 
 include::partial$04-solution-strategy.adoc[]
@@ -47,7 +47,7 @@ See the API reference for full signatures.
 include::example$api-overview.puml[]
 ----
 
-traceability:links[]
+tracer:links[]
 --
 
 === ConfigLoader
@@ -107,7 +107,7 @@ versioned configuration that users can extend or override.
 | `description` (markdown string), `examples` (string[]). Inline documentation explaining the preset's domain and usage.
 |===
 
-traceability:links[]
+tracer:links[]
 --
 
 .Configuration resolution chain
@@ -156,7 +156,7 @@ addresses:REQ-222[]
 addresses:QA-056[]
 addresses:QA-057[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#ARC-036, item, role=design, title="Preset inheritance and config merge"]
@@ -172,7 +172,7 @@ addresses:REQ-173[]
 addresses:REQ-223[]
 addresses:REQ-224[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#ARC-028, item, role=design, title="Circular reference detection in graph validation"]
@@ -187,7 +187,7 @@ Auto-generated inverse relationships
 are skipped to avoid false positives.
 
 addresses:REQ-109[]
-traceability:links[]
+tracer:links[]
 --
 
 [#ARC-029, item, role=design, title="Partial file processing with source-repo links"]
@@ -210,7 +210,7 @@ partial content is inlined into pages and reaches the browser.
 addresses:REQ-110[]
 addresses:REQ-144[]
 addresses:REQ-145[]
-traceability:links[]
+tracer:links[]
 --
 
 === TraceabilityGraph
@@ -234,7 +234,7 @@ include::example$graph-lifecycle.puml[]
 ----
 
 addresses:QA-058[]
-traceability:links[]
+tracer:links[]
 --
 
 [#ARC-026, item, role=design, title="GraphViz DOT and Vega-Lite serialization methods"]
@@ -253,7 +253,7 @@ encoded into Kroki URLs for rendering.
 
 addresses:REQ-053[]
 addresses:REQ-160[]
-traceability:links[]
+tracer:links[]
 --
 
 [#ARC-035, item, role=design, title="Relation reverse declaration and canonical storage"]
@@ -272,7 +272,7 @@ addresses:REQ-176[]
 addresses:REQ-177[]
 addresses:REQ-178[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#ARC-039, item, role=design, title="Supersession semantics"]
@@ -295,7 +295,7 @@ addresses:REQ-209[]
 addresses:REQ-210[]
 addresses:REQ-211[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#ARC-040, item, role=design, title="Graph diff"]
@@ -312,7 +312,7 @@ addresses:REQ-226[]
 addresses:REQ-216[]
 addresses:REQ-217[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#ARC-041, item, role=design, title="Supersession lifecycle states and queries"]
@@ -324,7 +324,7 @@ addresses:REQ-227[]
 addresses:REQ-228[]
 addresses:REQ-234[]
 
-traceability:links[]
+tracer:links[]
 --
 
 === AntoraTraceabilityExtension
@@ -343,7 +343,7 @@ the CLI outside Antora, demonstrating the event handlers are optional.
 
 addresses:REQ-249[]
 addresses:QA-055[]
-traceability:links[]
+tracer:links[]
 --
 
 [#ARC-042, item, role=design, title="Generated supersession overview page"]
@@ -356,7 +356,7 @@ addresses:REQ-230[]
 addresses:REQ-231[]
 addresses:REQ-232[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#ARC-043, item, role=design, title="Display-only superseded render toggle"]
@@ -366,7 +366,7 @@ The graph and matrices are unaffected — superseded items remain in the graph f
 
 addresses:REQ-233[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#ARC-045, item, role=design, title="Full graph for generation, working graph for xrefs"]
@@ -376,20 +376,20 @@ This split resolves the conflict between per-version xref isolation and full-sit
 
 addresses:REQ-239[]
 
-traceability:links[]
+tracer:links[]
 --
 
-[#ARC-024, item, role=design, title="traceability:links[] and traceability:incoming[] link rendering"]
+[#ARC-024, item, role=design, title="tracer:links[] and tracer:incoming[] link rendering"]
 --
 The `expandRelationMacros()` method in the Antora extension (not the
-DocumentParser) replaces `traceability:links[]` and
-`traceability:incoming[]` placeholders with formatted AsciiDoc content
+DocumentParser) replaces `tracer:links[]` and
+`tracer:incoming[]` placeholders with formatted AsciiDoc content
 showing the item's relationships.
 All three rendering macros (`outgoing`
 `incoming`, and `links`) share this single scan/render pipeline; only the
 relationship directions they emit differ.
 The DocumentParser's inline
-macro regex excludes these via a `traceability:` namespace guard; they are
+macro regex excludes these via a `tracer:` namespace guard; they are
 NOT parsed as relationships.
 Rendering is opt-in via the
 `:traceability-links:` document attribute.
@@ -415,7 +415,7 @@ addresses:REQ-100[]
 addresses:REQ-102[]
 addresses:REQ-104[]
 addresses:QA-060[]
-traceability:links[]
+tracer:links[]
 --
 
 [#ARC-037, item, role=design, title="Display labels with humanize default"]
@@ -428,18 +428,18 @@ Incoming links use the reverse type's label.
 addresses:REQ-161[]
 addresses:REQ-162[]
 
-traceability:links[]
+tracer:links[]
 --
 
-[#ARC-025, item, role=design, title="traceability:graph[], traceability:graph-coverage[], and traceability:config-graph[] visualization macros"]
+[#ARC-025, item, role=design, title="tracer:graph[], tracer:graph-coverage[], and tracer:config-graph[] visualization macros"]
 --
 The `expandGraphMacros()`, `expandCoverageMacros()`, and `expandConfigGraphMacros()` methods replace
-`traceability:graph[]`, `traceability:graph-coverage[]`, and `traceability:config-graph[]` placeholders with
-Kroki-rendered images. `traceability:graph[]` generates a GraphViz DOT
+`tracer:graph[]`, `tracer:graph-coverage[]`, and `tracer:config-graph[]` placeholders with
+Kroki-rendered images. `tracer:graph[]` generates a GraphViz DOT
 relationship graph for the enclosing item (or a specified item ID), colored
-by role with labeled edges. `traceability:graph-coverage[]` generates a
+by role with labeled edges. `tracer:graph-coverage[]` generates a
 Vega-Lite bar chart showing per-item or global coverage.
-`traceability:config-graph[]` renders the traceability configuration as a GraphViz DOT diagram of roles and declared relations.
+`tracer:config-graph[]` renders the traceability configuration as a GraphViz DOT diagram of roles and declared relations.
 Rendering is opt-in
 via the `:traceability-graph:` document attribute.
 
@@ -447,7 +447,7 @@ addresses:REQ-051[]
 addresses:REQ-052[]
 addresses:REQ-063[]
 addresses:REQ-159[]
-traceability:links[]
+tracer:links[]
 --
 
 [#ARC-027, item, role=design, title="Matrix registration in the content catalog"]
@@ -464,7 +464,7 @@ module that has AsciiDoc content; a committed copy, if present, has its
 contents refreshed in place.
 
 addresses:REQ-108[]
-traceability:links[]
+tracer:links[]
 --
 
 === DocumentParser
@@ -494,7 +494,7 @@ addresses:REQ-088[]
 addresses:REQ-090[]
 addresses:REQ-091[]
 addresses:REQ-092[]
-traceability:links[]
+tracer:links[]
 --
 
 === MatrixGenerator
@@ -514,7 +514,7 @@ addresses:REQ-083[]
 addresses:REQ-084[]
 addresses:REQ-085[]
 addresses:REQ-086[]
-traceability:links[]
+tracer:links[]
 --
 
 [#ARC-038, item, role=design, title="Matrix status column"]
@@ -528,7 +528,7 @@ addresses:REQ-167[]
 addresses:REQ-168[]
 addresses:REQ-169[]
 
-traceability:links[]
+tracer:links[]
 --
 
 === TemplateRenderer
@@ -542,7 +542,7 @@ Users can specify a custom template
 directory — the renderer falls back to built-in templates for any files not found
 in the custom directory.
 
-traceability:links[]
+tracer:links[]
 --
 
 === LinkResolver
@@ -562,7 +562,7 @@ addresses:REQ-041[]
 addresses:REQ-042[]
 addresses:REQ-043[]
 addresses:REQ-128[]
-traceability:links[]
+tracer:links[]
 --
 
 === Neo4jExporter
@@ -579,7 +579,7 @@ attributes are included as node properties.
 The export is optional and requires
 no Neo4j runtime dependency.
 
-traceability:links[]
+tracer:links[]
 --
 
 === CLI Tool
@@ -598,7 +598,7 @@ The CLI
 operates standalone — it does not require an Antora build pipeline.
 
 addresses:REQ-056[]
-traceability:links[]
+tracer:links[]
 --
 
 [#ARC-044, item, role=design, title="Item lifecycle CLI: archive and remove"]
@@ -612,7 +612,7 @@ addresses:REQ-236[]
 addresses:REQ-237[]
 addresses:REQ-238[]
 
-traceability:links[]
+tracer:links[]
 --
 
 [#ARC-030, item, role=design, title="CI/CD PDF build and deployment pipeline"]
@@ -643,7 +643,7 @@ addresses:REQ-096[]
 addresses:REQ-097[]
 addresses:REQ-098[]
 addresses:REQ-099[]
-traceability:links[]
+tracer:links[]
 --
 
 [#ARC-031, item, role=design, title="Static landing page at GitHub Pages root"]
@@ -667,7 +667,7 @@ addresses:REQ-075[]
 addresses:REQ-076[]
 addresses:REQ-077[]
 addresses:REQ-078[]
-traceability:links[]
+tracer:links[]
 --
 
 [#ARC-032, item, role=design, title="Lunr search extension customization for item anchor indexing"]
@@ -689,7 +689,7 @@ addresses:REQ-079[]
 addresses:REQ-080[]
 addresses:REQ-081[]
 addresses:REQ-082[]
-traceability:links[]
+tracer:links[]
 --
 
 [#ARC-033, item, role=design, title="Example site: config extension and dashboard patterns"]
@@ -700,8 +700,8 @@ extension: `examples/traceability.yml` extends the `requirements-engineering`
 preset with a custom `use_case` role and `leads_to` relation, showing how
 projects add domain-specific roles without modifying built-in presets.
 Second,
-the dashboard page (`dashboard.adoc`) embeds `traceability:graph[]` and
-`traceability:graph-coverage[]` macros to provide visual coverage at a glance,
+the dashboard page (`dashboard.adoc`) embeds `tracer:graph[]` and
+`tracer:graph-coverage[]` macros to provide visual coverage at a glance,
 gated by the `:traceability-graph:` document attribute.
 Both patterns serve as
 reference implementations for users extending the extension to their own domains.
@@ -710,7 +710,7 @@ addresses:REQ-054[]
 addresses:REQ-105[]
 addresses:REQ-106[]
 addresses:REQ-107[]
-traceability:links[]
+tracer:links[]
 --
 
 [#ARC-034, item, role=design, title="Vale prose-lint extension"]
@@ -729,7 +729,7 @@ addresses:REQ-155[]
 addresses:REQ-156[]
 addresses:REQ-157[]
 addresses:REQ-158[]
-traceability:links[]
+tracer:links[]
 --
 
 == Runtime View
@@ -792,12 +792,12 @@ include::example$pass-pipeline.puml[]
 | Graph must be complete before Pass 3 can resolve cross-file `addresses:TARGET[]` references. Both pages and partials are processed in all three passes — partial content is inlined into pages and reaches the browser.
 
 | Pass 2
-| `expandRelationMacros(file, macroName)` — replace `traceability:outgoing[]`, `traceability:incoming[]`, and `traceability:links[]` with formatted relationship lists (grouped by type, configurable style/order); macroName is `outgoing`, `incoming`, or `links`.
+| `expandRelationMacros(file, macroName)` — replace `tracer:outgoing[]`, `tracer:incoming[]`, and `tracer:links[]` with formatted relationship lists (grouped by type, configurable style/order); macroName is `outgoing`, `incoming`, or `links`.
 | Pages + partials
 | Depends on complete graph from Pass 1 to enumerate relationships. Opt-in via `:traceability-links:` document attribute; forced on for partials.
 
 | Pass 2b
-| `expandGraphMacros()` + `expandCoverageMacros()` + `expandConfigGraphMacros()` — replace `traceability:graph[]`, `traceability:graph-coverage[]`, and `traceability:config-graph[]` with rendered diagram image references (DOT and Vega-Lite).
+| `expandGraphMacros()` + `expandCoverageMacros()` + `expandConfigGraphMacros()` — replace `tracer:graph[]`, `tracer:graph-coverage[]`, and `tracer:config-graph[]` with rendered diagram image references (DOT and Vega-Lite).
 | Pages + partials
 | Uses `toDot()` / `toVegaLite()` / `toConfigDot()`. Opt-in via `:traceability-graph:` document attribute. Independent of Pass 2.
 
@@ -823,7 +823,7 @@ This eliminates redundant buffer conversions and regex scans that were previousl
 include::example$prepared-file-caching.puml[]
 ----
 
-traceability:links[]
+tracer:links[]
 
 --
 
@@ -840,7 +840,7 @@ extension loader uses `require()`, requiring `.cjs` wrappers for integration
 points (see xref:explanation/adr/0001-esm-over-cjs.adoc[ADR-001]).
 
 addresses:QA-055[]
-traceability:links[]
+tracer:links[]
 --
 
 [#ARC-014, item, role=design, title="Dependency injection by constructor"]
@@ -855,7 +855,7 @@ component independently testable without mocking frameworks (see
 xref:explanation/adr/0004-zero-framework.adoc[ADR-004]).
 
 addresses:QA-059[]
-traceability:links[]
+tracer:links[]
 --
 
 == Architecture Decisions
