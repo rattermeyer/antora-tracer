@@ -5,6 +5,23 @@
 
 toc::[]
 
+== Namespace alias
+
+Every macro on this page is also available under the shorter `tracer:` prefix.
+The two namespaces are equivalent and may be used side-by-side as a migration path:
+
+[source,asciidoc]
+----
+tracer:outgoing[]
+tracer:incoming[]
+tracer:links[]
+tracer:graph[]
+tracer:graph-coverage[]
+----
+
+`traceability:` remains fully supported and is not deprecated.
+New content may use either prefix.
+
 == Relationship Link Macros
 
 These macros display relationship lists as formatted text.

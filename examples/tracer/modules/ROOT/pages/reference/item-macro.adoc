@@ -86,6 +86,8 @@ To display relationships in documentation, use:
 - `traceability:incoming[]` — lists items that point to this item
 - `traceability:links[]` — shows both directions
 
+Each display macro also accepts the `tracer:` prefix as an alias (e.g. `tracer:links[]`).
+
 See xref:reference/traceability-macros.adoc[Traceability Macros Reference].
 
 == Validation

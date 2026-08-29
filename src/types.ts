@@ -59,6 +59,28 @@ export const SUPERSEDED_BY = "superseded_by";
 export const HISTORY_RELATION_TYPES = new Set([SUPERSEDES, SUPERSEDED_BY]);
 
 // ============================================================================
+// Rendering Macro Namespace
+// ============================================================================
+
+/**
+ * Accepted prefixes for the rendering macros (`links`, `outgoing`, `incoming`,
+ * `graph`, `graph-coverage`, `config-graph`). `tracer:` is an alias for
+ * `traceability:`, supported side-by-side as a migration path.
+ */
+export const RENDERING_MACRO_NAMESPACES = ["traceability", "tracer"] as const;
+
+/** Regex alternation of the accepted rendering-macro prefixes. */
+export const RENDERING_MACRO_NS = `(?:${RENDERING_MACRO_NAMESPACES.join("|")})`;
+
+/**
+ * Negative-lookahead form used to exclude rendering macros from inline
+ * relationship parsing (e.g. `(?!traceability:|tracer:)`).
+ */
+export const RENDERING_MACRO_LOOKAHEAD = `(?!${RENDERING_MACRO_NAMESPACES.map(
+  (ns) => `${ns}:`,
+).join("|")})`;
+
+// ============================================================================
 // Role Colors
 // ============================================================================
 

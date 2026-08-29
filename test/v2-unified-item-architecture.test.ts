@@ -260,6 +260,28 @@ addresses:REQ-001,REQ-002,REQ-003[]
         "REQ-003",
       ]);
     });
+
+    it("should not parse rendering macros (traceability:/tracer:) as relationships", () => {
+      const parser = new DocumentParser({});
+      const content = `
+[#DES-001, item, role=design]
+====
+Design 1
+
+traceability:links[]
+traceability:outgoing[]
+traceability:incoming[]
+tracer:links[]
+tracer:outgoing[]
+tracer:incoming[]
+addresses:REQ-001[]
+====
+`;
+      const result = parser.parse(content, "test.adoc");
+      expect(result.relationships).to.have.lengthOf(1);
+      expect(result.relationships[0].type).to.equal("addresses");
+      expect(result.relationships[0].targetId).to.equal("REQ-001");
+    });
   });
 });
 

@@ -3,7 +3,11 @@
  */
 
 import type { ConfigLoader } from "./config/TraceabilityConfig.js";
-import type { Item, ItemRelationship } from "./types.js";
+import {
+  RENDERING_MACRO_LOOKAHEAD,
+  type Item,
+  type ItemRelationship,
+} from "./types.js";
 
 /**
  * Warning type for parser warnings
@@ -405,8 +409,10 @@ export class DocumentParser {
       // Multiple targets per type are comma-separated: addresses:REQ-001,REQ-002[]
       // Exclude traceability: namespace — those are link/rendering macros, not relationships
       // Escape with backslash before the colon: relation\:TARGET[] is ignored
-      const inlineMacroRegex =
-        /(?<!\\)(?!traceability:)([a-zA-Z][a-zA-Z0-9_-]*:[A-Z0-9_-]+(?:\s*,\s*[A-Z0-9_-]+)*)\[/g;
+      const inlineMacroRegex = new RegExp(
+        `(?<!\\\\)${RENDERING_MACRO_LOOKAHEAD}([a-zA-Z][a-zA-Z0-9_-]*:[A-Z0-9_-]+(?:\\s*,\\s*[A-Z0-9_-]+)*)\\[`,
+        "g",
+      );
       let match: RegExpExecArray | null;
 
       while ((match = inlineMacroRegex.exec(itemContent)) !== null) {

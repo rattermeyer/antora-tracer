@@ -858,6 +858,53 @@ Description.
       expect(rels).to.have.lengthOf(2);
     });
 
+    it("should expand tracer:outgoing[] alias like traceability:outgoing[]", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const partialFiles = [
+        {
+          src: {
+            path: "partials/alias.adoc",
+            module: "ROOT",
+            component: "test",
+            fileUri:
+              "https://github.com/example/repo/blob/main/partials/alias.adoc",
+          },
+          contents: Buffer.from(
+            `[#REQ-300, item, role=requirement, title="Alias Macro"]
+--
+Has tracer: alias macro.
+
+tracer:outgoing[]
+--
+`,
+          ),
+        },
+      ];
+
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) => {
+            if (family === "partial") return partialFiles;
+            return [];
+          },
+        },
+      });
+
+      const traceExt = ext.getTraceabilityExtension();
+      expect(traceExt.getAllItems()).to.have.lengthOf(1);
+
+      // tracer: alias expands like traceability: — macro is replaced, not
+      // left as a literal nor parsed as an inline relationship.
+      const partialContent = partialFiles[0].contents.toString("utf8");
+      expect(partialContent).to.not.include("tracer:outgoing[]");
+      expect(traceExt.graph.getRelationships("REQ-300")).to.have.lengthOf(0);
+    });
+
     it("should expand traceability:incoming[] on targeted item", async () => {
       const ctx = createMockContext({
         playbook: { output: { dir: tempDir }, extensions: [] },

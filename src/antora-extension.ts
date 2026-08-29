@@ -22,7 +22,12 @@ import { RequirementsTraceabilityExtension } from "./index.js";
 import { TraceabilityGraph } from "./TraceabilityGraph.js";
 import { LinkResolver } from "./LinkResolver.js";
 import { MatrixGenerator } from "./MatrixGenerator.js";
-import type { Item } from "./types.js";
+import {
+  RENDERING_MACRO_LOOKAHEAD,
+  RENDERING_MACRO_NAMESPACES,
+  RENDERING_MACRO_NS,
+  type Item,
+} from "./types.js";
 
 /**
  * Antora Extension Configuration
@@ -357,7 +362,12 @@ export class AntoraTraceabilityExtension {
       const contentsBuffer = file.contents || file.src?.contents;
       if (!contentsBuffer) return;
       const content = contentsBuffer.toString("utf8");
-      if (!content.includes(`traceability:${macroName}[]`)) return;
+      if (
+        !RENDERING_MACRO_NAMESPACES.some((ns) =>
+          content.includes(`${ns}:${macroName}[]`),
+        )
+      )
+        return;
 
       const docAttrs = this.parseDocAttributes(content);
       const linksEnabled =
@@ -384,7 +394,10 @@ export class AntoraTraceabilityExtension {
           bodyEnd >= 0 ? bodyEnd : undefined,
         );
 
-        const macroRegex = new RegExp(`traceability:${macroName}\\[\\]`, "g");
+        const macroRegex = new RegExp(
+          `${RENDERING_MACRO_NS}:${macroName}\\[\\]`,
+          "g",
+        );
         const bodyRanges = this.getInlineCodeRanges(bodyContent);
         let macroMatch: RegExpExecArray | null;
         while ((macroMatch = macroRegex.exec(bodyContent)) !== null) {
@@ -794,7 +807,12 @@ export class AntoraTraceabilityExtension {
       if (!contentsBuffer) return;
       const content = contentsBuffer.toString("utf8");
       const docAttrs = this.parseDocAttributes(content);
-      if (!content.includes("traceability:graph[")) return;
+      if (
+        !RENDERING_MACRO_NAMESPACES.some((ns) =>
+          content.includes(`${ns}:graph[`),
+        )
+      )
+        return;
 
       const graphEnabled =
         (file as any).__isPartial || this.isGraphEnabled(docAttrs);
@@ -809,8 +827,10 @@ export class AntoraTraceabilityExtension {
           bodyEnd >= 0 ? bodyEnd : undefined,
         );
 
-        const macroRegex =
-          /traceability:graph\[([A-Z][A-Z0-9-]*)?(?:,\s*(\d+))?\]/g;
+        const macroRegex = new RegExp(
+          `${RENDERING_MACRO_NS}:graph\\[([A-Z][A-Z0-9-]*)?(?:,\\s*(\\d+))?\\]`,
+          "g",
+        );
         let macroMatch: RegExpExecArray | null;
         const bodyRanges = this.getInlineCodeRanges(bodyContent);
         while ((macroMatch = macroRegex.exec(bodyContent)) !== null) {
@@ -841,8 +861,10 @@ export class AntoraTraceabilityExtension {
       }
 
       // Handle graph macros outside item blocks: traceability:graph[ID]
-      const externalRegex =
-        /traceability:graph\[([A-Z][A-Z0-9-]*)(?:,\s*(\d+))?\]/g;
+      const externalRegex = new RegExp(
+        `${RENDERING_MACRO_NS}:graph\\[([A-Z][A-Z0-9-]*)(?:,\\s*(\\d+))?\\]`,
+        "g",
+      );
       let externalMatch: RegExpExecArray | null;
 
       // Build ranges to exclude: item headers + item bodies
@@ -912,7 +934,12 @@ export class AntoraTraceabilityExtension {
       if (!contentsBuffer) return;
       const content = contentsBuffer.toString("utf8");
       const docAttrs = this.parseDocAttributes(content);
-      if (!content.includes("traceability:graph-coverage[")) return;
+      if (
+        !RENDERING_MACRO_NAMESPACES.some((ns) =>
+          content.includes(`${ns}:graph-coverage[`),
+        )
+      )
+        return;
 
       const graphEnabled =
         (file as any).__isPartial || this.isGraphEnabled(docAttrs);
@@ -927,7 +954,10 @@ export class AntoraTraceabilityExtension {
           bodyEnd >= 0 ? bodyEnd : undefined,
         );
 
-        const macroRegex = /traceability:graph-coverage\[\]/g;
+        const macroRegex = new RegExp(
+          `${RENDERING_MACRO_NS}:graph-coverage\\[\\]`,
+          "g",
+        );
         let macroMatch: RegExpExecArray | null;
         const bodyRanges = this.getInlineCodeRanges(bodyContent);
         while ((macroMatch = macroRegex.exec(bodyContent)) !== null) {
@@ -956,7 +986,10 @@ export class AntoraTraceabilityExtension {
       }
 
       // Handle global coverage (outside item blocks)
-      const globalRegex = /traceability:graph-coverage\[\]/g;
+      const globalRegex = new RegExp(
+        `${RENDERING_MACRO_NS}:graph-coverage\\[\\]`,
+        "g",
+      );
       let globalMatch: RegExpExecArray | null;
 
       // Build ranges to exclude: item headers + item bodies
@@ -1025,7 +1058,12 @@ export class AntoraTraceabilityExtension {
       const contentsBuffer = file.contents || file.src?.contents;
       if (!contentsBuffer) return;
       const content = contentsBuffer.toString("utf8");
-      if (!content.includes("traceability:config-graph[")) return;
+      if (
+        !RENDERING_MACRO_NAMESPACES.some((ns) =>
+          content.includes(`${ns}:config-graph[`),
+        )
+      )
+        return;
 
       const docAttrs = this.parseDocAttributes(content);
       const graphEnabled =
@@ -1041,7 +1079,10 @@ export class AntoraTraceabilityExtension {
 
       const replacements: Array<{ start: number; end: number; text: string }> =
         [];
-      const macroRegex = /traceability:config-graph\[\]/g;
+      const macroRegex = new RegExp(
+        `${RENDERING_MACRO_NS}:config-graph\\[\\]`,
+        "g",
+      );
       const inlineRanges = this.getInlineCodeRanges(content);
       let match: RegExpExecArray | null;
 
@@ -1607,8 +1648,10 @@ export class AntoraTraceabilityExtension {
   private substituteRelationshipLinks(content: string): string {
     // Inline macros are always invisible — pure data markers.
     // Exclude traceability:outgoing[] and traceability:incoming[] (the rendering macros).
-    const relRegex =
-      /\b(?!traceability:)(\w+):([\w][-.\w]*(?:\s*,\s*[\w][-.\w]*)*)\[\]/g;
+    const relRegex = new RegExp(
+      `\\b${RENDERING_MACRO_LOOKAHEAD}(\\w+):([\\w][-.\\w]*(?:\\s*,\\s*[\\w][-.\\w]*)*)\\[\\]`,
+      "g",
+    );
 
     // Find verbatim block ranges so we can preserve example code inside them
     const ranges = this.findVerbatimRanges(content);
