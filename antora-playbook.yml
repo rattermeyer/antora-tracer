@@ -39,7 +39,8 @@ antora:
 
 ui:
   bundle:
-    url: https://github.com/rattermeyer/antora-ui-conemso/releases/download/v1.1.3/ui-bundle.zip
+    url: https://github.com/rattermeyer/antora-ui-conemso/releases/download/v1.2.0/ui-bundle.zip
+  supplemental_files: ./examples/ui-supplemental
 
 urls:
   latest_version_segment: stable

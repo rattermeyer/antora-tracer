@@ -1,0 +1,10 @@
+<footer class="footer">
+  <p>This page was built using the antora-ui-conemso theme</p>
+  {{#if site.keys.git_describe}}
+  <p>Built from {{site.keys.git_describe}}.</p>
+  {{/if}}
+  {{#if page.origin.refname}}
+  <p>Source: <code>{{page.origin.reftype}}/{{page.origin.refname}}@{{page.origin.url}}</code>{{#if page.origin.refhash}}<code>({{page.origin.refhash}})</code>{{/if}}</p>
+  {{/if}}
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>

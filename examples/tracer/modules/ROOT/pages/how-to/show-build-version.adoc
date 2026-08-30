@@ -1,0 +1,51 @@
+= How to show the build version in the footer
+:description: Render the git describe version string in the HTML, PDF, and DOCX footers using the git_describe key provided by the extension
+:keywords: antora, traceability, footer, version, git describe
+
+The extension computes `git describe --tags --always --dirty` once per build and exposes it as `git_describe`.
+This page shows how to render that version in each output format.
+
+== Show the version in AsciiDoc content
+
+The `{git_describe}` attribute resolves in AsciiDoc content in every backend (HTML, PDF, and DOCX):
+
+[source,asciidoc]
+----
+Built from {git_describe}.
+----
+
+== Show the version in the HTML footer
+
+Edit the footer partial in your UI theme (`partials/footer-content.hbs`) to read the site key:
+
+[source,handlebars]
+----
+{{#if site.keys.git_describe}}
+  <span class="build-version">Built from {{site.keys.git_describe}}</span>
+{{/if}}
+----
+
+To override the footer without editing or re-releasing the theme, use `ui.supplemental_files` to point at a directory holding a `partials/footer-content.hbs` replacement, as the example site playbook does.
+
+== Show the version in the PDF footer
+
+Reference the attribute in your PDF theme (`pdf-theme.yml`):
+
+[source,yaml]
+----
+footer:
+  recto:
+    right:
+      content: 'Built from {git_describe}'
+----
+
+== Show the version in the DOCX footer
+
+The DOCX pipeline consumes the assembled AsciiDoc, so `{git_describe}` resolves in document content.
+A running page footer requires a pandoc `--reference-doc` template with a footer field; that is outside the scope of this guide.
+
+== How it works
+
+The extension injects `git_describe` into `site.keys` (for HTML templates) and `asciidoc.attributes` (for AsciiDoc, PDF, and DOCX) at build time.
+No configuration is required.
+When the build runs outside a git repository, the key is absent, so a conditional footer renders nothing and the build succeeds.

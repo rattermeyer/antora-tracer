@@ -308,6 +308,10 @@ TST-002-verifies-REQ-164,TST-002,REQ-164,verifies,self-traceability/test-plan.ad
 TST-002-verifies-REQ-165,TST-002,REQ-165,verifies,self-traceability/test-plan.adoc,false
 TST-002-verifies-REQ-166,TST-002,REQ-166,verifies,self-traceability/test-plan.adoc,false
 TST-002-verifies-REQ-244,TST-002,REQ-244,verifies,self-traceability/test-plan.adoc,false
+TST-002-verifies-REQ-252,TST-002,REQ-252,verifies,self-traceability/test-plan.adoc,false
+TST-002-verifies-REQ-253,TST-002,REQ-253,verifies,self-traceability/test-plan.adoc,false
+TST-002-verifies-REQ-254,TST-002,REQ-254,verifies,self-traceability/test-plan.adoc,false
+TST-002-verifies-REQ-255,TST-002,REQ-255,verifies,self-traceability/test-plan.adoc,false
 TST-003-verifies-REQ-056,TST-003,REQ-056,verifies,self-traceability/test-plan.adoc,false
 TST-003-verifies-REQ-150,TST-003,REQ-150,verifies,self-traceability/test-plan.adoc,false
 TST-004-verifies-REQ-083,TST-004,REQ-083,verifies,self-traceability/test-plan.adoc,false

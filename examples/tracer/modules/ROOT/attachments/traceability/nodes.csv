@@ -14,7 +14,7 @@ UC-001,UC-001 — Team member writes traceable items in AsciiDoc,use_case,,self-
 . Team member assigns the concept to a role defined in the project's traceability domain model (requirement, design, test, etc.)
 . Team member writes the item using the `[#ID, item, role=...]` block macro with a description between `--` delimiters
 . Team member links the concept to related items already in the traceability graph using inline relationship macros (e.g., `addresses:REQ-001[]`)
-. Team member includes rendering macros (`traceability:links[]`, `traceability:outgoing[]`, `traceability:incoming[]`) to display relationship lists in the rendered output
+. Team member includes rendering macros (`tracer:links[]`, `tracer:outgoing[]`, `tracer:incoming[]`) to display relationship lists in the rendered output
 . Team member commits the file And triggers an Antora build
 . The extension registers the item in the traceability graph And its relationships appear in the traceability matrix
 | Alternate Flows |
@@ -62,7 +62,7 @@ leads_to:REQ-166[]
 leads_to:REQ-221[]
 leads_to:REQ-222[]
 
-traceability:links[]"""
+tracer:links[]"""
 UC-002,UC-002 — Requirements Engineer defines custom domain model via config,use_case,,self-traceability/use-cases.adoc,""".Use Case: Requirements Engineer defines custom domain model via config
 [width=100%, cols=""""25h,75a""""]
 |===
@@ -103,7 +103,7 @@ leads_to:REQ-178[]
 leads_to:REQ-223[]
 leads_to:REQ-224[]
 
-traceability:links[]"""
+tracer:links[]"""
 UC-004,UC-004 — Requirements Engineer organizes items in partial files,use_case,,self-traceability/use-cases.adoc,""".Use Case: Requirements Engineer organizes items in partial files
 [width=100%, cols=""""25h,75a""""]
 |===
@@ -133,7 +133,7 @@ leads_to:REQ-110[]
 leads_to:REQ-144[]
 leads_to:REQ-145[]
 
-traceability:links[]"""
+tracer:links[]"""
 UC-005,UC-005 — Reviewer browses traceability matrices for coverage,use_case,,self-traceability/use-cases.adoc,""".Use Case: Reviewer browses traceability matrices for coverage
 [width=100%, cols=""""25h,75a""""]
 |===
@@ -177,7 +177,7 @@ leads_to:REQ-167[]
 leads_to:REQ-168[]
 leads_to:REQ-169[]
 
-traceability:links[]"""
+tracer:links[]"""
 UC-006,UC-006 — Project lead bootstraps traceability for a new project,use_case,,self-traceability/use-cases.adoc,""".Use Case: Project lead bootstraps traceability for a new project
 [width=100%, cols=""""25h,75a""""]
 |===
@@ -221,7 +221,7 @@ leads_to:REQ-083[]
 leads_to:REQ-084[]
 leads_to:REQ-085[]
 
-traceability:links[]"""
+tracer:links[]"""
 UC-007,UC-007 — Developer validates traceability in CI pipeline,use_case,,self-traceability/use-cases.adoc,""".Use Case: Developer validates traceability in CI pipeline
 [width=100%, cols=""""25h,75a""""]
 |===
@@ -259,7 +259,7 @@ leads_to:REQ-150[]
 leads_to:REQ-219[]
 leads_to:REQ-220[]
 
-traceability:links[]"""
+tracer:links[]"""
 UC-008,UC-008 — Data analyst explores traceability in Neo4j,use_case,,self-traceability/use-cases.adoc,""".Use Case: Data analyst explores traceability in Neo4j
 [width=100%, cols=""""25h,75a""""]
 |===
@@ -286,7 +286,7 @@ UC-008,UC-008 — Data analyst explores traceability in Neo4j,use_case,,self-tra
 | Notes | The `cypher` format includes `:Item` and role-specific labels on nodes, and type-specific labels on relationships. The `includeContent` option controls whether item body text is included in the export.
 |===
 
-traceability:links[]"""
+tracer:links[]"""
 UC-009,UC-009 — Architect visualizes relationship dependencies,use_case,,self-traceability/use-cases.adoc,""".Use Case: Architect visualizes relationship dependencies
 [width=100%, cols=""""25h,75a""""]
 |===
@@ -298,14 +298,14 @@ UC-009,UC-009 — Architect visualizes relationship dependencies,use_case,,self-
 | Trigger | Architect wants to provide visual context — showing how a key requirement connects to downstream artifacts, or displaying global coverage status on a dashboard page
 | Basic Flow |
 . Architect adds `:traceability-graph: true` to a page's document header
-. Architect embeds `traceability:graph[]` inside an item block to render a GraphViz diagram of that item's direct relationships (colored by role, with labeled edges)
-. Architect embeds `traceability:graph-coverage[]` inside or outside item blocks to render Vega-Lite bar charts showing coverage
+. Architect embeds `tracer:graph[]` inside an item block to render a GraphViz diagram of that item's direct relationships (colored by role, with labeled edges)
+. Architect embeds `tracer:graph-coverage[]` inside or outside item blocks to render Vega-Lite bar charts showing coverage
 . Architect builds the Antora site — macros are replaced with Kroki image URLs (SVG by default, PNG configurable)
 . Stakeholders view the page — the diagram shows the item's dependency neighborhood and the bar chart shows coverage status
 . Stakeholders can click through from the diagram description to related items via xrefs
 | Alternate Flows |
-. *Architect uses `traceability:graph[ITEM-ID, 2]` with a depth of 2:* The graph shows two hops of relationships instead of one.
-. *Architect places `traceability:graph-coverage[]` outside an item block:* The chart shows global coverage by role instead of per-item coverage.
+. *Architect uses `tracer:graph[ITEM-ID, 2]` with a depth of 2:* The graph shows two hops of relationships instead of one.
+. *Architect places `tracer:graph-coverage[]` outside an item block:* The chart shows global coverage by role instead of per-item coverage.
 . *The project builds PDFs:* Architect sets `krokiImageFormat: png` in the playbook config — PNG images render correctly in PDF output where SVGs do not.
 . *Kroki is unavailable or misconfigured:* The macros render as fallback text with the item IDs, still providing value.
 | Postconditions | The documentation page contains embedded relationship graphs and/or coverage charts And stakeholders can visually explore dependencies And the graphs are navigable via xrefs to related items
@@ -324,7 +324,7 @@ leads_to:REQ-143[]
 leads_to:REQ-159[]
 leads_to:REQ-160[]
 
-traceability:links[]"""
+tracer:links[]"""
 UC-010,UC-010 — Developer assesses impact before changing a traceable item,use_case,,self-traceability/use-cases.adoc,""".Use Case: Developer assesses impact before changing a traceable item
 [width=100%, cols=""""25h,75a""""]
 |===
@@ -362,7 +362,7 @@ leads_to:REQ-140[]
 leads_to:REQ-141[]
 leads_to:REQ-227[]
 
-traceability:links[]"""
+tracer:links[]"""
 UC-011,UC-011 — Requirements Engineer writes a use case,use_case,,self-traceability/use-cases.adoc,""".Use Case: Requirements Engineer writes a use case
 [width=100%, cols=""""25h,75a""""]
 |===
@@ -377,7 +377,7 @@ UC-011,UC-011 — Requirements Engineer writes a use case,use_case,,self-traceab
 . Requirements Engineer determines the next available ID with `antora-tracer next-id --prefix UC -i <path>`
 . Requirements Engineer writes the use case item block (`[#UC-NNN, item, role=use_case, ...]`) following the Karl Wiegers template — actor, goal, preconditions, postconditions, main flow, and alternate flows
 . Requirements Engineer links the use case to the requirements it motivates with `leads_to:REQ-NNN[]` inline macros
-. Requirements Engineer includes `traceability:links[]` to render the relationship list
+. Requirements Engineer includes `tracer:links[]` to render the relationship list
 . Requirements Engineer commits the file And triggers an Antora build
 . The extension registers the use case item And the `leads_to` relationships appear in the traceability matrix
 | Alternate Flows |
@@ -393,7 +393,7 @@ UC-011,UC-011 — Requirements Engineer writes a use case,use_case,,self-traceab
 
 leads_to:REQ-056[]
 
-traceability:links[]"""
+tracer:links[]"""
 UC-012,UC-012 — Reader finds a traceable item through site search,use_case,,self-traceability/use-cases.adoc,""".Use Case: Reader finds a traceable item through site search
 [width=100%, cols=""""25h,75a""""]
 |===
@@ -423,7 +423,7 @@ leads_to:REQ-080[]
 leads_to:REQ-081[]
 leads_to:REQ-082[]
 
-traceability:links[]"""
+tracer:links[]"""
 UC-013,UC-013 — Requirements Engineer retires an obsolete traceable item,use_case,,self-traceability/use-cases.adoc,""".Use Case: Requirements Engineer retires an obsolete traceable item
 [width=100%, cols=""""25h,75a""""]
 |===
@@ -477,7 +477,7 @@ leads_to:REQ-237[]
 leads_to:REQ-238[]
 leads_to:REQ-239[]
 
-traceability:links[]"""
+tracer:links[]"""
 UC-014,UC-014 — Developer compares traceability across two versions,use_case,,self-traceability/use-cases.adoc,""".Use Case: Developer compares traceability across two versions
 [width=100%, cols=""""25h,75a""""]
 |===
@@ -513,7 +513,7 @@ leads_to:REQ-226[]
 leads_to:REQ-216[]
 leads_to:REQ-217[]
 
-traceability:links[]"""
+tracer:links[]"""
 CON-001,CON-001 — Antora extension integration,constraint,,requirements.adoc,"""The system SHALL be implemented as an Antora extension, integrating via the Antora extension API (`contentClassified` and `sitePublished` events).
 No Antora build pipeline modification or custom Antora fork SHALL be required."""
 CON-002,CON-002 — Source files are never modified,constraint,,requirements.adoc,"""The system SHALL NOT modify any `.adoc` source file on disk at any point during processing.
@@ -529,56 +529,56 @@ REQ-087,REQ-087 — Items inside verbatim blocks are not parsed,requirement,,req
 
 Source: openspec/specs/parser-verbatim-skip/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-088,REQ-088 — Inline macros inside verbatim blocks are not parsed,requirement,,requirements.adoc,"""The system SHALL NOT register inline relationship macros (`relation:TARGET[]`) whose enclosing item was skipped because it fell inside a verbatim block.
 
 Source: openspec/specs/parser-verbatim-skip/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-090,REQ-090 — Verbatim block detection handles standard AsciiDoc fences,requirement,,requirements.adoc,"""The system SHALL detect verbatim blocks by matching opening and closing fence lines consisting of exactly `----` or `....` (with optional trailing whitespace), ignoring style prefix lines like `[source,asciidoc]`.
 
 Source: openspec/specs/parser-verbatim-skip/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-091,REQ-091 — Inline macros inside verbatim blocks are preserved in rendered output,requirement,,requirements.adoc,"""The system SHALL preserve inline relationship macros (`relation:TARGET[]`) inside AsciiDoc verbatim blocks so they remain visible in the rendered output.
 
 Source: openspec/specs/parser-verbatim-skip/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-092,REQ-092 — Inline macros inside backtick code spans are not parsed,requirement,,requirements.adoc,"""The system SHALL NOT register inline relationship macros (`relation:ID[]`) that appear inside backtick-enclosed code spans as traceability relationships.
 
 Source: openspec/specs/parser-verbatim-skip/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-110,REQ-110 — Items defined in partials are registered in the graph,requirement,,requirements.adoc,"""The system SHALL process items defined in AsciiDoc partial files alongside page files, registering them in the traceability graph.
 
 Source: openspec/specs/partial-file-processing/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-144,REQ-144 — Partial items use view URL as source reference,requirement,,requirements.adoc,"""Items from partial files SHALL use the file's view URL as their source file reference, enabling traceability matrix links to resolve to the source repository.
 
 Source: openspec/specs/partial-file-processing/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-145,REQ-145 — All processing passes apply to partial files,requirement,,requirements.adoc,"""The system SHALL apply graph population, macro expansion, and link substitution passes to partial files in the same way as page files, because partial content is inlined into pages and reaches the browser.
 
 Source: openspec/specs/partial-file-processing/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-129,REQ-129 — Bidirectional relationship pairs are merged into a single edge,requirement,,requirements.adoc,"""The system SHALL detect when a newly added relationship is authored with the reverse of an existing relationship's type — the existing edge goes from B to A with a type whose declared `reverse` equals the new edge's type — and SHALL NOT store a second edge.
 The canonical primary edge is retained with its original metadata (sourceFile, line), and no warning is emitted.
 Merging is driven by the `reverse` declaration in `relations` (config).
 
 Source: openspec/specs/bidirectional-relationship-merge/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-219,REQ-219 — Reverse-authored relationships are detected,requirement,,requirements.adoc,"""The system SHALL detect when a newly added relationship is authored with the reverse of an existing relationship's type — the existing edge goes from B to A with a type whose declared `reverse` equals the new edge's type.
 
 supersedes:REQ-129[]
 
 Source: openspec/specs/bidirectional-relationship-merge/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-220,REQ-220 — No second edge is stored for a complementary pair,requirement,,requirements.adoc,"""If a newly added relationship forms a complementary pair with an existing relationship, then the system SHALL NOT store a second edge.
 The canonical primary edge is retained with its original metadata (sourceFile, line), and no warning is emitted.
 Merging is driven by the `reverse` declaration in `relations` (config).
@@ -587,616 +587,616 @@ supersedes:REQ-129[]
 
 Source: openspec/specs/bidirectional-relationship-merge/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-111,REQ-111 — File state is prepared once per file,requirement,,requirements.adoc,"""The system SHALL compute file content, document attributes, and item block positions exactly once per page file, and SHALL reuse the computed values across all macro-expansion passes for that file.
 
 Source: openspec/specs/file-preparation-cache/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-112,REQ-112 — PreparedFile carries all needed state,requirement,,requirements.adoc,"""The system SHALL cache the parsed state of each source file — including its full content, document attributes, item block positions, and normalized source-file metadata — so that subsequent processing steps within the same file pass do not reparse it.
 
 Source: openspec/specs/file-preparation-cache/spec.md
 
-traceability:links[]"""
-REQ-044,REQ-044 — traceability:outgoing[] macro renders outgoing links,requirement,,requirements.adoc,"""The system SHALL provide a `traceability:outgoing[]` macro that expands to a formatted list of all outgoing relationships for the enclosing item.
+tracer:links[]"""
+REQ-044,REQ-044 — tracer:outgoing[] macro renders outgoing links,requirement,,requirements.adoc,"""The system SHALL provide a `tracer:outgoing[]` macro that expands to a formatted list of all outgoing relationships for the enclosing item.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:links[]"""
-REQ-146,REQ-146 — Empty-state message when item has no outgoing relationships,requirement,,requirements.adoc,"""If the enclosing item has no outgoing relationships, then the `traceability:outgoing[]` macro SHALL render a configurable empty-state message controlled by the `:traceability-empty:` document attribute.
+tracer:links[]"""
+REQ-146,REQ-146 — Empty-state message when item has no outgoing relationships,requirement,,requirements.adoc,"""If the enclosing item has no outgoing relationships, then the `tracer:outgoing[]` macro SHALL render a configurable empty-state message controlled by the `:traceability-empty:` document attribute.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:links[]"""
-REQ-055,REQ-055 — traceability:incoming[] macro renders incoming links,requirement,,requirements.adoc,"""The system SHALL provide a `traceability:incoming[]` macro that expands to a formatted list of all relationships pointing to the enclosing item (reverse relationships).
+tracer:links[]"""
+REQ-055,REQ-055 — tracer:incoming[] macro renders incoming links,requirement,,requirements.adoc,"""The system SHALL provide a `tracer:incoming[]` macro that expands to a formatted list of all relationships pointing to the enclosing item (reverse relationships).
 
 Source: openspec/specs/incoming-links-macro/spec.md
 
-traceability:links[]"""
-REQ-104,REQ-104 — traceability:links[] macro renders combined outgoing and incoming links,requirement,,requirements.adoc,"""The system SHALL provide a `traceability:links[]` macro that expands to a combined list of all outgoing and incoming relationships for the enclosing item, with outgoing groups rendered first followed by incoming groups.
+tracer:links[]"""
+REQ-104,REQ-104 — tracer:links[] macro renders combined outgoing and incoming links,requirement,,requirements.adoc,"""The system SHALL provide a `tracer:links[]` macro that expands to a combined list of all outgoing and incoming relationships for the enclosing item, with outgoing groups rendered first followed by incoming groups.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:links[]"""
-REQ-045,REQ-045 — Opt-in via AsciiDoc attribute,requirement,,requirements.adoc,"""The system SHALL only expand `traceability:outgoing[]` and `traceability:incoming[]` when the `:traceability-links:` document attribute is set to a truthy value.
+tracer:links[]"""
+REQ-045,REQ-045 — Opt-in via AsciiDoc attribute,requirement,,requirements.adoc,"""The system SHALL only expand `tracer:outgoing[]` and `tracer:incoming[]` when the `:traceability-links:` document attribute is set to a truthy value.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:links[]"""
-REQ-100,REQ-100 — Inline macros suppressed when links macros are active,requirement,,requirements.adoc,"""When `:traceability-links:` is enabled, the system SHALL suppress the individual rendering of inline relationship macros within item blocks that contain a `traceability:outgoing[]` or `traceability:incoming[]` macro.
+tracer:links[]"""
+REQ-100,REQ-100 — Inline macros suppressed when links macros are active,requirement,,requirements.adoc,"""When `:traceability-links:` is enabled, the system SHALL suppress the individual rendering of inline relationship macros within item blocks that contain a `tracer:outgoing[]` or `tracer:incoming[]` macro.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:links[]"""
-REQ-047,REQ-047 — Configurable display style,requirement,,requirements.adoc,"""The system SHALL support configurable display styles via the `:traceability-style:` document attribute for both `traceability:outgoing[]` and `traceability:incoming[]` macros.
+tracer:links[]"""
+REQ-047,REQ-047 — Configurable display style,requirement,,requirements.adoc,"""The system SHALL support configurable display styles via the `:traceability-style:` document attribute for both `tracer:outgoing[]` and `tracer:incoming[]` macros.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:links[]"""
-REQ-048,REQ-048 — Configurable sort order,requirement,,requirements.adoc,"""The system SHALL support configurable sort order via the `:traceability-order:` document attribute for both `traceability:outgoing[]` and `traceability:incoming[]` macros, defaulting to sort by target ID for outgoing and source ID for incoming.
+tracer:links[]"""
+REQ-048,REQ-048 — Configurable sort order,requirement,,requirements.adoc,"""The system SHALL support configurable sort order via the `:traceability-order:` document attribute for both `tracer:outgoing[]` and `tracer:incoming[]` macros, defaulting to sort by target ID for outgoing and source ID for incoming.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-102,REQ-102 — Collapsible list-style output via document attribute,requirement,,requirements.adoc,"""The system SHALL support a `:traceability-collapsible:` document attribute that, when set to a truthy value, wraps each relation-type group in list-style output in a `[%collapsible]` AsciiDoc block.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:links[]"""
-REQ-064,REQ-064 — Incoming macro respects document attributes,requirement,,requirements.adoc,"""The system SHALL gate `traceability:incoming[]` expansion on the same `:traceability-links:` document attribute as the outgoing macro.
+tracer:links[]"""
+REQ-064,REQ-064 — Incoming macro respects document attributes,requirement,,requirements.adoc,"""The system SHALL gate `tracer:incoming[]` expansion on the same `:traceability-links:` document attribute as the outgoing macro.
 
 Source: openspec/specs/incoming-links-macro/spec.md
 
-traceability:links[]"""
-REQ-065,REQ-065 — Incoming macro display styles,requirement,,requirements.adoc,"""The system SHALL support the same display styles for `traceability:incoming[]` as for the outgoing macro, via the `:traceability-style:` document attribute.
+tracer:links[]"""
+REQ-065,REQ-065 — Incoming macro display styles,requirement,,requirements.adoc,"""The system SHALL support the same display styles for `tracer:incoming[]` as for the outgoing macro, via the `:traceability-style:` document attribute.
 
 Source: openspec/specs/incoming-links-macro/spec.md
 
-traceability:links[]"""
-REQ-066,REQ-066 — Incoming macro sort order,requirement,,requirements.adoc,"""The system SHALL support the same sort orders for `traceability:incoming[]` as for the outgoing macro, via the `:traceability-order:` document attribute, defaulting to sort by source ID.
+tracer:links[]"""
+REQ-066,REQ-066 — Incoming macro sort order,requirement,,requirements.adoc,"""The system SHALL support the same sort orders for `tracer:incoming[]` as for the outgoing macro, via the `:traceability-order:` document attribute, defaulting to sort by source ID.
 
 Source: openspec/specs/incoming-links-macro/spec.md
 
-traceability:links[]"""
-REQ-067,REQ-067 — Incoming groups use the reverse relation type,requirement,,requirements.adoc,"""The system SHALL group incoming relationships in `traceability:incoming[]` by the reverse relation type — the declared `reverse` of the relationship's type — so each group heading names the relation from the target item's perspective.
+tracer:links[]"""
+REQ-067,REQ-067 — Incoming groups use the reverse relation type,requirement,,requirements.adoc,"""The system SHALL group incoming relationships in `tracer:incoming[]` by the reverse relation type — the declared `reverse` of the relationship's type — so each group heading names the relation from the target item's perspective.
 
 Source: openspec/specs/incoming-links-macro/spec.md
 
-traceability:links[]"""
-REQ-070,REQ-070 — Incoming macro supports collapsible output,requirement,,requirements.adoc,"""The system SHALL apply the same `:traceability-collapsible:` document attribute to `traceability:incoming[]` output as it does for `traceability:outgoing[]`.
+tracer:links[]"""
+REQ-070,REQ-070 — Incoming macro supports collapsible output,requirement,,requirements.adoc,"""The system SHALL apply the same `:traceability-collapsible:` document attribute to `tracer:incoming[]` output as it does for `tracer:outgoing[]`.
 When enabled, each inverse relation-type group in list-style incoming output SHALL be wrapped in a `[%collapsible]` block.
 
 Source: openspec/specs/incoming-links-macro/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-103,REQ-103 — Graph isolation per component version,requirement,,requirements.adoc,"""Relationship macro expansion SHALL produce xrefs only to items in the same component version as the enclosing page.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-249,REQ-249 — Graph isolation per version,requirement,,requirements.adoc,"""Relationship macro expansion SHALL produce xrefs only to items in the same version as the enclosing page, spanning components at that version.
 
 supersedes:REQ-103[]
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:links[]"""
-REQ-163,REQ-163 — Incoming macro PDF compatibility,requirement,,requirements.adoc,"""The generated output from `traceability:incoming[]` SHALL be standard AsciiDoc constructs — not raw HTML — ensuring compatibility with both HTML and PDF backends.
+tracer:links[]"""
+REQ-163,REQ-163 — Incoming macro PDF compatibility,requirement,,requirements.adoc,"""The generated output from `tracer:incoming[]` SHALL be standard AsciiDoc constructs — not raw HTML — ensuring compatibility with both HTML and PDF backends.
 
 Source: openspec/specs/incoming-links-macro/spec.md
 
-traceability:links[]"""
-REQ-164,REQ-164 — Source file not modified by incoming macro,requirement,,requirements.adoc,"""The system SHALL NOT modify the `.adoc` source file on disk when expanding `traceability:incoming[]`.
+tracer:links[]"""
+REQ-164,REQ-164 — Source file not modified by incoming macro,requirement,,requirements.adoc,"""The system SHALL NOT modify the `.adoc` source file on disk when expanding `tracer:incoming[]`.
 
 Source: openspec/specs/incoming-links-macro/spec.md
 
-traceability:links[]"""
-REQ-165,REQ-165 — PDF compatibility,requirement,,requirements.adoc,"""The generated output from `traceability:outgoing[]` and `traceability:incoming[]` SHALL use standard AsciiDoc constructs, ensuring compatibility with both HTML and PDF rendering backends.
+tracer:links[]"""
+REQ-165,REQ-165 — PDF compatibility,requirement,,requirements.adoc,"""The generated output from `tracer:outgoing[]` and `tracer:incoming[]` SHALL use standard AsciiDoc constructs, ensuring compatibility with both HTML and PDF rendering backends.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:links[]"""
-REQ-166,REQ-166 — Source file not modified,requirement,,requirements.adoc,"""The system SHALL NOT modify the `.adoc` source file on disk when expanding `traceability:outgoing[]` or `traceability:incoming[]`.
+tracer:links[]"""
+REQ-166,REQ-166 — Source file not modified,requirement,,requirements.adoc,"""The system SHALL NOT modify the `.adoc` source file on disk when expanding `tracer:outgoing[]` or `tracer:incoming[]`.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-116,REQ-116 — Items carry component and module context from Antora,requirement,,requirements.adoc,"""When processing `.adoc` files through the Antora extension, the system SHALL store the Antora component and module names on each `Item` so that downstream xref and link generation can distinguish same-module from cross-module and cross-component references.
 
 Source: openspec/specs/cross-module-xref/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-117,REQ-117 — Cross-module and cross-component xref includes correct prefix,requirement,,requirements.adoc,"""When `buildXref` generates an Antora xref for an item in a different module or component than the current page, the system SHALL include the correct Antora xref prefix: `component:module:` for cross-component, `module:` for cross-module, and no prefix for same-module.
 
 Source: openspec/specs/cross-module-xref/spec.md
 
-traceability:links[]"""
-REQ-119,REQ-119 — Cross-module and cross-component xref resolution,requirement,,requirements.adoc,"""When an item in one module has relationships to items in other modules or components, the `traceability:outgoing[]` and `traceability:incoming[]` macros SHALL generate xrefs with the correct Antora prefix (`component:module:` or `module:`) so Antora can resolve them correctly.
+tracer:links[]"""
+REQ-119,REQ-119 — Cross-module and cross-component xref resolution,requirement,,requirements.adoc,"""When an item in one module has relationships to items in other modules or components, the `tracer:outgoing[]` and `tracer:incoming[]` macros SHALL generate xrefs with the correct Antora prefix (`component:module:` or `module:`) so Antora can resolve them correctly.
 
 Source: openspec/specs/traceability-links-macro/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-071,REQ-071 — Relation display names are config-driven,requirement,,requirements.adoc,"""The system SHALL support `labels` in the traceability configuration YAML, mapping each relation type to a human-readable display name used for rendering (incoming/outgoing lists, matrix headers, graph labels).
 `labels` SHALL NOT affect graph structure, merge behavior, or validation.
 
 Source: openspec/specs/inverse-labels/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-221,REQ-221 — Relation display names are configurable,requirement,,requirements.adoc,"""The system SHALL support `labels` in the traceability configuration YAML, mapping each relation type to a human-readable display name used for rendering (incoming/outgoing lists, matrix headers, graph labels).
 
 supersedes:REQ-071[]
 
 Source: openspec/specs/inverse-labels/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-222,REQ-222 — Labels do not affect the graph,requirement,,requirements.adoc,"""`labels` SHALL NOT affect graph structure, merge behavior, or validation.
 
 supersedes:REQ-071[]
 
 Source: openspec/specs/inverse-labels/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-161,REQ-161 — Default display name is the humanized type,requirement,,requirements.adoc,"""If a relation type has no entry in `labels`, the system SHALL display the type name humanized: underscores replaced with spaces and the result sentence-cased.
 
 Source: openspec/specs/inverse-labels/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-162,REQ-162 — No compile-time fallback,requirement,,requirements.adoc,"""The system SHALL NOT consult a compile-time inverse map for display names; the pairing between primary and reverse types is derived solely from the `reverse` declaration in `relations`, and display text comes solely from `labels` or the humanized default.
 
 Source: openspec/specs/inverse-labels/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-037,REQ-037 — Matrix displays row items as clickable links,requirement,,requirements.adoc,"""The matrix SHALL render row item IDs as hyperlinks that navigate to the item's definition in the rendered HTML documentation.
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-038,REQ-038 — Matrix displays cell items as clickable links,requirement,,requirements.adoc,"""The matrix SHALL render cell item IDs as hyperlinks that navigate to the item's definition in the rendered HTML documentation.
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-039,REQ-039 — Links include source file tooltip,requirement,,requirements.adoc,"""The matrix SHALL display the source file name as a tooltip when users hover over item links.
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-040,REQ-040 — Matrix links resolve correctly from site output location,requirement,,requirements.adoc,"""The system SHALL generate matrix links that resolve correctly regardless of where the matrix file is served within the Antora site output.
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-250,REQ-250 — Matrix links resolve correctly from site output location,requirement,,requirements.adoc,"""The system SHALL generate matrix links that resolve correctly regardless of where the matrix file is served within the Antora site output, resolving each item from the site root via its published URL so same-component and cross-component targets both resolve.
 
 supersedes:REQ-040[]
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-041,REQ-041 — Source file paths are normalized,requirement,,requirements.adoc,"""The system SHALL normalize item source file references so that matrix links resolve to the rendered page URL rather than the AsciiDoc source file path.
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-042,REQ-042 — Matrix renders correctly without link resolution configured,requirement,,requirements.adoc,"""The system SHALL maintain existing matrix rendering behaviour when link resolution is not configured.
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-043,REQ-043 — Non-HTML matrix outputs unchanged,requirement,,requirements.adoc,"""The system SHALL NOT modify CSV and JSON matrix outputs to include links.
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-128,REQ-128 — Matrix links include module path for module-aware items,requirement,,requirements.adoc,"""When an item has module information, the system SHALL generate HTML links that include the module name so the link navigates to the correct module page.
 
 Source: openspec/specs/matrix-item-linking/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-108,REQ-108 — Matrix files registered in the content catalog,requirement,,requirements.adoc,"""The system SHALL register generated matrix files (HTML, CSV, JSON) as site attachments before document conversion, so that `attachment$traceability/...` xrefs in pages and navigation resolve correctly.
 Registration SHALL occur per component version and under every module that has AsciiDoc content.
 A committed copy, if present, SHALL have its contents refreshed in place.
 
 Source: openspec/specs/matrix-attachment-sync/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-130,REQ-130 — Matrix links are compatible with Antora indexify URL style,requirement,,requirements.adoc,"""When Antora's `indexify` URL style is active (root-level pages are served as `pagename/index.html`), the system SHALL generate matrix links that include `index.html` in the path for root-level pages so links from traceability matrices resolve to the correct page.
 
 Source: openspec/specs/matrix-generation/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-113,REQ-113 — Matrix template uses partials for structure,requirement,,requirements.adoc,"""The HTML matrix template SHALL be split into a main template and four reusable partial fragments (`styles`, `header`, `matrix-row`, `footer`) loaded from the `partials/` subdirectory.
 
 Source: openspec/specs/template-partials/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-167,REQ-167 — Matrix renders one status column per row,requirement,,requirements.adoc,"""The HTML matrix SHALL render exactly one per-row status column.
 
 Source: openspec/specs/matrix-status/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-168,REQ-168 — Coverage summary remains,requirement,,requirements.adoc,"""The matrix SHALL still render a top-level coverage summary with the counts of done/partial/missing rows and an overall percentage of done rows.
 
 Source: openspec/specs/matrix-status/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-169,REQ-169 — CSV output is unchanged,requirement,,requirements.adoc,"""The CSV export SHALL NOT render a per-row status or coverage column, matching its current behavior.
 
 Source: openspec/specs/matrix-status/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-083,REQ-083 — Preset defines pairwise requirements-to-design matrix,requirement,,requirements.adoc,"""The `requirements-engineering` preset SHALL include a matrix named `requirements-to-design` with `requirement` rows and a single `design` column.
 
 Source: openspec/specs/pairwise-matrices-preset/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-084,REQ-084 — Preset defines pairwise design-to-implementation matrix,requirement,,requirements.adoc,"""The `requirements-engineering` preset SHALL include a matrix named `design-to-implementation` with `design` rows and a single `implementation` column.
 
 Source: openspec/specs/pairwise-matrices-preset/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-085,REQ-085 — Preset defines pairwise requirements-to-tests matrix,requirement,,requirements.adoc,"""The `requirements-engineering` preset SHALL include a matrix named `requirements-to-tests` with `requirement` rows and a single `test` column.
 
 Source: openspec/specs/pairwise-matrices-preset/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-086,REQ-086 — Preset does not define wide multi-column matrices,requirement,,requirements.adoc,"""The `requirements-engineering` preset SHALL NOT define matrices with more than one column role.
 
 Source: openspec/specs/pairwise-matrices-preset/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-170,REQ-170 — Preset extends a parent by top-level `extends`,requirement,,requirements.adoc,"""A preset SHALL declare its parent with a top-level `extends` field (sibling of `name`, `version`, `description`).
 When a preset declares `extends`, the resolved preset SHALL include the parent's `traceability` deep-merged under the child's own `traceability`.
 
 Source: openspec/specs/preset-inheritance/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-171,REQ-171 — Merge semantics match config-file `extends`,requirement,,requirements.adoc,"""Preset inheritance SHALL use the same merge rules as a config file extending a preset: roles are unioned, relations are deep-merged by source and target role, matrices are overridden by `name`, and `labels` are overridden key-by-key.
 
 Source: openspec/specs/preset-inheritance/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-172,REQ-172 — Transitive inheritance,requirement,,requirements.adoc,"""Inheritance SHALL resolve transitively: a preset extending a preset that itself extends another SHALL include the roles, relations, and matrices of the full chain.
 
 Source: openspec/specs/preset-inheritance/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-173,REQ-173 — Missing parent is reported,requirement,,requirements.adoc,"""When a preset's `extends` names a preset that cannot be resolved, loading SHALL fail with an error that names the missing preset.
 
 Source: openspec/specs/preset-inheritance/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-174,REQ-174 — Circular inheritance is rejected,requirement,,requirements.adoc,"""A preset SHALL NOT extend itself, directly or transitively.
 Any inheritance cycle SHALL be detected and rejected with a clear error rather than looping indefinitely.
 
 Source: openspec/specs/preset-inheritance/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-223,REQ-223 — A preset does not extend itself,requirement,,requirements.adoc,"""A preset SHALL NOT extend itself, directly or transitively.
 
 supersedes:REQ-174[]
 
 Source: openspec/specs/preset-inheritance/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-224,REQ-224 — Inheritance cycles are detected and rejected,requirement,,requirements.adoc,"""When a preset inheritance chain forms a cycle, the system SHALL detect it and report a clear error rather than looping indefinitely.
 
 supersedes:REQ-174[]
 
 Source: openspec/specs/preset-inheritance/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-175,REQ-175 — Relations are declared keyed with a mandatory reverse,requirement,,requirements.adoc,"""The `relations` config SHALL map `sourceRole → targetRole → relationType → { reverse }`, where `reverse` is required and names the authorable reverse relation type.
 
 Source: openspec/specs/reverse-relations/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-176,REQ-176 — Authoring the reverse name canonicalizes to the primary edge,requirement,,requirements.adoc,"""When an item authors a relationship using a reverse type, the graph SHALL store the canonical primary edge (primary direction and primary type), not the reverse-authored form.
 
 Source: openspec/specs/reverse-relations/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-177,REQ-177 — Reverse direction is derived for validation,requirement,,requirements.adoc,"""The system SHALL allow a relation type that is the reverse of a relation declared in the opposite role direction, without an explicit `relations` entry for that direction.
 
 Source: openspec/specs/reverse-relations/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-178,REQ-178 — Matrix coverage matches the canonical primary type,requirement,,requirements.adoc,"""A matrix `coverageRelations` entry SHALL name the canonical primary type, and a single entry SHALL count a relationship regardless of which name was authored.
 
 Source: openspec/specs/reverse-relations/spec.md
 
-traceability:links[]"""
-REQ-051,REQ-051 — Relationship graph via traceability:graph[] macro,requirement,,requirements.adoc,"""The system SHALL provide a `traceability:graph[]` inline macro that renders a relationship diagram for the enclosing item.
+tracer:links[]"""
+REQ-051,REQ-051 — Relationship graph via tracer:graph[] macro,requirement,,requirements.adoc,"""The system SHALL provide a `tracer:graph[]` inline macro that renders a relationship diagram for the enclosing item.
 The diagram SHALL show the item and its related items as labeled nodes and edges, colored by role.
 An optional depth parameter SHALL control the number of relationship hops shown.
 
 Source: openspec/specs/graph-visualization/spec.md
 
-traceability:links[]"""
-REQ-052,REQ-052 — Coverage chart via traceability:graph-coverage[] macro,requirement,,requirements.adoc,"""The system SHALL provide a `traceability:graph-coverage[]` inline macro that renders a coverage chart.
+tracer:links[]"""
+REQ-052,REQ-052 — Coverage chart via tracer:graph-coverage[] macro,requirement,,requirements.adoc,"""The system SHALL provide a `tracer:graph-coverage[]` inline macro that renders a coverage chart.
 When used inside an item block, it SHALL show per-relationship-type coverage for that item.
 When used outside an item block, it SHALL show global coverage by role.
 
 Source: openspec/specs/graph-visualization/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-053,REQ-053 — Graph model supports traversal-bounded subgraph and coverage queries,requirement,,requirements.adoc,"""The graph model SHALL support producing a traversal-bounded relationship subgraph for a given item, traversing both outgoing and incoming directions.
 Bidirectional relationships SHALL be visually distinguishable from one-directional relationships in the rendered output.
 The graph model SHALL also support producing coverage data for a given item, or globally across all items.
 
 Source: openspec/specs/graph-visualization/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-054,REQ-054 — Dashboard page in example site,requirement,,requirements.adoc,"""The example site SHALL include a dashboard page with a global coverage chart and select per-item relationship graphs, gated by the `:traceability-graph:` attribute.
 
 Source: openspec/specs/graph-visualization/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-063,REQ-063 — Configurable Kroki image format,requirement,,requirements.adoc,"""The `krokiImageFormat` extension config option SHALL control the image format (`svg` or `png`) used in rendered relationship diagram images.
 When not set, the format SHALL default to `svg`.
 The configured `krokiServerUrl` (or its default `https://kroki.io`) SHALL be used as the base URL for diagram rendering requests.
 
 Source: openspec/specs/graph-visualization/spec.md
 
-traceability:links[]"""
-REQ-159,REQ-159 — Configuration graph via traceability:config-graph[] macro,requirement,,requirements.adoc,"""The system SHALL provide a `traceability:config-graph[]` macro that renders the effective traceability configuration as a Kroki GraphViz diagram.
+tracer:links[]"""
+REQ-159,REQ-159 — Configuration graph via tracer:config-graph[] macro,requirement,,requirements.adoc,"""The system SHALL provide a `tracer:config-graph[]` macro that renders the effective traceability configuration as a Kroki GraphViz diagram.
 The diagram SHALL show each configured role as a node colored by role and each declared relation as a labeled edge, using declared directions only.
 
 Source: openspec/specs/graph-visualization/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-160,REQ-160 — Config graph generator renders configuration as DOT,requirement,,requirements.adoc,"""The system SHALL provide a DOT generator for the traceability configuration that renders roles as nodes and declared relations as labeled edges.
 
 Source: openspec/specs/graph-visualization/spec.md
 
-traceability:links[]"""
-REQ-142,REQ-142 — Configurable Kroki server URL via extension config,requirement,,requirements.adoc,"""The `krokiServerUrl` extension config option SHALL set the base URL used by `traceability:graph[]` and `traceability:graph-coverage[]` macros when generating Kroki image URLs.
+tracer:links[]"""
+REQ-142,REQ-142 — Configurable Kroki server URL via extension config,requirement,,requirements.adoc,"""The `krokiServerUrl` extension config option SHALL set the base URL used by `tracer:graph[]` and `tracer:graph-coverage[]` macros when generating Kroki image URLs.
 When set, the system SHALL use this URL instead of the default `https://kroki.io`.
 
 Source: openspec/specs/kroki-server-url-config/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-143,REQ-143 — Kroki server URL via environment variable,requirement,,requirements.adoc,"""The `KROKI_SERVER_URL` environment variable SHALL override the `krokiServerUrl` extension config option.
 When set, the system SHALL use its value as the Kroki server base URL.
 
 Source: openspec/specs/kroki-server-url-config/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-056,REQ-056 — CLI next-id command returns next available ID,requirement,,requirements.adoc,"""The CLI SHALL provide a `next-id` command that accepts a `--prefix` and `-i/--input` and returns the next available sequential ID for items matching that prefix.
 
 Source: openspec/specs/next-id/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-136,REQ-136 — CLI exposes a query subcommand,requirement,,requirements.adoc,"""The CLI SHALL provide a `query` subcommand that reads AsciiDoc source files and answers one structural question about items and their relationships per invocation.
 No Antora build SHALL be required.
 
 Source: openspec/specs/cli-query/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-137,REQ-137 — query reverse — find all items that point at a given ID,requirement,,requirements.adoc,"""The CLI SHALL provide `query reverse <id>` that returns all items whose relationship macros reference the given item ID.
 
 Source: openspec/specs/cli-query/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-138,REQ-138 — query impact — find all items connected to a given ID,requirement,,requirements.adoc,"""The CLI SHALL provide `query impact <id>` that returns all items transitively connected to the given item (its connected component, excluding the item itself), following relationships in both directions.
 
 Source: openspec/specs/cli-query/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-139,REQ-139 — query isolated — find items with no relationships,requirement,,requirements.adoc,"""The CLI SHALL provide `query isolated` that returns all items that have neither incoming nor outgoing relationships in the graph.
 
 Source: openspec/specs/cli-query/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-227,REQ-227 — query orphaned — find superseded items with no incoming functional links,requirement,,requirements.adoc,"""The CLI SHALL provide `query orphaned` that returns all effectively superseded items that have no incoming functional (non-history) relationships.
 
 Source: openspec/specs/cli-query/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-140,REQ-140 — query path — find the shortest path between two items,requirement,,requirements.adoc,"""The CLI SHALL provide `query path <from-id> <to-id>` that returns the shortest relationship path between two items in the graph.
 
 Source: openspec/specs/cli-query/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-141,REQ-141 — JSON output flag,requirement,,requirements.adoc,"""All `query` subcommands SHALL accept a `--json` flag that switches output to a machine-readable JSON array.
 
 Source: openspec/specs/cli-query/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-150,REQ-150 — CLI exposes a validate command,requirement,,requirements.adoc,"""The CLI SHALL provide a `validate` command that reads AsciiDoc source files and reports validation errors — invalid relation types, dangling references, duplicate item IDs, and circular references — with diagnostics naming the source and target item IDs with roles, the invalid relation type, and the allowed alternatives.
 No Antora build SHALL be required.
 The command SHALL exit with a non-zero code when errors are found and code 0 when the input is valid.
 
 Source: openspec/specs/cli-validate/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-079,REQ-079 — Non-heading elements with IDs are indexed as navigable anchors,requirement,,requirements.adoc,"""The search index SHALL include every non-heading HTML element inside `<article class=""""doc"""">` that has an `id` attribute as a separate searchable chunk.
 Each chunk SHALL use the element's `id` as its `hash`, enabling search result links to navigate directly to the element's anchor.
 
 Source: openspec/specs/lunr-item-anchor-indexing/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-080,REQ-080 — Item title is extracted from `.title` child element,requirement,,requirements.adoc,"""When an element has a child element with CSS class `title`, the extension SHALL use the text content of that child as the chunk's `title` field.
 If no `.title` child exists, the element's `id` SHALL be used as the title.
 
 Source: openspec/specs/lunr-item-anchor-indexing/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-081,REQ-081 — Heading elements are excluded from item indexing,requirement,,requirements.adoc,"""Elements that are HTML headings (`h1` through `h6`) SHALL be skipped by the item anchor indexing pass, as they are already indexed by the existing heading-based section chunking.
 
 Source: openspec/specs/lunr-item-anchor-indexing/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-082,REQ-082 — Item indexing is scoped to article body,requirement,,requirements.adoc,"""The item anchor indexing SHALL traverse only elements within `<article class=""""doc"""">`.
 
 Source: openspec/specs/lunr-item-anchor-indexing/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-201,REQ-201 — A successor declares a supersedes relationship,requirement,,requirements.adoc,"""When a traceable item replaces another item, the successor SHALL declare a `supersedes` relationship to the predecessor.
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-202,REQ-202 — The reverse superseded_by relationship is derivable,requirement,,requirements.adoc,"""When a successor declares a `supersedes` relationship, the predecessor's `superseded_by` relationship SHALL be derivable from the graph.
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-203,REQ-203 — Superseded state is derived from relationships,requirement,,requirements.adoc,"""An item SHALL be effectively superseded when at least one valid incoming `supersedes` relationship targets it.
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-228,REQ-228 — Orphaned state is derived from supersession and incoming functional links,requirement,,requirements.adoc,"""An effectively superseded item SHALL be considered orphaned when no incoming functional (non-history) relationship targets it.
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-204,REQ-204 — Invalid supersession structures are rejected,requirement,,requirements.adoc,"""If the supersession graph contains a self-reference, duplicate relationship, or cycle, then validation SHALL report an error.
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-205,REQ-205 — Current-state matrices omit superseded items,requirement,,requirements.adoc,"""When a current-state matrix is generated, the system SHALL omit effectively superseded items from both rows and columns by default.
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-206,REQ-206 — Functional links to superseded items remain visible,requirement,,requirements.adoc,"""When a relationship macro renders a functional relationship targeting a superseded item, the system SHALL retain the relationship and identify it as requiring review, naming every direct successor.
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-207,REQ-207 — History links are excluded from review worklists,requirement,,requirements.adoc,"""Supersession history relationships SHALL NOT be classified as stale functional links.
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-208,REQ-208 — Superseded item blocks link to successors,requirement,,requirements.adoc,"""When a superseded item's source block is rendered, the system SHALL display a superseded marker that links to every direct successor.
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-209,REQ-209 — CLI reports supersession impact,requirement,,requirements.adoc,"""When a supersession check is requested, the CLI SHALL report direct successors and incoming functional relationships requiring review.
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-210,REQ-210 — Supersession checks do not modify source files,requirement,,requirements.adoc,"""When a supersession check is requested, the CLI SHALL NOT modify any source file.
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-211,REQ-211 — Validation warns about stale functional links,requirement,,requirements.adoc,"""When a functional relationship targets an effectively superseded item, validation SHALL emit a non-blocking warning naming the source item, relation type, predecessor, and all direct successors.
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-233,REQ-233 — Superseded items and links can be hidden,requirement,,requirements.adoc,"""The system SHALL support a display-only `renderSuperseded` option. When set to false, superseded item blocks and the `supersedes`-related links in their successors SHALL be omitted from rendered output, without affecting the graph or matrices.
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-234,REQ-234 — Dangling history links are advisory,requirement,,requirements.adoc,"""A dangling link whose type is `supersedes` or `superseded_by` SHALL be reported as an advisory worklist item, not a validation error. A dangling link of any other type SHALL remain a validation error.
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-229,REQ-229 — Overview page generation is opt-in and configurable,requirement,,requirements.adoc,"""When `generateOverview` is enabled, the system SHALL register the overview as a content-catalog attachment at the configured `overviewTarget` (default `traceability/overview.html`), reporting supersession statistics and dangling references.
 
 Source: openspec/specs/supersession-overview/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-230,REQ-230 — Overview page reports graph totals,requirement,,requirements.adoc,"""The overview page SHALL report the number of managed items, the number of active items, and the number of superseded items.
 
 Source: openspec/specs/supersession-overview/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-231,REQ-231 — Overview page reports per-role statistics,requirement,,requirements.adoc,"""The overview page SHALL report a per-role table with columns role, total, active, and superseded.
 
 Source: openspec/specs/supersession-overview/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-232,REQ-232 — Overview page lists dangling references,requirement,,requirements.adoc,"""The overview page SHALL list every dangling reference — a link whose target item does not exist — showing the source item as an xref, the relation type, and the missing target ID.
 
 Source: openspec/specs/supersession-overview/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-235,REQ-235 — archive moves a superseded item to the module's superseded page,requirement,,requirements.adoc,"""The CLI SHALL provide `archive <ID>` that moves a superseded item's full block to a `superseded.adoc` page in the same module as the source file.
 
 Source: openspec/specs/item-lifecycle/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-236,REQ-236 — remove deletes an orphaned item,requirement,,requirements.adoc,"""The CLI SHALL provide `remove <ID>` that deletes an orphaned item's block after a normal confirmation prompt.
 
 Source: openspec/specs/item-lifecycle/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-237,REQ-237 — remove deletes an isolated item with a stronger confirmation,requirement,,requirements.adoc,"""The CLI SHALL provide a path to delete an isolated item's block only after the user types the item ID verbatim.
 
 Source: openspec/specs/item-lifecycle/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-238,REQ-238 — Block extent is detected before mutation,requirement,,requirements.adoc,"""Before mutating a file, the CLI SHALL locate the item's full block from its `[#ID, item, …]` header to the matching closing `--` delimiter, and SHALL refuse to mutate when the extent is ambiguous.
 
 Source: openspec/specs/item-lifecycle/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-239,REQ-239 — Generation passes use the complete graph across all components and versions,requirement,,requirements.adoc,"""When the extension generates matrices, coverage, and the supersession overview at `sitePublished`, it SHALL use a graph containing every item from every component and version of the site.
 
 Source: openspec/specs/graph-lifecycle/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-251,REQ-251 — Working graph spans components within a version,requirement,,requirements.adoc,"""The `contentClassified` working graph SHALL include items from every component at the same version, so relationship macros resolve cross-component xrefs. Cross-version isolation is unchanged.
 
 Source: openspec/specs/graph-lifecycle/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-212,REQ-212 — Diff classifies items by stable ID,requirement,,requirements.adoc,"""When two graph snapshots are compared, the diff SHALL classify each item as added, removed, or modified based on its stable ID.
 
 Source: openspec/specs/graph-diff/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-213,REQ-213 — Modified items report changed fields,requirement,,requirements.adoc,"""A surviving item SHALL be reported as modified when its `title`, `content`, `role`, `status`, or `attributes` differs between the snapshots, and the delta SHALL name the changed fields.
 
 Source: openspec/specs/graph-diff/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-214,REQ-214 — Relationship deltas are limited to surviving items,requirement,,requirements.adoc,"""The diff SHALL report relationship changes only between items that exist in both snapshots.
 
 Source: openspec/specs/graph-diff/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-215,REQ-215 — Supersession appears as added and removed,requirement,,requirements.adoc,"""The diff SHALL NOT attempt content-similarity rename detection.
 A superseded predecessor SHALL appear as removed and its successor as added, with the `supersedes` relationship reported as a new relationship.
 
 Source: openspec/specs/graph-diff/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-225,REQ-225 — The diff does not attempt rename detection,requirement,,requirements.adoc,"""The diff SHALL NOT attempt content-similarity rename detection.
 
 supersedes:REQ-215[]
 
 Source: openspec/specs/graph-diff/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-226,REQ-226 — A superseded predecessor is reported as removed and its successor as added,requirement,,requirements.adoc,"""A superseded predecessor SHALL appear as removed and its successor as added, with the `supersedes` relationship reported as a new relationship.
 
 supersedes:REQ-215[]
 
 Source: openspec/specs/graph-diff/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-216,"""REQ-216 — Diff is a public, config-agnostic API""",requirement,,requirements.adoc,"""The diff SHALL be exposed as a public function usable with any configured role or relation vocabulary, without hardcoding any role name.
 
 Source: openspec/specs/graph-diff/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-217,REQ-217 — CLI diff is read-only,requirement,,requirements.adoc,"""A `diff` CLI command SHALL scan two source paths, build two graphs, and print the delta without modifying any source file.
 
 Source: openspec/specs/graph-diff/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 QA-057,QA-057 — Fail-fast with clear diagnostics,requirement,,requirements.adoc,include::ROOT:partial$quality/qa-fail-fast-diagnostics.adoc[]
 QA-058,QA-058 — No side effects on source files,requirement,,requirements.adoc,include::ROOT:partial$quality/qa-no-side-effects.adoc[]
 QA-062,QA-062 — Query and indexing performance,requirement,,requirements.adoc,include::ROOT:partial$quality/qa-performance.adoc[]
@@ -1210,154 +1210,154 @@ The init hook SHALL run `npm install` and `bundle install` automatically.
 
 Source: openspec/specs/pdf-output/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-094,REQ-094 — Gemfile locks asciidoctor-pdf version,requirement,,requirements.adoc,"""The project SHALL include a `Gemfile` that specifies `asciidoctor-pdf` and `asciidoctor-kroki` gems so the PDF converter and diagram renderer are installed consistently across environments.
 
 Source: openspec/specs/pdf-output/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-095,REQ-095 — PDF playbook generates PDF from example site,requirement,,requirements.adoc,"""A separate `antora-playbook-pdf.yml` SHALL exist that uses `@antora/pdf-extension` to generate a single PDF from the example site's content.
 The playbook SHALL use the same content sources as the HTML playbook but output to `public/pdf/`.
 
 Source: openspec/specs/pdf-output/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-096,REQ-096 — PDF extension is a peer dependency,requirement,,requirements.adoc,"""The `@antora/pdf-extension` npm package SHALL be listed as a `peerDependency` (with `optional: true` in `peerDependenciesMeta`) so consumers who want PDF output are signalled to install it explicitly.
 It SHALL also remain in `devDependencies` for local development.
 
 Source: openspec/specs/pdf-output/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-097,REQ-097 — Assembler profiles produce separate PDFs per document,requirement,,requirements.adoc,"""The component descriptor SHALL define assembler profiles with dedicated nav files so that the assembler produces separate PDFs for requirements, architecture, and test-plan documents.
 
 Source: openspec/specs/split-pdf-documents/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-098,REQ-098 — Custom nav files select single documents,requirement,,requirements.adoc,"""Each profile SHALL reference a custom nav file that contains a single xref to the target document, so only that page is included in the assembly.
 
 Source: openspec/specs/split-pdf-documents/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-099,REQ-099 — Single-PDF output is preserved,requirement,,requirements.adoc,"""The existing single-PDF configuration SHALL remain available via `antora-assembler-pdf.yml` and the existing `antora-playbook-pdf.yml` SHALL continue to produce a single merged PDF.
 
 Source: openspec/specs/split-pdf-documents/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-131,REQ-131 — DOCX wrapper script converts assembled AsciiDoc to DOCX,process_requirement,,requirements.adoc,"""The project SHALL include an `adoc-to-docx` shell script that reads assembled AsciiDoc from stdin, converts it to DocBook using `asciidoctor -b docbook` with Kroki support, then pipes the result through `pandoc -f docbook -t docx` to produce a DOCX file.
 
 Source: openspec/specs/docx-output/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-132,REQ-132 — DOCX assembler configs mirror PDF assembler configs,process_requirement,,requirements.adoc,"""For each existing PDF assembler configuration, a corresponding DOCX assembler configuration SHALL exist that differs only in the build command, using `./adoc-to-docx` instead of `bundle exec asciidoctor-pdf`.
 
 Source: openspec/specs/docx-output/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-133,REQ-133 — PDF playbook includes DOCX assembler configurations,process_requirement,,requirements.adoc,"""The `antora-playbook-pdf.yml` SHALL register DOCX assembler configs alongside PDF assembler configs so a single build produces both PDF and DOCX outputs.
 
 Source: openspec/specs/docx-output/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-134,REQ-134 — pandoc is available in the build environment,process_requirement,,requirements.adoc,"""The project SHALL declare `pandoc` as a dependency in `devbox.json` so that `devbox shell` provides the pandoc binary for DOCX generation.
 
 Source: openspec/specs/docx-output/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-135,REQ-135 — DOCX output format is documented,requirement,,requirements.adoc,"""The project documentation SHALL include a how-to guide for generating DOCX output and reference documentation for the DOCX assembler configuration.
 
 Source: openspec/specs/docx-output/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-179,REQ-179 — PDF playbook references extension by local path in development,requirement,,requirements.adoc,"""The `antora-playbook-pdf.yml` example playbook SHALL reference the PDF extension using a local path (`./lib/src/antora-pdf-extension.cjs`) since it is the project's own development playbook.
 Consumer documentation SHALL show the package subpath pattern (`antora-tracer/antora-pdf`).
 
 Source: openspec/specs/pdf-output/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-180,REQ-180 — PDF extension is published and referenceable by package name,requirement,,requirements.adoc,"""The `antora-tracer` npm package SHALL include `lib/src/antora-pdf-extension.cjs` and export it under the subpath `antora-tracer/antora-pdf` so consumers can reference it in their playbooks without copying files from the repository.
 
 Source: openspec/specs/published-extensions/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-181,REQ-181 — DOCX extension is published and referenceable by package name,requirement,,requirements.adoc,"""The `antora-tracer` npm package SHALL include `lib/src/antora-docx-extension.cjs` and `lib/src/antora-docx-converter.cjs` and export the extension under the subpath `antora-tracer/antora-docx`.
 
 Source: openspec/specs/published-extensions/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-182,REQ-182 — Assembler packages declared as optional peer dependencies,requirement,,requirements.adoc,"""The `package.json` SHALL declare `@antora/assembler` and `@antora/pdf-extension` as `peerDependencies` with `optional: true` in `peerDependenciesMeta` so npm signals the requirement to consumers who use PDF or DOCX output without requiring them for consumers who do not.
 These packages SHALL also remain in `devDependencies` for local development builds.
 
 Source: openspec/specs/published-extensions/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-183,REQ-183 — Assembler configs and adoc-to-docx script are example-site configuration,requirement,,requirements.adoc,"""The assembler config YMLs and `adoc-to-docx` script SHALL reside in `examples/` as reference consumer configuration, not at the project root and not in the npm package.
 The how-to documentation SHALL explain that consumers create their own configs modelled on these examples.
 
 Source: openspec/specs/published-extensions/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-184,REQ-184 — DOCX playbook references extension by local path in development,process_requirement,,requirements.adoc,"""The `antora-playbook-pdf.yml` example playbook SHALL reference the DOCX extension using a local path (`./lib/src/antora-docx-extension.cjs`).
 Consumer documentation SHALL show the package subpath pattern (`antora-tracer/antora-docx`).
 
 Source: openspec/specs/docx-output/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-151,REQ-151 — Vale lints page and partial source content during the build,requirement,,requirements.adoc,"""The system SHALL run Vale against the source AsciiDoc content of every page and partial file in the content catalog when the extension is enabled.
 
 Source: openspec/specs/vale-build-integration/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-152,REQ-152 — The build gates on a configurable minimum severity,requirement,,requirements.adoc,"""The system SHALL fail the build when Vale reports a finding at or above the configured minimum severity, and SHALL log findings below that severity without failing.
 
 Source: openspec/specs/vale-build-integration/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-153,REQ-153 — The extension reports the Vale configuration source,requirement,,requirements.adoc,"""The system SHALL load Vale's configuration from the path supplied in the playbook configuration, so users control which styles and rules apply.
 
 Source: openspec/specs/vale-build-integration/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-154,REQ-154 — Missing executables fail with an actionable message,requirement,,requirements.adoc,"""When the extension is enabled, if the `vale` or `asciidoctor` executable is unavailable, the system SHALL fail the build with a message naming the missing executable.
 
 Source: openspec/specs/vale-build-integration/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-155,REQ-155 — The extension is opt-in,requirement,,requirements.adoc,"""The system SHALL NOT run Vale unless the extension is explicitly registered in the playbook, so existing builds are unaffected.
 
 Source: openspec/specs/vale-build-integration/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-156,REQ-156 — Source layout is out of scope,requirement,,requirements.adoc,"""The system SHALL NOT enforce source line layout such as one sentence per line; that concern belongs to the source-layout checker.
 
 Source: openspec/specs/vale-build-integration/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-157,REQ-157 — Reusable Vale rules encode the style guide,requirement,,requirements.adoc,"""The system SHALL provide a set of Vale rule files that encode the machine-checkable parts of the documentation style guide, including filler-word avoidance, inclusive language, non-militaristic language, and the instead-of/use substitutions.
 
 Source: openspec/specs/documentation-style-rules/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-158,REQ-158 — Rules are packaged with the extension,requirement,,requirements.adoc,"""The system SHALL ship the rule files and a sample configuration with the npm package, while remaining optional for users.
 
 Source: openspec/specs/documentation-style-rules/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-185,REQ-185 — Item blocks use the open-block delimiter,requirement,,requirements.adoc,"""Item block examples in the documentation SHALL use the `--` open-block delimiter as the canonical form.
 The `====` example-block delimiter SHALL be documented as a valid alternative with its rendering difference.
 
 Source: openspec/specs/documentation-style-rules/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-186,REQ-186 — Getting Started tutorial page,requirement,,requirements.adoc,"""The example site SHALL include a single Tutorial page (`getting-started.adoc`) that guides a first-time user from zero to a working traceability setup in numbered, sequential steps.
 
 Source: openspec/specs/doc-tutorial/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-187,REQ-187 — Tutorial in navigation,requirement,,requirements.adoc,"""The example site navigation SHALL include a """"Tutorial"""" section as the first top-level item, containing the Getting Started page.
 
 Source: openspec/specs/doc-tutorial/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-188,REQ-188 — How-to guide pages exist for key tasks,requirement,,requirements.adoc,"""The example site SHALL include How-to guide pages covering the following tasks:
 
 * Custom domain model definition
@@ -1371,17 +1371,17 @@ REQ-188,REQ-188 — How-to guide pages exist for key tasks,requirement,,requirem
 
 Source: openspec/specs/doc-howto-guides/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-189,REQ-189 — How-to guides link to Reference,requirement,,requirements.adoc,"""Each How-to guide page SHALL include links to relevant Reference pages for option details and syntax specifications.
 
 Source: openspec/specs/doc-howto-guides/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-190,REQ-190 — How-to guides section in navigation,requirement,,requirements.adoc,"""The example site navigation SHALL include a """"How-to Guides"""" section containing all how-to pages, ordered by typical usage frequency.
 
 Source: openspec/specs/doc-howto-guides/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-191,"""REQ-191 — Reference pages for macro syntax, configuration, CLI, presets, and API""",requirement,,requirements.adoc,"""The example site SHALL include Reference pages exhaustively documenting:
 
 * Item macro syntax and attributes
@@ -1393,17 +1393,17 @@ REQ-191,"""REQ-191 — Reference pages for macro syntax, configuration, CLI, pre
 
 Source: openspec/specs/doc-reference/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-192,REQ-192 — Reference pages cross-link to other modes,requirement,,requirements.adoc,"""Reference pages SHALL include links to relevant How-to guides, Explanation pages, and other Reference pages.
 
 Source: openspec/specs/doc-reference/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-193,REQ-193 — Reference section in navigation,requirement,,requirements.adoc,"""The example site navigation SHALL include a """"Reference"""" section containing all reference pages, ordered from most-used to least-used.
 
 Source: openspec/specs/doc-reference/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-194,"""REQ-194 — Explanation pages for concepts, architecture, and design rationale""",requirement,,requirements.adoc,"""The example site SHALL include Explanation pages covering:
 
 * The traceability model (roles, relations, matrices as concepts)
@@ -1416,17 +1416,17 @@ REQ-194,"""REQ-194 — Explanation pages for concepts, architecture, and design 
 
 Source: openspec/specs/doc-explanation/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-195,REQ-195 — Explanation pages link to Reference and How-to,requirement,,requirements.adoc,"""Explanation pages SHALL include links to relevant Reference pages and How-to guides for readers who want to act on the understanding gained.
 
 Source: openspec/specs/doc-explanation/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-196,REQ-196 — Explanation section in navigation,requirement,,requirements.adoc,"""The example site navigation SHALL include an """"Explanation"""" section containing all explanation pages.
 
 Source: openspec/specs/doc-explanation/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-197,REQ-197 — Self-Traceability nav section groups demo pages,requirement,,requirements.adoc,"""The example site navigation SHALL include a """"Self-Traceability"""" section containing the pages that demonstrate the extension tracing its own development artifacts:
 
 * Requirements
@@ -1436,197 +1436,217 @@ REQ-197,REQ-197 — Self-Traceability nav section groups demo pages,requirement,
 
 Source: openspec/specs/doc-self-traceability/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-198,REQ-198 — Self-Traceability section is visually distinct,requirement,,requirements.adoc,"""The Self-Traceability section SHALL be clearly separated from the user-facing documentation sections, signaling to readers that these are demonstration artifacts, not documentation about using the tool.
 
 Source: openspec/specs/doc-self-traceability/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-199,REQ-199 — Self-Traceability section preserves traceable items,requirement,,requirements.adoc,"""The restructuring SHALL keep every traceable `[item]` block in its current AsciiDoc file.
 
 Source: openspec/specs/doc-self-traceability/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-218,REQ-218 — Design concepts address functional requirements,requirement,,requirements.adoc,"""Every functional requirement (REQ) in the self-traceability example SHALL be addressed by at least one design concept (ARC item) via an `addresses:REQ-NNN[]` link.
 
 Source: openspec/specs/doc-self-traceability/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-200,REQ-200 — Doc examples validate against the traceability configuration,requirement,,requirements.adoc,"""The system SHALL provide a check that extracts `[item]` blocks from the example site's prose documentation pages and validates them against the example traceability configuration (`examples/traceability.yml`).
 The check SHALL fail on unknown roles, disallowed relations, and item blocks that fail to parse.
 
 Source: openspec/specs/doc-example-validation/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-060,REQ-060 — Pages workflow generates PDFs,requirement,,requirements.adoc,"""The GitHub Pages workflow SHALL include Ruby setup and PDF generation steps so that requirements, architecture, and test-plan PDFs are built and deployed alongside the HTML site on every push to main.
 
 Source: openspec/specs/ci-pdf-deploy/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-061,REQ-061 — Site links to PDF downloads,requirement,,requirements.adoc,"""The example site's index page SHALL include download links to the three core PDF documents.
 
 Source: openspec/specs/ci-pdf-deploy/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-062,REQ-062 — Local PDF workflow is unchanged,requirement,,requirements.adoc,"""The existing local PDF build workflow (`devbox shell` + `npx antora antora-playbook-pdf.yml`) SHALL continue to work unchanged.
 
 Source: openspec/specs/ci-pdf-deploy/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-240,REQ-240 — main is a named prerelease,requirement,,requirements.adoc,"""The `main` branch's component version descriptor SHALL declare `version: main` with `prerelease: true`, so `main` serves the development docs at `/main/` and is excluded from """"latest stable"""" selection.
 
 Source: openspec/specs/component-versioning/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-241,REQ-241 — Release versions derive from the git refname,requirement,,requirements.adoc,"""A maintenance branch SHALL derive its component version from the git refname using a projection in the component version descriptor, so no hand-maintained literal version exists on release refs.
 
 Source: openspec/specs/component-versioning/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-242,REQ-242 — Version selector shows main plus released versions,requirement,,requirements.adoc,"""The component version selector SHALL list the `main` prerelease and the released semantic versions in descending order.
 
 Source: openspec/specs/component-versioning/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-243,REQ-243 — Stable URL points at the latest release,requirement,,requirements.adoc,"""The playbook SHALL set `latest_version_segment: stable`, so the latest stable (non-prerelease) release is served at `/stable/`.
 
 Source: openspec/specs/component-versioning/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-244,REQ-244 — Extension handles unversioned components,requirement,,requirements.adoc,"""The extension SHALL treat an unversioned component version (an empty string) as a valid version rather than substituting a placeholder, so generated attachments resolve via xref from unversioned content.
 
 Source: openspec/specs/component-versioning/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-245,REQ-245 — Release consistency is checkable,requirement,,requirements.adoc,"""The project SHALL provide a script that verifies the release invariants across `package.json`, git tags, maintenance branches, playbook content-source refs, and the changelog, and SHALL exit non-zero on any mismatch.
 
 Source: openspec/specs/release-consistency/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-246,REQ-246 — Version is consistent across sources,requirement,,requirements.adoc,"""The script SHALL require that the `package.json` version, the git tag name, and the changelog entry version all refer to the same `major.minor.patch` release.
 
 Source: openspec/specs/release-consistency/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-247,REQ-247 — Maintenance branch follows the tag,requirement,,requirements.adoc,"""The script SHALL require a maintenance branch named `v<major>.<minor>.x` for the released `v<major>.<minor>.0` tag.
 
 Source: openspec/specs/release-consistency/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-248,REQ-248 — Playbook refs exist in the repository,requirement,,requirements.adoc,"""The script SHALL verify that every branch and tag referenced by the CI playbook content sources exists in the repository.
 
 Source: openspec/specs/release-consistency/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
+REQ-252,REQ-252 — git describe is computed once per build,requirement,,requirements.adoc,"""The extension SHALL compute the build version string using `git describe --tags --always --dirty`, run from the playbook directory, exactly once per Antora build.
+
+Source: openspec/specs/git-describe/spec.md
+
+tracer:links[]"""
+REQ-253,REQ-253 — git_describe is exposed as a site key,requirement,,requirements.adoc,"""The extension SHALL set `site.keys.git_describe` to the computed version string, making it available to HTML Handlebars templates.
+
+Source: openspec/specs/git-describe/spec.md
+
+tracer:links[]"""
+REQ-254,REQ-254 — git_describe is exposed as a document attribute,requirement,,requirements.adoc,"""The extension SHALL set `asciidoc.attributes.git_describe` to the computed version string, making it available to AsciiDoc content, the PDF theme, and the DOCX converter.
+
+Source: openspec/specs/git-describe/spec.md
+
+tracer:links[]"""
+REQ-255,REQ-255 — build succeeds outside a git repository,requirement,,requirements.adoc,"""When the version string cannot be computed — the build directory is not inside a git repository, or the `git` command is unavailable or fails — the extension SHALL set neither key and SHALL NOT fail the build.
+
+Source: openspec/specs/git-describe/spec.md
+
+tracer:links[]"""
 REQ-072,REQ-072 — Landing page at GitHub Pages root,requirement,,requirements.adoc,"""The system SHALL serve a landing page at the GitHub Pages root URL (`/`) that introduces the antora-tracer project before visitors enter the documentation, while the Antora documentation site remains accessible at `/docs/`.
 
 Source: openspec/specs/landing-page/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-073,REQ-073 — Two-persona feature presentation,requirement,,requirements.adoc,"""The landing page SHALL present project features in a way that resonates with both developers/architects (docs-as-code natives) and requirements engineers/project managers (traceability/compliance focused users).
 
 Source: openspec/specs/landing-page/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-074,REQ-074 — Traceability visualization preview,requirement,,requirements.adoc,"""The landing page SHALL include a visual preview of traceability output that links to the live traceability matrices in the documentation site.
 
 Source: openspec/specs/landing-page/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-075,REQ-075 — Deployment integration,requirement,,requirements.adoc,"""The GitHub Pages deployment workflow SHALL place the landing page at the root and the Antora documentation in a `/docs/` subdirectory, with both built and deployed from the same repository.
 
 Source: openspec/specs/landing-page/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-076,REQ-076 — Minimal tooling,requirement,,requirements.adoc,"""The landing page SHALL require no build step or installed dependencies to deploy — it SHALL be served as static HTML.
 
 Source: openspec/specs/landing-page/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-077,REQ-077 — Landing page uses conemso color palette,requirement,,requirements.adoc,"""The landing page SHALL use a consistent brand color palette for all brand-colored elements.
 Primary brand elements (buttons, links, icons, section backgrounds) SHALL use the primary brand color for interactive elements and a darker variant for headings and dark backgrounds.
 
 Source: openspec/specs/landing-page/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-078,REQ-078 — Landing page uses Roboto font,requirement,,requirements.adoc,"""The landing page SHALL use a consistent font family matching the documentation site theme for all text content.
 
 Source: openspec/specs/landing-page/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-123,REQ-123 — Architecture document includes class-level API diagram,requirement,,requirements.adoc,"""The architecture document SHALL include a class-level diagram showing the public interface of each major component.
 
 Source: openspec/specs/architecture-diagram-checklist/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-124,REQ-124 — Architecture document includes DocumentParser activity diagram,requirement,,requirements.adoc,"""The architecture document SHALL include an activity diagram showing the parser's step-by-step pipeline: verbatim block pre-scanning, item block extraction with quote-aware bracket matching, body delimiter detection, relationship macro scanning with inline-code exclusion, and result assembly.
 
 Source: openspec/specs/architecture-diagram-checklist/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-125,REQ-125 — Architecture document includes TraceabilityGraph state diagram,requirement,,requirements.adoc,"""The architecture document SHALL include a state diagram showing the graph lifecycle: empty → populated (items added) → complete (relationships added, ready for queries), including which operations are valid in each state.
 
 Source: openspec/specs/architecture-diagram-checklist/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-126,REQ-126 — Architecture document includes PreparedFile caching flow diagram,requirement,,requirements.adoc,"""The architecture document SHALL include an activity diagram showing the file-state caching flow: file content, document attributes, and block positions computed once per file, then reused across all macro-expansion passes.
 
 Source: openspec/specs/architecture-diagram-checklist/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-127,REQ-127 — update-example-site skill includes diagram checklist,requirement,,requirements.adoc,"""The `update-example-site` skill SHALL include a diagram checklist per arc42 section, guidance on when to add each diagram type (class, sequence, activity, state), and conventions for diagram file placement in the `examples/` directory.
 
 Source: openspec/specs/architecture-diagram-checklist/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-105,REQ-105 — Use-case role extends self-traceability preset,requirement,,requirements.adoc,"""The example site SHALL demonstrate config extension by adding a `use_case` role not present in any built-in preset, with a directional `leads_to` relation to `requirement`.
 
 Source: openspec/specs/use-case-example/spec.md
 
-traceability:links[]"""
-REQ-106,REQ-106 — Use-case page renders with traceability links,requirement,,requirements.adoc,"""The `use-cases.adoc` page SHALL render `traceability:outgoing[]` and `traceability:incoming[]` macros for each use-case item, showing its requirement links.
+tracer:links[]"""
+REQ-106,REQ-106 — Use-case page renders with traceability links,requirement,,requirements.adoc,"""The `use-cases.adoc` page SHALL render `tracer:outgoing[]` and `tracer:incoming[]` macros for each use-case item, showing its requirement links.
 
 Source: openspec/specs/use-case-example/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-107,REQ-107 — usecase-requirements matrix is generated,requirement,,requirements.adoc,"""The example site SHALL generate a `usecase-requirements` matrix with use-case rows, requirement columns, and `leads_to` coverage.
 
 Source: openspec/specs/use-case-example/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-120,REQ-120 — Process requirements are traceable to product requirements,requirement,,requirements.adoc,"""The example site SHALL include a `delivery-process.adoc` document containing process requirements with the `process_requirement` role.
 Each process requirement SHALL trace to the product requirements it validates via a `validates` relation and to the architectural decisions it implements via a `deploys` relation.
 
 Source: openspec/specs/delivery-process-traceability/spec.md
 
-traceability:links[]"""
-REQ-121,REQ-121 — Process requirements document follows site conventions,requirement,,requirements.adoc,"""The `delivery-process.adoc` SHALL use the same `[item]` macro format, `[#PRQ-XXX, item, role=process_requirement]` IDs, and `traceability:links[]` rendering macros as other example documents.
+tracer:links[]"""
+REQ-121,REQ-121 — Process requirements document follows site conventions,requirement,,requirements.adoc,"""The `delivery-process.adoc` SHALL use the same `[item]` macro format, `[#PRQ-XXX, item, role=process_requirement]` IDs, and `tracer:links[]` rendering macros as other example documents.
 
 Source: openspec/specs/delivery-process-traceability/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-122,REQ-122 — Process-to-product matrix exists,requirement,,requirements.adoc,"""The example site configuration SHALL define a `process-to-product` matrix with `process_requirement` as rows, `requirement` as columns, and `validates` as the coverage relation.
 
 Source: openspec/specs/delivery-process-traceability/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-114,REQ-114 — Dead design-matrix template is removed,requirement,,requirements.adoc,"""The unused design-matrix HTML template and its associated partials SHALL be removed, as they are not rendered by any code path.
 
 Source: openspec/specs/template-partials/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-115,REQ-115 — Dead MatrixGenerator methods are removed,requirement,,requirements.adoc,"""The unused matrix generation methods (`generateRequirementsMatrix`, `generateDesignMatrix`, `generateAllMatrices`) SHALL be removed, as they are not called by any code path.
 
 Source: openspec/specs/template-partials/spec.md
 
-traceability:links[]"""
+tracer:links[]"""
 REQ-109,REQ-109 — Circular reference detection in graph validation,requirement,,demo/index.adoc,"""The system SHALL detect circular references in the traceability graph during validation.
 A circular reference is a cycle in the directed relationship graph (e.g., A → B → A, or A → B → C → A).
 Self-referencing relationships (A → A) SHALL also be detected as cycles.
 Auto-generated inverse relationships SHALL be skipped during cycle detection to avoid false positives.
 Relationships marked as bidirectional SHALL also be skipped during cycle detection.
 
-traceability:links[]"""
+tracer:links[]"""
 ARC-001,ARC-001 — Project scope and architectural goals,design,,explanation/architecture.adoc,"""*Project scope and architectural goals*
 
 The Antora Tracer is an Antora extension that adds role-based requirements traceability to AsciiDoc documentation.
@@ -1640,9 +1660,9 @@ Architectural goals:
 - Integrate with Antora's event pipeline without imposing runtime dependencies on users who don't need specific features
 - Provide a standalone CLI for use outside Antora
 
-traceability:links[]
+tracer:links[]
 
-traceability:graph[]"""
+tracer:graph[]"""
 ARC-002,ARC-002 — Component-level architecture,design,,explanation/architecture.adoc,"""include::partial$05-bb-overview.adoc[]
 
 The following class diagram shows the public API of each component — the method groups and key signatures that form the contract boundaries between modules.
@@ -1653,7 +1673,7 @@ See the API reference for full signatures.
 include::example$api-overview.puml[]
 ----
 
-traceability:links[]"""
+tracer:links[]"""
 ARC-012,ARC-012 — Preset YAML schema,design,,explanation/architecture.adoc,"""Presets are YAML files following a defined structure.
 Each preset is a self-contained
 versioned configuration that users can extend or override.
@@ -1707,7 +1727,7 @@ versioned configuration that users can extend or override.
 | `description` (markdown string), `examples` (string[]). Inline documentation explaining the preset's domain and usage.
 |===
 
-traceability:links[]"""
+tracer:links[]"""
 ARC-018,ARC-018 — Config-driven validation,design,,explanation/architecture.adoc,"""Relation validation is driven by the YAML configuration rather than hardcoded
 rules. `ConfigLoader.isRelationAllowed()` checks source role, target role
 and relation type against the configured `relations` map.
@@ -1722,7 +1742,7 @@ addresses:REQ-222[]
 addresses:QA-056[]
 addresses:QA-057[]
 
-traceability:links[]"""
+tracer:links[]"""
 ARC-036,ARC-036 — Preset inheritance and config merge,design,,explanation/architecture.adoc,"""A preset may declare a top-level `extends` field naming a parent preset.
 `ConfigLoader.loadPreset()` recursively loads the parent and deep-merges it under the child via `mergeConfig()`: roles are unioned, relations deep-merged, matrices overridden by name, and `labels` overridden key-by-key.
 Inheritance resolves transitively; a missing parent raises a """"not found"""" error, and a circular chain raises a circular-inheritance error.
@@ -1734,7 +1754,7 @@ addresses:REQ-173[]
 addresses:REQ-223[]
 addresses:REQ-224[]
 
-traceability:links[]"""
+tracer:links[]"""
 ARC-028,ARC-028 — Circular reference detection in graph validation,design,,explanation/architecture.adoc,"""The `validate()` method calls `findCircularReferences()`, a DFS-based cycle
 detector that traverses all items and their outgoing relationships.
 A path stack
@@ -1745,7 +1765,7 @@ Auto-generated inverse relationships
 are skipped to avoid false positives.
 
 addresses:REQ-109[]
-traceability:links[]"""
+tracer:links[]"""
 ARC-029,ARC-029 — Partial file processing with source-repo links,design,,explanation/architecture.adoc,"""The `registerContentClassifier()` handler processes both `family: page` and
 `family: partial` files.
 Partial items use Antora's pre-computed `fileUri`
@@ -1764,7 +1784,7 @@ partial content is inlined into pages and reaches the browser.
 addresses:REQ-110[]
 addresses:REQ-144[]
 addresses:REQ-145[]
-traceability:links[]"""
+tracer:links[]"""
 ARC-015,ARC-015 — In-memory processing with no side effects,design,,explanation/architecture.adoc,"""All content transformations — parsing, macro expansion, link substitution
 title injection — operate on in-memory buffers.
 Source `.adoc` files are never
@@ -1782,7 +1802,7 @@ include::example$graph-lifecycle.puml[]
 ----
 
 addresses:QA-058[]
-traceability:links[]"""
+tracer:links[]"""
 ARC-026,ARC-026 — GraphViz DOT and Vega-Lite serialization methods,design,,explanation/architecture.adoc,"""`toDot(fromId, depth?)` generates GraphViz DOT source for a relationship graph
 using BFS traversal in both outgoing and incoming directions from the given item.
 Nodes are colored by role using a
@@ -1797,7 +1817,7 @@ encoded into Kroki URLs for rendering.
 
 addresses:REQ-053[]
 addresses:REQ-160[]
-traceability:links[]"""
+tracer:links[]"""
 ARC-035,ARC-035 — Relation reverse declaration and canonical storage,design,,explanation/architecture.adoc,"""The `relations` map is keyed as `sourceRole → targetRole → type → { reverse }`, each relation type declaring its authorable reverse name.
 `TraceabilityGraph.addRelationship()` canonicalizes a reverse-authored edge to the primary direction — authoring `is_derived_from` from a requirement stores `UC → REQ : leads_to`.
 A reverse edge whose target is defined in a later file is stored in its authored direction until all of the component version's items are collected, then `canonicalizeRelationships()` re-resolves every edge once so the reverse is never left as a second edge.
@@ -1812,7 +1832,7 @@ addresses:REQ-176[]
 addresses:REQ-177[]
 addresses:REQ-178[]
 
-traceability:links[]"""
+tracer:links[]"""
 ARC-039,ARC-039 — Supersession semantics,design,,explanation/architecture.adoc,"""A traceable item is superseded rather than mutated: the successor declares a `supersedes` relationship, and the graph derives the predecessor's superseded state from that relationship rather than a `status` attribute.
 `TraceabilityGraph.isSuperseded()` and `getSuccessors()` answer the direct questions, and splits (several successors) and merges (several predecessors) are first-class.
 Self-supersession, duplicate links, and cycles are validation errors; a functional link to a superseded item is an advisory `stale_link` warning.
@@ -1831,7 +1851,7 @@ addresses:REQ-209[]
 addresses:REQ-210[]
 addresses:REQ-211[]
 
-traceability:links[]"""
+tracer:links[]"""
 ARC-040,ARC-040 — Graph diff,design,,explanation/architecture.adoc,"""`GraphDiff.diffGraphs(prev, next)` compares two graph snapshots by stable item ID, classifying each item as added, removed, or modified without hardcoding any role name.
 A surviving item is `modified` when a compared field (`title`, `content`, `role`, `status`, or `attributes`) differs, and relationship deltas are reported only between surviving items, except `supersedes` history links.
 See xref:explanation/adr/0010-identity-first-graph-diff.adoc[ADR-010].
@@ -1844,7 +1864,7 @@ addresses:REQ-226[]
 addresses:REQ-216[]
 addresses:REQ-217[]
 
-traceability:links[]"""
+tracer:links[]"""
 ARC-041,ARC-041 — Supersession lifecycle states and queries,design,,explanation/architecture.adoc,"""The supersession lifecycle has three graph-level states: `isolated` (no relationships), `orphaned` (superseded with no incoming functional links), and `dangling reference` (a link whose target no longer exists).
 `TraceabilityGraph.isOrphaned()`, `getSupersededItems()`, and `getDanglingReferences()` expose them, and `validate()` classifies a dangling link as an advisory `dangling_link` warning when its type is a history relation (`supersedes`/`superseded_by`) and an error otherwise.
 
@@ -1852,7 +1872,7 @@ addresses:REQ-227[]
 addresses:REQ-228[]
 addresses:REQ-234[]
 
-traceability:links[]"""
+tracer:links[]"""
 ARC-016,ARC-016 — Event-driven Antora integration,design,,explanation/architecture.adoc,"""The extension hooks into Antora's event pipeline via `register()`:
 `contentClassified` triggers parsing, macro expansion, and matrix
 registration in the content catalog; `sitePublished` writes the standalone
@@ -1865,7 +1885,7 @@ the CLI outside Antora, demonstrating the event handlers are optional.
 
 addresses:REQ-249[]
 addresses:QA-055[]
-traceability:links[]"""
+tracer:links[]"""
 ARC-042,ARC-042 — Generated supersession overview page,design,,explanation/architecture.adoc,"""`generateOverviewContent()` runs in the `sitePublished` handler (gated by `generateOverview`) and writes `overview.html` into the traceability output directory, linked from the dashboard `index.html`.
 It reports managed/active/superseded totals, a per-role table, and a dangling-reference worklist built from `getDanglingReferences()`.
 
@@ -1874,28 +1894,28 @@ addresses:REQ-230[]
 addresses:REQ-231[]
 addresses:REQ-232[]
 
-traceability:links[]"""
+tracer:links[]"""
 ARC-043,ARC-043 — Display-only superseded render toggle,design,,explanation/architecture.adoc,"""`renderSuperseded` (default true) is a display-only toggle: when false, `stripSupersededBlocks()` removes superseded item blocks during the `contentClassified` pass before macro substitution.
 The graph and matrices are unaffected — superseded items remain in the graph for link resolution and are still omitted from current matrices.
 
 addresses:REQ-233[]
 
-traceability:links[]"""
+tracer:links[]"""
 ARC-045,"""ARC-045 — Full graph for generation, working graph for xrefs""",design,,explanation/architecture.adoc,"""The extension keeps two graphs: a working graph cleared per version for version-scoped xref generation (REQ-249), and an accumulated full graph merged after each version and read by the `sitePublished` generation passes.
 This split resolves the conflict between per-version xref isolation and full-site matrix/overview generation.
 
 addresses:REQ-239[]
 
-traceability:links[]"""
-ARC-024,ARC-024 — traceability:links[] and traceability:incoming[] link rendering,design,,explanation/architecture.adoc,"""The `expandRelationMacros()` method in the Antora extension (not the
-DocumentParser) replaces `traceability:links[]` and
-`traceability:incoming[]` placeholders with formatted AsciiDoc content
+tracer:links[]"""
+ARC-024,ARC-024 — tracer:links[] and tracer:incoming[] link rendering,design,,explanation/architecture.adoc,"""The `expandRelationMacros()` method in the Antora extension (not the
+DocumentParser) replaces `tracer:links[]` and
+`tracer:incoming[]` placeholders with formatted AsciiDoc content
 showing the item's relationships.
 All three rendering macros (`outgoing`
 `incoming`, and `links`) share this single scan/render pipeline; only the
 relationship directions they emit differ.
 The DocumentParser's inline
-macro regex excludes these via a `traceability:` namespace guard; they are
+macro regex excludes these via a `tracer:` namespace guard; they are
 NOT parsed as relationships.
 Rendering is opt-in via the
 `:traceability-links:` document attribute.
@@ -1921,7 +1941,7 @@ addresses:REQ-100[]
 addresses:REQ-102[]
 addresses:REQ-104[]
 addresses:QA-060[]
-traceability:links[]"""
+tracer:links[]"""
 ARC-037,ARC-037 — Display labels with humanize default,design,,explanation/architecture.adoc,"""Relation types are displayed through a `labels` map in the config, mapping a type to a human-readable name.
 The map is display-only and never affects graph structure, merge, or validation.
 When a type has no `labels` entry, `humanize(type)` renders it: underscores become spaces, sentence-cased (`is_derived_from` → """"Is derived from"""").
@@ -1930,14 +1950,14 @@ Incoming links use the reverse type's label.
 addresses:REQ-161[]
 addresses:REQ-162[]
 
-traceability:links[]"""
-ARC-025,"""ARC-025 — traceability:graph[], traceability:graph-coverage[], and traceability:config-graph[] visualization macros""",design,,explanation/architecture.adoc,"""The `expandGraphMacros()`, `expandCoverageMacros()`, and `expandConfigGraphMacros()` methods replace
-`traceability:graph[]`, `traceability:graph-coverage[]`, and `traceability:config-graph[]` placeholders with
-Kroki-rendered images. `traceability:graph[]` generates a GraphViz DOT
+tracer:links[]"""
+ARC-025,"""ARC-025 — tracer:graph[], tracer:graph-coverage[], and tracer:config-graph[] visualization macros""",design,,explanation/architecture.adoc,"""The `expandGraphMacros()`, `expandCoverageMacros()`, and `expandConfigGraphMacros()` methods replace
+`tracer:graph[]`, `tracer:graph-coverage[]`, and `tracer:config-graph[]` placeholders with
+Kroki-rendered images. `tracer:graph[]` generates a GraphViz DOT
 relationship graph for the enclosing item (or a specified item ID), colored
-by role with labeled edges. `traceability:graph-coverage[]` generates a
+by role with labeled edges. `tracer:graph-coverage[]` generates a
 Vega-Lite bar chart showing per-item or global coverage.
-`traceability:config-graph[]` renders the traceability configuration as a GraphViz DOT diagram of roles and declared relations.
+`tracer:config-graph[]` renders the traceability configuration as a GraphViz DOT diagram of roles and declared relations.
 Rendering is opt-in
 via the `:traceability-graph:` document attribute.
 
@@ -1945,7 +1965,7 @@ addresses:REQ-051[]
 addresses:REQ-052[]
 addresses:REQ-063[]
 addresses:REQ-159[]
-traceability:links[]"""
+tracer:links[]"""
 ARC-027,ARC-027 — Matrix registration in the content catalog,design,,explanation/architecture.adoc,"""The `registerMatricesInCatalog()` method generates matrix files (HTML, CSV,
 JSON) per component version during the `contentClassified` event and
 registers them in the Antora content catalog as `attachment`-family files
@@ -1958,7 +1978,7 @@ module that has AsciiDoc content; a committed copy, if present, has its
 contents refreshed in place.
 
 addresses:REQ-108[]
-traceability:links[]"""
+tracer:links[]"""
 ARC-017,ARC-017 — Regex-based parsing,design,,explanation/architecture.adoc,"""AsciiDoc content is parsed using regular expressions rather than an
 Asciidoctor AST walker.
 This makes the parser independent of Asciidoctor
@@ -1982,7 +2002,7 @@ addresses:REQ-088[]
 addresses:REQ-090[]
 addresses:REQ-091[]
 addresses:REQ-092[]
-traceability:links[]"""
+tracer:links[]"""
 ARC-019,ARC-019 — Config-driven matrix generation with coverage calculations,design,,explanation/architecture.adoc,"""The `MatrixGenerator` reads matrix definitions from configuration, queries the
 graph for items by role, and computes per-cell coverage based on
 `coverageRelations`.
@@ -1996,7 +2016,7 @@ addresses:REQ-083[]
 addresses:REQ-084[]
 addresses:REQ-085[]
 addresses:REQ-086[]
-traceability:links[]"""
+tracer:links[]"""
 ARC-038,ARC-038 — Matrix status column,design,,explanation/architecture.adoc,"""The HTML matrix renders a single per-row status column with values `done`, `partial`, and `missing`, derived from the row's column coverage.
 The per-row coverage percentage is no longer rendered as a separate column.
 The top coverage summary (done/partial/missing counts plus overall percentage) is preserved.
@@ -2006,7 +2026,7 @@ addresses:REQ-167[]
 addresses:REQ-168[]
 addresses:REQ-169[]
 
-traceability:links[]"""
+tracer:links[]"""
 ARC-020,ARC-020 — Mustache template rendering for HTML output,design,,explanation/architecture.adoc,"""The `TemplateRenderer` wraps Mustache for HTML matrix output.
 Built-in templates
 ship with the extension in `src/templates/`.
@@ -2014,7 +2034,7 @@ Users can specify a custom template
 directory — the renderer falls back to built-in templates for any files not found
 in the custom directory.
 
-traceability:links[]"""
+tracer:links[]"""
 ARC-021,ARC-021 — Path resolution for matrix-to-item links,design,,explanation/architecture.adoc,"""The `LinkResolver` generates links from matrix output to item pages.
 In an Antora build, each item carries its published `pubUrl` (for example, `/tracer/stable/index.html`), and the resolver prepends a `siteRootPath` — the matrix attachment's distance to the site root — so same-component and cross-component targets both resolve.
 Outside Antora (CLI), items carry no `pubUrl`, so the resolver falls back to a `relativePathPrefix` plus the normalized `sourceFile`: it strips the `pages/` prefix and `.adoc` extension, prepends the module name (skipping `ROOT`), and applies the `indexify` URL style.
@@ -2028,7 +2048,7 @@ addresses:REQ-041[]
 addresses:REQ-042[]
 addresses:REQ-043[]
 addresses:REQ-128[]
-traceability:links[]"""
+tracer:links[]"""
 ARC-022,ARC-022 — Graph-to-Neo4j CSV and Cypher export,design,,explanation/architecture.adoc,"""The `Neo4jExporter` serializes the traceability graph into `nodes.csv` and
 `relationships.csv` with proper headers, comma delimiters, and escaped special
 characters — importable via Neo4j's `LOAD CSV`.
@@ -2039,7 +2059,7 @@ attributes are included as node properties.
 The export is optional and requires
 no Neo4j runtime dependency.
 
-traceability:links[]"""
+tracer:links[]"""
 ARC-023,ARC-023 — Commander-based CLI with subcommands,design,,explanation/architecture.adoc,"""The CLI is built on https://www.npmjs.com/package/commander[Commander] with
 subcommands for processing (`process`), matrix generation (`matrix`)
 validation (`validate`), Neo4j export (`export neo4j`), statistics
@@ -2052,7 +2072,7 @@ The CLI
 operates standalone — it does not require an Antora build pipeline.
 
 addresses:REQ-056[]
-traceability:links[]"""
+tracer:links[]"""
 ARC-044,ARC-044 — Item lifecycle CLI: archive and remove,design,,explanation/architecture.adoc,"""The `archive` and `remove` commands are the first source-mutating CLI commands, enabled by block-extent detection that locates an item's full block (header through the closing delimiter) and refuses ambiguous edits.
 `archive <ID>` moves a superseded block to the module's `superseded.adoc`; `remove <ID>` deletes an orphaned block after a `y/N` prompt or an isolated block after typing the ID.
 Mutation lives in the CLI, never the extension, which remains read-only on source files.
@@ -2062,7 +2082,7 @@ addresses:REQ-236[]
 addresses:REQ-237[]
 addresses:REQ-238[]
 
-traceability:links[]"""
+tracer:links[]"""
 ARC-030,ARC-030 — CI/CD PDF build and deployment pipeline,design,,explanation/architecture.adoc,"""The GitHub Actions CI workflow (`.github/workflows/ci.yml` and `pages.yml`)
 builds and deploys the example site to GitHub Pages.
 The pages workflow
@@ -2089,7 +2109,7 @@ addresses:REQ-096[]
 addresses:REQ-097[]
 addresses:REQ-098[]
 addresses:REQ-099[]
-traceability:links[]"""
+tracer:links[]"""
 ARC-031,ARC-031 — Static landing page at GitHub Pages root,design,,explanation/architecture.adoc,"""A static `landing/index.html` page with Tailwind CSS loaded from CDN
 serves as the project landing page at the GitHub Pages root (`/`).
 The page uses conemso branding (teal palette `#108193`, Roboto font)
@@ -2109,7 +2129,7 @@ addresses:REQ-075[]
 addresses:REQ-076[]
 addresses:REQ-077[]
 addresses:REQ-078[]
-traceability:links[]"""
+tracer:links[]"""
 ARC-032,ARC-032 — Lunr search extension customization for item anchor indexing,design,,explanation/architecture.adoc,"""The `@antora/lunr-extension` is configured with a custom indexing pass
 that traverses non-heading elements with `id` attributes inside
 `<article class=""""doc"""">`.
@@ -2127,15 +2147,15 @@ addresses:REQ-079[]
 addresses:REQ-080[]
 addresses:REQ-081[]
 addresses:REQ-082[]
-traceability:links[]"""
+tracer:links[]"""
 ARC-033,ARC-033 — Example site: config extension and dashboard patterns,design,,explanation/architecture.adoc,"""The example site demonstrates two architectural patterns.
 First, config
 extension: `examples/traceability.yml` extends the `requirements-engineering`
 preset with a custom `use_case` role and `leads_to` relation, showing how
 projects add domain-specific roles without modifying built-in presets.
 Second,
-the dashboard page (`dashboard.adoc`) embeds `traceability:graph[]` and
-`traceability:graph-coverage[]` macros to provide visual coverage at a glance,
+the dashboard page (`dashboard.adoc`) embeds `tracer:graph[]` and
+`tracer:graph-coverage[]` macros to provide visual coverage at a glance,
 gated by the `:traceability-graph:` document attribute.
 Both patterns serve as
 reference implementations for users extending the extension to their own domains.
@@ -2144,7 +2164,7 @@ addresses:REQ-054[]
 addresses:REQ-105[]
 addresses:REQ-106[]
 addresses:REQ-107[]
-traceability:links[]"""
+tracer:links[]"""
 ARC-034,ARC-034 — Vale prose-lint extension,design,,explanation/architecture.adoc,"""The bundled `antora-vale-extension` runs the Vale prose linter during `contentClassified`.
 It streams each page and partial buffer to `vale --path=<source>` via stdin and parses the JSON output, reporting findings with source file and line references.
 A configurable `minLevel` gates the build: findings at or above it fail the build, findings below are logged.
@@ -2159,7 +2179,7 @@ addresses:REQ-155[]
 addresses:REQ-156[]
 addresses:REQ-157[]
 addresses:REQ-158[]
-traceability:links[]"""
+tracer:links[]"""
 ARC-003,ARC-003 — Processing flow during Antora build,design,,explanation/architecture.adoc,"""The following sequence shows how an AsciiDoc file flows through the system during an Antora build:
 
 [plantuml]
@@ -2216,12 +2236,12 @@ include::example$pass-pipeline.puml[]
 | Graph must be complete before Pass 3 can resolve cross-file `addresses:TARGET[]` references. Both pages and partials are processed in all three passes — partial content is inlined into pages and reaches the browser.
 
 | Pass 2
-| `expandRelationMacros(file, macroName)` — replace `traceability:outgoing[]`, `traceability:incoming[]`, and `traceability:links[]` with formatted relationship lists (grouped by type, configurable style/order); macroName is `outgoing`, `incoming`, or `links`.
+| `expandRelationMacros(file, macroName)` — replace `tracer:outgoing[]`, `tracer:incoming[]`, and `tracer:links[]` with formatted relationship lists (grouped by type, configurable style/order); macroName is `outgoing`, `incoming`, or `links`.
 | Pages + partials
 | Depends on complete graph from Pass 1 to enumerate relationships. Opt-in via `:traceability-links:` document attribute; forced on for partials.
 
 | Pass 2b
-| `expandGraphMacros()` + `expandCoverageMacros()` + `expandConfigGraphMacros()` — replace `traceability:graph[]`, `traceability:graph-coverage[]`, and `traceability:config-graph[]` with rendered diagram image references (DOT and Vega-Lite).
+| `expandGraphMacros()` + `expandCoverageMacros()` + `expandConfigGraphMacros()` — replace `tracer:graph[]`, `tracer:graph-coverage[]`, and `tracer:config-graph[]` with rendered diagram image references (DOT and Vega-Lite).
 | Pages + partials
 | Uses `toDot()` / `toVegaLite()` / `toConfigDot()`. Opt-in via `:traceability-graph:` document attribute. Independent of Pass 2.
 
@@ -2234,6 +2254,7 @@ include::example$pass-pipeline.puml[]
 Key timing characteristics:
 
 - *Synchronous init*: `AntoraTraceabilityExtension` constructor initializes the traceability graph synchronously (config/preset loading is a synchronous file read) before any event handler is registered. This eliminates the race where a `contentClassified` event could fire before the graph is ready.
+- *Build-version injection*: the constructor also runs `git describe --tags --always --dirty` once and injects the result as `git_describe` into `site.keys` and `asciidoc.attributes` before Antora freezes the playbook, so HTML and PDF/DOCX footers can render the version.
 - *Single-pass processing*: `process()` call does both parsing and graph population in one call. No separate relationship processing pass needed.
 - *Lazy rendering*: Templates are loaded and compiled on first use, cached thereafter.
 
@@ -2247,7 +2268,7 @@ This eliminates redundant buffer conversions and regex scans that were previousl
 include::example$prepared-file-caching.puml[]
 ----
 
-traceability:links[]"""
+tracer:links[]"""
 ARC-013,ARC-013 — ESM module system,design,,explanation/architecture.adoc,"""ESM (`""""type"""": """"module""""` in package.json) is used throughout the project.
 This
 choice enables modern `import`/`export` syntax, the `node:` protocol for built-in
@@ -2257,7 +2278,7 @@ extension loader uses `require()`, requiring `.cjs` wrappers for integration
 points (see xref:explanation/adr/0001-esm-over-cjs.adoc[ADR-001]).
 
 addresses:QA-055[]
-traceability:links[]"""
+tracer:links[]"""
 ARC-014,ARC-014 — Dependency injection by constructor,design,,explanation/architecture.adoc,"""All modules accept their dependencies via constructor parameters.
 There is no
 service locator, DI container, or global state. `TraceabilityGraph` receives
@@ -2268,7 +2289,7 @@ component independently testable without mocking frameworks (see
 xref:explanation/adr/0004-zero-framework.adoc[ADR-004]).
 
 addresses:QA-059[]
-traceability:links[]"""
+tracer:links[]"""
 ARC-004,ARC-004 — Key architectural decisions and their rationale,design,,explanation/architecture.adoc,"""This section captures the design decisions from `openspec/changes/unified-item-architecture/design.md`.
 
 [width=100%, cols=""""20,50,30""""]
@@ -2335,19 +2356,20 @@ verifies:REQ-090[]
 verifies:REQ-091[]
 verifies:REQ-092[]
 
-traceability:links[]
+tracer:links[]
 
-traceability:graph[]"""
+tracer:graph[]"""
 TST-002,TST-002 — Antora Extension Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/antora-extension.test.ts`
 
 Tests the `AntoraTraceabilityExtension` — initialization with default config, preset, config path, and disabled state.
 Tests event handler registration, content processing via `contentClassified` event (in-memory only, never touches disk), matrix generation via `sitePublished` event and matrix registration in the content catalog via `contentClassified`, and API access patterns.
-Also tests `traceability:outgoing[]`, `traceability:incoming[]`, and `traceability:links[]` macro expansion with configurable display style, sort order, collapsible sections, empty-state messages (`:traceability-empty:`), and opt-in behavior.
+Also tests `tracer:outgoing[]`, `tracer:incoming[]`, and `tracer:links[]` macro expansion with configurable display style, sort order, collapsible sections, empty-state messages (`:traceability-empty:`), and opt-in behavior.
 Tests incoming macro display styles, sort orders, reverse labels, PDF compatibility, and collapsible support.
-Tests `traceability:graph[]`, `traceability:graph-coverage[]`, and `traceability:config-graph[]` macro expansion with configurable Kroki image format and Kroki server URL (extension config option and `KROKI_SERVER_URL` env var override), graph-enabled and graph-disabled modes, including global coverage, explicit target IDs, and header exclusion.
+Tests `tracer:graph[]`, `tracer:graph-coverage[]`, and `tracer:config-graph[]` macro expansion with configurable Kroki image format and Kroki server URL (extension config option and `KROKI_SERVER_URL` env var override), graph-enabled and graph-disabled modes, including global coverage, explicit target IDs, and header exclusion.
 Tests automatic matrix registration in the content catalog during `contentClassified`.
 Tests partial file processing including item registration from partials, view URL as sourceFile, and macro expansion in Pass 2.
 Tests cross-module and cross-component xref prefix generation.
+Tests `git_describe` injection into `site.keys` and `asciidoc.attributes`, including the non-git fallback and absent-section handling.
 
 verifies:REQ-250[]
 verifies:REQ-041[]
@@ -2390,8 +2412,12 @@ verifies:REQ-164[]
 verifies:REQ-165[]
 verifies:REQ-166[]
 verifies:REQ-244[]
+verifies:REQ-252[]
+verifies:REQ-253[]
+verifies:REQ-254[]
+verifies:REQ-255[]
 
-traceability:links[]"""
+tracer:links[]"""
 TST-003,TST-003 — CLI Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/cli.test.ts`
 
 Tests the Commander-based CLI — process command (valid content, empty content, invalid paths, malformed macros), matrix command (generation, empty graph), validate command (invalid graph state), export command (empty graph), stats command (empty statistics), preset commands (invalid names, init, listing), help command, and next-id command (sequential ID generation, padding preservation, prefix matching).
@@ -2399,7 +2425,7 @@ Tests the Commander-based CLI — process command (valid content, empty content,
 verifies:REQ-056[]
 verifies:REQ-150[]
 
-traceability:links[]"""
+tracer:links[]"""
 TST-004,TST-004 — ConfigLoader Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/config-loader.test.ts`
 
 Tests the `ConfigLoader` — initialization, built-in preset listing and loading, preset structure validation (including pairwise matrix definitions), configuration loading from file, missing file handling, invalid YAML handling, role and relation validation, matrix definition retrieval, configuration merging (including label overrides), and error messages for invalid configurations and preset names.
@@ -2417,7 +2443,7 @@ verifies:REQ-224[]
 verifies:REQ-175[]
 verifies:REQ-177[]
 
-traceability:links[]"""
+tracer:links[]"""
 TST-005,TST-005 — Graph and API Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/graph-and-api.test.ts`
 
 Tests the `TraceabilityGraph` (extended queries: merge, getRelatedItems, getItemsWithRelationTo, getRelationshipsByRoles, findPath, getImpactAnalysis) and graph visualization methods (`toDot`, `toVegaLite`, `toConfigDot`).
@@ -2432,7 +2458,7 @@ verifies:REQ-219[]
 verifies:REQ-220[]
 verifies:REQ-176[]
 
-traceability:links[]"""
+tracer:links[]"""
 TST-006,TST-006 — MatrixGenerator Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/matrix-generator.test.ts`
 
 Tests the `MatrixGenerator` — basic matrix generation with empty graph, matrix generation with default and named configurations, role-based matrix rows and columns, coverage percentage calculation and status determination (`done`/`partial`/`missing`), coverage relation filtering, CSV export, HTML export, JSON export, coverage report generation, and edge cases (no matching items, missing titles, missing source files, unknown matrix names).
@@ -2453,18 +2479,18 @@ verifies:REQ-113[]
 verifies:REQ-114[]
 verifies:REQ-115[]
 
-traceability:links[]"""
+tracer:links[]"""
 TST-007,TST-007 — Neo4jExporter Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/neo4j-exporter.test.ts`
 
 Tests the `Neo4jExporter` — empty graph CSV export, items and relationships in CSV, all attributes in export, special character escaping, empty graph Cypher export, items and relationships in Cypher, `includeContent` option, `includeAllAttributes` option, output directory creation, multiple role types, and export result counts and file paths.
 
-traceability:links[]"""
+tracer:links[]"""
 TST-008,TST-008 — Relationship Link Substitution Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/relationship-link-substitution.test.ts`
 
 Tests the in-memory regex substitution that replaces relationship macros with Asciidoctor xrefs.
 Covers same-page xref generation, cross-page xref generation with basename path resolution, dangling reference handling, non-relationship text preservation, hyphenated/dotted IDs, missing sourceFile fallback, and surrounding text preservation.
 
-traceability:links[]"""
+tracer:links[]"""
 TST-009,TST-009 — Query Command Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/query-command.test.ts`
 
 Tests the `query` CLI subcommand end-to-end — reverse (inbound relationships, empty results, unknown ID), impact (connected items, disconnected items), isolated (relationship-less items, role filter), orphaned (superseded items without incoming functional links), path (chain output, no path, unknown ID), and the `--json` flag (valid JSON, empty array).
@@ -2478,7 +2504,7 @@ verifies:REQ-140[]
 verifies:REQ-141[]
 verifies:REQ-227[]
 
-traceability:links[]"""
+tracer:links[]"""
 TST-010,TST-010 — Vale Extension Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/antora-vale-extension.test.ts`
 
 Tests the bundled Vale prose-lint extension with fake `vale` and `asciidoctor` executables on PATH — page and partial findings with source path and line, severity gating (at-or-above fails the build, below is logged), opt-in behavior with no `.adoc` files, missing-executable failure messages, and that a multi-sentence source line produces no Vale finding.
@@ -2490,7 +2516,7 @@ verifies:REQ-155[]
 verifies:REQ-156[]
 verifies:REQ-153[]
 
-traceability:links[]"""
+tracer:links[]"""
 TST-011,TST-011 — Supersession Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/supersession.test.ts`
 
 Tests requirement supersession: deriving superseded state and successors from the `supersedes` relation, split and merge support, self-supersession and cycle validation errors, advisory stale-link warnings, orphaned-state derivation, dangling-reference detection with history/functional classification, and that superseded items are excluded from current-item queries and matrices.
@@ -2506,7 +2532,7 @@ verifies:REQ-211[]
 verifies:REQ-228[]
 verifies:REQ-234[]
 
-traceability:links[]"""
+tracer:links[]"""
 TST-012,TST-012 — Graph Diff Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/graph-diff.test.ts`
 
 Tests `diffGraphs`: added/removed/unmodified classification, field-level modification reporting, suppression of removed items' relationships, relationship deltas on surviving items, and that a superseded pair appears as removed plus added with the `supersedes` link.
@@ -2518,7 +2544,7 @@ verifies:REQ-225[]
 verifies:REQ-226[]
 verifies:REQ-216[]
 
-traceability:links[]"""
+tracer:links[]"""
 TST-013,TST-013 — Item Lifecycle Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/item-lifecycle.test.ts`
 
 Tests the `archive` and `remove` CLI commands end-to-end: moving a superseded block to `superseded.adoc` with content preserved, rejecting non-superseded and unknown IDs, removing an orphaned item after confirmation, declining on a non-y answer, removing an isolated item only after typing the ID, declining on ID mismatch, and rejecting a non-orphaned/non-isolated item.
@@ -2528,7 +2554,7 @@ verifies:REQ-236[]
 verifies:REQ-237[]
 verifies:REQ-238[]
 
-traceability:links[]"""
+tracer:links[]"""
 TST-014,TST-014 — Supersession Overview and Render Toggle Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/antora-extension.test.ts` (supersession overview and render toggle)
 
 Tests the generated supersession overview content — totals, per-role statistics, and the dangling-reference worklist — the display-only `renderSuperseded` toggle that omits superseded item blocks from rendered output without affecting the graph, and the full-graph accumulation across components used by the generation passes.
@@ -2540,14 +2566,14 @@ verifies:REQ-232[]
 verifies:REQ-233[]
 verifies:REQ-239[]
 
-traceability:links[]"""
+tracer:links[]"""
 TST-015,TST-015 — Documentation Example Validation Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/doc-example-validation.test.ts`
 
 Tests that every `[item]` example in the documentation uses known roles and relation types allowed by the traceability configuration.
 
 verifies:REQ-200[]
 
-traceability:links[]"""
+tracer:links[]"""
 TST-016,TST-016 — Release Consistency Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/release-check.test.ts`
 
 Tests the release-consistency checker's pure validation logic: a consistent release passes, and a missing tag, missing maintenance branch, missing changelog entry, and nonexistent playbook ref are each reported.
@@ -2557,7 +2583,7 @@ verifies:REQ-246[]
 verifies:REQ-247[]
 verifies:REQ-248[]
 
-traceability:links[]"""
+tracer:links[]"""
 PRQ-001,PRQ-001 — CI workflows trigger on push and PR,process_requirement,,self-traceability/delivery-process.adoc,"""The GitHub Actions CI workflow SHALL trigger on every push to `main` and every pull request.
 The workflow SHALL run on the latest Ubuntu runner and SHALL execute `npm ci`, `npm run build`, `npm test`, and `npm run lint` in sequence.
 
@@ -2565,7 +2591,7 @@ The CI pipeline ensures that every change is validated against the full test sui
 
 considered_by:ARC-031[]
 
-traceability:links[]"""
+tracer:links[]"""
 PRQ-002,PRQ-002 — Test suite runs as merge gate,process_requirement,,self-traceability/delivery-process.adoc,"""The test suite SHALL run as a required status check before merging any pull request to `main`.
 The suite SHALL include 275+ tests covering the extension core, Antora integration, CLI, matrix generation, Neo4j export, and link substitution.
 Any test failure SHALL block the merge.
@@ -2574,7 +2600,7 @@ validates:REQ-087[]
 validates:REQ-088[]
 considered_by:ARC-031[]
 
-traceability:links[]"""
+tracer:links[]"""
 PRQ-003,PRQ-003 — Example site builds without errors,process_requirement,,self-traceability/delivery-process.adoc,"""The example site SHALL build successfully as part of the CI pipeline.
 The build SHALL include the Antora HTML site generation and PDF output.
 Any xref warnings or build errors SHALL be treated as failures.
@@ -2583,7 +2609,7 @@ The site build exercises the full extension pipeline — parsing, macro expansio
 
 considered_by:ARC-031[]
 
-traceability:links[]"""
+tracer:links[]"""
 PRQ-004,PRQ-004 — Example site deploys from main branch,process_requirement,,self-traceability/delivery-process.adoc,"""The example site SHALL deploy to GitHub Pages automatically on every push to `main`.
 The Pages workflow SHALL build the Antora site, generate PDFs, copy the landing page, and deploy to the `gh-pages` branch.
 The deployment SHALL be atomic — either all artifacts deploy or none.
@@ -2593,7 +2619,7 @@ The deployed site serves as the project's public documentation and a live demons
 validates:REQ-072[]
 considered_by:ARC-033[]
 
-traceability:links[]"""
+tracer:links[]"""
 PRQ-005,PRQ-005 — Release is tagged and versioned,process_requirement,,self-traceability/delivery-process.adoc,"""Every release SHALL be tagged with a semver tag (`v0.12.1`) and the version SHALL be updated in `package.json`.
 The CHANGELOG SHALL be updated with all notable changes since the previous release.
 The release SHALL be published to npm.
@@ -2602,7 +2628,7 @@ Versioning follows https://semver.org/[Semantic Versioning]: MAJOR for breaking 
 
 considered_by:ARC-031[]
 
-traceability:links[]"""
+tracer:links[]"""
 PRQ-006,PRQ-006 — PDF artifacts are generated alongside HTML,process_requirement,,self-traceability/delivery-process.adoc,"""The Pages workflow SHALL generate PDF artifacts for the requirements, architecture, and test-plan documents using `@antora/pdf-extension` with Ruby and `asciidoctor-pdf`.
 PDFs SHALL be placed alongside HTML output in the deployed site.
 
@@ -2612,4 +2638,4 @@ validates:REQ-060[]
 validates:REQ-093[]
 considered_by:ARC-031[]
 
-traceability:links[]"""
+tracer:links[]"""

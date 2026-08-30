@@ -92,6 +92,17 @@ antora:
 The `KROKI_SERVER_URL` environment variable overrides the `krokiServerUrl` option.
 When set, it is used as the Kroki server base URL instead of the configured value or the default `https://kroki.io`.
 
+== Build version
+
+On every build, the extension computes the version string `git describe --tags --always --dirty` from the playbook directory and exposes it under one key in two channels:
+
+* `site.keys.git_describe` — for HTML UI templates (`{{site.keys.git_describe}}`)
+* `asciidoc.attributes.git_describe` — for AsciiDoc content and the PDF/DOCX backends (`{git_describe}`)
+
+When the build runs outside a git repository, neither key is set and the build continues unchanged.
+No configuration is required.
+See xref:how-to/show-build-version.adoc[How to show the build version in the footer].
+
 == Vale Extension
 
 The bundled `antora-vale` extension runs the https://vale.sh/[Vale] prose linter against the source AsciiDoc of the complete content catalog during the build.

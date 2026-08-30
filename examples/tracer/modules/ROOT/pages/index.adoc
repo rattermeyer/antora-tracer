@@ -39,6 +39,8 @@ This site follows the https://diataxis.fr[Diátaxis] documentation framework:
 
 A fifth section, *Self-Traceability*, demonstrates the extension applied to its own development — requirements, use cases, test plan, and dashboard — traced against each other using the same `[item]` macros.
 
+Built from {git_describe}.
+
 == Downloads
 
 Download the traceability documents:

@@ -1882,6 +1882,44 @@ Source: openspec/specs/release-consistency/spec.md
 tracer:links[]
 --
 
+=== Build Version
+
+[#REQ-252, item, role=requirement, title="git describe is computed once per build"]
+--
+The extension SHALL compute the build version string using `git describe --tags --always --dirty`, run from the playbook directory, exactly once per Antora build.
+
+Source: openspec/specs/git-describe/spec.md
+
+tracer:links[]
+--
+
+[#REQ-253, item, role=requirement, title="git_describe is exposed as a site key"]
+--
+The extension SHALL set `site.keys.git_describe` to the computed version string, making it available to HTML Handlebars templates.
+
+Source: openspec/specs/git-describe/spec.md
+
+tracer:links[]
+--
+
+[#REQ-254, item, role=requirement, title="git_describe is exposed as a document attribute"]
+--
+The extension SHALL set `asciidoc.attributes.git_describe` to the computed version string, making it available to AsciiDoc content, the PDF theme, and the DOCX converter.
+
+Source: openspec/specs/git-describe/spec.md
+
+tracer:links[]
+--
+
+[#REQ-255, item, role=requirement, title="build succeeds outside a git repository"]
+--
+When the version string cannot be computed — the build directory is not inside a git repository, or the `git` command is unavailable or fails — the extension SHALL set neither key and SHALL NOT fail the build.
+
+Source: openspec/specs/git-describe/spec.md
+
+tracer:links[]
+--
+
 === Landing Page
 
 [#REQ-072, item, role=requirement, title="Landing page at GitHub Pages root"]

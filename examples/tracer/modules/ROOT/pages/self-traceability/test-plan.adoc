@@ -42,6 +42,7 @@ Tests `tracer:graph[]`, `tracer:graph-coverage[]`, and `tracer:config-graph[]` m
 Tests automatic matrix registration in the content catalog during `contentClassified`.
 Tests partial file processing including item registration from partials, view URL as sourceFile, and macro expansion in Pass 2.
 Tests cross-module and cross-component xref prefix generation.
+Tests `git_describe` injection into `site.keys` and `asciidoc.attributes`, including the non-git fallback and absent-section handling.
 
 verifies:REQ-250[]
 verifies:REQ-041[]
@@ -84,6 +85,10 @@ verifies:REQ-164[]
 verifies:REQ-165[]
 verifies:REQ-166[]
 verifies:REQ-244[]
+verifies:REQ-252[]
+verifies:REQ-253[]
+verifies:REQ-254[]
+verifies:REQ-255[]
 
 tracer:links[]
 --

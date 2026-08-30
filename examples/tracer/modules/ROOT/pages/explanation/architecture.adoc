@@ -810,6 +810,7 @@ include::example$pass-pipeline.puml[]
 Key timing characteristics:
 
 - *Synchronous init*: `AntoraTraceabilityExtension` constructor initializes the traceability graph synchronously (config/preset loading is a synchronous file read) before any event handler is registered. This eliminates the race where a `contentClassified` event could fire before the graph is ready.
+- *Build-version injection*: the constructor also runs `git describe --tags --always --dirty` once and injects the result as `git_describe` into `site.keys` and `asciidoc.attributes` before Antora freezes the playbook, so HTML and PDF/DOCX footers can render the version.
 - *Single-pass processing*: `process()` call does both parsing and graph population in one call. No separate relationship processing pass needed.
 - *Lazy rendering*: Templates are loaded and compiled on first use, cached thereafter.
 

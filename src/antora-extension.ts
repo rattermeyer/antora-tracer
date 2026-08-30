@@ -13,6 +13,7 @@
  * }
  */
 
+import { execSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { isAbsolute, join } from "node:path";
 import { deflateSync } from "node:zlib";
@@ -28,6 +29,23 @@ import {
   RENDERING_MACRO_NS,
   type Item,
 } from "./types.js";
+
+/**
+ * Resolve the build version string from git. Returns undefined when the
+ * directory is not inside a git repository or the git command fails, so
+ * the build proceeds without the value.
+ */
+function gitDescribe(dir: string): string | undefined {
+  try {
+    return execSync("git describe --tags --always --dirty", {
+      cwd: dir,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+  } catch {
+    return undefined;
+  }
+}
 
 /**
  * Antora Extension Configuration
@@ -95,12 +113,17 @@ export class AntoraTraceabilityExtension {
   private fullGraph: TraceabilityGraph | null = null;
   private config: Required<AntoraTraceabilityConfig>;
   private readonly logger: ReturnType<AntoraExtensionContext["getLogger"]>;
+  private readonly playbook: any;
 
   constructor(
     private readonly context: AntoraExtensionContext,
-    antoraConfig?: { config?: Partial<AntoraTraceabilityConfig> },
+    antoraConfig?: {
+      config?: Partial<AntoraTraceabilityConfig>;
+      playbook?: any;
+    },
   ) {
     this.logger = context.getLogger("requirements-traceability");
+    this.playbook = antoraConfig?.playbook;
     // Antora normalizes YAML extension config keys to lowercase, so merge
     // all sources first, then re-apply camelCase keys so DEFAULT_CONFIG
     // fields like configPath/outputDir are correctly overridden.
@@ -140,6 +163,8 @@ export class AntoraTraceabilityExtension {
       return;
     }
 
+    this.injectGitVersion();
+
     this.logger.info("Requirements traceability extension initialized");
 
     // Load the extension synchronously so event handlers can rely on
@@ -154,6 +179,23 @@ export class AntoraTraceabilityExtension {
     this.registerContentClassifier();
     this.registerPageProcessor();
     this.registerNavigationEnhancer();
+  }
+
+  /**
+   * Expose the git version string to both render channels: the HTML
+   * Handlebars model (site.keys) and the AsciiDoc/PDF/DOCX backends
+   * (asciidoc.attributes). Runs in the constructor — before Antora freezes
+   * the playbook — and injects nothing when git is unavailable.
+   */
+  private injectGitVersion(): void {
+    const playbook = this.playbook;
+    if (!playbook) return;
+    const describe = gitDescribe(playbook.dir ?? process.cwd());
+    if (!describe) return;
+    (playbook.site ??= {}).keys ??= {};
+    playbook.site.keys.git_describe = describe;
+    (playbook.asciidoc ??= {}).attributes ??= {};
+    playbook.asciidoc.attributes.git_describe = describe;
   }
 
   private createTraceabilityExtension(): RequirementsTraceabilityExtension {

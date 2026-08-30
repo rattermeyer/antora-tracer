@@ -2778,4 +2778,64 @@ supersedes:REQ-042[]
       expect(out).to.include("REQ-043");
     });
   });
+
+  // ========================================================================
+  // Git describe exposure
+  // ========================================================================
+
+  describe("Git describe exposure", () => {
+    it("injects git_describe into site.keys when git describe succeeds", async () => {
+      const ctx = createMockContext();
+      const playbook: any = { dir: process.cwd(), site: {}, asciidoc: {} };
+      const ext = new AntoraTraceabilityExtension(ctx as any, {
+        playbook,
+      } as any);
+      await waitForInit();
+
+      expect(ext.getTraceabilityExtension()).to.exist;
+      expect(playbook.site.keys.git_describe).to.be.a("string").that.is.not
+        .empty;
+    });
+
+    it("injects git_describe into asciidoc.attributes when git describe succeeds", async () => {
+      const ctx = createMockContext();
+      const playbook: any = { dir: process.cwd(), site: {}, asciidoc: {} };
+      const ext = new AntoraTraceabilityExtension(ctx as any, {
+        playbook,
+      } as any);
+      await waitForInit();
+
+      expect(ext.getTraceabilityExtension()).to.exist;
+      expect(playbook.asciidoc.attributes.git_describe).to.be.a("string").that
+        .is.not.empty;
+    });
+
+    it("does not inject git_describe when git describe fails", async () => {
+      const ctx = createMockContext();
+      const playbook: any = { dir: tempDir, site: {}, asciidoc: {} };
+      const ext = new AntoraTraceabilityExtension(ctx as any, {
+        playbook,
+      } as any);
+      await waitForInit();
+
+      expect(ext.getTraceabilityExtension()).to.exist;
+      expect(playbook.site.keys).to.be.undefined;
+      expect(playbook.asciidoc.attributes).to.be.undefined;
+    });
+
+    it("creates site and asciidoc sections when absent", async () => {
+      const ctx = createMockContext();
+      const playbook: any = { dir: process.cwd() };
+      const ext = new AntoraTraceabilityExtension(ctx as any, {
+        playbook,
+      } as any);
+      await waitForInit();
+
+      expect(ext.getTraceabilityExtension()).to.exist;
+      expect(playbook.site.keys.git_describe).to.be.a("string").that.is.not
+        .empty;
+      expect(playbook.asciidoc.attributes.git_describe).to.be.a("string").that
+        .is.not.empty;
+    });
+  });
 });
