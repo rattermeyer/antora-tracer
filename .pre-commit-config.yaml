@@ -16,6 +16,7 @@ repos:
         entry: npx biome format --write
         language: node
         files: \.(json)$
+        exclude: ^lib/.*$
 
       - id: vale-adoc
         name: vale (AsciiDoc prose lint)
