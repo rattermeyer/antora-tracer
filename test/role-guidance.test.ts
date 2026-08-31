@@ -3,10 +3,10 @@
  * project override, and extends-chain merging.
  */
 
-import { expect } from "chai";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { expect } from "chai";
 import { ConfigLoader } from "../src/config/TraceabilityConfig.js";
 
 describe("role-guidance", () => {

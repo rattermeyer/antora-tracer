@@ -5,9 +5,9 @@
  * exercising end-to-end block relocation/deletion and the confirmation prompts.
  */
 
+import { spawnSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { expect } from "chai";
 

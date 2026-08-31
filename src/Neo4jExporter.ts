@@ -192,7 +192,14 @@ export class Neo4jExporter {
     relationships: ItemRelationship[],
     filePath: string,
   ): void {
-    const headers = ["id", "source", "target", "type", "sourceFile", "bidirectional"];
+    const headers = [
+      "id",
+      "source",
+      "target",
+      "type",
+      "sourceFile",
+      "bidirectional",
+    ];
     const lines: string[] = [this.escapeCSVRow(headers)];
 
     for (const rel of relationships) {

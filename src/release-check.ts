@@ -65,7 +65,9 @@ export function gatherState(cwd: string): ReleaseState {
   const pkg = JSON.parse(readFileSync(join(cwd, "package.json"), "utf8"));
   const playbook = yamlLoad(
     readFileSync(join(cwd, "antora-playbook-ci.yml"), "utf8"),
-  ) as { content?: { sources?: Array<{ branches?: string[]; tags?: string[] }> } };
+  ) as {
+    content?: { sources?: Array<{ branches?: string[]; tags?: string[] }> };
+  };
   const refs: string[] = [];
   for (const src of playbook.content?.sources ?? []) {
     for (const b of src.branches ?? []) refs.push(b);

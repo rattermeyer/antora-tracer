@@ -16,7 +16,12 @@ import { HISTORY_RELATION_TYPES, ROLE_COLORS, SUPERSEDES } from "./types.js";
  * Warning type for graph operations
  */
 export interface GraphWarning {
-  type: "unknown_role" | "invalid_relation" | "duplicate_node" | "stale_link" | "dangling_link";
+  type:
+    | "unknown_role"
+    | "invalid_relation"
+    | "duplicate_node"
+    | "stale_link"
+    | "dangling_link";
   message: string;
   file?: string;
   line?: number;

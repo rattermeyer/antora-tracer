@@ -12,8 +12,7 @@ function state(overrides: Partial<ReleaseState> = {}): ReleaseState {
     branches: ["main", "v0.20.x"],
     tags: ["v0.20.0"],
     playbookRefs: ["main", "v0.20.x"],
-    changelog:
-      "# Changelog\n\n## [0.20.0] — 2026-08-19\n\n### Added\n- x\n",
+    changelog: "# Changelog\n\n## [0.20.0] — 2026-08-19\n\n### Added\n- x\n",
     ...overrides,
   };
 }

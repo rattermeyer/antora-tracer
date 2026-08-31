@@ -2938,7 +2938,10 @@ supersedes:REQ-042[]
 addresses:REQ-999[]
 --
 `;
-      const file = { src: { path: "test.adoc" }, contents: Buffer.from(content) };
+      const file = {
+        src: { path: "test.adoc" },
+        contents: Buffer.from(content),
+      };
       ctx.fireEvent("contentClassified", {
         contentCatalog: {
           findBy: ({ family }: { family: string }) =>
@@ -3043,7 +3046,10 @@ New requirement.
 supersedes:REQ-042[]
 --
 `;
-      const file = { src: { path: "test.adoc" }, contents: Buffer.from(content) };
+      const file = {
+        src: { path: "test.adoc" },
+        contents: Buffer.from(content),
+      };
       ctx.fireEvent("contentClassified", {
         contentCatalog: {
           findBy: ({ family }: { family: string }) =>
@@ -3102,9 +3108,12 @@ supersedes:REQ-042[]
     it("injects git_describe into site.keys when git describe succeeds", async () => {
       const ctx = createMockContext();
       const playbook: any = { dir: process.cwd(), site: {}, asciidoc: {} };
-      const ext = new AntoraTraceabilityExtension(ctx as any, {
-        playbook,
-      } as any);
+      const ext = new AntoraTraceabilityExtension(
+        ctx as any,
+        {
+          playbook,
+        } as any,
+      );
       await waitForInit();
 
       expect(ext.getTraceabilityExtension()).to.exist;
@@ -3115,9 +3124,12 @@ supersedes:REQ-042[]
     it("injects git_describe into asciidoc.attributes when git describe succeeds", async () => {
       const ctx = createMockContext();
       const playbook: any = { dir: process.cwd(), site: {}, asciidoc: {} };
-      const ext = new AntoraTraceabilityExtension(ctx as any, {
-        playbook,
-      } as any);
+      const ext = new AntoraTraceabilityExtension(
+        ctx as any,
+        {
+          playbook,
+        } as any,
+      );
       await waitForInit();
 
       expect(ext.getTraceabilityExtension()).to.exist;
@@ -3128,9 +3140,12 @@ supersedes:REQ-042[]
     it("does not inject git_describe when git describe fails", async () => {
       const ctx = createMockContext();
       const playbook: any = { dir: tempDir, site: {}, asciidoc: {} };
-      const ext = new AntoraTraceabilityExtension(ctx as any, {
-        playbook,
-      } as any);
+      const ext = new AntoraTraceabilityExtension(
+        ctx as any,
+        {
+          playbook,
+        } as any,
+      );
       await waitForInit();
 
       expect(ext.getTraceabilityExtension()).to.exist;
@@ -3141,9 +3156,12 @@ supersedes:REQ-042[]
     it("creates site and asciidoc sections when absent", async () => {
       const ctx = createMockContext();
       const playbook: any = { dir: process.cwd() };
-      const ext = new AntoraTraceabilityExtension(ctx as any, {
-        playbook,
-      } as any);
+      const ext = new AntoraTraceabilityExtension(
+        ctx as any,
+        {
+          playbook,
+        } as any,
+      );
       await waitForInit();
 
       expect(ext.getTraceabilityExtension()).to.exist;

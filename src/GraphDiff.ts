@@ -7,10 +7,10 @@
  * single-repo CLI `diff` path is unchanged.
  */
 
+import type { GraphSnapshot } from "./GraphSnapshot.js";
 import type { TraceabilityGraph } from "./TraceabilityGraph.js";
 import type { Item, ItemRelationship } from "./types.js";
 import { HISTORY_RELATION_TYPES } from "./types.js";
-import type { GraphSnapshot } from "./GraphSnapshot.js";
 
 export type ItemChangeKind = "added" | "removed" | "modified";
 

@@ -15,7 +15,10 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pagesDir = resolve(__dirname, "tracer/modules/ROOT/pages");
-const outputDir = resolve(__dirname, "tracer/modules/ROOT/attachments/traceability");
+const outputDir = resolve(
+  __dirname,
+  "tracer/modules/ROOT/attachments/traceability",
+);
 
 // Load custom config
 const configLoader = new ConfigLoader();
@@ -25,13 +28,28 @@ configLoader.load(resolve(__dirname, "traceability.yml"));
 const extension = new RequirementsTraceabilityExtension(configLoader);
 const files = [
   "self-traceability/use-cases.adoc",
-  { adoc: "requirements.adoc", realPath: resolve(__dirname, "tracer/modules/requirements/pages/index.adoc") },
-  { adoc: "demo/index.adoc", realPath: resolve(__dirname, "demo/modules/ROOT/pages/index.adoc") },
-  "explanation/architecture.adoc", "self-traceability/test-plan.adoc", "self-traceability/delivery-process.adoc",
-  "explanation/quality/zero-operational-overhead.adoc", "explanation/quality/configurable-without-code.adoc",
-  "explanation/quality/fail-fast-diagnostics.adoc", "explanation/quality/no-side-effects.adoc",
-  "explanation/quality/testability-by-design.adoc", "explanation/quality/pdf-compatibility.adoc",
-  "explanation/quality/platform-stability.adoc", "explanation/quality/performance.adoc"
+  {
+    adoc: "requirements.adoc",
+    realPath: resolve(
+      __dirname,
+      "tracer/modules/requirements/pages/index.adoc",
+    ),
+  },
+  {
+    adoc: "demo/index.adoc",
+    realPath: resolve(__dirname, "demo/modules/ROOT/pages/index.adoc"),
+  },
+  "explanation/architecture.adoc",
+  "self-traceability/test-plan.adoc",
+  "self-traceability/delivery-process.adoc",
+  "explanation/quality/zero-operational-overhead.adoc",
+  "explanation/quality/configurable-without-code.adoc",
+  "explanation/quality/fail-fast-diagnostics.adoc",
+  "explanation/quality/no-side-effects.adoc",
+  "explanation/quality/testability-by-design.adoc",
+  "explanation/quality/pdf-compatibility.adoc",
+  "explanation/quality/platform-stability.adoc",
+  "explanation/quality/performance.adoc",
 ];
 const results = extension.processFiles(
   files.map((f) => {

@@ -10,8 +10,8 @@ import {
   writeFileSync,
 } from "node:fs";
 import { dirname, join, resolve, sep } from "node:path";
-import { fileURLToPath } from "node:url";
 import { createInterface } from "node:readline";
+import { fileURLToPath } from "node:url";
 import chalk from "chalk";
 import { program } from "commander";
 

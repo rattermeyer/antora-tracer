@@ -4,9 +4,9 @@
 
 import type { ConfigLoader } from "./config/TraceabilityConfig.js";
 import {
-  RENDERING_MACRO_LOOKAHEAD,
   type Item,
   type ItemRelationship,
+  RENDERING_MACRO_LOOKAHEAD,
 } from "./types.js";
 
 /**

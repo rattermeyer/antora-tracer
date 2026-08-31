@@ -477,7 +477,10 @@ export class ConfigLoader {
 
       // Resolve this preset's own roleGuidance page paths relative to the preset file
       if (preset.traceability) {
-        this.resolveGuidancePaths(preset.traceability, path.dirname(presetPath));
+        this.resolveGuidancePaths(
+          preset.traceability,
+          path.dirname(presetPath),
+        );
       }
 
       // Resolve parent preset inheritance (child wins on conflict)

@@ -601,12 +601,10 @@ export {
 // Graph snapshot
 export {
   deserializeSnapshot,
-  serializeSnapshot,
-  SNAPSHOT_FORMAT,
   type GraphSnapshot,
+  SNAPSHOT_FORMAT,
+  serializeSnapshot,
 } from "./GraphSnapshot.js";
-// Site-graph harvest
-export { harvestSiteFiles, type HarvestedFile } from "./SiteGraph.js";
 // Matrix Generator
 export {
   type GeneratedMatrix,
@@ -622,6 +620,8 @@ export {
   type Neo4jExportOptions,
   type Neo4jExportResult,
 } from "./Neo4jExporter.js";
+// Site-graph harvest
+export { type HarvestedFile, harvestSiteFiles } from "./SiteGraph.js";
 // Graph types
 export type { GraphWarning, ValidationResult } from "./TraceabilityGraph.js";
 // Core types

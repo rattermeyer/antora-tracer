@@ -20,14 +20,14 @@ import { deflateSync } from "node:zlib";
 import asciidoctor from "@asciidoctor/core";
 import { ConfigLoader, toConfigDot } from "./config/TraceabilityConfig.js";
 import { RequirementsTraceabilityExtension } from "./index.js";
-import { TraceabilityGraph } from "./TraceabilityGraph.js";
 import { LinkResolver } from "./LinkResolver.js";
 import { MatrixGenerator } from "./MatrixGenerator.js";
+import { TraceabilityGraph } from "./TraceabilityGraph.js";
 import {
+  type Item,
   RENDERING_MACRO_LOOKAHEAD,
   RENDERING_MACRO_NAMESPACES,
   RENDERING_MACRO_NS,
-  type Item,
 } from "./types.js";
 
 /**
@@ -147,7 +147,8 @@ export class AntoraTraceabilityExtension {
       allowDuplicateIds: rc.allowDuplicateIds ?? rc.allowduplicateids ?? false,
       renderSuperseded: rc.renderSuperseded ?? rc.rendersuperseded ?? true,
       generateOverview: rc.generateOverview ?? rc.generateoverview ?? true,
-      overviewTarget: rc.overviewTarget || rc.overviewtarget || "traceability/overview.html",
+      overviewTarget:
+        rc.overviewTarget || rc.overviewtarget || "traceability/overview.html",
     };
 
     // Fallback: if no configPath is set, try the example site config

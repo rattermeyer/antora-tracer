@@ -625,7 +625,10 @@ addresses:DES-001[] is real. \`addresses:TARGET[]\` is not.
 
   describe("Module and Component Context", () => {
     it("should set module and component on parsed items when provided", () => {
-      const parser = new DocumentParser({ component: "tracer", module: "ROOT" });
+      const parser = new DocumentParser({
+        component: "tracer",
+        module: "ROOT",
+      });
       const result = parser.parse(
         `[#REQ-001, item, role=requirement, title="Test"]
 --
