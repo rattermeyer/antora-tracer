@@ -2520,6 +2520,122 @@ satisfies:REQ-001[]
     });
   });
 
+  describe("Role Guidance Registration", () => {
+    it("registers resolved guidance pages as attachments in the content catalog", async () => {
+      const dir = mkdtempSync(join(tmpdir(), "guidance-reg-"));
+      const guidanceAdoc = join(dir, "req-guidance.adoc");
+      writeFileSync(
+        guidanceAdoc,
+        "= Requirement Guidance\n\nWrite SHALL statements.\n",
+      );
+      const configYml = join(dir, "traceability.yml");
+      writeFileSync(
+        configYml,
+        [
+          "extends: requirements-engineering",
+          "roles: [requirement]",
+          "roleGuidance:",
+          "  requirement:",
+          `    page: ${guidanceAdoc}`,
+          "    idPrefix: REQ",
+        ].join("\n"),
+      );
+
+      const addedFiles: any[] = [];
+      const contentCatalog = {
+        findBy: ({ family }: { family: string }) =>
+          family === "page"
+            ? [
+                {
+                  src: {
+                    path: "modules/ROOT/pages/index.adoc",
+                    module: "ROOT",
+                    component: "test-component",
+                    version: "1.0.0",
+                  },
+                  contents: Buffer.from("= Test\n"),
+                },
+              ]
+            : [],
+        getById: () => undefined,
+        addFile: (file: any) => {
+          addedFiles.push(file);
+          return file;
+        },
+      };
+
+      const ctx = createMockContext({
+        playbook: { output: { dir: dir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any, {
+        config: { configPath: configYml },
+      });
+      await waitForInit();
+
+      ctx.fireEvent("contentClassified", { contentCatalog });
+
+      const guidanceFiles = addedFiles.filter(
+        (f: any) =>
+          f.src?.family === "attachment" &&
+          f.src?.relative?.startsWith("traceability/guidance/"),
+      );
+      expect(guidanceFiles.length).to.be.greaterThan(0);
+
+      const reqGuidance = guidanceFiles.find(
+        (f: any) =>
+          f.src?.relative === "traceability/guidance/requirement.html",
+      );
+      expect(reqGuidance).to.exist;
+      expect(reqGuidance.src.component).to.equal("test-component");
+      expect(reqGuidance.src.version).to.equal("1.0.0");
+      expect(reqGuidance.contents.toString()).to.include("SHALL");
+
+      rmSync(dir, { recursive: true, force: true });
+    });
+
+    it("registers no guidance attachments when the config has no roleGuidance", async () => {
+      const configYml = join(tempDir, "agile-config.yml");
+      writeFileSync(configYml, "extends: agile\n");
+      const addedFiles: any[] = [];
+      const contentCatalog = {
+        findBy: ({ family }: { family: string }) =>
+          family === "page"
+            ? [
+                {
+                  src: {
+                    path: "modules/ROOT/pages/index.adoc",
+                    module: "ROOT",
+                    component: "test-component",
+                    version: "1.0.0",
+                  },
+                  contents: Buffer.from("= Test\n"),
+                },
+              ]
+            : [],
+        getById: () => undefined,
+        addFile: (file: any) => {
+          addedFiles.push(file);
+          return file;
+        },
+      };
+
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any, {
+        config: { configPath: configYml },
+      });
+      await waitForInit();
+
+      ctx.fireEvent("contentClassified", { contentCatalog });
+
+      const guidanceFiles = addedFiles.filter((f: any) =>
+        f.src?.relative?.startsWith("traceability/guidance/"),
+      );
+      expect(guidanceFiles).to.have.length(0);
+    });
+  });
+
   // ========================================================================
   // Cross-Module Xref Generation
   // ========================================================================

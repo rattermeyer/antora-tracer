@@ -767,6 +767,62 @@ Source: openspec/specs/reverse-relations/spec.md
 tracer:links[]
 --
 
+=== Role Guidance
+
+[#REQ-265, item, role=requirement, title="Role guidance is configurable per role"]
+--
+The traceability configuration SHALL support a `roleGuidance` section that maps a role name to a `page` (an AsciiDoc page path) and an optional `idPrefix`.
+
+Source: openspec/specs/role-guidance/spec.md
+
+tracer:links[]
+--
+
+[#REQ-266, item, role=requirement, title="Default guidance ships with presets"]
+--
+The extension SHALL ship default guidance AsciiDoc pages with the built-in presets, so a project that extends a preset receives guidance without authoring its own.
+
+Source: openspec/specs/role-guidance/spec.md
+
+tracer:links[]
+--
+
+[#REQ-267, item, role=requirement, title="Guidance resolves through the extends chain"]
+--
+The `roleGuidance` section SHALL merge through the preset `extends` chain the same way `relations` does, with the more-derived config overriding the base.
+
+Source: openspec/specs/role-guidance/spec.md
+
+tracer:links[]
+--
+
+[#REQ-268, item, role=requirement, title="CLI resolves and reports guidance"]
+--
+The CLI SHALL provide a `role-guidance <role>` command that resolves the guidance through the `extends` chain and reports the resolved page path and `idPrefix`.
+
+Source: openspec/specs/role-guidance/spec.md
+
+tracer:links[]
+--
+
+[#REQ-269, item, role=requirement, title="Guidance renders into the site"]
+--
+The extension SHALL register the resolved guidance pages into the content catalog at build time so they render in the consuming site.
+
+Source: openspec/specs/role-guidance/spec.md
+
+tracer:links[]
+--
+
+[#REQ-270, item, role=requirement, title="idPrefix is a fallback, not an authority"]
+--
+The `idPrefix` reported by the CLI SHALL be treated as advisory: it is a fallback for when the existing project content does not establish a convention, and it SHALL NOT override an established prefix.
+
+Source: openspec/specs/role-guidance/spec.md
+
+tracer:links[]
+--
+
 === Graph Visualization
 
 [#REQ-051, item, role=requirement, title="Relationship graph via tracer:graph[] macro"]

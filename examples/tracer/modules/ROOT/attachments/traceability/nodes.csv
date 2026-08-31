@@ -927,6 +927,36 @@ REQ-178,REQ-178 — Matrix coverage matches the canonical primary type,requireme
 Source: openspec/specs/reverse-relations/spec.md
 
 tracer:links[]"""
+REQ-265,REQ-265 — Role guidance is configurable per role,requirement,,requirements.adoc,"""The traceability configuration SHALL support a `roleGuidance` section that maps a role name to a `page` (an AsciiDoc page path) and an optional `idPrefix`.
+
+Source: openspec/specs/role-guidance/spec.md
+
+tracer:links[]"""
+REQ-266,REQ-266 — Default guidance ships with presets,requirement,,requirements.adoc,"""The extension SHALL ship default guidance AsciiDoc pages with the built-in presets, so a project that extends a preset receives guidance without authoring its own.
+
+Source: openspec/specs/role-guidance/spec.md
+
+tracer:links[]"""
+REQ-267,REQ-267 — Guidance resolves through the extends chain,requirement,,requirements.adoc,"""The `roleGuidance` section SHALL merge through the preset `extends` chain the same way `relations` does, with the more-derived config overriding the base.
+
+Source: openspec/specs/role-guidance/spec.md
+
+tracer:links[]"""
+REQ-268,REQ-268 — CLI resolves and reports guidance,requirement,,requirements.adoc,"""The CLI SHALL provide a `role-guidance <role>` command that resolves the guidance through the `extends` chain and reports the resolved page path and `idPrefix`.
+
+Source: openspec/specs/role-guidance/spec.md
+
+tracer:links[]"""
+REQ-269,REQ-269 — Guidance renders into the site,requirement,,requirements.adoc,"""The extension SHALL register the resolved guidance pages into the content catalog at build time so they render in the consuming site.
+
+Source: openspec/specs/role-guidance/spec.md
+
+tracer:links[]"""
+REQ-270,"""REQ-270 — idPrefix is a fallback, not an authority""",requirement,,requirements.adoc,"""The `idPrefix` reported by the CLI SHALL be treated as advisory: it is a fallback for when the existing project content does not establish a convention, and it SHALL NOT override an established prefix.
+
+Source: openspec/specs/role-guidance/spec.md
+
+tracer:links[]"""
 REQ-051,REQ-051 — Relationship graph via tracer:graph[] macro,requirement,,requirements.adoc,"""The system SHALL provide a `tracer:graph[]` inline macro that renders a relationship diagram for the enclosing item.
 The diagram SHALL show the item and its related items as labeled nodes and edges, colored by role.
 An optional depth parameter SHALL control the number of relationship hops shown.
@@ -1924,6 +1954,18 @@ addresses:REQ-261[]
 addresses:REQ-262[]
 
 tracer:links[]"""
+ARC-047,ARC-047 — Role-based authoring guidance,design,,explanation/architecture.adoc,"""Per-role authoring guidance is config data, not hardcoded: the `roleGuidance` config section maps a role to an AsciiDoc `page` and an optional `idPrefix`, merging through the preset `extends` chain so a project can override a preset's page per role.
+The `role-guidance` CLI command resolves and reports the page and prefix, and the bundled `write-item` skill consumes it when authoring an item.
+At build time, `resolveGuidanceEntries()` renders each resolved page to HTML and registers it as `traceability/guidance/<role>.html` in the content catalog (same attachment mechanism as matrices), so guidance renders in the consuming site without the project copying pages into its own content sources.
+
+addresses:REQ-265[]
+addresses:REQ-266[]
+addresses:REQ-267[]
+addresses:REQ-268[]
+addresses:REQ-269[]
+addresses:REQ-270[]
+
+tracer:links[]"""
 ARC-041,ARC-041 — Supersession lifecycle states and queries,design,,explanation/architecture.adoc,"""The supersession lifecycle has three graph-level states: `isolated` (no relationships), `orphaned` (superseded with no incoming functional links), and `dangling reference` (a link whose target no longer exists).
 `TraceabilityGraph.isOrphaned()`, `getSupersededItems()`, and `getDanglingReferences()` expose them, and `validate()` classifies a dangling link as an advisory `dangling_link` warning when its type is a history relation (`supersedes`/`superseded_by`) and an error otherwise.
 
@@ -2437,6 +2479,7 @@ Tests incoming macro display styles, sort orders, reverse labels, PDF compatibil
 Tests `tracer:graph[]`, `tracer:graph-coverage[]`, and `tracer:config-graph[]` macro expansion with configurable Kroki image format and Kroki server URL (extension config option and `KROKI_SERVER_URL` env var override), graph-enabled and graph-disabled modes, including global coverage, explicit target IDs, and header exclusion.
 Tests automatic matrix registration in the content catalog during `contentClassified`.
 Tests the per-version `graph.json` snapshot registration: snapshot content (items and relationships with scope, no `pubUrl`), gating by `generateMatrices`, empty-graph versions, and in-place refresh of a committed copy.
+Tests role guidance page registration in the content catalog: resolved pages render to `traceability/guidance/<role>.html`, and a config without `roleGuidance` registers none.
 Tests partial file processing including item registration from partials, view URL as sourceFile, and macro expansion in Pass 2.
 Tests cross-module and cross-component xref prefix generation.
 Tests `git_describe` injection into `site.keys` and `asciidoc.attributes`, including the non-git fallback and absent-section handling.
@@ -2468,6 +2511,7 @@ verifies:REQ-102[]
 verifies:REQ-249[]
 verifies:REQ-104[]
 verifies:REQ-108[]
+verifies:REQ-269[]
 verifies:REQ-256[]
 verifies:REQ-257[]
 verifies:REQ-258[]
@@ -2667,6 +2711,15 @@ verifies:REQ-245[]
 verifies:REQ-246[]
 verifies:REQ-247[]
 verifies:REQ-248[]
+
+tracer:links[]"""
+TST-018,TST-018 — Role Guidance Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/role-guidance.test.ts`
+
+Tests `roleGuidance` config resolution via `ConfigLoader`: preset default guidance, project override per role, extends-chain merging, and the no-guidance case for a role without an entry.
+
+verifies:REQ-265[]
+verifies:REQ-266[]
+verifies:REQ-267[]
 
 tracer:links[]"""
 PRQ-001,PRQ-001 — CI workflows trigger on push and PR,process_requirement,,self-traceability/delivery-process.adoc,"""The GitHub Actions CI workflow SHALL trigger on every push to `main` and every pull request.

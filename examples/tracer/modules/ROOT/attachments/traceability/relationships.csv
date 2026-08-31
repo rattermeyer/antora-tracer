@@ -175,6 +175,12 @@ ARC-040-addresses-REQ-264,ARC-040,REQ-264,addresses,explanation/architecture.ado
 ARC-046-addresses-REQ-260,ARC-046,REQ-260,addresses,explanation/architecture.adoc,false
 ARC-046-addresses-REQ-261,ARC-046,REQ-261,addresses,explanation/architecture.adoc,false
 ARC-046-addresses-REQ-262,ARC-046,REQ-262,addresses,explanation/architecture.adoc,false
+ARC-047-addresses-REQ-265,ARC-047,REQ-265,addresses,explanation/architecture.adoc,false
+ARC-047-addresses-REQ-266,ARC-047,REQ-266,addresses,explanation/architecture.adoc,false
+ARC-047-addresses-REQ-267,ARC-047,REQ-267,addresses,explanation/architecture.adoc,false
+ARC-047-addresses-REQ-268,ARC-047,REQ-268,addresses,explanation/architecture.adoc,false
+ARC-047-addresses-REQ-269,ARC-047,REQ-269,addresses,explanation/architecture.adoc,false
+ARC-047-addresses-REQ-270,ARC-047,REQ-270,addresses,explanation/architecture.adoc,false
 ARC-041-addresses-REQ-227,ARC-041,REQ-227,addresses,explanation/architecture.adoc,false
 ARC-041-addresses-REQ-228,ARC-041,REQ-228,addresses,explanation/architecture.adoc,false
 ARC-041-addresses-REQ-234,ARC-041,REQ-234,addresses,explanation/architecture.adoc,false
@@ -303,6 +309,7 @@ TST-002-verifies-REQ-102,TST-002,REQ-102,verifies,self-traceability/test-plan.ad
 TST-002-verifies-REQ-249,TST-002,REQ-249,verifies,self-traceability/test-plan.adoc,false
 TST-002-verifies-REQ-104,TST-002,REQ-104,verifies,self-traceability/test-plan.adoc,false
 TST-002-verifies-REQ-108,TST-002,REQ-108,verifies,self-traceability/test-plan.adoc,false
+TST-002-verifies-REQ-269,TST-002,REQ-269,verifies,self-traceability/test-plan.adoc,false
 TST-002-verifies-REQ-256,TST-002,REQ-256,verifies,self-traceability/test-plan.adoc,false
 TST-002-verifies-REQ-257,TST-002,REQ-257,verifies,self-traceability/test-plan.adoc,false
 TST-002-verifies-REQ-258,TST-002,REQ-258,verifies,self-traceability/test-plan.adoc,false
@@ -409,6 +416,9 @@ TST-016-verifies-REQ-245,TST-016,REQ-245,verifies,self-traceability/test-plan.ad
 TST-016-verifies-REQ-246,TST-016,REQ-246,verifies,self-traceability/test-plan.adoc,false
 TST-016-verifies-REQ-247,TST-016,REQ-247,verifies,self-traceability/test-plan.adoc,false
 TST-016-verifies-REQ-248,TST-016,REQ-248,verifies,self-traceability/test-plan.adoc,false
+TST-018-verifies-REQ-265,TST-018,REQ-265,verifies,self-traceability/test-plan.adoc,false
+TST-018-verifies-REQ-266,TST-018,REQ-266,verifies,self-traceability/test-plan.adoc,false
+TST-018-verifies-REQ-267,TST-018,REQ-267,verifies,self-traceability/test-plan.adoc,false
 PRQ-001-considered_by-ARC-031,PRQ-001,ARC-031,considered_by,self-traceability/delivery-process.adoc,false
 PRQ-002-validates-REQ-087,PRQ-002,REQ-087,validates,self-traceability/delivery-process.adoc,false
 PRQ-002-validates-REQ-088,PRQ-002,REQ-088,validates,self-traceability/delivery-process.adoc,false

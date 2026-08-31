@@ -332,6 +332,22 @@ addresses:REQ-262[]
 tracer:links[]
 --
 
+[#ARC-047, item, role=design, title="Role-based authoring guidance"]
+--
+Per-role authoring guidance is config data, not hardcoded: the `roleGuidance` config section maps a role to an AsciiDoc `page` and an optional `idPrefix`, merging through the preset `extends` chain so a project can override a preset's page per role.
+The `role-guidance` CLI command resolves and reports the page and prefix, and the bundled `write-item` skill consumes it when authoring an item.
+At build time, `resolveGuidanceEntries()` renders each resolved page to HTML and registers it as `traceability/guidance/<role>.html` in the content catalog (same attachment mechanism as matrices), so guidance renders in the consuming site without the project copying pages into its own content sources.
+
+addresses:REQ-265[]
+addresses:REQ-266[]
+addresses:REQ-267[]
+addresses:REQ-268[]
+addresses:REQ-269[]
+addresses:REQ-270[]
+
+tracer:links[]
+--
+
 [#ARC-041, item, role=design, title="Supersession lifecycle states and queries"]
 --
 The supersession lifecycle has three graph-level states: `isolated` (no relationships), `orphaned` (superseded with no incoming functional links), and `dangling reference` (a link whose target no longer exists).
