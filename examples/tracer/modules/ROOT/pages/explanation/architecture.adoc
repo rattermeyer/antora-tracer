@@ -300,8 +300,10 @@ tracer:links[]
 
 [#ARC-040, item, role=design, title="Graph diff"]
 --
-`GraphDiff.diffGraphs(prev, next)` compares two graph snapshots by stable item ID, classifying each item as added, removed, or modified without hardcoding any role name.
+`GraphDiff.diffGraphs(prev, next)` compares two graph snapshots by component-qualified item identity (component + version, when present, then ID), classifying each item as added, removed, or modified without hardcoding any role name.
+Items without a component fall back to bare ID, so the single-repo CLI `diff` path is unchanged.
 A surviving item is `modified` when a compared field (`title`, `content`, `role`, `status`, or `attributes`) differs, and relationship deltas are reported only between surviving items, except `supersedes` history links.
+`diffSnapshots()` diffs two loaded `GraphSnapshot` JSON artifacts at the data level, so snapshots can be diffed without reconstructing a graph.
 See xref:explanation/adr/0010-identity-first-graph-diff.adoc[ADR-010].
 
 addresses:REQ-212[]
@@ -311,6 +313,21 @@ addresses:REQ-225[]
 addresses:REQ-226[]
 addresses:REQ-216[]
 addresses:REQ-217[]
+addresses:REQ-263[]
+addresses:REQ-264[]
+
+tracer:links[]
+--
+
+[#ARC-046, item, role=design, title="Site-graph harvest and canonical snapshots"]
+--
+`SiteGraph.harvestSiteFiles(playbook)` resolves an Antora playbook through `@antora/playbook-builder`, `@antora/content-aggregator`, and `@antora/content-classifier` — stopping before document conversion — and returns each `.adoc` page and partial with its `component`, `module`, and `version` scope.
+The CLI `site-graph` command feeds those files into the core parser and serializes the graph with `GraphSnapshot.serializeSnapshot()`, which drops per-page `pubUrl` and stamps a `format: 1` schema version.
+The Antora packages are optional dependencies loaded lazily, so the CLI still runs without them.
+
+addresses:REQ-260[]
+addresses:REQ-261[]
+addresses:REQ-262[]
 
 tracer:links[]
 --
@@ -601,8 +618,8 @@ subcommands for processing (`process`), matrix generation (`matrix`)
 validation (`validate`), Neo4j export (`export neo4j`), statistics
 (`stats`), preset management (`preset`), ID allocation (`next-id`),
 graph querying (`query`), supersession inspection (`supersession`),
-graph diffing (`diff`), and item lifecycle management (`archive`,
-`remove`).
+graph diffing (`diff`, `diff-graphs`), site-graph harvest (`site-graph`),
+and item lifecycle management (`archive`, `remove`).
 Global `--config` and `--preset` flags apply to all commands.
 The CLI
 operates standalone — it does not require an Antora build pipeline.

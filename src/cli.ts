@@ -19,8 +19,12 @@ import { program } from "commander";
 import {
   BUILT_IN_PRESETS,
   ConfigLoader,
+  deserializeSnapshot,
   diffGraphs,
+  diffSnapshots,
+  harvestSiteFiles,
   RequirementsTraceabilityExtension,
+  serializeSnapshot,
 } from "./index.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -1095,10 +1099,7 @@ queryProgram
         ];
       });
       console.log(
-        formatTable(
-          ["ID", "Role", "Title", "Superseded by", "File"],
-          rows,
-        ),
+        formatTable(["ID", "Role", "Title", "Superseded by", "File"], rows),
       );
     }
   });
@@ -1264,8 +1265,96 @@ program
   });
 
 program
+  .command("site-graph")
+  .description(
+    "Build the full cross-source traceability graph from an Antora playbook and emit a JSON snapshot",
+  )
+  .argument("<playbook>", "Path to the Antora playbook file")
+  .option(
+    "-o, --out <path>",
+    "Write the snapshot to a file (defaults to stdout)",
+  )
+  .action(async (playbook: string, options: any) => {
+    try {
+      const extension = await createExtension({});
+      const files = await harvestSiteFiles(playbook);
+      for (const file of files) {
+        extension.process(file.content, {
+          sourceFile: file.path,
+          component: file.component,
+          module: file.module,
+          version: file.version,
+          pubUrl: file.pubUrl,
+        });
+      }
+      const snapshot = serializeSnapshot(extension.graph);
+      if (options.out) {
+        writeFileSync(resolve(process.cwd(), options.out), snapshot, "utf8");
+        console.log(chalk.green(`Snapshot written to ${options.out}`));
+      } else {
+        console.log(snapshot);
+      }
+    } catch (error: any) {
+      console.error(chalk.red("Error harvesting site graph:", error.message));
+      process.exit(1);
+    }
+  });
+
+program
+  .command("diff-graphs")
+  .description("Diff two JSON graph snapshots into a traceability delta")
+  .requiredOption("--from <path>", "Baseline snapshot JSON file")
+  .requiredOption("--to <path>", "Changed snapshot JSON file")
+  .option("--json", "Output machine-readable JSON")
+  .action((options: any) => {
+    try {
+      const prev = deserializeSnapshot(
+        readFileSync(resolve(process.cwd(), options.from), "utf8"),
+      );
+      const next = deserializeSnapshot(
+        readFileSync(resolve(process.cwd(), options.to), "utf8"),
+      );
+      const delta = diffSnapshots(prev, next);
+
+      if (options.json) {
+        console.log(JSON.stringify(delta, null, 2));
+        return;
+      }
+
+      if (delta.items.length === 0 && delta.relationships.length === 0) {
+        console.log("No changes.");
+        return;
+      }
+
+      const itemRows = delta.items.map((d) => [
+        d.kind,
+        d.id,
+        d.role,
+        d.changedFields.join(", "),
+      ]);
+      console.log(
+        formatTable(["Kind", "ID", "Role", "Changed fields"], itemRows),
+      );
+
+      if (delta.relationships.length > 0) {
+        console.log("");
+        const relRows = delta.relationships.map((r) => [
+          r.kind,
+          `${r.rel.fromId} --${r.rel.type}--> ${r.rel.targetId}`,
+        ]);
+        console.log(formatTable(["Kind", "Relationship"], relRows));
+      }
+    } catch (error: any) {
+      console.error(chalk.red("Error diffing snapshots:", error.message));
+      process.exit(1);
+    }
+  });
+
+program
   .command("archive <id>")
-  .description("Move a superseded item block to the module's superseded.adoc page")
+  .description(
+    "Move a superseded item block to the module's superseded.adoc page",
+  )
   .option("-i, --input <path>", "Input file or directory", ".")
   .action(async (id: string, options: any) => {
     const extension = await createExtension({});
@@ -1335,7 +1424,9 @@ program
       graph.getReverseRelationships(id).length === 0;
     if (!orphaned && !isolated) {
       console.error(
-        chalk.red(`Item ${id} is neither orphaned nor isolated — nothing to remove.`),
+        chalk.red(
+          `Item ${id} is neither orphaned nor isolated — nothing to remove.`,
+        ),
       );
       process.exit(1);
     }

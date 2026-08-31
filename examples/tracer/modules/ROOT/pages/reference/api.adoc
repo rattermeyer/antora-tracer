@@ -254,10 +254,34 @@ export interface GraphDiff {
 }
 
 export function diffGraphs(prev: TraceabilityGraph, next: TraceabilityGraph): GraphDiff;
+
+export function diffSnapshots(prev: GraphSnapshot, next: GraphSnapshot): GraphDiff;
 ----
 
-Items are matched by ID: present only in `next` are `added`, only in `prev` are `removed`, and survivors are compared field-by-field (`title`, `content`, `role`, `status`, `attributes`) for `modified`.
+Items are matched by component-qualified identity (`component`, then `version` when present, then `id`); items without a component fall back to bare ID.
+Items present only in `next` are `added`, only in `prev` are `removed`, and survivors are compared field-by-field (`title`, `content`, `role`, `status`, `attributes`) for `modified`.
 Relationship changes are reported only for surviving items, except `supersedes` history links.
+
+== GraphSnapshot
+
+`src/GraphSnapshot.ts` — the canonical JSON snapshot format shared by `site-graph`, `diff-graphs`, and the extension's per-version `graph.json`.
+
+[source,typescript]
+----
+export interface GraphSnapshot {
+  format: number;                    // schema version, currently 1
+  items: Item[];
+  relationships: ItemRelationship[];
+}
+
+export const SNAPSHOT_FORMAT = 1;
+
+export function serializeSnapshot(graph: TraceabilityGraph): string;
+export function deserializeSnapshot(json: string): GraphSnapshot;
+----
+
+`serializeSnapshot` keeps item scope fields (`component`, `module`, `version`) and drops per-page `pubUrl`.
+`deserializeSnapshot` rejects unknown `format` values and malformed snapshots.
 
 == Data Model
 
@@ -274,6 +298,10 @@ export interface Item {
   attributes: Record<string, string>; // Additional attributes
   sourceFile?: string;               // Source AsciiDoc file
   sourceLine?: number;               // Line number in source
+  component?: string;                // Antora component name (absent for CLI)
+  module?: string;                   // Antora module name (absent for CLI)
+  version?: string;                  // Antora component version (absent for CLI)
+  pubUrl?: string;                   // Antora published URL (absent for CLI)
 }
 
 export interface ItemRelationship {

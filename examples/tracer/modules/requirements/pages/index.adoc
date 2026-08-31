@@ -1215,7 +1215,7 @@ tracer:links[]
 
 [#REQ-212, item, role=requirement, title="Diff classifies items by stable ID"]
 --
-When two graph snapshots are compared, the diff SHALL classify each item as added, removed, or modified based on its stable ID.
+When two graph snapshots are compared, the diff SHALL classify each item as added, removed, or modified based on its stable ID, scoped to the item's component and version when present.
 
 Source: openspec/specs/graph-diff/spec.md
 
@@ -1286,6 +1286,53 @@ tracer:links[]
 A `diff` CLI command SHALL scan two source paths, build two graphs, and print the delta without modifying any source file.
 
 Source: openspec/specs/graph-diff/spec.md
+
+tracer:links[]
+--
+
+=== Multi-Source Diff
+
+[#REQ-260, item, role=requirement, title="Full cross-source graph is built without site output"]
+--
+The tooling SHALL build the complete traceability graph for a playbook's aggregated content — spanning all content sources, components, and versions — without generating HTML, PDF, or DOCX output.
+
+Source: openspec/specs/multi-source-diff/spec.md
+
+tracer:links[]
+--
+
+[#REQ-261, item, role=requirement, title="Harvested items carry component, module, and version scope"]
+--
+When items are harvested from a playbook, each item SHALL record the component, module, and version of the content source it came from, so the diff can disambiguate same-ID items.
+
+Source: openspec/specs/multi-source-diff/spec.md
+
+tracer:links[]
+--
+
+[#REQ-262, item, role=requirement, title="Graph snapshots serialize to JSON"]
+--
+A harvested graph SHALL serialize to a canonical JSON snapshot containing the item and relationship lists, with each item carrying its scope fields, so a snapshot can be stored and diffed later.
+
+Source: openspec/specs/multi-source-diff/spec.md
+
+tracer:links[]
+--
+
+[#REQ-263, item, role=requirement, title="Two snapshots can be diffed without checkouts"]
+--
+The tooling SHALL diff two JSON snapshots — reporting added, removed, modified, and superseded items — without requiring either version's sources to be checked out at diff time.
+
+Source: openspec/specs/multi-source-diff/spec.md
+
+tracer:links[]
+--
+
+[#REQ-264, item, role=requirement, title="Diff matches items by component-qualified identity"]
+--
+The diff SHALL match items by component-qualified identity — component, version when present, and ID — so the same ID in different components or versions is not conflated, while items without a component continue to match by bare ID.
+
+Source: openspec/specs/multi-source-diff/spec.md
 
 tracer:links[]
 --

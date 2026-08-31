@@ -265,6 +265,21 @@ verifies:REQ-216[]
 tracer:links[]
 --
 
+[#TST-017, item, role=test, title="Graph Snapshot and Site-Graph Harvest Tests"]
+--
+Test file: `test/graph-snapshot.test.ts`
+
+Tests `serializeSnapshot`/`deserializeSnapshot` round-trips (scope fields preserved, `pubUrl` dropped, unknown format and malformed snapshots rejected), `diffSnapshots` over JSON snapshots (same ID in different components not conflated, cross-component superseded pairs), component-qualified `diffGraphs` identity with bare-ID fallback, and the `site-graph` harvest resolving a multi-component playbook with component, module, and version scope.
+
+verifies:REQ-260[]
+verifies:REQ-261[]
+verifies:REQ-262[]
+verifies:REQ-263[]
+verifies:REQ-264[]
+
+tracer:links[]
+--
+
 [#TST-013, item, role=test, title="Item Lifecycle Tests"]
 --
 Test file: `test/item-lifecycle.test.ts`

@@ -435,6 +435,65 @@ A `modified` item lists the changed fields (`title`, `content`, `role`, `status`
 Relationship changes are reported only for items that survive the diff, except `supersedes` history links.
 The command never modifies source files.
 
+== site-graph
+
+Build the full cross-source traceability graph from an Antora playbook and emit a canonical JSON snapshot.
+The harvest runs Antora's content aggregation and classification stages only — no HTML, PDF, or DOCX output is produced — so it captures items from every content source, component, and version the playbook resolves.
+
+[source,bash]
+----
+npx antora-tracer site-graph antora-playbook.yml --out snapshot.json
+----
+
+[width=100%, cols="25,15,60"]
+|===
+| Option | Type | Description
+
+| `<playbook>`
+| string
+| Path to the Antora playbook file (positional argument)
+
+| `-o, --out <path>`
+| string
+| Write the snapshot to a file instead of stdout
+|===
+
+Each item in the snapshot carries `component`, `module`, and `version` scope.
+The snapshot is versioned (`format: 1`) and omits per-page `pubUrl` fields.
+
+Requires the optional `@antora/content-aggregator`, `@antora/content-classifier`, and `@antora/playbook-builder` packages.
+
+== diff-graphs
+
+Diff two JSON graph snapshots into a traceability delta without checking out either version's sources.
+The snapshots are produced by `site-graph` (or by the extension's per-version `graph.json` attachment).
+
+[source,bash]
+----
+npx antora-tracer diff-graphs --from v1.json --to v2.json
+npx antora-tracer diff-graphs --from v1.json --to v2.json --json
+----
+
+[width=100%, cols="25,15,60"]
+|===
+| Option | Type | Description
+
+| `--from <path>`
+| string
+| Baseline snapshot JSON file (required)
+
+| `--to <path>`
+| string
+| Changed snapshot JSON file (required)
+
+| `--json`
+| flag
+| Output machine-readable JSON instead of a table
+|===
+
+Items are matched by component-qualified identity (component + version + ID), falling back to bare ID for items without a component.
+An unknown `format` value is rejected with a prompt to re-run `site-graph`.
+
 == Related
 
 - xref:how-to/write-traceable-items.adoc[How to write traceable items] — using next-id in workflow

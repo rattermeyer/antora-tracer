@@ -593,10 +593,20 @@ export type {
 // Graph diff
 export {
   diffGraphs,
+  diffSnapshots,
   type GraphDiff,
   type ItemDelta,
   type RelationshipDelta,
 } from "./GraphDiff.js";
+// Graph snapshot
+export {
+  deserializeSnapshot,
+  serializeSnapshot,
+  SNAPSHOT_FORMAT,
+  type GraphSnapshot,
+} from "./GraphSnapshot.js";
+// Site-graph harvest
+export { harvestSiteFiles, type HarvestedFile } from "./SiteGraph.js";
 // Matrix Generator
 export {
   type GeneratedMatrix,

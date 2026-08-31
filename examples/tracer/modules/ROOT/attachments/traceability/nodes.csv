@@ -1173,7 +1173,7 @@ REQ-251,REQ-251 — Working graph spans components within a version,requirement,
 Source: openspec/specs/graph-lifecycle/spec.md
 
 tracer:links[]"""
-REQ-212,REQ-212 — Diff classifies items by stable ID,requirement,,requirements.adoc,"""When two graph snapshots are compared, the diff SHALL classify each item as added, removed, or modified based on its stable ID.
+REQ-212,REQ-212 — Diff classifies items by stable ID,requirement,,requirements.adoc,"""When two graph snapshots are compared, the diff SHALL classify each item as added, removed, or modified based on its stable ID, scoped to the item's component and version when present.
 
 Source: openspec/specs/graph-diff/spec.md
 
@@ -1216,6 +1216,31 @@ tracer:links[]"""
 REQ-217,REQ-217 — CLI diff is read-only,requirement,,requirements.adoc,"""A `diff` CLI command SHALL scan two source paths, build two graphs, and print the delta without modifying any source file.
 
 Source: openspec/specs/graph-diff/spec.md
+
+tracer:links[]"""
+REQ-260,REQ-260 — Full cross-source graph is built without site output,requirement,,requirements.adoc,"""The tooling SHALL build the complete traceability graph for a playbook's aggregated content — spanning all content sources, components, and versions — without generating HTML, PDF, or DOCX output.
+
+Source: openspec/specs/multi-source-diff/spec.md
+
+tracer:links[]"""
+REQ-261,"""REQ-261 — Harvested items carry component, module, and version scope""",requirement,,requirements.adoc,"""When items are harvested from a playbook, each item SHALL record the component, module, and version of the content source it came from, so the diff can disambiguate same-ID items.
+
+Source: openspec/specs/multi-source-diff/spec.md
+
+tracer:links[]"""
+REQ-262,REQ-262 — Graph snapshots serialize to JSON,requirement,,requirements.adoc,"""A harvested graph SHALL serialize to a canonical JSON snapshot containing the item and relationship lists, with each item carrying its scope fields, so a snapshot can be stored and diffed later.
+
+Source: openspec/specs/multi-source-diff/spec.md
+
+tracer:links[]"""
+REQ-263,REQ-263 — Two snapshots can be diffed without checkouts,requirement,,requirements.adoc,"""The tooling SHALL diff two JSON snapshots — reporting added, removed, modified, and superseded items — without requiring either version's sources to be checked out at diff time.
+
+Source: openspec/specs/multi-source-diff/spec.md
+
+tracer:links[]"""
+REQ-264,REQ-264 — Diff matches items by component-qualified identity,requirement,,requirements.adoc,"""The diff SHALL match items by component-qualified identity — component, version when present, and ID — so the same ID in different components or versions is not conflated, while items without a component continue to match by bare ID.
+
+Source: openspec/specs/multi-source-diff/spec.md
 
 tracer:links[]"""
 QA-057,QA-057 — Fail-fast with clear diagnostics,requirement,,requirements.adoc,include::ROOT:partial$quality/qa-fail-fast-diagnostics.adoc[]
@@ -1873,8 +1898,10 @@ addresses:REQ-210[]
 addresses:REQ-211[]
 
 tracer:links[]"""
-ARC-040,ARC-040 — Graph diff,design,,explanation/architecture.adoc,"""`GraphDiff.diffGraphs(prev, next)` compares two graph snapshots by stable item ID, classifying each item as added, removed, or modified without hardcoding any role name.
+ARC-040,ARC-040 — Graph diff,design,,explanation/architecture.adoc,"""`GraphDiff.diffGraphs(prev, next)` compares two graph snapshots by component-qualified item identity (component + version, when present, then ID), classifying each item as added, removed, or modified without hardcoding any role name.
+Items without a component fall back to bare ID, so the single-repo CLI `diff` path is unchanged.
 A surviving item is `modified` when a compared field (`title`, `content`, `role`, `status`, or `attributes`) differs, and relationship deltas are reported only between surviving items, except `supersedes` history links.
+`diffSnapshots()` diffs two loaded `GraphSnapshot` JSON artifacts at the data level, so snapshots can be diffed without reconstructing a graph.
 See xref:explanation/adr/0010-identity-first-graph-diff.adoc[ADR-010].
 
 addresses:REQ-212[]
@@ -1884,6 +1911,17 @@ addresses:REQ-225[]
 addresses:REQ-226[]
 addresses:REQ-216[]
 addresses:REQ-217[]
+addresses:REQ-263[]
+addresses:REQ-264[]
+
+tracer:links[]"""
+ARC-046,ARC-046 — Site-graph harvest and canonical snapshots,design,,explanation/architecture.adoc,"""`SiteGraph.harvestSiteFiles(playbook)` resolves an Antora playbook through `@antora/playbook-builder`, `@antora/content-aggregator`, and `@antora/content-classifier` — stopping before document conversion — and returns each `.adoc` page and partial with its `component`, `module`, and `version` scope.
+The CLI `site-graph` command feeds those files into the core parser and serializes the graph with `GraphSnapshot.serializeSnapshot()`, which drops per-page `pubUrl` and stamps a `format: 1` schema version.
+The Antora packages are optional dependencies loaded lazily, so the CLI still runs without them.
+
+addresses:REQ-260[]
+addresses:REQ-261[]
+addresses:REQ-262[]
 
 tracer:links[]"""
 ARC-041,ARC-041 — Supersession lifecycle states and queries,design,,explanation/architecture.adoc,"""The supersession lifecycle has three graph-level states: `isolated` (no relationships), `orphaned` (superseded with no incoming functional links), and `dangling reference` (a link whose target no longer exists).
@@ -2096,8 +2134,8 @@ subcommands for processing (`process`), matrix generation (`matrix`)
 validation (`validate`), Neo4j export (`export neo4j`), statistics
 (`stats`), preset management (`preset`), ID allocation (`next-id`),
 graph querying (`query`), supersession inspection (`supersession`),
-graph diffing (`diff`), and item lifecycle management (`archive`,
-`remove`).
+graph diffing (`diff`, `diff-graphs`), site-graph harvest (`site-graph`),
+and item lifecycle management (`archive`, `remove`).
 Global `--config` and `--preset` flags apply to all commands.
 The CLI
 operates standalone — it does not require an Antora build pipeline.
@@ -2579,6 +2617,17 @@ verifies:REQ-214[]
 verifies:REQ-225[]
 verifies:REQ-226[]
 verifies:REQ-216[]
+
+tracer:links[]"""
+TST-017,TST-017 — Graph Snapshot and Site-Graph Harvest Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/graph-snapshot.test.ts`
+
+Tests `serializeSnapshot`/`deserializeSnapshot` round-trips (scope fields preserved, `pubUrl` dropped, unknown format and malformed snapshots rejected), `diffSnapshots` over JSON snapshots (same ID in different components not conflated, cross-component superseded pairs), component-qualified `diffGraphs` identity with bare-ID fallback, and the `site-graph` harvest resolving a multi-component playbook with component, module, and version scope.
+
+verifies:REQ-260[]
+verifies:REQ-261[]
+verifies:REQ-262[]
+verifies:REQ-263[]
+verifies:REQ-264[]
 
 tracer:links[]"""
 TST-013,TST-013 — Item Lifecycle Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/item-lifecycle.test.ts`

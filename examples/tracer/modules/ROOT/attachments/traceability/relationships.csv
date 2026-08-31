@@ -170,6 +170,11 @@ ARC-040-addresses-REQ-225,ARC-040,REQ-225,addresses,explanation/architecture.ado
 ARC-040-addresses-REQ-226,ARC-040,REQ-226,addresses,explanation/architecture.adoc,false
 ARC-040-addresses-REQ-216,ARC-040,REQ-216,addresses,explanation/architecture.adoc,false
 ARC-040-addresses-REQ-217,ARC-040,REQ-217,addresses,explanation/architecture.adoc,false
+ARC-040-addresses-REQ-263,ARC-040,REQ-263,addresses,explanation/architecture.adoc,false
+ARC-040-addresses-REQ-264,ARC-040,REQ-264,addresses,explanation/architecture.adoc,false
+ARC-046-addresses-REQ-260,ARC-046,REQ-260,addresses,explanation/architecture.adoc,false
+ARC-046-addresses-REQ-261,ARC-046,REQ-261,addresses,explanation/architecture.adoc,false
+ARC-046-addresses-REQ-262,ARC-046,REQ-262,addresses,explanation/architecture.adoc,false
 ARC-041-addresses-REQ-227,ARC-041,REQ-227,addresses,explanation/architecture.adoc,false
 ARC-041-addresses-REQ-228,ARC-041,REQ-228,addresses,explanation/architecture.adoc,false
 ARC-041-addresses-REQ-234,ARC-041,REQ-234,addresses,explanation/architecture.adoc,false
@@ -384,6 +389,11 @@ TST-012-verifies-REQ-214,TST-012,REQ-214,verifies,self-traceability/test-plan.ad
 TST-012-verifies-REQ-225,TST-012,REQ-225,verifies,self-traceability/test-plan.adoc,false
 TST-012-verifies-REQ-226,TST-012,REQ-226,verifies,self-traceability/test-plan.adoc,false
 TST-012-verifies-REQ-216,TST-012,REQ-216,verifies,self-traceability/test-plan.adoc,false
+TST-017-verifies-REQ-260,TST-017,REQ-260,verifies,self-traceability/test-plan.adoc,false
+TST-017-verifies-REQ-261,TST-017,REQ-261,verifies,self-traceability/test-plan.adoc,false
+TST-017-verifies-REQ-262,TST-017,REQ-262,verifies,self-traceability/test-plan.adoc,false
+TST-017-verifies-REQ-263,TST-017,REQ-263,verifies,self-traceability/test-plan.adoc,false
+TST-017-verifies-REQ-264,TST-017,REQ-264,verifies,self-traceability/test-plan.adoc,false
 TST-013-verifies-REQ-235,TST-013,REQ-235,verifies,self-traceability/test-plan.adoc,false
 TST-013-verifies-REQ-236,TST-013,REQ-236,verifies,self-traceability/test-plan.adoc,false
 TST-013-verifies-REQ-237,TST-013,REQ-237,verifies,self-traceability/test-plan.adoc,false
