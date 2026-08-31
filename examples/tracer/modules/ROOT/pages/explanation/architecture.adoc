@@ -463,7 +463,17 @@ Matrices are registered under every
 module that has AsciiDoc content; a committed copy, if present, has its
 contents refreshed in place.
 
+The same mechanism registers a per-version `traceability/graph.json` snapshot via
+`registerGraphJsonInCatalog()`.
+`serializeGraphSnapshot()` writes the version's items and relationships in the
+canonical `{ format, component, version, items, relationships }` shape, dropping
+`pubUrl`, and is gated by the same `generateMatrices` option as the matrices.
+
 addresses:REQ-108[]
+addresses:REQ-256[]
+addresses:REQ-257[]
+addresses:REQ-258[]
+addresses:REQ-259[]
 tracer:links[]
 --
 
@@ -748,10 +758,10 @@ include::example$sequence-diagram.puml[]
 | Participant | Role in processing
 
 | Antora Build
-| Triggers `contentClassified` (document processing and matrix registration) and `sitePublished` (standalone output directory). Provides the content catalog.
+| Triggers `contentClassified` (document processing, matrix and graph-snapshot registration) and `sitePublished` (standalone output directory). Provides the content catalog.
 
 | `AntoraTraceabilityExtension`
-| Event handler registration. Orchestrates the processing passes and matrix registration in the content catalog. Reads playbook config to determine preset, config path, output directory.
+| Event handler registration. Orchestrates the processing passes, matrix registration, and graph-snapshot registration in the content catalog. Reads playbook config to determine preset, config path, output directory.
 
 | `RequirementsTraceabilityExtension`
 | Core API. Owns the graph, delegates to parser and generators. Same class used by CLI without Antora events.

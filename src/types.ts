@@ -23,6 +23,8 @@ export interface Item {
   component?: string;
   /** Antora module name (e.g., "ROOT", "requirements"). Absent for CLI usage. */
   module?: string;
+  /** Antora component version (e.g., "0.19", "main"). Absent for CLI usage. */
+  version?: string;
   /** Antora published URL of the item's page (e.g., "/tracer/stable/index.html"). Absent for CLI usage. */
   pubUrl?: string;
 }

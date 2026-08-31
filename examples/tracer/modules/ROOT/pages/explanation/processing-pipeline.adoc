@@ -12,7 +12,7 @@ It covers the internal pass structure, the graph lifecycle, and how components c
 
 The extension hooks into Antora's event pipeline through two events:
 
-- `contentClassified` — fires once after content classification, before document conversion. The extension parses items, expands macros, substitutes links, and registers generated matrices in the content catalog.
+- `contentClassified` — fires once after content classification, before document conversion. The extension parses items, expands macros, substitutes links, and registers generated matrices and the per-version graph snapshot in the content catalog.
 - `sitePublished` — fires once after all pages are published. The extension writes the standalone traceability output directory (matrices, coverage, index).
 
 The same `RequirementsTraceabilityExtension` class works standalone (via CLI) or within Antora — the event handlers are optional.
@@ -60,6 +60,13 @@ For partial items: `link:URL#ID` (since partials don't produce HTML pages).
 
 This pass also runs `injectTitleIds()` (prepends ID to title for visible display) and `unindentItemMacros()`.
 
+=== Artifact registration (per component version)
+
+After Pass 3, the extension registers generated artifacts in the content catalog for each component version, under every module with AsciiDoc content.
+Matrices (HTML, CSV, JSON) are generated from the working graph.
+A `traceability/graph.json` snapshot serializes the same version's working graph in the canonical `{ format, component, version, items, relationships }` shape, excluding `pubUrl`.
+Both are gated by the `generateMatrices` option and refresh a committed copy in place rather than adding a duplicate.
+
 == Graph lifecycle
 
 The extension maintains two graphs with distinct lifecycles:
@@ -77,7 +84,7 @@ The working graph's lifecycle:
 
 . **Macro expansion** (Pass 2/2b/3): The working graph is read-only. Macros query it to generate output. No new items or relationships are added.
 
-. **Finalization**: The standalone output directory (matrices, coverage, overview) is written at `sitePublished` from the full graph, so it spans every component and version.
+. **Finalization**: The standalone output directory (matrices, coverage, overview) is written at `sitePublished` from the full graph, so it spans every component and version. The `graph.json` snapshot is not part of this pass — it is registered during `contentClassified` from the working graph, so each published version keeps its own copy.
 
 == Component interaction
 

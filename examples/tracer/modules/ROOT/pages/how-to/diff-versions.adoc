@@ -37,6 +37,12 @@ Add `--json` for machine-readable output.
 - Relationship changes are reported only for items that survive the diff.
 - A superseded requirement appears as `removed` plus its successor `added`, with the `supersedes` link listed as a new relationship.
 
+== Published graph snapshots
+
+Every site build also publishes a per-version `graph.json` snapshot next to the generated matrices, at `traceability/graph.json` under each component version.
+The snapshot records the version's items and relationships in the canonical `{ format, component, version, items, relationships }` shape, so a published version carries a machine-readable record of its traceability graph without re-checking out the sources.
+See xref:reference/configuration.adoc[Configuration Reference] for the `generateMatrices` option that gates it.
+
 == Related
 
 - xref:reference/cli.adoc[CLI Reference] — `diff` and `supersession check` options

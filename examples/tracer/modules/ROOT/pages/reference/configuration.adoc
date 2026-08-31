@@ -46,7 +46,7 @@ antora:
 | `generateMatrices`
 | boolean
 | `true`
-| Generate traceability matrices. Set to `false` for Neo4j-only usage
+| Generate traceability matrices and the per-version `graph.json` snapshot. Set to `false` for Neo4j-only usage
 
 | `matrixFormats`
 | string[]
@@ -91,6 +91,10 @@ antora:
 
 The `KROKI_SERVER_URL` environment variable overrides the `krokiServerUrl` option.
 When set, it is used as the Kroki server base URL instead of the configured value or the default `https://kroki.io`.
+
+When matrix generation is enabled, the extension also registers a per-version `graph.json` snapshot as a site attachment under `traceability/graph.json`.
+The snapshot contains every item and relationship of that component version in the canonical `{ format, component, version, items, relationships }` shape, with per-item scope fields but no per-page `pubUrl`.
+It gives each published version a machine-readable record of its traceability graph.
 
 == Build version
 

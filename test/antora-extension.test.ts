@@ -2321,6 +2321,205 @@ The system shall authenticate users.
     });
   });
 
+  describe("Graph JSON Catalog Registration", () => {
+    const itemContent = `
+[#REQ-001, item, role=requirement, title="User Authentication"]
+====
+The system shall authenticate users.
+====
+
+[#IMP-001, item, role=implementation, title="AuthService"]
+====
+Implements user authentication.
+
+satisfies:REQ-001[]
+====
+`;
+
+    function createCatalog(overrides: Partial<any> = {}) {
+      return {
+        findBy: ({ family }: { family: string }) => {
+          if (family === "page") {
+            return [
+              {
+                src: {
+                  path: "test.adoc",
+                  module: "ROOT",
+                  component: "test-component",
+                  version: "1.0.0",
+                },
+                pub: { url: "/test-component/1.0.0/test.html#REQ-001" },
+                contents: Buffer.from(itemContent),
+              },
+            ];
+          }
+          return [];
+        },
+        getById: () => undefined,
+        addFile: (file: any) => file,
+        ...overrides,
+      };
+    }
+
+    it("registers a graph.json attachment containing every item and relationship", async () => {
+      const addedFiles: any[] = [];
+      const contentCatalog = createCatalog({
+        addFile: (file: any) => {
+          addedFiles.push(file);
+          return file;
+        },
+      });
+
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      ctx.fireEvent("contentClassified", { contentCatalog });
+
+      const graphFiles = addedFiles.filter(
+        (f: any) =>
+          f.src?.family === "attachment" &&
+          f.src?.relative === "traceability/graph.json",
+      );
+      expect(graphFiles.length).to.be.greaterThan(0);
+      expect(graphFiles[0].src.component).to.equal("test-component");
+      expect(graphFiles[0].src.version).to.equal("1.0.0");
+      expect(graphFiles[0].src.module).to.equal("ROOT");
+
+      const snapshot = JSON.parse(graphFiles[0].contents.toString());
+      expect(snapshot.format).to.equal(1);
+      expect(snapshot.component).to.equal("test-component");
+      expect(snapshot.version).to.equal("1.0.0");
+      expect(snapshot.items).to.have.length(2);
+      expect(snapshot.relationships).to.have.length(1);
+    });
+
+    it("snapshot items carry component, module, and version and exclude pubUrl", async () => {
+      const addedFiles: any[] = [];
+      const contentCatalog = createCatalog({
+        addFile: (file: any) => {
+          addedFiles.push(file);
+          return file;
+        },
+      });
+
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      ctx.fireEvent("contentClassified", { contentCatalog });
+
+      const graphFile = addedFiles.find(
+        (f: any) => f.src?.relative === "traceability/graph.json",
+      );
+      const snapshot = JSON.parse(graphFile.contents.toString());
+      const item = snapshot.items.find((i: any) => i.id === "REQ-001");
+      expect(item.component).to.equal("test-component");
+      expect(item.module).to.equal("ROOT");
+      expect(item.version).to.equal("1.0.0");
+      expect(item).to.not.have.property("pubUrl");
+    });
+
+    it("registers no graph.json when generateMatrices is false", async () => {
+      const addedFiles: any[] = [];
+      const contentCatalog = createCatalog({
+        addFile: (file: any) => {
+          addedFiles.push(file);
+          return file;
+        },
+      });
+
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any, {
+        config: { generateMatrices: false },
+      });
+      await waitForInit();
+
+      ctx.fireEvent("contentClassified", { contentCatalog });
+
+      const graphFiles = addedFiles.filter(
+        (f: any) => f.src?.relative === "traceability/graph.json",
+      );
+      expect(graphFiles).to.have.length(0);
+    });
+
+    it("registers no graph.json for a version with no traceable items", async () => {
+      const addedFiles: any[] = [];
+      const contentCatalog = createCatalog({
+        findBy: ({ family }: { family: string }) => {
+          if (family === "page") {
+            return [
+              {
+                src: {
+                  path: "plain.adoc",
+                  module: "ROOT",
+                  component: "test-component",
+                  version: "1.0.0",
+                },
+                contents: Buffer.from("No items here.\n"),
+              },
+            ];
+          }
+          return [];
+        },
+        addFile: (file: any) => {
+          addedFiles.push(file);
+          return file;
+        },
+      });
+
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      ctx.fireEvent("contentClassified", { contentCatalog });
+
+      const graphFiles = addedFiles.filter(
+        (f: any) => f.src?.relative === "traceability/graph.json",
+      );
+      expect(graphFiles).to.have.length(0);
+    });
+
+    it("replaces the contents of an existing committed graph.json attachment", async () => {
+      const committed = new Map([
+        ["traceability/graph.json", { contents: Buffer.from("stale") }],
+      ]);
+      const addedFiles: any[] = [];
+      const contentCatalog = createCatalog({
+        getById: (id: any) => committed.get(id?.relative),
+        addFile: (file: any) => {
+          addedFiles.push(file);
+          return file;
+        },
+      });
+
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      ctx.fireEvent("contentClassified", { contentCatalog });
+
+      const reAddedGraph = addedFiles.find(
+        (f: any) => f.src?.relative === "traceability/graph.json",
+      );
+      expect(reAddedGraph).to.be.undefined;
+      const refreshed = committed.get("traceability/graph.json")!.contents;
+      expect(refreshed.toString()).to.not.equal("stale");
+      const snapshot = JSON.parse(refreshed.toString());
+      expect(snapshot.items).to.have.length(2);
+    });
+  });
+
   // ========================================================================
   // Cross-Module Xref Generation
   // ========================================================================

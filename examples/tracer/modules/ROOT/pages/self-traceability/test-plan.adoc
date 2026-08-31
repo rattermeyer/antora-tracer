@@ -40,6 +40,7 @@ Also tests `tracer:outgoing[]`, `tracer:incoming[]`, and `tracer:links[]` macro 
 Tests incoming macro display styles, sort orders, reverse labels, PDF compatibility, and collapsible support.
 Tests `tracer:graph[]`, `tracer:graph-coverage[]`, and `tracer:config-graph[]` macro expansion with configurable Kroki image format and Kroki server URL (extension config option and `KROKI_SERVER_URL` env var override), graph-enabled and graph-disabled modes, including global coverage, explicit target IDs, and header exclusion.
 Tests automatic matrix registration in the content catalog during `contentClassified`.
+Tests the per-version `graph.json` snapshot registration: snapshot content (items and relationships with scope, no `pubUrl`), gating by `generateMatrices`, empty-graph versions, and in-place refresh of a committed copy.
 Tests partial file processing including item registration from partials, view URL as sourceFile, and macro expansion in Pass 2.
 Tests cross-module and cross-component xref prefix generation.
 Tests `git_describe` injection into `site.keys` and `asciidoc.attributes`, including the non-git fallback and absent-section handling.
@@ -71,6 +72,10 @@ verifies:REQ-102[]
 verifies:REQ-249[]
 verifies:REQ-104[]
 verifies:REQ-108[]
+verifies:REQ-256[]
+verifies:REQ-257[]
+verifies:REQ-258[]
+verifies:REQ-259[]
 verifies:REQ-110[]
 verifies:REQ-116[]
 verifies:REQ-117[]

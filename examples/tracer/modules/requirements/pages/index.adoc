@@ -542,6 +542,43 @@ Source: openspec/specs/matrix-attachment-sync/spec.md
 tracer:links[]
 --
 
+[#REQ-256, item, role=requirement, title="Graph JSON snapshot is registered per component version"]
+--
+The system SHALL serialize each component version's traceability graph to a JSON snapshot and register it as a site attachment at `traceability/graph.json` during the `contentClassified` event, before document conversion, so the published site carries a machine-readable graph per version.
+
+Source: openspec/specs/graph-json-attachment/spec.md
+
+tracer:links[]
+--
+
+[#REQ-257, item, role=requirement, title="Snapshot uses the canonical graph format"]
+--
+The generated `graph.json` SHALL contain the item and relationship lists in the canonical snapshot format: a top-level `format` field, the component and version, and every item carrying its `id`, `role`, `title`, `content`, `status`, `attributes`, `component`, `module`, `version`, `sourceFile`, and `sourceLine`.
+The snapshot SHALL NOT include per-page `pubUrl` fields.
+
+Source: openspec/specs/graph-json-attachment/spec.md
+
+tracer:links[]
+--
+
+[#REQ-258, item, role=requirement, title="Graph JSON is gated by matrix generation"]
+--
+The graph JSON snapshot SHALL be emitted only when matrix generation is enabled, so it is produced wherever matrices are and nowhere matrices are not.
+
+Source: openspec/specs/graph-json-attachment/spec.md
+
+tracer:links[]
+--
+
+[#REQ-259, item, role=requirement, title="Unversioned components produce a snapshot"]
+--
+The system SHALL emit a `graph.json` snapshot for a component version with an empty-string version, matching how matrices and the overview are registered for unversioned content.
+
+Source: openspec/specs/graph-json-attachment/spec.md
+
+tracer:links[]
+--
+
 [#REQ-130, item, role=requirement, title="Matrix links are compatible with Antora indexify URL style"]
 --
 When Antora's `indexify` URL style is active (root-level pages are served as `pagename/index.html`), the system SHALL generate matrix links that include `index.html` in the path for root-level pages so links from traceability matrices resolve to the correct page.

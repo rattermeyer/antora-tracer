@@ -1317,6 +1317,12 @@ export class AntoraTraceabilityExtension {
             versionFiles,
             htmlStyle,
           );
+          this.registerGraphJsonInCatalog(
+            contentCatalog,
+            component,
+            version,
+            versionFiles,
+          );
         }
       }
 
@@ -1447,6 +1453,57 @@ export class AntoraTraceabilityExtension {
   }
 
   /**
+   * Serialize the current (per-version) graph to the canonical snapshot format.
+   * `pubUrl` is excluded — it embeds the version segment and is recomputable
+   * from `component` + `module` + `sourceFile`.
+   */
+  private serializeGraphSnapshot(component: string, version: string): string {
+    const graph = this.traceability!.graph;
+    const items = graph
+      .getAllItems()
+      .map(({ pubUrl: _pubUrl, ...item }) => item);
+    const relationships = graph.getAllRelationships();
+    return JSON.stringify(
+      { format: 1, component, version, items, relationships },
+      null,
+      2,
+    );
+  }
+
+  /**
+   * Register the per-version graph JSON snapshot as a site attachment under
+   * every module that has AsciiDoc content, mirroring the matrix registration
+   * so `attachment$traceability/graph.json` resolves from any page or nav file.
+   */
+  private registerGraphJsonInCatalog(
+    contentCatalog: any,
+    component: string,
+    version: string,
+    files: any[],
+  ): void {
+    if (!this.config.generateMatrices || !this.traceability) return;
+    if (this.traceability.graph.getAllItems().length === 0) return;
+
+    const modules = new Set<string>();
+    for (const file of files) {
+      modules.add(file.src?.module || "ROOT");
+    }
+    if (modules.size === 0) modules.add("ROOT");
+
+    const content = this.serializeGraphSnapshot(component, version);
+    for (const module of modules) {
+      this.registerAttachmentInCatalog(
+        contentCatalog,
+        component,
+        version,
+        module,
+        "traceability/graph.json",
+        content,
+      );
+    }
+  }
+
+  /**
    * Add (or refresh) a single attachment in the content catalog. If a committed
    * copy already exists (e.g. matrices checked into modules/ROOT/attachments/),
    * its contents are replaced so the freshly generated output is authoritative.
@@ -1497,6 +1554,7 @@ export class AntoraTraceabilityExtension {
         sourceFile,
         component,
         module: moduleName,
+        version: file.src?.version || undefined,
         pubUrl: file.pub?.url,
       });
     } catch (error: any) {

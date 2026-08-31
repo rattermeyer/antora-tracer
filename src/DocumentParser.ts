@@ -73,6 +73,7 @@ export class DocumentParser {
   private errors: ParserError[] = [];
   private component?: string;
   private module?: string;
+  private version?: string;
   private pubUrl?: string;
 
   constructor(options: ParserOptions = {}) {
@@ -90,6 +91,7 @@ export class DocumentParser {
     component?: string,
     module?: string,
     pubUrl?: string,
+    version?: string,
   ): ParserResult {
     // Validate input
     if (typeof content !== "string") {
@@ -100,6 +102,7 @@ export class DocumentParser {
     this.component = component;
     this.module = module;
     this.pubUrl = pubUrl;
+    this.version = version;
 
     this.warnings = [];
     this.errors = [];
@@ -303,6 +306,7 @@ export class DocumentParser {
         sourceLine: line,
         component: this.component,
         module: this.module,
+        version: this.version,
         pubUrl: this.pubUrl,
       };
 
