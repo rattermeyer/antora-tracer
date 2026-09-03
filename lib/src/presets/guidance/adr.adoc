@@ -1,0 +1,24 @@
+= Writing Architecture Decision Records
+
+An `adr` item records a durable decision made while addressing a change.
+The ADR explains context, the decision, alternatives, and consequences.
+
+== Item template
+
+[source,asciidoc]
+----
+[#ADR-NNN, item, role=adr, status=proposed, title="Short decision title"]
+--
+Context:: What problem requires a decision?
+Decision:: What was decided?
+Alternatives:: What was considered and rejected?
+Consequences:: What follows from the decision?
+
+leads_to:DES-NNN[]
+
+tracer:links[]
+--
+----
+
+An accepted ADR leads to at least one stable design concept.
+The preset validates this structural condition without enforcing status transitions.

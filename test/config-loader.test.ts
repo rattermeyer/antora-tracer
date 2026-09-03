@@ -68,6 +68,19 @@ describe("ConfigLoader", () => {
       expect(preset.traceability.relations).to.be.an("object");
     });
 
+    it("should load the spec-driven-development workflow preset", () => {
+      const preset = configLoader.loadPreset("spec-driven-development");
+      expect(preset.traceability.roles).to.include.members([
+        "change",
+        "adr",
+        "design_concept",
+      ]);
+      expect(preset.traceability.workflow?.change.states).to.include("accepted");
+      expect(preset.traceability.validation?.change.accepted?.requiresRoles).to.deep.equal([
+        "requirement",
+      ]);
+    });
+
     it("should get preset details via loadPreset", () => {
       const preset = configLoader.loadPreset("requirements-engineering");
       expect(preset).to.exist;

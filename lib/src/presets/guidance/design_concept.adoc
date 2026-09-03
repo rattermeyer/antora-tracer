@@ -1,0 +1,22 @@
+= Writing Design Concepts
+
+A `design_concept` item captures stable architectural knowledge.
+It should outlive the change that introduced or refined it.
+
+== Item template
+
+[source,asciidoc]
+----
+[#DES-NNN, item, role=design_concept, status=draft, title="Short concept title"]
+--
+Describe the stable concept and its rationale.
+
+addresses:REQ-NNN[]
+derived_from:ADR-NNN[]
+
+tracer:links[]
+--
+----
+
+Keep change-specific reasoning in an ADR.
+Use the design concept for the resulting reusable architecture.

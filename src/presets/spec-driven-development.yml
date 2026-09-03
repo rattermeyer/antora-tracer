@@ -1,0 +1,137 @@
+# Spec-Driven Development Preset
+# Durable project knowledge with temporary, change-scoped execution plans.
+
+name: spec-driven-development
+description: |
+  Spec-driven development using project-level use cases, requirements, ADRs,
+  design concepts, changes, and verification evidence.
+version: 1.0.0
+author: Antora Tracer Team
+tags: [software, specifications, adr, ai-assisted-development]
+
+traceability:
+  roles:
+    - use_case
+    - requirement
+    - change
+    - adr
+    - design_concept
+    - test
+
+  roleGuidance:
+    use_case:
+      page: guidance/use_case.adoc
+      idPrefix: UC
+    requirement:
+      page: guidance/requirement.adoc
+      idPrefix: REQ
+    change:
+      page: guidance/change.adoc
+      idPrefix: CHG
+    adr:
+      page: guidance/adr.adoc
+      idPrefix: ADR
+    design_concept:
+      page: guidance/design_concept.adoc
+      idPrefix: DES
+    test:
+      page: guidance/test.adoc
+      idPrefix: TST
+
+  relations:
+    use_case:
+      requirement:
+        leads_to:
+          reverse: is_derived_from
+    change:
+      requirement:
+        addresses:
+          reverse: addressed_by
+      adr:
+        records:
+          reverse: recorded_by
+    adr:
+      design_concept:
+        leads_to:
+          reverse: derived_from
+    design_concept:
+      requirement:
+        addresses:
+          reverse: addressed_by
+    test:
+      requirement:
+        verifies:
+          reverse: verified_by
+
+  matrices:
+    - name: use-cases-to-requirements
+      description: "Use cases traced to derived requirements"
+      rows: use_case
+      columns: [requirement]
+      coverageRelations:
+        requirement: [leads_to]
+    - name: changes-to-requirements
+      description: "Changes traced to addressed requirements"
+      rows: change
+      columns: [requirement]
+      coverageRelations:
+        requirement: [addresses]
+    - name: requirements-to-design-concepts
+      description: "Requirements traced to stable design concepts"
+      rows: requirement
+      columns: [design_concept]
+      coverageRelations:
+        design_concept: [addresses]
+    - name: requirements-to-tests
+      description: "Requirements traced to verification evidence"
+      rows: requirement
+      columns: [test]
+      coverageRelations:
+        test: [verifies]
+
+  workflow:
+    change:
+      states: [proposed, refined, accepted, implemented, verified, closed, rejected]
+      transitions:
+        proposed: [refined, rejected]
+        refined: [accepted, proposed]
+        accepted: [implemented, rejected]
+        implemented: [verified, accepted]
+        verified: [closed, implemented]
+    adr:
+      states: [proposed, accepted, rejected, superseded]
+      transitions:
+        proposed: [accepted, rejected]
+        accepted: [superseded]
+    requirement:
+      states: [draft, reviewed, approved, superseded]
+      transitions:
+        draft: [reviewed]
+        reviewed: [approved, draft]
+        approved: [superseded]
+    design_concept:
+      states: [draft, accepted, deprecated]
+      transitions:
+        draft: [accepted]
+        accepted: [deprecated]
+
+  validation:
+    change:
+      refined:
+        requiresRoles: [use_case]
+      accepted:
+        requiresRoles: [requirement]
+    adr:
+      accepted:
+        requiresRoles: [design_concept]
+
+  labels:
+    design_concept: Design Concept
+    leads_to: Leads To
+    derived_from: Derived From
+    addresses: Addresses
+    addressed_by: Addressed By
+    records: Records
+    recorded_by: Recorded By
+    verifies: Verifies
+    verified_by: Verified By

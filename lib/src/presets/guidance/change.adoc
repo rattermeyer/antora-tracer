@@ -1,0 +1,28 @@
+= Writing Changes
+
+A `change` item records a proposed feature, fix, or improvement.
+It links to the durable requirements it addresses and the ADRs that record decisions made for the change.
+
+== Item template
+
+[source,asciidoc]
+----
+[#CHG-NNN, item, role=change, status=proposed, title="Short change title"]
+--
+The change describes the outcome to deliver.
+
+addresses:REQ-NNN[]
+records:ADR-NNN[]
+
+tracer:links[]
+--
+----
+
+== Lifecycle
+
+The recommended states are `proposed`, `refined`, `accepted`, `implemented`, `verified`, and `closed`.
+A change may also be `rejected`.
+
+A refined change has at least one use case.
+An accepted change addresses at least one requirement.
+The initial preset validates these structural conditions without enforcing transitions.

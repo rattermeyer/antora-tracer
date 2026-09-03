@@ -90,6 +90,22 @@ export interface RoleGuidance {
 }
 
 /**
+ * Declarative workflow states and transitions for a role.
+ * These are configuration data for now; validation/enforcement can consume them later.
+ */
+export interface WorkflowDefinition {
+  states: string[];
+  transitions?: Record<string, string[]>;
+}
+
+/**
+ * Status-based validation requirements for a role.
+ */
+export interface WorkflowValidationRule {
+  requiresRoles?: string[];
+}
+
+/**
  * Main traceability configuration
  */
 export interface TraceabilityConfig {
@@ -121,6 +137,16 @@ export interface TraceabilityConfig {
   roleGuidance?: Record<string, RoleGuidance>;
 
   /**
+   * Declarative lifecycle states and allowed transitions by role.
+   */
+  workflow?: Record<string, WorkflowDefinition>;
+
+  /**
+   * Structural requirements for items at a given role/status.
+   */
+  validation?: Record<string, Record<string, WorkflowValidationRule>>;
+
+  /**
    * Extend from a preset
    */
   extends?: string;
@@ -149,6 +175,7 @@ export interface CompleteConfig extends TraceabilityConfig {
  */
 export const BUILT_IN_PRESETS = [
   "requirements-engineering",
+  "spec-driven-development",
   "agile",
   "medical-iec62304",
   "minimal",
@@ -647,6 +674,16 @@ export class ConfigLoader {
     result.roleGuidance = {
       ...(base.roleGuidance || {}),
       ...(override.roleGuidance || {}),
+    };
+
+    // Merge workflow definitions and validation rules by role/status
+    result.workflow = {
+      ...(base.workflow || {}),
+      ...(override.workflow || {}),
+    };
+    result.validation = {
+      ...(base.validation || {}),
+      ...(override.validation || {}),
     };
 
     return result;
