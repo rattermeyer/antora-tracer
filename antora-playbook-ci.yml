@@ -9,7 +9,7 @@ content:
   sources:
     - url: https://github.com/rattermeyer/antora-tracer.git
       start_path: examples/tracer
-      branches: ['main', 'v0.23.x', 'v0.22.x']
+      branches: ['main', 'v0.24.x', 'v0.23.x']
     - url: https://github.com/rattermeyer/antora-tracer.git
       start_path: examples/demo
       branches: ['main']

@@ -2,6 +2,21 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.24.0] — 2026-09-03
+
+### Changed
+- Renamed the package from `antora-tracer` to `@antora-tracer/core`; the CLI binary name remains `antora-tracer`.
+
+### Added
+- Added a `spec-driven-development` preset with the workflow roles (`change`, `use_case`, `adr`, `design_concept`), declarative states, transitions, and validation rules.
+- CLI `site-graph` harvest and `diff-graphs` snapshot diffing.
+- Per-version `graph.json` snapshot registered in the generated site.
+- Expose the `git describe` string as a site key and AsciiDoc attribute.
+- Support the `tracer:` alias for rendering macros.
+
+### Fixed
+- The Antora extension now reads the playbook configuration from the playbook object, so `configPath` is honored and configured matrices are generated instead of silently falling back to the `requirements-engineering` preset.
+
 ## [0.23.0] — 2026-08-27
 
 ### Added
