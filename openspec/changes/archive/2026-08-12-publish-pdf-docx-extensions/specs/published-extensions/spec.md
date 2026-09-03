@@ -1,11 +1,11 @@
 ## ADDED Requirements
 
 ### Requirement: PDF extension is published and referenceable by package name
-The `antora-tracer` npm package SHALL include `lib/src/antora-pdf-extension.cjs` and export it under the subpath `antora-tracer/antora-pdf` so consumers can reference it in their playbooks without copying files from the repository.
+The `@antora-tracer/core` npm package SHALL include `lib/src/antora-pdf-extension.cjs` and export it under the subpath `@antora-tracer/core/antora-pdf` so consumers can reference it in their playbooks without copying files from the repository.
 
 #### Scenario: Consumer references PDF extension by package name
-- **WHEN** a consumer adds `require: antora-tracer/antora-pdf` to their Antora playbook extensions
-- **THEN** Antora resolves the extension from `node_modules/antora-tracer/lib/src/antora-pdf-extension.cjs`
+- **WHEN** a consumer adds `require: @antora-tracer/core/antora-pdf` to their Antora playbook extensions
+- **THEN** Antora resolves the extension from `node_modules/@antora-tracer/core/lib/src/antora-pdf-extension.cjs`
 - **AND** the PDF assembler pipeline is registered for the build
 
 #### Scenario: npm pack includes the PDF extension
@@ -13,11 +13,11 @@ The `antora-tracer` npm package SHALL include `lib/src/antora-pdf-extension.cjs`
 - **THEN** `lib/src/antora-pdf-extension.cjs` appears in the file list
 
 ### Requirement: DOCX extension is published and referenceable by package name
-The `antora-tracer` npm package SHALL include `lib/src/antora-docx-extension.cjs` and `lib/src/antora-docx-converter.cjs` and export the extension under the subpath `antora-tracer/antora-docx`.
+The `@antora-tracer/core` npm package SHALL include `lib/src/antora-docx-extension.cjs` and `lib/src/antora-docx-converter.cjs` and export the extension under the subpath `@antora-tracer/core/antora-docx`.
 
 #### Scenario: Consumer references DOCX extension by package name
-- **WHEN** a consumer adds `require: antora-tracer/antora-docx` to their Antora playbook extensions
-- **THEN** Antora resolves the extension from `node_modules/antora-tracer/lib/src/antora-docx-extension.cjs`
+- **WHEN** a consumer adds `require: @antora-tracer/core/antora-docx` to their Antora playbook extensions
+- **THEN** Antora resolves the extension from `node_modules/@antora-tracer/core/lib/src/antora-docx-extension.cjs`
 - **AND** the DOCX assembler pipeline is registered for the build
 
 #### Scenario: npm pack includes the DOCX extension and converter

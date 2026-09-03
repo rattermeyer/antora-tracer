@@ -37,7 +37,7 @@ Add the extension to your playbook:
 ----
 antora:
   extensions:
-    - require: antora-tracer/antora-vale
+    - require: @antora-tracer/core/antora-vale
       valeConfig: .vale.ini
       minLevel: warning
 ----
@@ -59,7 +59,7 @@ MinAlertLevel = warning
 BasedOnStyles = antora-tracer
 ----
 
-A starter style ships in the package at `node_modules/antora-tracer/lib/src/vale/`.
+A starter style ships in the package at `node_modules/@antora-tracer/core/lib/src/vale/`.
 Copy its `.vale.ini` and `styles/antora-tracer/` into your project as a starting point, then add your own rules.
 Vale rules are YAML files that extend checks such as `existence` and `substitution`.
 

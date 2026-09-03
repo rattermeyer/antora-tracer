@@ -13,7 +13,7 @@ Configure the extension in your Antora playbook (`antora-playbook.yml` or `antor
 ----
 antora:
   extensions:
-    - require: antora-tracer/antora-extension
+    - require: @antora-tracer/core/antora-extension
       config:
         preset: requirements-engineering
         # ... additional options ...
@@ -116,7 +116,7 @@ It is opt-in: register it in the playbook to enable it.
 ----
 antora:
   extensions:
-    - require: antora-tracer/antora-vale
+    - require: @antora-tracer/core/antora-vale
       valeConfig: .vale.ini
       minLevel: warning
 ----
@@ -136,7 +136,7 @@ antora:
 
 Prerequisites: the `vale` and `asciidoctor` executables must be on `PATH`.
 If either is missing, the build fails with an actionable message.
-A starter style is shipped at `node_modules/antora-tracer/lib/src/vale/`; copy it into your project and reference it from your `.vale.ini`, or write your own rules.
+A starter style is shipped at `node_modules/@antora-tracer/core/lib/src/vale/`; copy it into your project and reference it from your `.vale.ini`, or write your own rules.
 
 Source-layout rules such as one sentence per line are not enforced by Vale.
 Use `scripts/check-one-sentence-per-line.js` for that.

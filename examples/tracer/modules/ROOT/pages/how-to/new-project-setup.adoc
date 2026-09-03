@@ -39,7 +39,7 @@ In your `antora-playbook.yml`, add the extension entry:
 ----
 antora:
   extensions:
-    - require: antora-tracer/antora-extension
+    - require: @antora-tracer/core/antora-extension
       config:
         preset: requirements-engineering
 ----
@@ -50,7 +50,7 @@ If you need custom configuration, point to a `traceability.yml` file instead:
 ----
 antora:
   extensions:
-    - require: antora-tracer/antora-extension
+    - require: @antora-tracer/core/antora-extension
       config:
         configPath: ./config/traceability.yml
 ----
@@ -83,7 +83,7 @@ To control whether traceability pages appear in navigation, set `includeInNaviga
 ----
 antora:
   extensions:
-    - require: antora-tracer/antora-extension
+    - require: @antora-tracer/core/antora-extension
       config:
         preset: requirements-engineering
         includeInNavigation: false

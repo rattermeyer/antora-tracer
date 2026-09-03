@@ -212,7 +212,7 @@ tracer:links[]
 | Preconditions | The project uses Antora as its site generator And the project lead has access to the Antora playbook and module directories
 | Trigger | The team decides to adopt traceability — a new project is starting, or an existing project wants to add traceability to its documentation
 | Basic Flow |
-. Project lead installs the extension: `npm install antora-tracer --save-dev`
+. Project lead installs the extension: `npm install @antora-tracer/core --save-dev`
 . Project lead reviews the built-in presets to find the closest match for the team's domain (requirements-engineering, agile, medical-iec62304, minimal)
 . Project lead adds the extension to the Antora playbook with the chosen preset:
 +
@@ -220,7 +220,7 @@ tracer:links[]
 ----
 antora:
   extensions:
-    - require: antora-tracer/antora-extension
+    - require: @antora-tracer/core/antora-extension
       config:
         preset: requirements-engineering
 ----

@@ -1,6 +1,6 @@
 ## Context
 
-The `antora-tracer` npm package currently ships the core traceability extension (`lib/src/antora-extension.js`) but not the PDF or DOCX assembler extensions. These live as hand-authored `.cjs` files at the project root alongside 10 assembler config YMLs and a shell script. They are excluded from the npm `files` list, so consumers who want PDF or DOCX output must find and copy these files manually from the GitHub repository.
+The `@antora-tracer/core` npm package currently ships the core traceability extension (`lib/src/antora-extension.js`) but not the PDF or DOCX assembler extensions. These live as hand-authored `.cjs` files at the project root alongside 10 assembler config YMLs and a shell script. They are excluded from the npm `files` list, so consumers who want PDF or DOCX output must find and copy these files manually from the GitHub repository.
 
 Additionally, `@antora/assembler` and `@antora/pdf-extension` are listed as `devDependencies`, meaning npm does not signal to consumers that these are required for PDF/DOCX functionality.
 
@@ -9,7 +9,7 @@ Current root clutter: `antora-pdf-extension.cjs`, `antora-docx-extension.cjs`, `
 ## Goals / Non-Goals
 
 **Goals:**
-- Publish PDF and DOCX Antora extensions as part of the `antora-tracer` npm package
+- Publish PDF and DOCX Antora extensions as part of the `@antora-tracer/core` npm package
 - Enable consumers to reference extensions by package name in their playbooks
 - Declare `@antora/assembler` and `@antora/pdf-extension` as `peerDependencies`
 - Relocate example-site-specific assembler configs and scripts to `examples/`
@@ -49,8 +49,8 @@ Alternative: Ship sample configs in npm package. Rejected — imposes opinionate
 ### Export names
 
 Use short, predictable subpath exports:
-- `antora-tracer/antora-pdf` → `lib/src/antora-pdf-extension.cjs`
-- `antora-tracer/antora-docx` → `lib/src/antora-docx-extension.cjs`
+- `@antora-tracer/core/antora-pdf` → `lib/src/antora-pdf-extension.cjs`
+- `@antora-tracer/core/antora-docx` → `lib/src/antora-docx-extension.cjs`
 
 These match the Antora convention of referencing extensions by npm package subpath.
 

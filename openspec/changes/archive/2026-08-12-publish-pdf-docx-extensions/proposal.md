@@ -5,7 +5,7 @@ The PDF and DOCX assembler extensions (`antora-pdf-extension.cjs`, `antora-docx-
 ## What Changes
 
 - Move PDF and DOCX extension files from the project root into `src/` so they are compiled/copied to `lib/src/` and published
-- Add `exports` entries in `package.json` so consumers can reference extensions by package name (e.g., `require: antora-tracer/antora-pdf`)
+- Add `exports` entries in `package.json` so consumers can reference extensions by package name (e.g., `require: @antora-tracer/core/antora-pdf`)
 - Promote `@antora/assembler` and `@antora/pdf-extension` from `devDependencies` to `peerDependencies` — consumers must install them, but the package declares the dependency contract
 - Move the `adoc-to-docx` wrapper script and assembler config YMLs into `examples/` — they are consumer-side configuration, not library code
 - Update all playbook `require:` paths and assembler `command:` paths to reflect new locations
@@ -15,12 +15,12 @@ The PDF and DOCX assembler extensions (`antora-pdf-extension.cjs`, `antora-docx-
 
 ### New Capabilities
 
-- `published-extensions`: PDF and DOCX Antora extensions are published as part of the `antora-tracer` npm package and referenceable by package name
+- `published-extensions`: PDF and DOCX Antora extensions are published as part of the `@antora-tracer/core` npm package and referenceable by package name
 
 ### Modified Capabilities
 
-- `pdf-output`: Extension is now published and referenced via `antora-tracer/antora-pdf`; assembler configs and `adoc-to-docx` move to consumer-side (examples)
-- `docx-output`: Same pattern — extension published as `antora-tracer/antora-docx`; assembler configs and script move to consumer-side
+- `pdf-output`: Extension is now published and referenced via `@antora-tracer/core/antora-pdf`; assembler configs and `adoc-to-docx` move to consumer-side (examples)
+- `docx-output`: Same pattern — extension published as `@antora-tracer/core/antora-docx`; assembler configs and script move to consumer-side
 
 ## Impact
 

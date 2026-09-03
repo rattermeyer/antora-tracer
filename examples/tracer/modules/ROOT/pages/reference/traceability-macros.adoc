@@ -192,7 +192,7 @@ The image format (SVG/PNG) is controlled by `krokiImageFormat`, the server URL b
 ----
 antora:
   extensions:
-    - require: antora-tracer/antora-extension
+    - require: @antora-tracer/core/antora-extension
       # defaults: krokiServerUrl: https://kroki.io, krokiImageFormat: svg
 ----
 
@@ -201,7 +201,7 @@ antora:
 ----
 antora:
   extensions:
-    - require: antora-tracer/antora-extension
+    - require: @antora-tracer/core/antora-extension
       krokiServerUrl: http://localhost:8000
       krokiImageFormat: png
 ----

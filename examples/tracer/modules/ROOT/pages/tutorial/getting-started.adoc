@@ -83,7 +83,7 @@ Install the extension:
 
 [source,bash]
 ----
-npm install antora-tracer --save-dev
+npm install @antora-tracer/core --save-dev
 ----
 
 Add it to your playbook (`antora-playbook.yml`):
@@ -92,7 +92,7 @@ Add it to your playbook (`antora-playbook.yml`):
 ----
 antora:
   extensions:
-    - require: antora-tracer/antora-extension
+    - require: @antora-tracer/core/antora-extension
       config:
         preset: requirements-engineering
 ----

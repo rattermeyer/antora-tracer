@@ -188,7 +188,7 @@ UC-006,UC-006 — Project lead bootstraps traceability for a new project,use_cas
 | Preconditions | The project uses Antora as its site generator And the project lead has access to the Antora playbook and module directories
 | Trigger | The team decides to adopt traceability — a new project is starting, or an existing project wants to add traceability to its documentation
 | Basic Flow |
-. Project lead installs the extension: `npm install antora-tracer --save-dev`
+. Project lead installs the extension: `npm install @antora-tracer/core --save-dev`
 . Project lead reviews the built-in presets to find the closest match for the team's domain (requirements-engineering, agile, medical-iec62304, minimal)
 . Project lead adds the extension to the Antora playbook with the chosen preset:
 +
@@ -196,7 +196,7 @@ UC-006,UC-006 — Project lead bootstraps traceability for a new project,use_cas
 ----
 antora:
   extensions:
-    - require: antora-tracer/antora-extension
+    - require: @antora-tracer/core/antora-extension
       config:
         preset: requirements-engineering
 ----
@@ -1345,17 +1345,17 @@ Source: openspec/specs/docx-output/spec.md
 
 tracer:links[]"""
 REQ-179,REQ-179 — PDF playbook references extension by local path in development,requirement,,requirements.adoc,"""The `antora-playbook-pdf.yml` example playbook SHALL reference the PDF extension using a local path (`./lib/src/antora-pdf-extension.cjs`) since it is the project's own development playbook.
-Consumer documentation SHALL show the package subpath pattern (`antora-tracer/antora-pdf`).
+Consumer documentation SHALL show the package subpath pattern (`@antora-tracer/core/antora-pdf`).
 
 Source: openspec/specs/pdf-output/spec.md
 
 tracer:links[]"""
-REQ-180,REQ-180 — PDF extension is published and referenceable by package name,requirement,,requirements.adoc,"""The `antora-tracer` npm package SHALL include `lib/src/antora-pdf-extension.cjs` and export it under the subpath `antora-tracer/antora-pdf` so consumers can reference it in their playbooks without copying files from the repository.
+REQ-180,REQ-180 — PDF extension is published and referenceable by package name,requirement,,requirements.adoc,"""The `@antora-tracer/core` npm package SHALL include `lib/src/antora-pdf-extension.cjs` and export it under the subpath `@antora-tracer/core/antora-pdf` so consumers can reference it in their playbooks without copying files from the repository.
 
 Source: openspec/specs/published-extensions/spec.md
 
 tracer:links[]"""
-REQ-181,REQ-181 — DOCX extension is published and referenceable by package name,requirement,,requirements.adoc,"""The `antora-tracer` npm package SHALL include `lib/src/antora-docx-extension.cjs` and `lib/src/antora-docx-converter.cjs` and export the extension under the subpath `antora-tracer/antora-docx`.
+REQ-181,REQ-181 — DOCX extension is published and referenceable by package name,requirement,,requirements.adoc,"""The `@antora-tracer/core` npm package SHALL include `lib/src/antora-docx-extension.cjs` and `lib/src/antora-docx-converter.cjs` and export the extension under the subpath `@antora-tracer/core/antora-docx`.
 
 Source: openspec/specs/published-extensions/spec.md
 
@@ -1373,7 +1373,7 @@ Source: openspec/specs/published-extensions/spec.md
 
 tracer:links[]"""
 REQ-184,REQ-184 — DOCX playbook references extension by local path in development,process_requirement,,requirements.adoc,"""The `antora-playbook-pdf.yml` example playbook SHALL reference the DOCX extension using a local path (`./lib/src/antora-docx-extension.cjs`).
-Consumer documentation SHALL show the package subpath pattern (`antora-tracer/antora-docx`).
+Consumer documentation SHALL show the package subpath pattern (`@antora-tracer/core/antora-docx`).
 
 Source: openspec/specs/docx-output/spec.md
 

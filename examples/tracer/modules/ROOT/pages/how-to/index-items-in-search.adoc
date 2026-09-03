@@ -28,7 +28,7 @@ npm i -D patch-package @antora/lunr-extension@1.0.0-alpha.13
 [source,bash]
 ----
 mkdir -p patches
-cp node_modules/antora-tracer/patches/@antora+lunr-extension+1.0.0-alpha.13.patch patches/
+cp node_modules/@antora-tracer/core/patches/@antora+lunr-extension+1.0.0-alpha.13.patch patches/
 ----
 . Register `patch-package` as your `postinstall` script:
 +

@@ -83,7 +83,7 @@ Update `antora-playbook.yml`:
 ----
 antora:
   extensions:
-    - require: antora-tracer/antora-extension
+    - require: @antora-tracer/core/antora-extension
       config:
         configPath: ./config/traceability.yml
 ----

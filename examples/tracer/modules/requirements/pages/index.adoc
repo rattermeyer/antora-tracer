@@ -1591,7 +1591,7 @@ tracer:links[]
 [#REQ-179, item, role=requirement, title="PDF playbook references extension by local path in development"]
 --
 The `antora-playbook-pdf.yml` example playbook SHALL reference the PDF extension using a local path (`./lib/src/antora-pdf-extension.cjs`) since it is the project's own development playbook.
-Consumer documentation SHALL show the package subpath pattern (`antora-tracer/antora-pdf`).
+Consumer documentation SHALL show the package subpath pattern (`@antora-tracer/core/antora-pdf`).
 
 Source: openspec/specs/pdf-output/spec.md
 
@@ -1600,7 +1600,7 @@ tracer:links[]
 
 [#REQ-180, item, role=requirement, title="PDF extension is published and referenceable by package name"]
 --
-The `antora-tracer` npm package SHALL include `lib/src/antora-pdf-extension.cjs` and export it under the subpath `antora-tracer/antora-pdf` so consumers can reference it in their playbooks without copying files from the repository.
+The `@antora-tracer/core` npm package SHALL include `lib/src/antora-pdf-extension.cjs` and export it under the subpath `@antora-tracer/core/antora-pdf` so consumers can reference it in their playbooks without copying files from the repository.
 
 Source: openspec/specs/published-extensions/spec.md
 
@@ -1609,7 +1609,7 @@ tracer:links[]
 
 [#REQ-181, item, role=requirement, title="DOCX extension is published and referenceable by package name"]
 --
-The `antora-tracer` npm package SHALL include `lib/src/antora-docx-extension.cjs` and `lib/src/antora-docx-converter.cjs` and export the extension under the subpath `antora-tracer/antora-docx`.
+The `@antora-tracer/core` npm package SHALL include `lib/src/antora-docx-extension.cjs` and `lib/src/antora-docx-converter.cjs` and export the extension under the subpath `@antora-tracer/core/antora-docx`.
 
 Source: openspec/specs/published-extensions/spec.md
 
@@ -1639,7 +1639,7 @@ tracer:links[]
 [#REQ-184, item, role=process_requirement, title="DOCX playbook references extension by local path in development"]
 --
 The `antora-playbook-pdf.yml` example playbook SHALL reference the DOCX extension using a local path (`./lib/src/antora-docx-extension.cjs`).
-Consumer documentation SHALL show the package subpath pattern (`antora-tracer/antora-docx`).
+Consumer documentation SHALL show the package subpath pattern (`@antora-tracer/core/antora-docx`).
 
 Source: openspec/specs/docx-output/spec.md
 

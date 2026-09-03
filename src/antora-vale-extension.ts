@@ -6,7 +6,7 @@
  * Register in a playbook:
  *   antora:
  *     extensions:
- *       - require: antora-tracer/antora-vale
+ *       - require: @antora-tracer/core/antora-vale
  *         valeConfig: .vale.ini
  *         minLevel: warning
  *

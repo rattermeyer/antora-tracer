@@ -55,7 +55,7 @@ The project SHALL declare `pandoc` as a dependency in `devbox.json` so that `dev
 ### Requirement: DOCX output format is documented
 
 ### Requirement: DOCX playbook references extension by local path in development
-The `antora-playbook-pdf.yml` example playbook SHALL reference the DOCX extension using a local path (`./lib/src/antora-docx-extension.cjs`). Consumer documentation SHALL show the package subpath pattern (`antora-tracer/antora-docx`).
+The `antora-playbook-pdf.yml` example playbook SHALL reference the DOCX extension using a local path (`./lib/src/antora-docx-extension.cjs`). Consumer documentation SHALL show the package subpath pattern (`@antora-tracer/core/antora-docx`).
 
 #### Scenario: Playbook uses local path for self-reference
 - **WHEN** reading `antora-playbook-pdf.yml`

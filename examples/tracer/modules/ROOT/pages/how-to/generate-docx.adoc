@@ -99,10 +99,10 @@ Then reference the DOCX extension in your playbook:
 ----
 antora:
   extensions:
-    - require: antora-tracer/antora-pdf
+    - require: @antora-tracer/core/antora-pdf
       config_files:
         - my-pdf-assembler.yml
-    - require: antora-tracer/antora-docx
+    - require: @antora-tracer/core/antora-docx
       config_files:
         - my-docx-assembler.yml
 ----

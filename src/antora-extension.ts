@@ -240,7 +240,7 @@ export class AntoraTraceabilityExtension {
       if (!extensions) return {};
       const extEntry = extensions.find(
         (e: any) =>
-          e.require === "antora-tracer/antora-extension" ||
+          e.require === "@antora-tracer/core/antora-extension" ||
           e.require === "./lib/src/antora-extension.js" ||
           e.require?.includes("antora-tracer") ||
           e.name === "antora-requirements-traceability",

@@ -24,13 +24,13 @@
 
 ## 5. Update playbook files
 
-- [x] 5.1 Update `antora-playbook-pdf.yml`: change `require: ./antora-pdf-extension.cjs` to `require: antora-tracer/antora-pdf`
-- [x] 5.2 Update `antora-playbook-pdf.yml`: change `require: ./antora-docx-extension.cjs` to `require: antora-tracer/antora-docx`
+- [x] 5.1 Update `antora-playbook-pdf.yml`: change `require: ./antora-pdf-extension.cjs` to `require: @antora-tracer/core/antora-pdf`
+- [x] 5.2 Update `antora-playbook-pdf.yml`: change `require: ./antora-docx-extension.cjs` to `require: @antora-tracer/core/antora-docx`
 - [x] 5.3 Update assembler config references in `antora-playbook-pdf.yml` from root paths to `./examples/antora-assembler-*.yml`
 
 ## 6. Update documentation
 
-- [x] 6.1 Update `how-to/generate-docx.adoc`: show `require: antora-tracer/antora-docx` and `npm install @antora/assembler @antora/pdf-extension`
+- [x] 6.1 Update `how-to/generate-docx.adoc`: show `require: @antora-tracer/core/antora-docx` and `npm install @antora/assembler @antora/pdf-extension`
 - [x] 6.2 Update `how-to/contribute.adoc` if it references the old local paths
 
 ## 7. Verify

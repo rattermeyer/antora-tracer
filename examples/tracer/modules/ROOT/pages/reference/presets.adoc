@@ -269,7 +269,7 @@ Edit it, then point your playbook at the file:
 ----
 antora:
   extensions:
-    - require: antora-tracer/antora-extension
+    - require: @antora-tracer/core/antora-extension
       config:
         configPath: ./config/traceability.yml
 ----

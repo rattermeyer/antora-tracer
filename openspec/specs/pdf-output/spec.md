@@ -42,12 +42,12 @@ The `@antora/pdf-extension` npm package SHALL be listed as a `peerDependency` (w
 - **AND** `@antora/assembler` is also available as its dependency
 
 #### Scenario: Consumer is signalled to install peers
-- **WHEN** a consumer runs `npm install antora-tracer`
+- **WHEN** a consumer runs `npm install @antora-tracer/core`
 - **THEN** npm shows a peer dependency warning if `@antora/pdf-extension` or `@antora/assembler` is missing
 - **AND** the warning states these are optional for PDF/DOCX output
 
 ### Requirement: PDF playbook references extension by local path in development
-The `antora-playbook-pdf.yml` example playbook SHALL reference the PDF extension using a local path (`./lib/src/antora-pdf-extension.cjs`) since it is the project's own development playbook. Consumer documentation SHALL show the package subpath pattern (`antora-tracer/antora-pdf`).
+The `antora-playbook-pdf.yml` example playbook SHALL reference the PDF extension using a local path (`./lib/src/antora-pdf-extension.cjs`) since it is the project's own development playbook. Consumer documentation SHALL show the package subpath pattern (`@antora-tracer/core/antora-pdf`).
 
 #### Scenario: Playbook uses local path for self-reference
 - **WHEN** reading `antora-playbook-pdf.yml`
