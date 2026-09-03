@@ -235,7 +235,7 @@ export class AntoraTraceabilityExtension {
 
   private loadConfig(): Partial<AntoraTraceabilityConfig> {
     try {
-      const playbook = this.context.playbook;
+      const playbook = this.playbook ?? this.context.playbook;
       const extensions = playbook.antora?.extensions || playbook.extensions;
       if (!extensions) return {};
       const extEntry = extensions.find(
