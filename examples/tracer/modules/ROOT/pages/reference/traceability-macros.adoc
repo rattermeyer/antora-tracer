@@ -1,5 +1,5 @@
 = Traceability Macros Reference
-:description: Complete reference for tracer:outgoing[], tracer:incoming[], tracer:links[], tracer:graph[], and tracer:graph-coverage[] macros
+:description: Complete reference for outgoing[], incoming[], links[], graph[], and graph-coverage[] macros
 :keywords: antora, asciidoc, traceability, macros, reference
 :toc: macro
 

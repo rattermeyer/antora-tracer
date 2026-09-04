@@ -2,6 +2,11 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.24.1] — 2026-09-04
+
+### Fixed
+- Preserve macro text in source blocks and inline code.
+
 ## [0.24.0] — 2026-09-03
 
 ### Changed

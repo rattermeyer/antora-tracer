@@ -343,8 +343,12 @@ export class AntoraTraceabilityExtension {
 
     const macroStartRe = /\[#([^,\]]+),\s*item,?/g;
     let m: RegExpExecArray | null;
+    // Item-like patterns inside verbatim/source blocks are example code, not
+    // live items — skip them so documentation examples aren't parsed.
+    const verbatimRanges = this.findVerbatimRanges(content);
 
     while ((m = macroStartRe.exec(content)) !== null) {
+      if (this.isInsideRange(m.index, verbatimRanges)) continue;
       const itemId = m[1].trim();
       const attrStart = m.index + m[0].length;
 
@@ -910,18 +914,23 @@ export class AntoraTraceabilityExtension {
       );
       let externalMatch: RegExpExecArray | null;
 
-      // Build ranges to exclude: item headers + item bodies
+      // Build ranges to exclude: item headers + item bodies, plus verbatim
+      // blocks and inline code spans that hold example/documentation text.
       const graphExcludeRanges = blocks.map((b) => ({
         start: b.headerStart,
         end: b.bodyEnd,
       }));
+      const verbatimRanges = this.findVerbatimRanges(content);
+      const inlineRanges = this.getInlineCodeRanges(content);
 
       while ((externalMatch = externalRegex.exec(content)) !== null) {
         const matchStart = externalMatch.index;
         if (
           graphExcludeRanges.some(
             (r) => matchStart >= r.start && matchStart <= r.end,
-          )
+          ) ||
+          this.isInsideRange(matchStart, verbatimRanges) ||
+          this.isInsideRange(matchStart, inlineRanges)
         )
           continue;
 
@@ -1035,11 +1044,14 @@ export class AntoraTraceabilityExtension {
       );
       let globalMatch: RegExpExecArray | null;
 
-      // Build ranges to exclude: item headers + item bodies
+      // Build ranges to exclude: item headers + item bodies, plus verbatim
+      // blocks and inline code spans that hold example/documentation text.
       const excludeRanges = blocks.map((b) => ({
         start: b.headerStart,
         end: b.bodyEnd,
       }));
+      const verbatimRanges = this.findVerbatimRanges(content);
+      const inlineRanges = this.getInlineCodeRanges(content);
 
       while ((globalMatch = globalRegex.exec(content)) !== null) {
         const matchStart = globalMatch.index;
@@ -1047,7 +1059,9 @@ export class AntoraTraceabilityExtension {
         if (
           excludeRanges.some(
             (r) => matchStart >= r.start && matchStart <= r.end,
-          )
+          ) ||
+          this.isInsideRange(matchStart, verbatimRanges) ||
+          this.isInsideRange(matchStart, inlineRanges)
         )
           continue;
 
@@ -1126,11 +1140,15 @@ export class AntoraTraceabilityExtension {
         `${RENDERING_MACRO_NS}:config-graph\\[\\]`,
         "g",
       );
-      const inlineRanges = this.getInlineCodeRanges(content);
+      // Skip inline code spans and verbatim/source blocks (documentation text).
+      const protectedRanges = [
+        ...this.getInlineCodeRanges(content),
+        ...this.findVerbatimRanges(content),
+      ];
       let match: RegExpExecArray | null;
 
       while ((match = macroRegex.exec(content)) !== null) {
-        if (this.isInsideRange(match.index, inlineRanges)) continue;
+        if (this.isInsideRange(match.index, protectedRanges)) continue;
         const macroStart = match.index;
         const macroEnd = macroStart + match[0].length;
 
@@ -1671,8 +1689,11 @@ export class AntoraTraceabilityExtension {
     const replacements: Array<{ start: number; end: number; text: string }> =
       [];
     let m: RegExpExecArray | null;
+    // Don't touch item-like patterns inside verbatim/source blocks (examples).
+    const verbatimRanges = this.findVerbatimRanges(content);
 
     while ((m = macroStartRe.exec(content)) !== null) {
+      if (this.isInsideRange(m.index, verbatimRanges)) continue;
       const id = m[1].trim();
       const startPos = m.index;
       const attrStart = startPos + m[0].length;
@@ -1754,18 +1775,23 @@ export class AntoraTraceabilityExtension {
       "g",
     );
 
-    // Find verbatim block ranges so we can preserve example code inside them
-    const ranges = this.findVerbatimRanges(content);
+    // Preserve verbatim blocks and inline code spans — these hold example or
+    // documentation text whose macros must not be stripped.
+    const ranges = [
+      ...this.findVerbatimRanges(content),
+      ...this.getInlineCodeRanges(content),
+    ].sort((a, b) => a.start - b.start);
 
     if (ranges.length === 0) {
       return content.replace(relRegex, "");
     }
 
-    // Segment-based processing: strip macros from non-verbatim parts,
-    // preserve verbatim blocks as-is (they are example/documentation code)
+    // Segment-based processing: strip macros from non-protected parts,
+    // preserve protected segments as-is (they are example/documentation code).
     let result = "";
     let pos = 0;
     for (const range of ranges) {
+      if (range.start < pos) continue; // skip nested ranges already protected
       result += content.slice(pos, range.start).replace(relRegex, "");
       result += content.slice(range.start, range.end);
       pos = range.end;
