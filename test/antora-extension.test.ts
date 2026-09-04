@@ -307,6 +307,36 @@ describe("AntoraTraceabilityExtension", () => {
       expect(rels[0].targetId).to.equal("REQ-001");
     });
 
+    it("should preserve inline relationship macros inside backtick code spans", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const content =
+        "The relationships (`addresses:REQ-001[]`, `validates:DES-001[]`) are stored.";
+      const files = [
+        {
+          src: { path: "test.adoc", module: "ROOT", component: "tracer" },
+          contents: Buffer.from(content),
+        },
+      ];
+
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? files : [],
+        },
+      });
+
+      const out = files[0].contents.toString();
+      // Inline relationship macros inside backtick spans are documentation,
+      // not data markers — they must not be stripped.
+      expect(out).to.include("`addresses:REQ-001[]`");
+      expect(out).to.include("`validates:DES-001[]`");
+    });
+
     it("should handle files with multiple items and relationships", async () => {
       const ctx = createMockContext({
         playbook: { output: { dir: tempDir }, extensions: [] },
@@ -1701,6 +1731,54 @@ Description.
       expect(traceExt.getAllItems()).to.have.lengthOf(2);
       const rels = traceExt.graph.getRelationships("REQ-001");
       expect(rels).to.have.lengthOf(1);
+    });
+
+    it("should preserve graph macros inside [source,asciidoc] blocks", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const files = [
+        {
+          src: { path: "test.adoc", module: "ROOT", component: "tracer" },
+          contents: Buffer.from(`[source,asciidoc]
+----
+[#REQ-001, item, role=requirement, title="Auth"]
+--
+traceability:graph[]
+--
+----
+
+[source,asciidoc]
+----
+traceability:graph[REQ-001]
+traceability:graph-coverage[]
+traceability:config-graph[]
+----
+`),
+        },
+      ];
+
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? files : [],
+        },
+      });
+
+      const out = files[0].contents.toString();
+      // Macro text and example item markup inside source blocks are documentation,
+      // not live macros — they must survive contentClassified unchanged.
+      expect(out).to.include("traceability:graph[]");
+      expect(out).to.include("traceability:graph[REQ-001]");
+      expect(out).to.include("traceability:graph-coverage[]");
+      expect(out).to.include("traceability:config-graph[]");
+      expect(out).to.include('title="Auth"');
+      expect(out).to.not.include("\u2014");
+      // The example item block must not be registered as a real item.
+      expect(ext.getTraceabilityExtension().getAllItems()).to.have.lengthOf(0);
     });
 
     it("should process traceability:graph-coverage[] without crashing", async () => {
