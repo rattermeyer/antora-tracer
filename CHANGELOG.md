@@ -2,6 +2,15 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.24.2] — 2026-09-12
+
+### Fixed
+- Parse item blocks whose closing `--`/`====` delimiter is the last line of the file (no trailing newline).
+- Honor `traceability-links` (and related link-rendering attributes) set globally via the component `antora.yml` or the playbook `asciidoc.attributes`, not just per-page headers.
+
+### Changed
+- Derive the Antora component version from the git refname via a projection, removing the hand-maintained version.
+
 ## [0.24.1] — 2026-09-04
 
 ### Fixed
