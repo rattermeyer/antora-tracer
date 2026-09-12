@@ -9,7 +9,15 @@ It links to the durable requirements it addresses and the ADRs that record decis
 ----
 [#CHG-NNN, item, role=change, status=proposed, title="Short change title"]
 --
-The change describes the outcome to deliver.
+Rationale:: Why this change is needed.
+
+Outcome:: What the change produces
+
+Out of Scope:: What is excluded and not available after the change is finished.
+
+Open Questions:: Questions that need to be decided or answered during refinement.
+
+Notes:: Anything discussed when crafting the change that is worth to be captured for subsequent phases.
 
 addresses:REQ-NNN[]
 records:ADR-NNN[]
