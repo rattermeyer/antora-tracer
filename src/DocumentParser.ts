@@ -514,12 +514,16 @@ export class DocumentParser {
     if (!m || m.index === undefined) return null;
     const blockStart = startIndex + m.index! + 1;
     const delimiter = m[1];
-    const blockEnd = content.indexOf(
-      `\n${delimiter}\n`,
-      blockStart + delimiter.length + 1,
+    // Closing delimiter: same delimiter, alone on a line, terminated by
+    // newline or end-of-file.
+    const closeRegex = new RegExp(`\\n${delimiter}(?:\\n|$)`, "g");
+    closeRegex.lastIndex = blockStart + delimiter.length + 1;
+    const closeMatch = closeRegex.exec(content);
+    if (!closeMatch) return null;
+    return content.substring(
+      startIndex,
+      closeMatch.index + closeMatch[0].length,
     );
-    if (blockEnd === -1) return null;
-    return content.substring(startIndex, blockEnd + delimiter.length + 2);
   }
 
   private extractBody(block: string): string {
@@ -530,9 +534,12 @@ export class DocumentParser {
     const start = block.indexOf(`\n${delimiter}\n`);
     if (start === -1) return "";
     const bodyStart = start + delimiter.length + 2;
-    const end = block.lastIndexOf(`\n${delimiter}\n`);
-    const body = end > start ? block.substring(bodyStart, end).trim() : "";
-    return body;
+    // Closing delimiter may terminate the file (no trailing newline).
+    const closeRegex = new RegExp(`\\n${delimiter}(?:\\n|$)`, "g");
+    closeRegex.lastIndex = bodyStart;
+    const closeMatch = closeRegex.exec(block);
+    if (!closeMatch) return "";
+    return block.substring(bodyStart, closeMatch.index).trim();
   }
 
   private lineAt(content: string, position: number): number {
