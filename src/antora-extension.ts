@@ -114,6 +114,7 @@ export class AntoraTraceabilityExtension {
   private config: Required<AntoraTraceabilityConfig>;
   private readonly logger: ReturnType<AntoraExtensionContext["getLogger"]>;
   private readonly playbook: any;
+  private contentCatalog: any = null;
 
   constructor(
     private readonly context: AntoraExtensionContext,
@@ -283,6 +284,36 @@ export class AntoraTraceabilityExtension {
     return attrs;
   }
 
+  /**
+   * Resolve the document attributes for a file: the resolved component/playbook
+   * AsciiDoc attributes (from the component descriptor's antora.yml and the
+   * playbook) as the base, overlaid by per-file header attributes (which win).
+   * Base values are stringified since YAML attributes may be booleans/numbers.
+   */
+  private resolveDocAttributes(
+    file: any,
+    content: string,
+  ): Record<string, string> {
+    const component = file.src?.component;
+    const version = file.src?.version;
+    const base: Record<string, unknown> = {};
+    if (
+      component &&
+      typeof this.contentCatalog?.getComponentVersion === "function"
+    ) {
+      const componentVersion = this.contentCatalog.getComponentVersion(
+        component,
+        version,
+      );
+      Object.assign(base, componentVersion?.asciidoc?.attributes ?? {});
+    }
+    const merged: Record<string, string> = {};
+    for (const [key, value] of Object.entries(base)) {
+      merged[key] = value == null ? "" : String(value);
+    }
+    return Object.assign(merged, this.parseDocAttributes(content));
+  }
+
   private isLinksEnabled(attrs: Record<string, string>): boolean {
     const val = (attrs["traceability-links"] || "").toLowerCase();
     return val === "true" || val === "yes" || val === "1";
@@ -416,7 +447,7 @@ export class AntoraTraceabilityExtension {
       )
         return;
 
-      const docAttrs = this.parseDocAttributes(content);
+      const docAttrs = this.resolveDocAttributes(file, content);
       const linksEnabled =
         (file as any).__isPartial || this.isLinksEnabled(docAttrs);
       const style = this.getLinksStyle(docAttrs);
@@ -853,7 +884,7 @@ export class AntoraTraceabilityExtension {
       const contentsBuffer = file.contents || file.src?.contents;
       if (!contentsBuffer) return;
       const content = contentsBuffer.toString("utf8");
-      const docAttrs = this.parseDocAttributes(content);
+      const docAttrs = this.resolveDocAttributes(file, content);
       if (
         !RENDERING_MACRO_NAMESPACES.some((ns) =>
           content.includes(`${ns}:graph[`),
@@ -985,7 +1016,7 @@ export class AntoraTraceabilityExtension {
       const contentsBuffer = file.contents || file.src?.contents;
       if (!contentsBuffer) return;
       const content = contentsBuffer.toString("utf8");
-      const docAttrs = this.parseDocAttributes(content);
+      const docAttrs = this.resolveDocAttributes(file, content);
       if (
         !RENDERING_MACRO_NAMESPACES.some((ns) =>
           content.includes(`${ns}:graph-coverage[`),
@@ -1122,7 +1153,7 @@ export class AntoraTraceabilityExtension {
       )
         return;
 
-      const docAttrs = this.parseDocAttributes(content);
+      const docAttrs = this.resolveDocAttributes(file, content);
       const graphEnabled =
         (file as any).__isPartial || this.isGraphEnabled(docAttrs);
 
@@ -1193,6 +1224,7 @@ export class AntoraTraceabilityExtension {
         this.logger.warn("contentCatalog not found in contentClassified event");
         return;
       }
+      this.contentCatalog = contentCatalog;
 
       this.logger.info("Processing content for traceability");
       const pageFiles = contentCatalog.findBy({ family: "page" }) || [];

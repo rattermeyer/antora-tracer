@@ -888,6 +888,100 @@ Description.
       expect(rels).to.have.lengthOf(2);
     });
 
+    it("should honor traceability-links from component asciidoc.attributes", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      // No :traceability-links: header — the flag comes from antora.yml's
+      // asciidoc.attributes, resolved via the content catalog.
+      const file = {
+        src: {
+          path: "modules/ROOT/pages/test.adoc",
+          module: "ROOT",
+          component: "test",
+          version: "1.0",
+        },
+        contents: Buffer.from(
+          `[#REQ-001, item, role=requirement, title="User Auth"]
+--
+addresses:ARC-001[]
+
+traceability:outgoing[]
+--
+
+[#ARC-001, item, role=architecture, title="Auth Module"]
+--
+Description.
+--
+`,
+        ),
+      };
+
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [file] : [],
+          getComponentVersion: () => ({
+            asciidoc: { attributes: { "traceability-links": true } },
+          }),
+        },
+      });
+
+      const content = file.contents.toString("utf8");
+      expect(content).to.not.include("traceability:outgoing[]");
+      expect(content).to.include("xref:");
+    });
+
+    it("should let a file header override component attributes", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const file = {
+        src: {
+          path: "modules/ROOT/pages/test.adoc",
+          module: "ROOT",
+          component: "test",
+          version: "1.0",
+        },
+        contents: Buffer.from(
+          `:traceability-links: false
+
+[#REQ-001, item, role=requirement, title="User Auth"]
+--
+addresses:ARC-001[]
+
+traceability:outgoing[]
+--
+
+[#ARC-001, item, role=architecture, title="Auth Module"]
+--
+Description.
+--
+`,
+        ),
+      };
+
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [file] : [],
+          getComponentVersion: () => ({
+            asciidoc: { attributes: { "traceability-links": true } },
+          }),
+        },
+      });
+
+      const content = file.contents.toString("utf8");
+      expect(content).to.not.include("traceability:outgoing[]");
+      expect(content).to.not.include("xref:");
+    });
+
     it("should expand tracer:outgoing[] alias like traceability:outgoing[]", async () => {
       const ctx = createMockContext({
         playbook: { output: { dir: tempDir }, extensions: [] },
