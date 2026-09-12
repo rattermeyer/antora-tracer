@@ -36,7 +36,8 @@ This is why Pass 1 processes *all* files before moving on.
 `tracer:outgoing[]`, `tracer:incoming[]`, and `tracer:links[]` placeholders are replaced with formatted relationship lists.
 The expansion queries the graph to enumerate relationships for each item.
 
-This pass is opt-in: only files with `:traceability-links: true` get macro expansion.
+This pass is opt-in: only files whose resolved `:traceability-links:` attribute is true get macro expansion.
+The attribute can be set per page in the document header, or globally via the component's `antora.yml` or the playbook `asciidoc.attributes`.
 Partials have the attribute forced on since they have no document attributes of their own.
 Files without the attribute have the macro text stripped.
 

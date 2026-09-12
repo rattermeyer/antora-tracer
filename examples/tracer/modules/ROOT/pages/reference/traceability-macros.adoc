@@ -71,7 +71,27 @@ Opt-in per page via document attribute:
 :traceability-links: true
 ----
 
-Without this attribute, the macro text is stripped from output.
+Or enable it globally by setting the attribute in the component descriptor's `antora.yml`:
+
+[source,yaml]
+----
+asciidoc:
+  attributes:
+    traceability-links: true
+----
+
+or in the playbook:
+
+[source,yaml]
+----
+asciidoc:
+  attributes:
+    traceability-links: true
+----
+
+A per-page `:traceability-links:` header overrides the global setting.
+
+Without the attribute, the macro text is stripped from output.
 
 === Display options
 

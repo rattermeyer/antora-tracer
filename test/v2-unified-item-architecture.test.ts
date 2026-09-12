@@ -282,6 +282,34 @@ addresses:REQ-001[]
       expect(result.relationships[0].type).to.equal("addresses");
       expect(result.relationships[0].targetId).to.equal("REQ-001");
     });
+
+    it("should parse an item whose closing -- delimiter is at EOF", () => {
+      const parser = new DocumentParser({});
+      const content = `[#DEC-003, item, role=decision, title="Example"]
+--
+Context:: context
+Decision:: decision
+
+tracer:links[]
+--`;
+      const result = parser.parse(content, "test.adoc");
+      expect(result.items).to.have.lengthOf(1);
+      expect(result.items[0].id).to.equal("DEC-003");
+      expect(result.items[0].content).to.contain("Decision:: decision");
+      expect(result.warnings).to.have.lengthOf(0);
+    });
+
+    it("should parse an item whose closing ==== delimiter is at EOF", () => {
+      const parser = new DocumentParser({});
+      const content = `[#REQ-009, item, role=requirement]
+====
+Requirement body
+====`;
+      const result = parser.parse(content, "test.adoc");
+      expect(result.items).to.have.lengthOf(1);
+      expect(result.items[0].id).to.equal("REQ-009");
+      expect(result.items[0].content).to.equal("Requirement body");
+    });
   });
 });
 
