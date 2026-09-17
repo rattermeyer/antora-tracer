@@ -64,20 +64,25 @@ async function createExtension(options: any) {
   const mergedOptions = { ...options, ...globalOpts };
 
   try {
-    // An explicit --config takes precedence over the (defaulted) --preset,
-    // otherwise the preset default silently swallows the config file and its
-    // labels/custom roles never load.
+    // An explicit --config takes precedence. Without one, auto-discover a
+    // traceability.yml/yaml in the working directory so idAllocation and
+    // custom roles load; only fall back to the preset when none is found.
     if (mergedOptions.config) {
       const configLoader = new ConfigLoader();
       configLoader.load(mergedOptions.config);
       return new RequirementsTraceabilityExtension(configLoader);
-    } else if (mergedOptions.preset) {
+    }
+    const configLoader = new ConfigLoader();
+    if (configLoader.findConfigFile()) {
+      configLoader.load();
+      return new RequirementsTraceabilityExtension(configLoader);
+    }
+    if (mergedOptions.preset) {
       return RequirementsTraceabilityExtension.createWithPreset(
         mergedOptions.preset,
       );
-    } else {
-      return new RequirementsTraceabilityExtension();
     }
+    return new RequirementsTraceabilityExtension();
   } catch (error: any) {
     console.error(chalk.red("Error creating extension:", error.message));
     process.exit(1);

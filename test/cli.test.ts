@@ -944,12 +944,13 @@ Content.
     async function runNextId(
       args: string[],
       env: Record<string, string> = {},
+      opts: { cwd?: string } = {},
     ): Promise<{ status: number; stdout: string; stderr: string }> {
       try {
         const { stdout } = await execFileAsync(
           "node",
           [cliPath, "next-id", ...args],
-          { encoding: "utf8", env: { ...process.env, ...env } },
+          { encoding: "utf8", env: { ...process.env, ...env }, cwd: opts.cwd },
         );
         return { status: 0, stdout, stderr: "" };
       } catch (error: any) {
@@ -988,6 +989,21 @@ Content.
       expect(res.stdout.trim()).to.equal("REQ-055");
       expect(seenPath).to.equal("/next-id?prefix=REQ");
       expect(seenAuth).to.equal("Bearer secret-token");
+    });
+
+    it("auto-discovers traceability.yml when --config is omitted", async () => {
+      let seenPath = "";
+      await startAllocator((req, res) => {
+        seenPath = req.url || "";
+        res.setHeader("content-type", "application/json");
+        res.end(JSON.stringify({ id: "REQ-077" }));
+      });
+      writeIdAllocConfig(`http://127.0.0.1:${port}`);
+
+      const res = await runNextId(["-p", "REQ"], {}, { cwd: tempDir });
+      expect(res.status).to.equal(0);
+      expect(res.stdout.trim()).to.equal("REQ-077");
+      expect(seenPath).to.equal("/next-id?prefix=REQ");
     });
 
     it("fails closed on a non-2xx response", async () => {

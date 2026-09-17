@@ -25,6 +25,10 @@ const PAGES_ROOT = join(
 const PROSE_DIRS = ["tutorial", "how-to", "reference", "explanation"];
 const CONFIG_PATH = join(REPO_ROOT, "examples", "traceability.yml");
 
+// The example config's idAllocation references `TRACER_ID_TOKEN`; provide a
+// placeholder so loading it doesn't fail closed on a missing env var.
+process.env.TRACER_ID_TOKEN ??= "doc-example-validation";
+
 /** Pages that intentionally show invalid examples (teaching the failure case). */
 const EXCLUDED_FILES = new Set(["how-to/detect-duplicate-ids.adoc"]);
 

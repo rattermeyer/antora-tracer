@@ -39,3 +39,7 @@ matrices:
     columns: [design]
     coverageRelations:
       design: [considered_by]
+
+idAllocation:
+  endpoint: http://localhost:7654
+  token: ${TRACER_ID_TOKEN}

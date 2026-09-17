@@ -2,6 +2,11 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.24.3] — 2026-09-17
+
+### Fixed
+- CLI commands now auto-discover `traceability.yml`/`traceability.yaml` in the working directory (and parent directories) before falling back to the default preset, so a configured `idAllocation` endpoint is honored by `next-id` without an explicit `--config` flag.
+
 ## [0.24.2] — 2026-09-12
 
 ### Fixed

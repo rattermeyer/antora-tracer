@@ -312,7 +312,7 @@ export class ConfigLoader {
   /**
    * Find configuration file in default locations
    */
-  private findConfigFile(): string | undefined {
+  findConfigFile(): string | undefined {
     // Check current directory and parent directories
     const searchPaths = [".", "..", "../..", process.cwd()];
 
