@@ -140,7 +140,7 @@ If you're moving from Sphinx Needs to Antora Tracer:
 
 == Key Differences
 
-For a comparison of Antora and Sphinx as *publishing platforms* (HTML, PDF, versioning, navigation), see xref:antora-vs-sphinx.adoc[].
+For a comparison of Antora and Sphinx as *publishing platforms* (HTML, PDF, versioning, navigation), see xref:explanation/antora-vs-sphinx.adoc[].
 
 *Sphinx Needs* is tightly integrated with Sphinx. *Antora Tracer* is tightly integrated with Antora.
 Both are language-agnostic — they document projects written in any programming language.

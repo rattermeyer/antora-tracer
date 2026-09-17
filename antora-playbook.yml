@@ -49,3 +49,7 @@ urls:
 
 output:
   dir: ./public/docs
+
+runtime:
+  log:
+    level: warn
