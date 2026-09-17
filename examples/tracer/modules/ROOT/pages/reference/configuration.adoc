@@ -346,6 +346,32 @@ Built-in presets ship default guidance pages.
 A project's `roleGuidance` overrides the preset per role.
 Resolve guidance from the CLI with `antora-tracer role-guidance <role>`.
 
+=== `idAllocation`
+
+Opt-in remote ID allocation for the `next-id` command.
+When set, `next-id` requests the next ID from a shared allocator instead of scanning local files:
+
+[source,yaml]
+----
+idAllocation:
+  endpoint: https://ids.example.com   # required, HTTP(S) URL
+  token: ${ID_ALLOC_TOKEN}            # optional bearer token
+----
+
+`endpoint` must be a non-empty HTTP(S) URL.
+`token`, when set, is sent as `Authorization: Bearer <token>`.
+
+Both values support environment-variable interpolation, so secrets stay out of the committed file.
+An unset variable fails configuration loading.
+
+When `endpoint` is set, `next-id` fails closed: an unreachable allocator, a non-2xx response, or a malformed body exits with an error rather than falling back to a local ID.
+A `401` or `403` response is reported as an authentication failure.
+Pass `--local` to force the local scan regardless.
+
+Absent `idAllocation`, `next-id` keeps its local `max+1` behavior unchanged.
+
+The allocator itself is the separate xref:how-to/run-id-server.adoc[ID allocation server] package.
+
 == Configuration Resolution
 
 When both `preset` and `configPath` are provided, `configPath` takes precedence:

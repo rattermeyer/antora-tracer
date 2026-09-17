@@ -221,6 +221,7 @@ Get the next available sequential ID for a given prefix.
 ----
 npx antora-tracer next-id --prefix REQ -i docs/
 npx antora-tracer next-id --prefix TST -i test-plan.adoc
+npx antora-tracer next-id --prefix REQ --local -i docs/
 ----
 
 [width=100%, cols="25,15,60"]
@@ -232,14 +233,24 @@ npx antora-tracer next-id --prefix TST -i test-plan.adoc
 | ID prefix, e.g. `REQ`, `TST`, `ARC`
 
 | `-i, --input <path>`
-| string (required)
-| Input file or directory to scan for existing IDs
+| string
+| Input file or directory to scan for existing IDs.
+Required for a local scan; ignored when a remote allocator is used.
+
+| `--local`
+| flag
+| Force a local scan, ignoring any configured `idAllocation`.
 |===
 
 Auto-detects padding from existing IDs.
 If `REQ-001` and `REQ-002` exist, returns `REQ-003`.
 If `TST-0001` exists, returns `TST-0002`.
 With no existing items matching the prefix, defaults to 3-digit padding (`REQ-001`).
+
+When `idAllocation.endpoint` is configured, `next-id` requests the next ID from the allocator and prints its `id` verbatim.
+A configured-but-unreachable allocator, a non-2xx response, or a malformed body exits with an error instead of falling back to a local ID.
+Pass `--local` to override.
+See xref:reference/configuration.adoc[Configuration Reference] for the `idAllocation` key and xref:how-to/run-id-server.adoc[Run the ID allocation server] for the service.
 
 == role-guidance
 

@@ -525,46 +525,6 @@ The package SHALL use ECMAScript modules (`""""type"""": """"module""""`) throug
 No runtime framework SHALL be introduced as a dependency."""
 CON-005,CON-005 — Document format is AsciiDoc processed by Antora,constraint,,requirements.adoc,"""The system SHALL process AsciiDoc files as managed by Antora's content catalog.
 Direct filesystem reads of source `.adoc` files SHALL only occur in the standalone CLI path, where no Antora content catalog is available."""
-REQ-087,REQ-087 — Items inside verbatim blocks are not parsed,requirement,,requirements.adoc,"""The system SHALL NOT register item declarations (`[#ID, item, role=...]`) found inside AsciiDoc verbatim blocks (listing blocks delimited by `----` and literal blocks delimited by `....`) as traceability items.
-
-Source: openspec/specs/parser-verbatim-skip/spec.md
-
-tracer:links[]"""
-REQ-088,REQ-088 — Inline macros inside verbatim blocks are not parsed,requirement,,requirements.adoc,"""The system SHALL NOT register inline relationship macros (`relation:TARGET[]`) whose enclosing item was skipped because it fell inside a verbatim block.
-
-Source: openspec/specs/parser-verbatim-skip/spec.md
-
-tracer:links[]"""
-REQ-090,REQ-090 — Verbatim block detection handles standard AsciiDoc fences,requirement,,requirements.adoc,"""The system SHALL detect verbatim blocks by matching opening and closing fence lines consisting of exactly `----` or `....` (with optional trailing whitespace), ignoring style prefix lines like `[source,asciidoc]`.
-
-Source: openspec/specs/parser-verbatim-skip/spec.md
-
-tracer:links[]"""
-REQ-091,REQ-091 — Inline macros inside verbatim blocks are preserved in rendered output,requirement,,requirements.adoc,"""The system SHALL preserve inline relationship macros (`relation:TARGET[]`) inside AsciiDoc verbatim blocks so they remain visible in the rendered output.
-
-Source: openspec/specs/parser-verbatim-skip/spec.md
-
-tracer:links[]"""
-REQ-092,REQ-092 — Inline macros inside backtick code spans are not parsed,requirement,,requirements.adoc,"""The system SHALL NOT register inline relationship macros (`relation:ID[]`) that appear inside backtick-enclosed code spans as traceability relationships.
-
-Source: openspec/specs/parser-verbatim-skip/spec.md
-
-tracer:links[]"""
-REQ-110,REQ-110 — Items defined in partials are registered in the graph,requirement,,requirements.adoc,"""The system SHALL process items defined in AsciiDoc partial files alongside page files, registering them in the traceability graph.
-
-Source: openspec/specs/partial-file-processing/spec.md
-
-tracer:links[]"""
-REQ-144,REQ-144 — Partial items use view URL as source reference,requirement,,requirements.adoc,"""Items from partial files SHALL use the file's view URL as their source file reference, enabling traceability matrix links to resolve to the source repository.
-
-Source: openspec/specs/partial-file-processing/spec.md
-
-tracer:links[]"""
-REQ-145,REQ-145 — All processing passes apply to partial files,requirement,,requirements.adoc,"""The system SHALL apply graph population, macro expansion, and link substitution passes to partial files in the same way as page files, because partial content is inlined into pages and reaches the browser.
-
-Source: openspec/specs/partial-file-processing/spec.md
-
-tracer:links[]"""
 REQ-129,REQ-129 — Bidirectional relationship pairs are merged into a single edge,requirement,,requirements.adoc,"""The system SHALL detect when a newly added relationship is authored with the reverse of an existing relationship's type — the existing edge goes from B to A with a type whose declared `reverse` equals the new edge's type — and SHALL NOT store a second edge.
 The canonical primary edge is retained with its original metadata (sourceFile, line), and no warning is emitted.
 Merging is driven by the `reverse` declaration in `relations` (config).
@@ -1018,6 +978,26 @@ REQ-056,REQ-056 — CLI next-id command returns next available ID,requirement,,r
 Source: openspec/specs/next-id/spec.md
 
 tracer:links[]"""
+REQ-271,REQ-271 — next-id uses a configured remote allocator,requirement,,requirements.adoc,"""The CLI SHALL request the next ID from a remote allocator when `idAllocation.endpoint` is configured, instead of scanning local files.
+
+Source: openspec/specs/next-id/spec.md
+
+tracer:links[]"""
+REQ-272,REQ-272 — next-id fails closed when the allocator is unavailable,requirement,,requirements.adoc,"""A configured-but-unreachable allocator SHALL cause `next-id` to exit with an error, never silently fall back to a local scan.
+
+Source: openspec/specs/next-id/spec.md
+
+tracer:links[]"""
+REQ-273,REQ-273 — --local forces a local scan,requirement,,requirements.adoc,"""A `--local` flag SHALL bypass a configured allocator and use the existing local `max+1` scan.
+
+Source: openspec/specs/next-id/spec.md
+
+tracer:links[]"""
+REQ-274,REQ-274 — idAllocation config is validated,requirement,,requirements.adoc,"""An `idAllocation.endpoint` that is not a non-empty HTTP(S) URL SHALL cause configuration loading to fail.
+
+Source: openspec/specs/next-id/spec.md
+
+tracer:links[]"""
 REQ-136,REQ-136 — CLI exposes a query subcommand,requirement,,requirements.adoc,"""The CLI SHALL provide a `query` subcommand that reads AsciiDoc source files and answers one structural question about items and their relationships per invocation.
 No Antora build SHALL be required.
 
@@ -1059,6 +1039,31 @@ No Antora build SHALL be required.
 The command SHALL exit with a non-zero code when errors are found and code 0 when the input is valid.
 
 Source: openspec/specs/cli-validate/spec.md
+
+tracer:links[]"""
+REQ-275,REQ-275 — Allocator returns the next ID,requirement,,requirements.adoc,"""The service SHALL respond to `GET /next-id?prefix=<prefix>` with `200` and a JSON body `{""""id"""": """"<prefix>-NNN""""}`, where `NNN` is the next sequential value for that prefix.
+
+Source: openspec/specs/id-allocation-server/spec.md
+
+tracer:links[]"""
+REQ-276,REQ-276 — Allocation is atomic and monotonic,requirement,,requirements.adoc,"""The service SHALL never return the same ID twice for the same tenant and prefix, even under concurrent requests, and SHALL never reuse a previously allocated ID.
+
+Source: openspec/specs/id-allocation-server/spec.md
+
+tracer:links[]"""
+REQ-277,REQ-277 — Tenancy is derived from the bearer token,requirement,,requirements.adoc,"""Counters SHALL be keyed by tenant, resolved from the `Authorization: Bearer <token>` header; a request with no token SHALL use a default tenant.
+
+Source: openspec/specs/id-allocation-server/spec.md
+
+tracer:links[]"""
+REQ-278,REQ-278 — Padding honors configured width,requirement,,requirements.adoc,"""Generated IDs SHALL be zero-padded to the configured width for the prefix, defaulting to 3, applied as a minimum so larger values grow rather than truncate.
+
+Source: openspec/specs/id-allocation-server/spec.md
+
+tracer:links[]"""
+REQ-279,REQ-279 — Server honors a configured starting value per prefix,requirement,,requirements.adoc,"""The service SHALL begin allocation for a prefix at a configured `start` value, defaulting to 1 when none is configured.
+
+Source: openspec/specs/id-allocation-server/spec.md
 
 tracer:links[]"""
 REQ-079,REQ-079 — Non-heading elements with IDs are indexed as navigable anchors,requirement,,requirements.adoc,"""The search index SHALL include every non-heading HTML element inside `<article class=""""doc"""">` that has an `id` attribute as a separate searchable chunk.
@@ -2538,15 +2543,18 @@ verifies:REQ-255[]
 tracer:links[]"""
 TST-003,TST-003 — CLI Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/cli.test.ts`
 
-Tests the Commander-based CLI — process command (valid content, empty content, invalid paths, malformed macros), matrix command (generation, empty graph), validate command (invalid graph state), export command (empty graph), stats command (empty statistics), preset commands (invalid names, init, listing), help command, and next-id command (sequential ID generation, padding preservation, prefix matching).
+Tests the Commander-based CLI — process command (valid content, empty content, invalid paths, malformed macros), matrix command (generation, empty graph), validate command (invalid graph state), export command (empty graph), stats command (empty statistics), preset commands (invalid names, init, listing), help command, and next-id command (sequential ID generation, padding preservation, prefix matching, remote allocation, fail-closed errors, authentication failures, and --local bypass).
 
 verifies:REQ-056[]
 verifies:REQ-150[]
+verifies:REQ-271[]
+verifies:REQ-272[]
+verifies:REQ-273[]
 
 tracer:links[]"""
 TST-004,TST-004 — ConfigLoader Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/config-loader.test.ts`
 
-Tests the `ConfigLoader` — initialization, built-in preset listing and loading, preset structure validation (including pairwise matrix definitions), configuration loading from file, missing file handling, invalid YAML handling, role and relation validation, matrix definition retrieval, configuration merging (including label overrides), and error messages for invalid configurations and preset names.
+Tests the `ConfigLoader` — initialization, built-in preset listing and loading, preset structure validation (including pairwise matrix definitions), configuration loading from file, missing file handling, invalid YAML handling, role and relation validation, matrix definition retrieval, configuration merging (including label overrides), idAllocation validation and environment interpolation, and error messages for invalid configurations and preset names.
 
 verifies:REQ-083[]
 verifies:REQ-084[]
@@ -2560,6 +2568,7 @@ verifies:REQ-223[]
 verifies:REQ-224[]
 verifies:REQ-175[]
 verifies:REQ-177[]
+verifies:REQ-274[]
 
 tracer:links[]"""
 TST-005,TST-005 — Graph and API Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/graph-and-api.test.ts`
@@ -2720,6 +2729,17 @@ Tests `roleGuidance` config resolution via `ConfigLoader`: preset default guidan
 verifies:REQ-265[]
 verifies:REQ-266[]
 verifies:REQ-267[]
+
+tracer:links[]"""
+TST-019,TST-019 — ID Allocation Server Tests,test,,self-traceability/test-plan.adoc,"""Test file: `id-server/test/server.test.ts`
+
+Tests the standalone allocator service — sequential ID allocation, missing-prefix errors, bearer-token tenancy (default tenant, unknown token), per-tenant counter isolation, padding width (default, configured, overflow), seeded starting values, error responses allocating no ID, concurrent allocation, database reopen persistence, and config parsing.
+
+verifies:REQ-275[]
+verifies:REQ-276[]
+verifies:REQ-277[]
+verifies:REQ-278[]
+verifies:REQ-279[]
 
 tracer:links[]"""
 PRQ-001,PRQ-001 — CI workflows trigger on push and PR,process_requirement,,self-traceability/delivery-process.adoc,"""The GitHub Actions CI workflow SHALL trigger on every push to `main` and every pull request.

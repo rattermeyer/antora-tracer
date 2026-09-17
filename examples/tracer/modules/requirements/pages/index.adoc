@@ -856,6 +856,42 @@ Source: openspec/specs/next-id/spec.md
 tracer:links[]
 --
 
+[#REQ-271, item, role=requirement, title="next-id uses a configured remote allocator"]
+--
+The CLI SHALL request the next ID from a remote allocator when `idAllocation.endpoint` is configured, instead of scanning local files.
+
+Source: openspec/specs/next-id/spec.md
+
+tracer:links[]
+--
+
+[#REQ-272, item, role=requirement, title="next-id fails closed when the allocator is unavailable"]
+--
+A configured-but-unreachable allocator SHALL cause `next-id` to exit with an error, never silently fall back to a local scan.
+
+Source: openspec/specs/next-id/spec.md
+
+tracer:links[]
+--
+
+[#REQ-273, item, role=requirement, title="--local forces a local scan"]
+--
+A `--local` flag SHALL bypass a configured allocator and use the existing local `max+1` scan.
+
+Source: openspec/specs/next-id/spec.md
+
+tracer:links[]
+--
+
+[#REQ-274, item, role=requirement, title="idAllocation config is validated"]
+--
+An `idAllocation.endpoint` that is not a non-empty HTTP(S) URL SHALL cause configuration loading to fail.
+
+Source: openspec/specs/next-id/spec.md
+
+tracer:links[]
+--
+
 [#REQ-136, item, role=requirement, title="CLI exposes a query subcommand"]
 --
 The CLI SHALL provide a `query` subcommand that reads AsciiDoc source files and answers one structural question about items and their relationships per invocation.
@@ -927,6 +963,53 @@ No Antora build SHALL be required.
 The command SHALL exit with a non-zero code when errors are found and code 0 when the input is valid.
 
 Source: openspec/specs/cli-validate/spec.md
+
+tracer:links[]
+--
+
+=== ID Allocation Server
+
+[#REQ-275, item, role=requirement, title="Allocator returns the next ID"]
+--
+The service SHALL respond to `GET /next-id?prefix=<prefix>` with `200` and a JSON body `{"id": "<prefix>-NNN"}`, where `NNN` is the next sequential value for that prefix.
+
+Source: openspec/specs/id-allocation-server/spec.md
+
+tracer:links[]
+--
+
+[#REQ-276, item, role=requirement, title="Allocation is atomic and monotonic"]
+--
+The service SHALL never return the same ID twice for the same tenant and prefix, even under concurrent requests, and SHALL never reuse a previously allocated ID.
+
+Source: openspec/specs/id-allocation-server/spec.md
+
+tracer:links[]
+--
+
+[#REQ-277, item, role=requirement, title="Tenancy is derived from the bearer token"]
+--
+Counters SHALL be keyed by tenant, resolved from the `Authorization: Bearer <token>` header; a request with no token SHALL use a default tenant.
+
+Source: openspec/specs/id-allocation-server/spec.md
+
+tracer:links[]
+--
+
+[#REQ-278, item, role=requirement, title="Padding honors configured width"]
+--
+Generated IDs SHALL be zero-padded to the configured width for the prefix, defaulting to 3, applied as a minimum so larger values grow rather than truncate.
+
+Source: openspec/specs/id-allocation-server/spec.md
+
+tracer:links[]
+--
+
+[#REQ-279, item, role=requirement, title="Server honors a configured starting value per prefix"]
+--
+The service SHALL begin allocation for a prefix at a configured `start` value, defaulting to 1 when none is configured.
+
+Source: openspec/specs/id-allocation-server/spec.md
 
 tracer:links[]
 --

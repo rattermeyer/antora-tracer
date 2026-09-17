@@ -20,6 +20,8 @@
 ** xref:how-to/evaluate-skills.adoc[Evaluate the agent skills]
 ** xref:how-to/contribute.adoc[Contribute to the project]
 ** xref:how-to/troubleshooting.adoc[Troubleshoot common issues]
+* ID Allocation Server
+** xref:how-to/run-id-server.adoc[Run the server]
 * Reference
 ** xref:reference/item-macro.adoc[Item Macro]
 ** xref:reference/traceability-macros.adoc[Traceability Macros]
