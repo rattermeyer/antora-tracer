@@ -3,8 +3,9 @@ function extractBearer(authorization) {
     return match ? match[1].trim() : undefined;
 }
 /**
- * Static `token -> tenant` map. An absent token resolves to the `default`
- * tenant; an unrecognized token (when tokens are configured) resolves to
+ * Static `token -> tenant` map. With no tokens configured, every request is
+ * attributed to the `default` tenant (single-tenant, auth off). With tokens
+ * configured, an absent, malformed, or unrecognized token resolves to
  * `undefined` so the route rejects with 401.
  */
 export class StaticTokenAuth {
@@ -13,14 +14,13 @@ export class StaticTokenAuth {
         this.tokens = tokens;
     }
     resolve(authorization) {
-        if (authorization === undefined || authorization === "") {
+        if (this.tokens.size === 0)
             return "default";
-        }
+        if (authorization === undefined)
+            return undefined;
         const token = extractBearer(authorization);
         if (token === undefined)
             return undefined;
-        if (this.tokens.size === 0)
-            return "default";
         return this.tokens.get(token);
     }
 }

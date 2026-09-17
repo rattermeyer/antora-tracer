@@ -1,3 +1,7 @@
+import { config } from "dotenv";
+// Load a `.env` file from the working directory so `${VAR}` interpolation in
+// configuration resolves without manual shell setup.
+config({ quiet: true });
 import { pathToFileURL } from "node:url";
 import { loadConfig } from "./config.js";
 import { StaticTokenAuth } from "./auth.js";

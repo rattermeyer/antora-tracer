@@ -81,10 +81,15 @@ describe("id-server", () => {
     expect(res.status).to.equal(400);
   });
 
-  it("uses the default tenant for an absent token and 401 for an unknown token", async () => {
-    const s = await startServer({ tokens: { "known-secret": "acme" } });
-    // absent token -> default tenant
+  it("uses the default tenant when no tokens are configured", async () => {
+    const s = await startServer({});
     expect((await nextId(s.base, "REQ")).body).to.deep.equal({ id: "REQ-001" });
+  });
+
+  it("rejects absent and unknown tokens when tokens are configured", async () => {
+    const s = await startServer({ tokens: { "known-secret": "acme" } });
+    // absent token -> 401
+    expect((await nextId(s.base, "REQ")).status).to.equal(401);
     // unknown token -> 401
     expect((await nextId(s.base, "REQ", "wrong")).status).to.equal(401);
     // known token -> its own tenant, independent counter

@@ -17,20 +17,19 @@ function extractBearer(authorization: string): string | undefined {
 }
 
 /**
- * Static `token -> tenant` map. An absent token resolves to the `default`
- * tenant; an unrecognized token (when tokens are configured) resolves to
+ * Static `token -> tenant` map. With no tokens configured, every request is
+ * attributed to the `default` tenant (single-tenant, auth off). With tokens
+ * configured, an absent, malformed, or unrecognized token resolves to
  * `undefined` so the route rejects with 401.
  */
 export class StaticTokenAuth implements Auth {
   constructor(private readonly tokens: ReadonlyMap<string, string>) {}
 
   resolve(authorization: string | undefined): string | undefined {
-    if (authorization === undefined || authorization === "") {
-      return "default";
-    }
+    if (this.tokens.size === 0) return "default";
+    if (authorization === undefined) return undefined;
     const token = extractBearer(authorization);
     if (token === undefined) return undefined;
-    if (this.tokens.size === 0) return "default";
     return this.tokens.get(token);
   }
 }
