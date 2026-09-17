@@ -189,3 +189,6 @@ __pycache__/
 # Vale package-sync cache
 src/vale/.vale/
 lib/src/vale/.vale/
+
+# Local id-server config (contains tokens)
+id-server.config.yml
