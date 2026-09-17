@@ -1215,6 +1215,31 @@ export class TraceabilityGraph {
     return `${prefix}-${String(next).padStart(padWidth, "0")}`;
   }
 
+  /**
+   * Compute the next numeric ID (max+1) and padding width for every prefix
+   * present in the graph. Returns `prefix -> { start, width }` where `start`
+   * is the numeric next value — never the current maximum, never a formatted
+   * ID string. Used to seed the remote ID allocation server.
+   */
+  getPrefixMaxima(): Map<string, { start: number; width: number }> {
+    const maxima = new Map<string, { start: number; width: number }>();
+    for (const id of this._items.keys()) {
+      const m = /^(.*)-(\d+)$/.exec(id);
+      if (!m) continue;
+      const prefix = m[1];
+      const num = parseInt(m[2], 10);
+      const width = m[2].length;
+      const existing = maxima.get(prefix);
+      if (existing) {
+        if (num + 1 > existing.start) existing.start = num + 1;
+        if (width > existing.width) existing.width = width;
+      } else {
+        maxima.set(prefix, { start: num + 1, width });
+      }
+    }
+    return maxima;
+  }
+
   // ========================================================================
   // Private Index Management
   // ========================================================================

@@ -14,6 +14,12 @@ import { createInterface } from "node:readline";
 import { fileURLToPath } from "node:url";
 import chalk from "chalk";
 import { program } from "commander";
+import { dump as yamlDump } from "js-yaml";
+import { config } from "dotenv";
+
+// Load a `.env` file from the working directory so `${VAR}` interpolation in
+// configuration resolves without manual shell setup.
+config({ quiet: true });
 
 // Import extension
 import {
@@ -774,8 +780,9 @@ tests:IMP-001[]
   });
 
 // Config validation command
-program
-  .command("config validate")
+const configProgram = program.command("config");
+configProgram
+  .command("validate")
   .description("Validate traceability configuration file")
   .option(
     "-c, --config <path>",
@@ -829,9 +836,11 @@ program
     }
   });
 
-program
-  .command("export neo4j")
+const exportProgram = program.command("export");
+exportProgram
+  .command("neo4j")
   .description("Export traceability data to Neo4j graph database format")
+  .argument("[playbook]", "Antora playbook to harvest (all components/repos)")
   .option("-i, --input <path>", "Input file or directory to process first")
   .option(
     "-o, --output <path>",
@@ -839,17 +848,29 @@ program
     "./neo4j",
   )
   .option("-f, --format <format>", "Export format: csv or cypher", "csv")
-  .action(async (_target, options) => {
+  .action(async (playbook, options) => {
     console.log(chalk.blue("Exporting to Neo4j..."));
-    if (!options.input) {
-      console.error(chalk.red("Error: Input file or directory is required"));
-      process.exit(1);
-    }
     const extension = await createExtension(options);
     try {
       if (options.input) {
         const adocFiles = collectAdocFiles(options.input);
         extension.processFiles(adocFiles);
+      } else if (playbook) {
+        const files = await harvestSiteFiles(playbook);
+        for (const file of files) {
+          extension.process(file.content, {
+            sourceFile: file.path,
+            component: file.component,
+            module: file.module,
+            version: file.version,
+            pubUrl: file.pubUrl,
+          });
+        }
+      } else {
+        console.error(
+          chalk.red("Error: Provide -i <dir> or a playbook path"),
+        );
+        process.exit(1);
       }
       if (isDryRun(options)) {
         console.log(chalk.yellow("[DRY RUN] Would export to Neo4j"));
@@ -977,6 +998,62 @@ program
       extension.processFiles(adocFiles);
       const nextId = extension.getNextId(options.prefix);
       console.log(nextId);
+    } catch (error: any) {
+      console.error(chalk.red("Error:", error.message));
+      process.exit(1);
+    }
+  });
+
+/**
+ * Serialize per-prefix maxima to the id-server `prefixes` seed format.
+ */
+function seedToYaml(
+  maxima: Map<string, { start: number; width: number }>,
+): string {
+  const prefixes: Record<string, { start: number; width: number }> = {};
+  for (const [prefix, { start, width }] of maxima) {
+    prefixes[prefix] = { start, width };
+  }
+  return yamlDump({ prefixes });
+}
+
+program
+  .command("seed")
+  .description(
+    "Export allocator seed values (next ID per prefix) for the ID allocation server",
+  )
+  .argument("[playbook]", "Antora playbook to harvest (all components/repos)")
+  .option("-i, --input <path>", "Input file or directory to scan")
+  .option("-o, --output <path>", "Output file (defaults to stdout)")
+  .action(async (playbook: string | undefined, options: any) => {
+    const extension = await createExtension(options);
+    try {
+      if (options.input) {
+        extension.processFiles(collectAdocFiles(options.input));
+      } else if (playbook) {
+        const files = await harvestSiteFiles(playbook);
+        for (const file of files) {
+          extension.process(file.content, {
+            sourceFile: file.path,
+            component: file.component,
+            module: file.module,
+            version: file.version,
+            pubUrl: file.pubUrl,
+          });
+        }
+      } else {
+        console.error(
+          chalk.red("Error: Provide -i <dir> or a playbook path"),
+        );
+        process.exit(1);
+      }
+      const yaml = seedToYaml(extension.getPrefixMaxima());
+      if (options.output) {
+        writeFileSync(resolve(process.cwd(), options.output), yaml, "utf8");
+        console.log(chalk.green(`Seed written to ${options.output}`));
+      } else {
+        console.log(yaml);
+      }
     } catch (error: any) {
       console.error(chalk.red("Error:", error.message));
       process.exit(1);
