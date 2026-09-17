@@ -84,6 +84,53 @@ function isDryRun(options: any): boolean {
   return options.dryRun || globalOpts.dryRun || false;
 }
 
+/**
+ * Request the next ID from a remote allocator.
+ * Fails closed: non-2xx, network error, timeout, or malformed body throws.
+ */
+async function fetchNextId(
+  endpoint: string,
+  token: string | undefined,
+  prefix: string,
+  timeoutMs = 10_000,
+): Promise<string> {
+  const base = endpoint.endsWith("/") ? endpoint : `${endpoint}/`;
+  const url = new URL("next-id", base);
+  url.searchParams.set("prefix", prefix);
+
+  const headers: Record<string, string> = {};
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      headers,
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+  } catch (error: any) {
+    throw new Error(`allocator unreachable: ${error.message}`);
+  }
+
+  if (response.status === 401 || response.status === 403) {
+    throw new Error("authentication failed (check idAllocation.token)");
+  }
+  if (!response.ok) {
+    throw new Error(`allocator returned HTTP ${response.status}`);
+  }
+
+  let body: unknown;
+  try {
+    body = await response.json();
+  } catch {
+    throw new Error("allocator returned invalid response (missing id)");
+  }
+  const id = (body as { id?: unknown })?.id;
+  if (typeof id !== "string" || id.trim() === "") {
+    throw new Error("allocator returned invalid response (missing id)");
+  }
+  return id;
+}
+
 function ensureDirectory(dir: string) {
   const fullPath = resolve(process.cwd(), dir);
 
@@ -905,13 +952,27 @@ program
     "-i, --input <path>",
     "Input file or directory to scan for existing IDs",
   )
+  .option(
+    "--local",
+    "Force a local scan, ignoring any configured idAllocation",
+  )
   .action(async (options) => {
-    if (!options.input) {
-      console.error(chalk.red("Error: Input file or directory is required"));
-      process.exit(1);
-    }
     const extension = await createExtension(options);
     try {
+      const idAllocation = extension.configLoader?.getConfig()?.idAllocation;
+      if (idAllocation?.endpoint && !options.local) {
+        const nextId = await fetchNextId(
+          idAllocation.endpoint,
+          idAllocation.token,
+          options.prefix,
+        );
+        console.log(nextId);
+        return;
+      }
+      if (!options.input) {
+        console.error(chalk.red("Error: Input file or directory is required"));
+        process.exit(1);
+      }
       const adocFiles = collectAdocFiles(options.input);
       extension.processFiles(adocFiles);
       const nextId = extension.getNextId(options.prefix);

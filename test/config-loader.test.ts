@@ -510,6 +510,123 @@ matrices:
       }).to.throw;
     });
   });
+
+  describe("idAllocation", () => {
+    function writeConfig(idAllocationYaml: string): string {
+      const tempDir = path.join(__dirname, "temp-idallocation");
+      fs.mkdirSync(tempDir, { recursive: true });
+      const configPath = path.join(tempDir, "traceability.yml");
+      fs.writeFileSync(
+        configPath,
+        ["roles: [requirement]", idAllocationYaml].join("\n"),
+      );
+      return configPath;
+    }
+
+    afterEach(() => {
+      fs.rmSync(path.join(__dirname, "temp-idallocation"), {
+        recursive: true,
+        force: true,
+      });
+    });
+
+    it("loads a valid idAllocation endpoint and token", () => {
+      const configPath = writeConfig(
+        [
+          "idAllocation:",
+          "  endpoint: https://ids.example.com",
+          "  token: secret-token",
+        ].join("\n"),
+      );
+
+      const config = configLoader.load(configPath);
+      expect(config.idAllocation).to.deep.equal({
+        endpoint: "https://ids.example.com",
+        token: "secret-token",
+      });
+    });
+
+    it("interpolates environment variable references in endpoint and token", () => {
+      process.env.ID_ALLOC_ENDPOINT = "https://ids.example.com";
+      process.env.ID_ALLOC_TOKEN = "env-secret";
+      try {
+        const configPath = writeConfig(
+          [
+            "idAllocation:",
+            `  endpoint: \${ID_ALLOC_ENDPOINT}`,
+            `  token: \${ID_ALLOC_TOKEN}`,
+          ].join("\n"),
+        );
+
+        const config = configLoader.load(configPath);
+        expect(config.idAllocation).to.deep.equal({
+          endpoint: "https://ids.example.com",
+          token: "env-secret",
+        });
+      } finally {
+        delete process.env.ID_ALLOC_ENDPOINT;
+        delete process.env.ID_ALLOC_TOKEN;
+      }
+    });
+
+    it("throws when a referenced environment variable is unset", () => {
+      delete process.env.ID_ALLOC_MISSING;
+      const configPath = writeConfig(
+        [
+          "idAllocation:",
+          "  endpoint: https://ids.example.com",
+          `  token: \${ID_ALLOC_MISSING}`,
+        ].join("\n"),
+      );
+
+      expect(() => configLoader.load(configPath)).to.throw(
+        /ID_ALLOC_MISSING.*is not set/,
+      );
+    });
+
+    it("throws when endpoint is missing or empty", () => {
+      const configPath = writeConfig("idAllocation:\n  token: x");
+
+      expect(() => configLoader.load(configPath)).to.throw(
+        /idAllocation.endpoint must be a non-empty URL/,
+      );
+    });
+
+    it("throws when endpoint is not a URL", () => {
+      const configPath = writeConfig(
+        "idAllocation:\n  endpoint: not-a-url",
+      );
+
+      expect(() => configLoader.load(configPath)).to.throw(
+        /idAllocation.endpoint is not a valid URL/,
+      );
+    });
+
+    it("throws when endpoint is not HTTP(S)", () => {
+      const configPath = writeConfig(
+        "idAllocation:\n  endpoint: ftp://ids.example.com",
+      );
+
+      expect(() => configLoader.load(configPath)).to.throw(
+        /must be an HTTP\(S\) URL/,
+      );
+    });
+
+    it("preserves idAllocation when the config extends a preset", () => {
+      const configPath = writeConfig(
+        [
+          "extends: requirements-engineering",
+          "idAllocation:",
+          "  endpoint: https://ids.example.com",
+        ].join("\n"),
+      );
+
+      const config = configLoader.load(configPath);
+      expect(config.idAllocation?.endpoint).to.equal(
+        "https://ids.example.com",
+      );
+    });
+  });
 });
 
 describe("Preset Inheritance", () => {

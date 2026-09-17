@@ -3,10 +3,12 @@
  * Tests the CLI module exports and basic functionality
  */
 
-import { execFileSync } from "node:child_process";
+import { execFile, execFileSync } from "node:child_process";
 import * as fs from "node:fs";
+import * as http from "node:http";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
+import { promisify } from "node:util";
 import { expect } from "chai";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -905,6 +907,167 @@ Content.
       expect(nextReq).to.equal("REQ-002");
       const nextArc = extension.getNextId("ARC");
       expect(nextArc).to.equal("ARC-006");
+    });
+  });
+
+  describe("Next-ID Remote Allocation", () => {
+    const cliPath = path.join(__dirname, "..", "src", "cli.js");
+    const tempDir = path.join(__dirname, "temp-cli-remote");
+
+    let server: http.Server;
+    let port: number;
+
+    function startAllocator(
+      handler: (req: http.IncomingMessage, res: http.ServerResponse) => void,
+    ): Promise<void> {
+      server = http.createServer(handler);
+      return new Promise((resolve) => {
+        server.listen(0, "127.0.0.1", () => {
+          port = (server.address() as any).port;
+          resolve();
+        });
+      });
+    }
+
+    function writeIdAllocConfig(endpoint: string, extra = ""): string {
+      fs.mkdirSync(tempDir, { recursive: true });
+      const configPath = path.join(tempDir, "traceability.yml");
+      fs.writeFileSync(
+        configPath,
+        ["roles: [requirement]", "idAllocation:", `  endpoint: ${endpoint}`, extra].join("\n"),
+      );
+      return configPath;
+    }
+
+    const execFileAsync = promisify(execFile);
+
+    async function runNextId(
+      args: string[],
+      env: Record<string, string> = {},
+    ): Promise<{ status: number; stdout: string; stderr: string }> {
+      try {
+        const { stdout } = await execFileAsync(
+          "node",
+          [cliPath, "next-id", ...args],
+          { encoding: "utf8", env: { ...process.env, ...env } },
+        );
+        return { status: 0, stdout, stderr: "" };
+      } catch (error: any) {
+        return {
+          status: error.code ?? error.status ?? -1,
+          stdout: error.stdout ?? "",
+          stderr: error.stderr ?? error.message,
+        };
+      }
+    }
+
+    afterEach(() => {
+      if (server) {
+        server.close();
+        server = undefined as any;
+      }
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    });
+
+    it("requests the next ID from a configured allocator and emits it", async () => {
+      let seenPath = "";
+      let seenAuth = "";
+      await startAllocator((req, res) => {
+        seenPath = req.url || "";
+        seenAuth = req.headers.authorization || "";
+        res.setHeader("content-type", "application/json");
+        res.end(JSON.stringify({ id: "REQ-055" }));
+      });
+      const configPath = writeIdAllocConfig(
+        `http://127.0.0.1:${port}`,
+        "  token: secret-token",
+      );
+
+      const res = await runNextId(["-p", "REQ", "--config", configPath]);
+      expect(res.status).to.equal(0);
+      expect(res.stdout.trim()).to.equal("REQ-055");
+      expect(seenPath).to.equal("/next-id?prefix=REQ");
+      expect(seenAuth).to.equal("Bearer secret-token");
+    });
+
+    it("fails closed on a non-2xx response", async () => {
+      await startAllocator((_req, res) => {
+        res.statusCode = 500;
+        res.end("boom");
+      });
+      const configPath = writeIdAllocConfig(`http://127.0.0.1:${port}`);
+
+      const res = await runNextId(["-p", "REQ", "--config", configPath]);
+      expect(res.status).to.equal(1);
+      expect(res.stdout.trim()).to.equal("");
+      expect(res.stderr).to.contain("HTTP 500");
+    });
+
+    it("reports authentication failure on 401", async () => {
+      await startAllocator((_req, res) => {
+        res.statusCode = 401;
+        res.end("");
+      });
+      const configPath = writeIdAllocConfig(
+        `http://127.0.0.1:${port}`,
+        "  token: wrong",
+      );
+
+      const res = await runNextId(["-p", "REQ", "--config", configPath]);
+      expect(res.status).to.equal(1);
+      expect(res.stderr).to.contain("authentication failed");
+      expect(res.stdout.trim()).to.equal("");
+    });
+
+    it("fails closed when the allocator is unreachable", async () => {
+      // Nothing listens on port 1; connection is refused immediately.
+      const configPath = writeIdAllocConfig("http://127.0.0.1:1");
+
+      const res = await runNextId(["-p", "REQ", "--config", configPath]);
+      expect(res.status).to.equal(1);
+      expect(res.stderr).to.contain("allocator unreachable");
+      expect(res.stdout.trim()).to.equal("");
+    });
+
+    it("fails closed when the allocator returns no id", async () => {
+      await startAllocator((_req, res) => {
+        res.setHeader("content-type", "application/json");
+        res.end("{}");
+      });
+      const configPath = writeIdAllocConfig(`http://127.0.0.1:${port}`);
+
+      const res = await runNextId(["-p", "REQ", "--config", configPath]);
+      expect(res.status).to.equal(1);
+      expect(res.stderr).to.contain("invalid response");
+      expect(res.stdout.trim()).to.equal("");
+    });
+
+    it("--local bypasses a configured allocator", async () => {
+      let hit = false;
+      await startAllocator((_req, res) => {
+        hit = true;
+        res.setHeader("content-type", "application/json");
+        res.end(JSON.stringify({ id: "REQ-999" }));
+      });
+      const configPath = writeIdAllocConfig(`http://127.0.0.1:${port}`);
+      const adocPath = path.join(tempDir, "items.adoc");
+      fs.writeFileSync(
+        adocPath,
+        '[#REQ-001, item, role=requirement]\n--\n.\n--\n',
+      );
+
+      const res = await runNextId([
+        "-p",
+        "REQ",
+        "--config",
+        configPath,
+        "-i",
+        adocPath,
+        "--local",
+      ]);
+      expect(res.status).to.equal(0);
+      expect(res.stdout.trim()).to.equal("REQ-002");
+      expect(hit).to.equal(false);
     });
   });
 });

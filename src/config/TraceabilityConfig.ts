@@ -106,6 +106,16 @@ export interface WorkflowValidationRule {
 }
 
 /**
+ * Remote ID allocation: opt-in shared allocator for `next-id`.
+ */
+export interface IdAllocationConfig {
+  /** Base URL of the allocator (HTTP or HTTPS). */
+  endpoint: string;
+  /** Optional bearer token sent as `Authorization: Bearer <token>`. */
+  token?: string;
+}
+
+/**
  * Main traceability configuration
  */
 export interface TraceabilityConfig {
@@ -135,6 +145,12 @@ export interface TraceabilityConfig {
    * The page is an AsciiDoc page describing how to write items of that role.
    */
   roleGuidance?: Record<string, RoleGuidance>;
+
+  /**
+   * Remote ID allocation: when present, `next-id` requests IDs from
+   * `endpoint` instead of scanning local files.
+   */
+  idAllocation?: IdAllocationConfig;
 
   /**
    * Declarative lifecycle states and allowed transitions by role.
@@ -190,6 +206,27 @@ export const DEFAULT_CONFIG_FILES = [
   "traceability.yml",
   "traceability.yaml",
 ] as const;
+
+/**
+ * Interpolate `${VAR}` references against `process.env`, throwing when a
+ * referenced variable is unset. Scoped to `idAllocation` so existing config
+ * values containing `$` keep their meaning.
+ */
+function interpolateEnv(value: string | undefined): string | undefined {
+  if (typeof value !== "string") return value;
+  return value.replace(
+    /\$\{([A-Za-z_][A-Za-z0-9_]*)\}/g,
+    (_match, name: string) => {
+      const resolved = process.env[name];
+      if (resolved === undefined) {
+        throw new Error(
+          `Environment variable '${name}' referenced in idAllocation is not set`,
+        );
+      }
+      return resolved;
+    },
+  );
+}
 
 /**
  * Configuration loader with preset support
@@ -369,6 +406,19 @@ export class ConfigLoader {
       config.matrices = [];
     }
 
+    // Normalize + interpolate idAllocation (endpoint required, token optional).
+    // Environment expansion happens here, on the user's file only — presets
+    // never pass through normalizeConfig.
+    if (config.idAllocation) {
+      const ida = config.idAllocation as Partial<IdAllocationConfig>;
+      const endpoint = interpolateEnv(ida.endpoint);
+      const token = interpolateEnv(ida.token);
+      config.idAllocation = {
+        endpoint: endpoint as string,
+        ...(token !== undefined ? { token } : {}),
+      };
+    }
+
     return config;
   }
 
@@ -464,6 +514,34 @@ export class ConfigLoader {
             );
           }
         }
+      }
+    }
+
+    // Validate idAllocation
+    if (config.idAllocation) {
+      const endpoint = config.idAllocation.endpoint;
+      if (typeof endpoint !== "string" || endpoint.trim() === "") {
+        errors.push("idAllocation.endpoint must be a non-empty URL");
+      } else {
+        let parsed: URL | null = null;
+        try {
+          parsed = new URL(endpoint);
+        } catch {
+          errors.push(`idAllocation.endpoint is not a valid URL: '${endpoint}'`);
+        }
+        if (
+          parsed &&
+          parsed.protocol !== "http:" &&
+          parsed.protocol !== "https:"
+        ) {
+          errors.push(
+            `idAllocation.endpoint must be an HTTP(S) URL, got '${parsed.protocol}'`,
+          );
+        }
+      }
+      const token = config.idAllocation.token;
+      if (token !== undefined && typeof token !== "string") {
+        errors.push("idAllocation.token must be a string");
       }
     }
 
@@ -669,6 +747,9 @@ export class ConfigLoader {
       ...(base.labels || {}),
       ...(override.labels || {}),
     };
+
+    // idAllocation: override wins; base preserved when override absent
+    result.idAllocation = override.idAllocation ?? base.idAllocation;
 
     // Merge roleGuidance: user overrides preset values per role
     result.roleGuidance = {
