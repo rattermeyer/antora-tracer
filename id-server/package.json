@@ -5,7 +5,7 @@
   "type": "module",
   "main": "./lib/index.js",
   "bin": {
-    "antora-id-server": "./lib/index.js"
+    "antora-id-server": "lib/index.js"
   },
   "scripts": {
     "build": "tsc",
@@ -15,6 +15,23 @@
   "engines": {
     "node": ">=22.5.0"
   },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "lib",
+    "!lib/src",
+    "!lib/test"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rattermeyer/antora-tracer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rattermeyer/antora-tracer/issues"
+  },
+  "homepage": "https://antora-tracer.conemso.de",
   "dependencies": {
     "dotenv": "^17.4.2",
     "js-yaml": "^4.3.1"
