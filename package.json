@@ -75,7 +75,7 @@
     "chalk": "^5.6.2",
     "commander": "^12.1.0",
     "downdoc": "^1.1.0-stable",
-    "mocha": "^11.7.6",
+    "mocha": "^12.0.2",
     "nyc": "^18.0.0",
     "patch-package": "^8.0.1",
     "ts-mocha": "^11.1.0",
