@@ -633,6 +633,7 @@ The CLI is built on https://www.npmjs.com/package/commander[Commander] with
 subcommands for processing (`process`), matrix generation (`matrix`)
 validation (`validate`), Neo4j export (`export neo4j`), statistics
 (`stats`), preset management (`preset`), ID allocation (`next-id`),
+allocator seed export (`seed`),
 graph querying (`query`), supersession inspection (`supersession`),
 graph diffing (`diff`, `diff-graphs`), site-graph harvest (`site-graph`),
 and item lifecycle management (`archive`, `remove`).
@@ -641,6 +642,7 @@ The CLI
 operates standalone — it does not require an Antora build pipeline.
 
 addresses:REQ-056[]
+addresses:REQ-280[]
 tracer:links[]
 --
 

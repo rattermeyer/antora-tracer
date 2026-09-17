@@ -12,14 +12,15 @@ The export is file-based only: there is no direct Neo4j connection; you import t
 
 [source,bash]
 ----
-# Export as CSV
+# Export a local directory as CSV
 npx antora-tracer export neo4j -i modules/ROOT/pages/ --format csv -o ./neo4j-export/
 
-# Export as Cypher script
-npx antora-tracer export neo4j -i modules/ROOT/pages/ --format cypher -o ./neo4j-export/
+# Export the complete graph from an Antora playbook as Cypher
+npx antora-tracer export neo4j antora-playbook.yml --format cypher -o ./neo4j-export/
 ----
 
-The `-i` flag processes the input files first (parsing items and relationships), then exports the graph.
+The `-i` flag processes a local directory first (parsing items and relationships), then exports the graph.
+Pass a playbook path instead to harvest every component and repository in that playbook and export the complete graph.
 Use `--config` or `--preset` to specify your configuration.
 
 == CSV format

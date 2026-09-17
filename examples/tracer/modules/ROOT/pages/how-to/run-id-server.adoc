@@ -56,13 +56,38 @@ prefixes:                        # per-prefix allocation config
 
 * `tokens` maps each bearer token to a tenant.
 Each tenant gets an independent ID sequence.
-* A request with no token is attributed to a `default` tenant.
-* A token that is not in the map is rejected with `401`.
+* When no `tokens` are configured, every request is attributed to a `default` tenant.
+* When `tokens` are configured, a request without a valid token — absent, malformed, or unrecognized — is rejected with `401`.
 * `prefixes` sets the minimum zero-padding width per prefix, defaulting to 3.
 IDs grow past the width rather than truncating.
 * A prefix's `start` sets the first ID the server allocates for it, defaulting to 1.
 A team with existing IDs can set `start` to continue from their sequence instead of colliding at `001`.
 * Token values support environment-variable interpolation, so secrets stay out of the file.
+* Both the server and the CLI load a `.env` file from the working directory at startup, so you can keep the token there instead of exporting it.
+
+== Seed the server from existing IDs
+
+If your project already has IDs in the local files (for example, `REQ-001` through `REQ-054`), seed the server so it continues from `REQ-055` instead of colliding at `REQ-001`.
+
+Generate a seed file with the `seed` command:
+
+[source,shell]
+----
+npx antora-tracer seed -i docs/ -o seeds.yml
+----
+
+For a project spread across multiple repositories, point the command at the Antora playbook instead:
+
+[source,shell]
+----
+npx antora-tracer seed antora-playbook.yml -o seeds.yml
+----
+
+The output is a `prefixes:` map with a numeric `start` value per prefix.
+Merge that `prefixes` block into the server's `config.yml` `prefixes` section.
+
+The seed is a one-time snapshot.
+Re-run it before pointing new clients at the server if items were added since the last export.
 
 == Point the client at the server
 

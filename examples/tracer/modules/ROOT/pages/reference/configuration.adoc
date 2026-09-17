@@ -363,6 +363,7 @@ idAllocation:
 
 Both values support environment-variable interpolation, so secrets stay out of the committed file.
 An unset variable fails configuration loading.
+The CLI loads a `.env` file from the working directory at startup, so you can keep the token there instead of exporting it.
 
 When `endpoint` is set, `next-id` fails closed: an unreachable allocator, a non-2xx response, or a malformed body exits with an error rather than falling back to a local ID.
 A `401` or `403` response is reported as an authentication failure.

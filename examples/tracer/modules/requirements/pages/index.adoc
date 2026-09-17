@@ -892,6 +892,42 @@ Source: openspec/specs/next-id/spec.md
 tracer:links[]
 --
 
+[#REQ-280, item, role=requirement, title="seed reports the next numeric ID per prefix"]
+--
+The CLI SHALL provide a `seed` command that scans items and, for each ID prefix found, reports the numeric value one greater than the highest existing suffix.
+
+Source: openspec/specs/seed-export/spec.md
+
+tracer:links[]
+--
+
+[#REQ-281, item, role=requirement, title="seed output matches the allocator seed format"]
+--
+The seed output SHALL be a YAML `prefixes` map whose entries carry a numeric `start`, directly consumable as the id-server's `prefixes` configuration.
+
+Source: openspec/specs/seed-export/spec.md
+
+tracer:links[]
+--
+
+[#REQ-282, item, role=requirement, title="seed accepts a local directory or an Antora playbook"]
+--
+The `seed` command SHALL accept either `-i <dir>` to scan a single directory, or a playbook path to harvest every component and repository in that playbook.
+
+Source: openspec/specs/seed-export/spec.md
+
+tracer:links[]
+--
+
+[#REQ-283, item, role=requirement, title="seed requires an input"]
+--
+The `seed` command SHALL require exactly one input — either `-i <dir>` or a playbook path — and SHALL exit with an error when neither is provided.
+
+Source: openspec/specs/seed-export/spec.md
+
+tracer:links[]
+--
+
 [#REQ-136, item, role=requirement, title="CLI exposes a query subcommand"]
 --
 The CLI SHALL provide a `query` subcommand that reads AsciiDoc source files and answers one structural question about items and their relationships per invocation.

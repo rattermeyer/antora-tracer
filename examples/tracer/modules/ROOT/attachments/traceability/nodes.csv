@@ -998,6 +998,26 @@ REQ-274,REQ-274 — idAllocation config is validated,requirement,,requirements.a
 Source: openspec/specs/next-id/spec.md
 
 tracer:links[]"""
+REQ-280,REQ-280 — seed reports the next numeric ID per prefix,requirement,,requirements.adoc,"""The CLI SHALL provide a `seed` command that scans items and, for each ID prefix found, reports the numeric value one greater than the highest existing suffix.
+
+Source: openspec/specs/seed-export/spec.md
+
+tracer:links[]"""
+REQ-281,REQ-281 — seed output matches the allocator seed format,requirement,,requirements.adoc,"""The seed output SHALL be a YAML `prefixes` map whose entries carry a numeric `start`, directly consumable as the id-server's `prefixes` configuration.
+
+Source: openspec/specs/seed-export/spec.md
+
+tracer:links[]"""
+REQ-282,REQ-282 — seed accepts a local directory or an Antora playbook,requirement,,requirements.adoc,"""The `seed` command SHALL accept either `-i <dir>` to scan a single directory, or a playbook path to harvest every component and repository in that playbook.
+
+Source: openspec/specs/seed-export/spec.md
+
+tracer:links[]"""
+REQ-283,REQ-283 — seed requires an input,requirement,,requirements.adoc,"""The `seed` command SHALL require exactly one input — either `-i <dir>` or a playbook path — and SHALL exit with an error when neither is provided.
+
+Source: openspec/specs/seed-export/spec.md
+
+tracer:links[]"""
 REQ-136,REQ-136 — CLI exposes a query subcommand,requirement,,requirements.adoc,"""The CLI SHALL provide a `query` subcommand that reads AsciiDoc source files and answers one structural question about items and their relationships per invocation.
 No Antora build SHALL be required.
 
@@ -1721,6 +1741,46 @@ REQ-115,REQ-115 — Dead MatrixGenerator methods are removed,requirement,,requir
 Source: openspec/specs/template-partials/spec.md
 
 tracer:links[]"""
+REQ-087,REQ-087 — Items inside verbatim blocks are not parsed,requirement,,requirements/partials/item-definition-and-parsing.adoc,"""The system SHALL NOT register item declarations (`[#ID, item, role=...]`) found inside AsciiDoc verbatim blocks (listing blocks delimited by `----` and literal blocks delimited by `....`) as traceability items.
+
+Source: openspec/specs/parser-verbatim-skip/spec.md
+
+tracer:links[]"""
+REQ-088,REQ-088 — Inline macros inside verbatim blocks are not parsed,requirement,,requirements/partials/item-definition-and-parsing.adoc,"""The system SHALL NOT register inline relationship macros (`relation:TARGET[]`) whose enclosing item was skipped because it fell inside a verbatim block.
+
+Source: openspec/specs/parser-verbatim-skip/spec.md
+
+tracer:links[]"""
+REQ-090,REQ-090 — Verbatim block detection handles standard AsciiDoc fences,requirement,,requirements/partials/item-definition-and-parsing.adoc,"""The system SHALL detect verbatim blocks by matching opening and closing fence lines consisting of exactly `----` or `....` (with optional trailing whitespace), ignoring style prefix lines like `[source,asciidoc]`.
+
+Source: openspec/specs/parser-verbatim-skip/spec.md
+
+tracer:links[]"""
+REQ-091,REQ-091 — Inline macros inside verbatim blocks are preserved in rendered output,requirement,,requirements/partials/item-definition-and-parsing.adoc,"""The system SHALL preserve inline relationship macros (`relation:TARGET[]`) inside AsciiDoc verbatim blocks so they remain visible in the rendered output.
+
+Source: openspec/specs/parser-verbatim-skip/spec.md
+
+tracer:links[]"""
+REQ-092,REQ-092 — Inline macros inside backtick code spans are not parsed,requirement,,requirements/partials/item-definition-and-parsing.adoc,"""The system SHALL NOT register inline relationship macros (`relation:ID[]`) that appear inside backtick-enclosed code spans as traceability relationships.
+
+Source: openspec/specs/parser-verbatim-skip/spec.md
+
+tracer:links[]"""
+REQ-110,REQ-110 — Items defined in partials are registered in the graph,requirement,,requirements/partials/item-definition-and-parsing.adoc,"""The system SHALL process items defined in AsciiDoc partial files alongside page files, registering them in the traceability graph.
+
+Source: openspec/specs/partial-file-processing/spec.md
+
+tracer:links[]"""
+REQ-144,REQ-144 — Partial items use view URL as source reference,requirement,,requirements/partials/item-definition-and-parsing.adoc,"""Items from partial files SHALL use the file's view URL as their source file reference, enabling traceability matrix links to resolve to the source repository.
+
+Source: openspec/specs/partial-file-processing/spec.md
+
+tracer:links[]"""
+REQ-145,REQ-145 — All processing passes apply to partial files,requirement,,requirements/partials/item-definition-and-parsing.adoc,"""The system SHALL apply graph population, macro expansion, and link substitution passes to partial files in the same way as page files, because partial content is inlined into pages and reaches the browser.
+
+Source: openspec/specs/partial-file-processing/spec.md
+
+tracer:links[]"""
 REQ-109,REQ-109 — Circular reference detection in graph validation,requirement,,demo/index.adoc,"""The system SHALL detect circular references in the traceability graph during validation.
 A circular reference is a cycle in the directed relationship graph (e.g., A → B → A, or A → B → C → A).
 Self-referencing relationships (A → A) SHALL also be detected as cycles.
@@ -2180,6 +2240,7 @@ ARC-023,ARC-023 — Commander-based CLI with subcommands,design,,explanation/arc
 subcommands for processing (`process`), matrix generation (`matrix`)
 validation (`validate`), Neo4j export (`export neo4j`), statistics
 (`stats`), preset management (`preset`), ID allocation (`next-id`),
+allocator seed export (`seed`),
 graph querying (`query`), supersession inspection (`supersession`),
 graph diffing (`diff`, `diff-graphs`), site-graph harvest (`site-graph`),
 and item lifecycle management (`archive`, `remove`).
@@ -2188,6 +2249,7 @@ The CLI
 operates standalone — it does not require an Antora build pipeline.
 
 addresses:REQ-056[]
+addresses:REQ-280[]
 tracer:links[]"""
 ARC-044,ARC-044 — Item lifecycle CLI: archive and remove,design,,explanation/architecture.adoc,"""The `archive` and `remove` commands are the first source-mutating CLI commands, enabled by block-extent detection that locates an item's full block (header through the closing delimiter) and refuses ambiguous edits.
 `archive <ID>` moves a superseded block to the module's `superseded.adoc`; `remove <ID>` deletes an orphaned block after a `y/N` prompt or an isolated block after typing the ID.
@@ -2740,6 +2802,16 @@ verifies:REQ-276[]
 verifies:REQ-277[]
 verifies:REQ-278[]
 verifies:REQ-279[]
+
+tracer:links[]"""
+TST-020,TST-020 — Seed Export Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/seed.test.ts`
+
+Tests `getPrefixMaxima` and the `seed` command — numeric max+1 per prefix with padding width, deduplication of the same ID across files, skipping IDs without a numeric suffix, local-directory YAML output, missing-input error, and playbook harvesting.
+
+verifies:REQ-280[]
+verifies:REQ-281[]
+verifies:REQ-282[]
+verifies:REQ-283[]
 
 tracer:links[]"""
 PRQ-001,PRQ-001 — CI workflows trigger on push and PR,process_requirement,,self-traceability/delivery-process.adoc,"""The GitHub Actions CI workflow SHALL trigger on every push to `main` and every pull request.

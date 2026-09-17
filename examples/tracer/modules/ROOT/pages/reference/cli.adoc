@@ -112,20 +112,27 @@ Exits with non-zero code if errors are found.
 == export neo4j
 
 Export the graph to Neo4j-compatible formats.
+Supply either `-i <dir>` (a local directory) or a playbook path (every component and repository in the playbook).
 
 [source,bash]
 ----
 npx antora-tracer export neo4j -i docs/ --format csv -o ./neo4j-export/
-npx antora-tracer export neo4j -i docs/ --format cypher -o ./neo4j-export/
+npx antora-tracer export neo4j antora-playbook.yml --format cypher -o ./neo4j-export/
 ----
 
 [width=100%, cols="25,15,60"]
 |===
 | Option | Type | Description
 
+| `<playbook>`
+| string (positional)
+| Antora playbook to harvest across components and repositories.
+Required when `-i` is not given.
+
 | `-i, --input <path>`
 | string
-| Input file or directory to process first
+| Input file or directory to process first.
+Required when no playbook is given.
 
 | `--format <format>`
 | string (required)
@@ -251,6 +258,50 @@ When `idAllocation.endpoint` is configured, `next-id` requests the next ID from 
 A configured-but-unreachable allocator, a non-2xx response, or a malformed body exits with an error instead of falling back to a local ID.
 Pass `--local` to override.
 See xref:reference/configuration.adoc[Configuration Reference] for the `idAllocation` key and xref:how-to/run-id-server.adoc[Run the ID allocation server] for the service.
+
+== seed
+
+Export allocator seed values for the ID allocation server.
+For each ID prefix found in the scanned items, it reports the numeric `max+1` value as a `start` seed, so the server continues from existing local IDs instead of colliding at `001`.
+
+[source,bash]
+----
+npx antora-tracer seed -i docs/
+npx antora-tracer seed antora-playbook.yml
+----
+
+The command accepts either `-i <dir>` (scan a directory) or a playbook path (harvest every component and repository in the playbook).
+
+[width=100%, cols="25,15,60"]
+|===
+| Option | Type | Description
+
+| `-i, --input <path>`
+| string
+| Input file or directory to scan.
+Required when no playbook is given.
+
+| `<playbook>`
+| string (positional)
+| Antora playbook to harvest across components and repositories.
+
+| `-o, --output <path>`
+| string
+| Write the seed file instead of printing to stdout.
+|===
+
+The output is a `prefixes:` map consumable directly as the server's seed configuration:
+
+[source,yaml]
+----
+prefixes:
+  REQ:
+    start: 55
+    width: 3
+----
+
+`start` is `max+1` — the first ID the server allocates — never the current maximum and never a formatted `REQ-055` string.
+See xref:how-to/run-id-server.adoc[Run the ID allocation server] for the seeding workflow.
 
 == role-guidance
 
