@@ -87,7 +87,7 @@ describe("id-server", () => {
   });
 
   it("rejects absent and unknown tokens when tokens are configured", async () => {
-    const s = await startServer({ tokens: { "known-secret": "acme" } });
+    const s = await startServer({ tokens: { acme: "known-secret" } });
     // absent token -> 401
     expect((await nextId(s.base, "REQ")).status).to.equal(401);
     // unknown token -> 401
@@ -99,7 +99,7 @@ describe("id-server", () => {
   });
 
   it("isolates counters per tenant", async () => {
-    const s = await startServer({ tokens: { a: "acme", b: "beta" } });
+    const s = await startServer({ tokens: { acme: "a", beta: "b" } });
     expect((await nextId(s.base, "REQ", "a")).body).to.deep.equal({ id: "REQ-001" });
     expect((await nextId(s.base, "REQ", "b")).body).to.deep.equal({ id: "REQ-001" });
     expect((await nextId(s.base, "REQ", "a")).body).to.deep.equal({ id: "REQ-002" });
@@ -126,7 +126,7 @@ describe("id-server", () => {
   });
 
   it("does not allocate an ID on error responses", async () => {
-    const s = await startServer({ tokens: { k: "acme" } });
+    const s = await startServer({ tokens: { acme: "k" } });
     expect((await nextId(s.base, "REQ", "bad")).status).to.equal(401);
     expect((await nextId(s.base, "REQ", "k")).body).to.deep.equal({ id: "REQ-001" });
   });

@@ -19,7 +19,7 @@ export interface IdServerConfig {
   port: number;
   /** Path to the SQLite database file. */
   db: string;
-  /** Map of token -> tenant. Empty means single-tenant (all requests default). */
+  /** Map of tenant -> token. Empty means single-tenant (all requests default). */
   tokens: Map<string, string>;
   /** Map of prefix -> width/start configuration. */
   prefixes: Map<string, PrefixConfig>;
@@ -56,8 +56,8 @@ export function loadConfig(configPath?: string): IdServerConfig {
 
   const tokens = new Map<string, string>();
   const rawTokens = (data.tokens ?? {}) as Record<string, unknown>;
-  for (const [token, tenant] of Object.entries(rawTokens)) {
-    tokens.set(interpolateEnv(token), interpolateEnv(String(tenant)));
+  for (const [tenant, token] of Object.entries(rawTokens)) {
+    tokens.set(interpolateEnv(tenant), interpolateEnv(String(token)));
   }
 
   const prefixes = new Map<string, PrefixConfig>();

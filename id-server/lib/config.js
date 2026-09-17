@@ -22,8 +22,8 @@ export function loadConfig(configPath) {
     const data = (raw.trim() ? yamlLoad(raw) : {});
     const tokens = new Map();
     const rawTokens = (data.tokens ?? {});
-    for (const [token, tenant] of Object.entries(rawTokens)) {
-        tokens.set(interpolateEnv(token), interpolateEnv(String(tenant)));
+    for (const [tenant, token] of Object.entries(rawTokens)) {
+        tokens.set(interpolateEnv(tenant), interpolateEnv(String(token)));
     }
     const prefixes = new Map();
     const rawPrefixes = (data.prefixes ?? {});

@@ -29,7 +29,7 @@ The service SHALL never return the same ID twice for the same tenant and prefix,
 - **THEN** each receives a distinct ID, with none skipped or duplicated
 
 ### Requirement: Tenancy is derived from the bearer token
-Counters SHALL be keyed by tenant, resolved from the `Authorization: Bearer <token>` header. When no tokens are configured, the service SHALL attribute every request to a default tenant. When tokens are configured, a request with an absent, malformed, or unrecognized token SHALL be rejected with `401`.
+Counters SHALL be keyed by tenant, resolved from the `Authorization: Bearer <token>` header. The `tokens` configuration SHALL map a tenant name to its token value (`tenant → token`). When no tokens are configured, the service SHALL attribute every request to a default tenant. When tokens are configured, a request with an absent, malformed, or unrecognized token SHALL be rejected with `401`.
 
 #### Scenario: Independent tenants
 - **WHEN** two requests use different tokens mapped to different tenants

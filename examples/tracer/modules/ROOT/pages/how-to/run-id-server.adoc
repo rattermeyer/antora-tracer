@@ -44,9 +44,9 @@ Create a `config.yml`:
 ----
 port: 8080                       # optional, default 8080
 db: ./ids.sqlite                 # optional, SQLite file
-tokens:                          # token -> tenant
-  "acme-secret": "acme"
-  "beta-secret": "beta"
+tokens:                          # tenant -> token
+  acme: acme-secret
+  beta: beta-secret
 prefixes:                        # per-prefix allocation config
   REQ:
     width: 3                     # minimum padding (default 3)

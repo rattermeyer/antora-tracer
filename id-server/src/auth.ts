@@ -17,7 +17,7 @@ function extractBearer(authorization: string): string | undefined {
 }
 
 /**
- * Static `token -> tenant` map. With no tokens configured, every request is
+ * Static `tenant -> token` map. With no tokens configured, every request is
  * attributed to the `default` tenant (single-tenant, auth off). With tokens
  * configured, an absent, malformed, or unrecognized token resolves to
  * `undefined` so the route rejects with 401.
@@ -30,6 +30,9 @@ export class StaticTokenAuth implements Auth {
     if (authorization === undefined) return undefined;
     const token = extractBearer(authorization);
     if (token === undefined) return undefined;
-    return this.tokens.get(token);
+    for (const [tenant, candidate] of this.tokens) {
+      if (candidate === token) return tenant;
+    }
+    return undefined;
   }
 }
