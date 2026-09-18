@@ -390,6 +390,15 @@ export class RequirementsTraceabilityExtension {
   }
 
   /**
+   * Compute the next numeric ID and padding width for every prefix, for
+   * seeding the remote ID allocation server.
+   * See TraceabilityGraph.getPrefixMaxima for details.
+   */
+  getPrefixMaxima(): Map<string, { start: number; width: number }> {
+    return this.graph.getPrefixMaxima();
+  }
+
+  /**
    * Get relationships filtered by source and target roles
    */
   getRelationshipsByRoles(

@@ -104,10 +104,13 @@ tracer:links[]
 --
 Test file: `test/cli.test.ts`
 
-Tests the Commander-based CLI — process command (valid content, empty content, invalid paths, malformed macros), matrix command (generation, empty graph), validate command (invalid graph state), export command (empty graph), stats command (empty statistics), preset commands (invalid names, init, listing), help command, and next-id command (sequential ID generation, padding preservation, prefix matching).
+Tests the Commander-based CLI — process command (valid content, empty content, invalid paths, malformed macros), matrix command (generation, empty graph), validate command (invalid graph state), export command (empty graph), stats command (empty statistics), preset commands (invalid names, init, listing), help command, and next-id command (sequential ID generation, padding preservation, prefix matching, remote allocation, fail-closed errors, authentication failures, and --local bypass).
 
 verifies:REQ-056[]
 verifies:REQ-150[]
+verifies:REQ-271[]
+verifies:REQ-272[]
+verifies:REQ-273[]
 
 tracer:links[]
 --
@@ -116,7 +119,7 @@ tracer:links[]
 --
 Test file: `test/config-loader.test.ts`
 
-Tests the `ConfigLoader` — initialization, built-in preset listing and loading, preset structure validation (including pairwise matrix definitions), configuration loading from file, missing file handling, invalid YAML handling, role and relation validation, matrix definition retrieval, configuration merging (including label overrides), and error messages for invalid configurations and preset names.
+Tests the `ConfigLoader` — initialization, built-in preset listing and loading, preset structure validation (including pairwise matrix definitions), configuration loading from file, missing file handling, invalid YAML handling, role and relation validation, matrix definition retrieval, configuration merging (including label overrides), idAllocation validation and environment interpolation, and error messages for invalid configurations and preset names.
 
 verifies:REQ-083[]
 verifies:REQ-084[]
@@ -130,6 +133,7 @@ verifies:REQ-223[]
 verifies:REQ-224[]
 verifies:REQ-175[]
 verifies:REQ-177[]
+verifies:REQ-274[]
 
 tracer:links[]
 --
@@ -346,6 +350,35 @@ Tests `roleGuidance` config resolution via `ConfigLoader`: preset default guidan
 verifies:REQ-265[]
 verifies:REQ-266[]
 verifies:REQ-267[]
+
+tracer:links[]
+--
+
+[#TST-019, item, role=test, title="ID Allocation Server Tests"]
+--
+Test file: `id-server/test/server.test.ts`
+
+Tests the standalone allocator service — sequential ID allocation, missing-prefix errors, bearer-token tenancy (default tenant, unknown token), per-tenant counter isolation, padding width (default, configured, overflow), seeded starting values, error responses allocating no ID, concurrent allocation, database reopen persistence, and config parsing.
+
+verifies:REQ-275[]
+verifies:REQ-276[]
+verifies:REQ-277[]
+verifies:REQ-278[]
+verifies:REQ-279[]
+
+tracer:links[]
+--
+
+[#TST-020, item, role=test, title="Seed Export Tests"]
+--
+Test file: `test/seed.test.ts`
+
+Tests `getPrefixMaxima` and the `seed` command — numeric max+1 per prefix with padding width, deduplication of the same ID across files, skipping IDs without a numeric suffix, local-directory YAML output, missing-input error, and playbook harvesting.
+
+verifies:REQ-280[]
+verifies:REQ-281[]
+verifies:REQ-282[]
+verifies:REQ-283[]
 
 tracer:links[]
 --

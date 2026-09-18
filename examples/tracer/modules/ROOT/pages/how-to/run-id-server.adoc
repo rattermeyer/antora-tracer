@@ -1,0 +1,119 @@
+= How to Run the ID Allocation Server
+:description: Run a standalone allocator service so next-id hands out shared, collision-free IDs across a team
+:keywords: antora, id-server, allocator, next-id, remote, sqlite
+:toc: macro
+
+toc::[]
+
+The ID allocation server is a standalone package (`@antora-tracer/id-server`), a companion service to the Antora extension and CLI — not part of either.
+
+The remote `next-id` feature needs an allocator service to request IDs from.
+This guide runs the standalone server that implements it.
+
+== Prerequisites
+
+. Node.js 22.5 or later — the server uses the built-in `node:sqlite` module
+. The `@antora-tracer/id-server` package, or a checkout of the repository
+
+== Start the server
+
+From the repository:
+
+[source,shell]
+----
+cd id-server
+npm install
+npm run build
+npm start -- ./config.yml
+----
+
+Once published, run the binary directly:
+
+[source,shell]
+----
+npx @antora-tracer/id-server ./config.yml
+----
+
+The server listens on port 8080 by default.
+
+== Configure the server
+
+Create a `config.yml`:
+
+[source,yaml]
+----
+port: 8080                       # optional, default 8080
+db: ./ids.sqlite                 # optional, SQLite file
+tokens:                          # tenant -> token
+  acme: acme-secret
+  beta: beta-secret
+prefixes:                        # per-prefix allocation config
+  REQ:
+    width: 3                     # minimum padding (default 3)
+    start: 55                    # first ID number (default 1)
+  ARC: 4                         # shorthand = width only
+----
+
+* `tokens` maps each bearer token to a tenant.
+Each tenant gets an independent ID sequence.
+* When no `tokens` are configured, every request is attributed to a `default` tenant.
+* When `tokens` are configured, a request without a valid token — absent, malformed, or unrecognized — is rejected with `401`.
+* `prefixes` sets the minimum zero-padding width per prefix, defaulting to 3.
+IDs grow past the width rather than truncating.
+* A prefix's `start` sets the first ID the server allocates for it, defaulting to 1.
+A team with existing IDs can set `start` to continue from their sequence instead of colliding at `001`.
+* Token values support environment-variable interpolation, so secrets stay out of the file.
+* Both the server and the CLI load a `.env` file from the working directory at startup, so you can keep the token there instead of exporting it.
+
+== Seed the server from existing IDs
+
+If your project already has IDs in the local files (for example, `REQ-001` through `REQ-054`), seed the server so it continues from `REQ-055` instead of colliding at `REQ-001`.
+
+Generate a seed file with the `seed` command:
+
+[source,shell]
+----
+npx antora-tracer seed -i docs/ -o seeds.yml
+----
+
+For a project spread across multiple repositories, point the command at the Antora playbook instead:
+
+[source,shell]
+----
+npx antora-tracer seed antora-playbook.yml -o seeds.yml
+----
+
+The output is a `prefixes:` map with a numeric `start` value per prefix.
+Merge that `prefixes` block into the server's `config.yml` `prefixes` section.
+
+The seed is a one-time snapshot.
+Re-run it before pointing new clients at the server if items were added since the last export.
+
+== Point the client at the server
+
+In the client's `traceability.yml`:
+
+[source,yaml]
+----
+idAllocation:
+  endpoint: http://localhost:8080
+  token: ${ID_ALLOC_TOKEN}
+----
+
+Run `antora-tracer next-id --prefix REQ` and it requests the next ID from the server instead of scanning local files.
+
+== Verify
+
+[source,shell]
+----
+curl http://localhost:8080/next-id?prefix=REQ
+# {"id":"REQ-001"}
+
+curl http://localhost:8080/next-id?prefix=REQ
+# {"id":"REQ-002"}
+----
+
+== Related
+
+- xref:reference/configuration.adoc[Configuration Reference] — the client-side `idAllocation` key
+- xref:reference/cli.adoc[CLI Reference] — the `next-id` command

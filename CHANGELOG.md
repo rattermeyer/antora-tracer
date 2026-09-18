@@ -2,6 +2,18 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.24.3] — 2026-09-17
+
+### Added
+- `next-id` allocates IDs from a remote allocator via a configured `idAllocation` endpoint; pass `--local` to force a local scan.
+- `seed` command exports per-prefix seed values for the ID allocation server.
+- `export neo4j` accepts an Antora playbook to harvest all components and repos.
+- The CLI loads a `.env` file from the working directory so `${VAR}` interpolation in configuration resolves.
+
+### Fixed
+- CLI commands now auto-discover `traceability.yml`/`traceability.yaml` in the working directory (and parent directories) before falling back to the default preset, so a configured `idAllocation` endpoint is honored by `next-id` without an explicit `--config` flag.
+- Resolved `js-yaml` dependency advisories via version bump and overrides.
+
 ## [0.24.2] — 2026-09-12
 
 ### Fixed

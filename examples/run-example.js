@@ -36,6 +36,13 @@ const files = [
     ),
   },
   {
+    adoc: "requirements/partials/item-definition-and-parsing.adoc",
+    realPath: resolve(
+      __dirname,
+      "tracer/modules/requirements/partials/item-definition-and-parsing.adoc",
+    ),
+  },
+  {
     adoc: "demo/index.adoc",
     realPath: resolve(__dirname, "demo/modules/ROOT/pages/index.adoc"),
   },

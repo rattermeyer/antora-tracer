@@ -16,6 +16,9 @@ content:
     - url: https://github.com/rattermeyer/antora-tracer.git
       start_path: blog
       branches: ['main']
+    - url: https://github.com/antora-tracer/tracer-spec.git
+      start_path: docs
+      branches: ['main']
 
 asciidoc:
   extensions:

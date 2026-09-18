@@ -14,6 +14,12 @@ import { createInterface } from "node:readline";
 import { fileURLToPath } from "node:url";
 import chalk from "chalk";
 import { program } from "commander";
+import { dump as yamlDump } from "js-yaml";
+import { config } from "dotenv";
+
+// Load a `.env` file from the working directory so `${VAR}` interpolation in
+// configuration resolves without manual shell setup.
+config({ quiet: true });
 
 // Import extension
 import {
@@ -58,20 +64,25 @@ async function createExtension(options: any) {
   const mergedOptions = { ...options, ...globalOpts };
 
   try {
-    // An explicit --config takes precedence over the (defaulted) --preset,
-    // otherwise the preset default silently swallows the config file and its
-    // labels/custom roles never load.
+    // An explicit --config takes precedence. Without one, auto-discover a
+    // traceability.yml/yaml in the working directory so idAllocation and
+    // custom roles load; only fall back to the preset when none is found.
     if (mergedOptions.config) {
       const configLoader = new ConfigLoader();
       configLoader.load(mergedOptions.config);
       return new RequirementsTraceabilityExtension(configLoader);
-    } else if (mergedOptions.preset) {
+    }
+    const configLoader = new ConfigLoader();
+    if (configLoader.findConfigFile()) {
+      configLoader.load();
+      return new RequirementsTraceabilityExtension(configLoader);
+    }
+    if (mergedOptions.preset) {
       return RequirementsTraceabilityExtension.createWithPreset(
         mergedOptions.preset,
       );
-    } else {
-      return new RequirementsTraceabilityExtension();
     }
+    return new RequirementsTraceabilityExtension();
   } catch (error: any) {
     console.error(chalk.red("Error creating extension:", error.message));
     process.exit(1);
@@ -82,6 +93,53 @@ async function createExtension(options: any) {
 function isDryRun(options: any): boolean {
   const globalOpts = program.opts();
   return options.dryRun || globalOpts.dryRun || false;
+}
+
+/**
+ * Request the next ID from a remote allocator.
+ * Fails closed: non-2xx, network error, timeout, or malformed body throws.
+ */
+async function fetchNextId(
+  endpoint: string,
+  token: string | undefined,
+  prefix: string,
+  timeoutMs = 10_000,
+): Promise<string> {
+  const base = endpoint.endsWith("/") ? endpoint : `${endpoint}/`;
+  const url = new URL("next-id", base);
+  url.searchParams.set("prefix", prefix);
+
+  const headers: Record<string, string> = {};
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      headers,
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+  } catch (error: any) {
+    throw new Error(`allocator unreachable: ${error.message}`);
+  }
+
+  if (response.status === 401 || response.status === 403) {
+    throw new Error("authentication failed (check idAllocation.token)");
+  }
+  if (!response.ok) {
+    throw new Error(`allocator returned HTTP ${response.status}`);
+  }
+
+  let body: unknown;
+  try {
+    body = await response.json();
+  } catch {
+    throw new Error("allocator returned invalid response (missing id)");
+  }
+  const id = (body as { id?: unknown })?.id;
+  if (typeof id !== "string" || id.trim() === "") {
+    throw new Error("allocator returned invalid response (missing id)");
+  }
+  return id;
 }
 
 function ensureDirectory(dir: string) {
@@ -727,8 +785,9 @@ tests:IMP-001[]
   });
 
 // Config validation command
-program
-  .command("config validate")
+const configProgram = program.command("config");
+configProgram
+  .command("validate")
   .description("Validate traceability configuration file")
   .option(
     "-c, --config <path>",
@@ -782,9 +841,11 @@ program
     }
   });
 
-program
-  .command("export neo4j")
+const exportProgram = program.command("export");
+exportProgram
+  .command("neo4j")
   .description("Export traceability data to Neo4j graph database format")
+  .argument("[playbook]", "Antora playbook to harvest (all components/repos)")
   .option("-i, --input <path>", "Input file or directory to process first")
   .option(
     "-o, --output <path>",
@@ -792,17 +853,29 @@ program
     "./neo4j",
   )
   .option("-f, --format <format>", "Export format: csv or cypher", "csv")
-  .action(async (_target, options) => {
+  .action(async (playbook, options) => {
     console.log(chalk.blue("Exporting to Neo4j..."));
-    if (!options.input) {
-      console.error(chalk.red("Error: Input file or directory is required"));
-      process.exit(1);
-    }
     const extension = await createExtension(options);
     try {
       if (options.input) {
         const adocFiles = collectAdocFiles(options.input);
         extension.processFiles(adocFiles);
+      } else if (playbook) {
+        const files = await harvestSiteFiles(playbook);
+        for (const file of files) {
+          extension.process(file.content, {
+            sourceFile: file.path,
+            component: file.component,
+            module: file.module,
+            version: file.version,
+            pubUrl: file.pubUrl,
+          });
+        }
+      } else {
+        console.error(
+          chalk.red("Error: Provide -i <dir> or a playbook path"),
+        );
+        process.exit(1);
       }
       if (isDryRun(options)) {
         console.log(chalk.yellow("[DRY RUN] Would export to Neo4j"));
@@ -905,17 +978,87 @@ program
     "-i, --input <path>",
     "Input file or directory to scan for existing IDs",
   )
+  .option(
+    "--local",
+    "Force a local scan, ignoring any configured idAllocation",
+  )
   .action(async (options) => {
-    if (!options.input) {
-      console.error(chalk.red("Error: Input file or directory is required"));
-      process.exit(1);
-    }
     const extension = await createExtension(options);
     try {
+      const idAllocation = extension.configLoader?.getConfig()?.idAllocation;
+      if (idAllocation?.endpoint && !options.local) {
+        const nextId = await fetchNextId(
+          idAllocation.endpoint,
+          idAllocation.token,
+          options.prefix,
+        );
+        console.log(nextId);
+        return;
+      }
+      if (!options.input) {
+        console.error(chalk.red("Error: Input file or directory is required"));
+        process.exit(1);
+      }
       const adocFiles = collectAdocFiles(options.input);
       extension.processFiles(adocFiles);
       const nextId = extension.getNextId(options.prefix);
       console.log(nextId);
+    } catch (error: any) {
+      console.error(chalk.red("Error:", error.message));
+      process.exit(1);
+    }
+  });
+
+/**
+ * Serialize per-prefix maxima to the id-server `prefixes` seed format.
+ */
+function seedToYaml(
+  maxima: Map<string, { start: number; width: number }>,
+): string {
+  const prefixes: Record<string, { start: number; width: number }> = {};
+  for (const [prefix, { start, width }] of maxima) {
+    prefixes[prefix] = { start, width };
+  }
+  return yamlDump({ prefixes });
+}
+
+program
+  .command("seed")
+  .description(
+    "Export allocator seed values (next ID per prefix) for the ID allocation server",
+  )
+  .argument("[playbook]", "Antora playbook to harvest (all components/repos)")
+  .option("-i, --input <path>", "Input file or directory to scan")
+  .option("-o, --output <path>", "Output file (defaults to stdout)")
+  .action(async (playbook: string | undefined, options: any) => {
+    const extension = await createExtension(options);
+    try {
+      if (options.input) {
+        extension.processFiles(collectAdocFiles(options.input));
+      } else if (playbook) {
+        const files = await harvestSiteFiles(playbook);
+        for (const file of files) {
+          extension.process(file.content, {
+            sourceFile: file.path,
+            component: file.component,
+            module: file.module,
+            version: file.version,
+            pubUrl: file.pubUrl,
+          });
+        }
+      } else {
+        console.error(
+          chalk.red("Error: Provide -i <dir> or a playbook path"),
+        );
+        process.exit(1);
+      }
+      const yaml = seedToYaml(extension.getPrefixMaxima());
+      if (options.output) {
+        writeFileSync(resolve(process.cwd(), options.output), yaml, "utf8");
+        console.log(chalk.green(`Seed written to ${options.output}`));
+      } else {
+        console.log(yaml);
+      }
     } catch (error: any) {
       console.error(chalk.red("Error:", error.message));
       process.exit(1);

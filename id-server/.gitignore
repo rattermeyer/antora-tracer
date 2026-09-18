@@ -1,0 +1,6 @@
+# Test-build output (production build emits flat lib/*.js)
+lib/src/
+lib/test/
+
+# Runtime state
+*.sqlite
