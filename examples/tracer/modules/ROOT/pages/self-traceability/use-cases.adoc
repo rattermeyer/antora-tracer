@@ -571,3 +571,35 @@ leads_to:REQ-217[]
 
 tracer:links[]
 --
+
+[#UC-015, item, role=use_case, title="Team member allocates a collision-free item ID"]
+--
+.Use Case: Team member allocates a collision-free item ID
+[width=100%, cols="25h,75a"]
+|===
+| ID | UC-015
+| Title | Team member allocates a collision-free item ID
+| Goal | Team member obtains a unique item ID so that parallel work on separate branches never produces duplicate IDs in the merged tree
+| Primary Actor | Business Analyst, Architect, Developer, Test Manager — any team member who authors traceable content
+| Preconditions | The project configures `idAllocation.endpoint` to a shared allocator And the team member has network access to it
+| Trigger | Team member needs a new ID for a traceable item while other branches may be allocating IDs for the same prefix concurrently
+| Basic Flow |
+. Team member runs `antora-tracer next-id --prefix <PREFIX>` with a configured allocator
+. The CLI requests the next ID for the prefix from the shared allocator
+. The allocator atomically increments its counter for the prefix And returns a unique, zero-padded ID
+. Team member writes the item with the returned ID
+. Another team member on a different branch repeats the flow And receives the next, distinct ID
+| Alternate Flows |
+. *No allocator is configured:* `next-id` falls back to a local `max+1` scan, which cannot prevent duplicates under parallel work; the `validate` command detects any resulting collision at merge time.
+. *The allocator is unreachable:* `next-id` fails closed with an error And emits no ID.
+. *An existing local sequence must continue:* Team member seeds the allocator's per-prefix `start` value with `antora-tracer seed` so it continues from the current maximum instead of colliding at `001`.
+| Postconditions | The allocator has persisted the incremented counter And the team member holds a unique ID for the prefix And concurrent allocations for the same prefix yield distinct IDs
+| Priority | High
+| Frequency | Per item — whenever a team member authors a new traceable item
+| Notes | The allocator is the standalone `@antora-tracer/id-server` package. Local `next-id` is a best-effort convenience; only the shared allocator guarantees uniqueness under concurrency.
+|===
+
+leads_to:REQ-284[]
+
+tracer:links[]
+--

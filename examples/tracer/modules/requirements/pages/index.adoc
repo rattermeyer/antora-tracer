@@ -1050,6 +1050,19 @@ Source: openspec/specs/id-allocation-server/spec.md
 tracer:links[]
 --
 
+[#REQ-284, item, role=requirement, title="Concurrent allocation yields unique item IDs"]
+--
+The system SHALL allocate collision-free item IDs across concurrent authoring through a shared monotonic allocation source, so that parallel work on the same prefix never produces duplicate IDs in the merged tree.
+
+The local `max+1` scan is best-effort and cannot guarantee uniqueness under parallel work; the shared allocator is the mechanism that satisfies this requirement.
+
+Source: openspec/specs/id-allocation-server/spec.md
+
+depends_on:REQ-276[]
+
+tracer:links[]
+--
+
 === Search Integration
 
 [#REQ-079, item, role=requirement, title="Non-heading elements with IDs are indexed as navigable anchors"]

@@ -660,6 +660,25 @@ addresses:REQ-238[]
 tracer:links[]
 --
 
+=== ID Allocation Server
+
+[#ARC-048, item, role=design, title="Shared monotonic ID allocator"]
+--
+*Shared monotonic ID allocator*
+
+The ID allocation server (`@antora-tracer/id-server`) is a standalone companion service that hands out the next sequential ID for a prefix.
+It exists because parallel authoring cannot be deduplicated locally: `next-id`'s local `max+1` scan reads the tree as it is now, and two branches read the same tree, so both compute the same next ID.
+A single monotonic allocation source — the server — replaces that race with an atomic counter, so distributed authors share one sequence instead of colliding on locally computed IDs.
+
+The CLI's `next-id` requests an ID from the server when `idAllocation.endpoint` is configured, and fails closed when the server is unreachable.
+The `seed` command exports the server's per-prefix `start` values so an existing sequence can continue without colliding at `001`.
+
+addresses:REQ-284[]
+addresses:REQ-276[]
+
+tracer:links[]
+--
+
 [#ARC-030, item, role=design, title="CI/CD PDF build and deployment pipeline"]
 --
 The GitHub Actions CI workflow (`.github/workflows/ci.yml` and `pages.yml`)
