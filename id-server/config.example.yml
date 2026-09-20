@@ -1,0 +1,18 @@
+# Copy to config.yml and edit. Mounted read-only at /config/config.yml.
+port: 8080                       # optional, default 8080
+db: /data/ids.sqlite             # persisted in the mounted /data directory
+
+# Enable the project admin API (set to a bearer token).
+#adminToken: ${ADMIN_TOKEN}
+
+# Seed initial projects (tenant -> token) on first boot.
+# Token values support ${VAR} interpolation from the container environment.
+#tokens:
+#  acme: "${ACME_TOKEN}"
+#  beta: "${BETA_TOKEN}"
+
+# Optional per-prefix allocation (minimum width, first ID number).
+#prefixes:
+#  REQ:
+#    width: 3
+#    start: 1

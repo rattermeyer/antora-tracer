@@ -21,6 +21,8 @@ export interface IdServerConfig {
   db: string;
   /** Map of tenant -> token. Empty means single-tenant (all requests default). */
   tokens: Map<string, string>;
+  /** Bearer token enabling the `/admin/projects` routes; absent disables them. */
+  adminToken: string | undefined;
   /** Map of prefix -> width/start configuration. */
   prefixes: Map<string, PrefixConfig>;
   /** Fallback width for prefixes not listed in `prefixes`. */
@@ -82,6 +84,10 @@ export function loadConfig(configPath?: string): IdServerConfig {
     port: Number(data.port ?? 8080) || 8080,
     db: interpolateEnv(String(data.db ?? "./ids.sqlite")),
     tokens,
+    adminToken:
+      data.adminToken === undefined
+        ? undefined
+        : interpolateEnv(String(data.adminToken)),
     prefixes,
     defaultWidth: 3,
   };

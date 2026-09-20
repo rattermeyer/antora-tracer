@@ -1025,7 +1025,9 @@ tracer:links[]
 
 [#REQ-277, item, role=requirement, title="Tenancy is derived from the bearer token"]
 --
-Counters SHALL be keyed by tenant, resolved from the `Authorization: Bearer <token>` header; a request with no token SHALL use a default tenant.
+Counters SHALL be keyed by tenant, resolved from the `Authorization: Bearer <token>` header against projects persisted in the database.
+The `tokens` configuration SHALL seed the initial project set.
+When no admin token is configured and no projects exist, requests SHALL use a default tenant; otherwise an absent, malformed, or unrecognized token SHALL be rejected with `401`.
 
 Source: openspec/specs/id-allocation-server/spec.md
 
@@ -1059,6 +1061,72 @@ The local `max+1` scan is best-effort and cannot guarantee uniqueness under para
 Source: openspec/specs/id-allocation-server/spec.md
 
 depends_on:REQ-276[]
+
+tracer:links[]
+--
+
+=== ID Server Project Management
+
+[#REQ-285, item, role=requirement, title="Admin API is gated by an admin token"]
+--
+The admin endpoints SHALL require a bearer token matching the configured `adminToken`.
+When no `adminToken` is configured, the admin endpoints SHALL not exist and requests to them SHALL return `404`.
+
+Source: openspec/specs/id-server-project-management/spec.md
+
+tracer:links[]
+--
+
+[#REQ-286, item, role=requirement, title="List projects"]
+--
+`GET /admin/projects` SHALL return the tenant names of all projects, without token values.
+
+Source: openspec/specs/id-server-project-management/spec.md
+
+tracer:links[]
+--
+
+[#REQ-287, item, role=requirement, title="Add a project"]
+--
+`POST /admin/projects` with a tenant name and token SHALL create a project whose token immediately resolves to that tenant for `GET /next-id`.
+
+Source: openspec/specs/id-server-project-management/spec.md
+
+tracer:links[]
+--
+
+[#REQ-288, item, role=requirement, title="Update a project token"]
+--
+`PUT /admin/projects/:tenant` SHALL replace a project's token; the old token SHALL immediately stop resolving.
+
+Source: openspec/specs/id-server-project-management/spec.md
+
+tracer:links[]
+--
+
+[#REQ-289, item, role=requirement, title="Remove a project"]
+--
+`DELETE /admin/projects/:tenant` SHALL remove a project; its token SHALL immediately stop resolving.
+
+Source: openspec/specs/id-server-project-management/spec.md
+
+tracer:links[]
+--
+
+[#REQ-290, item, role=requirement, title="Tokens are stored hashed at rest"]
+--
+Project tokens SHALL be stored as hashes so plaintext tokens are never persisted or returned by the API.
+
+Source: openspec/specs/id-server-project-management/spec.md
+
+tracer:links[]
+--
+
+[#REQ-291, item, role=requirement, title="CLI manages projects"]
+--
+The `antora-id-server projects` subcommand SHALL provide `list`, `add`, `update`, and `remove` operations that call the admin API.
+
+Source: openspec/specs/id-server-project-management/spec.md
 
 tracer:links[]
 --

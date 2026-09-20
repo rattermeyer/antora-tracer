@@ -358,7 +358,7 @@ tracer:links[]
 --
 Test file: `id-server/test/server.test.ts`
 
-Tests the standalone allocator service — sequential ID allocation, missing-prefix errors, bearer-token tenancy (default tenant, unknown token), per-tenant counter isolation, padding width (default, configured, overflow), seeded starting values, error responses allocating no ID, concurrent allocation, database reopen persistence, and config parsing.
+Tests the standalone allocator service — sequential ID allocation, missing-prefix errors, bearer-token tenancy (default tenant, unknown token), per-tenant counter isolation, padding width (default, configured, overflow), seeded starting values, error responses allocating no ID, concurrent allocation, database reopen persistence, config parsing, and the project-management admin API (admin-token gating, list, add, duplicate, update, remove, malformed bodies, and runtime add/remove propagation).
 
 verifies:REQ-275[]
 verifies:REQ-276[]
@@ -366,6 +366,38 @@ verifies:REQ-277[]
 verifies:REQ-278[]
 verifies:REQ-279[]
 verifies:REQ-284[]
+verifies:REQ-285[]
+verifies:REQ-286[]
+verifies:REQ-287[]
+verifies:REQ-288[]
+verifies:REQ-289[]
+verifies:REQ-290[]
+
+tracer:links[]
+--
+
+[#TST-021, item, role=test, title="ID Server Project Store Tests"]
+--
+Test file: `id-server/test/store.test.ts`
+
+Tests the projects table — listing, creating (with duplicate rejection), token hashing, tenant resolution, token updates, removal, and seeding the initial project set only when empty.
+
+verifies:REQ-277[]
+verifies:REQ-287[]
+verifies:REQ-288[]
+verifies:REQ-289[]
+verifies:REQ-290[]
+
+tracer:links[]
+--
+
+[#TST-022, item, role=test, title="ID Server Token Hash Tests"]
+--
+Test file: `id-server/test/hash.test.ts`
+
+Tests the sha256 token digest and constant-time secret comparison.
+
+verifies:REQ-290[]
 
 tracer:links[]
 --

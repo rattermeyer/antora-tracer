@@ -5,19 +5,24 @@ import { config } from "dotenv";
 config({ quiet: true });
 
 import { pathToFileURL } from "node:url";
-import { loadConfig } from "./config.js";
 import { StaticTokenAuth } from "./auth.js";
-import { SqliteStore } from "./store.js";
+import { runProjectsCommand } from "./cli.js";
+import { loadConfig } from "./config.js";
 import { createIdServer } from "./server.js";
+import { SqliteStore } from "./store.js";
 
-export { loadConfig, type IdServerConfig } from "./config.js";
-export { StaticTokenAuth, type Auth } from "./auth.js";
-export { SqliteStore, type AllocatorStore } from "./store.js";
+export { type Auth, StaticTokenAuth } from "./auth.js";
+export { type IdServerConfig, loadConfig } from "./config.js";
 export { createIdServer, type IdServerOptions } from "./server.js";
+export {
+  type AllocatorStore,
+  type ProjectStore,
+  SqliteStore,
+} from "./store.js";
 
 /**
- * Load config, wire the store/auth, and start listening. Returns the server
- * so callers (and tests) can close it.
+ * Load config, seed projects, wire the store/auth, and start listening.
+ * Returns the server so callers (and tests) can close it.
  */
 export function start(configPath?: string) {
   const config = loadConfig(configPath);
@@ -28,12 +33,14 @@ export function start(configPath?: string) {
     if (p.start !== undefined) starts.set(prefix, p.start);
   }
   const store = new SqliteStore(config.db, starts);
-  const auth = new StaticTokenAuth(config.tokens);
+  store.seedProjects(config.tokens);
+  const auth = new StaticTokenAuth(store, config.adminToken === undefined);
   const server = createIdServer({
     store,
     auth,
     prefixes: widths,
     defaultWidth: config.defaultWidth,
+    adminToken: config.adminToken,
   });
   server.listen(config.port, () => {
     console.log(
@@ -43,6 +50,17 @@ export function start(configPath?: string) {
   return server;
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  start(process.argv[2]);
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(process.argv[1]).href
+) {
+  const command = process.argv[2];
+  if (command === "projects") {
+    runProjectsCommand(process.argv.slice(3)).catch((err: unknown) => {
+      console.error(err instanceof Error ? err.message : String(err));
+      process.exitCode = 1;
+    });
+  } else {
+    start(command);
+  }
 }

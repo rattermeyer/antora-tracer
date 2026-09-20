@@ -48,6 +48,9 @@ export function loadConfig(configPath) {
         port: Number(data.port ?? 8080) || 8080,
         db: interpolateEnv(String(data.db ?? "./ids.sqlite")),
         tokens,
+        adminToken: data.adminToken === undefined
+            ? undefined
+            : interpolateEnv(String(data.adminToken)),
         prefixes,
         defaultWidth: 3,
     };

@@ -673,8 +673,11 @@ A single monotonic allocation source — the server — replaces that race with 
 The CLI's `next-id` requests an ID from the server when `idAllocation.endpoint` is configured, and fails closed when the server is unreachable.
 The `seed` command exports the server's per-prefix `start` values so an existing sequence can continue without colliding at `001`.
 
+Projects (tenants) are persisted in the server's SQLite store and managed at runtime through an admin API gated by an `adminToken`, with project tokens stored hashed.
+
 addresses:REQ-284[]
 addresses:REQ-276[]
+addresses:REQ-285[]
 
 tracer:links[]
 --

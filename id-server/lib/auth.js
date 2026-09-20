@@ -1,30 +1,31 @@
-function extractBearer(authorization) {
+export function extractBearer(authorization) {
     const match = /^Bearer\s+(.+)$/i.exec(authorization);
     return match ? match[1].trim() : undefined;
 }
 /**
- * Static `tenant -> token` map. With no tokens configured, every request is
- * attributed to the `default` tenant (single-tenant, auth off). With tokens
- * configured, an absent, malformed, or unrecognized token resolves to
- * `undefined` so the route rejects with 401.
+ * Resolves a bearer token against the persisted project set.
+ *
+ * `defaultWhenEmpty` is true in single-team mode (no admin token configured):
+ * with no projects, every request is attributed to the `default` tenant.
+ * When false (an admin token is configured), a project token is always
+ * required — even with zero projects — so removing the last project can
+ * never silently open the allocator.
  */
 export class StaticTokenAuth {
-    tokens;
-    constructor(tokens) {
-        this.tokens = tokens;
+    store;
+    defaultWhenEmpty;
+    constructor(store, defaultWhenEmpty) {
+        this.store = store;
+        this.defaultWhenEmpty = defaultWhenEmpty;
     }
     resolve(authorization) {
-        if (this.tokens.size === 0)
+        if (this.defaultWhenEmpty && !this.store.hasProjects())
             return "default";
         if (authorization === undefined)
             return undefined;
         const token = extractBearer(authorization);
         if (token === undefined)
             return undefined;
-        for (const [tenant, candidate] of this.tokens) {
-            if (candidate === token)
-                return tenant;
-        }
-        return undefined;
+        return this.store.resolveTenant(token);
     }
 }

@@ -1,6 +1,6 @@
 = How to Run the ID Allocation Server
 :description: Run a standalone allocator service so next-id hands out shared, collision-free IDs across a team
-:keywords: antora, id-server, allocator, next-id, remote, sqlite
+:keywords: antora, id-server, allocator, next-id, remote, sqlite, docker
 :toc: macro
 
 toc::[]
@@ -8,7 +8,7 @@ toc::[]
 The ID allocation server is a standalone package (`@antora-tracer/id-server`), a companion service to the Antora extension and CLI — not part of either.
 
 The remote `next-id` feature needs an allocator service to request IDs from.
-This guide runs the standalone server that implements it.
+This guide runs the standalone server that implements it, from source or in Docker.
 
 == Prerequisites
 
@@ -36,6 +36,62 @@ npx @antora-tracer/id-server ./config.yml
 
 The server listens on port 8080 by default.
 
+== Run with Docker
+
+The repository ships an image and a Compose file in `id-server/` that run the server without a local Node toolchain.
+
+. Create the config, secret, and data files:
+
+[source,shell]
+----
+cd id-server
+cp config.example.yml config.yml
+cp .env.example .env
+mkdir -p data
+----
+
+. Start the stack:
+
+[source,shell]
+----
+docker compose up -d --build
+----
+
+The image builds from source and serves with `node:22-alpine`.
+`config.yml` is mounted read-only at `/config/config.yml`, and the SQLite database persists in the host `./data` directory.
+
+=== Add a project key
+
+Set `adminToken` in `config.yml`, then manage projects at runtime with the `projects` command (see the Manage projects section below).
+No restart or image rebuild:
+
+[source,shell]
+----
+antora-id-server projects add acme --token acme-secret \
+  --endpoint http://localhost:8080 --admin-token ...
+----
+
+The `tokens` config only seeds projects on first boot.
+After that, changes go through the admin API.
+
+=== Back up
+
+[source,shell]
+----
+tar czf id-server-backup.tgz ./config.yml ./data
+----
+
+The entire persistent state is the single `./data/ids.sqlite` file.
+Because token values are `${VAR}`-interpolated, `config.yml` holds no secrets.
+
+=== Verify
+
+[source,shell]
+----
+curl http://localhost:8080/next-id?prefix=REQ
+# {"id":"REQ-001"}
+----
+
 == Configure the server
 
 Create a `config.yml`:
@@ -44,7 +100,8 @@ Create a `config.yml`:
 ----
 port: 8080                       # optional, default 8080
 db: ./ids.sqlite                 # optional, SQLite file
-tokens:                          # tenant -> token
+adminToken: ${ADMIN_TOKEN}       # optional, enables the project admin API
+tokens:                          # seeds initial projects (tenant -> token)
   acme: acme-secret
   beta: beta-secret
 prefixes:                        # per-prefix allocation config
@@ -54,16 +111,41 @@ prefixes:                        # per-prefix allocation config
   ARC: 4                         # shorthand = width only
 ----
 
-* `tokens` maps each bearer token to a tenant.
+* `tokens` maps each bearer token to a tenant, seeding the initial project set on first boot.
 Each tenant gets an independent ID sequence.
-* When no `tokens` are configured, every request is attributed to a `default` tenant.
-* When `tokens` are configured, a request without a valid token — absent, malformed, or unrecognized — is rejected with `401`.
+* When no `tokens` and no `adminToken` are configured, every request is attributed to a `default` tenant.
+* When projects are configured, a request without a valid token — absent, malformed, or unrecognized — is rejected with `401`.
+* `adminToken` enables the project admin API.
+With it set, a valid project token is always required, even before any project is added.
 * `prefixes` sets the minimum zero-padding width per prefix, defaulting to 3.
 IDs grow past the width rather than truncating.
 * A prefix's `start` sets the first ID the server allocates for it, defaulting to 1.
 A team with existing IDs can set `start` to continue from their sequence instead of colliding at `001`.
 * Token values support environment-variable interpolation, so secrets stay out of the file.
 * Both the server and the CLI load a `.env` file from the working directory at startup, so you can keep the token there instead of exporting it.
+
+== Manage projects
+
+The server runs in one of two modes:
+
+* *Single team* — no `tokens` and no `adminToken`.
+Every request shares one `default` tenant with no authentication.
+* *Multi team* — an `adminToken` is configured.
+Each project has its own token and counter, managed at runtime.
+
+With `adminToken` set, manage projects with the `projects` subcommand:
+
+[source,shell]
+----
+antora-id-server projects list                           --endpoint http://localhost:8080 --admin-token ...
+antora-id-server projects add acme --token acme-secret   --endpoint http://localhost:8080 --admin-token ...
+antora-id-server projects update acme --token new-secret --endpoint http://localhost:8080 --admin-token ...
+antora-id-server projects remove acme                    --endpoint http://localhost:8080 --admin-token ...
+----
+
+Changes take effect immediately — no restart.
+The endpoint and admin token also read from the `ID_SERVER_ENDPOINT` and `ID_SERVER_ADMIN_TOKEN` environment variables.
+Project tokens are stored hashed; `list` shows tenant names only.
 
 == Seed the server from existing IDs
 
