@@ -2,26 +2,31 @@
 * Tutorial
 ** xref:tutorial/getting-started.adoc[Getting Started]
 * How-to Guides
-** xref:how-to/new-project-setup.adoc[Set up traceability for a new project]
-** xref:how-to/custom-domain-model.adoc[Define a custom domain model]
-** xref:how-to/write-traceable-items.adoc[Write traceable items]
-** xref:how-to/supersede-items.adoc[Supersede an item]
-** xref:how-to/detect-duplicate-ids.adoc[Detect and resolve duplicate item IDs]
-** xref:how-to/lint-prose-with-vale.adoc[Lint prose with Vale]
-** xref:how-to/visualizations.adoc[Add traceability visualizations]
-** xref:how-to/index-items-in-search.adoc[Index traceable items in site search]
-** xref:how-to/partials.adoc[Use partial files with items]
-** xref:how-to/neo4j-export.adoc[Export to Neo4j]
-** xref:how-to/query-graph.adoc[Query the graph from the command line]
-** xref:how-to/diff-versions.adoc[Diff two versions of your docs]
-** xref:how-to/generate-docx.adoc[Generate DOCX output]
-** xref:how-to/show-build-version.adoc[Show the build version in the footer]
-** xref:how-to/install-skills.adoc[Install the agent skills]
-** xref:how-to/evaluate-skills.adoc[Evaluate the agent skills]
-** xref:how-to/contribute.adoc[Contribute to the project]
-** xref:how-to/troubleshooting.adoc[Troubleshoot common issues]
+** Set up
+*** xref:how-to/new-project-setup.adoc[Set up traceability for a new project]
+*** xref:how-to/custom-domain-model.adoc[Define a custom domain model]
+** Author items
+*** xref:how-to/write-traceable-items.adoc[Write traceable items]
+*** xref:how-to/partials.adoc[Use partial files with items]
+*** xref:how-to/supersede-items.adoc[Supersede an item]
+** Maintain & verify
+*** xref:how-to/detect-duplicate-ids.adoc[Detect and resolve duplicate item IDs]
+*** xref:how-to/lint-prose-with-vale.adoc[Lint prose with Vale]
+** Query & export
+*** xref:how-to/query-graph.adoc[Query the graph from the command line]
+*** xref:how-to/neo4j-export.adoc[Export to Neo4j]
+*** xref:how-to/diff-versions.adoc[Diff two versions of your docs]
+** Publish
+*** xref:how-to/visualizations.adoc[Add traceability visualizations]
+*** xref:how-to/index-items-in-search.adoc[Index traceable items in site search]
+*** xref:how-to/generate-docx.adoc[Generate DOCX output]
+*** xref:how-to/show-build-version.adoc[Show the build version in the footer]
+*** xref:how-to/serve-with-docker.adoc[Serve the site with Docker]
 * ID Allocation Server
 ** xref:how-to/run-id-server.adoc[Run the server]
+* Skills
+** xref:how-to/install-skills.adoc[Install the agent skills]
+** xref:how-to/evaluate-skills.adoc[Evaluate the agent skills]
 * Reference
 ** xref:reference/item-macro.adoc[Item Macro]
 ** xref:reference/traceability-macros.adoc[Traceability Macros]
@@ -53,3 +58,6 @@
 ** xref:attachment$traceability/matrix-requirements-to-design.html[Req → Design]
 ** xref:attachment$traceability/matrix-requirements-to-tests.html[Req → Tests]
 ** xref:attachment$traceability/matrix-process-to-design.html[Process → Design]
+* Project
+** xref:how-to/contribute.adoc[Contribute to the project]
+** xref:how-to/troubleshooting.adoc[Troubleshoot common issues]

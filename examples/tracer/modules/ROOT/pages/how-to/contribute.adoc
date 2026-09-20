@@ -59,6 +59,8 @@ After building, serve locally:
 npx serve public
 ----
 
+To serve the site in a container or add authentication, see xref:how-to/serve-with-docker.adoc[Serve the site with Docker].
+
 The CI workflow calls the same script with `--ci` to use the remote content source (`antora-playbook-ci.yml`) instead of the local one (`antora-playbook.yml`).
 
 == Blog
