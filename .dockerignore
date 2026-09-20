@@ -1,0 +1,11 @@
+.git
+.github
+node_modules
+lib
+src
+test
+examples
+openspec
+authelia
+.env
+.env.*

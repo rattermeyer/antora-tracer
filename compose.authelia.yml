@@ -1,0 +1,17 @@
+services:
+  site:
+    build: .
+    volumes:
+      - ./caddy/Caddyfile.auth:/etc/caddy/Caddyfile:ro
+    ports:
+      - "80:80"
+      - "443:443"
+
+  authelia:
+    image: authelia/authelia:4.39.19
+    volumes:
+      - ./authelia/config:/config:ro
+      - authelia-data:/data
+
+volumes:
+  authelia-data:

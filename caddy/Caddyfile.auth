@@ -1,0 +1,16 @@
+example.com {
+	tls internal
+
+	forward_auth authelia:9091 {
+		uri /api/authz/forward-auth
+		copy_headers Remote-User Remote-Groups Remote-Email Remote-Name
+	}
+
+	root * /usr/share/caddy
+	file_server
+}
+
+auth.example.com {
+	tls internal
+	reverse_proxy authelia:9091
+}
