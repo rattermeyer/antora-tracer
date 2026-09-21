@@ -1,6 +1,6 @@
 {
   "name": "@antora-tracer/id-server",
-  "version": "0.1.0",
+  "version": "0.24.4",
   "description": "Standalone allocator service for antora-tracer remote ID allocation",
   "type": "module",
   "main": "./lib/index.js",

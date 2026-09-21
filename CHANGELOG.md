@@ -2,6 +2,15 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.24.4] — 2026-09-21
+
+### Added
+- The ID allocation server manages projects at runtime through a token-gated admin API and an `antora-id-server projects` CLI (`list`, `add`, `update`, `remove`); project tokens are stored hashed.
+- Docker images and Compose files for serving the generated site (Caddy, with OIDC and Authelia examples) and for running the ID allocation server.
+
+### Changed
+- Packages are published from CI with SLSA provenance and a cosign-signed SBOM per release.
+
 ## [0.24.3] — 2026-09-17
 
 ### Added
