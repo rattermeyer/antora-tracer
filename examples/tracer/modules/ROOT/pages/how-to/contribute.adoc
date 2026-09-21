@@ -149,8 +149,25 @@ git tag v0.7.0
 git checkout -b v0.7.x v0.7.0
 # set the projection on the branch's antora.yml, commit, push
 node scripts/release-check.js   # verify consistency
-npm publish              # Publish to npm
+git push --follow-tags          # CI builds, tests, and publishes
 ----
+
+Pushing the `v0.7.0` tag triggers the `release` workflow, which publishes the package with an npm provenance attestation and attaches a cosign-signed SBOM.
+There is no manual `npm publish` step.
+The same workflow publishes `@antora-tracer/id-server` when its version changes.
+
+Confirm a release with:
+
+[source,bash]
+----
+npm attestation verify @antora-tracer/core@0.7.0
+cosign verify-blob --certificate-identity \
+  https://github.com/rattermeyer/antora-tracer/.github/workflows/release.yml@refs/tags/v0.7.0 \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+  --bundle bom-core.json.bundle bom-core.json
+----
+
+The SBOM files (`bom-core.json` and its `.bundle`) are attached to the GitHub release.
 
 See the `publish` skill for the complete checklist.
 

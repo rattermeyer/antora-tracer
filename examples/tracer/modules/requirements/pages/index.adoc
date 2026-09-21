@@ -2150,6 +2150,44 @@ Source: openspec/specs/release-consistency/spec.md
 tracer:links[]
 --
 
+=== Release Provenance
+
+[#REQ-292, item, role=requirement, title="Published packages carry provenance"]
+--
+Each published package SHALL carry a SLSA Level 3 provenance attestation linking the tarball to the source commit, workflow, and date that produced it.
+
+Source: openspec/specs/publish-provenance/spec.md
+
+tracer:links[]
+--
+
+[#REQ-293, item, role=requirement, title="Releases are published from CI"]
+--
+Package releases SHALL be published from the GitHub Actions release workflow, not from a developer machine.
+
+Source: openspec/specs/publish-provenance/spec.md
+
+tracer:links[]
+--
+
+[#REQ-294, item, role=requirement, title="Releases produce a signed SBOM"]
+--
+Each release SHALL produce a CycloneDX SBOM for each package, signed with cosign using the workflow's keyless identity.
+
+Source: openspec/specs/publish-provenance/spec.md
+
+tracer:links[]
+--
+
+[#REQ-295, item, role=requirement, title="No long-lived signing keys"]
+--
+Signing SHALL use Sigstore keyless identity, with no long-lived signing key stored in the repository or its secrets.
+
+Source: openspec/specs/publish-provenance/spec.md
+
+tracer:links[]
+--
+
 === Build Version
 
 [#REQ-252, item, role=requirement, title="git describe is computed once per build"]

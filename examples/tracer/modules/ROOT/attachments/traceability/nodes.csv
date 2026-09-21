@@ -1680,6 +1680,26 @@ REQ-248,REQ-248 — Playbook refs exist in the repository,requirement,,requireme
 Source: openspec/specs/release-consistency/spec.md
 
 tracer:links[]"""
+REQ-292,REQ-292 — Published packages carry provenance,requirement,,requirements.adoc,"""Each published package SHALL carry a SLSA Level 3 provenance attestation linking the tarball to the source commit, workflow, and date that produced it.
+
+Source: openspec/specs/publish-provenance/spec.md
+
+tracer:links[]"""
+REQ-293,REQ-293 — Releases are published from CI,requirement,,requirements.adoc,"""Package releases SHALL be published from the GitHub Actions release workflow, not from a developer machine.
+
+Source: openspec/specs/publish-provenance/spec.md
+
+tracer:links[]"""
+REQ-294,REQ-294 — Releases produce a signed SBOM,requirement,,requirements.adoc,"""Each release SHALL produce a CycloneDX SBOM for each package, signed with cosign using the workflow's keyless identity.
+
+Source: openspec/specs/publish-provenance/spec.md
+
+tracer:links[]"""
+REQ-295,REQ-295 — No long-lived signing keys,requirement,,requirements.adoc,"""Signing SHALL use Sigstore keyless identity, with no long-lived signing key stored in the repository or its secrets.
+
+Source: openspec/specs/publish-provenance/spec.md
+
+tracer:links[]"""
 REQ-252,REQ-252 — git describe is computed once per build,requirement,,requirements.adoc,"""The extension SHALL compute the build version string using `git describe --tags --always --dirty`, run from the playbook directory, exactly once per Antora build.
 
 Source: openspec/specs/git-describe/spec.md
