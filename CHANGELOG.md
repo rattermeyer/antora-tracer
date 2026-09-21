@@ -9,7 +9,7 @@ All notable changes to the Antora Requirements Traceability Extension.
 - Docker images and Compose files for serving the generated site (Caddy, with OIDC and Authelia examples) and for running the ID allocation server.
 
 ### Changed
-- Packages are published from CI with SLSA provenance and a cosign-signed SBOM per release.
+- Packages are staged from CI with SLSA provenance and a cosign-signed SBOM, then approved by a maintainer with 2FA.
 
 ## [0.24.3] — 2026-09-17
 

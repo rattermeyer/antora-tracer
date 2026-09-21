@@ -34,8 +34,8 @@ jobs:
       - name: Test (core)
         run: npm test
 
-      - name: Publish (core)
-        run: npm publish
+      - name: Stage (core)
+        run: npm stage publish --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -52,14 +52,14 @@ jobs:
         run: npm test
         working-directory: id-server
 
-      - name: Publish (id-server, skip if version unchanged)
+      - name: Stage (id-server, skip if version unchanged)
         working-directory: id-server
         run: |
           VERSION=$(node -p "require('./package.json').version")
           if npm view "@antora-tracer/id-server@${VERSION}" version >/dev/null 2>&1; then
             echo "id-server@${VERSION} already published — skipping"
           else
-            npm publish
+            npm stage publish --provenance
           fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

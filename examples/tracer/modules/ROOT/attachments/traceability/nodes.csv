@@ -1685,7 +1685,7 @@ REQ-292,REQ-292 — Published packages carry provenance,requirement,,requirement
 Source: openspec/specs/publish-provenance/spec.md
 
 tracer:links[]"""
-REQ-293,REQ-293 — Releases are published from CI,requirement,,requirements.adoc,"""Package releases SHALL be published from the GitHub Actions release workflow, not from a developer machine.
+REQ-293,REQ-293 — Releases are staged from CI and approved by a maintainer,requirement,,requirements.adoc,"""Package releases SHALL be staged from the GitHub Actions release workflow, and approved by a maintainer with two-factor authentication.
 
 Source: openspec/specs/publish-provenance/spec.md
 

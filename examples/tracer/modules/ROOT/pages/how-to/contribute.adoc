@@ -152,9 +152,16 @@ node scripts/release-check.js   # verify consistency
 git push --follow-tags          # CI builds, tests, and publishes
 ----
 
-Pushing the `v0.7.0` tag triggers the `release` workflow, which publishes the package with an npm provenance attestation and attaches a cosign-signed SBOM.
-There is no manual `npm publish` step.
-The same workflow publishes `@antora-tracer/id-server` when its version changes.
+Pushing the `v0.7.0` tag triggers the `release` workflow, which stages the package with an npm provenance attestation and attaches a cosign-signed SBOM.
+A maintainer then approves the staged version to publish it:
+
+[source,shell]
+----
+npm stage list                    # find the stage id
+npm stage approve <stage-id>      # prompt for 2FA, then publish
+----
+
+The same workflow stages `@antora-tracer/id-server` when its version changes.
 
 Confirm a release with:
 

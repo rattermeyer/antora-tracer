@@ -2161,9 +2161,9 @@ Source: openspec/specs/publish-provenance/spec.md
 tracer:links[]
 --
 
-[#REQ-293, item, role=requirement, title="Releases are published from CI"]
+[#REQ-293, item, role=requirement, title="Releases are staged from CI and approved by a maintainer"]
 --
-Package releases SHALL be published from the GitHub Actions release workflow, not from a developer machine.
+Package releases SHALL be staged from the GitHub Actions release workflow, and approved by a maintainer with two-factor authentication.
 
 Source: openspec/specs/publish-provenance/spec.md
 
