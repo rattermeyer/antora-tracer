@@ -38,7 +38,15 @@ The server listens on port 8080 by default.
 
 == Run with Docker
 
-The repository ships an image and a Compose file in `id-server/` that run the server without a local Node toolchain.
+A prebuilt image is published to the GitHub Container Registry on every release:
+
+[source,shell]
+----
+docker pull ghcr.io/rattermeyer/id-server:latest
+----
+
+The repository also ships a Compose file in `id-server/` that builds the image from source, for local development.
+The image serves with `node:22-alpine`, and `config.yml` is mounted read-only at `/config/config.yml`.
 
 . Create the config, secret, and data files:
 
@@ -50,15 +58,19 @@ cp .env.example .env
 mkdir -p data
 ----
 
-. Start the stack:
+. Start the stack, from the published image or built from source:
 
 [source,shell]
 ----
+docker run -d --name id-server --env-file .env -p 8080:8080 \
+  -v ./config.yml:/config/config.yml:ro -v ./data:/data \
+  ghcr.io/rattermeyer/id-server:latest
+
+# or, build from source:
 docker compose up -d --build
 ----
 
-The image builds from source and serves with `node:22-alpine`.
-`config.yml` is mounted read-only at `/config/config.yml`, and the SQLite database persists in the host `./data` directory.
+The SQLite database persists in the host `./data` directory.
 
 === Add a project key
 
