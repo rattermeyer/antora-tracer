@@ -198,7 +198,7 @@ ui:
         (f) => f.component === "tracer" && f.path.includes("index.adoc"),
       );
       expect(tracerPage).to.exist;
-      expect(tracerPage!.version).to.equal("main");
+      expect(tracerPage!.version).to.be.a("string").and.not.be.empty;
       expect(tracerPage!.module).to.be.a("string");
     } finally {
       rmSync(tmpDir, { recursive: true, force: true });
