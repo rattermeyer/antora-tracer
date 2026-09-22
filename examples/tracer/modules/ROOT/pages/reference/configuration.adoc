@@ -87,7 +87,14 @@ antora:
 | string
 | `traceability/overview.html`
 | Attachment relative path for the generated overview, so it is navigable via `xref:attachment$...`
+
+| `excludeComponents`
+| string[]
+| `[]`
+| Antora component names to exclude from the traceability graph. Excluded components still render and cross-link normally, but their items never enter the graph, their pages are not macro-expanded, and they receive no generated matrices, overview, or guidance attachments
 |===
+
+`excludeComponents` matches Antora component names exactly; no glob or substring matching.
 
 The `KROKI_SERVER_URL` environment variable overrides the `krokiServerUrl` option.
 When set, it is used as the Kroki server base URL instead of the configured value or the default `https://kroki.io`.

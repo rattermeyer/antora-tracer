@@ -525,6 +525,9 @@ The snapshot is versioned (`format: 1`) and omits per-page `pubUrl` fields.
 
 Requires the optional `@antora/content-aggregator`, `@antora/content-classifier`, and `@antora/playbook-builder` packages.
 
+When the playbook's extension config sets `excludeComponents`, the harvest omits those components so the snapshot matches the graph the Antora build produces.
+The same exclusion applies to `export neo4j` and `seed` when given a playbook.
+
 == diff-graphs
 
 Diff two JSON graph snapshots into a traceability delta without checking out either version's sources.

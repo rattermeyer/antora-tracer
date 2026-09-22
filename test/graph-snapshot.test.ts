@@ -204,4 +204,38 @@ ui:
       rmSync(tmpDir, { recursive: true, force: true });
     }
   });
+
+  it("omits excluded components from a harvested playbook", async () => {
+    const repoRoot = resolve(process.cwd());
+    const playbook = `
+site:
+  title: harvest-test
+content:
+  sources:
+    - url: ${repoRoot}
+      start_paths: [examples/tracer, examples/demo]
+      branches: HEAD
+antora:
+  extensions:
+    - require: ./lib/src/antora-extension.js
+      excludeComponents: [demo]
+ui:
+  bundle:
+    url: https://example.com/ui-bundle.zip
+`;
+    const tmpDir = mkdtempSync(join(tmpdir(), "site-graph-test-"));
+    const playbookPath = join(tmpDir, "playbook.yml");
+    writeFileSync(playbookPath, playbook, "utf8");
+
+    try {
+      const files = await harvestSiteFiles(playbookPath);
+      const components = new Set(
+        files.map((f) => f.component).filter((c) => c !== undefined),
+      );
+      expect(components.has("tracer")).to.be.true;
+      expect(components.has("demo")).to.be.false;
+    } finally {
+      rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
 });

@@ -27,6 +27,12 @@ New content may use either prefix.
 These macros display relationship lists as formatted text.
 They are gated by the `:traceability-links:` document attribute.
 
+[NOTE]
+====
+A relationship whose target item lives only in an excluded component (the `excludeComponents` option in xref:reference/configuration.adoc[Configuration]) stays pending and is reported with a "Target item not found" warning.
+It renders no link and creates no stub item.
+====
+
 === tracer:outgoing[]
 
 Lists items that this item points to (outgoing relationships).

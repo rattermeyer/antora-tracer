@@ -22,6 +22,7 @@ import { ConfigLoader, toConfigDot } from "./config/TraceabilityConfig.js";
 import { RequirementsTraceabilityExtension } from "./index.js";
 import { LinkResolver } from "./LinkResolver.js";
 import { MatrixGenerator } from "./MatrixGenerator.js";
+import { findTraceabilityExtensionEntry } from "./SiteGraph.js";
 import { TraceabilityGraph } from "./TraceabilityGraph.js";
 import {
   type Item,
@@ -64,6 +65,8 @@ export interface AntoraTraceabilityConfig {
   renderSuperseded?: boolean;
   generateOverview?: boolean;
   overviewTarget?: string;
+  /** Antora component names to exclude from the traceability graph. */
+  excludeComponents?: string[];
 }
 
 const DEFAULT_CONFIG: Required<AntoraTraceabilityConfig> = {
@@ -80,6 +83,7 @@ const DEFAULT_CONFIG: Required<AntoraTraceabilityConfig> = {
   renderSuperseded: true,
   generateOverview: true,
   overviewTarget: "traceability/overview.html",
+  excludeComponents: [],
 };
 
 export interface AntoraExtensionContext {
@@ -150,6 +154,7 @@ export class AntoraTraceabilityExtension {
       generateOverview: rc.generateOverview ?? rc.generateoverview ?? true,
       overviewTarget:
         rc.overviewTarget || rc.overviewtarget || "traceability/overview.html",
+      excludeComponents: rc.excludeComponents ?? rc.excludecomponents ?? [],
     };
 
     // Fallback: if no configPath is set, try the example site config
@@ -234,20 +239,15 @@ export class AntoraTraceabilityExtension {
     return new RequirementsTraceabilityExtension(undefined, this.logger);
   }
 
-  private loadConfig(): Partial<AntoraTraceabilityConfig> {
+  private loadConfig(): Record<string, unknown> {
     try {
       const playbook = this.playbook ?? this.context.playbook;
-      const extensions = playbook.antora?.extensions || playbook.extensions;
-      if (!extensions) return {};
-      const extEntry = extensions.find(
-        (e: any) =>
-          e.require === "@antora-tracer/core/antora-extension" ||
-          e.require === "./lib/src/antora-extension.js" ||
-          e.require?.includes("antora-tracer") ||
-          e.name === "antora-requirements-traceability",
-      );
+      const extEntry = findTraceabilityExtensionEntry(playbook);
       if (!extEntry) return {};
-      return extEntry.config ?? extEntry ?? {};
+      const config = extEntry.config;
+      return typeof config === "object" && config !== null
+        ? (config as Record<string, unknown>)
+        : extEntry;
     } catch {
       return {};
     }
@@ -1228,14 +1228,18 @@ export class AntoraTraceabilityExtension {
 
       this.logger.info("Processing content for traceability");
       const pageFiles = contentCatalog.findBy({ family: "page" }) || [];
-      const adocFiles = pageFiles.filter((file: any) =>
-        file.src?.path?.endsWith(".adoc"),
+      const adocFiles = pageFiles.filter(
+        (file: any) =>
+          file.src?.path?.endsWith(".adoc") &&
+          !this.config.excludeComponents.includes(file.src?.component),
       );
 
       // Also process partial files — items defined in partials need to be in the graph
       const partialFiles = contentCatalog.findBy({ family: "partial" }) || [];
-      const adocPartials = partialFiles.filter((file: any) =>
-        file.src?.path?.endsWith(".adoc"),
+      const adocPartials = partialFiles.filter(
+        (file: any) =>
+          file.src?.path?.endsWith(".adoc") &&
+          !this.config.excludeComponents.includes(file.src?.component),
       );
 
       const allModules = new Set<string>();

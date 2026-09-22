@@ -454,6 +454,155 @@ satisfies:REQ-002[]
   });
 
   // ========================================================================
+  // Component Exclusion
+  // ========================================================================
+
+  describe("Component exclusion", () => {
+    it("excludes listed components from the traceability graph", async () => {
+      const ctx = createMockContext({
+        playbook: {
+          extensions: [
+            {
+              name: "antora-requirements-traceability",
+              config: { excludeComponents: ["blog"] },
+            },
+          ],
+        },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      ctx.fireEvent(
+        "contentClassified",
+        createContentClassifiedEvent([
+          {
+            path: "tracer.adoc",
+            component: "tracer",
+            content: createSampleContent(),
+          },
+          {
+            path: "blog.adoc",
+            component: "blog",
+            content: `
+[#REQ-900, item, role=requirement, title="Blog Req"]
+====
+Blog-only content.
+====
+`,
+          },
+        ]),
+      );
+
+      const traceExt = ext.getTraceabilityExtension();
+      expect(traceExt.getAllItems()).to.have.lengthOf(2);
+      expect(traceExt.graph.getItem("REQ-001")).to.exist;
+      expect(traceExt.graph.getItem("IMP-001")).to.exist;
+      expect(traceExt.graph.getItem("REQ-900")).to.not.exist;
+    });
+
+    it("keeps references into excluded components as pending targets without stubs", async () => {
+      const ctx = createMockContext({
+        playbook: {
+          extensions: [
+            {
+              name: "antora-requirements-traceability",
+              config: { excludeComponents: ["blog"] },
+            },
+          ],
+        },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      ctx.fireEvent(
+        "contentClassified",
+        createContentClassifiedEvent([
+          {
+            path: "tracer.adoc",
+            component: "tracer",
+            content: `
+[#ARC-001, item, role=design, title="Architecture"]
+====
+Design that traces a blog requirement.
+
+addresses:REQ-900[]
+====
+`,
+          },
+          {
+            path: "blog.adoc",
+            component: "blog",
+            content: `
+[#REQ-900, item, role=requirement, title="Blog Req"]
+====
+Blog-only content.
+====
+`,
+          },
+        ]),
+      );
+
+      const traceExt = ext.getTraceabilityExtension();
+      expect(traceExt.getAllItems()).to.have.lengthOf(1);
+      expect(traceExt.graph.getItem("ARC-001")).to.exist;
+      expect(traceExt.graph.getItem("REQ-900")).to.not.exist;
+
+      const result = traceExt.graph.validate();
+      expect(
+        result.warnings.some((w) =>
+          w.message.includes("Target item not found: REQ-900"),
+        ),
+      ).to.be.true;
+    });
+
+    it("matches component names exactly, not by substring", async () => {
+      const ctx = createMockContext({
+        playbook: {
+          extensions: [
+            {
+              name: "antora-requirements-traceability",
+              config: { excludeComponents: ["demo"] },
+            },
+          ],
+        },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      ctx.fireEvent(
+        "contentClassified",
+        createContentClassifiedEvent([
+          {
+            path: "demo.adoc",
+            component: "demo",
+            content: `
+[#REQ-901, item, role=requirement, title="Demo Req"]
+====
+Demo-only content.
+====
+`,
+          },
+          {
+            path: "demo-sdk.adoc",
+            component: "demo-sdk",
+            content: `
+[#REQ-902, item, role=requirement, title="Demo SDK Req"]
+====
+SDK content.
+====
+`,
+          },
+        ]),
+      );
+
+      const traceExt = ext.getTraceabilityExtension();
+      expect(traceExt.getAllItems()).to.have.lengthOf(1);
+      expect(traceExt.graph.getItem("REQ-901")).to.not.exist;
+      expect(traceExt.graph.getItem("REQ-902")).to.exist;
+    });
+  });
+
+  // ========================================================================
   // Partial File Processing
   // ========================================================================
 
