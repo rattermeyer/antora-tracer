@@ -2,6 +2,14 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.25.0] — 2026-09-22
+
+### Added
+- The ID allocation server resolves per-prefix `start` and `width` per tenant through an opt-in `tenantPrefixes` override, falling back to the global `prefixes` block, so two tenants can share a prefix without emitting duplicate IDs.
+
+### Changed
+- `SqliteStore` now takes a `(tenant, prefix) => number` start resolver instead of a per-prefix map.
+
 ## [0.24.4] — 2026-09-21
 
 ### Added
