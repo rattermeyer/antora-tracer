@@ -1,0 +1,52 @@
+= ADR-016: Tenant-scoped ID prefix settings
+:keywords: adr, architecture, decision, id-server, allocator, tenant, prefix, start, width, multi-tenant
+
+*Status*: accepted +
+*Deciders*: Richard Attermeyer +
+*Date*: 2026-09-22
+
+== Context and Problem Statement
+
+The ID allocation server keys counters by `(tenant, prefix)` — a tenant's sequence for a prefix is independent of every other tenant's — but it resolved the `start` seed and `width` padding by prefix alone, from the global `prefixes` block.
+Two tenants that reused the same prefix therefore seeded from the same global `start` and used the same padding, emitting identical IDs (`REQ-001`, `REQ-002`, …) that collide if their namespaces ever merge.
+The operator had no way to give two tenants different allocation parameters for the same prefix.
+
+== Decision Drivers
+
+* Tenants must be able to reuse a prefix without emitting duplicate IDs
+* Existing global `prefixes` and `tokens` configs must keep working unchanged
+* Credentials must stay separate from allocation configuration
+* The store and server seams must stay narrow enough for a future Postgres/hosted backend
+* The change must not alter the returned ID format, which `next-id` and downstream tooling depend on
+
+== Considered Options
+
+* Add an opt-in `tenantPrefixes` override block with fallback to the global `prefixes` block — chosen
+* Nest prefix settings under `tokens` — rejected: breaks the `acme: acme-secret` shorthand and mixes credentials with allocation config
+* Qualify IDs with the tenant (`acme-REQ-001`) — rejected: changes the ID format and breaks the `next-id` contract and existing seed/export tooling
+* Manage per-tenant settings at runtime through the admin API — rejected for now: the settings are boot-time allocation policy, not runtime project state
+
+== Decision Outcome
+
+Chosen option: an opt-in `tenantPrefixes` block (`tenant -> prefix -> { width?, start? }`) that overrides `prefixes` per tenant.
+`start` and `width` resolve per `(tenant, prefix)` with the fallback chain *tenant override → global prefix → default (`1` / width `3`)*.
+The store and server receive the resolution as plain `(tenant, prefix) => number` resolver functions, so neither module learns the config shape.
+The SQLite counter schema is unchanged — the primary key is already `(tenant, prefix)` — only the seed lookup became tenant-aware.
+
+=== Positive Consequences
+
+* The operator can partition ID ranges by assigning non-overlapping `start` values per tenant, so two tenants can safely share a prefix
+* No breaking change: existing configs and the returned ID format are untouched
+* A minimal diff — the counter schema and the atomic increment statement are unchanged
+
+=== Negative Consequences
+
+* Uniqueness across tenants is not enforced automatically: tenants sharing a prefix and an overlapping `start` range still emit duplicate IDs
+* A tenant added at runtime through the admin API has no override until the server restarts with a `tenantPrefixes` entry, because configuration is loaded at boot
+* The global `seed` command still emits only the global `prefixes` fallback; per-tenant offsets are set by hand
+
+== Links
+
+* xref:explanation/architecture.adoc#ARC-048[ARC-048] — the shared monotonic ID allocator this decision extends
+* xref:how-to/run-id-server.adoc[Run the ID allocation server] — documents `tenantPrefixes`
+* `openspec/specs/id-allocation-server/spec.md`

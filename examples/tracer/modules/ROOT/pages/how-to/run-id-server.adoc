@@ -121,6 +121,11 @@ prefixes:                        # per-prefix allocation config
     width: 3                     # minimum padding (default 3)
     start: 55                    # first ID number (default 1)
   ARC: 4                         # shorthand = width only
+tenantPrefixes:                  # optional per-tenant overrides
+  beta:
+    REQ:
+      start: 1000                # beta's REQ sequence starts here
+      width: 4
 ----
 
 * `tokens` maps each bearer token to a tenant, seeding the initial project set on first boot.
@@ -133,6 +138,10 @@ With it set, a valid project token is always required, even before any project i
 IDs grow past the width rather than truncating.
 * A prefix's `start` sets the first ID the server allocates for it, defaulting to 1.
 A team with existing IDs can set `start` to continue from their sequence instead of colliding at `001`.
+* `tenantPrefixes` overrides `prefixes` per tenant and prefix, falling back to the global `prefixes` value and then to width 3 / start 1.
+Each tenant's counter is still independent.
+* Tenants that reuse the same prefix still emit duplicate IDs if their `start` ranges overlap and the namespaces ever merge.
+Assign non-overlapping `start` ranges in `tenantPrefixes` when two tenants share a prefix.
 * Token values support environment-variable interpolation, so secrets stay out of the file.
 * Both the server and the CLI load a `.env` file from the working directory at startup, so you can keep the token there instead of exporting it.
 

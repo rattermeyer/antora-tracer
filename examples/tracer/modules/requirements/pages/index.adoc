@@ -1084,7 +1084,7 @@ tracer:links[]
 
 [#REQ-278, item, role=requirement, title="Padding honors configured width"]
 --
-Generated IDs SHALL be zero-padded to the configured width for the prefix, defaulting to 3, applied as a minimum so larger values grow rather than truncate.
+Generated IDs SHALL be zero-padded to the configured width for the tenant and prefix, resolving the width per tenant first and falling back to the global prefix width and then a default of 3, applied as a minimum so larger values grow rather than truncate.
 
 Source: openspec/specs/id-allocation-server/spec.md
 
@@ -1093,7 +1093,7 @@ tracer:links[]
 
 [#REQ-279, item, role=requirement, title="Server honors a configured starting value per prefix"]
 --
-The service SHALL begin allocation for a prefix at a configured `start` value, defaulting to 1 when none is configured.
+The service SHALL begin allocation for a tenant and prefix at the tenant's configured `start` value for that prefix, falling back to the global prefix `start`, and defaulting to 1 when neither is configured.
 
 Source: openspec/specs/id-allocation-server/spec.md
 
