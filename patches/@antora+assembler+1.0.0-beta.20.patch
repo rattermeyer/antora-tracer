@@ -1,7 +1,7 @@
-diff --git a/node_modules/@antora/assembler/lib/configure.js b/node_modules/@antora/assembler/lib/configure.js
+diff --git a/lib/configure.js b/lib/configure.js
 index f97da91..bda5a02 100644
---- a/node_modules/@antora/assembler/lib/configure.js
-+++ b/node_modules/@antora/assembler/lib/configure.js
+--- a/lib/configure.js
++++ b/lib/configure.js
 @@ -5,7 +5,7 @@ function configure (context, ...args) {
  }
 

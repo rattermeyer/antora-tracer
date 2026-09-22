@@ -16,21 +16,18 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: '26'
-          cache: 'npm'
+          cache: 'pnpm'
 
-      - run: npm ci
-
-      - name: Apply patches
-        run: npx patch-package
+      - run: pnpm install --frozen-lockfile
 
       - name: Type Check
-        run: npx tsc --noEmit
+        run: pnpm exec tsc --noEmit
 
       - name: Build
-        run: npm run build
+        run: pnpm run build
 
       - name: Test
-        run: npm test
+        run: pnpm test
 
       - name: Lint
-        run: npm run lint
+        run: pnpm run lint

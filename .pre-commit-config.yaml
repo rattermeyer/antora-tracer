@@ -7,13 +7,13 @@ repos:
     hooks:
       - id: biome-check
         name: biome check (TypeScript/JavaScript)
-        entry: npx biome lint --write --unsafe
+        entry: pnpm exec biome lint --write --unsafe
         language: node
         files: ^(src|test|examples|scripts)/.*\.(ts|tsx|js)$
 
       - id: biome-format
         name: biome format (JSON)
-        entry: npx biome format --write
+        entry: pnpm exec biome format --write
         language: node
         files: \.(json)$
         exclude: ^lib/.*$
