@@ -322,6 +322,54 @@ Source: openspec/specs/traceability-links-macro/spec.md
 tracer:links[]
 --
 
+=== Excluded Components
+
+[#REQ-296, item, role=requirement, title="Excluded components are omitted from the traceability graph"]
+--
+When `excludeComponents` names a component, that component's `.adoc` pages and partials SHALL be excluded from traceability processing: their items do not enter the graph, their content is not rewritten by relation/graph/coverage macros, and no generated matrices, overview, or role-guidance attachments are registered for that component.
+
+Source: openspec/specs/exclude-components/spec.md
+
+tracer:links[]
+--
+
+[#REQ-297, item, role=requirement, title="Exclusion is hard — references into excluded components stay unresolved"]
+--
+Exclusion SHALL NOT fabricate stub items.
+A relationship macro authored in an included document whose target item lives only in an excluded component SHALL remain an unresolved "pending target" and be reported as such, exactly as if the target had never been defined.
+
+Source: openspec/specs/exclude-components/spec.md
+
+tracer:links[]
+--
+
+[#REQ-298, item, role=requirement, title="CLI playbook harvesting honors the same exclusion"]
+--
+When a CLI command that harvests a playbook (`export neo4j`, `seed`, `site-graph`) reads the extension's `excludeComponents`, the harvested files SHALL omit excluded components so the resulting graph matches the one the Antora build produces.
+
+Source: openspec/specs/exclude-components/spec.md
+
+tracer:links[]
+--
+
+[#REQ-299, item, role=requirement, title="Unlisted components are processed unchanged"]
+--
+An absent or empty `excludeComponents` SHALL leave behavior unchanged, and a component not named in the list SHALL be processed in full.
+
+Source: openspec/specs/exclude-components/spec.md
+
+tracer:links[]
+--
+
+[#REQ-300, item, role=requirement, title="Exclusion matches exact component names"]
+--
+`excludeComponents` entries SHALL match the Antora component name exactly; a component whose name merely contains or resembles an entry is not excluded.
+
+Source: openspec/specs/exclude-components/spec.md
+
+tracer:links[]
+--
+
 === Inverse Labels
 
 [#REQ-071, item, role=requirement, title="Relation display names are config-driven"]

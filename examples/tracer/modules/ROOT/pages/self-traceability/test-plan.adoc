@@ -45,6 +45,7 @@ Tests role guidance page registration in the content catalog: resolved pages ren
 Tests partial file processing including item registration from partials, view URL as sourceFile, and macro expansion in Pass 2.
 Tests cross-module and cross-component xref prefix generation.
 Tests `git_describe` injection into `site.keys` and `asciidoc.attributes`, including the non-git fallback and absent-section handling.
+Tests `excludeComponents` scoping — excluded components contribute no items, references into excluded components stay pending-target without stubs, unlisted components are processed in full, and matching is exact (no substring).
 
 verifies:REQ-250[]
 verifies:REQ-041[]
@@ -96,6 +97,10 @@ verifies:REQ-252[]
 verifies:REQ-253[]
 verifies:REQ-254[]
 verifies:REQ-255[]
+verifies:REQ-296[]
+verifies:REQ-297[]
+verifies:REQ-299[]
+verifies:REQ-300[]
 
 tracer:links[]
 --
@@ -275,13 +280,14 @@ tracer:links[]
 --
 Test file: `test/graph-snapshot.test.ts`
 
-Tests `serializeSnapshot`/`deserializeSnapshot` round-trips (scope fields preserved, `pubUrl` dropped, unknown format and malformed snapshots rejected), `diffSnapshots` over JSON snapshots (same ID in different components not conflated, cross-component superseded pairs), component-qualified `diffGraphs` identity with bare-ID fallback, and the `site-graph` harvest resolving a multi-component playbook with component, module, and version scope.
+Tests `serializeSnapshot`/`deserializeSnapshot` round-trips (scope fields preserved, `pubUrl` dropped, unknown format and malformed snapshots rejected), `diffSnapshots` over JSON snapshots (same ID in different components not conflated, cross-component superseded pairs), component-qualified `diffGraphs` identity with bare-ID fallback, and the `site-graph` harvest resolving a multi-component playbook with component, module, and version scope, omitting components named by the extension's `excludeComponents`.
 
 verifies:REQ-260[]
 verifies:REQ-261[]
 verifies:REQ-262[]
 verifies:REQ-263[]
 verifies:REQ-264[]
+verifies:REQ-298[]
 
 tracer:links[]
 --

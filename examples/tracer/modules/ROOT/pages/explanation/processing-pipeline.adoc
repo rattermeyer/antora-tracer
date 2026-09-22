@@ -27,6 +27,7 @@ The order matters — each pass depends on the result of earlier ones.
 `DocumentParser` scans every page and partial for `[item]` blocks and inline relationship macros.
 Items and relationships are registered in the `TraceabilityGraph`.
 Both pages and partials are processed here.
+Files from components named by the `excludeComponents` extension option are filtered out before this pass, so excluded components never enter the graph and receive no macro expansion or generated attachments.
 
 The graph must be complete before any subsequent pass can resolve cross-file references.
 This is why Pass 1 processes *all* files before moving on.
