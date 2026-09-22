@@ -54,3 +54,33 @@ describe("SqliteStore projects", () => {
     }
   });
 });
+
+describe("SqliteStore counters", () => {
+  it("resolves start per tenant with global fallback and independent counters", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "id-server-store-"));
+    const globalStarts = new Map<string, number>([["REQ", 55]]);
+    const tenantStarts = new Map<string, Map<string, number>>([
+      ["beta", new Map([["REQ", 1000]])],
+    ]);
+    const store = new SqliteStore(
+      join(dir, "ids.sqlite"),
+      (tenant, prefix) =>
+        tenantStarts.get(tenant)?.get(prefix) ?? globalStarts.get(prefix) ?? 1,
+    );
+    try {
+      // tenant override
+      expect(await store.nextId("beta", "REQ")).to.equal(1000);
+      expect(await store.nextId("beta", "REQ")).to.equal(1001);
+      // global fallback
+      expect(await store.nextId("acme", "REQ")).to.equal(55);
+      expect(await store.nextId("acme", "REQ")).to.equal(56);
+      // independent counters for the same prefix
+      expect(await store.nextId("beta", "REQ")).to.equal(1002);
+      // unseeded prefix defaults to 1
+      expect(await store.nextId("acme", "ARC")).to.equal(1);
+    } finally {
+      store.close();
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+});

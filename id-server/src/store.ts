@@ -25,13 +25,16 @@ export interface ProjectStore {
   removeProject(tenant: string): boolean;
 }
 
+/** Resolves the first ID number for a (tenant, prefix) pair. */
+export type StartResolver = (tenant: string, prefix: string) => number;
+
 export class SqliteStore implements AllocatorStore, ProjectStore {
   private readonly db: DatabaseSync;
-  private readonly starts: ReadonlyMap<string, number>;
+  private readonly startOf: StartResolver;
 
-  constructor(path: string, starts?: ReadonlyMap<string, number>) {
+  constructor(path: string, startOf?: StartResolver) {
     this.db = new DatabaseSync(path);
-    this.starts = starts ?? new Map();
+    this.startOf = startOf ?? (() => 1);
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS counters (
         tenant TEXT NOT NULL,
@@ -51,7 +54,7 @@ export class SqliteStore implements AllocatorStore, ProjectStore {
     // A single atomic statement: insert the configured start on first use,
     // else increment and return. Correct under concurrency without a
     // read-then-write.
-    const start = this.starts.get(prefix) ?? 1;
+    const start = this.startOf(tenant, prefix);
     const row = this.db
       .prepare(`
         INSERT INTO counters (tenant, prefix, n)

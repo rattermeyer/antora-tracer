@@ -11,10 +11,8 @@ import type { AllocatorStore, ProjectStore } from "./store.js";
 export interface IdServerOptions {
   store: AllocatorStore & ProjectStore;
   auth: Auth;
-  /** Map of prefix -> minimum padding width. */
-  prefixes: ReadonlyMap<string, number>;
-  /** Width for prefixes not present in `prefixes`. */
-  defaultWidth: number;
+  /** Resolves the minimum padding width for a (tenant, prefix) pair. */
+  prefixes: (tenant: string, prefix: string) => number;
   /** When set, enables the `/admin/projects` routes. */
   adminToken?: string;
 }
@@ -71,7 +69,7 @@ export function createIdServer(options: IdServerOptions): Server {
           return;
         }
         const n = await options.store.nextId(tenant, prefix);
-        const width = options.prefixes.get(prefix) ?? options.defaultWidth;
+        const width = options.prefixes(tenant, prefix);
         sendJson(res, 200, {
           id: `${prefix}-${String(n).padStart(width, "0")}`,
         });

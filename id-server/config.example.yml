@@ -16,3 +16,11 @@ db: /data/ids.sqlite             # persisted in the mounted /data directory
 #  REQ:
 #    width: 3
 #    start: 1
+
+# Optional per-tenant overrides of `prefixes` (tenant -> prefix -> width/start).
+# Falls back to `prefixes` above, then width 3 / start 1.
+#tenantPrefixes:
+#  beta:
+#    REQ:
+#      start: 1000
+#      width: 4

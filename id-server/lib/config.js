@@ -14,20 +14,12 @@ function interpolateEnv(value) {
     });
 }
 /**
- * Load and validate server configuration from a YAML file. When no path is
- * given, sensible defaults are used (port 8080, ./ids.sqlite).
+ * Parse a `{ prefix -> number | {width?, start?} }` map into prefix configs.
+ * A bare number is shorthand for `{ width: number }`.
  */
-export function loadConfig(configPath) {
-    const raw = configPath ? readFileSync(configPath, "utf8") : "";
-    const data = (raw.trim() ? yamlLoad(raw) : {});
-    const tokens = new Map();
-    const rawTokens = (data.tokens ?? {});
-    for (const [tenant, token] of Object.entries(rawTokens)) {
-        tokens.set(interpolateEnv(tenant), interpolateEnv(String(token)));
-    }
+function parsePrefixes(raw) {
     const prefixes = new Map();
-    const rawPrefixes = (data.prefixes ?? {});
-    for (const [prefix, value] of Object.entries(rawPrefixes)) {
+    for (const [prefix, value] of Object.entries(raw)) {
         if (typeof value === "number") {
             prefixes.set(prefix, { width: value });
         }
@@ -44,6 +36,28 @@ export function loadConfig(configPath) {
             prefixes.set(prefix, entry);
         }
     }
+    return prefixes;
+}
+/**
+ * Load and validate server configuration from a YAML file. When no path is
+ * given, sensible defaults are used (port 8080, ./ids.sqlite).
+ */
+export function loadConfig(configPath) {
+    const raw = configPath ? readFileSync(configPath, "utf8") : "";
+    const data = (raw.trim() ? yamlLoad(raw) : {});
+    const tokens = new Map();
+    const rawTokens = (data.tokens ?? {});
+    for (const [tenant, token] of Object.entries(rawTokens)) {
+        tokens.set(interpolateEnv(tenant), interpolateEnv(String(token)));
+    }
+    const prefixes = parsePrefixes((data.prefixes ?? {}));
+    const tenantPrefixes = new Map();
+    const rawTenantPrefixes = (data.tenantPrefixes ?? {});
+    for (const [tenant, raw] of Object.entries(rawTenantPrefixes)) {
+        if (raw !== null && typeof raw === "object") {
+            tenantPrefixes.set(interpolateEnv(tenant), parsePrefixes(raw));
+        }
+    }
     return {
         port: Number(data.port ?? 8080) || 8080,
         db: interpolateEnv(String(data.db ?? "./ids.sqlite")),
@@ -52,6 +66,7 @@ export function loadConfig(configPath) {
             ? undefined
             : interpolateEnv(String(data.adminToken)),
         prefixes,
+        tenantPrefixes,
         defaultWidth: 3,
     };
 }

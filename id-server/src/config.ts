@@ -23,8 +23,10 @@ export interface IdServerConfig {
   tokens: Map<string, string>;
   /** Bearer token enabling the `/admin/projects` routes; absent disables them. */
   adminToken: string | undefined;
-  /** Map of prefix -> width/start configuration. */
+  /** Map of prefix -> width/start configuration (global fallback). */
   prefixes: Map<string, PrefixConfig>;
+  /** Map of tenant -> prefix -> width/start configuration (overrides `prefixes`). */
+  tenantPrefixes: Map<string, Map<string, PrefixConfig>>;
   /** Fallback width for prefixes not listed in `prefixes`. */
   defaultWidth: number;
 }
@@ -47,6 +49,30 @@ function interpolateEnv(value: string): string {
 }
 
 /**
+ * Parse a `{ prefix -> number | {width?, start?} }` map into prefix configs.
+ * A bare number is shorthand for `{ width: number }`.
+ */
+function parsePrefixes(raw: Record<string, unknown>): Map<string, PrefixConfig> {
+  const prefixes = new Map<string, PrefixConfig>();
+  for (const [prefix, value] of Object.entries(raw)) {
+    if (typeof value === "number") {
+      prefixes.set(prefix, { width: value });
+    } else if (value !== null && typeof value === "object") {
+      const v = value as Record<string, unknown>;
+      const entry: PrefixConfig = {};
+      if (v.width !== undefined) entry.width = Number(v.width) || 3;
+      if (v.start !== undefined) {
+        const start = Number(v.start);
+        entry.start =
+          Number.isFinite(start) && start >= 1 ? Math.floor(start) : 1;
+      }
+      prefixes.set(prefix, entry);
+    }
+  }
+  return prefixes;
+}
+
+/**
  * Load and validate server configuration from a YAML file. When no path is
  * given, sensible defaults are used (port 8080, ./ids.sqlite).
  */
@@ -62,21 +88,19 @@ export function loadConfig(configPath?: string): IdServerConfig {
     tokens.set(interpolateEnv(tenant), interpolateEnv(String(token)));
   }
 
-  const prefixes = new Map<string, PrefixConfig>();
-  const rawPrefixes = (data.prefixes ?? {}) as Record<string, unknown>;
-  for (const [prefix, value] of Object.entries(rawPrefixes)) {
-    if (typeof value === "number") {
-      prefixes.set(prefix, { width: value });
-    } else if (value !== null && typeof value === "object") {
-      const v = value as Record<string, unknown>;
-      const entry: PrefixConfig = {};
-      if (v.width !== undefined) entry.width = Number(v.width) || 3;
-      if (v.start !== undefined) {
-        const start = Number(v.start);
-        entry.start =
-          Number.isFinite(start) && start >= 1 ? Math.floor(start) : 1;
-      }
-      prefixes.set(prefix, entry);
+  const prefixes = parsePrefixes((data.prefixes ?? {}) as Record<string, unknown>);
+
+  const tenantPrefixes = new Map<string, Map<string, PrefixConfig>>();
+  const rawTenantPrefixes = (data.tenantPrefixes ?? {}) as Record<
+    string,
+    unknown
+  >;
+  for (const [tenant, raw] of Object.entries(rawTenantPrefixes)) {
+    if (raw !== null && typeof raw === "object") {
+      tenantPrefixes.set(
+        interpolateEnv(tenant),
+        parsePrefixes(raw as Record<string, unknown>),
+      );
     }
   }
 
@@ -89,6 +113,7 @@ export function loadConfig(configPath?: string): IdServerConfig {
         ? undefined
         : interpolateEnv(String(data.adminToken)),
     prefixes,
+    tenantPrefixes,
     defaultWidth: 3,
   };
 }

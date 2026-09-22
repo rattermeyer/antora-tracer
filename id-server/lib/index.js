@@ -26,14 +26,19 @@ export function start(configPath) {
         if (p.start !== undefined)
             starts.set(prefix, p.start);
     }
-    const store = new SqliteStore(config.db, starts);
+    const widthOf = (tenant, prefix) => config.tenantPrefixes.get(tenant)?.get(prefix)?.width ??
+        widths.get(prefix) ??
+        config.defaultWidth;
+    const startOf = (tenant, prefix) => config.tenantPrefixes.get(tenant)?.get(prefix)?.start ??
+        starts.get(prefix) ??
+        1;
+    const store = new SqliteStore(config.db, startOf);
     store.seedProjects(config.tokens);
     const auth = new StaticTokenAuth(store, config.adminToken === undefined);
     const server = createIdServer({
         store,
         auth,
-        prefixes: widths,
-        defaultWidth: config.defaultWidth,
+        prefixes: widthOf,
         adminToken: config.adminToken,
     });
     server.listen(config.port, () => {

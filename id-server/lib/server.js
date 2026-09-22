@@ -52,7 +52,7 @@ export function createIdServer(options) {
                     return;
                 }
                 const n = await options.store.nextId(tenant, prefix);
-                const width = options.prefixes.get(prefix) ?? options.defaultWidth;
+                const width = options.prefixes(tenant, prefix);
                 sendJson(res, 200, {
                     id: `${prefix}-${String(n).padStart(width, "0")}`,
                 });

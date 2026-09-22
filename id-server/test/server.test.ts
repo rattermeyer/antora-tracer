@@ -24,23 +24,28 @@ async function startServer(opts: {
   tokens?: Record<string, string>;
   prefixes?: Record<string, number>;
   starts?: Record<string, number>;
+  tenantPrefixes?: Record<
+    string,
+    Record<string, { width?: number; start?: number }>
+  >;
   store?: SqliteStore;
   adminToken?: string;
 }): Promise<Started> {
   const dir = mkdtempSync(join(tmpdir(), "id-server-"));
-  const store =
-    opts.store ??
-    new SqliteStore(
-      join(dir, "ids.sqlite"),
-      new Map(Object.entries(opts.starts ?? {})),
-    );
+  const globalWidths = new Map(Object.entries(opts.prefixes ?? {}));
+  const globalStarts = new Map(Object.entries(opts.starts ?? {}));
+  const tenantPrefixes = opts.tenantPrefixes ?? {};
+  const widthOf = (tenant: string, prefix: string): number =>
+    tenantPrefixes[tenant]?.[prefix]?.width ?? globalWidths.get(prefix) ?? 3;
+  const startOf = (tenant: string, prefix: string): number =>
+    tenantPrefixes[tenant]?.[prefix]?.start ?? globalStarts.get(prefix) ?? 1;
+  const store = opts.store ?? new SqliteStore(join(dir, "ids.sqlite"), startOf);
   store.seedProjects(new Map(Object.entries(opts.tokens ?? {})));
   const auth = new StaticTokenAuth(store, opts.adminToken === undefined);
   const server = createIdServer({
     store,
     auth,
-    prefixes: new Map(Object.entries(opts.prefixes ?? {})),
-    defaultWidth: 3,
+    prefixes: widthOf,
     adminToken: opts.adminToken,
   });
   await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
@@ -139,6 +144,36 @@ describe("id-server", () => {
     expect((await nextId(s.base, "REQ")).body).to.deep.equal({ id: "REQ-056" });
   });
 
+  it("applies tenant-scoped start and width overrides with global fallback", async () => {
+    const s = await startServer({
+      tokens: { acme: "a", beta: "b", gamma: "c" },
+      prefixes: { REQ: 3 },
+      starts: { REQ: 55 },
+      tenantPrefixes: {
+        beta: { REQ: { start: 1000, width: 4 } },
+        gamma: { REQ: { width: 4 } },
+      },
+    });
+    // acme: no override — global width 3 and start 55
+    expect((await nextId(s.base, "REQ", "a")).body).to.deep.equal({
+      id: "REQ-055",
+    });
+    expect((await nextId(s.base, "REQ", "a")).body).to.deep.equal({
+      id: "REQ-056",
+    });
+    // beta: start and width override
+    expect((await nextId(s.base, "REQ", "b")).body).to.deep.equal({
+      id: "REQ-1000",
+    });
+    expect((await nextId(s.base, "REQ", "b")).body).to.deep.equal({
+      id: "REQ-1001",
+    });
+    // gamma: width override only — start falls back to global 55
+    expect((await nextId(s.base, "REQ", "c")).body).to.deep.equal({
+      id: "REQ-0055",
+    });
+  });
+
   it("does not allocate an ID on error responses", async () => {
     const s = await startServer({ tokens: { acme: "k" } });
     expect((await nextId(s.base, "REQ", "bad")).status).to.equal(401);
@@ -190,6 +225,11 @@ describe("id-server", () => {
         "    width: 4",
         "    start: 55",
         "  ARC: 3",
+        "tenantPrefixes:",
+        "  beta:",
+        "    REQ:",
+        "      start: 1000",
+        "    ARC: 5",
       ].join("\n"),
     );
     try {
@@ -197,6 +237,12 @@ describe("id-server", () => {
       expect(config.prefixes.get("REQ")).to.deep.equal({ width: 4, start: 55 });
       expect(config.prefixes.get("ARC")).to.deep.equal({ width: 3 });
       expect(config.tokens.get("s")).to.equal("acme");
+      expect(config.tenantPrefixes.get("beta")?.get("REQ")).to.deep.equal({
+        start: 1000,
+      });
+      expect(config.tenantPrefixes.get("beta")?.get("ARC")).to.deep.equal({
+        width: 5,
+      });
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }

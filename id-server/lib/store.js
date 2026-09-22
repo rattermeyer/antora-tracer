@@ -2,10 +2,10 @@ import { DatabaseSync } from "node:sqlite";
 import { sha256Hex } from "./hash.js";
 export class SqliteStore {
     db;
-    starts;
-    constructor(path, starts) {
+    startOf;
+    constructor(path, startOf) {
         this.db = new DatabaseSync(path);
-        this.starts = starts ?? new Map();
+        this.startOf = startOf ?? (() => 1);
         this.db.exec(`
       CREATE TABLE IF NOT EXISTS counters (
         tenant TEXT NOT NULL,
@@ -24,7 +24,7 @@ export class SqliteStore {
         // A single atomic statement: insert the configured start on first use,
         // else increment and return. Correct under concurrency without a
         // read-then-write.
-        const start = this.starts.get(prefix) ?? 1;
+        const start = this.startOf(tenant, prefix);
         const row = this.db
             .prepare(`
         INSERT INTO counters (tenant, prefix, n)
