@@ -20,52 +20,43 @@ jobs:
         with:
           node-version: '26'
           registry-url: 'https://registry.npmjs.org'
+          cache: 'pnpm'
 
       # ---- @antora-tracer/core ----
-      - name: Install (core)
-        run: npm ci
-
-      - name: Apply patches
-        run: npx patch-package
+      - name: Install
+        run: pnpm install --frozen-lockfile
 
       - name: Build (core)
-        run: npm run build
+        run: pnpm run build
 
       - name: Test (core)
-        run: npm test
+        run: pnpm test
 
-      - name: Stage (core, skip if version unchanged)
+      - name: Publish (core, skip if version unchanged)
         run: |
           VERSION=$(node -p "require('./package.json').version")
-          if npm view "@antora-tracer/core@${VERSION}" version >/dev/null 2>&1; then
+          if pnpm view "@antora-tracer/core@${VERSION}" version >/dev/null 2>&1; then
             echo "core@${VERSION} already published — skipping"
           else
-            npm stage publish --provenance
+            pnpm --filter @antora-tracer/core publish --provenance
           fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       # ---- @antora-tracer/id-server ----
-      - name: Install (id-server)
-        run: npm ci
-        working-directory: id-server
-
       - name: Build (id-server)
-        run: npm run build
-        working-directory: id-server
+        run: pnpm --filter @antora-tracer/id-server run build
 
       - name: Test (id-server)
-        run: npm test
-        working-directory: id-server
+        run: pnpm --filter @antora-tracer/id-server test
 
-      - name: Stage (id-server, skip if version unchanged)
-        working-directory: id-server
+      - name: Publish (id-server, skip if version unchanged)
         run: |
-          VERSION=$(node -p "require('./package.json').version")
-          if npm view "@antora-tracer/id-server@${VERSION}" version >/dev/null 2>&1; then
+          VERSION=$(node -p "require('./id-server/package.json').version")
+          if pnpm view "@antora-tracer/id-server@${VERSION}" version >/dev/null 2>&1; then
             echo "id-server@${VERSION} already published — skipping"
           else
-            npm stage publish --provenance
+            pnpm --filter @antora-tracer/id-server publish --provenance
           fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -74,13 +65,13 @@ jobs:
       - uses: sigstore/cosign-installer@v3
 
       - name: Generate SBOM (core)
-        run: npx --yes @cyclonedx/cyclonedx-npm --omit dev --output-file bom-core.json
+        run: pnpm dlx @cyclonedx/cyclonedx-npm --omit dev --output-file bom-core.json
 
       - name: Sign SBOM (core)
         run: cosign sign-blob --yes bom-core.json --bundle bom-core.json.bundle
 
       - name: Generate SBOM (id-server)
-        run: npx --yes @cyclonedx/cyclonedx-npm --omit dev --output-file bom-id-server.json
+        run: pnpm dlx @cyclonedx/cyclonedx-npm --omit dev --output-file bom-id-server.json
         working-directory: id-server
 
       - name: Sign SBOM (id-server)
@@ -122,7 +113,8 @@ jobs:
 
       - uses: docker/build-push-action@v6
         with:
-          context: id-server
+          context: .
+          file: id-server/Dockerfile
           push: true
           provenance: true
           sbom: true

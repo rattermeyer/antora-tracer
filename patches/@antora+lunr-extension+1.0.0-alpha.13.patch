@@ -1,7 +1,7 @@
-diff --git a/node_modules/@antora/lunr-extension/lib/generate-index.js b/node_modules/@antora/lunr-extension/lib/generate-index.js
+diff --git a/lib/generate-index.js b/lib/generate-index.js
 index c55ed12..dacf1d1 100644
---- a/node_modules/@antora/lunr-extension/lib/generate-index.js
-+++ b/node_modules/@antora/lunr-extension/lib/generate-index.js
+--- a/lib/generate-index.js
++++ b/lib/generate-index.js
 @@ -263,6 +263,36 @@ function extractIndexContent (page, dom, indexByHeading) {
 
      processNodes(contextNodes)

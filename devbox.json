@@ -1,12 +1,20 @@
 {
   "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.17.2/.schema/devbox.schema.json",
-  "packages": ["nodejs", "ruby", "bundler", "pandoc", "librsvg", "vale"],
+  "packages": [
+    "nodejs",
+    "pnpm",
+    "ruby",
+    "bundler",
+    "pandoc",
+    "librsvg",
+    "vale"
+  ],
   "shell": {
-    "init_hook": ["npm install", "bundle install"],
+    "init_hook": ["pnpm install", "bundle install"],
     "scripts": {
-      "build:html": "npx antora antora-playbook.yml",
-      "build:pdf": "npx antora antora-playbook-pdf.yml",
-      "test": "npm test"
+      "build:html": "pnpm exec antora antora-playbook.yml",
+      "build:pdf": "pnpm exec antora antora-playbook-pdf.yml",
+      "test": "pnpm test"
     }
   }
 }

@@ -2,6 +2,7 @@
   "name": "@antora-tracer/core",
   "version": "0.25.0",
   "type": "module",
+  "packageManager": "pnpm@10.33.0",
   "description": "Requirements traceability extensions for Antora/AsciiDoc",
   "main": "./lib/src/index.js",
   "module": "lib/src/index.js",
@@ -78,7 +79,6 @@
     "downdoc": "^1.1.0-stable",
     "mocha": "^11.7.6",
     "nyc": "^18.0.0",
-    "patch-package": "^8.0.1",
     "ts-mocha": "^11.1.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.23.1",
@@ -101,6 +101,15 @@
     "@antora/content-classifier": "3.1.15",
     "@antora/playbook-builder": "3.1.15"
   },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ],
+    "patchedDependencies": {
+      "@antora/assembler@1.0.0-beta.20": "patches/@antora+assembler+1.0.0-beta.20.patch",
+      "@antora/lunr-extension@1.0.0-alpha.13": "patches/@antora+lunr-extension+1.0.0-alpha.13.patch"
+    }
+  },
   "bin": {
     "antora-tracer": "lib/src/cli.js"
   },
@@ -109,7 +118,6 @@
     "!lib/src/test",
     "!lib/src/coverage",
     "skills",
-    "patches/@antora+lunr-extension+1.0.0-alpha.13.patch",
     "package.json",
     "LICENSE"
   ],
