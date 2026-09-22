@@ -41,5 +41,5 @@ matrices:
       design: [considered_by]
 
 idAllocation:
-  endpoint: http://localhost:7654
+  endpoint: https://tracerid.conemso.de
   token: ${TRACER_ID_TOKEN}
