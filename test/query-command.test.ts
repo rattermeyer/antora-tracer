@@ -18,8 +18,8 @@ const CLI = path.join(__dirname, "..", "src", "cli.js");
 const TEST_DIR = path.join(__dirname, "temp-query");
 
 // Chain: TST-001 ->tests-> IMP-001 ->implements-> DES-001 ->addresses-> REQ-001
-// Plus two disconnected items (REQ-999 isolated, REQ-002 isolated),
-// and supersession fixtures: REQ-010 (orphaned), REQ-020 (superseded but still referenced).
+// Plus two disconnected items, REQ-002 and REQ-999.
+// REQ-003 branches from DES-001; DES-002 points inward to TST-001 only.
 const SAMPLE = `= Test
 
 [#REQ-001, item, role=requirement, title="Req 1"]
@@ -32,7 +32,16 @@ Requirement one.
 Design one.
 
 addresses:REQ-001[]
+addresses:REQ-003[]
 ====
+
+[#DES-002, item, role=design, title="Inbound Design"]
+====
+Referenced only by the test.
+
+references:TST-001[]
+====
+
 
 [#IMP-001, item, role=implementation, title="Impl 1"]
 ====
@@ -51,6 +60,11 @@ tests:IMP-001[]
 [#REQ-999, item, role=requirement, title="Orphan Req"]
 ====
 Orphan requirement.
+====
+
+[#REQ-003, item, role=requirement, title="Req 3"]
+====
+Requirement three.
 ====
 
 [#REQ-002, item, role=requirement, title="Req 2"]
@@ -90,14 +104,13 @@ supersedes:REQ-020[]
 ====
 `;
 
-function runQuery(args: string[]): {
-  stdout: string;
-  stderr: string;
-  status: number;
-} {
+function runQuery(
+  args: string[],
+  cwd = PROJECT_ROOT,
+): { stdout: string; stderr: string; status: number } {
   const res = spawnSync("node", [CLI, "query", ...args], {
     encoding: "utf8",
-    cwd: PROJECT_ROOT,
+    cwd,
   });
   return {
     stdout: res.stdout ?? "",
@@ -112,9 +125,68 @@ function jsonOf(args: string[]): unknown {
   return JSON.parse(stdout.trim());
 }
 
+const SNAPSHOT_PATH = path.join(TEST_DIR, "site-graph.json");
+
+const MULTI_SOURCE_SNAPSHOT = {
+  format: 1,
+  items: [
+    {
+      id: "CHG-001",
+      title: "Change",
+      role: "change",
+      attributes: {},
+      component: "app",
+      module: "ROOT",
+      version: "1.0",
+    },
+    {
+      id: "UC-001",
+      title: "Use case",
+      role: "use_case",
+      attributes: {},
+      component: "app",
+      module: "ROOT",
+      version: "1.0",
+    },
+    {
+      id: "REQ-101",
+      title: "Requirement A",
+      role: "requirement",
+      attributes: {},
+      component: "core",
+      module: "requirements",
+      version: "2.0",
+    },
+    {
+      id: "REQ-102",
+      title: "Requirement B",
+      role: "requirement",
+      attributes: {},
+      component: "docs",
+      module: "ROOT",
+      version: "main",
+    },
+    {
+      id: "REQ-103",
+      title: "Inbound only",
+      role: "requirement",
+      attributes: {},
+      component: "other",
+      module: "ROOT",
+      version: "1.0",
+    },
+  ],
+  relationships: [
+    { id: "R1", fromId: "CHG-001", targetId: "UC-001", type: "links" },
+    { id: "R2", fromId: "UC-001", targetId: "REQ-101", type: "links" },
+    { id: "R3", fromId: "UC-001", targetId: "REQ-102", type: "links" },
+    { id: "R4", fromId: "REQ-103", targetId: "CHG-001", type: "links" },
+  ],
+};
 describe("Query Command", () => {
   before(() => {
     fs.mkdirSync(TEST_DIR, { recursive: true });
+    fs.writeFileSync(SNAPSHOT_PATH, JSON.stringify(MULTI_SOURCE_SNAPSHOT));
     fs.writeFileSync(path.join(TEST_DIR, "sample.adoc"), SAMPLE);
   });
 
@@ -162,11 +234,135 @@ describe("Query Command", () => {
     });
   });
 
+  describe("query linked", () => {
+    it("returns forward reachable matching-role items at any distance", () => {
+      const result = jsonOf([
+        "linked",
+        "TST-001",
+        "requirement",
+        "--json",
+        ...input(),
+      ]);
+      expect((result as any[]).map((item) => item.id).sort()).to.deep.equal([
+        "REQ-001",
+        "REQ-003",
+      ]);
+    });
+
+    it("prints matching items in the standard table", () => {
+      const { stdout, status } = runQuery([
+        "linked",
+        "TST-001",
+        "requirement",
+        ...input(),
+      ]);
+      expect(status).to.equal(0);
+      expect(stdout).to.include("ID");
+      expect(stdout).to.include("REQ-001");
+    });
+
+    it("returns an empty result for an unmatched role", () => {
+      expect(
+        jsonOf(["linked", "TST-001", "unknown", "--json", ...input()]),
+      ).to.deep.equal([]);
+    });
+
+    it("does not include items linked only toward the start", () => {
+      const result = jsonOf([
+        "linked",
+        "TST-001",
+        "design",
+        "--json",
+        ...input(),
+      ]);
+      expect((result as any[]).map((item) => item.id)).to.not.include(
+        "DES-002",
+      );
+      expect((result as any[]).map((item) => item.id)).to.include("DES-001");
+    });
+
+    it("scans the current directory when no source option is given", () => {
+      const { stdout, status } = runQuery(
+        ["linked", "TST-001", "requirement", "--json"],
+        TEST_DIR,
+      );
+      expect(status).to.equal(0);
+      expect(
+        (JSON.parse(stdout) as any[]).map((item) => item.id).sort(),
+      ).to.deep.equal(["REQ-001", "REQ-003"]);
+    });
+
+    it("reports an unknown starting ID", () => {
+      const { status, stderr } = runQuery([
+        "linked",
+        "UNKNOWN-001",
+        "requirement",
+        ...input(),
+      ]);
+      expect(status).to.equal(1);
+      expect(stderr).to.include("Item not found: UNKNOWN-001");
+    });
+
+    it("queries linked items from a multi-source snapshot", () => {
+      const result = jsonOf([
+        "linked",
+        "CHG-001",
+        "requirement",
+        "--snapshot",
+        SNAPSHOT_PATH,
+        "--json",
+      ]);
+      expect((result as any[]).map((item) => item.id).sort()).to.deep.equal([
+        "REQ-101",
+        "REQ-102",
+      ]);
+      expect(
+        (result as any[]).map((item) => item.component).sort(),
+      ).to.deep.equal(["core", "docs"]);
+    });
+
+    it("rejects snapshot and explicit local input together", () => {
+      const { status, stderr } = runQuery([
+        "linked",
+        "CHG-001",
+        "requirement",
+        "--snapshot",
+        SNAPSHOT_PATH,
+        ...input(),
+      ]);
+      expect(status).to.equal(1);
+      expect(stderr).to.include("Use either --input or --snapshot");
+    });
+
+    it("rejects an unsupported snapshot format", () => {
+      const invalidPath = path.join(TEST_DIR, "invalid-snapshot.json");
+      fs.writeFileSync(
+        invalidPath,
+        JSON.stringify({ format: 2, items: [], relationships: [] }),
+      );
+      const { status, stderr } = runQuery([
+        "linked",
+        "CHG-001",
+        "requirement",
+        "--snapshot",
+        invalidPath,
+      ]);
+      expect(status).to.equal(1);
+      expect(stderr).to.include("Unsupported snapshot format '2'");
+    });
+  });
+
   describe("query impact", () => {
     it("lists all transitively connected items", () => {
       const result = jsonOf(["impact", "REQ-001", "--json", ...input()]);
       const ids = (result as any[]).map((i) => i.id).sort();
-      expect(ids).to.deep.equal(["DES-001", "IMP-001", "TST-001"]);
+      expect(ids).to.deep.equal([
+        "DES-001",
+        "DES-002",
+        "IMP-001",
+        "REQ-003",
+        "TST-001",
+      ]);
     });
 
     it("returns an empty result for a disconnected item", () => {

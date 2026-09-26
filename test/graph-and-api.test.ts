@@ -294,6 +294,38 @@ describe("TraceabilityGraph - Extended Queries", () => {
     });
   });
 
+  describe("getLinkedItems()", () => {
+    it("follows outgoing paths once through cycles and convergent paths", () => {
+      const graph = new TraceabilityGraph();
+      graph.addItem(createItem("REQ-000", "requirement"));
+      graph.addItem(createItem("DES-001", "design"));
+      graph.addItem(createItem("TST-001", "test"));
+      graph.addItem(createItem("REQ-001", "requirement"));
+      graph.addItem(createItem("REQ-002", "requirement"));
+      graph.addItem(createItem("ARC-001", "design"));
+      graph.addRelationship(createRel("R1", "REQ-000", "DES-001", "links"));
+      graph.addRelationship(createRel("R2", "REQ-000", "TST-001", "links"));
+      graph.addRelationship(createRel("R3", "DES-001", "REQ-001", "links"));
+      graph.addRelationship(createRel("R4", "TST-001", "REQ-001", "links"));
+      graph.addRelationship(createRel("R5", "REQ-001", "REQ-000", "links"));
+      graph.addRelationship(createRel("R6", "REQ-001", "ARC-001", "links"));
+      graph.addRelationship(createRel("R7", "ARC-001", "REQ-002", "links"));
+      graph.addRelationship(createRel("R8", "ARC-001", "REQ-000", "links"));
+
+      expect(
+        graph.getLinkedItems("REQ-000", "requirement").map((i) => i.id),
+      ).to.have.members(["REQ-001", "REQ-002"]);
+    });
+
+    it("does not traverse inbound-only relationships", () => {
+      const graph = new TraceabilityGraph();
+      graph.addItem(createItem("REQ-000", "requirement"));
+      graph.addItem(createItem("DES-001", "design"));
+      graph.addRelationship(createRel("R1", "DES-001", "REQ-000", "links"));
+
+      expect(graph.getLinkedItems("REQ-000", "design")).to.deep.equal([]);
+    });
+  });
   // ============================================================================
   // Section 4E: toDot() and toVegaLite() — Graph visualization (REQ-053)
   // ============================================================================

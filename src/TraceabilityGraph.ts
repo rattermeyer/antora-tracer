@@ -973,6 +973,28 @@ export class TraceabilityGraph {
     return Array.from(impacted).filter((id) => id !== itemId);
   }
 
+  /**
+   * Return distinct items reachable through outgoing relationships with the requested role.
+   */
+  getLinkedItems(itemId: string, role: string): Item[] {
+    const linked: Item[] = [];
+    const visited = new Set([itemId]);
+    const queue = [itemId];
+
+    for (let index = 0; index < queue.length; index++) {
+      for (const rel of this.getRelationships(queue[index])) {
+        if (visited.has(rel.targetId)) continue;
+        visited.add(rel.targetId);
+        const item = this.getItem(rel.targetId);
+        if (!item) continue;
+        if (item.role === role) linked.push(item);
+        queue.push(item.id);
+      }
+    }
+
+    return linked;
+  }
+
   // ========================================================================
   // Lifecycle
   // ========================================================================

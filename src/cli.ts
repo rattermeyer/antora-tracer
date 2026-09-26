@@ -1161,6 +1161,54 @@ queryProgram
   });
 
 queryProgram
+  .command("linked <id> <role>")
+  .description("List outgoing reachable items matching a role")
+  .option("--snapshot <path>", "Read a canonical site-graph snapshot")
+  .action(async (id: string, role: string, _options: any, cmd: any) => {
+    const { json } = cmd.parent.opts();
+    const queryCommand = cmd.parent;
+    const { snapshot } = cmd.opts();
+    let graph: RequirementsTraceabilityExtension["graph"];
+
+    if (snapshot && queryCommand.getOptionValueSource("input") === "cli") {
+      console.error(chalk.red("Use either --input or --snapshot, not both"));
+      process.exit(1);
+    }
+
+    if (snapshot) {
+      try {
+        const data = deserializeSnapshot(
+          readFileSync(resolve(process.cwd(), snapshot), "utf8"),
+        );
+        const extension = await createExtension({});
+        for (const item of data.items) extension.graph.addItem(item);
+        for (const relationship of data.relationships) {
+          extension.graph.addRelationship(relationship);
+        }
+        graph = extension.graph;
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        console.error(chalk.red(`Error loading graph snapshot: ${message}`));
+        process.exit(1);
+      }
+    } else {
+      graph = (await buildQueryGraph(cmd)).graph;
+    }
+
+    if (!graph.getItem(id)) {
+      console.error(chalk.red(`Item not found: ${id}`));
+      process.exit(1);
+    }
+    const items = graph.getLinkedItems(id, role);
+    if (json) {
+      console.log(JSON.stringify(items, null, 2));
+    } else {
+      const rows = items.map((item) => [item.id, item.role, item.title]);
+      console.log(formatTable(["ID", "Role", "Title"], rows));
+    }
+  });
+
+queryProgram
   .command("impact <id>")
   .description("List all items transitively connected to the given ID")
   .action(async (id: string, _options: any, cmd: any) => {

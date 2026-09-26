@@ -41,6 +41,30 @@ npx antora-tracer query reverse REQ-005 --json
 npx antora-tracer query impact REQ-005
 ----
 
+
+== Find forward-linked items by role
+
+`linked` follows outgoing relationships from the starting item across any number of links, including through items with other roles.
+It returns each reachable item of the requested role once and does not follow inbound-only relationships.
+
+[source,bash]
+----
+npx antora-tracer query linked CHG-001 requirement -i docs/
+----
+
+For a complete graph spanning Antora components or repositories, generate a canonical snapshot and query it:
+
+[source,bash]
+----
+npx antora-tracer site-graph antora-playbook.yml --out graph.json
+npx antora-tracer query linked CHG-001 requirement --snapshot graph.json
+----
+
+Multi-source queries require item IDs to be globally unique across every source in the snapshot.
+Use `@antora-tracer/id-server` to allocate IDs, seeded from the same playbook with `npx antora-tracer seed antora-playbook.yml -o seeds.yml`.
+Authors whose sources can be merged must share an allocation tenant and prefix settings; separate tenants with the same prefixes allocate overlapping IDs.
+Regenerate the snapshot after source changes.
+
 == Find isolated items
 
 `isolated` lists items with no relationships in either direction:

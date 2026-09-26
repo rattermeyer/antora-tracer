@@ -338,6 +338,8 @@ Parses your `.adoc` source files and answers one structural question per invocat
 npx antora-tracer query reverse REQ-005
 npx antora-tracer query reverse REQ-005 -i docs/
 npx antora-tracer query impact REQ-005 --json
+npx antora-tracer query linked CHG-001 requirement -i docs/
+npx antora-tracer query linked CHG-001 requirement --snapshot graph.json --json
 npx antora-tracer query isolated --role requirement
 npx antora-tracer query orphaned
 npx antora-tracer query path TST-001 REQ-001
@@ -358,7 +360,15 @@ npx antora-tracer query path TST-001 REQ-001
 | `--role <role>`
 | string
 | For `isolated` and `orphaned`: filter results by role
+
+| `--snapshot <path>`
+| string
+| For `linked`: read items and relationships from a canonical `site-graph` snapshot instead of scanning local AsciiDoc
 |===
+
+
+`linked <id> <role>` follows outgoing relationships any number of edges, traversing through items of every role and excluding the start item.
+For a multi-source snapshot, IDs must be globally unique across included sources; use `@antora-tracer/id-server` seeded with `antora-tracer seed antora-playbook.yml` and shared allocation tenant and prefix settings.
 
 Subcommands:
 
@@ -368,6 +378,9 @@ Subcommands:
 
 | `reverse <id>`
 | List every item that references `<id>` (inbound relationships)
+
+| `linked <id> <role>`
+| List distinct items matching `<role>` reachable through outgoing relationships at any distance
 
 | `impact <id>`
 | List every item transitively connected to `<id>`
