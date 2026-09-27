@@ -15,6 +15,28 @@ npx antora-tracer <command> --help
 
 Global options (`--config`, `--preset`) are inherited by all commands.
 
+== completion
+
+Generate shell completion scripts for Bash, Zsh, or Fish, or install one for the current user.
+Generation writes the script to standard output, so redirect it to save a copy or inspect it.
+
+[source,bash]
+----
+npx antora-tracer completion bash > antora-tracer-completion.bash
+npx antora-tracer completion zsh > antora-tracer-completion.zsh
+npx antora-tracer completion fish > antora-tracer-completion.fish
+npx antora-tracer completion install bash
+npx antora-tracer completion install zsh
+npx antora-tracer completion install fish
+----
+
+Installation writes to `~/.local/share/bash-completion/completions/antora-tracer` for Bash, `~/.zfunc/_antora-tracer` for Zsh, and `~/.config/fish/completions/antora-tracer.fish` for Fish.
+It prints the completion path and activation steps without editing shell startup files.
+
+For Bash, source the installed file in the current shell; add the printed `source` command to `~/.bashrc` yourself if you want it loaded in future sessions.
+For Zsh, add `fpath=(~/.zfunc $fpath)` and `autoload -Uz compinit && compinit` to `~/.zshrc`, before any other `compinit` call.
+Fish automatically loads completion files from its completion directory in new sessions.
+
 == process
 
 Process AsciiDoc files to populate the traceability graph.
