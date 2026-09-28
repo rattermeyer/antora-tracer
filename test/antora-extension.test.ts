@@ -712,6 +712,84 @@ A requirement from a partial file.
       expect(partialItem!.sourceFile).to.include("github.com");
     });
 
+    it("uses component link attributes for partials, not including page headers", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const pageFiles = [
+        {
+          src: {
+            path: "pages/enabled.adoc",
+            module: "ROOT",
+            component: "enabled",
+            version: "1.0",
+          },
+          contents: Buffer.from(
+            `:traceability-links: false\n\n[#TGT-001, item, role=requirement]\n--\nTarget.\n--\n`,
+          ),
+        },
+        {
+          src: {
+            path: "pages/disabled.adoc",
+            module: "ROOT",
+            component: "disabled",
+            version: "1.0",
+          },
+          contents: Buffer.from(
+            `:traceability-links: true\n\n[#TGT-002, item, role=requirement]\n--\nTarget.\n--\n`,
+          ),
+        },
+      ];
+      const partialFiles = [
+        {
+          src: {
+            path: "partials/enabled.adoc",
+            module: "ROOT",
+            component: "enabled",
+            version: "1.0",
+            fileUri: "https://example.test/enabled.adoc",
+          },
+          contents: Buffer.from(
+            `[#SRC-001, item, role=design]\n--\naddresses:TGT-001[]\n--\n`,
+          ),
+        },
+        {
+          src: {
+            path: "partials/disabled.adoc",
+            module: "ROOT",
+            component: "disabled",
+            version: "1.0",
+            fileUri: "https://example.test/disabled.adoc",
+          },
+          contents: Buffer.from(
+            `[#SRC-002, item, role=design]\n--\naddresses:TGT-002[]\n--\n`,
+          ),
+        },
+      ];
+
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "partial" ? partialFiles : pageFiles,
+          getComponentVersion: (component: string) => ({
+            asciidoc: {
+              attributes: { "traceability-links": component === "enabled" },
+            },
+          }),
+        },
+      });
+
+      const enabledOutput = partialFiles[0].contents.toString("utf8");
+      const disabledOutput = partialFiles[1].contents.toString("utf8");
+      expect(enabledOutput).to.include("TGT-001");
+      expect(enabledOutput).to.include("xref:");
+      expect(disabledOutput).to.not.include("traceability:links[]");
+      expect(disabledOutput).to.not.include("xref:");
+    });
+
     it("should expand macros in partial files during Pass 2", async () => {
       const ctx = createMockContext({
         playbook: { output: { dir: tempDir }, extensions: [] },
@@ -1753,6 +1831,104 @@ Description.
       const traceExt = ext.getTraceabilityExtension();
       expect(traceExt.getAllItems()).to.have.lengthOf(2);
       // No crash — inline style ignores collapsible
+    });
+
+    it("automatically renders both relationship directions for enabled items", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const content = `:traceability-links: true
+:traceability-style: table
+
+[#REQ-001, item, role=requirement, title="Requirement"]
+--
+addresses:ARC-001[]
+--
+
+[#ARC-001, item, role=architecture, title="Design"]
+====
+Design details.
+====
+
+[#TEST-001, item, role=test, title="Test"]
+--
+addresses:REQ-001[]
+--
+`;
+      const file = {
+        src: { path: "test.adoc" },
+        contents: Buffer.from(content),
+      };
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [file] : [],
+        },
+      });
+
+      const output = file.contents.toString("utf8");
+      const requirement = output.slice(
+        output.indexOf("[#REQ-001"),
+        output.indexOf("[#ARC-001"),
+      );
+      expect(requirement).to.include('[cols="15,15,70"]');
+      expect(requirement).to.include("xref:#ARC-001[ARC-001]");
+      expect(requirement).to.include("xref:#TEST-001[TEST-001]");
+    });
+
+    it("preserves explicit macro direction and suppresses automatic duplicates", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const content = `:traceability-links: true
+
+[#REQ-001, item, role=requirement]
+--
+addresses:ARC-001[]
+traceability:outgoing[]
+--
+
+[#ARC-001, item, role=architecture]
+--
+addresses:REQ-001[]
+traceability:incoming[]
+--
+
+[#TEST-001, item, role=design]
+--
+addresses:REQ-001[]
+traceability:links[]
+--
+`;
+      const file = {
+        src: { path: "test.adoc" },
+        contents: Buffer.from(content),
+      };
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [file] : [],
+        },
+      });
+
+      const output = file.contents.toString("utf8");
+      const itemBody = (id: string, nextId: string) =>
+        output.slice(output.indexOf(`[${id}`), output.indexOf(`[${nextId}`));
+      const requirement = itemBody("#REQ-001", "#ARC-001");
+      const design = itemBody("#ARC-001", "#TEST-001");
+      const test = output.slice(output.indexOf("[#TEST-001"));
+
+      expect((requirement.match(/xref:#ARC-001/g) ?? [])).to.have.lengthOf(1);
+      expect(requirement).to.not.include("xref:#TEST-001");
+      expect(design.match(/Addressed by/g) ?? []).to.have.lengthOf(1);
+      expect(design).to.not.include("* Addresses");
+      expect(test.match(/xref:#REQ-001/g) ?? []).to.have.lengthOf(1);
     });
 
     it("should expand traceability:links[] with both outgoing and incoming", async () => {

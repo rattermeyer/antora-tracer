@@ -103,24 +103,10 @@ For the full lifecycle — re-pointing links, archiving, and removing — see xr
 
 == Display relationships in rendered output
 
-Use the `tracer:outgoing[]` and `tracer:incoming[]` macros to show relationship lists:
+When `:traceability-links:` is enabled, every item automatically renders its outgoing and incoming relationship lists.
+Use `tracer:outgoing[]`, `tracer:incoming[]`, or `tracer:links[]` only when you need to control which directions appear or where the list is placed; an explicit macro suppresses automatic rendering for that item.
 
-[source,asciidoc]
-----
-[#DES-001, item, role=design]
---
-JWT-based authentication.
-
-addresses:REQ-001[]
-
-tracer:outgoing[]     <1>
-tracer:incoming[]     <2>
---
-----
-<1> Renders a list of items this item points to
-<2> Renders a list of items that point to this item
-
-Enable these macros per page with the document attribute:
+Enable automatic rendering for every item on a page with the document attribute:
 
 [source,asciidoc]
 ----

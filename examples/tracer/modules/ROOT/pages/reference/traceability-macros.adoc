@@ -24,8 +24,8 @@ New content may use either prefix.
 
 == Relationship Link Macros
 
-These macros display relationship lists as formatted text.
-They are gated by the `:traceability-links:` document attribute.
+When `:traceability-links:` resolves to true, every item automatically renders its outgoing and incoming relationship lists using the configured display options.
+An explicit `tracer:outgoing[]`, `tracer:incoming[]`, or `tracer:links[]` macro overrides automatic rendering for that item and controls its direction and placement.
 
 [NOTE]
 ====
@@ -69,7 +69,7 @@ tracer:links[]
 
 === Enabling
 
-Opt-in per page via document attribute:
+Enable automatic relationship rendering for every item on a page with the document attribute:
 
 [source,asciidoc]
 ----
@@ -77,7 +77,7 @@ Opt-in per page via document attribute:
 :traceability-links: true
 ----
 
-Or enable it globally by setting the attribute in the component descriptor's `antora.yml`:
+For a component-wide default, set the attribute in the component descriptor's `antora.yml`:
 
 [source,yaml]
 ----
@@ -95,9 +95,9 @@ asciidoc:
     traceability-links: true
 ----
 
-A per-page `:traceability-links:` header overrides the global setting.
-
-Without the attribute, the macro text is stripped from output.
+A page-level `:traceability-links:` header overrides the component or playbook setting for items authored in that page.
+Items defined in partials use their own component's setting; the including page's header does not override it, and partials need no local setting.
+When the resolved setting is absent or false, explicit relationship rendering macros are stripped from output and automatic links are not added.
 
 === Display options
 
@@ -107,8 +107,7 @@ Without the attribute, the macro text is stripped from output.
 
 | `:traceability-links:`
 | `true`
-| Enables the macros
-
+| Renders automatic outgoing and incoming relationship lists and enables explicit rendering macros
 | `:traceability-style:`
 | `list` (default), `table`, `inline`
 | Display format: bulleted list, AsciiDoc table, or comma-separated inline

@@ -1,6 +1,5 @@
 = Delivery Process
 :keywords: traceability, delivery process, ci, cd, release, quality gate
-:traceability-links: true
 
 This document captures the delivery process requirements — the CI/CD pipeline, quality gates, and release process that ensure the extension is built, tested, and deployed consistently.
 Each process requirement traces to the product requirements it validates and the architectural decisions it implements.

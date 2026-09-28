@@ -1,5 +1,4 @@
 = Demo
-:traceability-links: true
 
 This is a second Antora component, living as a sibling to `examples/tracer`.
 

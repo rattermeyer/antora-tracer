@@ -1,6 +1,9 @@
 name: demo
 title: Demo
 version: main
+asciidoc:
+  attributes:
+    traceability-links: true
 start_page: index.adoc
 nav:
   - modules/ROOT/nav.adoc

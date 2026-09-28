@@ -34,13 +34,11 @@ This is why Pass 1 processes *all* files before moving on.
 
 === Pass 2: Expand relation macros (pages and partials)
 
-`tracer:outgoing[]`, `tracer:incoming[]`, and `tracer:links[]` placeholders are replaced with formatted relationship lists.
-The expansion queries the graph to enumerate relationships for each item.
-
-This pass is opt-in: only files whose resolved `:traceability-links:` attribute is true get macro expansion.
-The attribute can be set per page in the document header, or globally via the component's `antora.yml` or the playbook `asciidoc.attributes`.
-Partials have the attribute forced on since they have no document attributes of their own.
-Files without the attribute have the macro text stripped.
+When `:traceability-links:` resolves to true, each item without an explicit relationship-rendering macro receives outgoing and incoming relationship lists.
+An explicit `tracer:outgoing[]`, `tracer:incoming[]`, or `tracer:links[]` controls rendering for that item.
+The attribute can be set in a page header or inherited from the component descriptor or playbook; the page header overrides component and playbook values for page items.
+Items defined in partials use the partial component's attribute, independent of the including page's header.
+When the resolved attribute is absent or false, explicit relationship-rendering macros are stripped and automatic links are not added.
 
 Display style (list, table, inline), sort order (target-id, target-title, relation-type), and collapsible sections are configurable via document attributes.
 

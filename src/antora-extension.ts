@@ -352,10 +352,7 @@ export class AntoraTraceabilityExtension {
   }
 
   /**
-   * Find all item block boundaries in content using quote-aware scanning
-   * so that ']' inside quoted title values doesn't break detection.
-   * Returns array of { itemId, headerEnd, bodyStart, bodyEnd } where
-   * bodyStart..bodyEnd is the body content between -- delimiters.
+   * Find item block boundaries with quote-aware header scanning.
    */
   private findItemBlocks(content: string): Array<{
     itemId: string;
@@ -373,17 +370,13 @@ export class AntoraTraceabilityExtension {
     }> = [];
 
     const macroStartRe = /\[(?:\.tracer)?#([^,\]]+),\s*item,?/g;
-    let m: RegExpExecArray | null;
-    // Item-like patterns inside verbatim/source blocks are example code, not
-    // live items — skip them so documentation examples aren't parsed.
     const verbatimRanges = this.findVerbatimRanges(content);
+    let m: RegExpExecArray | null;
 
     while ((m = macroStartRe.exec(content)) !== null) {
       if (this.isInsideRange(m.index, verbatimRanges)) continue;
       const itemId = m[1].trim();
       const attrStart = m.index + m[0].length;
-
-      // Scan forward for the closing ']' outside quoted strings
       let macroEnd = -1;
       let inQ = false;
       let qChar = "";
@@ -407,21 +400,21 @@ export class AntoraTraceabilityExtension {
       }
       if (macroEnd === -1) continue;
 
-      // Find the opening '--' delimiter after the macro line
       const afterHeader = content.slice(macroEnd + 1);
-      const openDelim = afterHeader.match(/[ \t]*\r?\n--\r?\n/);
+      const openDelim = afterHeader.match(/[ \t]*\r?\n(--|====)\r?\n/);
       if (!openDelim || openDelim.index === undefined) continue;
-
       const bodyStart = macroEnd + 1 + openDelim.index + openDelim[0].length;
-      const bodyEnd = content.indexOf("\n--\n", bodyStart);
-      if (bodyEnd === -1) continue;
+      const closeRe = new RegExp(`\\r?\\n${openDelim[1]}\\r?\\n`, "g");
+      closeRe.lastIndex = bodyStart;
+      const closeDelim = closeRe.exec(content);
+      if (!closeDelim) continue;
 
       results.push({
         itemId,
         headerStart: m.index,
         headerEnd: macroEnd + 1,
         bodyStart,
-        bodyEnd,
+        bodyEnd: closeDelim.index,
       });
     }
 
@@ -440,16 +433,13 @@ export class AntoraTraceabilityExtension {
       const contentsBuffer = file.contents || file.src?.contents;
       if (!contentsBuffer) return;
       const content = contentsBuffer.toString("utf8");
-      if (
-        !RENDERING_MACRO_NAMESPACES.some((ns) =>
-          content.includes(`${ns}:${macroName}[]`),
-        )
-      )
-        return;
-
       const docAttrs = this.resolveDocAttributes(file, content);
-      const linksEnabled =
-        (file as any).__isPartial || this.isLinksEnabled(docAttrs);
+      const linksEnabled = this.isLinksEnabled(docAttrs);
+      const hasMacro = RENDERING_MACRO_NAMESPACES.some((ns) =>
+        content.includes(`${ns}:${macroName}[]`),
+      );
+      if (!hasMacro && (macroName !== "links" || !linksEnabled)) return;
+
       const style = this.getLinksStyle(docAttrs);
       const order = this.getLinksOrder(docAttrs);
       const collapsible = this.getCollapsible(docAttrs);
@@ -460,43 +450,61 @@ export class AntoraTraceabilityExtension {
       const currentModule = file.src?.module || undefined;
       const replacements: Array<{ start: number; end: number; text: string }> =
         [];
-
-      // Find item blocks and scan for macros only within block bodies.
-      // This avoids matching the macro name in prose/documentation text.
       const blocks = this.findItemBlocks(content);
+      const explicitMacroRegex = new RegExp(
+        `${RENDERING_MACRO_NS}:(links|outgoing|incoming)\\[\\]`,
+        "g",
+      );
 
-      for (const { itemId, bodyStart } of blocks) {
-        const bodyEnd = content.indexOf("\n--\n", bodyStart);
-        const bodyContent = content.slice(
-          bodyStart,
-          bodyEnd >= 0 ? bodyEnd : undefined,
-        );
-
-        const macroRegex = new RegExp(
-          `${RENDERING_MACRO_NS}:${macroName}\\[\\]`,
-          "g",
-        );
+      for (const { itemId, bodyStart, bodyEnd } of blocks) {
+        const bodyContent = content.slice(bodyStart, bodyEnd);
         const bodyRanges = this.getInlineCodeRanges(bodyContent);
+        let hasExplicitMacro = false;
         let macroMatch: RegExpExecArray | null;
-        while ((macroMatch = macroRegex.exec(bodyContent)) !== null) {
+
+        explicitMacroRegex.lastIndex = 0;
+        while ((macroMatch = explicitMacroRegex.exec(bodyContent)) !== null) {
           if (this.isInsideRange(macroMatch.index, bodyRanges)) continue;
+          hasExplicitMacro = true;
+          if (macroMatch[1] !== macroName) continue;
+
           const macroStart = bodyStart + macroMatch.index;
           const macroEnd = macroStart + macroMatch[0].length;
+          replacements.push({
+            start: macroStart,
+            end: macroEnd,
+            text: linksEnabled
+              ? this.buildRelationMacroOutput(
+                  itemId,
+                  macroName,
+                  style,
+                  order,
+                  currentFile,
+                  collapsible,
+                  currentComponent,
+                  currentModule,
+                  emptyStyle,
+                )
+              : "",
+          });
+        }
 
-          const text = linksEnabled
-            ? this.buildRelationMacroOutput(
-                itemId,
-                macroName,
-                style,
-                order,
-                currentFile,
-                collapsible,
-                currentComponent,
-                currentModule,
-                emptyStyle,
-              )
-            : "";
-          replacements.push({ start: macroStart, end: macroEnd, text });
+        if (macroName === "links" && linksEnabled && !hasExplicitMacro) {
+          replacements.push({
+            start: bodyEnd,
+            end: bodyEnd,
+            text: this.buildRelationMacroOutput(
+              itemId,
+              "links",
+              style,
+              order,
+              currentFile,
+              collapsible,
+              currentComponent,
+              currentModule,
+              emptyStyle,
+            ),
+          });
         }
       }
 
@@ -1332,9 +1340,9 @@ export class AntoraTraceabilityExtension {
 
         // Expand macros on pages
         for (const file of pageFilesForVersion) {
+          this.expandRelationMacros(file, "links");
           this.expandRelationMacros(file, "outgoing");
           this.expandRelationMacros(file, "incoming");
-          this.expandRelationMacros(file, "links");
           this.expandGraphMacros(file);
           this.expandCoverageMacros(file);
           this.expandConfigGraphMacros(file);
@@ -1344,9 +1352,9 @@ export class AntoraTraceabilityExtension {
         // links/graph to enabled (partials have no doc attributes of their own)
         for (const file of partialFilesForVersion) {
           (file as any).__isPartial = true;
+          this.expandRelationMacros(file, "links");
           this.expandRelationMacros(file, "outgoing");
           this.expandRelationMacros(file, "incoming");
-          this.expandRelationMacros(file, "links");
           this.expandGraphMacros(file);
           this.expandCoverageMacros(file);
           this.expandConfigGraphMacros(file);

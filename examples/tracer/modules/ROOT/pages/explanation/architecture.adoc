@@ -1,6 +1,5 @@
 = Architecture
 :keywords: antora, traceability, architecture, arc42, components, graph, parser
-:traceability-links: true
 :traceability-graph: true
 :traceability-style: list
 :traceability-order: target-id

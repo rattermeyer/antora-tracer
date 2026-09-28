@@ -3,6 +3,9 @@ title: Antora Tracer
 version:
   v(?<v>+({0..9}).+({0..9})).x: $<v>
 start_page: index.adoc
+asciidoc:
+  attributes:
+    traceability-links: true
 nav:
   - modules/ROOT/nav.adoc
   - modules/ROOT/nav-architecture.adoc

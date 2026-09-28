@@ -98,7 +98,7 @@ Roles declared with no relations still appear as isolated nodes, which makes orp
 
 == Enabling relationship link macros
 
-For textual relationship lists (not diagrams), enable the link macros:
+Enable relationship rendering for every item with the document attribute:
 
 [source,asciidoc]
 ----
@@ -108,7 +108,7 @@ For textual relationship lists (not diagrams), enable the link macros:
 :traceability-order: target-id
 ----
 
-Then use `tracer:outgoing[]` and `tracer:incoming[]` inside item blocks.
+The component-level `traceability-links` attribute or a page-level header enables the macros and automatic relationship lists; explicit macros control direction and placement for individual items.
 See xref:reference/traceability-macros.adoc[Traceability Macros Reference] for all options.
 
 === Local Kroki server

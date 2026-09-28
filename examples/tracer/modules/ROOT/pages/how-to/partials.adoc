@@ -32,7 +32,10 @@ Include it in a page:
 include::partial$04-solution-strategy.adoc[]
 ----
 
-The extension processes partials during graph population on equal footing with page files.
+The extension processes partials during graph population and relationship rendering using their component's AsciiDoc attributes.
+
+Automatic relationship rendering for items in a partial follows the partial component's `traceability-links` attribute.
+No attribute is needed in the partial, and the including page's header does not override the component setting.
 
 == Where links point
 

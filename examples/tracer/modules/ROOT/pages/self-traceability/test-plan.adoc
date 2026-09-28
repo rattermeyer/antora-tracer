@@ -1,6 +1,5 @@
 = Test Plan
 :keywords: traceability, test plan, tests, verification, coverage
-:traceability-links: true
 :traceability-graph: true
 :traceability-style: table
 :traceability-order: target-id
