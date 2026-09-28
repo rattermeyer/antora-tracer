@@ -372,7 +372,7 @@ export class AntoraTraceabilityExtension {
       bodyEnd: number;
     }> = [];
 
-    const macroStartRe = /\[#([^,\]]+),\s*item,?/g;
+    const macroStartRe = /\[(?:\.tracer)?#([^,\]]+),\s*item,?/g;
     let m: RegExpExecArray | null;
     // Item-like patterns inside verbatim/source blocks are example code, not
     // live items — skip them so documentation examples aren't parsed.
@@ -1662,13 +1662,13 @@ export class AntoraTraceabilityExtension {
    * Uses quote-aware scanning to find the real closing ']'.
    */
   private unindentItemMacros(content: string): string {
-    const macroStartRe = /^[ \t]+(\[#[^,\]]+,\s*item,?)/gm;
+    const macroStartRe = /^[ \t]+(\[(?:\.tracer)?#[^,\]]+,\s*item,?)/gm;
     const replacements: Array<{ start: number; end: number; text: string }> =
       [];
     let m: RegExpExecArray | null;
 
     while ((m = macroStartRe.exec(content)) !== null) {
-      const prefix = m[1]; // "[#ID, item," without leading whitespace
+      const prefix = m[1]; // Item header prefix, including an optional tracer role
       const attrStart = m.index + m[0].length;
 
       let macroEnd = -1;
@@ -1721,7 +1721,7 @@ export class AntoraTraceabilityExtension {
   private injectTitleIds(content: string): string {
     if (!this.traceability) return content;
 
-    const macroStartRe = /^[ \t]*\[#([^,\]]+),\s*item,?/gm;
+    const macroStartRe = /^[ \t]*\[(?:\.tracer)?#([^,\]]+),\s*item,?/gm;
     const replacements: Array<{ start: number; end: number; text: string }> =
       [];
     let m: RegExpExecArray | null;
@@ -2140,9 +2140,13 @@ export class AntoraTraceabilityExtension {
   private stripSupersededBlocks(content: string): string {
     if (!this.traceability) return content;
     const graph = this.traceability.graph;
+    const verbatimRanges = this.findVerbatimRanges(content);
     return content.replace(
-      /^\[#([A-Za-z0-9_-]+),\s*item,[^\]]*\]\n(--|====)\n[\s\S]*?\n\2\n?/gm,
-      (match: string, id: string) => (graph.isSuperseded(id) ? "" : match),
+      /^\[(?:\.tracer)?#([A-Za-z0-9_-]+),\s*item,[^\]]*\]\n(--|====)\n[\s\S]*?\n\2\n?/gm,
+      (match: string, id: string, _delimiter: string, offset: number) =>
+        !this.isInsideRange(offset, verbatimRanges) && graph.isSuperseded(id)
+          ? ""
+          : match,
     );
   }
 

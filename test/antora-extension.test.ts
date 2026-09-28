@@ -22,8 +22,12 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { createRequire } from "node:module";
+import type asciidoctorFactory from "@asciidoctor/core";
 import { expect } from "chai";
 import { AntoraTraceabilityExtension } from "../src/antora-extension.js";
+const asciidoctor = createRequire(import.meta.url)("@asciidoctor/core") as () =>
+  asciidoctorFactory.Asciidoctor;
 
 // ============================================================================
 // Helper Types
@@ -283,6 +287,50 @@ describe("AntoraTraceabilityExtension", () => {
       const imp = traceExt.graph.getItem("IMP-001");
       expect(imp).to.exist;
       expect(imp?.role).to.equal("implementation");
+    });
+
+    it("preserves tracer-role IDs and expands macros in item blocks", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const content = `:traceability-links: true
+
+[#REQ-BASE, item, role=requirement, title="Base"]
+--
+Base requirement.
+--
+
+  [.tracer#DES-001, item, role=design, title="Design"]
+--
+Design body.
+addresses:REQ-BASE[]
+traceability:outgoing[]
+--
+`;
+      const file = {
+        src: { path: "test.adoc", module: "ROOT", component: "tracer" },
+        contents: Buffer.from(content),
+      };
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [file] : [],
+        },
+      });
+
+      const output = file.contents.toString("utf8");
+      const html = asciidoctor().convert(output, { safe: "safe" });
+      expect(ext.getTraceabilityExtension().graph.getItem("DES-001")).to
+        .exist;
+      expect(output).to.not.include("traceability:outgoing[]");
+      expect(html).to.include('id="REQ-BASE"');
+      expect(html).to.include('id="DES-001"');
+      expect(html).to.include('class="openblock design tracer"');
+      expect(html).to.include("DES-001 — Design");
+      expect(output).to.include("xref:");
     });
 
     it("should register relationships from inline macros", async () => {
@@ -3382,6 +3430,93 @@ supersedes:REQ-042[]
       expect(out).to.not.include("REQ-042");
       expect(out).to.include("REQ-043");
       expect((ext as any).traceability.graph.getItem("REQ-042")).to.exist;
+    });
+
+    it("hides superseded tracer-role item blocks", async () => {
+      const ctx = createMockContext();
+      const ext = new AntoraTraceabilityExtension(ctx as any, {
+        config: { renderSuperseded: false },
+      });
+      await waitForInit();
+
+      const content = `
+[.tracer#REQ-042, item, role=requirement, title="Old"]
+--
+Old requirement.
+--
+
+[#REQ-043, item, role=requirement, title="New"]
+--
+New requirement.
+supersedes:REQ-042[]
+--
+`;
+      const file = {
+        src: { path: "test.adoc" },
+        contents: Buffer.from(content),
+      };
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [file] : [],
+        },
+      });
+
+      const output = file.contents.toString("utf8");
+      expect(output).to.not.include("REQ-042");
+      expect(output).to.include("REQ-043");
+      expect(ext.getTraceabilityExtension().graph.getItem("REQ-042")).to
+        .exist;
+    });
+
+    it("preserves tracer item examples in verbatim blocks", async () => {
+      const ctx = createMockContext();
+      const ext = new AntoraTraceabilityExtension(ctx as any, {
+        config: { renderSuperseded: false },
+      });
+      await waitForInit();
+
+      const example = `[.tracer#REQ-042, item, role=requirement, title="Example"]
+====
+Example only.
+====`;
+      const content = `
+[source,asciidoc]
+----
+${example}
+----
+
+[.tracer#REQ-042, item, role=requirement, title="Old"]
+--
+Old requirement.
+--
+
+[#REQ-043, item, role=requirement, title="New"]
+--
+New requirement.
+supersedes:REQ-042[]
+--
+`;
+      const file = {
+        src: { path: "test.adoc" },
+        contents: Buffer.from(content),
+      };
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [file] : [],
+        },
+      });
+
+      const output = file.contents.toString("utf8");
+      expect(output).to.include(example);
+      expect(
+        ext
+          .getTraceabilityExtension()
+          .graph.getItem("REQ-042")
+          ?.content,
+      ).to.equal("Old requirement.");
+      expect(output).to.not.include("Old requirement.");
     });
 
     it("hides superseded item blocks delimited by ==== fences", async () => {

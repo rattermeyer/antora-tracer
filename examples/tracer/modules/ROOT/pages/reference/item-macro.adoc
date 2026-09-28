@@ -25,6 +25,21 @@ Both `--` (open block) and `====` (example block) are valid delimiters for the i
 The choice is presentational — the parser treats them identically.
 This documentation uses `--`.
 
+To add a CSS class to the rendered item block, prefix the ID with the `.tracer` role:
+
+[source,asciidoc]
+----
+[.tracer#REQ-001, item, role=requirement, title="Title"]
+--
+Item content.
+--
+----
+
+This form is equivalent to `[#REQ-001, item, ...]` for parsing and traceability.
+Asciidoctor renders it with `id="REQ-001"` and the `tracer` CSS class, in addition to the configured item role class.
+For example, target the title in the HTML UI stylesheet with `.openblock.tracer > .title`.
+The `.tracer` role syntax is optional and does not change the `role` attribute used by the traceability configuration.
+
 == Attributes
 
 [width=100%, cols="25,10,65"]

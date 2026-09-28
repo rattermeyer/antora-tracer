@@ -20,7 +20,7 @@ const TEST_DIR = path.join(__dirname, "temp-lifecycle");
 // REQ-100 has no relationships at all → isolated.
 const SAMPLE = `= Test
 
-[#REQ-042, item, role=requirement, title="Old"]
+[.tracer#REQ-042, item, role=requirement, title="Old"]
 --
 Old requirement.
 --
@@ -73,7 +73,7 @@ describe("Item lifecycle (archive/remove)", () => {
         "utf8",
       );
       expect(superseded).to.include(
-        '[#REQ-042, item, role=requirement, title="Old"]',
+        '[.tracer#REQ-042, item, role=requirement, title="Old"]',
       );
       expect(superseded).to.include("Old requirement.");
     });

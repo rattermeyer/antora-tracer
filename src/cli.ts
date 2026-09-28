@@ -251,7 +251,7 @@ function extractItemBlock(
   const lines = content.split("\n");
   const headerIdx = sourceLine - 1;
   if (headerIdx < 0 || headerIdx >= lines.length) return null;
-  if (!/\[#[^,\]]+,\s*item,?/.test(lines[headerIdx])) return null;
+  if (!/\[(?:\.tracer)?#[^,\]]+,\s*item,?/.test(lines[headerIdx])) return null;
 
   let openIdx = -1;
   for (let i = headerIdx + 1; i < lines.length; i++) {

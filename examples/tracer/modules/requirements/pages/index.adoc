@@ -24,7 +24,7 @@ The system SHALL be implemented as an Antora extension, integrating via the Anto
 No Antora build pipeline modification or custom Antora fork SHALL be required.
 --
 
-[#CON-002, item, role=constraint, title="Source files are never modified"]
+[.tracer#CON-002, item, role=constraint, title="Source files are never modified"]
 --
 The system SHALL NOT modify any `.adoc` source file on disk at any point during processing.
 All content transformations (macro expansion, link substitution, title injection) SHALL operate exclusively on in-memory content buffers.

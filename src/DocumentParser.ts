@@ -152,12 +152,10 @@ export class DocumentParser {
     result: ParserResult,
     verbatimRanges: Array<{ start: number; end: number }>,
   ): void {
-    // Parse items with Asciidoctor native ID syntax: [#ID, item, role=XXX, title="..."]
-    // Only match at line start to avoid matching inline backtick references.
-    // Use a quote-aware scanner to find the closing ']' so that ']' inside
-    // quoted attribute values (e.g. title="traceability:outgoing[]") doesn't
-    // prematurely terminate the macro.
-    const itemStartRegex = /^[ \t]*\[#([^,\]]+),\s*item,?/gm;
+    // Recognize both native ID headers and ID headers with a tracer role.
+    // Only match at line start to avoid inline backtick references.
+    // Use a quote-aware scanner so ']' in a title doesn't end the header.
+    const itemStartRegex = /^[ \t]*\[(?:\.tracer)?#([^,\]]+),\s*item,?/gm;
     let match: RegExpExecArray | null;
 
     while ((match = itemStartRegex.exec(content)) !== null) {

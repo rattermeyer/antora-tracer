@@ -200,6 +200,33 @@ Content here
       expect(result.items[0].status).to.equal("approved");
     });
 
+    it("should parse tracer-role item headers like existing headers", () => {
+      const parser = new DocumentParser();
+      const existing = parser.parse(
+        `[#REQ-BASE, item, role=requirement]\n--\nBase\n--\n\n[#REQ-001, item, role=requirement, title="Example", status=approved]\n--\nItem body\naddresses:REQ-BASE[]\n--`,
+        "test.adoc",
+      );
+      const tracer = parser.parse(
+        `[.tracer#REQ-BASE, item, role=requirement]\n--\nBase\n--\n\n[.tracer#REQ-001, item, role=requirement, title="Example", status=approved]\n--\nItem body\naddresses:REQ-BASE[]\n--`,
+        "test.adoc",
+      );
+
+      expect(tracer.items).to.have.lengthOf(2);
+      expect(tracer.items[1]).to.include({
+        id: "REQ-001",
+        role: "requirement",
+        title: "REQ-001 — Example",
+        status: "approved",
+        content: "Item body\naddresses:REQ-BASE[]",
+      });
+      expect(tracer.items[1].attributes).to.deep.equal(
+        existing.items[1].attributes,
+      );
+      expect(tracer.relationships).to.deep.equal(existing.relationships);
+      expect(tracer.errors).to.deep.equal(existing.errors);
+      expect(tracer.warnings).to.deep.equal(existing.warnings);
+    });
+
     it("should parse multiple items", () => {
       const parser = new DocumentParser({});
       const content = `
@@ -448,7 +475,7 @@ Here is how to define an item:
 
 [source,asciidoc]
 ----
-[#REQ-001, item, role=requirement]
+[.tracer#REQ-001, item, role=requirement]
 ====
 User Authentication
 ====
