@@ -48,15 +48,37 @@ If the enclosing item has no outgoing relationships, then the `traceability:outg
 ---
 
 ### Requirement: Opt-in via AsciiDoc attribute
-The system SHALL only expand `traceability:outgoing[]` and `traceability:incoming[]` when the `:traceability-links:` document attribute is set to a truthy value.
+The system SHALL use the resolved `:traceability-links:` attribute to determine whether relationship links are rendered. When truthy, the system SHALL automatically render combined outgoing and incoming relationship links for each page item that has no explicit relationship-rendering macro. For page items, a page-header value overrides the component value. For items defined in partials, the partial component's value governs and an including page's header SHALL NOT override it. Explicit rendering macros SHALL expand without automatic output being added to that item. When the resolved attribute is absent or falsy, explicit relationship-rendering macros SHALL be stripped from rendered output and automatic links SHALL NOT be added.
 
-#### Scenario: Attribute set to true
-- **WHEN** `:traceability-links: true` is present in the document header
-- **THEN** `traceability:outgoing[]` and `traceability:incoming[]` macros are expanded
+#### Scenario: Attribute set to true renders automatic links
+- **WHEN** `:traceability-links: true` is resolved for a page containing items without relationship-rendering macros
+- **THEN** each such item renders its outgoing and incoming relationship links
+
+#### Scenario: Explicit rendering macro controls an item
+- **WHEN** link rendering is enabled and an item contains `traceability:links[]`, `traceability:outgoing[]`, or `traceability:incoming[]`
+- **THEN** the explicitly authored macro or macros are expanded
+- **AND** automatic combined output is not added to that item
+
+#### Scenario: Page attribute overrides component attribute for page items
+- **WHEN** a page-header `:traceability-links:` value differs from its component value
+- **THEN** automatic relationship rendering for items authored in the page follows the page-header value
+
+#### Scenario: Component setting governs items defined in partials
+- **WHEN** a partial defines an item and its component's `:traceability-links:` value is truthy
+- **THEN** that item's combined outgoing and incoming relationships render when the partial is included
+- **AND** the partial does not require its own attribute
+
+#### Scenario: Including page attribute does not override a partial's component setting
+- **WHEN** an including page's header value differs from the partial component's `:traceability-links:` value
+- **THEN** automatic rendering for items defined in the partial follows the partial component value
 
 #### Scenario: Attribute not set
-- **WHEN** `:traceability-links:` is not present in the document
-- **THEN** `traceability:outgoing[]` and `traceability:incoming[]` macros remain as literal text in the output
+- **WHEN** `:traceability-links:` is absent or resolves to false for a page item without an explicit rendering macro
+- **THEN** the system does not add automatic relationship links
+
+#### Scenario: Explicit macros are stripped when rendering is disabled
+- **WHEN** `:traceability-links:` is absent or falsy and an item contains an explicit relationship-rendering macro
+- **THEN** the system strips the macro from rendered output
 
 ---
 
