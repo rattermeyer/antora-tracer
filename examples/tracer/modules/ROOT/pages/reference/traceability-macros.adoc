@@ -118,7 +118,7 @@ When the resolved setting is absent or false, explicit relationship rendering ma
 
 | `:traceability-collapsible:`
 | `true`
-| Wrap output in collapsible `<details>` sections by relation type (HTML only)
+| In list style, wrap all relation-type groups in one `Links` disclosure, with headings inside (HTML only)
 |===
 
 === Superseded items

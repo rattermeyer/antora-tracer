@@ -1699,6 +1699,132 @@ foobar:REQ-001[]
       expect(file.contents.toString("utf8")).to.include("Foobar");
     });
 
+    it("wraps multiple outgoing relation groups in one Links disclosure", async () => {
+      const output = await renderDoc(`:traceability-links: true
+:traceability-collapsible: true
+
+[#ARC-001, item, role=design]
+--
+addresses:REQ-001[]
+validated_by:TEST-001[]
+traceability:outgoing[]
+--
+
+[#REQ-001, item, role=requirement]
+--
+Requirement.
+--
+
+[#TEST-001, item, role=test]
+--
+Test.
+--
+`);
+
+      const itemOutput = output.slice(
+        output.indexOf("[#ARC-001"),
+        output.indexOf("[#REQ-001"),
+      );
+      expect(itemOutput.match(/\[%collapsible\]/g) ?? []).to.have.lengthOf(1);
+      expect(itemOutput).to.include(".Links");
+      expect(itemOutput).to.include(".Addresses");
+      expect(itemOutput).to.include(".Validated by");
+    });
+
+    it("combines outgoing and incoming groups in one disclosure", async () => {
+      const output = await renderDoc(`:traceability-links: true
+:traceability-collapsible: true
+
+[#REQ-001, item, role=requirement]
+--
+depends_on:REQ-002[]
+traceability:links[]
+--
+
+[#REQ-002, item, role=requirement]
+--
+Requirement.
+--
+
+[#ARC-001, item, role=design]
+--
+addresses:REQ-001[]
+--
+`);
+      const itemOutput = output.slice(
+        output.indexOf("[#REQ-001"),
+        output.indexOf("[#REQ-002"),
+      );
+
+      expect(itemOutput.match(/\[%collapsible\]/g) ?? []).to.have.lengthOf(1);
+      expect(itemOutput).to.include(".Links");
+      expect(itemOutput).to.include(".Depends on");
+      expect(itemOutput).to.include(".Addressed by");
+      const html = String(asciidoctor().convert(output, { safe: "safe" }));
+      const htmlItem = html.slice(
+        html.indexOf('id="REQ-001"'),
+        html.indexOf('id="REQ-002"'),
+      );
+      expect(htmlItem.match(/<details>/g) ?? []).to.have.lengthOf(1);
+      expect(htmlItem).to.include('<summary class="title">Links</summary>');
+      expect(htmlItem).to.include('<div class="title">Depends on</div>');
+      expect(htmlItem).to.include('<div class="title">Addressed by</div>');
+    });
+
+    it("does not rescan macro-like text in generated relation titles", async () => {
+      const output = await renderDoc(`:traceability-links: true
+:traceability-collapsible: true
+
+[#SRC-001, item, role=design]
+--
+addresses:REQ-044[]
+tracer:links[]
+--
+
+[#REQ-044, item, role=requirement, title="tracer:incoming[] macro"]
+--
+Requirement.
+--
+`);
+      const itemOutput = output.slice(
+        output.indexOf("[#SRC-001"),
+        output.indexOf("[#REQ-044"),
+      );
+      const html = String(asciidoctor().convert(output, { safe: "safe" }));
+      const htmlItem = html.slice(
+        html.indexOf('id="SRC-001"'),
+        html.indexOf('id="REQ-044"'),
+      );
+
+      expect(itemOutput.match(/\[%collapsible\]/g) ?? []).to.have.lengthOf(1);
+      expect(htmlItem.match(/<details>/g) ?? []).to.have.lengthOf(1);
+      expect(htmlItem).to.include('<div class="title">Addresses</div>');
+      expect(htmlItem).to.not.include("Addressed by");
+    });
+
+    it("renders incoming-only groups inside one Links disclosure", async () => {
+      const output = await renderDoc(`:traceability-links: true
+:traceability-collapsible: true
+
+[#REQ-001, item, role=requirement]
+--
+traceability:incoming[]
+--
+
+[#ARC-001, item, role=design]
+--
+addresses:REQ-001[]
+--
+`);
+      const itemOutput = output.slice(
+        output.indexOf("[#REQ-001"),
+        output.indexOf("[#ARC-001"),
+      );
+      expect(itemOutput.match(/\[%collapsible\]/g) ?? []).to.have.lengthOf(1);
+      expect(itemOutput).to.include(".Links");
+      expect(itemOutput).to.include(".Addressed by");
+    });
+
     it("should wrap output in [%collapsible] when attribute is true", async () => {
       const ctx = createMockContext({
         playbook: { output: { dir: tempDir }, extensions: [] },

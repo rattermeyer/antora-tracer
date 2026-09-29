@@ -75,6 +75,10 @@ The system SHALL support the same sort orders for `traceability:incoming[]` as f
 ### Requirement: Incoming groups use the reverse relation type
 The system SHALL group incoming relationships in `traceability:incoming[]` by the reverse relation type — the declared `reverse` of the relationship's type — so each group heading names the relation from the target item's perspective.
 
+#### Scenario: Incoming relation uses its declared reverse type
+- **WHEN** an item has an incoming relationship whose declared reverse type is `addresses`
+- **THEN** the incoming macro groups the source item under the `Addresses` heading
+
 ### Requirement: Incoming macro PDF compatibility
 The generated output from `traceability:incoming[]` SHALL be standard AsciiDoc constructs — not raw HTML — ensuring compatibility with both HTML and PDF backends.
 
@@ -97,11 +101,12 @@ The system SHALL NOT modify the `.adoc` source file on disk when expanding `trac
 ---
 
 ### Requirement: Incoming macro supports collapsible output
-The system SHALL apply the same `:traceability-collapsible:` document attribute to `traceability:incoming[]` output as it does for `traceability:outgoing[]`. When enabled, each inverse relation-type group in list-style incoming output SHALL be wrapped in a `[%collapsible]` block.
+The system SHALL apply the same `:traceability-collapsible:` document attribute to `traceability:incoming[]` list-style output as for outgoing links. Incoming groups SHALL be included inside the item's single `Links` collapsible block, shared with outgoing groups when present, and SHALL retain their inverse relation-type headings.
 
 #### Scenario: Collapsible enabled for incoming macro
 - **WHEN** `:traceability-collapsible: true` and an item block contains `traceability:incoming[]`
-- **THEN** each incoming relation-type group renders as a `[%collapsible]` block with the inverse type label as the title
+- **THEN** incoming relation-type groups render inside the item's single `[%collapsible]` block titled `Links`
+- **AND** each group uses the inverse relation label as its heading
 
 #### Scenario: Collapsible disabled for incoming macro
 - **WHEN** `:traceability-collapsible:` is absent and an item block contains `traceability:incoming[]`

@@ -9,6 +9,10 @@ Renders outgoing, incoming, and combined relationships inside item blocks via `t
 ### Requirement: traceability:outgoing[] macro renders outgoing links
 The system SHALL provide a `traceability:outgoing[]` macro (formerly `traceability:links[]`) that expands to a formatted list of all outgoing relationships for the enclosing item.
 
+#### Scenario: Macro expands links declared in the enclosing item
+- **WHEN** an item contains `traceability:outgoing[]` and declares outgoing relationships
+- **THEN** the macro renders its outgoing relationship groups with clickable links to the related items
+
 ### Requirement: Empty-state message when item has no outgoing relationships
 If the enclosing item has no outgoing relationships, then the `traceability:outgoing[]` macro SHALL render a configurable empty-state message controlled by the `:traceability-empty:` document attribute.
 
@@ -137,11 +141,12 @@ The system SHALL NOT modify the `.adoc` source file on disk when expanding `trac
 ---
 
 ### Requirement: Collapsible list-style output via document attribute
-The system SHALL support a `:traceability-collapsible:` document attribute that, when set to a truthy value, wraps each relation-type group in list-style output in a `[%collapsible]` AsciiDoc block.
+The system SHALL support a `:traceability-collapsible:` document attribute that, when truthy with list style, wraps all relation-type groups rendered for an item in one `[%collapsible]` AsciiDoc block titled `Links`. Each relation type SHALL remain a heading above its related links inside the block.
 
 #### Scenario: Collapsible enabled
 - **WHEN** `:traceability-collapsible: true` and `:traceability-style: list` (or default)
-- **THEN** each relation-type group renders as a `[%collapsible]` block with the relation type as the title and the links as the block body
+- **THEN** all relationship groups rendered for the item appear inside one `[%collapsible]` block titled `Links`
+- **AND** each relation-type group retains its heading and links
 
 #### Scenario: Collapsible disabled (default)
 - **WHEN** `:traceability-collapsible:` is absent or set to a non-truthy value

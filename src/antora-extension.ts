@@ -427,7 +427,7 @@ export class AntoraTraceabilityExtension {
    * kinds share the same scan/expand/replace pipeline and differ only in
    * which relationship directions they render.
    */
-  private expandRelationMacros(file: any, macroName: RelationMacro): void {
+  private expandRelationMacros(file: any): void {
     if (!this.traceability) return;
     try {
       const contentsBuffer = file.contents || file.src?.contents;
@@ -436,9 +436,9 @@ export class AntoraTraceabilityExtension {
       const docAttrs = this.resolveDocAttributes(file, content);
       const linksEnabled = this.isLinksEnabled(docAttrs);
       const hasMacro = RENDERING_MACRO_NAMESPACES.some((ns) =>
-        content.includes(`${ns}:${macroName}[]`),
+        new RegExp(`${ns}:(?:links|outgoing|incoming)\\[\\]`).test(content),
       );
-      if (!hasMacro && (macroName !== "links" || !linksEnabled)) return;
+      if (!hasMacro && !linksEnabled) return;
 
       const style = this.getLinksStyle(docAttrs);
       const order = this.getLinksOrder(docAttrs);
@@ -452,7 +452,7 @@ export class AntoraTraceabilityExtension {
         [];
       const blocks = this.findItemBlocks(content);
       const explicitMacroRegex = new RegExp(
-        `${RENDERING_MACRO_NS}:(links|outgoing|incoming)\\[\\]`,
+        `(${RENDERING_MACRO_NS}):(links|outgoing|incoming)\\[\\]`,
         "g",
       );
 
@@ -466,8 +466,7 @@ export class AntoraTraceabilityExtension {
         while ((macroMatch = explicitMacroRegex.exec(bodyContent)) !== null) {
           if (this.isInsideRange(macroMatch.index, bodyRanges)) continue;
           hasExplicitMacro = true;
-          if (macroMatch[1] !== macroName) continue;
-
+          const macroName = macroMatch[2] as RelationMacro;
           const macroStart = bodyStart + macroMatch.index;
           const macroEnd = macroStart + macroMatch[0].length;
           replacements.push({
@@ -489,7 +488,7 @@ export class AntoraTraceabilityExtension {
           });
         }
 
-        if (macroName === "links" && linksEnabled && !hasExplicitMacro) {
+        if (linksEnabled && !hasExplicitMacro) {
           replacements.push({
             start: bodyEnd,
             end: bodyEnd,
@@ -523,7 +522,7 @@ export class AntoraTraceabilityExtension {
       }
     } catch (error: any) {
       this.logger.warn(
-        `Error expanding ${macroName} links in ${file.src?.path}: ${error.message}`,
+        `Error expanding relationship links in ${file.src?.path}: ${error.message}`,
       );
     }
   }
@@ -547,29 +546,51 @@ export class AntoraTraceabilityExtension {
   ): string {
     const directions: RelationDirection[] =
       macroName === "links" ? ["outgoing", "incoming"] : [macroName];
-
+    const combineGroups = collapsible && style === "list" && macroName === "links";
+    const combinedGroups: Array<[string, RelItem[]]> = [];
     const parts: string[] = [];
+    let combinedOutputIndex = -1;
+
     for (const direction of directions) {
       const groups = this.buildRelationGroups(itemId, direction, order);
       if (groups.length > 0) {
-        parts.push(
-          this.generateLinksAsciiDoc(
-            groups,
-            style,
-            currentFile,
-            collapsible,
-            currentComponent,
-            currentModule,
-          ),
-        );
+        if (combineGroups) {
+          if (combinedOutputIndex === -1) {
+            combinedOutputIndex = parts.length;
+            parts.push("");
+          }
+          combinedGroups.push(...groups);
+        } else {
+          parts.push(
+            this.generateLinksAsciiDoc(
+              groups,
+              style,
+              currentFile,
+              collapsible,
+              currentComponent,
+              currentModule,
+            ),
+          );
+        }
       } else if (emptyStyle !== "none") {
         const msg = `No ${direction} relationships.`;
-        if (emptyStyle === "admonition") {
-          parts.push(`\n[NOTE]\n====\n${msg}\n====\n`);
-        } else {
-          parts.push(`\n_${msg}_\n`);
-        }
+        parts.push(
+          emptyStyle === "admonition"
+            ? `\n[NOTE]\n====\n${msg}\n====\n`
+            : `\n_${msg}_\n`,
+        );
       }
+    }
+
+    if (combinedOutputIndex !== -1) {
+      parts[combinedOutputIndex] = this.generateLinksAsciiDoc(
+        combinedGroups,
+        style,
+        currentFile,
+        true,
+        currentComponent,
+        currentModule,
+      );
     }
     return parts.join("");
   }
@@ -738,16 +759,11 @@ export class AntoraTraceabilityExtension {
     currentComponent?: string,
     currentModule?: string,
   ): string {
-    const lines: string[] = [];
+    const lines: string[] = collapsible
+      ? ["\n[%collapsible]", ".Links", "===="]
+      : [];
     for (const [relType, items] of grouped) {
-      const title = this.displayLabel(relType);
-      if (collapsible) {
-        lines.push(`\n[%collapsible]`);
-        lines.push(`.${title}`);
-        lines.push(`====`);
-      } else {
-        lines.push(`\n.${title}`);
-      }
+      lines.push("", `.${this.displayLabel(relType)}`);
       for (const item of items) {
         const safeTitle = item.title
           .replace(/&/g, "&amp;")
@@ -757,10 +773,8 @@ export class AntoraTraceabilityExtension {
           `* ${this.buildXref(item, currentFile, safeTitle, currentComponent, currentModule)}`,
         );
       }
-      if (collapsible) {
-        lines.push(`====`);
-      }
     }
+    if (collapsible) lines.push("====");
     return `${lines.join("\n")}\n`;
   }
 
@@ -1340,9 +1354,7 @@ export class AntoraTraceabilityExtension {
 
         // Expand macros on pages
         for (const file of pageFilesForVersion) {
-          this.expandRelationMacros(file, "links");
-          this.expandRelationMacros(file, "outgoing");
-          this.expandRelationMacros(file, "incoming");
+          this.expandRelationMacros(file);
           this.expandGraphMacros(file);
           this.expandCoverageMacros(file);
           this.expandConfigGraphMacros(file);
@@ -1352,9 +1364,7 @@ export class AntoraTraceabilityExtension {
         // links/graph to enabled (partials have no doc attributes of their own)
         for (const file of partialFilesForVersion) {
           (file as any).__isPartial = true;
-          this.expandRelationMacros(file, "links");
-          this.expandRelationMacros(file, "outgoing");
-          this.expandRelationMacros(file, "incoming");
+          this.expandRelationMacros(file);
           this.expandGraphMacros(file);
           this.expandCoverageMacros(file);
           this.expandConfigGraphMacros(file);
