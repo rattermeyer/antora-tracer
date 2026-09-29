@@ -1,8 +1,6 @@
 = Architecture
 :keywords: antora, traceability, architecture, arc42, components, graph, parser
 :traceability-graph: true
-:traceability-style: list
-:traceability-order: target-id
 :arc42-sections: 1,4,5,6,8,9
 
 This document describes the architecture of the Antora Tracer extension using selected arc42 sections.
@@ -139,7 +137,7 @@ include::example$config-resolution.puml[]
 | `DocumentParser` uses roles only. `TraceabilityGraph` uses roles + relations for `addRelationship()` validation. `MatrixGenerator` reads matrix definitions. `Neo4jExporter` reads named Cypher queries. Each consumer queries independently through `ConfigLoader` — no shared mutable state.
 |===
 
-[#ARC-018, item, role=design, title="Config-driven validation"]
+[#ARC-018, item, role=design, title="Config-driven validation", addresses="REQ-221, REQ-222, QA-056, QA-057"]
 --
 Relation validation is driven by the YAML configuration rather than hardcoded
 rules. `ConfigLoader.isRelationAllowed()` checks source role, target role
@@ -149,11 +147,6 @@ references are re-validated after all files are loaded to catch late-resolved
 targets.
 Error messages include file path, line number, and allowed
 alternatives (see xref:explanation/adr/0004-zero-framework.adoc[ADR-004]).
-
-addresses:REQ-221[]
-addresses:REQ-222[]
-addresses:QA-056[]
-addresses:QA-057[]
 
 tracer:links[]
 --
@@ -174,7 +167,7 @@ addresses:REQ-224[]
 tracer:links[]
 --
 
-[#ARC-028, item, role=design, title="Circular reference detection in graph validation"]
+[#ARC-028, item, role=design, title="Circular reference detection in graph validation", addresses="REQ-109"]
 --
 The `validate()` method calls `findCircularReferences()`, a DFS-based cycle
 detector that traverses all items and their outgoing relationships.
@@ -185,7 +178,6 @@ same path, a circular reference error is reported with the full cycle path
 Auto-generated inverse relationships
 are skipped to avoid false positives.
 
-addresses:REQ-109[]
 tracer:links[]
 --
 
@@ -214,7 +206,7 @@ tracer:links[]
 
 === TraceabilityGraph
 
-[#ARC-015, item, role=design, title="In-memory processing with no side effects"]
+[#ARC-015, item, role=design, title="In-memory processing with no side effects", addresses="QA-058"]
 --
 All content transformations — parsing, macro expansion, link substitution
 title injection — operate on in-memory buffers.
@@ -232,7 +224,6 @@ The graph has a well-defined lifecycle — understanding which operations are va
 include::example$graph-lifecycle.puml[]
 ----
 
-addresses:QA-058[]
 tracer:links[]
 --
 
@@ -255,7 +246,7 @@ addresses:REQ-160[]
 tracer:links[]
 --
 
-[#ARC-035, item, role=design, title="Relation reverse declaration and canonical storage"]
+[#ARC-035, item, role=design, title="Relation reverse declaration and canonical storage", addresses="REQ-219, REQ-220, REQ-175, REQ-176, REQ-177, REQ-178"]
 --
 The `relations` map is keyed as `sourceRole → targetRole → type → { reverse }`, each relation type declaring its authorable reverse name.
 `TraceabilityGraph.addRelationship()` canonicalizes a reverse-authored edge to the primary direction — authoring `is_derived_from` from a requirement stores `UC → REQ : leads_to`.
@@ -263,13 +254,6 @@ A reverse edge whose target is defined in a later file is stored in its authored
 Authoring the same logical edge from both sides deduplicates into one `bidirectional` edge driven by the `reverse` declaration.
 `ConfigLoader.isRelationAllowed()` derives the reverse direction, so the reverse type is allowed without a second `relations` entry.
 See xref:explanation/adr/0015-deferred-canonicalization.adoc[ADR-015].
-
-addresses:REQ-219[]
-addresses:REQ-220[]
-addresses:REQ-175[]
-addresses:REQ-176[]
-addresses:REQ-177[]
-addresses:REQ-178[]
 
 tracer:links[]
 --
@@ -297,23 +281,13 @@ addresses:REQ-211[]
 tracer:links[]
 --
 
-[#ARC-040, item, role=design, title="Graph diff"]
+[#ARC-040, item, role=design, title="Graph diff", addresses="REQ-212, REQ-213, REQ-214, REQ-225, REQ-226, REQ-216, REQ-217, REQ-263, REQ-264"]
 --
 `GraphDiff.diffGraphs(prev, next)` compares two graph snapshots by component-qualified item identity (component + version, when present, then ID), classifying each item as added, removed, or modified without hardcoding any role name.
 Items without a component fall back to bare ID, so the single-repo CLI `diff` path is unchanged.
 A surviving item is `modified` when a compared field (`title`, `content`, `role`, `status`, or `attributes`) differs, and relationship deltas are reported only between surviving items, except `supersedes` history links.
 `diffSnapshots()` diffs two loaded `GraphSnapshot` JSON artifacts at the data level, so snapshots can be diffed without reconstructing a graph.
 See xref:explanation/adr/0010-identity-first-graph-diff.adoc[ADR-010].
-
-addresses:REQ-212[]
-addresses:REQ-213[]
-addresses:REQ-214[]
-addresses:REQ-225[]
-addresses:REQ-226[]
-addresses:REQ-216[]
-addresses:REQ-217[]
-addresses:REQ-263[]
-addresses:REQ-264[]
 
 tracer:links[]
 --
@@ -331,18 +305,11 @@ addresses:REQ-262[]
 tracer:links[]
 --
 
-[#ARC-047, item, role=design, title="Role-based authoring guidance"]
+[#ARC-047, item, role=design, title="Role-based authoring guidance", addresses="REQ-265, REQ-266, REQ-267, REQ-268, REQ-269, REQ-270"]
 --
 Per-role authoring guidance is config data, not hardcoded: the `roleGuidance` config section maps a role to an AsciiDoc `page` and an optional `idPrefix`, merging through the preset `extends` chain so a project can override a preset's page per role.
 The `role-guidance` CLI command resolves and reports the page and prefix, and the bundled `write-item` skill consumes it when authoring an item.
 At build time, `resolveGuidanceEntries()` renders each resolved page to HTML and registers it as `traceability/guidance/<role>.html` in the content catalog (same attachment mechanism as matrices), so guidance renders in the consuming site without the project copying pages into its own content sources.
-
-addresses:REQ-265[]
-addresses:REQ-266[]
-addresses:REQ-267[]
-addresses:REQ-268[]
-addresses:REQ-269[]
-addresses:REQ-270[]
 
 tracer:links[]
 --
@@ -361,7 +328,7 @@ tracer:links[]
 
 === AntoraTraceabilityExtension
 
-[#ARC-016, item, role=design, title="Event-driven Antora integration"]
+[#ARC-016, item, role=design, title="Event-driven Antora integration", addresses="REQ-249, QA-055"]
 --
 The extension hooks into Antora's event pipeline via `register()`:
 `contentClassified` triggers parsing, macro expansion, and matrix
@@ -373,8 +340,6 @@ parameter.
 The same `RequirementsTraceabilityExtension` class is used by
 the CLI outside Antora, demonstrating the event handlers are optional.
 
-addresses:REQ-249[]
-addresses:QA-055[]
 tracer:links[]
 --
 
@@ -391,12 +356,10 @@ addresses:REQ-232[]
 tracer:links[]
 --
 
-[#ARC-043, item, role=design, title="Display-only superseded render toggle"]
+[#ARC-043, item, role=design, title="Display-only superseded render toggle", addresses="REQ-233"]
 --
 `renderSuperseded` (default true) is a display-only toggle: when false, `stripSupersededBlocks()` removes superseded item blocks during the `contentClassified` pass before macro substitution.
 The graph and matrices are unaffected — superseded items remain in the graph for link resolution and are still omitted from current matrices.
-
-addresses:REQ-233[]
 
 tracer:links[]
 --
@@ -411,7 +374,7 @@ addresses:REQ-239[]
 tracer:links[]
 --
 
-[#ARC-024, item, role=design, title="tracer:links[] and tracer:incoming[] link rendering"]
+[#ARC-024, item, role=design, title="tracer:links[] and tracer:incoming[] link rendering", addresses="REQ-044, REQ-045, REQ-047, REQ-048, REQ-055, REQ-064, REQ-065, REQ-066, REQ-067, REQ-070, REQ-100, REQ-102, REQ-104, QA-060"]
 --
 The `expandRelationMacros()` method in the Antora extension (not the
 DocumentParser) replaces `tracer:links[]` and
@@ -429,24 +392,9 @@ Display style (list, table
 inline), sort order (target ID, title, relation type), and collapsible
 sections are configurable via document attributes.
 Inline relationship
-macros (``) are always stripped from output — they are
+macros (`addresses:REQ-001[]`) are always stripped from output — they are
 pure data markers; the link macros are the sole rendering mechanism.
 
-addresses:REQ-044[]
-addresses:REQ-045[]
-
-addresses:REQ-047[]
-addresses:REQ-048[]
-addresses:REQ-055[]
-addresses:REQ-064[]
-addresses:REQ-065[]
-addresses:REQ-066[]
-addresses:REQ-067[]
-addresses:REQ-070[]
-addresses:REQ-100[]
-addresses:REQ-102[]
-addresses:REQ-104[]
-addresses:QA-060[]
 tracer:links[]
 --
 
@@ -463,7 +411,7 @@ addresses:REQ-162[]
 tracer:links[]
 --
 
-[#ARC-025, item, role=design, title="tracer:graph[], tracer:graph-coverage[], and tracer:config-graph[] visualization macros"]
+[#ARC-025, item, role=design, title="tracer:graph[], tracer:graph-coverage[], and tracer:config-graph[] visualization macros", addresses="REQ-051, REQ-052, REQ-063, REQ-159"]
 --
 The `expandGraphMacros()`, `expandCoverageMacros()`, and `expandConfigGraphMacros()` methods replace
 `tracer:graph[]`, `tracer:graph-coverage[]`, and `tracer:config-graph[]` placeholders with
@@ -475,10 +423,6 @@ Vega-Lite bar chart showing per-item or global coverage.
 Rendering is opt-in
 via the `:traceability-graph:` document attribute.
 
-addresses:REQ-051[]
-addresses:REQ-052[]
-addresses:REQ-063[]
-addresses:REQ-159[]
 tracer:links[]
 --
 
@@ -511,7 +455,7 @@ tracer:links[]
 
 === DocumentParser
 
-[#ARC-017, item, role=design, title="Regex-based parsing"]
+[#ARC-017, item, role=design, title="Regex-based parsing", addresses="REQ-087, REQ-088, REQ-090, REQ-091, REQ-092"]
 --
 AsciiDoc content is parsed using regular expressions rather than an
 Asciidoctor AST walker.
@@ -531,11 +475,6 @@ The parser's internal pipeline has four distinct steps — each builds on the pr
 include::example$parser-flow.puml[]
 ----
 
-addresses:REQ-087[]
-addresses:REQ-088[]
-addresses:REQ-090[]
-addresses:REQ-091[]
-addresses:REQ-092[]
 tracer:links[]
 --
 
@@ -559,16 +498,12 @@ addresses:REQ-086[]
 tracer:links[]
 --
 
-[#ARC-038, item, role=design, title="Matrix status column"]
+[#ARC-038, item, role=design, title="Matrix status column", addresses="REQ-167, REQ-168, REQ-169"]
 --
 The HTML matrix renders a single per-row status column with values `done`, `partial`, and `missing`, derived from the row's column coverage.
 The per-row coverage percentage is no longer rendered as a separate column.
 The top coverage summary (done/partial/missing counts plus overall percentage) is preserved.
 CSV output is unchanged.
-
-addresses:REQ-167[]
-addresses:REQ-168[]
-addresses:REQ-169[]
 
 tracer:links[]
 --
@@ -626,7 +561,7 @@ tracer:links[]
 
 === CLI Tool
 
-[#ARC-023, item, role=design, title="Commander-based CLI with subcommands"]
+[#ARC-023, item, role=design, title="Commander-based CLI with subcommands", addresses="REQ-056, REQ-280"]
 --
 The CLI is built on https://www.npmjs.com/package/commander[Commander] with
 subcommands for processing (`process`), matrix generation (`matrix`)
@@ -640,8 +575,6 @@ Global `--config` and `--preset` flags apply to all commands.
 The CLI
 operates standalone — it does not require an Antora build pipeline.
 
-addresses:REQ-056[]
-addresses:REQ-280[]
 tracer:links[]
 --
 
@@ -661,7 +594,7 @@ tracer:links[]
 
 === ID Allocation Server
 
-[#ARC-048, item, role=design, title="Shared monotonic ID allocator"]
+[#ARC-048, item, role=design, title="Shared monotonic ID allocator", addresses="REQ-284, REQ-276, REQ-285"]
 --
 *Shared monotonic ID allocator*
 
@@ -675,10 +608,6 @@ The `seed` command exports the server's per-prefix `start` values so an existing
 Projects (tenants) are persisted in the server's SQLite store and managed at runtime through an admin API gated by an `adminToken`, with project tokens stored hashed.
 
 Each prefix's `start` and `width` resolve per `(tenant, prefix)` via an opt-in `tenantPrefixes` override, falling back to the global `prefixes` block, so an operator can give two tenants non-overlapping `start` ranges for the same prefix (see xref:explanation/adr/0016-tenant-scoped-id-prefix-settings.adoc[ADR-016]).
-
-addresses:REQ-284[]
-addresses:REQ-276[]
-addresses:REQ-285[]
 
 tracer:links[]
 --
@@ -714,7 +643,7 @@ addresses:REQ-099[]
 tracer:links[]
 --
 
-[#ARC-031, item, role=design, title="Static landing page at GitHub Pages root"]
+[#ARC-031, item, role=design, title="Static landing page at GitHub Pages root", addresses="REQ-072, REQ-073, REQ-074, REQ-075, REQ-076, REQ-077, REQ-078"]
 --
 A static `landing/index.html` page with Tailwind CSS loaded from CDN
 serves as the project landing page at the GitHub Pages root (`/`).
@@ -728,13 +657,6 @@ The CI workflow copies
 No build step,
 npm dependencies, or static site generator required.
 
-addresses:REQ-072[]
-addresses:REQ-073[]
-addresses:REQ-074[]
-addresses:REQ-075[]
-addresses:REQ-076[]
-addresses:REQ-077[]
-addresses:REQ-078[]
 tracer:links[]
 --
 
@@ -760,7 +682,7 @@ addresses:REQ-082[]
 tracer:links[]
 --
 
-[#ARC-033, item, role=design, title="Example site: config extension and dashboard patterns"]
+[#ARC-033, item, role=design, title="Example site: config extension and dashboard patterns", addresses="REQ-054, REQ-105, REQ-106, REQ-107"]
 --
 The example site demonstrates two architectural patterns.
 First, config
@@ -774,10 +696,6 @@ gated by the `:traceability-graph:` document attribute.
 Both patterns serve as
 reference implementations for users extending the extension to their own domains.
 
-addresses:REQ-054[]
-addresses:REQ-105[]
-addresses:REQ-106[]
-addresses:REQ-107[]
 tracer:links[]
 --
 
@@ -898,7 +816,7 @@ tracer:links[]
 
 == Concepts — Cross-cutting Concerns
 
-[#ARC-013, item, role=design, title="ESM module system"]
+[#ARC-013, item, role=design, title="ESM module system", addresses="QA-055"]
 --
 ESM (`"type": "module"` in package.json) is used throughout the project.
 This
@@ -908,7 +826,6 @@ The tradeoff is that Antora's
 extension loader uses `require()`, requiring `.cjs` wrappers for integration
 points (see xref:explanation/adr/0001-esm-over-cjs.adoc[ADR-001]).
 
-addresses:QA-055[]
 tracer:links[]
 --
 
