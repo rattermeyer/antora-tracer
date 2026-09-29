@@ -2,6 +2,18 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.26.0] — 2026-09-29
+
+### Added
+- Relationship links can be declared in item headers with configured relation-type attributes and comma- or whitespace-separated targets.
+- Enabled items render outgoing and incoming relationship lists automatically, while explicit macros retain directional and placement control.
+- Collapsible relationship lists group relation types inside one `Links` disclosure.
+- The `query linked` command finds items reachable by role, and shell completion is available for Bash, Zsh, and Fish.
+
+### Fixed
+- Inline relationship macros are stripped when documentation contains an empty backtick span.
+- Remote `next-id` defers allocator token resolution until it needs the token, allowing unrelated operations to load the config without it.
+
 ## [0.25.0] — 2026-09-22
 
 ### Added
