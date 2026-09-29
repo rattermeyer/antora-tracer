@@ -1899,8 +1899,9 @@ export class AntoraTraceabilityExtension {
     content: string,
   ): Array<{ start: number; end: number }> {
     const ranges: Array<{ start: number; end: number }> = [];
-    // Match single-backtick spans: `content`
-    const btRe = /`([^`]+)`/g;
+    // Match backtick code spans, including the empty `` form, so a stray
+    // empty span doesn't mis-pair the next backtick and swallow content.
+    const btRe = /`[^`]*`/g;
     let m: RegExpExecArray | null;
     while ((m = btRe.exec(content)) !== null) {
       ranges.push({ start: m.index, end: m.index + m[0].length });

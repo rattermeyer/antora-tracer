@@ -20,14 +20,16 @@ import {
   rmSync,
   writeFileSync,
 } from "node:fs";
+import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createRequire } from "node:module";
 import type asciidoctorFactory from "@asciidoctor/core";
 import { expect } from "chai";
 import { AntoraTraceabilityExtension } from "../src/antora-extension.js";
-const asciidoctor = createRequire(import.meta.url)("@asciidoctor/core") as () =>
-  asciidoctorFactory.Asciidoctor;
+
+const asciidoctor = createRequire(import.meta.url)(
+  "@asciidoctor/core",
+) as () => asciidoctorFactory.Asciidoctor;
 
 // ============================================================================
 // Helper Types
@@ -323,8 +325,7 @@ traceability:outgoing[]
 
       const output = file.contents.toString("utf8");
       const html = asciidoctor().convert(output, { safe: "safe" });
-      expect(ext.getTraceabilityExtension().graph.getItem("DES-001")).to
-        .exist;
+      expect(ext.getTraceabilityExtension().graph.getItem("DES-001")).to.exist;
       expect(output).to.not.include("traceability:outgoing[]");
       expect(html).to.include('id="REQ-BASE"');
       expect(html).to.include('id="DES-001"');
@@ -2050,7 +2051,7 @@ traceability:links[]
       const design = itemBody("#ARC-001", "#TEST-001");
       const test = output.slice(output.indexOf("[#TEST-001"));
 
-      expect((requirement.match(/xref:#ARC-001/g) ?? [])).to.have.lengthOf(1);
+      expect(requirement.match(/xref:#ARC-001/g) ?? []).to.have.lengthOf(1);
       expect(requirement).to.not.include("xref:#TEST-001");
       expect(design.match(/Addressed by/g) ?? []).to.have.lengthOf(1);
       expect(design).to.not.include("* Addresses");
@@ -2193,6 +2194,18 @@ Description.
       });
       return file.contents.toString("utf8");
     }
+
+    it("strips inline relationship macros after an empty backtick span", async () => {
+      const content =
+        ":traceability-links: true\n\n" +
+        '[#REQ-001, item, role=requirement, title="Orphan"]\n--\n' +
+        "An empty code span `` precedes this line.\n\n" +
+        "addresses:REQ-002[]\n\ntraceability:links[]\n--\n\n" +
+        '[#REQ-002, item, role=requirement, title="Target"]\n--\nTarget.\n--\n';
+      const out = await renderDoc(content);
+      expect(out).to.not.include("addresses:REQ-002[]");
+      expect(out).to.include("REQ-002");
+    });
 
     it("should render italic empty message for outgoing[] with no relationships", async () => {
       const out = await renderDoc(`:traceability-links: true
@@ -2864,6 +2877,101 @@ The system shall authenticate users.
       expect(matrixFiles[0].src.version).to.equal("1.0.0");
       expect(matrixFiles[0].src.module).to.equal("ROOT");
       expect(matrixFiles[0].contents).to.be.instanceOf(Buffer);
+    });
+    it("loads configured matrices without the allocator token and resolves their attachments", async () => {
+      const dir = mkdtempSync(join(tmpdir(), "matrix-config-reg-"));
+      const configYml = join(dir, "traceability.yml");
+      const originalToken = process.env.TRACER_ID_TOKEN;
+      delete process.env.TRACER_ID_TOKEN;
+      writeFileSync(
+        configYml,
+        [
+          "extends: requirements-engineering",
+          "roles: [requirement]",
+          "matrices:",
+          "  - name: requirements-to-tests",
+          "    rows: requirement",
+          "    columns: [test]",
+          "idAllocation:",
+          "  endpoint: https://ids.example.com",
+          `  token: \${TRACER_ID_TOKEN}`,
+        ].join("\n"),
+      );
+
+      const addedFiles: any[] = [];
+      const Vinyl = createRequire(import.meta.url)("vinyl");
+      const page = new Vinyl({
+        path: "modules/ROOT/pages/index.adoc",
+        contents: Buffer.from(
+          "= Index\n\n[#REQ-001, item, role=requirement]\n====\nRequired.\n====\n\nxref:attachment$traceability/matrix-requirements-to-tests.html[Matrix]\n",
+        ),
+      });
+      page.src = {
+        relative: "index.adoc",
+        basename: "index.adoc",
+        stem: "index",
+        extname: ".adoc",
+        module: "ROOT",
+        component: "test-component",
+        version: "1.0.0",
+        family: "page",
+      };
+      page.src.path = "modules/ROOT/pages/index.adoc";
+      const contentCatalog = {
+        findBy: ({ family }: { family: string }) =>
+          family === "page" ? [page] : [],
+        getById: () => undefined,
+        addFile: (file: any) => {
+          addedFiles.push(file);
+          return file;
+        },
+      };
+      const ctx = createMockContext({
+        playbook: { output: { dir, extensions: [] } },
+      });
+
+      try {
+        const ext = new AntoraTraceabilityExtension(ctx as any, {
+          config: { configPath: configYml },
+        });
+        await waitForInit();
+        ctx.fireEvent("contentClassified", { contentCatalog });
+
+        expect(
+          ext.getTraceabilityExtension().getMatrixDefinitions(),
+        ).to.deep.include({
+          name: "requirements-to-tests",
+          rows: "requirement",
+          columns: ["test"],
+        });
+        const matrix = addedFiles.find(
+          (file) =>
+            file.src?.family === "attachment" &&
+            file.src?.relative ===
+              "traceability/matrix-requirements-to-tests.html",
+        );
+        expect(matrix).to.exist;
+        const ContentCatalog = createRequire(import.meta.url)(
+          "@antora/content-classifier/content-catalog",
+        );
+        const catalog = new ContentCatalog();
+        catalog.registerComponentVersion("test-component", "1.0.0");
+        catalog.addFile(page);
+        catalog.addFile(matrix);
+        const loadAsciiDoc = createRequire(import.meta.url)(
+          "@antora/asciidoc-loader",
+        );
+        const resolved = loadAsciiDoc(page, catalog).convert();
+        expect(resolved).to.include('class="xref attachment"');
+        expect(resolved).to.include(
+          "_attachments/traceability/matrix-requirements-to-tests.html",
+        );
+        expect(resolved).to.not.include('class="xref unresolved"');
+      } finally {
+        if (originalToken === undefined) delete process.env.TRACER_ID_TOKEN;
+        else process.env.TRACER_ID_TOKEN = originalToken;
+        rmSync(dir, { recursive: true, force: true });
+      }
     });
 
     it("uses a deeper link prefix for non-ROOT module matrix attachments", async () => {
@@ -3767,8 +3875,7 @@ supersedes:REQ-042[]
       const output = file.contents.toString("utf8");
       expect(output).to.not.include("REQ-042");
       expect(output).to.include("REQ-043");
-      expect(ext.getTraceabilityExtension().graph.getItem("REQ-042")).to
-        .exist;
+      expect(ext.getTraceabilityExtension().graph.getItem("REQ-042")).to.exist;
     });
 
     it("preserves tracer item examples in verbatim blocks", async () => {
@@ -3813,10 +3920,7 @@ supersedes:REQ-042[]
       const output = file.contents.toString("utf8");
       expect(output).to.include(example);
       expect(
-        ext
-          .getTraceabilityExtension()
-          .graph.getItem("REQ-042")
-          ?.content,
+        ext.getTraceabilityExtension().graph.getItem("REQ-042")?.content,
       ).to.equal("Old requirement.");
       expect(output).to.not.include("Old requirement.");
     });
