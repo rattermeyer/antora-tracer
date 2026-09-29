@@ -292,6 +292,27 @@ export class DocumentParser {
       delete itemAttributes.title;
       delete itemAttributes.status;
 
+      // Recognized relation-name attributes become relationships from this
+      // item to each listed target ID; unrecognized keys stay metadata.
+      for (const key of Object.keys(itemAttributes)) {
+        if (!this.configLoader?.isRelationType(key)) continue;
+        const targets = itemAttributes[key]
+          .split(/[,\s]+/)
+          .map((t) => t.trim())
+          .filter(Boolean);
+        for (const targetId of targets) {
+          result.relationships.push({
+            id: `${id}-${key}-${targetId}`,
+            fromId: id,
+            targetId,
+            type: key,
+            sourceFile,
+            line,
+          });
+        }
+        delete itemAttributes[key];
+      }
+
       // Create the item
       const item: Item = {
         id,

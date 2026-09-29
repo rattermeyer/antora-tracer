@@ -2,6 +2,9 @@
  * Tests for unified item architecture
  */
 
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { expect } from "chai";
 import { DocumentParser } from "../src/DocumentParser.js";
 import {
@@ -9,6 +12,20 @@ import {
   RequirementsTraceabilityExtension,
 } from "../src/index.js";
 import { TraceabilityGraph } from "../src/TraceabilityGraph.js";
+
+/** Build a ConfigLoader with a design -> requirement `addresses` relation. */
+function makeRelationLoader(): ConfigLoader {
+  const dir = mkdtempSync(join(tmpdir(), "cfg-"));
+  const cfgPath = join(dir, "config.yml");
+  writeFileSync(
+    cfgPath,
+    "roles:\n  - requirement\n  - design\nrelations:\n  design:\n    requirement:\n      addresses:\n        reverse: addressed_by\n",
+  );
+  const loader = new ConfigLoader();
+  loader.load(cfgPath);
+  rmSync(dir, { recursive: true, force: true });
+  return loader;
+}
 
 describe("Requirements Traceability Extension", () => {
   describe("Initialization", () => {
@@ -337,6 +354,56 @@ Requirement body
       expect(result.items[0].id).to.equal("REQ-009");
       expect(result.items[0].content).to.equal("Requirement body");
     });
+
+    it("parses comma-separated relation header attributes", () => {
+      const parser = new DocumentParser({ configLoader: makeRelationLoader() });
+      const result = parser.parse(
+        `[#ARC-018, item, role=design, addresses="REQ-222, QA-056, QA-057"]\n--\nBody\n--\n`,
+        "test.adoc",
+      );
+      expect(result.relationships.map((r) => r.targetId)).to.have.members([
+        "REQ-222",
+        "QA-056",
+        "QA-057",
+      ]);
+      expect(result.relationships.every((r) => r.type === "addresses")).to.be
+        .true;
+      expect(result.items[0].attributes).to.not.have.property("addresses");
+    });
+
+    it("parses whitespace-separated relation header attributes", () => {
+      const parser = new DocumentParser({ configLoader: makeRelationLoader() });
+      const result = parser.parse(
+        `[#ARC-018, item, role=design, addresses="REQ-222 QA-056 QA-057"]\n--\nBody\n--\n`,
+        "test.adoc",
+      );
+      expect(result.relationships.map((r) => r.targetId)).to.have.members([
+        "REQ-222",
+        "QA-056",
+        "QA-057",
+      ]);
+    });
+
+    it("recognizes a reverse relation name as a header attribute", () => {
+      const parser = new DocumentParser({ configLoader: makeRelationLoader() });
+      const result = parser.parse(
+        `[#REQ-222, item, role=requirement, addressed_by="ARC-018"]\n--\nBody\n--\n`,
+        "test.adoc",
+      );
+      expect(result.relationships).to.have.lengthOf(1);
+      expect(result.relationships[0].type).to.equal("addressed_by");
+      expect(result.relationships[0].targetId).to.equal("ARC-018");
+    });
+
+    it("keeps unrecognized header attributes as metadata", () => {
+      const parser = new DocumentParser({ configLoader: makeRelationLoader() });
+      const result = parser.parse(
+        `[#ARC-018, item, role=design, priority="high"]\n--\nBody\n--\n`,
+        "test.adoc",
+      );
+      expect(result.relationships).to.have.lengthOf(0);
+      expect(result.items[0].attributes.priority).to.equal("high");
+    });
   });
 });
 
@@ -388,6 +455,40 @@ describe("TraceabilityGraph", () => {
       graph.addRelationship(relationship);
       const relationships = graph.getRelationships("DES-001");
       expect(relationships).to.have.lengthOf(1);
+    });
+
+    it("reports a duplicate when a relationship is authored twice", () => {
+      const loader = makeRelationLoader();
+      const graph = new TraceabilityGraph(loader);
+      graph.addItem({
+        id: "ARC-018",
+        role: "design",
+        title: "ARC-018",
+        attributes: {},
+        sourceFile: "test.adoc",
+        sourceLine: 1,
+      });
+      graph.addItem({
+        id: "REQ-222",
+        role: "requirement",
+        title: "REQ-222",
+        attributes: {},
+        sourceFile: "test.adoc",
+        sourceLine: 2,
+      });
+
+      const parser = new DocumentParser({ configLoader: loader });
+      const result = parser.parse(
+        `[#ARC-018, item, role=design, addresses="REQ-222"]\n--\naddresses:REQ-222[]\n--\n`,
+        "test.adoc",
+      );
+      expect(result.relationships).to.have.lengthOf(2);
+      for (const rel of result.relationships) graph.addRelationship(rel);
+
+      const validation = graph.validate();
+      expect(validation.errors).to.include(
+        "Duplicate relationship: ARC-018 addresses REQ-222",
+      );
     });
 
     it("should get items by role", () => {

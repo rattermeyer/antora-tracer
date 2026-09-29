@@ -91,6 +91,24 @@ depends_on:DES-002[]
 - The `TARGET-ID` must match the `id` of another item in the graph
 - Missing targets generate a warning, not an error
 
+=== As header attributes
+
+A relationship can also be declared in the item header using its configured relation type as an attribute:
+
+[source,asciidoc]
+----
+[#DES-001, item, role=design, addresses="REQ-001, REQ-002"]
+--
+Auth Service
+--
+----
+
+The value accepts target IDs separated by commas or whitespace.
+Quote the value when it contains commas so the header parser treats it as a single attribute.
+
+Only names configured as relation types (primary or reverse) become relationships; other attributes stay item metadata and are exported to Neo4j as node properties.
+Header attributes follow the same canonicalization, validation, rendering, and duplicate handling as inline macros.
+
 === Visibility
 
 Inline relationship macros are *always invisible* in rendered output.
