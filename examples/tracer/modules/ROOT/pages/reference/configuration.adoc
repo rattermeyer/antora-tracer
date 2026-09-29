@@ -368,8 +368,12 @@ idAllocation:
 `endpoint` must be a non-empty HTTP(S) URL.
 `token`, when set, is sent as `Authorization: Bearer <token>`.
 
-Both values support environment-variable interpolation, so secrets stay out of the committed file.
-An unset variable fails configuration loading.
+Both values support environment-variable interpolation.
+Keep secrets out of the committed file.
+An unset endpoint variable fails configuration loading.
+An unset token variable does not prevent configuration loading or site generation.
+Remote `next-id` reports the missing variable and fails before contacting the allocator.
+`--local` does not require the token.
 The CLI loads a `.env` file from the working directory at startup, so you can keep the token there instead of exporting it.
 
 When `endpoint` is set, `next-id` fails closed: an unreachable allocator, a non-2xx response, or a malformed body exits with an error rather than falling back to a local ID.

@@ -278,7 +278,8 @@ With no existing items matching the prefix, defaults to 3-digit padding (`REQ-00
 
 When `idAllocation.endpoint` is configured, `next-id` requests the next ID from the allocator and prints its `id` verbatim.
 A configured-but-unreachable allocator, a non-2xx response, or a malformed body exits with an error instead of falling back to a local ID.
-Pass `--local` to override.
+If the configured token references an unset environment variable, remote `next-id` exits with an error before making the request.
+Pass `--local` to scan locally without requiring the remote token.
 See xref:reference/configuration.adoc[Configuration Reference] for the `idAllocation` key and xref:how-to/run-id-server.adoc[Run the ID allocation server] for the service.
 
 == seed

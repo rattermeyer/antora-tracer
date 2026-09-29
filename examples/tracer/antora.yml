@@ -6,6 +6,9 @@ start_page: index.adoc
 asciidoc:
   attributes:
     traceability-links: true
+    traceability-order: target-id
+    traceability-collapsible: true
+
 nav:
   - modules/ROOT/nav.adoc
   - modules/ROOT/nav-architecture.adoc

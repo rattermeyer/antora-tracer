@@ -7,7 +7,11 @@ import * as os from "node:os";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import { expect } from "chai";
-import { ConfigLoader, loadConfig } from "../src/config/TraceabilityConfig.js";
+import {
+  ConfigLoader,
+  loadConfig,
+  resolveIdAllocationToken,
+} from "../src/config/TraceabilityConfig.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -47,6 +51,22 @@ describe("ConfigLoader", () => {
       expect(preset.traceability.roles.length).to.be.at.least(1);
     });
 
+    it("recognizes primary and reverse relation types", () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), "cfg-"));
+      const cfgPath = path.join(dir, "config.yml");
+      fs.writeFileSync(
+        cfgPath,
+        "roles:\n  - requirement\n  - design\nrelations:\n  design:\n    requirement:\n      addresses:\n        reverse: addressed_by\n",
+      );
+      const loader = new ConfigLoader();
+      loader.load(cfgPath);
+      fs.rmSync(dir, { recursive: true, force: true });
+
+      expect(loader.isRelationType("addresses")).to.be.true;
+      expect(loader.isRelationType("addressed_by")).to.be.true;
+      expect(loader.isRelationType("widget")).to.be.false;
+    });
+
     it("should load preset with correct structure", () => {
       const preset = configLoader.loadPreset("requirements-engineering");
 
@@ -75,10 +95,12 @@ describe("ConfigLoader", () => {
         "adr",
         "design_concept",
       ]);
-      expect(preset.traceability.workflow?.change.states).to.include("accepted");
-      expect(preset.traceability.validation?.change.accepted?.requiresRoles).to.deep.equal([
-        "requirement",
-      ]);
+      expect(preset.traceability.workflow?.change.states).to.include(
+        "accepted",
+      );
+      expect(
+        preset.traceability.validation?.change.accepted?.requiresRoles,
+      ).to.deep.equal(["requirement"]);
     });
 
     it("should get preset details via loadPreset", () => {
@@ -546,9 +568,9 @@ matrices:
       });
     });
 
-    it("interpolates environment variable references in endpoint and token", () => {
+    it("interpolates the endpoint while preserving a token environment reference", () => {
       process.env.ID_ALLOC_ENDPOINT = "https://ids.example.com";
-      process.env.ID_ALLOC_TOKEN = "env-secret";
+      delete process.env.ID_ALLOC_TOKEN;
       try {
         const configPath = writeConfig(
           [
@@ -561,7 +583,7 @@ matrices:
         const config = configLoader.load(configPath);
         expect(config.idAllocation).to.deep.equal({
           endpoint: "https://ids.example.com",
-          token: "env-secret",
+          token: `\${ID_ALLOC_TOKEN}`,
         });
       } finally {
         delete process.env.ID_ALLOC_ENDPOINT;
@@ -569,17 +591,30 @@ matrices:
       }
     });
 
-    it("throws when a referenced environment variable is unset", () => {
-      delete process.env.ID_ALLOC_MISSING;
-      const configPath = writeConfig(
-        [
-          "idAllocation:",
-          "  endpoint: https://ids.example.com",
-          `  token: \${ID_ALLOC_MISSING}`,
-        ].join("\n"),
-      );
+    it("resolves configured token environment references on demand", () => {
+      process.env.ID_ALLOC_TOKEN = "env-secret";
+      try {
+        const configPath = writeConfig(
+          [
+            "idAllocation:",
+            "  endpoint: https://ids.example.com",
+            `  token: \${ID_ALLOC_TOKEN}`,
+          ].join("\n"),
+        );
+        const config = configLoader.load(configPath);
 
-      expect(() => configLoader.load(configPath)).to.throw(
+        expect(config.idAllocation?.token).to.equal(`\${ID_ALLOC_TOKEN}`);
+        expect(resolveIdAllocationToken(config.idAllocation?.token)).to.equal(
+          "env-secret",
+        );
+      } finally {
+        delete process.env.ID_ALLOC_TOKEN;
+      }
+    });
+
+    it("reports an unset token environment reference when resolved", () => {
+      delete process.env.ID_ALLOC_MISSING;
+      expect(() => resolveIdAllocationToken(`\${ID_ALLOC_MISSING}`)).to.throw(
         /ID_ALLOC_MISSING.*is not set/,
       );
     });
@@ -593,9 +628,7 @@ matrices:
     });
 
     it("throws when endpoint is not a URL", () => {
-      const configPath = writeConfig(
-        "idAllocation:\n  endpoint: not-a-url",
-      );
+      const configPath = writeConfig("idAllocation:\n  endpoint: not-a-url");
 
       expect(() => configLoader.load(configPath)).to.throw(
         /idAllocation.endpoint is not a valid URL/,
@@ -622,9 +655,7 @@ matrices:
       );
 
       const config = configLoader.load(configPath);
-      expect(config.idAllocation?.endpoint).to.equal(
-        "https://ids.example.com",
-      );
+      expect(config.idAllocation?.endpoint).to.equal("https://ids.example.com");
     });
   });
 });

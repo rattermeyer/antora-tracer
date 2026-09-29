@@ -1,11 +1,6 @@
 = Requirements
 :keywords: requirements, traceability, antora, asciidoc, overview
-:traceability-style: list
 :traceability-order: target-id
-:traceability-collapsible: true
-:req-id-prefix: REQ
-:toclevels: 3
-:outlinelevels: 2
 
 Antora Tracer is an Antora extension that adds requirements traceability to AsciiDoc documentation sites.
 Authors declare traceable items using the `[item]` block macro, link them with inline relationship macros, and the extension generates traceability matrices and visualizations as part of the Antora build.
@@ -109,13 +104,11 @@ tracer:links[]
 
 === Relationship Macros
 
-[#REQ-044, item, role=requirement, title="tracer:outgoing[] macro renders outgoing links"]
+[.tracer#REQ-044, item, role=requirement, title="tracer:outgoing[] macro renders outgoing links"]
 --
 The system SHALL provide a `tracer:outgoing[]` macro that expands to a formatted list of all outgoing relationships for the enclosing item.
 
 Source: openspec/specs/traceability-links-macro/spec.md
-
-tracer:links[]
 --
 
 [#REQ-146, item, role=requirement, title="Empty-state message when item has no outgoing relationships"]
@@ -392,11 +385,10 @@ Source: openspec/specs/inverse-labels/spec.md
 tracer:links[]
 --
 
-[#REQ-222, item, role=requirement, title="Labels do not affect the graph"]
+[.tracer#REQ-222, item, role=requirement, title="Labels do not affect the graph", supersedes="REQ-071"]
 --
 `labels` SHALL NOT affect graph structure, merge behavior, or validation.
 
-supersedes:REQ-071[]
 
 Source: openspec/specs/inverse-labels/spec.md
 

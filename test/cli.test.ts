@@ -934,7 +934,12 @@ Content.
       const configPath = path.join(tempDir, "traceability.yml");
       fs.writeFileSync(
         configPath,
-        ["roles: [requirement]", "idAllocation:", `  endpoint: ${endpoint}`, extra].join("\n"),
+        [
+          "roles: [requirement]",
+          "idAllocation:",
+          `  endpoint: ${endpoint}`,
+          extra,
+        ].join("\n"),
       );
       return configPath;
     }
@@ -959,6 +964,18 @@ Content.
           stdout: error.stdout ?? "",
           stderr: error.stderr ?? error.message,
         };
+      }
+    }
+    async function runNextIdWithoutToken(
+      args: string[],
+    ): Promise<{ status: number; stdout: string; stderr: string }> {
+      const token = process.env.ID_ALLOC_TOKEN;
+      delete process.env.ID_ALLOC_TOKEN;
+      try {
+        return await runNextId(args, {}, { cwd: tempDir });
+      } finally {
+        if (token === undefined) delete process.env.ID_ALLOC_TOKEN;
+        else process.env.ID_ALLOC_TOKEN = token;
       }
     }
 
@@ -989,6 +1006,24 @@ Content.
       expect(res.stdout.trim()).to.equal("REQ-055");
       expect(seenPath).to.equal("/next-id?prefix=REQ");
       expect(seenAuth).to.equal("Bearer secret-token");
+    });
+    it("resolves token environment variables for remote allocation", async () => {
+      let seenAuth = "";
+      await startAllocator((_req, res) => {
+        seenAuth = _req.headers.authorization || "";
+        res.end(JSON.stringify({ id: "REQ-056" }));
+      });
+      const configPath = writeIdAllocConfig(
+        `http://127.0.0.1:${port}`,
+        `  token: \${ID_ALLOC_TOKEN}`,
+      );
+
+      const res = await runNextId(["-p", "REQ", "--config", configPath], {
+        ID_ALLOC_TOKEN: "env-secret",
+      });
+      expect(res.status).to.equal(0);
+      expect(res.stdout.trim()).to.equal("REQ-056");
+      expect(seenAuth).to.equal("Bearer env-secret");
     });
 
     it("auto-discovers traceability.yml when --config is omitted", async () => {
@@ -1045,17 +1080,51 @@ Content.
       expect(res.stdout.trim()).to.equal("");
     });
 
-    it("fails closed when the allocator returns no id", async () => {
+    it("fails before contacting allocator when remote token environment variable is unset", async () => {
+      let hit = false;
       await startAllocator((_req, res) => {
-        res.setHeader("content-type", "application/json");
-        res.end("{}");
+        hit = true;
+        res.end(JSON.stringify({ id: "REQ-999" }));
       });
-      const configPath = writeIdAllocConfig(`http://127.0.0.1:${port}`);
+      const configPath = writeIdAllocConfig(
+        `http://127.0.0.1:${port}`,
+        `  token: \${ID_ALLOC_TOKEN}`,
+      );
 
-      const res = await runNextId(["-p", "REQ", "--config", configPath]);
+      const res = await runNextIdWithoutToken([
+        "-p",
+        "REQ",
+        "--config",
+        configPath,
+      ]);
       expect(res.status).to.equal(1);
-      expect(res.stderr).to.contain("invalid response");
+      expect(res.stderr).to.contain("ID_ALLOC_TOKEN");
       expect(res.stdout.trim()).to.equal("");
+      expect(hit).to.equal(false);
+    });
+
+    it("--local bypasses a configured allocator with an unset token", async () => {
+      const configPath = writeIdAllocConfig(
+        "http://127.0.0.1:1",
+        `  token: \${ID_ALLOC_TOKEN}`,
+      );
+      const adocPath = path.join(tempDir, "items.adoc");
+      fs.writeFileSync(
+        adocPath,
+        "[#REQ-001, item, role=requirement]\n--\n.\n--\n",
+      );
+
+      const res = await runNextIdWithoutToken([
+        "-p",
+        "REQ",
+        "--config",
+        configPath,
+        "-i",
+        adocPath,
+        "--local",
+      ]);
+      expect(res.status).to.equal(0);
+      expect(res.stdout.trim()).to.equal("REQ-002");
     });
 
     it("--local bypasses a configured allocator", async () => {
@@ -1069,7 +1138,7 @@ Content.
       const adocPath = path.join(tempDir, "items.adoc");
       fs.writeFileSync(
         adocPath,
-        '[#REQ-001, item, role=requirement]\n--\n.\n--\n',
+        "[#REQ-001, item, role=requirement]\n--\n.\n--\n",
       );
 
       const res = await runNextId([

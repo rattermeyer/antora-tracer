@@ -207,11 +207,7 @@ export const DEFAULT_CONFIG_FILES = [
   "traceability.yaml",
 ] as const;
 
-/**
- * Interpolate `${VAR}` references against `process.env`, throwing when a
- * referenced variable is unset. Scoped to `idAllocation` so existing config
- * values containing `$` keep their meaning.
- */
+/** Interpolate `${VAR}` references against `process.env`, throwing when unset. */
 function interpolateEnv(value: string | undefined): string | undefined {
   if (typeof value !== "string") return value;
   return value.replace(
@@ -406,16 +402,14 @@ export class ConfigLoader {
       config.matrices = [];
     }
 
-    // Normalize + interpolate idAllocation (endpoint required, token optional).
-    // Environment expansion happens here, on the user's file only — presets
-    // never pass through normalizeConfig.
+    // Resolve the endpoint during config loading; token expansion is deferred
+    // until a CLI command actually contacts the allocator.
     if (config.idAllocation) {
       const ida = config.idAllocation as Partial<IdAllocationConfig>;
       const endpoint = interpolateEnv(ida.endpoint);
-      const token = interpolateEnv(ida.token);
       config.idAllocation = {
         endpoint: endpoint as string,
-        ...(token !== undefined ? { token } : {}),
+        ...(ida.token !== undefined ? { token: ida.token } : {}),
       };
     }
 
@@ -527,7 +521,9 @@ export class ConfigLoader {
         try {
           parsed = new URL(endpoint);
         } catch {
-          errors.push(`idAllocation.endpoint is not a valid URL: '${endpoint}'`);
+          errors.push(
+            `idAllocation.endpoint is not a valid URL: '${endpoint}'`,
+          );
         }
         if (
           parsed &&
@@ -925,6 +921,22 @@ export class ConfigLoader {
   }
 
   /**
+   * Check whether a name is any configured relation type (primary or reverse),
+   * regardless of the roles it connects.
+   */
+  isRelationType(type: string): boolean {
+    const relation = type.toLowerCase();
+    for (const targets of Object.values(this.getConfig().relations || {})) {
+      for (const typeMap of Object.values(targets)) {
+        for (const [primary, def] of Object.entries(typeMap)) {
+          if (primary === relation || def.reverse === relation) return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
    * Get matrix definitions from configuration
    */
   getMatrices(): MatrixDefinition[] {
@@ -997,6 +1009,7 @@ export function toConfigDot(config: TraceabilityConfig): string {
   lines.push("}");
   return lines.join("\n");
 }
+export { interpolateEnv as resolveIdAllocationToken };
 
 // Default export
 export default ConfigLoader;

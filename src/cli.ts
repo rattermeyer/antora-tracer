@@ -9,20 +9,16 @@ import {
   statSync,
   writeFileSync,
 } from "node:fs";
+import { homedir } from "node:os";
 import { dirname, join, resolve, sep } from "node:path";
 import { createInterface } from "node:readline";
 import { fileURLToPath } from "node:url";
 import chalk from "chalk";
-import { homedir } from "node:os";
 import { type Command, program } from "commander";
-import { dump as yamlDump } from "js-yaml";
 import { config } from "dotenv";
+import { dump as yamlDump } from "js-yaml";
 
-// Load a `.env` file from the working directory so `${VAR}` interpolation in
-// configuration resolves without manual shell setup.
-config({ quiet: true });
-
-// Import extension
+import { resolveIdAllocationToken } from "./config/TraceabilityConfig.js";
 import {
   BUILT_IN_PRESETS,
   ConfigLoader,
@@ -33,6 +29,10 @@ import {
   RequirementsTraceabilityExtension,
   serializeSnapshot,
 } from "./index.js";
+
+// Load a `.env` file from the working directory so `${VAR}` interpolation in
+// configuration resolves without manual shell setup.
+config({ quiet: true });
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -873,9 +873,7 @@ exportProgram
           });
         }
       } else {
-        console.error(
-          chalk.red("Error: Provide -i <dir> or a playbook path"),
-        );
+        console.error(chalk.red("Error: Provide -i <dir> or a playbook path"));
         process.exit(1);
       }
       if (isDryRun(options)) {
@@ -979,18 +977,16 @@ program
     "-i, --input <path>",
     "Input file or directory to scan for existing IDs",
   )
-  .option(
-    "--local",
-    "Force a local scan, ignoring any configured idAllocation",
-  )
+  .option("--local", "Force a local scan, ignoring any configured idAllocation")
   .action(async (options) => {
     const extension = await createExtension(options);
+    const idAllocation = extension.configLoader?.getConfig()?.idAllocation;
     try {
-      const idAllocation = extension.configLoader?.getConfig()?.idAllocation;
       if (idAllocation?.endpoint && !options.local) {
+        const token = resolveIdAllocationToken(idAllocation.token);
         const nextId = await fetchNextId(
           idAllocation.endpoint,
-          idAllocation.token,
+          token,
           options.prefix,
         );
         console.log(nextId);
@@ -1048,9 +1044,7 @@ program
           });
         }
       } else {
-        console.error(
-          chalk.red("Error: Provide -i <dir> or a playbook path"),
-        );
+        console.error(chalk.red("Error: Provide -i <dir> or a playbook path"));
         process.exit(1);
       }
       const yaml = seedToYaml(extension.getPrefixMaxima());
