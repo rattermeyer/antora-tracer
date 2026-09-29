@@ -119,7 +119,7 @@ preview-only; do not edit its refs.
 ## npm staged publishing
 
 The release workflow builds and tests both packages, then stages each unpublished version with `npm stage publish --provenance --access public` from GitHub Actions. It does not publish versions directly or require an `NPM_TOKEN`.
-The workflow requires npm CLI 11.15.0 or later, `id-token: write`, and `actions/setup-node` with the npm registry URL and `package-manager-cache: false`.
+The release job uses pnpm 11's native `pnpm sbom` command for CycloneDX 1.7 SBOMs because CycloneDX's npm-ls generator does not reliably model pnpm's virtual-store layout.
 Configure a separate npm Trusted Publisher for each existing package (`@antora-tracer/core` and `@antora-tracer/id-server`): GitHub Actions, owner `rattermeyer`, repository `antora-tracer`, workflow filename `release.yml`, and allow `npm stage publish`.
 After the workflow succeeds, review each staged package on npmjs.com under **Staged Packages** or with `npm stage list <package>`, inspect it, then approve it with `npm stage approve <stage-id>` (requires interactive 2FA). Approve both packages separately.
 `npm stage list` uses regular npm authentication, not trusted-publisher OIDC; use it locally or review **Staged Packages** on npmjs.com, not in CI.
