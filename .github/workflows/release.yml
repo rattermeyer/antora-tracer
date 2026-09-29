@@ -21,8 +21,10 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: '26'
-          registry-url: 'https://registry.npmjs.org'
           cache: 'pnpm'
+
+      - name: Enable npm trusted publishing
+        run: npm install --global 'npm@^11.5.1'
 
       # ---- @antora-tracer/core ----
       - name: Install
@@ -37,13 +39,11 @@ jobs:
       - name: Publish (core, skip if version unchanged)
         run: |
           VERSION=$(node -p "require('./package.json').version")
-          if pnpm view "@antora-tracer/core@${VERSION}" version >/dev/null 2>&1; then
+          if npm view "@antora-tracer/core@${VERSION}" version >/dev/null 2>&1; then
             echo "core@${VERSION} already published — skipping"
           else
-            pnpm --filter @antora-tracer/core publish --provenance --no-git-checks
+            npm publish --provenance --access public
           fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       # ---- @antora-tracer/id-server ----
       - name: Build (id-server)
@@ -53,15 +53,14 @@ jobs:
         run: pnpm --filter @antora-tracer/id-server test
 
       - name: Publish (id-server, skip if version unchanged)
+        working-directory: id-server
         run: |
-          VERSION=$(node -p "require('./id-server/package.json').version")
-          if pnpm view "@antora-tracer/id-server@${VERSION}" version >/dev/null 2>&1; then
+          VERSION=$(node -p "require('./package.json').version")
+          if npm view "@antora-tracer/id-server@${VERSION}" version >/dev/null 2>&1; then
             echo "id-server@${VERSION} already published — skipping"
           else
-            pnpm --filter @antora-tracer/id-server publish --provenance --no-git-checks
+            npm publish --provenance --access public
           fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       # ---- SBOM + cosign (keyless) ----
       - uses: sigstore/cosign-installer@v3

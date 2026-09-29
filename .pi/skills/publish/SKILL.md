@@ -116,45 +116,37 @@ it.
 The local playbook (`antora-playbook.yml`) uses `branches: HEAD` and is
 preview-only; do not edit its refs.
 
+## npm trusted publishing
+
+Releases publish from GitHub Actions with npm OIDC trusted publishing; never run `npm publish` locally or require a long-lived `NPM_TOKEN`.
+Before the first release, configure a separate npm Trusted Publisher on each package (`@antora-tracer/core` and `@antora-tracer/id-server`): GitHub Actions, owner `rattermeyer`, repository `antora-tracer`, workflow filename `release.yml`, with direct `npm publish` allowed.
+Do not set an npm environment name unless the workflow uses a GitHub deployment environment.
+The release workflow requires `id-token: write` and npm CLI 11.5.1 or later on Node.js 22.14 or later; both are configured in `.github/workflows/release.yml`.
+
 ## Release sequence
 
-Run from a clean tree on `main`. Order matters: the maintenance branch must be
-created at the tagged commit.
+Run from a clean tree on `main`; create the maintenance branch at the release commit.
 
 ```bash
 # 1. Pre-flight — everything green
-npm run build && npm test && npm run lint
+pnpm run build && pnpm test && pnpm run lint
 git status --short          # must be empty
-```
 
-2. Agent edits the files above (mechanically, exact values).
-3. Commit, then tag and branch:
-
-```bash
-# 3. Single commit: package.json + package-lock.json + CHANGELOG.md + playbook
-git add package.json package-lock.json CHANGELOG.md antora-playbook-ci.yml
+# 2. Update package.json, CHANGELOG.md, and antora-playbook-ci.yml.
+# 3. Commit release metadata.
+git add package.json pnpm-lock.yaml CHANGELOG.md antora-playbook-ci.yml
 git commit -m "chore(release): v0.19.0"
 
-# 4. Tag, then create the maintenance branch at the tag
+# 4. Tag and create the maintenance branch at that release commit.
 git tag v0.19.0
-git checkout -b v0.19.x v0.19.0
+git branch v0.19.x v0.19.0
 
-# 5. Set the projection on the branch's antora.yml (replace "version: main"
-#    and "prerelease: true" with the projection map above), commit and push
-git add examples/tracer/antora.yml
-git commit -m "feat(antora): derive component version from refname via projection"
-git push origin main v0.19.0 v0.19.x
-git checkout main
-
-# 6. Verify release consistency, then publish
+# 5. Verify and push; the tag push triggers the GitHub publish workflow.
 node scripts/release-check.js
-npm run build
-npm publish
+git push origin main v0.19.0 v0.19.x
 ```
 
-**Why not plain `npm version`:** it commits and tags immediately, which would
-tag a commit *before* the other edits if run out of order. Edit all files
-first, commit, then tag.
+Wait for the `Release` workflow to publish both packages and complete SBOM signing before calling the release complete.
 
 ## Guardrails
 
