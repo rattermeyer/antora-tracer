@@ -122,6 +122,7 @@ Releases publish from GitHub Actions with npm OIDC trusted publishing; never run
 Before the first release, configure a separate npm Trusted Publisher on each package (`@antora-tracer/core` and `@antora-tracer/id-server`): GitHub Actions, owner `rattermeyer`, repository `antora-tracer`, workflow filename `release.yml`, with direct `npm publish` allowed.
 Do not set an npm environment name unless the workflow uses a GitHub deployment environment.
 The release workflow requires `id-token: write` and npm CLI 11.5.1 or later on Node.js 22.14 or later; both are configured in `.github/workflows/release.yml`.
+Use `actions/setup-node` with the npm registry URL but `package-manager-cache: false`; its `.npmrc` selects the OIDC registry, while cache setup can interfere with trusted publishing.
 
 ## Release sequence
 
@@ -147,7 +148,6 @@ git push origin main v0.19.0 v0.19.x
 ```
 
 Wait for the `Release` workflow to publish both packages and complete SBOM signing before calling the release complete.
-
 ## Guardrails
 
 - Never `npm publish` before `npm run build` — the package ships compiled
