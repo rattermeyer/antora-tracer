@@ -116,13 +116,15 @@ it.
 The local playbook (`antora-playbook.yml`) uses `branches: HEAD` and is
 preview-only; do not edit its refs.
 
-## npm publishing credentials
+## npm staged publishing
 
-The release workflow publishes from GitHub Actions using the repository secret `NPM_TOKEN`, mapped to `NODE_AUTH_TOKEN` on each publish step. `actions/setup-node` writes the npm registry config that consumes this variable.
-Create a granular token with **Read and write (publish and stage)** access to both `@antora-tracer/core` and `@antora-tracer/id-server`, and enable **Bypass two-factor authentication**; without that checkbox, npm rejects CI publishing with `EOTP` when account 2FA is enabled.
-Keep the secret only in GitHub Actions; never print it or pass it on the command line.
-The workflow retains `id-token: write` for provenance and SBOM signing; npm publish commands keep `--provenance`.
-Verify `NPM_TOKEN` exists in repository or organization Actions secrets and has not expired or been revoked.
+The release workflow builds and tests both packages, then stages each unpublished version with `npm stage publish --provenance --access public` from GitHub Actions. It does not publish versions directly or require an `NPM_TOKEN`.
+The workflow requires npm CLI 11.15.0 or later, `id-token: write`, and `actions/setup-node` with the npm registry URL and `package-manager-cache: false`.
+Configure a separate npm Trusted Publisher for each existing package (`@antora-tracer/core` and `@antora-tracer/id-server`): GitHub Actions, owner `rattermeyer`, repository `antora-tracer`, workflow filename `release.yml`, and allow `npm stage publish`.
+After the workflow succeeds, review each staged package on npmjs.com under **Staged Packages** or with `npm stage list <package>`, inspect it, then approve it with `npm stage approve <stage-id>` (requires interactive 2FA). Approve both packages separately.
+`npm stage list` uses regular npm authentication, not trusted-publisher OIDC; use it locally or review **Staged Packages** on npmjs.com, not in CI.
+Staging requires each package and version to be unpublished; an already staged version cannot be staged again. If a previous stage attempt succeeded but the workflow failed later, review and approve that staged version rather than rerunning the same stage.
+
 ## Release sequence
 
 Run from a clean tree on `main`; create the maintenance branch at the release commit.
@@ -141,16 +143,16 @@ git commit -m "chore(release): v0.19.0"
 git tag v0.19.0
 git branch v0.19.x v0.19.0
 
-# 5. Verify and push; the tag push triggers the GitHub publish workflow.
+# 5. Verify and push; the tag push stages both packages for approval.
 node scripts/release-check.js
 git push origin main v0.19.0 v0.19.x
 ```
 
-Wait for the `Release` workflow to publish both packages and complete SBOM signing before calling the release complete.
+Wait for the `Release` workflow to finish staging before approving both versions in npm.
+
 ## Guardrails
 
-- Never `npm publish` before `npm run build` — the package ships compiled
-  `lib/src`; stale output would be published.
+- Never use direct `npm publish` in release CI; stage packages with `npm stage publish` and require maintainer approval.
 - Never tag before the changelog and playbook edits are committed.
 - The stable docs build from a maintenance branch (`vX.Y.x`), never from the
   tag itself — a tag is immutable.

@@ -24,8 +24,8 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           package-manager-cache: false
 
-      - name: Enable npm trusted publishing
-        run: npm install --global 'npm@^11.5.1'
+      - name: Enable npm staged publishing
+        run: npm install --global 'npm@^11.15.0'
 
       # ---- @antora-tracer/core ----
       - name: Install
@@ -37,38 +37,13 @@ jobs:
       - name: Test (core)
         run: pnpm test
 
-      - name: Publish (core, skip if version unchanged)
-        run: |
-          VERSION=$(node -p "require('./package.json').version")
-          if npm view "@antora-tracer/core@${VERSION}" version >/dev/null 2>&1; then
-            echo "core@${VERSION} already published — skipping"
-          else
-            npm publish --provenance --access public
-          fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
       # ---- @antora-tracer/id-server ----
       - name: Build (id-server)
         run: pnpm --filter @antora-tracer/id-server run build
 
       - name: Test (id-server)
         run: pnpm --filter @antora-tracer/id-server test
-
-      - name: Publish (id-server, skip if version unchanged)
-        working-directory: id-server
-        run: |
-          VERSION=$(node -p "require('./package.json').version")
-          if npm view "@antora-tracer/id-server@${VERSION}" version >/dev/null 2>&1; then
-            echo "id-server@${VERSION} already published — skipping"
-          else
-            npm publish --provenance --access public
-          fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
       # ---- SBOM + cosign (keyless) ----
-      - uses: sigstore/cosign-installer@v3
 
       - name: Generate SBOM (core)
         run: pnpm dlx @cyclonedx/cyclonedx-npm --omit dev --output-file bom-core.json
@@ -93,6 +68,27 @@ jobs:
             bom-core.json.bundle
             id-server/bom-id-server.json
             id-server/bom-id-server.json.bundle
+
+      # ---- Stage packages for maintainer approval ----
+
+      - name: Stage (core, skip if version already published)
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if npm view "@antora-tracer/core@${VERSION}" version >/dev/null 2>&1; then
+            echo "core@${VERSION} already published — skipping"
+          else
+            npm stage publish --provenance --access public
+          fi
+
+      - name: Stage (id-server, skip if version already published)
+        working-directory: id-server
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if npm view "@antora-tracer/id-server@${VERSION}" version >/dev/null 2>&1; then
+            echo "id-server@${VERSION} already published — skipping"
+          else
+            npm stage publish --provenance --access public
+          fi
 
   docker:
     needs: publish
