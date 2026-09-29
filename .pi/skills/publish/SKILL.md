@@ -119,9 +119,9 @@ preview-only; do not edit its refs.
 ## npm publishing credentials
 
 The release workflow publishes from GitHub Actions using the repository secret `NPM_TOKEN`, mapped to `NODE_AUTH_TOKEN` on each publish step. `actions/setup-node` writes the npm registry config that consumes this variable.
-Use a token with publish access to both `@antora-tracer/core` and `@antora-tracer/id-server`, and configure the token to bypass 2FA if npm requires it for automation publishing.
+Create a granular token with **Read and write (publish and stage)** access to both `@antora-tracer/core` and `@antora-tracer/id-server`, and enable **Bypass two-factor authentication**; without that checkbox, npm rejects CI publishing with `EOTP` when account 2FA is enabled.
 Keep the secret only in GitHub Actions; never print it or pass it on the command line.
-The workflow retains `id-token: write` for npm provenance and cosign SBOM signing; npm publish commands keep `--provenance`.
+The workflow retains `id-token: write` for provenance and SBOM signing; npm publish commands keep `--provenance`.
 Verify `NPM_TOKEN` exists in repository or organization Actions secrets and has not expired or been revoked.
 ## Release sequence
 
