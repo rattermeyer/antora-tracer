@@ -1,4 +1,8 @@
-## ADDED Requirements
+## Purpose
+
+Defines how the example site's delivery-process requirements trace to product requirements and architecture decisions.
+
+## Requirements
 
 ### Requirement: Process requirements are traceable to product requirements
 The example site SHALL include a `delivery-process.adoc` document containing process requirements with the `process_requirement` role. Each process requirement SHALL trace to the product requirements it validates via a `validates` relation and to the architectural decisions it implements via a `deploys` relation.

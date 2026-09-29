@@ -1,4 +1,8 @@
-## ADDED Requirements
+## Purpose
+
+Defines the local build environment and Antora workflow for generating PDF documentation.
+
+## Requirements
 
 ### Requirement: Devbox provides Ruby and Node.js for PDF builds
 The devbox.json configuration SHALL include `ruby`, `bundler`, and `nodejs` packages so that `devbox shell` provides a complete PDF build environment. The init hook SHALL run `npm install` and `bundle install` automatically.

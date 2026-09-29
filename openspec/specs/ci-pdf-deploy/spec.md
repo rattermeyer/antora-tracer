@@ -1,4 +1,8 @@
-## ADDED Requirements
+## Purpose
+
+Defines CI and site-publishing behavior for generating and publishing the project's PDF documentation.
+
+## Requirements
 
 ### Requirement: Pages workflow generates PDFs
 The GitHub Pages workflow SHALL include Ruby setup and PDF generation steps so that requirements, architecture, and test-plan PDFs are built and deployed alongside the HTML site on every push to main.

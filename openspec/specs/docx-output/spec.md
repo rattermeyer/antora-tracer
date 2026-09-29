@@ -1,4 +1,8 @@
-## ADDED Requirements
+## Purpose
+
+Defines the project's DOCX build pipeline, assembler configurations, and documentation for generated DOCX output.
+
+## Requirements
 
 ### Requirement: DOCX wrapper script converts assembled AsciiDoc to DOCX
 The project SHALL include an `adoc-to-docx` shell script (in `examples/`) that reads assembled AsciiDoc from stdin, converts it to DocBook using `asciidoctor -b docbook` with Kroki support, then pipes the result through `pandoc -f docbook -t docx` to produce a DOCX file at the path specified by the `-o` argument.
@@ -51,8 +55,6 @@ The project SHALL declare `pandoc` as a dependency in `devbox.json` so that `dev
 - **WHEN** reading the project documentation
 - **THEN** the build prerequisites list mentions pandoc alongside Ruby and Node.js
 - **AND** instructions are provided for installing pandoc without devbox (`apt install pandoc`, `brew install pandoc`, `choco install pandoc`)
-
-### Requirement: DOCX output format is documented
 
 ### Requirement: DOCX playbook references extension by local path in development
 The `antora-playbook-pdf.yml` example playbook SHALL reference the DOCX extension using a local path (`./lib/src/antora-docx-extension.cjs`). Consumer documentation SHALL show the package subpath pattern (`@antora-tracer/core/antora-docx`).

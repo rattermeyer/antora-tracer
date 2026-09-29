@@ -1,4 +1,8 @@
-## ADDED Requirements
+## Purpose
+
+Defines the example site's use-case traceability model, rendered links, and generated matrix.
+
+## Requirements
 
 ### Requirement: Use-case role extends self-traceability preset
 The example site SHALL demonstrate config extension by adding a `use_case` role not present in any built-in preset, with a directional `leads_to` relation to `requirement`.

@@ -1,4 +1,8 @@
-## ADDED Requirements
+## Purpose
+
+Defines the diagrams required in architecture documentation and the checklist for keeping them current.
+
+## Requirements
 
 ### Requirement: Architecture document includes class-level API diagram
 The architecture document SHALL include a class-level diagram showing the public interface of each major component.

@@ -1,4 +1,8 @@
-## ADDED Requirements
+## Purpose
+
+Defines how PDF assembler profiles produce separate documents while preserving merged PDF output.
+
+## Requirements
 
 ### Requirement: Assembler profiles produce separate PDFs per document
 The component descriptor SHALL define assembler profiles with dedicated nav files so that the assembler produces separate PDFs for requirements, architecture, and test-plan documents.

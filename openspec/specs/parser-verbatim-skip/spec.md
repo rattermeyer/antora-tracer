@@ -4,7 +4,7 @@
 
 Prevents the DocumentParser from registering traceability items and relationships found inside AsciiDoc verbatim blocks (`----` listing blocks and `....` literal blocks). Content inside such blocks is treated as example/documentation text, not real traceability data.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: Items inside verbatim blocks are not parsed
 The system SHALL NOT register item declarations (`[#ID, item, role=...]`) found inside AsciiDoc verbatim blocks (listing blocks delimited by `----` and literal blocks delimited by `....`) as traceability items.

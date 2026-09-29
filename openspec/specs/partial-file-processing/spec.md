@@ -9,8 +9,16 @@ Process items defined in AsciiDoc partial files (`family: partial`) during the `
 ### Requirement: Items defined in partials are registered in the graph
 The system SHALL process items defined in AsciiDoc partial files alongside page files, registering them in the traceability graph.
 
+#### Scenario: Partial item enters the graph
+- **WHEN** a content catalog contains a partial file with a valid item declaration during `contentClassified`
+- **THEN** the item is registered in the traceability graph with its ID and role
+
 ### Requirement: Partial items use view URL as source reference
 Items from partial files SHALL use the file's view URL as their source file reference, enabling traceability matrix links to resolve to the source repository.
+
+#### Scenario: Partial item uses the source view URL
+- **WHEN** a partial item is registered and the partial has a repository view URL
+- **THEN** the item's `sourceFile` is set to that view URL
 
 ### Requirement: All processing passes apply to partial files
 The system SHALL apply graph population, macro expansion, and link substitution passes to partial files in the same way as page files, because partial content is inlined into pages and reaches the browser.

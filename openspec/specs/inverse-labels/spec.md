@@ -23,6 +23,10 @@ The system SHALL support `labels` in the traceability configuration YAML, mappin
 ### Requirement: Labels do not affect the graph
 `labels` SHALL NOT affect graph structure, merge behavior, or validation.
 
+#### Scenario: Changing a label leaves graph semantics unchanged
+- **WHEN** a relation label is added or changed in `traceability.yml`
+- **THEN** stored relationship types, graph validation results, and relationship merging remain unchanged
+
 ### Requirement: Default display name is the humanized type
 If a relation type has no entry in `labels`, the system SHALL display the type name humanized: underscores replaced with spaces and the result sentence-cased.
 
