@@ -45,6 +45,8 @@ jobs:
           else
             npm publish --provenance --access public
           fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       # ---- @antora-tracer/id-server ----
       - name: Build (id-server)
@@ -62,6 +64,8 @@ jobs:
           else
             npm publish --provenance --access public
           fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       # ---- SBOM + cosign (keyless) ----
       - uses: sigstore/cosign-installer@v3

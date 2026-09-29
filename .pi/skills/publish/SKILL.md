@@ -116,14 +116,13 @@ it.
 The local playbook (`antora-playbook.yml`) uses `branches: HEAD` and is
 preview-only; do not edit its refs.
 
-## npm trusted publishing
+## npm publishing credentials
 
-Releases publish from GitHub Actions with npm OIDC trusted publishing; never run `npm publish` locally or require a long-lived `NPM_TOKEN`.
-Before the first release, configure a separate npm Trusted Publisher on each package (`@antora-tracer/core` and `@antora-tracer/id-server`): GitHub Actions, owner `rattermeyer`, repository `antora-tracer`, workflow filename `release.yml`, with direct `npm publish` allowed.
-Do not set an npm environment name unless the workflow uses a GitHub deployment environment.
-The release workflow requires `id-token: write` and npm CLI 11.5.1 or later on Node.js 22.14 or later; both are configured in `.github/workflows/release.yml`.
-Use `actions/setup-node` with the npm registry URL but `package-manager-cache: false`; its `.npmrc` selects the OIDC registry, while cache setup can interfere with trusted publishing.
-
+The release workflow publishes from GitHub Actions using the repository secret `NPM_TOKEN`, mapped to `NODE_AUTH_TOKEN` on each publish step. `actions/setup-node` writes the npm registry config that consumes this variable.
+Use a token with publish access to both `@antora-tracer/core` and `@antora-tracer/id-server`, and configure the token to bypass 2FA if npm requires it for automation publishing.
+Keep the secret only in GitHub Actions; never print it or pass it on the command line.
+The workflow retains `id-token: write` for npm provenance and cosign SBOM signing; npm publish commands keep `--provenance`.
+Verify `NPM_TOKEN` exists in repository or organization Actions secrets and has not expired or been revoked.
 ## Release sequence
 
 Run from a clean tree on `main`; create the maintenance branch at the release commit.
