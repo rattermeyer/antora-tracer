@@ -18,7 +18,7 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         with:
-          version: '11.28.2'
+          version: '10.33.0'
 
       - uses: actions/setup-node@v7
         with:
@@ -45,13 +45,13 @@ jobs:
         run: pnpm --filter @antora-tracer/id-server test
 
       - name: Generate SBOM (core)
-        run: pnpm sbom --sbom-format cyclonedx --prod --out bom-core.json
+        run: pnpm dlx pnpm@11.28.2 --pm-on-fail=ignore sbom --sbom-format cyclonedx --prod --out bom-core.json
 
       - name: Sign SBOM (core)
         run: cosign sign-blob --yes bom-core.json --bundle bom-core.json.bundle
 
       - name: Generate SBOM (id-server)
-        run: pnpm sbom --sbom-format cyclonedx --prod --filter @antora-tracer/id-server --out id-server/bom-id-server.json
+        run: pnpm dlx pnpm@11.28.2 --pm-on-fail=ignore sbom --sbom-format cyclonedx --prod --filter @antora-tracer/id-server --out id-server/bom-id-server.json
 
       - name: Sign SBOM (id-server)
         run: cosign sign-blob --yes id-server/bom-id-server.json --bundle id-server/bom-id-server.json.bundle
