@@ -35,6 +35,9 @@ importers:
         specifier: ^4.2.0
         version: 4.2.0
     devDependencies:
+      '@antora/asciidoc-loader':
+        specifier: 3.1.15
+        version: 3.1.15
       '@antora/assembler':
         specifier: 1.0.0-beta.20
         version: 1.0.0-beta.20(patch_hash=32610f2c08917b285b83fc47625a0caf68664e9e14d847845e74949fad53f841)
