@@ -44,6 +44,8 @@ jobs:
       - name: Test (id-server)
         run: pnpm --filter @antora-tracer/id-server test
 
+      - uses: sigstore/cosign-installer@v4.1.2
+
       - name: Generate SBOM (core)
         run: pnpm dlx pnpm@11.28.2 --pm-on-fail=ignore sbom --sbom-format cyclonedx --prod --out bom-core.json
 
