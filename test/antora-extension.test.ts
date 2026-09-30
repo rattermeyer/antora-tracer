@@ -3700,7 +3700,7 @@ Description.
 
       (ext as any).partialPageMap = new Map([
         [
-          "tracer:ROOT:partials/use-cases/validation-and-maintenance",
+          "tracer:ROOT:use-cases/validation-and-maintenance",
           [
             {
               sourceFile: "self-traceability/use-cases",
@@ -3728,6 +3728,71 @@ Description.
       expect(xref).to.equal(
         "xref:tracer:ROOT:self-traceability/use-cases#UC-007[UC-007]",
       );
+    });
+    it("resolves partial includes with attributes and relative paths", async () => {
+      const ctx = createMockContext();
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const includingPage = {
+        src: {
+          path: "modules/ROOT/pages/use-cases.adoc",
+          component: "tracer",
+          module: "ROOT",
+          version: "1.0",
+        },
+        contents: Buffer.from(
+          "include::partial$use-cases/validation.adoc[opts=optional]\n",
+        ),
+      };
+      const partial = {
+        src: {
+          path: "modules/ROOT/partials/use-cases/validation.adoc",
+          fileUri:
+            "file:///repo/modules/ROOT/partials/use-cases/validation.adoc",
+          component: "tracer",
+          module: "ROOT",
+          version: "1.0",
+        },
+        contents: Buffer.from(
+          '[#REQ-200, item, role=requirement, title="Target"]\n--\nTarget.\n--\n',
+        ),
+      };
+      const consumer = {
+        src: {
+          path: "modules/ROOT/pages/consumer.adoc",
+          component: "demo",
+          module: "ROOT",
+          version: "1.0",
+        },
+        contents: Buffer.from(
+          ':traceability-links: true\n\n[#DES-200, item, role=design, title="Consumer"]\n--\naddresses:REQ-200[]\ntraceability:links[]\n--\n',
+        ),
+      };
+
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [includingPage, consumer] : [partial],
+        },
+      });
+
+      const xref = (ext as any).buildXref(
+        {
+          id: "REQ-200",
+          title: "Target",
+          sourceFile:
+            "file:///repo/modules/ROOT/partials/use-cases/validation.adoc",
+          component: "tracer",
+          module: "ROOT",
+          version: "1.0",
+        },
+        "consumer",
+        "REQ-200",
+        "demo",
+        "ROOT",
+      );
+      expect(xref).to.equal("xref:tracer:ROOT:use-cases#REQ-200[REQ-200]");
     });
   });
 

@@ -868,7 +868,7 @@ matrices:
         siteRootPath: "../../../../",
         partialTargets: new Map([
           [
-            "tracer:ROOT:partials/use-cases/validation-and-maintenance",
+            "tracer:ROOT:use-cases/validation-and-maintenance",
             [
               {
                 sourceFile: "self-traceability/use-cases",
@@ -910,6 +910,51 @@ matrices:
       });
 
       expect(link).to.equal("#UC-007");
+    });
+    it("normalizes absolute and relative partial source paths", () => {
+      const targets = [
+        {
+          sourceFile: "self-traceability/use-cases",
+          component: "tracer",
+          module: "ROOT",
+          version: "stable",
+          pubUrl: "/tracer/stable/self-traceability/use-cases.html",
+        },
+      ];
+      const resolver = new LinkResolver({
+        relativePathPrefix: "../../",
+        siteRootPath: "../../../../",
+        partialTargets: new Map([
+          ["tracer:ROOT:use-cases/validation", targets],
+        ]),
+      });
+
+      const absolute = resolver.generateItemLink({
+        id: "REQ-201",
+        title: "Target",
+        role: "requirement",
+        attributes: {},
+        sourceFile:
+          "file:///repo/modules/ROOT/partials/use-cases/validation.adoc",
+        component: "tracer",
+        module: "ROOT",
+        version: "stable",
+      });
+      const relative = resolver.generateItemLink({
+        id: "REQ-201",
+        title: "Target",
+        role: "requirement",
+        attributes: {},
+        sourceFile: "partials/use-cases/validation.adoc",
+        component: "tracer",
+        module: "ROOT",
+        version: "stable",
+      });
+
+      expect(absolute).to.equal(relative);
+      expect(relative).to.equal(
+        "../../../../tracer/stable/self-traceability/use-cases.html#REQ-201",
+      );
     });
   });
 });

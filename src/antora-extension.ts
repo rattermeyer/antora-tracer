@@ -1318,14 +1318,9 @@ export class AntoraTraceabilityExtension {
           pubUrl: file.pub?.url,
         };
         for (const match of content.matchAll(
-          /include::partial\$([^[]+)\[\]/g,
+          /^[ \t]*include::partial\$(.+?)\[(.*?)\]/gm,
         )) {
-          const partialPath = match[1].replace(/\.adoc$/, "");
-          const key = partialTargetKey(
-            component,
-            moduleName,
-            `partials/${partialPath}`,
-          );
+          const key = partialTargetKey(component, moduleName, match[1]);
           const targets = partialPageMap.get(key) || [];
           if (!targets.some((candidate) => candidate.sourceFile === page)) {
             targets.push(target);

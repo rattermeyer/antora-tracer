@@ -18,12 +18,22 @@ export interface PartialPageTarget {
 
 export type PartialPageTargets = Map<string, PartialPageTarget[]>;
 
+export function normalizePartialPath(sourceFile: string): string {
+  return sourceFile
+    .trim()
+    .replace(/\\/g, "/")
+    .replace(/^(?:.*\/)?modules\/[^/]+\//, "")
+    .replace(/^.*:\s*/, "")
+    .replace(/^partials\//, "")
+    .replace(/\.adoc$/, "");
+}
+
 export function partialTargetKey(
   component: string | undefined,
   module: string | undefined,
   partialPath: string,
 ): string {
-  return `${component || ""}:${module || "ROOT"}:${partialPath}`;
+  return `${component || ""}:${module || "ROOT"}:${normalizePartialPath(partialPath)}`;
 }
 
 /**
@@ -51,12 +61,6 @@ export interface LinkResolverOptions {
   indexify?: boolean;
   /** Pages that render items defined in partials. */
   partialTargets?: PartialPageTargets;
-}
-function partialPath(sourceFile: string): string {
-  return sourceFile
-    .replace(/\\/g, "/")
-    .replace(/^(?:.*\/)?modules\/[^/]+\//, "")
-    .replace(/\.adoc$/, "");
 }
 
 /**
@@ -102,7 +106,7 @@ export class LinkResolver {
       partialTargetKey(
         item.component,
         item.module,
-        partialPath(item.sourceFile!),
+        normalizePartialPath(item.sourceFile!),
       ),
     );
     return candidates?.find(
