@@ -1300,7 +1300,12 @@ export class AntoraTraceabilityExtension {
 
       const partialPageMap: PartialPageTargets = new Map();
       for (const file of adocFiles) {
-        const content = file.contents?.toString("utf8") || "";
+        let content: string;
+        try {
+          content = file.contents?.toString("utf8") || "";
+        } catch {
+          continue;
+        }
         const page = this.normalizeSourceFile(file.src.path);
         const component = file.src?.component || undefined;
         const moduleName = file.src?.module || "ROOT";

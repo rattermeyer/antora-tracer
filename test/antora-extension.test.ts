@@ -3840,7 +3840,7 @@ addresses:REQ-999[]
       });
 
       const out = designFile.contents.toString("utf8");
-      expect(out).to.include("xref:comp-a:ROOT:reqs.adoc#REQ-001");
+      expect(out).to.include("xref:comp-a:ROOT:reqs#REQ-001");
     });
 
     it("hides superseded item blocks when renderSuperseded is false", async () => {
