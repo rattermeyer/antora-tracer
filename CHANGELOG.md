@@ -2,6 +2,12 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.26.1] — 2026-09-30
+
+### Fixed
+- Normalize partial include targets so relationships and links resolve consistently.
+- Preserve content processing error handling while resolving partial relationships.
+
 ## [0.26.0] — 2026-09-29
 
 ### Added
