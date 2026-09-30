@@ -20,7 +20,12 @@ import { deflateSync } from "node:zlib";
 import asciidoctor from "@asciidoctor/core";
 import { ConfigLoader, toConfigDot } from "./config/TraceabilityConfig.js";
 import { RequirementsTraceabilityExtension } from "./index.js";
-import { LinkResolver } from "./LinkResolver.js";
+import {
+  LinkResolver,
+  type PartialPageTarget,
+  type PartialPageTargets,
+  partialTargetKey,
+} from "./LinkResolver.js";
 import { MatrixGenerator } from "./MatrixGenerator.js";
 import { findTraceabilityExtensionEntry } from "./SiteGraph.js";
 import { TraceabilityGraph } from "./TraceabilityGraph.js";
@@ -107,6 +112,7 @@ type RelItem = {
   sourceFile?: string;
   component?: string;
   module?: string;
+  version?: string;
 };
 /** Which relationship macros expand a given direction. */
 type RelationMacro = "outgoing" | "incoming" | "links";
@@ -119,6 +125,7 @@ export class AntoraTraceabilityExtension {
   private readonly logger: ReturnType<AntoraExtensionContext["getLogger"]>;
   private readonly playbook: any;
   private contentCatalog: any = null;
+  private partialPageMap: PartialPageTargets = new Map();
 
   constructor(
     private readonly context: AntoraExtensionContext,
@@ -263,7 +270,7 @@ export class AntoraTraceabilityExtension {
       return sourceFile;
     }
     let result = sourceFile.replace(/\\/g, "/");
-    result = result.replace(/\\.adoc$/, "");
+    result = result.replace(/\.adoc$/, "");
     result = result.replace(/^.*[\\/]pages[\\/]/, "");
     return result;
   }
@@ -546,7 +553,8 @@ export class AntoraTraceabilityExtension {
   ): string {
     const directions: RelationDirection[] =
       macroName === "links" ? ["outgoing", "incoming"] : [macroName];
-    const combineGroups = collapsible && style === "list" && macroName === "links";
+    const combineGroups =
+      collapsible && style === "list" && macroName === "links";
     const combinedGroups: Array<[string, RelItem[]]> = [];
     const parts: string[] = [];
     let combinedOutputIndex = -1;
@@ -638,6 +646,7 @@ export class AntoraTraceabilityExtension {
         sourceFile: related.sourceFile,
         component: related.component,
         module: related.module,
+        version: related.version,
       });
     }
 
@@ -704,6 +713,7 @@ export class AntoraTraceabilityExtension {
       sourceFile?: string;
       component?: string;
       module?: string;
+      version?: string;
     },
     currentFile: string,
     displayText: string,
@@ -711,14 +721,46 @@ export class AntoraTraceabilityExtension {
     currentModule?: string,
   ): string {
     if (item.sourceFile && item.sourceFile !== currentFile) {
-      // Partial items have view URLs as sourceFile — use link: instead of xref:
+      // Partials are rendered into their including page; link to that page
+      // instead of the source file, which is not published by Antora.
+      if (
+        item.sourceFile.includes("/partials/") ||
+        item.sourceFile.startsWith("partials/")
+      ) {
+        const partialPath = item.sourceFile
+          .replace(/^(?:.*\/)?modules\/[^/]+\//, "")
+          .replace(/\.adoc$/, "");
+        const partialTarget = this.partialPageMap
+          .get(partialTargetKey(item.component, item.module, partialPath))
+          ?.find(
+            (target) =>
+              !item.version ||
+              !target.version ||
+              target.version === item.version,
+          );
+        if (partialTarget) {
+          let path = partialTarget.sourceFile;
+          if (
+            item.component &&
+            currentComponent &&
+            item.component !== currentComponent
+          ) {
+            path = `${item.component}:${item.module || ""}:${path}`;
+          } else if (
+            item.module &&
+            currentModule &&
+            item.module !== currentModule
+          ) {
+            path = `${item.module}:${path}`;
+          }
+          return `xref:${path}#${item.id}[${displayText}]`;
+        }
+        return `xref:#${item.id}[${displayText}]`;
+      }
+      // Partial items with view URLs are handled by the source-path lookup
+      // above; retain external links when no page include was discovered.
       if (item.sourceFile.includes("://")) {
         return `link:${item.sourceFile}#${item.id}[${displayText}]`;
-      }
-      // Items defined in partials can't be xref'd to the partial file —
-      // partials don't produce pages. Fall back to same-page anchor.
-      if (item.sourceFile.includes("/partials/")) {
-        return `xref:#${item.id}[${displayText}]`;
       }
       // Build the xref path with appropriate Antora prefix:
       // cross-component → component:module:page, cross-module → module:page, same → page
@@ -1256,7 +1298,36 @@ export class AntoraTraceabilityExtension {
           !this.config.excludeComponents.includes(file.src?.component),
       );
 
-      // Also process partial files — items defined in partials need to be in the graph
+      const partialPageMap: PartialPageTargets = new Map();
+      for (const file of adocFiles) {
+        const content = file.contents?.toString("utf8") || "";
+        const page = this.normalizeSourceFile(file.src.path);
+        const component = file.src?.component || undefined;
+        const moduleName = file.src?.module || "ROOT";
+        const version = file.src?.version || undefined;
+        const target: PartialPageTarget = {
+          sourceFile: page,
+          component,
+          module: moduleName,
+          version,
+          pubUrl: file.pub?.url,
+        };
+        for (const match of content.matchAll(
+          /include::partial\$([^[]+)\[\]/g,
+        )) {
+          const partialPath = match[1].replace(/\.adoc$/, "");
+          const key = partialTargetKey(
+            component,
+            moduleName,
+            `partials/${partialPath}`,
+          );
+          const targets = partialPageMap.get(key) || [];
+          if (!targets.some((candidate) => candidate.sourceFile === page)) {
+            targets.push(target);
+            partialPageMap.set(key, targets);
+          }
+        }
+      }
       const partialFiles = contentCatalog.findBy({ family: "partial" }) || [];
       const adocPartials = partialFiles.filter(
         (file: any) =>
@@ -1312,6 +1383,7 @@ export class AntoraTraceabilityExtension {
         const pageFilesForVersion = pageGroups.get(version) || [];
         const partialFilesForVersion = partialGroups.get(version) || [];
         const components = [...(versionComponents.get(version) ?? ["unknown"])];
+        this.partialPageMap = partialPageMap;
 
         // Clear the graph so each version is self-contained
         if (this.traceability) {
@@ -1959,10 +2031,10 @@ export class AntoraTraceabilityExtension {
           relativePathPrefix,
           siteRootPath,
           indexify: htmlStyle !== "default",
+          partialTargets: this.partialPageMap,
         }),
       },
     );
-
     for (const matrixName of matrixNames) {
       for (const format of this.config.matrixFormats) {
         try {

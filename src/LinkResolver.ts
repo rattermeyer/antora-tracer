@@ -7,6 +7,25 @@
 
 import type { Item } from "./types.js";
 
+/** A published page that renders an item defined in a partial. */
+export interface PartialPageTarget {
+  sourceFile: string;
+  component?: string;
+  module?: string;
+  version?: string;
+  pubUrl?: string;
+}
+
+export type PartialPageTargets = Map<string, PartialPageTarget[]>;
+
+export function partialTargetKey(
+  component: string | undefined,
+  module: string | undefined,
+  partialPath: string,
+): string {
+  return `${component || ""}:${module || "ROOT"}:${partialPath}`;
+}
+
 /**
  * Options for LinkResolver
  */
@@ -30,6 +49,14 @@ export interface LinkResolverOptions {
    * produce pagename/index.html instead of pagename.html.
    */
   indexify?: boolean;
+  /** Pages that render items defined in partials. */
+  partialTargets?: PartialPageTargets;
+}
+function partialPath(sourceFile: string): string {
+  return sourceFile
+    .replace(/\\/g, "/")
+    .replace(/^(?:.*\/)?modules\/[^/]+\//, "")
+    .replace(/\.adoc$/, "");
 }
 
 /**
@@ -49,20 +76,49 @@ export class LinkResolver {
    * Generate a full HTML link (href) for an item.
    *
    * @param item - The item to generate a link for
-   * @returns Full URL path including fragment identifier, e.g., "../../architecture.html#ARC-001"
+   * @returns Full URL path including fragment identifier
    */
   generateItemLink(item: Item): string {
-    const htmlPath = this.itemToHtmlPath(item);
-    // If the path is a full URL, return it directly with the fragment
+    const partialTarget = this.resolvePartialTarget(item);
+    if (this.isPartial(item.sourceFile) && !partialTarget) {
+      return `#${item.id}`;
+    }
+    const targetItem = partialTarget ? { ...item, ...partialTarget } : item;
+    const htmlPath = this.itemToHtmlPath(targetItem);
     if (htmlPath.includes("://")) {
       return `${htmlPath}#${item.id}`;
     }
-    // Antora build: resolve from the site root using the item's published URL
-    // so cross-component and cross-version targets resolve correctly.
-    if (this.options.siteRootPath && item.pubUrl) {
-      return `${this.options.siteRootPath}${item.pubUrl.replace(/^\//, "")}#${item.id}`;
+    if (this.options.siteRootPath && targetItem.pubUrl) {
+      return `${this.options.siteRootPath}${targetItem.pubUrl.replace(/^\//, "")}#${item.id}`;
     }
     return `${this.options.relativePathPrefix + htmlPath}#${item.id}`;
+  }
+
+  private resolvePartialTarget(item: Item): PartialPageTarget | undefined {
+    if (!this.options.partialTargets || !this.isPartial(item.sourceFile)) {
+      return undefined;
+    }
+    const candidates = this.options.partialTargets.get(
+      partialTargetKey(
+        item.component,
+        item.module,
+        partialPath(item.sourceFile!),
+      ),
+    );
+    return candidates?.find(
+      (candidate) =>
+        !item.version ||
+        !candidate.version ||
+        candidate.version === item.version,
+    );
+  }
+
+  private isPartial(sourceFile: string | undefined): boolean {
+    return (
+      sourceFile?.includes("/partials/") ||
+      sourceFile?.startsWith("partials/") ||
+      false
+    );
   }
 
   /**

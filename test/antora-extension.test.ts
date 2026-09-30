@@ -3691,6 +3691,44 @@ Description.
       );
       expect(xref).to.equal("xref:other-comp:ROOT:page#ITEM-001[Other Item]");
     });
+    it("should link partial items to their including page", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      (ext as any).partialPageMap = new Map([
+        [
+          "tracer:ROOT:partials/use-cases/validation-and-maintenance",
+          [
+            {
+              sourceFile: "self-traceability/use-cases",
+              component: "tracer",
+              module: "ROOT",
+            },
+          ],
+        ],
+      ]);
+      const xref = (ext as any).buildXref(
+        {
+          id: "UC-007",
+          title: "Validation",
+          sourceFile:
+            "file:///repo/modules/ROOT/partials/use-cases/validation-and-maintenance.adoc",
+          component: "tracer",
+          module: "ROOT",
+        },
+        "traceability/matrix",
+        "UC-007",
+        "demo",
+        "ROOT",
+      );
+
+      expect(xref).to.equal(
+        "xref:tracer:ROOT:self-traceability/use-cases#UC-007[UC-007]",
+      );
+    });
   });
 
   describe("supersession overview and render toggle", () => {

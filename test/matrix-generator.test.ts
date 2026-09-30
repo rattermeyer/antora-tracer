@@ -862,5 +862,54 @@ matrices:
       const link = resolver.generateItemLink(item);
       expect(link).to.equal("../../../../demo/stable/index.html#REQ-109");
     });
+    it("should resolve partial items to their including page", () => {
+      const resolver = new LinkResolver({
+        relativePathPrefix: "../../",
+        siteRootPath: "../../../../",
+        partialTargets: new Map([
+          [
+            "tracer:ROOT:partials/use-cases/validation-and-maintenance",
+            [
+              {
+                sourceFile: "self-traceability/use-cases",
+                component: "tracer",
+                module: "ROOT",
+                version: "stable",
+                pubUrl: "/tracer/stable/self-traceability/use-cases.html",
+              },
+            ],
+          ],
+        ]),
+      });
+
+      const link = resolver.generateItemLink({
+        id: "UC-007",
+        title: "Validation",
+        role: "use_case",
+        attributes: {},
+        sourceFile:
+          "file:///repo/modules/ROOT/partials/use-cases/validation-and-maintenance",
+        component: "tracer",
+        module: "ROOT",
+        version: "stable",
+      });
+
+      expect(link).to.equal(
+        "../../../../tracer/stable/self-traceability/use-cases.html#UC-007",
+      );
+    });
+
+    it("should avoid partial file URLs when no target page is known", () => {
+      const resolver = new LinkResolver({ relativePathPrefix: "../../" });
+      const link = resolver.generateItemLink({
+        id: "UC-007",
+        title: "Validation",
+        role: "use_case",
+        attributes: {},
+        sourceFile: "partials/use-cases/validation-and-maintenance",
+      });
+
+      expect(link).to.equal("#UC-007");
+    });
   });
 });
