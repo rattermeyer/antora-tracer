@@ -25,7 +25,7 @@ The `export neo4j` command SHALL require exactly one input — either `-i <dir>`
 - **THEN** the command exits with a non-zero code and an error message
 
 ### Requirement: playbook export spans repositories
-When a playbook is given, the exported graph SHALL include items from every component and repository in that playbook, not just a single component.
+When a playbook is given, the exported graph SHALL include items from every component and repository in that playbook, rather than a single component.
 
 #### Scenario: multi-repository export
 - **WHEN** a playbook aggregates components from multiple repositories

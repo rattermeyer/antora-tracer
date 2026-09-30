@@ -52,11 +52,11 @@ It's independent of Pass 2 — you can enable graph macros without link macros, 
 
 === Pass 3: Substitute relationship links (pages and partials)
 
-Inline relationship macros (``) are replaced with clickable xrefs to the target item's source page.
-This is the mechanism that makes matrix cells clickable links to item definitions.
+Inline relationship macros are replaced with clickable xrefs to the target item's rendered page.
+This is the mechanism that makes relationship and matrix links navigate to item definitions.
 
-For page items: `xref:page.html#ID`.
-For partial items: `link:URL#ID` (since partials don't produce HTML pages).
+For page items, links target the item's page and explicit ID anchor.
+For items defined in partials, links target the page that includes the partial while preserving the partial as source provenance.
 
 This pass also runs `injectTitleIds()` (prepends ID to title for visible display) and `unindentItemMacros()`.
 

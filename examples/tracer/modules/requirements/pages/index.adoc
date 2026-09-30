@@ -2453,6 +2453,317 @@ Source: openspec/specs/template-partials/spec.md
 tracer:links[]
 --
 
+
+=== Current OpenSpec Coverage
+
+[#REQ-301, item, role=requirement, title="Circular reference detection in graph validation"]
+--
+The system SHALL detect circular references in the traceability graph during validation. A circular reference is a cycle in the directed relationship graph (e.g., A → B → A, or A → B → C → A). Self-referencing relationships (A → A) SHALL also be detected as cycles. Auto-generated inverse relationships SHALL be skipped during cycle detection to avoid false positives. Relationships marked as bidirectional SHALL also be skipped during cycle detection, since a bidirectional pair (A → B and B → A with complementary types) is a legitimate traceability construct, not a cycle.
+
+Source: openspec/specs/circular-reference-detection/spec.md
+
+tracer:links[]
+--
+
+[#REQ-302, item, role=requirement, title="query linked — find reachable items by role"]
+--
+The CLI SHALL provide `query linked <id> <role>` that returns each distinct item with the requested role reachable from the starting item by following outgoing graph relationships. Traversal SHALL follow relationships across any number of edges, continue through items of every role, and exclude the starting item from results. Results SHALL include each matching item once, including when paths converge or contain cycles.
+
+Source: openspec/specs/cli-query/spec.md
+
+tracer:links[]
+--
+
+[#REQ-303, item, role=requirement, title="Multi-source linked queries require globally unique IDs"]
+--
+A complete multi-source graph query SHALL document globally unique item IDs as a prerequisite for unambiguous results. The CLI is not required to detect or reject duplicate IDs. Documentation SHALL recommend allocating IDs through the provided `@antora-tracer/id-server`, seeded from the Antora playbook and configured with shared allocation settings that keep IDs unique across included sources.
+
+Source: openspec/specs/cli-query/spec.md
+
+tracer:links[]
+--
+
+[#REQ-304, item, role=requirement, title="Generate shell completion scripts"]
+--
+The CLI SHALL provide a `completion` command that emits a completion script to standard output for each supported shell: Bash, Zsh, and Fish.
+
+Source: openspec/specs/cli-shell-completion/spec.md
+
+tracer:links[]
+--
+
+[#REQ-305, item, role=requirement, title="Install shell completion scripts"]
+--
+The CLI SHALL provide an installation action that writes the selected shell's generated completion script to an appropriate completion directory for the current user.
+
+Source: openspec/specs/cli-shell-completion/spec.md
+
+tracer:links[]
+--
+
+[#REQ-306, item, role=requirement, title="Document shell completion use"]
+--
+The CLI reference SHALL describe script generation, installation, and the activation steps printed by installation for Bash, Zsh, and Fish.
+
+Source: openspec/specs/cli-shell-completion/spec.md
+
+tracer:links[]
+--
+
+[#REQ-307, item, role=requirement, title="DOCX wrapper script converts assembled AsciiDoc to DOCX"]
+--
+The project SHALL include an `adoc-to-docx` shell script (in `examples/`) that reads assembled AsciiDoc from stdin, converts it to DocBook using `asciidoctor -b docbook` with Kroki support, then pipes the result through `pandoc -f docbook -t docx` to produce a DOCX file at the path specified by the `-o` argument.
+
+Source: openspec/specs/docx-output/spec.md
+
+tracer:links[]
+--
+
+[#REQ-308, item, role=requirement, title="DOCX assembler configs mirror PDF assembler configs"]
+--
+For each existing PDF assembler configuration (`examples/antora-assembler-pdf*.yml`), a corresponding DOCX assembler configuration SHALL exist (`examples/antora-assembler-docx*.yml`) that differs only in the `build.command` value, using `./examples/adoc-to-docx` instead of `bundle exec asciidoctor-pdf`.
+
+Source: openspec/specs/docx-output/spec.md
+
+tracer:links[]
+--
+
+[#REQ-309, item, role=requirement, title="PDF playbook includes DOCX assembler configurations"]
+--
+The `antora-playbook-pdf.yml` SHALL register DOCX assembler configs alongside PDF assembler configs so a single build produces both PDF and DOCX outputs.
+
+Source: openspec/specs/docx-output/spec.md
+
+tracer:links[]
+--
+
+[#REQ-310, item, role=requirement, title="pandoc is available in the build environment"]
+--
+The project SHALL declare `pandoc` as a dependency in `devbox.json` so that `devbox shell` provides the pandoc binary.
+
+Source: openspec/specs/docx-output/spec.md
+
+tracer:links[]
+--
+
+[#REQ-311, item, role=requirement, title="DOCX playbook references extension by local path in development"]
+--
+The `antora-playbook-pdf.yml` example playbook SHALL reference the DOCX extension using a local path (`./lib/src/antora-docx-extension.cjs`). Consumer documentation SHALL show the package subpath pattern (`@antora-tracer/core/antora-docx`).
+
+Source: openspec/specs/docx-output/spec.md
+
+tracer:links[]
+--
+
+[#REQ-312, item, role=requirement, title="Entry points load a .env file"]
+--
+The CLI and the id-server SHALL load a `.env` file from the working directory into the process environment at startup, before reading configuration.
+
+Source: openspec/specs/env-file-loading/spec.md
+
+tracer:links[]
+--
+
+[#REQ-313, item, role=requirement, title="Process environment takes precedence"]
+--
+A variable already present in the process environment SHALL NOT be overridden by the `.env` file.
+
+Source: openspec/specs/env-file-loading/spec.md
+
+tracer:links[]
+--
+
+[#REQ-314, item, role=requirement, title="Relationship graph via traceability:graph[] macro"]
+--
+The system SHALL provide a `traceability:graph[]` inline macro that renders a relationship diagram for the enclosing item. The diagram SHALL show the item and its related items as labeled nodes and edges, colored by role. An optional depth parameter SHALL control the number of relationship hops shown.
+
+Source: openspec/specs/graph-visualization/spec.md
+
+tracer:links[]
+--
+
+[#REQ-315, item, role=requirement, title="Coverage chart via traceability:graph-coverage[] macro"]
+--
+The system SHALL provide a `traceability:graph-coverage[]` inline macro that renders a coverage chart. When used inside an item block, it SHALL show per-relationship-type coverage for that item. When used outside an item block, it SHALL show global coverage by role.
+
+Source: openspec/specs/graph-visualization/spec.md
+
+tracer:links[]
+--
+
+[#REQ-316, item, role=requirement, title="Configuration graph via traceability:config-graph[] macro"]
+--
+The system SHALL provide a `traceability:config-graph[]` macro that renders the effective traceability configuration as a Kroki GraphViz diagram. The diagram SHALL show each configured role as a node colored by role and each declared relation as a labeled edge, using declared directions only.
+
+Source: openspec/specs/graph-visualization/spec.md
+
+tracer:links[]
+--
+
+[#REQ-317, item, role=requirement, title="traceability:incoming[] macro renders incoming links"]
+--
+The system SHALL provide a `traceability:incoming[]` macro that expands to a formatted list of all relationships pointing to the enclosing item (reverse relationships).
+
+Source: openspec/specs/incoming-links-macro/spec.md
+
+tracer:links[]
+--
+
+[#REQ-318, item, role=requirement, title="Labels do not affect the graph"]
+--
+`labels` SHALL NOT affect graph structure, merge behavior, or validation.
+
+Source: openspec/specs/inverse-labels/spec.md
+
+tracer:links[]
+--
+
+[#REQ-319, item, role=requirement, title="Matrix links resolve partial-defined items to rendered pages"]
+--
+The HTML matrix SHALL link an item defined in an Antora partial to the page that includes the partial.
+The link SHALL use the including page's published URL and the item's explicit ID fragment.
+The partial source SHALL remain available for source metadata and tooltips but SHALL NOT be emitted as a navigable file URL.
+
+Source: openspec/specs/matrix-item-linking/spec.md
+
+tracer:links[]
+--
+
+[#REQ-320, item, role=requirement, title="export neo4j accepts a local directory or a playbook"]
+--
+The `export neo4j` command SHALL accept either `-i <dir>` to process a local directory, or a playbook path to harvest every component and repository in that playbook.
+
+Source: openspec/specs/neo4j-export/spec.md
+
+tracer:links[]
+--
+
+[#REQ-321, item, role=requirement, title="export neo4j requires an input"]
+--
+The `export neo4j` command SHALL require exactly one input — either `-i <dir>` or a playbook path — and SHALL exit with an error when neither is provided.
+
+Source: openspec/specs/neo4j-export/spec.md
+
+tracer:links[]
+--
+
+[#REQ-322, item, role=requirement, title="playbook export spans repositories"]
+--
+When a playbook is given, the exported graph SHALL include items from every component and repository in that playbook, rather than a single component.
+
+Source: openspec/specs/neo4j-export/spec.md
+
+tracer:links[]
+--
+
+[#REQ-323, item, role=requirement, title="Items inside verbatim blocks are not parsed"]
+--
+The system SHALL NOT register item declarations (`[#ID, item, role=...]`) found inside AsciiDoc verbatim blocks (listing blocks delimited by `----` and literal blocks delimited by `....`) as traceability items.
+
+Source: openspec/specs/parser-verbatim-skip/spec.md
+
+tracer:links[]
+--
+
+[#REQ-324, item, role=requirement, title="Inline macros inside verbatim blocks are not parsed"]
+--
+The system SHALL NOT register inline relationship macros (`relation:TARGET[]`) whose enclosing item was skipped because it fell inside a verbatim block.
+
+Source: openspec/specs/parser-verbatim-skip/spec.md
+
+tracer:links[]
+--
+
+[#REQ-325, item, role=requirement, title="Verbatim block detection handles standard AsciiDoc fences"]
+--
+The system SHALL detect verbatim blocks by matching opening and closing fence lines consisting of exactly `----` or `....` (with optional trailing whitespace), ignoring style prefix lines like `[source,asciidoc]`.
+
+Source: openspec/specs/parser-verbatim-skip/spec.md
+
+tracer:links[]
+--
+
+[#REQ-326, item, role=requirement, title="Inline macros inside verbatim blocks are preserved in rendered output"]
+--
+The system SHALL preserve inline relationship macros (`relation:TARGET[]`) inside AsciiDoc verbatim blocks so they remain visible in the rendered output.
+
+Source: openspec/specs/parser-verbatim-skip/spec.md
+
+tracer:links[]
+--
+
+[#REQ-327, item, role=requirement, title="Inline macros inside backtick code spans are not parsed"]
+--
+The system SHALL NOT register inline relationship macros (`relation:ID[]`) that appear inside backtick-enclosed code spans as traceability relationships.
+
+Source: openspec/specs/parser-verbatim-skip/spec.md
+
+tracer:links[]
+--
+
+[#REQ-328, item, role=requirement, title="Items defined in partials are registered in the graph"]
+--
+The system SHALL process items defined in AsciiDoc partial files alongside page files, registering them in the traceability graph.
+
+Source: openspec/specs/partial-file-processing/spec.md
+
+tracer:links[]
+--
+
+[#REQ-329, item, role=requirement, title="Partial items use view URL as source reference"]
+--
+Items from partial files SHALL use the file's view URL as their source file reference, enabling traceability matrix links to resolve to the source repository.
+
+Source: openspec/specs/partial-file-processing/spec.md
+
+tracer:links[]
+--
+
+[#REQ-330, item, role=requirement, title="All processing passes apply to partial files"]
+--
+The system SHALL apply graph population, macro expansion, and link substitution passes to partial files in the same way as page files, because partial content is inlined into pages and reaches the browser.
+
+Source: openspec/specs/partial-file-processing/spec.md
+
+tracer:links[]
+--
+
+[#REQ-331, item, role=requirement, title="Relation-name attributes produce relationships"]
+--
+The system SHALL treat an item-header attribute whose name matches a configured relation type (primary or reverse) as one or more relationships from that item to the listed target IDs.
+
+Source: openspec/specs/relationship-header-attributes/spec.md
+
+tracer:links[]
+--
+
+[#REQ-332, item, role=requirement, title="Relation attributes match inline macro semantics"]
+--
+Relationships declared as header attributes SHALL follow the same canonicalization, validation, and rendering as inline relationship macros.
+
+Source: openspec/specs/relationship-header-attributes/spec.md
+
+tracer:links[]
+--
+
+[#REQ-333, item, role=requirement, title="traceability:outgoing[] macro renders outgoing links"]
+--
+The system SHALL provide a `traceability:outgoing[]` macro (formerly `traceability:links[]`) that expands to a formatted list of all outgoing relationships for the enclosing item.
+
+Source: openspec/specs/traceability-links-macro/spec.md
+
+tracer:links[]
+--
+
+[#REQ-334, item, role=requirement, title="traceability:links[] macro renders combined outgoing and incoming links"]
+--
+The system SHALL provide a `traceability:links[]` macro that expands to a combined list of all outgoing and incoming relationships for the enclosing item, with outgoing groups rendered first followed by incoming groups.
+
+Source: openspec/specs/traceability-links-macro/spec.md
+
+tracer:links[]
+--
+
 ifdef::assembler-backend-pdf[]
 == Changelog
 [cols="1,2,2,3"]
