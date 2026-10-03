@@ -22,22 +22,37 @@ Architectural goals:
 - Ship with built-in presets for common domains without requiring users to write configuration
 - Integrate with Antora's event pipeline without imposing runtime dependencies on users who don't need specific features
 - Provide a standalone CLI for use outside Antora
-
 tracer:links[]
 
 tracer:graph[]
 --
 
-include::partial$04-solution-strategy.adoc[]
-
 == Building Block View
+
+=== C4 system context
+
+The three C4 diagrams enable C4-PlantUML's `!NEW_C4_STYLE=1` wireframe style before loading their bundled C4 macros.
+It uses rounded boxes and swaps the meanings of background/font color settings; these diagrams define no custom color tags.
+
+[plantuml]
+----
+include::example$c4-context.puml[]
+----
+
+=== C4 containers
+
+The container view shows the core package and separately deployed optional ID allocation server.
+
+[plantuml]
+----
+include::example$c4-container.puml[]
+----
 
 [#ARC-002, item, role=design, title="Component-level architecture"]
 --
 include::partial$05-bb-overview.adoc[]
 
-The following class diagram shows the public API of each component — the method groups and key signatures that form the contract boundaries between modules.
-See the API reference for full signatures.
+The existing class diagram uses standard PlantUML for class-level API details.
 
 [plantuml]
 ----
@@ -46,8 +61,6 @@ include::example$api-overview.puml[]
 
 tracer:links[]
 --
-
-=== ConfigLoader
 
 [#ARC-012, item, role=design, title="Preset YAML schema"]
 --

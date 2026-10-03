@@ -1,52 +1,51 @@
-The extension is composed of eleven components organized in four layers.
-Arrows indicate dependencies, with constructor-injected dependencies labeled explicitly.
+This C4 Component view expands the core package into its internal components.
 
 [plantuml]
 ----
-include::example$bb-overview.puml[]
+include::example$c4-component.puml[]
 ----
 
 [width=100%, cols="25,40,35", options="header"]
 |===
 | Component | Responsibility | Key dependencies
 
-| `AntoraTraceabilityExtension`
-| Antora entry point. Registers `contentClassified` and `sitePublished` event handlers, reads playbook config, creates and orchestrates the core extension.
-| `RequirementsTraceabilityExtension` (created at init)
+| CLI
+| Standalone command-line entry point for processing, matrices, validation, export, and ID allocation.
+| `RequirementsTraceabilityExtension`, `ConfigLoader`
 
-| CLI (`cli.ts`)
-| Standalone CLI. Same core extension as Antora but without event handlers. Commander-based subcommands for processing, matrices, validation, export, next-id.
-| `RequirementsTraceabilityExtension` (created per command)
+| `AntoraTraceabilityExtension`
+| Antora entry point. Hooks site-generation events, loads configuration, and orchestrates the core API against the content catalog.
+| `RequirementsTraceabilityExtension`, Antora APIs
 
 | `RequirementsTraceabilityExtension`
-| Orchestrator. Owns the `TraceabilityGraph`, delegates to `DocumentParser`, `MatrixGenerator`, `Neo4jExporter`. Public API for programmatic use.
+| Public core API. Owns the graph and delegates parsing, matrix generation, and export.
 | `DocumentParser`, `TraceabilityGraph`, `MatrixGenerator`, `Neo4jExporter`, `ConfigLoader`
 
+| `ConfigLoader`
+| Loads and validates built-in presets and user YAML configuration.
+| Preset YAML files and user configuration
+
 | `DocumentParser`
-| Regex-based AsciiDoc parser. Extracts `[#ID, item, role=XXX]` blocks and inline `relation:TARGET[]` macros. Excludes `tracer:` namespace. Verbatim blocks pre-scanned.
-| `ConfigLoader` (optional — for role validation)
+| Extracts traceable items and relationships from AsciiDoc.
+| `ConfigLoader` (optional role and relation validation)
 
 | `TraceabilityGraph`
-| In-memory directed graph. Forward and reverse relationship indexes for O(1) lookups. Provides query methods (`findPath`, `getImpactAnalysis`), validation (dangling refs, circular refs), visualization (`toDot`, `toVegaLite`), and ID allocation (`getNextId`).
-| `ConfigLoader` (optional — for relation validation)
-
-| `ConfigLoader`
-| Loads built-in preset YAML, merges with user-provided config. Exposes `isRelationAllowed()`, `getMatrices()`, `listPresets()`, `getAllowedRelations()`. Validation queries used by graph and parser.
-| Built-in presets (`src/presets/`), user YAML config
+| In-memory graph with validation, relationship indexes, query, diff, and visualization support.
+| `ConfigLoader` (optional relation rules)
 
 | `MatrixGenerator`
-| Config-driven matrix generation. Reads matrix definitions from config, queries graph for items by role, computes coverage with `coverageRelations` filter. Produces CSV output; delegates HTML to `TemplateRenderer`.
-| `TraceabilityGraph`, `ConfigLoader`, `TemplateRenderer`, optional `LinkResolver`
+| Generates configured matrices in HTML, CSV, or JSON formats.
+| `TraceabilityGraph`, `ConfigLoader`, `TemplateRenderer`, `LinkResolver`
 
 | `TemplateRenderer`
-| Mustache wrapper. Loads templates from `src/templates/`. Supports custom template directories with fallback to built-ins.
-| Mustache templates
+| Renders HTML matrices from Mustache templates.
+| Built-in or user templates
 
 | `LinkResolver`
-| Path resolution for matrix-to-item deep links. Normalizes `sourceFile` (strips `pages/` prefix, `.adoc` extension). Detects URL sourceFiles (partial items) and returns them unchanged. Generates `../../page.html#ID` links with configurable `relativePathPrefix`.
-| None (standalone utility)
+| Resolves links from matrix cells to item source pages.
+| None
 
 | `Neo4jExporter`
-| Graph-to-Neo4j CSV + Cypher export. Produces `nodes.csv`, `relationships.csv`, and `import.cypher` with proper escaping.
+| Exports graph data to Neo4j CSV and Cypher files.
 | `TraceabilityGraph`, `ConfigLoader`
 |===

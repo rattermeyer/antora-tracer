@@ -1,0 +1,44 @@
+@startuml C4_Component
+!NEW_C4_STYLE=1
+!include <C4/C4_Component>
+
+LAYOUT_WITH_LEGEND()
+
+title Antora Tracer — Core Components
+
+Container_Ext(antora, "Antora", "Documentation site generator", "Hosts the extension entry point")
+System_Ext(neo4j, "Neo4j", "Graph database", "Optional destination for exported CSV / Cypher")
+Container_Ext(idServer, "ID allocation server", "Node.js HTTP service", "Optional remote ID allocator")
+
+Container_Boundary(corePackage, "Antora Tracer core package") {
+  Component(cli, "CLI", "Commander / Node.js", "Standalone command-line entry point")
+  Component(antoraExtension, "Antora extension", "Antora extension API", "Registers build event handlers")
+  Component(core, "Core API", "TypeScript", "Coordinates parsing, graph operations, generation, and export")
+  Component(config, "ConfigLoader", "YAML", "Loads presets and project configuration")
+  Component(parser, "DocumentParser", "AsciiDoc parser", "Extracts items and relationships")
+  Component(graph, "TraceabilityGraph", "In-memory graph", "Validates relationships and serves graph queries")
+  Component(matrix, "MatrixGenerator", "CSV / HTML", "Builds configured traceability matrices")
+  Component(templates, "TemplateRenderer", "Mustache", "Renders HTML matrix templates")
+  Component(linkResolver, "LinkResolver", "URL resolver", "Builds links from matrices to source items")
+  Component(neo4jExporter, "Neo4jExporter", "CSV / Cypher", "Writes graph export files")
+}
+
+Rel(cli, core, "Invokes")
+Rel(antora, antoraExtension, "Loads during site builds")
+Rel(antoraExtension, core, "Orchestrates")
+Rel(core, config, "Loads and queries")
+Rel(core, parser, "Parses content with")
+Rel(core, graph, "Populates and queries")
+Rel(core, matrix, "Generates matrices with")
+Rel(core, neo4jExporter, "Exports with")
+Rel(parser, config, "Checks configured roles and relations")
+Rel(graph, config, "Checks relation rules")
+Rel(matrix, graph, "Queries items and relationships")
+Rel(matrix, config, "Reads matrix definitions")
+Rel(matrix, templates, "Renders HTML through")
+Rel(matrix, linkResolver, "Resolves source links with")
+Rel(neo4jExporter, graph, "Reads items and relationships")
+Rel(neo4jExporter, config, "Reads export queries")
+Rel(cli, idServer, "Requests shared IDs when configured", "HTTP")
+
+@enduml

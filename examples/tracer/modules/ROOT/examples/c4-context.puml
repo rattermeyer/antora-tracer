@@ -1,0 +1,24 @@
+@startuml C4_Context
+!NEW_C4_STYLE=1
+!include <C4/C4_Context>
+
+LAYOUT_WITH_LEGEND()
+
+title Antora Tracer — System Context
+
+Person(author, "Documentation author", "Writes traceable AsciiDoc")
+Person(maintainer, "Project maintainer", "Configures and builds documentation sites")
+System(tracer, "Antora Tracer", "CLI, Antora extension, shared ID allocation service, and optional authoring skills")
+System_Ext(antora, "Antora", "Builds documentation sites")
+System_Ext(aiAssistant, "AI assistant", "Uses optional authoring and review skills")
+System_Ext(neo4j, "Neo4j", "Optional consumer of exported graph data")
+System_Ext(kroki, "Kroki", "Optional renderer for visualization images")
+
+Rel(author, tracer, "Authors traceable content and uses CLI")
+Rel(maintainer, tracer, "Configures and integrates into builds")
+Rel(antora, tracer, "Loads extension during site builds")
+Rel(tracer, aiAssistant, "Ships optional authoring skill files")
+Rel(tracer, neo4j, "Exports CSV and Cypher for import")
+Rel(tracer, kroki, "Generates optional visualization references")
+
+@enduml
