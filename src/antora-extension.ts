@@ -469,9 +469,8 @@ export class AntoraTraceabilityExtension {
       for (const { itemId, bodyStart, bodyEnd, delimiter } of blocks) {
         const bodyContent = content.slice(bodyStart, bodyEnd);
         const bodyRanges = this.getInlineCodeRanges(bodyContent);
-        // Example-block items (====) cannot nest the ==== fences that
-        // collapsible link output emits — fall back to plain lists.
-        const collapsibleHere = delimiter === "--" && collapsible;
+        // Collapsible fences must be strictly longer than the item
+        // delimiter to nest — generateListStyle derives the fence length.
         let hasExplicitMacro = false;
         let macroMatch: RegExpExecArray | null;
 
@@ -492,10 +491,11 @@ export class AntoraTraceabilityExtension {
                   style,
                   order,
                   currentFile,
-                  collapsibleHere,
+                  collapsible,
                   currentComponent,
                   currentModule,
                   emptyStyle,
+                  delimiter,
                 )
               : "",
           });
@@ -508,10 +508,11 @@ export class AntoraTraceabilityExtension {
             style,
             order,
             currentFile,
-            collapsibleHere,
+            collapsible,
             currentComponent,
             currentModule,
             emptyStyle,
+            delimiter,
           );
           // Collapsible output opens with a block attribute ([%collapsible]);
           // plain list output must be separated from the last body paragraph
@@ -519,7 +520,7 @@ export class AntoraTraceabilityExtension {
           replacements.push({
             start: bodyEnd,
             end: bodyEnd,
-            text: collapsibleHere ? autoOutput : `\n${autoOutput}`,
+            text: collapsible ? autoOutput : `\n${autoOutput}`,
           });
         }
       }
@@ -560,6 +561,7 @@ export class AntoraTraceabilityExtension {
     currentComponent?: string,
     currentModule?: string,
     emptyStyle: "none" | "italic" | "admonition" = "none",
+    itemDelimiter?: string,
   ): string {
     const directions: RelationDirection[] =
       macroName === "links" ? ["outgoing", "incoming"] : [macroName];
@@ -587,6 +589,7 @@ export class AntoraTraceabilityExtension {
               collapsible,
               currentComponent,
               currentModule,
+              itemDelimiter,
             ),
           );
         }
@@ -608,6 +611,7 @@ export class AntoraTraceabilityExtension {
         true,
         currentComponent,
         currentModule,
+        itemDelimiter,
       );
     }
     return parts.join("");
@@ -691,6 +695,7 @@ export class AntoraTraceabilityExtension {
     collapsible: boolean,
     currentComponent?: string,
     currentModule?: string,
+    itemDelimiter?: string,
   ): string {
     if (grouped.length === 0) return "";
     if (style === "table")
@@ -713,6 +718,7 @@ export class AntoraTraceabilityExtension {
       collapsible,
       currentComponent,
       currentModule,
+      itemDelimiter,
     );
   }
 
@@ -810,9 +816,15 @@ export class AntoraTraceabilityExtension {
     collapsible: boolean,
     currentComponent?: string,
     currentModule?: string,
+    itemDelimiter?: string,
   ): string {
+    // Example-block fences nest by length: the collapsible fence must be
+    // strictly longer than the enclosing item delimiter, or the inner fence
+    // closes the item block (==== items therefore need ======).
+    const fenceLen = Math.max(itemDelimiter?.length ?? 2, 2) + 2;
+    const fence = "=".repeat(fenceLen);
     const lines: string[] = collapsible
-      ? ["\n[%collapsible]", ".Links", "===="]
+      ? ["\n[%collapsible]", ".Links", fence]
       : [];
     for (const [relType, items] of grouped) {
       lines.push("", `.${this.displayLabel(relType)}`);
@@ -826,7 +838,7 @@ export class AntoraTraceabilityExtension {
         );
       }
     }
-    if (collapsible) lines.push("====");
+    if (collapsible) lines.push(fence);
     return `${lines.join("\n")}\n`;
   }
 
@@ -972,12 +984,8 @@ export class AntoraTraceabilityExtension {
       const replacements: Array<{ start: number; end: number; text: string }> =
         [];
 
-      for (const { itemId, bodyStart } of blocks) {
-        const bodyEnd = content.indexOf("\n--\n", bodyStart);
-        const bodyContent = content.slice(
-          bodyStart,
-          bodyEnd >= 0 ? bodyEnd : undefined,
-        );
+      for (const { itemId, bodyStart, bodyEnd } of blocks) {
+        const bodyContent = content.slice(bodyStart, bodyEnd);
 
         const macroRegex = new RegExp(
           `${RENDERING_MACRO_NS}:graph\\[([A-Z][A-Z0-9-]*)?(?:,\\s*(\\d+))?\\]`,
@@ -1104,13 +1112,8 @@ export class AntoraTraceabilityExtension {
       const replacements: Array<{ start: number; end: number; text: string }> =
         [];
 
-      for (const { itemId, bodyStart } of blocks) {
-        const bodyEnd = content.indexOf("\n--\n", bodyStart);
-        const bodyContent = content.slice(
-          bodyStart,
-          bodyEnd >= 0 ? bodyEnd : undefined,
-        );
-
+      for (const { itemId, bodyStart, bodyEnd } of blocks) {
+        const bodyContent = content.slice(bodyStart, bodyEnd);
         const macroRegex = new RegExp(
           `${RENDERING_MACRO_NS}:graph-coverage\\[\\]`,
           "g",

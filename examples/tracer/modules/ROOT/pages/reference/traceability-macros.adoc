@@ -119,7 +119,6 @@ When the resolved setting is absent or false, explicit relationship rendering ma
 | `:traceability-collapsible:`
 | `true`
 | In list style, wrap all relation-type groups in one `Links` disclosure, with headings inside (HTML only).
-Disabled inside items delimited by `====` — example blocks cannot nest `====` fences, so links render as plain lists.
 |===
 
 === Superseded items

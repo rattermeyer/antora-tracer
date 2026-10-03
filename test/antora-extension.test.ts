@@ -1826,7 +1826,7 @@ addresses:REQ-001[]
       expect(itemOutput).to.include(".Addressed by");
     });
 
-    it("does not emit ==== collapsible fences inside example-block items", async () => {
+    it("nests collapsible links with a longer fence inside example-block items", async () => {
       const output = await renderDoc(`:traceability-links: true
 :traceability-collapsible: true
 
@@ -1845,7 +1845,10 @@ Target.
         output.indexOf("[#PRQ-001"),
         output.indexOf("[#REQ-072"),
       );
-      expect(itemOutput).to.not.include("[%collapsible]");
+      expect(itemOutput).to.include("[%collapsible]");
+      // Collapsible fence (6 equals) must be strictly longer than the
+      // item delimiter (4 equals) so it nests instead of closing the item.
+      expect(itemOutput).to.include("\n======\n");
       expect(itemOutput).to.include(".Validates");
       expect(itemOutput).to.include("REQ-072");
     });
