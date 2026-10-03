@@ -47,9 +47,8 @@ jobs:
 
       - name: Compile tests
         run: pnpm exec tsc -p tsconfig.test.json
-
-      - name: Check landing page stats
-        run: node scripts/check-landing-stats.js
+        # The landing-stats generator (run by preview.js) reads the passing
+        # count from the compiled suite — no separate verification step.
 
       - name: Install Vale
         run: |

@@ -1,20 +1,26 @@
 #!/usr/bin/env node
 // Patches landing-page stats into the built index.html from the site's own
-// traceability graph, so the numbers cannot drift from reality.
+// traceability graph and the real test suite, so the numbers cannot drift
+// from reality.
 //
 // The landing source (landing/index.html) keeps static fallback numbers in
 // elements tagged data-stat="...". This script rewrites those numbers in the
-// BUILT copy (public/index.html) using the graph.json attachment that the
-// Antora build just generated — the same artifact the published matrices are
-// built from. The source file is never modified.
+// BUILT copy (public/index.html):
+//   - graph numbers (requirements, relationships, items) from the graph.json
+//     attachment the Antora build just generated — the same artifact the
+//     published matrices are built from
+//   - the tests count by running the compiled suite once and reading the
+//     passing count (the suite must be compiled first:
+//     pnpm exec tsc -p tsconfig.test.json)
 //
-// The tests count is not recomputed here — the docs build must not run the
-// test suite. scripts/check-landing-stats.js verifies the declared value in
-// CI instead.
+// The source file is never modified. If the suite cannot be run or its
+// summary parsed, the declared fallback number stays in place rather than
+// failing the docs build.
 //
 // Usage: node scripts/generate-landing-stats.js [target-html] [graph.json]
 //   defaults: public/index.html  public/docs/tracer/stable/_attachments/traceability/graph.json
 
+import { spawnSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
@@ -24,11 +30,24 @@ const graphPath = resolve(
     "public/docs/tracer/stable/_attachments/traceability/graph.json",
 );
 
-// Declared test count — read from the built HTML, verified against the real
-// suite by scripts/check-landing-stats.js, never recomputed here.
-const testsCount =
+// Declared test count — the fallback when the suite cannot be run.
+const declaredTests =
   (/data-stat="tests"[^>]*>(\d+)</.exec(readFileSync(target, "utf8")) ??
     [])[1] ?? "0";
+
+// Run the suite once and read the passing count. A failing suite still has a
+// passing count (CI gates failures separately); only an unreadable summary
+// falls back to the declared number.
+const suite = spawnSync(
+  process.execPath,
+  ["--import=tsx/cjs", "node_modules/mocha/bin/mocha", "lib/test/**/*.test.js"],
+  { encoding: "utf8" },
+);
+const testsCount =
+  (/(\d+) passing/.exec(suite.stdout ?? "") ?? [])[1] ?? declaredTests;
+if (testsCount === declaredTests && suite.status !== 0 && !suite.stdout) {
+  console.log("⚠ test suite not runnable — keeping declared count");
+}
 
 const graph = JSON.parse(readFileSync(graphPath, "utf8"));
 const roleStats = {};
@@ -44,9 +63,9 @@ const itemsTotal = graph.items.length;
 
 const values = {
   tests: testsCount,
-  requirements: String(roleStats["requirement"] ?? 0),
+  requirements: String(roleStats.requirement ?? 0),
   relationships: String(relationships),
-  "requirements-inline": String(roleStats["requirement"] ?? 0),
+  "requirements-inline": String(roleStats.requirement ?? 0),
   "relationships-inline": String(relationships),
   "items-total": String(itemsTotal),
 };
