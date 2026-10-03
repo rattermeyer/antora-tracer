@@ -1,6 +1,6 @@
 {
   "name": "@antora-tracer/core",
-  "version": "0.26.1",
+  "version": "0.27.0",
   "type": "module",
   "packageManager": "pnpm@10.33.0",
   "description": "Requirements traceability extensions for Antora/AsciiDoc",

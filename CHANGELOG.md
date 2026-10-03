@@ -2,6 +2,20 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.27.0] — 2026-10-03
+
+### Added
+- The `query siblings` CLI command finds items sharing typed neighbors with a given ID, undirected over declared relations, with shared-neighbor context and supersession status; it supports `--relation` filtering and cross-source `site-graph` snapshots.
+- The traceability graph exposes `getSiblings(itemId, relationType?)` as a query API.
+- All built-in presets ship role guidance for every role, so projects extending a preset inherit authoring guidance without declaring `roleGuidance`.
+- Collapsible relationship lists render inside `====` example-block items by deriving a longer fence from the item delimiter.
+
+### Fixed
+- Auto-injected plain link lists no longer merge into the last body paragraph of an item.
+- Graph and coverage macro passes locate `====` item bodies correctly instead of scanning past them for `--` delimiters.
+- The self-traceability example no longer emits duplicate REQ IDs, and the landing page links the live matrices at their stable path.
+- Vale prose linting excludes the spec-derived requirements pages.
+
 ## [0.26.1] — 2026-09-30
 
 ### Fixed
