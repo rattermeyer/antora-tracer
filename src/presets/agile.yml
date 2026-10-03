@@ -22,6 +22,23 @@ traceability:
     - spike
     - bug
     - test
+  roleGuidance:
+    epic:
+      page: guidance/agile_epic.adoc
+    feature:
+      page: guidance/agile_feature.adoc
+    user_story:
+      page: guidance/agile_user_story.adoc
+    acceptance_criterion:
+      page: guidance/agile_acceptance_criterion.adoc
+    task:
+      page: guidance/agile_task.adoc
+    spike:
+      page: guidance/agile_spike.adoc
+    bug:
+      page: guidance/agile_bug.adoc
+    test:
+      page: guidance/agile_test.adoc
 
   relations:
     # Epic relations

@@ -1,0 +1,41 @@
+= Writing Constraints
+
+A `constraint` item states a condition or limit that the design must not violate.
+
+== Item template
+
+[source,asciidoc]
+----
+[#<constraint-id>, item, role=constraint, title="<constraint>"]
+--
+The design SHALL respect <non-negotiable condition or limit>.
+
+--
+----
+== Optional traceability
+
+Traceability is optional and each relation requires a configured target ID.
+
+[source,asciidoc]
+----
+restricts:<design-element-id>[]
+----
+
+Use `restricts` only for an existing `design_element` that this constraint limits.
+Use `tracer:links[]` only when the item's configured relationships should be displayed.
+
+== Authoring checklist
+
+* State the non-negotiable condition or limit precisely.
+* Identify the scope and consequence when they are known.
+* Keep the constraint distinct from a desired feature or implementation choice.
+* Use `restricts` only to point to an existing `design_element` that the constraint limits.
+* Omit the link when no affected design element is known.
+
+== Review checklist
+
+* [ ] The condition is mandatory rather than merely preferred.
+* [ ] The scope and boundary are clear enough to review.
+* [ ] The statement avoids invented authority, targets, or compliance claims.
+* [ ] The `restricts` relation uses an existing design element ID.
+* [ ] The constraint can be checked against the affected design when evidence is available.

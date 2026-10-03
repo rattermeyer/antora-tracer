@@ -6,8 +6,9 @@ A `requirement` item states what the system must do — never how.
 
 A `requirement` is a traceable item.
 Check the traceability configuration for the relations a requirement can author and the roles that reference it.
-In the `requirements-engineering` preset a requirement relates to other requirements (`refines`, `depends_on`, `conflicts_with`, `supersedes`), and is referenced by design (`addresses`) and test (`verifies`) items.
-Use cases link to requirements via `leads_to` — a requirement links back only if the config defines an inverse.
+In the `requirements-engineering` preset, requirements may refine, depend on, conflict with, or supersede other requirements.
+Designs and tests point to requirements using their configured relations (`addresses` and `verifies`).
+In the `spec-driven-development` preset, a use case points to a requirement with `leads_to`, and the inverse relation is `is_derived_from` when linking from a requirement to a use case.
 
 Do not invent role or relation names — take them from the config.
 
@@ -27,15 +28,15 @@ Never fabricate relation or target IDs. If no target ID was given, leave the tra
 
 === Step 1: Get the Next ID
 
-```bash
-antora-tracer next-id --prefix <requirement-prefix> -i <docs-dir>
-```
+[source,bash]
+----
+antora-tracer next-id --prefix REQ -i <docs-dir>
+----
 
 === Step 2: Write the Item Block
 
 One SHALL statement plus any boundary conditions:
-
-[asciidoc]
+[source,asciidoc]
 ----
 [#<requirement-id>, item, role=requirement, title="<short title>"]
 --
@@ -43,7 +44,6 @@ The system SHALL <observable behaviour>.
 
 <boundary conditions or scope>
 
-tracer:links[]
 --
 ----
 
@@ -135,6 +135,6 @@ Exception: when the integration IS the feature — "Neo4j export", "Antora exten
 - [ ] Scope boundaries explicit
 
 === Traceability
-- [ ] `tracer:links[]` present
+- [ ] Links and `tracer:links[]` are included only when configured relationships exist and the project wants them displayed.
 - [ ] All referenced IDs exist
 - [ ] Relation types come from the config, not from memory

@@ -1,0 +1,49 @@
+= Writing Quality Scenarios
+
+A `quality_scenario` item makes a quality attribute concrete through a stimulus, context, response, and measurable result.
+
+== Item template
+
+[source,asciidoc]
+----
+[#<quality-scenario-id>, item, role=quality_scenario, title="<stimulus and quality outcome>"]
+--
+Stimulus: <event or load that occurs>.
+
+Context: <relevant operating state or environment>.
+
+Response: <observable system response>.
+
+Measure: <response measure and target>.
+
+--
+----
+== Optional traceability
+
+Traceability is optional and each relation requires a configured target ID.
+
+[source,asciidoc]
+----
+characterizes:<quality-attribute-id>[]
+leads_to:<requirement-id>[]
+----
+
+Use `characterizes` only for an existing `quality_attribute` that this scenario details.
+Use `leads_to` only for an existing `requirement` derived from the scenario.
+Use `tracer:links[]` only when the item's configured relationships should be displayed.
+
+== Authoring checklist
+
+* State a concrete stimulus and the context in which it occurs.
+* Describe an observable response and a measurable target.
+* Keep one quality scenario per item.
+* Use `characterizes` only to point to the existing `quality_attribute` it details.
+* Use `leads_to` only to point to an existing `requirement` derived from the scenario.
+
+== Review checklist
+
+* [ ] The stimulus, context, response, and measure are all clear.
+* [ ] A reviewer can determine pass or fail without guessing.
+* [ ] The scenario characterizes a quality attribute rather than adding unrelated function.
+* [ ] Each relation uses a configured type and an existing target ID.
+* [ ] Unsupported assumptions and unquantified claims are marked as open questions.

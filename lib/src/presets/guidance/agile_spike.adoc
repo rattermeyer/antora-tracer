@@ -1,0 +1,35 @@
+= Writing Agile Spike Items
+
+A `spike` item describes a time-boxed investigation that reduces uncertainty before implementation or acceptance work proceeds.
+
+== Item template
+
+[source,asciidoc]
+----
+[item, id=<id>, role=spike, title="<short question>"]
+====
+Question: <the uncertainty to resolve>.
+
+Approach: <the smallest investigation that can answer the question>.
+
+Result: <evidence, decision, or follow-up work expected>.
+
+<Optional configured links.>
+
+====
+----
+The optional `tracer:links[]` macro may be added when rendered link output is useful.
+
+== Writing and review checklist
+
+* Frame one concrete question and set a time-box or stopping condition.
+* Define the evidence needed to support the resulting decision.
+* Record a result that can guide implementation or the next item.
+* Use an existing target ID for each link and omit links whose targets are not known.
+* Confirm the item uses `role=spike` and that every relation name comes from this preset.
+
+== Optional configured links
+
+Use `investigates:<user-story-id>[]` from a spike to a user story; the story-side reverse is `investigated_by:<spike-id>[]`.
+Use `results_in:<task-id>[]` from a spike to a task; the task-side reverse is `result_of:<spike-id>[]`.
+Include only links supported by the configured relation and only when the target ID is real.

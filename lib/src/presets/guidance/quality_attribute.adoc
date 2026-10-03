@@ -1,0 +1,43 @@
+= Writing Quality Attributes
+
+A `quality_attribute` item states a quality characteristic the system or service is expected to exhibit.
+
+== Item template
+
+[source,asciidoc]
+----
+[#<quality-attribute-id>, item, role=quality_attribute, title="<quality characteristic>"]
+--
+The system exhibits <quality characteristic> under <condition> with <measure or target>.
+
+--
+----
+== Optional traceability
+
+Traceability is optional and each relation requires a configured target ID.
+
+[source,asciidoc]
+----
+is_motivated_by:<business-goal-id>[]
+characterized_by:<quality-scenario-id>[]
+----
+
+Use `is_motivated_by` only for an existing `business_goal` that genuinely motivates the attribute.
+Use `characterized_by` only for an existing `quality_scenario` that makes the attribute concrete.
+Use `tracer:links[]` only when the item's configured relationships should be displayed.
+
+== Authoring checklist
+
+* Name one quality characteristic and its scope.
+* State a measurable target or explain how the quality will be assessed.
+* Keep implementation choices out of the attribute statement.
+* Use `is_motivated_by` only for an existing motivating `business_goal`.
+* Use `characterized_by` only for an existing `quality_scenario` that makes the attribute concrete.
+
+== Review checklist
+
+* [ ] The characteristic is specific enough to assess.
+* [ ] The condition, measure, and target are clear when they are known.
+* [ ] The item does not prescribe a technology or design.
+* [ ] Each relation uses a configured type and an existing target ID.
+* [ ] Missing measures and links are identified instead of fabricated.

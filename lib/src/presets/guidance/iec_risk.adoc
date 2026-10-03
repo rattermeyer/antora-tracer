@@ -1,0 +1,40 @@
+= Writing Risk Items
+
+A `risk` item describes a harmful possibility, its context, and the uncertainty that makes control necessary.
+This guidance supports traceability authoring only and does not establish IEC 62304, FDA, or other regulatory compliance.
+`tracer:links[]` is optional display-only markup and is not part of the item content.
+
+== Item template
+
+[source,asciidoc]
+----
+[#<id>, item, role=risk, title="<risk statement>"]
+--
+If <condition or initiating situation>, <harmful outcome> may occur.
+
+Likelihood, severity, assumptions, and affected context: <supported assessment detail>.
+
+<optional link, for example:>
+caused_by:<hazard-id>[]
+
+--
+----
+
+== Optional configured links
+
+A risk may use `caused_by` for a `hazard`.
+It may use `mitigated_by` for a `mitigation`.
+It may use `requires` for a `software_requirement` or a `system_requirement`.
+It may use `verified_by` for a `test_procedure`.
+The configured reverse names are `causes`, `mitigates`, `required_by`, and `verifies`, respectively.
+Add a link only when the target ID exists and the relationship is supported by the risk analysis.
+
+== Writing and review checklist
+
+* [ ] Describes a specific harmful possibility rather than a generic concern.
+* [ ] States initiating conditions, affected context, and potential outcome.
+* [ ] Records likelihood, severity, assumptions, or uncertainty only when supported.
+* [ ] Distinguishes the risk from its hazard and its mitigation.
+* [ ] Uses only configured relation names and existing target IDs for optional links.
+* [ ] Avoids claiming that a traceability link or preset use proves compliance.
+* [ ] Includes `tracer:links[]` only when displaying related items is useful.

@@ -1,0 +1,40 @@
+= Writing System Requirement Items
+
+A `system_requirement` item states an observable system capability or constraint that the product must satisfy.
+This guidance supports traceability authoring only and does not establish IEC 62304, FDA, or other regulatory compliance.
+`tracer:links[]` is optional display-only markup and is not part of the item content.
+
+== Item template
+
+[source,asciidoc]
+----
+[#<id>, item, role=system_requirement, title="<short title>"]
+--
+The system SHALL <observable capability or constraint>.
+
+<scope, condition, or measurable acceptance detail>
+
+<optional link, for example:>
+allocated_to:<software-requirement-id>[]
+
+--
+----
+
+== Optional configured links
+
+A system requirement may use `allocated_to` for a `software_requirement`.
+A system requirement may use `mitigated_by` for a `risk`.
+A system requirement may use `derived_from` for a `regulation`.
+A system requirement may use `complies_with` for a `standard`.
+The configured reverse names are `allocated_from`, `mitigates`, `derived_into`, and `complied_with_by`, respectively.
+Add a link only when the target ID exists and the relationship is supported by project evidence.
+
+== Writing and review checklist
+
+* [ ] States one observable system capability or constraint.
+* [ ] Defines scope, conditions, and measurable acceptance details where applicable.
+* [ ] Avoids prescribing an implementation unless the constraint genuinely requires it.
+* [ ] Separates independent obligations into separate items.
+* [ ] Uses only configured relation names and existing target IDs for optional links.
+* [ ] Avoids claiming that a traceability link or preset use proves compliance.
+* [ ] Includes `tracer:links[]` only when displaying related items is useful.

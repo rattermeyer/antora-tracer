@@ -1,0 +1,47 @@
+= Writing Test Cases
+
+A `test_case` item defines a concrete verification case with inputs, conditions, actions, and expected results.
+
+== Item template
+
+[source,asciidoc]
+----
+[#TST-NNN, item, role=test_case, title="<test objective>"]
+--
+Preconditions: <conditions that must hold>.
+
+Inputs: <values, fixtures, or events>.
+
+Steps: <actions that exercise the behavior>.
+
+Expected result: <observable result and pass criterion>.
+
+--
+----
+== Optional traceability
+
+Traceability is optional and each relation requires a configured target ID.
+
+[source,asciidoc]
+----
+verifies:<requirement-id>[]
+----
+
+Use `verifies` only for an existing `requirement` that this case verifies.
+Use `tracer:links[]` only when the item's configured relationships should be displayed.
+
+== Authoring checklist
+
+* State the behavior under test and its observable pass criterion.
+* Include the preconditions, inputs, and actions needed to reproduce the case.
+* Use the established `TST` ID prefix for this role unless the project already has another convention.
+* Use `verifies` only to point to an existing `requirement` that the case verifies.
+* Keep implementation details out unless they are necessary to execute the case.
+
+== Review checklist
+
+* [ ] The case has a clear objective and deterministic expected result.
+* [ ] Preconditions, inputs, and steps are sufficient to reproduce the case.
+* [ ] Pass and fail outcomes are observable without guessing.
+* [ ] The `verifies` relation uses an existing requirement ID.
+* [ ] The case does not claim unsupported links to design elements or other roles.

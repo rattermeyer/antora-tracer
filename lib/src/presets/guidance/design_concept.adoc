@@ -1,22 +1,63 @@
 = Writing Design Concepts
 
-A `design_concept` item captures stable architectural knowledge.
-It should outlive the change that introduced or refined it.
+A `design_concept` item records stable architectural knowledge that should remain useful beyond the change that introduced it.
+Use it for a settled, reusable design approach; keep alternatives and decision rationale in an ADR and change-specific detail in the change item.
 
-== Item template
+== Traceability
+
+In `spec-driven-development`, a design concept may point to requirements using `addresses` and to originating ADRs with the inverse relation `derived_from`.
+Use existing IDs and include a link only when the relationship is real.
+
+== Get the Next ID
+
+Use the prefix established by the project; the `spec-driven-development` preset uses `DES`.
+
+[source,bash]
+----
+antora-tracer next-id --prefix DES -i <docs-dir>
+----
+
+== Item Template
 
 [source,asciidoc]
 ----
-[#DES-NNN, item, role=design_concept, status=draft, title="Short concept title"]
+[#DES-NNN, item, role=design_concept, status=draft, title="<stable design concept>"]
 --
-Describe the stable concept and its rationale.
+<Describe the reusable design principle, structure, or approach.>
 
-addresses:REQ-NNN[]
-derived_from:ADR-NNN[]
+Rationale:: <why it exists and what constraints shape it>
 
-tracer:links[]
 --
 ----
 
-Keep change-specific reasoning in an ADR.
-Use the design concept for the resulting reusable architecture.
+== Optional Traceability
+
+Use only configured relations with existing target IDs.
+
+[source,asciidoc]
+----
+addresses:REQ-NNN[]
+derived_from:ADR-NNN[]
+----
+
+`tracer:links[]` only displays relationships; add it separately when rendered relationship lists are wanted.
+
+The preset uses the `DES` prefix and declares `draft`, `accepted`, and `deprecated` states.
+
+== Writing Rules
+
+* Describe a durable concept at the level that should survive implementation changes.
+* State the rationale and important constraints; do not copy the ADR's option analysis.
+* Keep one coherent concept per item and distinguish settled guidance from proposals.
+* Link to requirements or decisions only when the active model allows it and the relationship is accurate.
+* When a concept is replaced, preserve the history and update its lifecycle or relationships according to the project model.
+
+== Quality Checklist
+
+* [ ] The concept is reusable beyond one temporary change.
+* [ ] Its name and scope are clear.
+* [ ] Rationale and constraints are recorded.
+* [ ] The item does not duplicate decision alternatives or implementation task lists.
+* [ ] Optional links use configured relations, correct direction, and existing IDs.
+* [ ] Status reflects the project's defined lifecycle.
+

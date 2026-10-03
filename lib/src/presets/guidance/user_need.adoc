@@ -1,0 +1,43 @@
+= Writing User Needs
+
+A `user_need` item captures a stakeholder's desired capability or outcome.
+
+== Item template
+
+[source,asciidoc]
+----
+[#<user-need-id>, item, role=user_need, title="<stakeholder need>"]
+--
+<Stakeholder> needs <capability or outcome> so that <benefit>.
+
+--
+----
+== Optional traceability
+
+Traceability is optional and each relation requires a configured target ID.
+
+[source,asciidoc]
+----
+is_motivated_by:<business-goal-id>[]
+described_by:<use-case-id>[]
+----
+
+Use `is_motivated_by` only for an existing `business_goal` that genuinely motivates the need.
+Use `described_by` only for an existing `use_case` that describes the need.
+Use `tracer:links[]` only when the item's configured relationships should be displayed.
+
+== Authoring checklist
+
+* State the stakeholder and the desired outcome.
+* Explain the benefit without prescribing a solution.
+* Keep one coherent need in each item.
+* Use `is_motivated_by` only to point to an existing `business_goal` that genuinely motivates the need.
+* Use `described_by` only to point to an existing `use_case` that describes the need.
+
+== Review checklist
+
+* [ ] The item names a specific stakeholder or stakeholder group.
+* [ ] The need states an outcome or capability rather than an implementation.
+* [ ] The benefit is clear and testable downstream.
+* [ ] Each relation uses a configured type and an existing target ID.
+* [ ] Unknown facts and links are omitted rather than invented.

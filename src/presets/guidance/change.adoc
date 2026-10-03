@@ -1,36 +1,59 @@
 = Writing Changes
 
-A `change` item records a proposed feature, fix, or improvement.
-It links to the durable requirements it addresses and the ADRs that record decisions made for the change.
+A `change` item records a proposed, bounded body of work in the `spec-driven-development` preset.
+Use it to carry the rationale, intended outcome, scope, questions, and decisions needed to deliver a change.
+Keep durable requirements, architecture decisions, and reusable design concepts in their own roles.
 
-== Item template
+== Traceability
+
+In the `spec-driven-development` preset, a change may point to requirements using `addresses` and to ADRs using `records`.
+These links are optional when there is no meaningful relationship or the target ID is not known.
+Use only configured relation names and existing IDs.
+
+== Item Template
 
 [source,asciidoc]
 ----
-[#CHG-NNN, item, role=change, status=proposed, title="Short change title"]
+[#CHG-NNN, item, role=change, status=proposed, title="<short change title>"]
 --
-Rationale:: Why this change is needed.
+Rationale:: Why is this change needed?
 
-Outcome:: What the change produces
+Outcome:: What observable result should the change produce?
 
-Out of Scope:: What is excluded and not available after the change is finished.
+Out of Scope:: What will remain unchanged or unavailable?
 
-Open Questions:: Questions that need to be decided or answered during refinement.
+Open Questions:: What needs a decision or answer before implementation?
 
-Notes:: Anything discussed when crafting the change that is worth to be captured for subsequent phases.
+Notes:: Context worth retaining across the change lifecycle.
 
-addresses:REQ-NNN[]
-records:ADR-NNN[]
-
-tracer:links[]
 --
 ----
 
+== Optional Traceability
+
+In the `spec-driven-development` preset, a change may point to requirements with `addresses` and ADRs with `records`.
+Add these only when relevant and the target IDs exist.
+
+[source,asciidoc]
+----
+addresses:REQ-NNN[]
+records:ADR-NNN[]
+----
+
+`tracer:links[]` only displays relationships; add it separately when rendered relationship lists are useful.
+
+The preset's configured prefix is `CHG`.
+Omit empty sections and unused relationship macros rather than leaving template prompts in a committed item.
+
 == Lifecycle
+Follow its configured transitions when recording progress; state names do not replace a clear rationale or acceptance evidence.
+The preset associates refinement with a use case and acceptance with a requirement; describe or link these only when they exist.
 
-The recommended states are `proposed`, `refined`, `accepted`, `implemented`, `verified`, and `closed`.
-A change may also be `rejected`.
+== Quality Checklist
 
-A refined change has at least one use case.
-An accepted change addresses at least one requirement.
-The initial preset validates these structural conditions without enforcing transitions.
+* [ ] The rationale and intended outcome are specific.
+* [ ] Scope boundaries say what is excluded.
+* [ ] Open questions are explicit; unresolved decisions are not presented as settled.
+* [ ] Status reflects actual progress under the configured lifecycle.
+* [ ] Optional links use configured relations, correct direction, and existing IDs.
+* [ ] Durable decisions and requirements are recorded in their own roles.

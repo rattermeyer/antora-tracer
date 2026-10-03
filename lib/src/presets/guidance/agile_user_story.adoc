@@ -1,0 +1,38 @@
+= Writing Agile User Story Items
+
+A `user_story` item states a user-facing need, the desired outcome, and the value that makes the work worth doing.
+
+== Item template
+
+[source,asciidoc]
+----
+[item, id=<id>, role=user_story, title="<short outcome title>"]
+====
+As a <specific user>, I want <capability>, so that <observable value>.
+
+<Context, scope, or important constraint.>
+
+<Optional configured links.>
+
+====
+----
+The optional `tracer:links[]` macro may be added when rendered link output is useful.
+
+== Writing and review checklist
+
+* Name a specific user or stakeholder and one outcome.
+* Keep the story understandable without prescribing implementation.
+* Make the value and boundaries observable enough to derive acceptance criteria.
+* Use an existing target ID for each link and omit links whose targets are not known.
+* Confirm the item uses `role=user_story` and that every relation name comes from this preset.
+
+== Optional configured links
+
+Use `part_of:<epic-id>[]` from a user story to an epic; the epic-side reverse is `contains:<user-story-id>[]`.
+Use `part_of:<feature-id>[]` from a user story to a feature; the feature-side reverse is `contains:<user-story-id>[]`.
+Use `has:<acceptance-criterion-id>[]` from a user story to an acceptance criterion; the criterion-side reverse is `belongs_to:<user-story-id>[]`.
+Use `broken_down_into:<task-id>[]` from a user story to a task; the task-side reverse is `broken_down_from:<user-story-id>[]`.
+Use `requires:<spike-id>[]` from a user story to a spike; the spike-side reverse is `required_by:<user-story-id>[]`.
+Use `verified_by:<test-id>[]` from a user story to a test; the test-side reverse is `verifies:<user-story-id>[]`.
+Use `affected_by:<bug-id>[]` from a user story to a bug; the bug-side reverse is `affects:<user-story-id>[]`.
+Include only links supported by the configured relation and only when the target ID is real.

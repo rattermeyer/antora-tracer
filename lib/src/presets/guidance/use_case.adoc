@@ -5,11 +5,10 @@ A `use_case` item describes a user goal in Karl Wiegers tabular form.
 == Traceability
 
 A `use_case` is a traceable item.
-Check the traceability configuration if and to what role it should be linke upwards.
-If not existent, think about writing downstream items.
-
-Do not invent role or relation names — take them from the config.
-If the project defines no use-case role or incoming or outgoing relations, tell the user use cases are not wired into their traceability model yet.
+Check the active traceability configuration for relations available to use cases; link only to real, relevant items.
+In the `spec-driven-development` preset, a use case points to a requirement using `leads_to`.
+That relation is optional when no requirement exists yet or the ID is unknown.
+Do not invent role names, relation names, or target IDs.
 
 == Guardrails
 
@@ -30,9 +29,10 @@ Never fabricate actors, steps, conditions, or priorities. If the user cannot ans
 
 === Step 1: Get the Next ID
 
-```bash
-antora-tracer next-id --prefix <use_case_prefix> -i <docs-dir>
-```
+[source,bash]
+----
+antora-tracer next-id --prefix UC -i <docs-dir>
+----
 
 === Step 2: Define the Actor (Persona)
 
@@ -46,7 +46,7 @@ Only proceed to write the use case after the actor is precisely identified.
 
 Use the Karl Wiegers tabular template. The `[item]` block body contains a table with all sections:
 
-[asciidoc]
+[source,asciidoc]
 ----
 [#<use-case-id>, item, role=use_case, title="<Actor> <action verb> <observable outcome>"]
 --
@@ -72,16 +72,8 @@ Use the Karl Wiegers tabular template. The `[item]` block body contains a table 
 | Notes | <open issues, assumptions, references>
 |===
 
-<traceability-relations>
-
-tracer:links[]
---
+<optional configured traceability relations>
 ----
-
-The `<traceability-relations>` relation names the requirements this use case is derived from (if defined in the traceability model).
-Only include it if the relation is defined in `traceability.yml` — see the discovery step.
-
-=== Preconditions and Postconditions
 
 Must be written as **testable statements in past tense**:
 
@@ -178,9 +170,8 @@ When asked to review a use case, check the following. Do NOT stop at formatting 
 - [ ] Multiple conditions use "And" or "Or"
 
 === Traceability
-- [ ] At least one traceability relationship
-- [ ] All referenced requirement IDs exist in the requirements document
-- [ ] `tracer:links[]` is present
+- [ ] Any relevant relationship uses a configured type and an existing target ID; omit links when none apply.
+- [ ] `tracer:links[]` appears only when relationship display is wanted.
 
 === Consistency
 - [ ] Title style matches other use cases in the project

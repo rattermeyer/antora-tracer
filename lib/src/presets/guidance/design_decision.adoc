@@ -1,0 +1,50 @@
+= Writing Design Decisions
+
+A `design_decision` item records a chosen design direction and the reasoning that led to it.
+
+== Item template
+
+[source,asciidoc]
+----
+[#<design-decision-id>, item, role=design_decision, title="<decision>"]
+--
+Context: <problem or choice that required a decision>.
+
+Decision: <chosen design direction>.
+
+Rationale: <decision drivers, trade-offs, and consequences>.
+
+--
+----
+== Optional traceability
+
+Traceability is optional and each relation requires a configured target ID.
+
+[source,asciidoc]
+----
+influences:<design-concept-id>[]
+supersedes:<design-concept-id>[]
+motivates:<design-element-id>[]
+influences:<design-decision-id>[]
+supersedes:<design-decision-id>[]
+----
+
+Use `influences` or `supersedes` only for an existing `design_concept` or `design_decision` target as configured.
+Use `motivates` only for an existing `design_element` that follows from the decision.
+Use `tracer:links[]` only when the item's configured relationships should be displayed.
+
+== Authoring checklist
+
+* State the design question, chosen direction, and rationale.
+* Record meaningful trade-offs without presenting an unmade choice as settled.
+* Use `influences` or `supersedes` for existing `design_concept` or `design_decision` targets as configured.
+* Use `motivates` only for an existing `design_element` that follows from the decision.
+* Omit optional links when the target is unknown or the relationship is not real.
+
+== Review checklist
+
+* [ ] The decision is distinct from an implementation task or a component description.
+* [ ] The chosen direction and its rationale are explicit.
+* [ ] Important consequences and trade-offs are not hidden.
+* [ ] Each relation uses a configured target role, relation type, and existing ID.
+* [ ] The record does not imply approval, status, or compliance that the configuration does not define.

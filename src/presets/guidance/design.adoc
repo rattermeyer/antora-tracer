@@ -1,32 +1,50 @@
 = Writing Design Items
 
-A `design` item captures an architectural decision or a component of the system.
+A `design` item describes an architectural component or decision in the `requirements-engineering` preset.
+Use the `design_concept` role instead when the active model distinguishes stable, reusable architecture from project-specific design.
 
-== Item template
+== Traceability
+
+Check the active configuration for allowed target roles and relation directions.
+In the `requirements-engineering` preset, a design points to a requirement with `addresses` and may point to a test with `validated_by`.
+Add links only for real relationships and existing target IDs.
+
+== Item Template
 
 [source,asciidoc]
 ----
-[#ARC-NNN, item, role=design, title="Short title"]
+[#<design-id>, item, role=design, title="<component or decision>"]
 --
-<Component or decision description.>
+<Describe the component, structure, or decision and its role in the system.>
 
-Rationale: <why this design was chosen>
-
-addresses:REQ-NNN[]
-
-tracer:links[]
+Rationale: <why this design fits its context and constraints>
 --
 ----
 
-== Writing rules
+== Optional Traceability
 
-* Name the component or decision in the title.
-* State the rationale so a reader understands why the design is the way it is.
-* Cross-link to the requirements it addresses with `addresses:REQ-NNN[]`.
-* One decision or component per item.
+In the `requirements-engineering` preset, a design may point to a requirement with `addresses` or to a test with `validated_by`.
+Add a relationship only when configured and the target exists.
 
-== Quality checklist
+[source,asciidoc]
+----
+addresses:<requirement-id>[]
+validated_by:<test-id>[]
+----
 
-* Rationale present — the "why" is stated, not implied.
-* Traceable — linked to at least one requirement.
-* Grounded — describes the actual system, not an aspiration.
+`tracer:links[]` is optional display markup; include it separately only when the project wants rendered relationship lists.
+
+== Writing Rules
+
+* Name one component or decision in the title and keep one coherent subject per item.
+* Describe the design that exists or has been decided; label proposals as proposals.
+* Keep a decision's alternatives and durable reasoning in an ADR when that role exists.
+* Do not invent relation names or imply that an unlinked requirement is addressed.
+
+== Quality Checklist
+
+* [ ] The item describes a real component or architectural decision.
+* [ ] The title and scope identify one coherent design subject.
+* [ ] The rationale explains the important choice or constraint.
+* [ ] Optional links use configured directions and existing target IDs.
+* [ ] Rendering macros are included only when relationship display is wanted.

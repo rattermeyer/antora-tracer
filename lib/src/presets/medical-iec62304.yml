@@ -29,6 +29,33 @@ traceability:
     - test_case
     - test_report
     - soi  # Software of Unknown Provenance
+  roleGuidance:
+    system_requirement:
+      page: guidance/iec_system_requirement.adoc
+    software_requirement:
+      page: guidance/iec_software_requirement.adoc
+    software_item:
+      page: guidance/iec_software_item.adoc
+    software_unit:
+      page: guidance/iec_software_unit.adoc
+    risk:
+      page: guidance/iec_risk.adoc
+    hazard:
+      page: guidance/iec_hazard.adoc
+    mitigation:
+      page: guidance/iec_mitigation.adoc
+    regulation:
+      page: guidance/iec_regulation.adoc
+    standard:
+      page: guidance/iec_standard.adoc
+    test_procedure:
+      page: guidance/iec_test_procedure.adoc
+    test_case:
+      page: guidance/iec_test_case.adoc
+    test_report:
+      page: guidance/iec_test_report.adoc
+    soi:
+      page: guidance/iec_soi.adoc
 
   relations:
     # System requirement relations

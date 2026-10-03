@@ -1,0 +1,41 @@
+= Writing Software Requirement Items
+
+A `software_requirement` item states an observable software behavior or constraint allocated from system needs.
+This guidance supports traceability authoring only and does not establish IEC 62304, FDA, or other regulatory compliance.
+`tracer:links[]` is optional display-only markup and is not part of the item content.
+
+== Item template
+
+[source,asciidoc]
+----
+[#<id>, item, role=software_requirement, title="<short title>"]
+--
+The software SHALL <observable behavior or constraint>.
+
+<conditions, inputs, outputs, timing, or acceptance detail>
+
+<optional link, for example:>
+refines:<software-requirement-id>[]
+
+--
+----
+
+== Optional configured links
+
+A software requirement may use `refines` or `depends_on` for another `software_requirement`.
+It may use `implemented_by` for a `software_item` or a `software_unit`.
+It may use `addresses` for a `risk`.
+It may use `verified_by` for a `test_procedure`.
+It may use `uses` for an `soi`.
+The configured reverse names are `refined_by`, `is_prerequisite_of`, `implements`, `addressed_by`, `verifies`, and `used_by`, respectively.
+Add a link only when the target ID exists and the relationship is supported by project evidence.
+
+== Writing and review checklist
+
+* [ ] States one testable software behavior or constraint.
+* [ ] Defines trigger, state, data, timing, error behavior, or boundary conditions as needed.
+* [ ] Distinguishes observable behavior from design or implementation prescription.
+* [ ] Keeps each requirement atomic and unambiguous.
+* [ ] Uses only configured relation names and existing target IDs for optional links.
+* [ ] Avoids claiming that a traceability link or preset use proves compliance.
+* [ ] Includes `tracer:links[]` only when displaying related items is useful.

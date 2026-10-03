@@ -1,0 +1,49 @@
+= Writing Design Elements
+
+A `design_element` item captures a concrete architectural element or structure used to realize the design.
+
+== Item template
+
+[source,asciidoc]
+----
+[#ARC-NNN, item, role=design_element, title="<element name>"]
+--
+<Component, structure, or boundary description and its responsibility>.
+
+--
+----
+== Optional traceability
+
+Traceability is optional and each relation requires a configured target ID.
+
+[source,asciidoc]
+----
+realizes:<design-concept-id>[]
+is_motivated_by:<requirement-id>[]
+is_restricted_by:<constraint-id>[]
+depends_on:<design-element-id>[]
+refines:<design-element-id>[]
+----
+
+Use `realizes` only for an existing `design_concept` that this element realizes.
+Use `is_motivated_by` only for an existing `requirement` that motivates this element.
+Use `is_restricted_by` only for an existing `constraint` that restricts this element.
+Use `depends_on` or `refines` only for an existing `design_element` target.
+Use `tracer:links[]` only when the item's configured relationships should be displayed.
+
+== Authoring checklist
+
+* Name one concrete element and state its responsibility.
+* Describe boundaries and dependencies that matter to the design.
+* Use the established `ARC` ID prefix for this role unless the project already has another convention.
+* Use `realizes` for an existing `design_concept` that this element implements.
+* Use `is_motivated_by` for an existing `requirement` only when the requirement motivates the element.
+* Use `is_restricted_by`, `depends_on`, or `refines` only for existing configured targets of the supported role.
+
+== Review checklist
+
+* [ ] The element is concrete enough to locate in the architecture.
+* [ ] Its responsibility is distinct from its rationale or business need.
+* [ ] Links use only configured relation types and existing IDs.
+* [ ] Dependencies, refinements, and restrictions are stated only when they are real.
+* [ ] The description does not claim unsupported coverage or validation relationships.

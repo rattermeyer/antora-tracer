@@ -1,31 +1,55 @@
 = Writing Test Items
 
-A `test` item describes a test plan or case that verifies one or more requirements.
+A test item describes a verification or validation activity and the evidence it produces.
+Use the role's level in the active traceability model: a test may be a test plan, procedure, case, or report.
 
-== Item template
+== Traceability
+
+Check the active configuration before adding links; the source role and direction determine the relation name.
+For example, the `requirements-engineering` preset uses `verifies` from `test` to `requirement`, while the `minimal` preset uses `covers` in that direction.
+The `spec-driven-development` preset uses `verifies` from `test` to `requirement`, and the `agile` preset relates tests to user stories with `verifies`.
+Use only existing IDs and relations declared for the project's roles.
+
+== Item Template
 
 [source,asciidoc]
 ----
-[#TST-NNN, item, role=test, title="Short title"]
+[#<test-id>, item, role=<configured-test-role>, title="<what is verified>"]
 --
-Test file: `test/<name>.test.ts`
+Test method: <test procedure, case, or verification approach>
 
-<What is tested and how.>
+Expected evidence: <observable result that demonstrates pass or failure>
 
-verifies:REQ-NNN[]
+<Automated test path or other evidence location, when applicable.>
 
-tracer:links[]
---
 ----
 
-== Writing rules
+== Optional Traceability
 
-* Reference the requirement it verifies with `verifies:REQ-NNN[]`.
-* State the observable outcome the test asserts.
-* Name the test file when the item traces an automated test.
+Add only configured relationships to existing target IDs.
+For example, `requirements-engineering` uses `verifies` from a test to a requirement; `minimal` also allows `covers` in that direction.
 
-== Quality checklist
+[source,asciidoc]
+----
+<configured-verification-relation>:<target-id>[]
+----
 
-* Traceable — linked to at least one requirement via `verifies:`.
-* Concrete — describes what is asserted, not vague coverage claims.
-* Grounded — matches an actual test file or test procedure.
+`tracer:links[]` is optional display markup; include it separately only when the project wants rendered relationship lists.
+
+Follow the established ID prefix and role name; do not assume `TST`, `TEST`, or `test_case` when the project does not define them.
+Add relationship macros only when the relationship exists and the target ID is known.
+
+* State what is examined, the method or conditions, and what evidence counts as success or failure.
+* Keep one test purpose per item; split independently executable checks when they can pass or fail separately.
+* Name a source file or procedure when one exists; do not invent file paths for manual or planned tests.
+* Describe observed evidence rather than claiming coverage without an executable or reviewable check.
+* Record results in a test-report role only when the active model defines one.
+
+== Quality Checklist
+
+* [ ] The test purpose and scope are clear.
+* [ ] The method or procedure is concrete enough to repeat.
+* [ ] Expected evidence distinguishes pass from failure.
+* [ ] Any automated test reference points to an existing test; other evidence is identified honestly.
+* [ ] Traceability links use configured relations, correct direction, and existing IDs.
+* [ ] Relationship display macros are included only when wanted.

@@ -1,0 +1,33 @@
+= Writing Agile Acceptance Criterion Items
+
+An `acceptance_criterion` item states one condition that must hold for a user story to be accepted.
+
+== Item template
+
+[source,asciidoc]
+----
+[item, id=<id>, role=acceptance_criterion, title="<short condition title>"]
+====
+Given <context>, when <event or action>, then <observable result>.
+
+<Additional boundary or error condition, if needed.>
+
+<Optional configured links.>
+
+====
+----
+The optional `tracer:links[]` macro may be added when rendered link output is useful.
+
+== Writing and review checklist
+
+* State one observable pass or fail condition.
+* Include the relevant context and trigger when they affect the result.
+* Cover important negative or boundary behaviour with a separate criterion.
+* Use an existing target ID for each link and omit links whose targets are not known.
+* Confirm the item uses `role=acceptance_criterion` and that every relation name comes from this preset.
+
+== Optional configured links
+
+Use `belongs_to:<user-story-id>[]` from an acceptance criterion to its user story; the story-side reverse is `has:<acceptance-criterion-id>[]`.
+Use `validated_by:<test-id>[]` from an acceptance criterion to a test; the test-side reverse is `validates:<acceptance-criterion-id>[]`.
+Include only links supported by the configured relation and only when the target ID is real.

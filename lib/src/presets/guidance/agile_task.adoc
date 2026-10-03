@@ -1,0 +1,35 @@
+= Writing Agile Task Items
+
+A `task` item describes a bounded piece of work that implements a user story or produces a concrete investigation result.
+
+== Item template
+
+[source,asciidoc]
+----
+[item, id=<id>, role=task, title="<short work title>"]
+====
+<Action and the concrete result it must produce.>
+
+<Scope, completion evidence, or relevant constraint.>
+
+<Optional configured links.>
+
+====
+----
+The optional `tracer:links[]` macro may be added when rendered link output is useful.
+
+== Writing and review checklist
+
+* Describe one actionable unit of work with a clear completion result.
+* Keep the task small enough to estimate, assign, and review.
+* State evidence or conditions that show the work is complete.
+* Use an existing target ID for each link and omit links whose targets are not known.
+* Confirm the item uses `role=task` and that every relation name comes from this preset.
+
+== Optional configured links
+
+Use `implements:<user-story-id>[]` from a task to a user story; the story-side reverse is `implemented_by:<task-id>[]`.
+Use `implements:<spike-id>[]` from a task to a spike; the spike-side reverse is `implemented_by:<task-id>[]`.
+Use `affects:<test-id>[]` from a task to a test; the test-side reverse is `affected_by:<task-id>[]`.
+Use `fixes:<bug-id>[]` from a task to a bug; the bug-side reverse is `fixed_by:<task-id>[]`.
+Include only links supported by the configured relation and only when the target ID is real.

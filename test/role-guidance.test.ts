@@ -3,11 +3,11 @@
  * project override, and extends-chain merging.
  */
 
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect } from "chai";
-import { ConfigLoader } from "../src/config/TraceabilityConfig.js";
+import { BUILT_IN_PRESETS, ConfigLoader } from "../src/config/TraceabilityConfig.js";
 
 describe("role-guidance", () => {
   it("resolves default guidance from a preset", () => {
@@ -20,6 +20,22 @@ describe("role-guidance", () => {
     expect(requirement.idPrefix).to.equal("REQ");
     expect(requirement.page).to.match(/guidance\/requirement\.adoc$/);
   });
+
+  it("maps every built-in preset role to a shipped guidance page", () => {
+    const loader = new ConfigLoader();
+
+    for (const name of BUILT_IN_PRESETS) {
+      const traceability = loader.loadPreset(name).traceability;
+      const roles = new Set(traceability.roles);
+      const guidance = traceability.roleGuidance ?? {};
+
+      expect(Object.keys(guidance), name).to.have.members([...roles]);
+      for (const [role, entry] of Object.entries(guidance)) {
+        expect(existsSync(entry.page), `${name}:${role} page`).to.equal(true);
+      }
+    }
+  });
+
 
   it("project roleGuidance overrides the preset per role", () => {
     const dir = mkdtempSync(join(tmpdir(), "role-guidance-"));

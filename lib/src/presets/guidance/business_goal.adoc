@@ -1,0 +1,136 @@
+= Writing Business Goals
+
+A `business_goal` item states a business outcome the organization wants to achieve.
+It explains why the outcome matters, not the solution or work planned to achieve it.
+
+== Traceability
+
+A business goal is an upstream outcome; it does not need outgoing links to be useful.
+In the `requirements-engineering-max` preset, a related `user_need` or `quality_attribute` may optionally point back to the goal using the configured inverse relation `is_motivated_by`.
+This records that the business goal motivates the downstream item.
+Check the project's traceability configuration for the roles and relations available in that project.
+Do not invent role names, relation names, or target IDs.
+
+== Guardrails
+
+**Do not guess.** When information is missing or ambiguous, ask the user:
+
+- Vague outcome → "What measurable change should the business see, and how would we know it happened?"
+- Activity instead of outcome → "What business result should this work achieve?"
+- Proposed solution instead of goal → "What outcome does this solution help achieve?"
+- Missing business value → "Why does this outcome matter to the organization or its stakeholders?"
+- Unclear scope or timeframe → "Which part of the business and what time horizon does this goal cover?"
+- Missing baseline or target → "What is the current state, and what target would represent success?"
+
+Never fabricate stakeholders, metrics, baselines, targets, timeframes, or traceability links.
+If a measure cannot yet be quantified, describe how progress or achievement will be assessed and mark unresolved details as open questions.
+
+== Creating a Business Goal
+
+=== Step 1: Choose the Project's ID Convention
+
+Use the ID prefix already established for business goals in the project.
+If no convention exists, agree one before creating the item.
+
+=== Step 2: Write the Item Block
+
+[source,asciidoc]
+----
+[#<business-goal-id>, item, role=business_goal, title="<outcome> for <stakeholder>"]
+--
+<Stakeholder or organization> will <achieve a business outcome>.
+
+Success is measured by <indicator>, from <baseline> to <target>, by <timeframe>.
+
+<Why this outcome matters, if not clear from the outcome.>
+--
+----
+
+== Optional Links to Business Goals
+
+In the max preset, the relationship runs from a business goal to a downstream `user_need` or `quality_attribute` using `motivates`.
+Its configured inverse is `is_motivated_by`, which lets the downstream item point back to the goal.
+
+Add that inverse relation to a downstream item only when the goal genuinely motivates it:
+
+[source,asciidoc]
+----
+[#<user-need-id>, item, role=user_need, title="<short title>"]
+--
+<User need statement.>
+
+is_motivated_by:<business-goal-id>[]
+--
+----
+
+This link is optional.
+Omit it when no meaningful relationship exists, the goal ID is unknown, or the project does not configure the relation.
+A business goal remains valid without links; never add a link just to satisfy the template.
+
+`tracer:links[]` only displays relationships; it does not create them.
+Add it to the business-goal item only when its incoming links should be displayed.
+Otherwise omit it, including from the template above.
+
+Include only measures and traceability links supported by the available information and configured relations.
+Omit an unknown baseline, target, timeframe, or relation rather than making one up.
+
+== Writing Rules
+
+=== State the Outcome, Not the Work
+
+Describe the change in business performance, capability, risk, or stakeholder value.
+Keep planned features, implementation choices, and delivery activities in downstream items.
+
+[cols="50,50"]
+|===
+| Wrong — activity or solution | Right — business outcome
+| Build a customer analytics dashboard | Increase the share of renewals completed before expiry from 70% to 85% by the end of the year.
+| Migrate reporting to a cloud platform | Reduce monthly reporting effort from 40 staff-hours to 20 by the end of Q2.
+| Improve customer satisfaction | Raise the post-support satisfaction score from 3.8 to 4.3 out of 5 by the end of Q4.
+|===
+
+The examples are illustrative; use real stakeholder groups, baselines, targets, and timeframes for the project.
+
+=== Make Success Assessable
+
+Name an indicator and target when they are known.
+State a baseline and timeframe when they are relevant and available.
+Avoid unsupported precision: a plausible number is still fabricated if nobody supplied it.
+If the outcome cannot be measured directly, state a credible way to assess progress or achievement.
+
+=== Keep One Business Outcome
+
+Keep one coherent business outcome in each item.
+If the statement combines independent outcomes with "and", split them into separate goals.
+Combining an outcome with its measure or rationale is fine.
+
+=== Use Clear Business Language
+
+Name the stakeholder or part of the organization affected when known.
+Use concrete terms with a single interpretation.
+Avoid vague claims such as "improve efficiency", "become world-class", or "increase value" unless the goal defines how success will be assessed.
+
+== Reviewing a Business Goal
+
+When reviewing, if the outcome is vague, unsupported, or written as a solution or activity, flag the issue with a specific question and suggested rewrite.
+Do not invent missing information or silently rewrite the goal.
+
+=== Quality Checklist
+
+* [ ] States a business outcome, not a feature, implementation choice, or project activity.
+* [ ] Identifies the affected stakeholder or organizational area when known.
+* [ ] Explains the business value or makes it clear from the outcome.
+* [ ] Defines a meaningful indicator and target where they are known and measurable.
+* [ ] Includes baseline and timeframe where relevant and available; missing facts are identified rather than fabricated.
+* [ ] Has one coherent outcome, with no unrelated goals bundled together.
+* [ ] Uses specific, unambiguous language and avoids unsupported claims.
+* [ ] Any optional relation uses a configured type and existing target ID; no link is added just to fill the template.
+* [ ] Includes `tracer:links[]` only when incoming links to the business goal should be displayed.
+
+=== If a Goal Is Vague or Solution-Led
+
+. Identify whether the statement describes an outcome, activity, or proposed solution.
+. Ask what observable business change is expected and why it matters.
+. Ask for the indicator, baseline, target, and timeframe when applicable.
+. Rewrite only with information the user provides; leave unknowns open.
+. Put proposed features or delivery work in downstream user needs, use cases, or requirements.

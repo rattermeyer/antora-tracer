@@ -1,0 +1,42 @@
+= Writing Test Report Items
+
+A `test_report` item records the outcome and evidence from executing test procedures and cases.
+This guidance supports traceability authoring only and does not establish IEC 62304, FDA, or other regulatory compliance.
+`tracer:links[]` is optional display-only markup and is not part of the item content.
+
+== Item template
+
+[source,asciidoc]
+----
+[#<id>, item, role=test_report, title="<execution and result>"]
+--
+Execution date and environment: <recorded context>.
+
+Result: <pass, fail, blocked, or other project-defined outcome>.
+
+Observed evidence and deviations: <recorded facts and artifact references>.
+
+<optional link, for example:>
+documents:<test-procedure-id>[]
+
+documents:<test-case-id>[]
+
+--
+----
+
+== Optional configured links
+
+A test report may use `documents` for a `test_procedure`.
+It may use `documents` for a `test_case`.
+The configured reverse name is `documented_by` for both relations.
+Add a link only when the report contains evidence for the target execution or case.
+
+== Writing and review checklist
+
+* [ ] Records execution context, date, inputs, observed results, and evidence.
+* [ ] Reports outcome and deviations as facts without concealing failures or gaps.
+* [ ] Distinguishes planned expectations from actual observations.
+* [ ] Preserves enough detail to identify the procedure and case execution.
+* [ ] Uses only configured relation names and existing target IDs for optional links.
+* [ ] Avoids claiming that a traceability link or preset use proves compliance.
+* [ ] Includes `tracer:links[]` only when displaying related items is useful.

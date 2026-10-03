@@ -1,24 +1,153 @@
 = Writing Architecture Decision Records
 
-An `adr` item records a durable decision made while addressing a change.
-The ADR explains context, the decision, alternatives, and consequences.
+An `adr` item records a durable architectural or technical decision and why it was made.
+Follow the MADR structure so future readers can understand the problem, the options, the decision, and its consequences without reconstructing the original discussion.
+Keep change-specific progress and temporary implementation notes in the change item.
 
-== Item template
+== Traceability
+
+Check the project's traceability configuration before adding links; do not invent relations or target IDs.
+In the `spec-driven-development` preset, a change may point to an ADR using `records`.
+The `spec-driven-development` preset declares that an accepted ADR requires at least one `design_concept`; add the `leads_to` link when the decision is accepted and the concept exists.
+This is configured structural guidance; whether a command enforces it depends on the active tooling.
+
+== Creating an ADR
+
+=== Step 1: Decide Whether an ADR Is Warranted
+
+Record decisions with lasting consequences, such as choices that shape architecture, interfaces, data, dependencies, security, deployment, or future change.
+An ADR should explain a choice and its rationale, not serve as a design document, implementation plan, meeting transcript, or change log.
+If there is no consequential choice to preserve, do not create an ADR just to document routine work.
+
+=== Step 2: Get the Next ID
+
+Use the ID prefix and allocation method established by the project.
+For the `spec-driven-development` preset, the prefix is `ADR`:
+
+[source,bash]
+----
+antora-tracer next-id --prefix ADR -i <docs-dir>
+----
+
+=== Step 3: Write the ADR in MADR Form
+
+Use the following MADR structure.
+Keep optional metadata and sections only when they add useful information; remove sections that do not apply and delete all unused prompts before publishing.
 
 [source,asciidoc]
 ----
-[#ADR-NNN, item, role=adr, status=proposed, title="Short decision title"]
+[#ADR-NNN, item, role=adr, status=proposed, title="<short decision title>"]
 --
-Context:: What problem requires a decision?
-Decision:: What was decided?
-Alternatives:: What was considered and rejected?
-Consequences:: What follows from the decision?
+*Status*: proposed
+*Date*: <YYYY-MM-DD>
+*Deciders*: <people or roles who made the decision>
+*Consulted*: <people whose advice informed it, if applicable>
+*Informed*: <people who need to know, if applicable>
 
-leads_to:DES-NNN[]
+== Context and Problem Statement
 
-tracer:links[]
+<Describe the situation, problem, constraints, and scope that require a decision.>
+
+== Decision Drivers
+
+* <Important constraint, quality, risk, or goal>
+* <Another decision driver>
+
+== Considered Options
+
+* <Option one>
+* <Option two>
+
+== Decision Outcome
+
+Chosen option: <option>, because <the decisive reasons and trade-offs>.
+
+=== Consequences
+
+* Good, because <positive consequence>.
+* Bad, because <negative consequence or accepted cost>.
+
+=== Confirmation
+
+<How review, tests, metrics, or another check will confirm the decision is followed, if applicable.>
+
+== Pros and Cons of the Options
+
+=== <Option one>
+
+* Good, because <reason>.
+* Bad, because <reason>.
+
+=== <Option two>
+
+* Good, because <reason>.
+* Bad, because <reason>.
+
+== More Information
+
+<Evidence, relevant links, related decisions, or conditions for revisiting this decision.>
 --
 ----
 
-An accepted ADR leads to at least one stable design concept.
-The preset validates this structural condition without enforcing status transitions.
+== Optional Traceability
+
+In the `spec-driven-development` preset, add `leads_to:DES-NNN[]` only when this accepted ADR led to an existing design concept.
+While the ADR is proposed, omit the relationship rather than leaving a placeholder.
+
+[source,asciidoc]
+----
+leads_to:DES-NNN[]
+----
+
+`tracer:links[]` only displays relationships; add it separately when incoming change links or outgoing design-concept links should be shown.
+
+The MADR `Decision Drivers`, `Consequences`, `Confirmation`, `Pros and Cons of the Options`, and `More Information` sections may be omitted when they add no useful information.
+List only options that were seriously considered and give each a fair account of its advantages and disadvantages.
+Do not invent consultation, evidence, agreement, or checks that did not happen.
+
+== Writing Rules
+
+=== Describe the Decision, Not Just the Result
+
+State the chosen option and the reason it best fits the decision drivers.
+Record rejected options and why they were not chosen; a list of alternatives without the comparison does not preserve the reasoning.
+Separate known consequences from assumptions and risks.
+
+=== Keep the Record Durable
+
+Write for a reader who was not part of the discussion.
+Include enough context to understand why the question arose, but keep transient project details in the change record.
+Describe a decision at the level that remains useful after implementation details change.
+When a later decision replaces an earlier one, preserve the earlier record and identify the replacement in `More Information`.
+
+=== Track Status Honestly
+
+Use the status attribute configured by the project.
+The `spec-driven-development` preset uses `proposed`, `accepted`, `rejected`, and `superseded`.
+Record a decision as `accepted` only after it has been agreed; use `rejected` when the proposal was considered and declined.
+When an accepted ADR is superseded, retain the old ADR as history and explain the replacement.
+
+== Reviewing an ADR
+
+Flag missing reasoning, unfair option comparisons, unacknowledged trade-offs, and claims without evidence.
+Ask for clarification rather than inventing a decision, decider, rationale, consequence, or confirmation method.
+
+=== Quality Checklist
+
+* [ ] The title names the decision clearly.
+* [ ] The context states the problem, relevant constraints, and decision scope.
+* [ ] Decision drivers describe the criteria that matter for this choice.
+* [ ] Considered options are plausible alternatives, not straw men.
+* [ ] The decision outcome names the selected option and explains why it fits the drivers.
+* [ ] Material positive and negative consequences are recorded.
+* [ ] Confirmation is stated when compliance or implementation needs a specific check.
+* [ ] Status, date, and deciders reflect what actually happened.
+* [ ] Authored links use configured relation names and existing IDs; `tracer:links[]` is included only if the project wants to display relationships.
+* [ ] An accepted ADR links to at least one stable design concept when required by the project's configuration; omit the link while proposed.
+* [ ] Empty optional sections and template prompts have been removed.
+* [ ] The record preserves durable reasoning rather than duplicating a change plan.
+
+== Related
+
+* https://github.com/adr/madr/blob/main/template/adr-template.md[MADR template]
+* `antora-tracer role-guidance adr` — resolve this guidance from the active preset.

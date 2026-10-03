@@ -1,0 +1,44 @@
+= Writing Test Procedure Items
+
+A `test_procedure` item defines repeatable steps and expected observations for verification or validation.
+This guidance supports traceability authoring only and does not establish IEC 62304, FDA, or other regulatory compliance.
+`tracer:links[]` is optional display-only markup and is not part of the item content.
+
+== Item template
+
+[source,asciidoc]
+----
+[#<id>, item, role=test_procedure, title="<procedure name>"]
+--
+Purpose and setup: <scope, preconditions, equipment, and data>.
+
+. <step>
+. <step>
+
+Expected result: <observable pass condition>.
+
+<optional link, for example:>
+verifies:<software-requirement-id>[]
+
+--
+----
+
+== Optional configured links
+
+A test procedure may use `verifies` for a `software_requirement`.
+It may use `validates` for a `software_item`, a `risk`, or a `mitigation`.
+It may use `tests` for a `software_unit`.
+It may use `contains` for a `test_case`.
+It may use `generates` for a `test_report`.
+The configured reverse names are `verified_by`, `validated_by`, `tested_by`, `part_of`, and `generated_by`, respectively.
+Add a link only when the target ID exists and the procedure actually covers it.
+
+== Writing and review checklist
+
+* [ ] Defines preconditions, inputs, steps, expected observations, and pass criteria.
+* [ ] Makes each step repeatable and keeps one observable action per step.
+* [ ] Distinguishes verification or validation scope without asserting results in advance.
+* [ ] Records environment or data assumptions that affect reproducibility.
+* [ ] Uses only configured relation names and existing target IDs for optional links.
+* [ ] Avoids claiming that a traceability link or preset use proves compliance.
+* [ ] Includes `tracer:links[]` only when displaying related items is useful.

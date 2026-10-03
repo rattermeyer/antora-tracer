@@ -1,0 +1,39 @@
+= Writing Software Unit Items
+
+A `software_unit` item identifies the smallest implementation unit tracked for requirement implementation and testing.
+This guidance supports traceability authoring only and does not establish IEC 62304, FDA, or other regulatory compliance.
+`tracer:links[]` is optional display-only markup and is not part of the item content.
+
+== Item template
+
+[source,asciidoc]
+----
+[#<id>, item, role=software_unit, title="<unit name>"]
+--
+This software unit implements <focused responsibility>.
+
+<public boundary, relevant behavior, or source location>
+
+<optional link, for example:>
+implements:<software-requirement-id>[]
+
+--
+----
+
+== Optional configured links
+
+A software unit may use `implements` for a `software_requirement`.
+It may use `part_of` for a `software_item`.
+It may use `tested_by` for a `test_procedure`.
+The configured reverse names are `implemented_by`, `contains`, and `tests`, respectively.
+Add a link only when the target ID exists and the relationship is supported by project evidence.
+
+== Writing and review checklist
+
+* [ ] Identifies one bounded unit and its focused responsibility.
+* [ ] States behavior or boundary information useful for review and testing.
+* [ ] Keeps source references current when they are included.
+* [ ] Separates distinct implementation units instead of combining unrelated code.
+* [ ] Uses only configured relation names and existing target IDs for optional links.
+* [ ] Avoids claiming that a traceability link or preset use proves compliance.
+* [ ] Includes `tracer:links[]` only when displaying related items is useful.
