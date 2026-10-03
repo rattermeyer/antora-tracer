@@ -103,7 +103,7 @@ tracer:links[]
 --
 
 
-[#REQ-324, item, role=requirement, title="Sibling query returns items sharing typed neighbors"]
+[#REQ-340, item, role=requirement, title="Sibling query returns items sharing typed neighbors"]
 --
 The system SHALL provide a sibling query for an item that returns every other item connected to at least one common neighbor, where the connection uses the same relation type on both sides.
 Traversal SHALL be undirected: because relations are bidirectional, an item's neighbors include both outgoing and incoming relation targets, regardless of edge authoring direction.
@@ -113,7 +113,7 @@ Source: openspec/specs/functional-siblings/spec.md
 traceability:links[]
 --
 
-[#REQ-325, item, role=requirement, title="Sibling results carry shared-neighbor context"]
+[#REQ-339, item, role=requirement, title="Sibling results carry shared-neighbor context"]
 --
 Each sibling result SHALL include the IDs of the shared neighbors that connect the sibling to the queried item, so a reviewer can see why the item is a sibling.
 
@@ -122,7 +122,7 @@ Source: openspec/specs/functional-siblings/spec.md
 traceability:links[]
 --
 
-[#REQ-326, item, role=requirement, title="Sibling query supports relation-type filtering"]
+[#REQ-338, item, role=requirement, title="Sibling query supports relation-type filtering"]
 --
 The sibling query SHALL accept an optional relation type.
 When given, only neighbors connected through that relation type on both sides contribute to sibling discovery.
@@ -133,7 +133,7 @@ Source: openspec/specs/functional-siblings/spec.md
 traceability:links[]
 --
 
-[#REQ-327, item, role=requirement, title="Sibling results include supersession status"]
+[#REQ-337, item, role=requirement, title="Sibling results include supersession status"]
 --
 Each sibling result SHALL indicate whether the sibling is superseded, so stale siblings are distinguishable during review.
 
@@ -142,7 +142,7 @@ Source: openspec/specs/functional-siblings/spec.md
 traceability:links[]
 --
 
-[#REQ-328, item, role=requirement, title="Item headers support a tracer role and ID"]
+[#REQ-336, item, role=requirement, title="Item headers support a tracer role and ID"]
 --
 The system SHALL recognize `[.tracer#ID, item, ...]` as an item declaration equivalent to `[#ID, item, ...]` with respect to the item's ID, role, title, status, additional attributes, content, and relationships. Existing `[#ID, item, ...]` declarations SHALL remain supported.
 
@@ -151,7 +151,7 @@ Source: openspec/specs/item-header-syntax/spec.md
 traceability:links[]
 --
 
-[#REQ-329, item, role=requirement, title="Tracer-role headers work across item processing"]
+[#REQ-335, item, role=requirement, title="Tracer-role headers work across item processing"]
 --
 The system SHALL treat the tracer-role header as an item declaration in every processing path that recognizes, transforms, renders, or locates item blocks, including Antora relationship rendering and CLI item lifecycle operations.
 
@@ -344,7 +344,7 @@ tracer:links[]
 --
 
 
-[#REQ-316, item, role=requirement, title="Relation-name attributes produce relationships"]
+[#REQ-342, item, role=requirement, title="Relation-name attributes produce relationships"]
 --
 The system SHALL treat an item-header attribute whose name matches a configured relation type (primary or reverse) as one or more relationships from that item to the listed target IDs.
 
@@ -353,7 +353,7 @@ Source: openspec/specs/relationship-header-attributes/spec.md
 traceability:links[]
 --
 
-[#REQ-317, item, role=requirement, title="Relation attributes match inline macro semantics"]
+[#REQ-341, item, role=requirement, title="Relation attributes match inline macro semantics"]
 --
 Relationships declared as header attributes SHALL follow the same canonicalization, validation, and rendering as inline relationship macros.
 
@@ -870,7 +870,7 @@ tracer:links[]
 --
 
 
-[#REQ-312, item, role=requirement, title="Architecture C4 diagrams use the modern C4 style"]
+[#REQ-343, item, role=requirement, title="Architecture C4 diagrams use the modern C4 style"]
 --
 The architecture documentation SHALL render its C4 context, container, and component diagrams with C4-PlantUML's `!NEW_C4_STYLE=1` setting enabled before the bundled C4 macros are loaded.
 
@@ -1132,7 +1132,7 @@ tracer:links[]
 --
 
 
-[#REQ-301, item, role=requirement, title="query linked — find reachable items by role"]
+[#REQ-354, item, role=requirement, title="query linked — find reachable items by role"]
 --
 The CLI SHALL provide `query linked <id> <role>` that returns each distinct item with the requested role reachable from the starting item by following outgoing graph relationships. Traversal SHALL follow relationships across any number of edges, continue through items of every role, and exclude the starting item from results. Results SHALL include each matching item once, including when paths converge or contain cycles.
 
@@ -1141,7 +1141,7 @@ Source: openspec/specs/cli-query/spec.md
 traceability:links[]
 --
 
-[#REQ-302, item, role=requirement, title="query siblings — find items sharing neighbors with a given ID"]
+[#REQ-353, item, role=requirement, title="query siblings — find items sharing neighbors with a given ID"]
 --
 The CLI SHALL provide `query siblings <id>` that returns all items sharing at least one typed neighbor with the given item, following the sibling query semantics of the functional-siblings capability.
 Output SHALL list each sibling with its role, title, the shared neighbor IDs, and its supersession status.
@@ -1152,7 +1152,7 @@ Source: openspec/specs/cli-query/spec.md
 traceability:links[]
 --
 
-[#REQ-303, item, role=requirement, title="Multi-source linked queries require globally unique IDs"]
+[#REQ-352, item, role=requirement, title="Multi-source linked queries require globally unique IDs"]
 --
 A complete multi-source graph query SHALL document globally unique item IDs as a prerequisite for unambiguous results. The CLI is not required to detect or reject duplicate IDs. Documentation SHALL recommend allocating IDs through the provided `@antora-tracer/id-server`, seeded from the Antora playbook and configured with shared allocation settings that keep IDs unique across included sources.
 
@@ -1161,7 +1161,7 @@ Source: openspec/specs/cli-query/spec.md
 traceability:links[]
 --
 
-[#REQ-304, item, role=requirement, title="Generate shell completion scripts"]
+[#REQ-351, item, role=requirement, title="Generate shell completion scripts"]
 --
 The CLI SHALL provide a `completion` command that emits a completion script to standard output for each supported shell: Bash, Zsh, and Fish.
 
@@ -1170,7 +1170,7 @@ Source: openspec/specs/cli-shell-completion/spec.md
 traceability:links[]
 --
 
-[#REQ-305, item, role=requirement, title="Install shell completion scripts"]
+[#REQ-350, item, role=requirement, title="Install shell completion scripts"]
 --
 The CLI SHALL provide an installation action that writes the selected shell's generated completion script to an appropriate completion directory for the current user.
 
@@ -1179,7 +1179,7 @@ Source: openspec/specs/cli-shell-completion/spec.md
 traceability:links[]
 --
 
-[#REQ-306, item, role=requirement, title="Document shell completion use"]
+[#REQ-349, item, role=requirement, title="Document shell completion use"]
 --
 The CLI reference SHALL describe script generation, installation, and the activation steps printed by installation for Bash, Zsh, and Fish.
 
@@ -1188,7 +1188,7 @@ Source: openspec/specs/cli-shell-completion/spec.md
 traceability:links[]
 --
 
-[#REQ-307, item, role=requirement, title="export neo4j accepts a local directory or a playbook"]
+[#REQ-348, item, role=requirement, title="export neo4j accepts a local directory or a playbook"]
 --
 The `export neo4j` command SHALL accept either `-i <dir>` to process a local directory, or a playbook path to harvest every component and repository in that playbook.
 
@@ -1197,7 +1197,7 @@ Source: openspec/specs/neo4j-export/spec.md
 traceability:links[]
 --
 
-[#REQ-308, item, role=requirement, title="export neo4j requires an input"]
+[#REQ-347, item, role=requirement, title="export neo4j requires an input"]
 --
 The `export neo4j` command SHALL require exactly one input — either `-i <dir>` or a playbook path — and SHALL exit with an error when neither is provided.
 
@@ -1206,7 +1206,7 @@ Source: openspec/specs/neo4j-export/spec.md
 traceability:links[]
 --
 
-[#REQ-309, item, role=requirement, title="playbook export spans repositories"]
+[#REQ-346, item, role=requirement, title="playbook export spans repositories"]
 --
 When a playbook is given, the exported graph SHALL include items from every component and repository in that playbook, not just a single component.
 
@@ -1215,7 +1215,7 @@ Source: openspec/specs/neo4j-export/spec.md
 traceability:links[]
 --
 
-[#REQ-310, item, role=requirement, title="Entry points load a .env file"]
+[#REQ-345, item, role=requirement, title="Entry points load a .env file"]
 --
 The CLI and the id-server SHALL load a `.env` file from the working directory into the process environment at startup, before reading configuration.
 
@@ -1224,7 +1224,7 @@ Source: openspec/specs/env-file-loading/spec.md
 traceability:links[]
 --
 
-[#REQ-311, item, role=requirement, title="Process environment takes precedence"]
+[#REQ-344, item, role=requirement, title="Process environment takes precedence"]
 --
 A variable already present in the process environment SHALL NOT be overridden by the `.env` file.
 

@@ -46,6 +46,10 @@ const files = [
     adoc: "demo/index.adoc",
     realPath: resolve(__dirname, "demo/modules/ROOT/pages/index.adoc"),
   },
+  {
+    adoc: "demo/partials/requirements.adoc",
+    realPath: resolve(__dirname, "demo/modules/ROOT/partials/requirements.adoc"),
+  },
   "explanation/architecture.adoc",
   "self-traceability/test-plan.adoc",
   "self-traceability/delivery-process.adoc",
