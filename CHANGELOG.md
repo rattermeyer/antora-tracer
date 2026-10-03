@@ -2,6 +2,11 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.27.1] — 2026-10-03
+
+### Fixed
+- Auto-injected collapsible relationship lists render after items whose body ends in a bullet list; without a blank-line separator the collapsible attribute merged into the last list item and the links rendered inside a stray example block.
+
 ## [0.27.0] — 2026-10-03
 
 ### Added
