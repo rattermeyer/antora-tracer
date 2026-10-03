@@ -70,6 +70,51 @@ The key differences are in their markup languages and hosting platforms: Sphinx 
 | User-defined relation types per role pair
 | Both support custom link types; Antora Tracer validates allowed relations between roles
 
+| Bidirectional relations
+| Free-form link names
+| Declared `reverse` per relation; complementary pairs merged into one canonical edge
+| Antora Tracer's graph stays unambiguous at scale
+
+| Supersession lifecycle
+| User-defined statuses, no first-class semantics
+| First-class: `supersedes`/`superseded_by`, derived state, stale-link warnings, archive/remove CLI
+| Antora Tracer models item history in the graph itself
+
+| In-page visualization
+| `needflow`, `needpie`, `needbar`, `needgantt`, `needsequence`, `needuml`, `needarch`
+| `traceability:graph[]`, `traceability:graph-coverage[]`, `traceability:config-graph[]` (DOT and Vega-Lite via Kroki)
+| Sphinx Needs offers more chart types; Antora Tracer focuses on per-item and coverage graphs
+
+| Tables
+| `needtable` — arbitrary filtered tables, any columns
+| Config-driven pairwise matrices with coverage status
+| Sphinx Needs tables are generic; Antora Tracer matrices are role-coverage grids
+
+| Filtering
+| Filter language usable in every directive at render time
+| CLI queries (`query reverse/impact/linked/siblings/path`) outside the build
+| Sphinx Needs slices at render time; Antora Tracer analyzes developer-time
+
+| External data import
+| `needservice` (JIRA, GitHub), `needimport`, `list2need`, sphinx-test-reports (XML)
+| Not available — data authored in AsciiDoc only
+| Sphinx Needs pulls from ALM tools; Antora Tracer exports out, never in
+
+| Dynamic fields
+| Dynamic functions compute fields from other needs during the build
+| Not available
+| Sphinx Needs can derive data at build time
+
+| Multi-repo, multi-team
+| Per-build; sphinx-collections can gather sources, IDs are build-local
+| Native: Antora components/versions, cross-component xrefs, `site-graph` snapshots spanning sources
+| Antora Tracer treats the distributed graph as a first-class concern
+
+| Shared ID allocation
+| Not available
+| Standalone ID allocation server with `next-id` and `seed`
+| Collision-free IDs across concurrent teams and branches
+
 | Matrices
 | `needtable` directive
 | Config-driven matrix generation
@@ -82,12 +127,17 @@ The key differences are in their markup languages and hosting platforms: Sphinx 
 
 | Export
 | needs.json, needs builder API
-| Neo4j CSV and Cypher export
+| Neo4j CSV and Cypher, JSON graph snapshots
 | Different export targets
+
+| Graph analysis
+| Filter expressions at render time
+| Neo4j Cypher queries, graph diff between snapshots, `query siblings`
+| Antora Tracer's graph is analyzable outside any doc build
 
 | Presets
 | Not available
-| 4 built-in presets (requirements-eng, agile, medical, minimal)
+| 4 built-in presets (requirements-eng, agile, medical, minimal) with shipped role guidance
 | Antora Tracer ships with ready-to-use configurations
 
 | Custom fields
@@ -107,17 +157,17 @@ The key differences are in their markup languages and hosting platforms: Sphinx 
 
 | Validation
 | Schema validation via `needs_fields`, constraint checking, dead link detection
-| Role-based relation validation + duplicate detection
-| Both validate; Sphinx-Needs validates custom field schemas, Antora Tracer validates role-to-role relations
+| Graph validation: circular references, dangling references, duplicate IDs, unknown relation types, supersession cycles
+| Both validate; Sphinx-Needs validates field schemas, Antora Tracer validates the graph structure
 
 | CLI
 | Via Sphinx build
-| Standalone CLI with 6 commands
+| Standalone CLI with 18+ commands (process, matrix, validate, query, diff, site-graph, supersession, next-id, ...)
 | Antora Tracer works outside the documentation build
 
 | Link rendering
 | Inline via directives
-| `tracer:outgoing[]` and `tracer:incoming[]` macros with configurable style (list, table, inline)
+| `traceability:outgoing[]` and `traceability:incoming[]` macros with configurable style (list, table, inline)
 | Antora Tracer separates data (inline macros) from rendering (links macro)
 
 | Matrix navigation
@@ -134,21 +184,37 @@ If you're moving from Sphinx Needs to Antora Tracer:
 . Replace `:need:\` with `[item, role=requirement]`, `:spec:\` with `[item, role=design]`, etc.
 . Move your needs types into `traceability.yml` `roles` field
 . Define allowed relations in `traceability.yml` `relations` section
-. Replace `:links:` with inline relationship macros (``)
+. Replace `:links:` with inline relationship macros
 . Replace `needtable` directives with matrix definitions in `traceability.yml`
-. Use `npx antora-req-trace process` instead of the Sphinx build for traceability
+. Use `npx antora-tracer process` instead of the Sphinx build for traceability
 
 == Key Differences
 
 For a comparison of Antora and Sphinx as *publishing platforms* (HTML, PDF, versioning, navigation), see xref:explanation/antora-vs-sphinx.adoc[].
 
-*Sphinx Needs* is tightly integrated with Sphinx. *Antora Tracer* is tightly integrated with Antora.
+*Sphinx Needs* and *Antora Tracer* grew from opposite philosophies.
+
+Sphinx Needs is a render-time framework: needs are Sphinx nodes, and everything happens inside the build through directives.
+Every view of the data — tables, flows, charts, filters — is a directive evaluated while the documentation renders.
+
+*Antora Tracer* is graph-first: items are graph data that happens to live in AsciiDoc.
+The build populates a traceability graph; the rendered matrices and link lists are one projection of it.
+The same graph is queryable from the CLI, exportable as JSON snapshots, diffable between versions, and loadable into Neo4j — without rendering any documentation.
+
+This structural choice explains most of the practical differences:
+
+* *Rendering richness vs analysis depth.* Sphinx Needs couples analysis to rendering, so it can put a pie chart next to a requirement; Antora Tracer decouples them, so it can answer `query siblings` across repositories from a snapshot.
+
+* *Where data lives.* Sphinx Needs imports from external ALM tools (JIRA, GitHub tickets become needs); Antora Tracer treats AsciiDoc as the single source of truth and only exports out (CSV, Cypher, JSON).
+
+* *Distributed teams.* Sphinx Needs links are per-build; Antora Tracer's ID allocation server hands out collision-free IDs across concurrent teams, and Antora's component model spans repositories natively.
+
+* *Item history.* Sphinx Needs has user-defined statuses; Antora Tracer models supersession as first-class graph relationships with derived state, stale-link warnings, and archive tooling.
+
+*Sphinx Needs* is mature, commercially backed (useblocks GmbH), and offers training and an extension ecosystem.
+*Antora Tracer* is newer; its self-tracing example site is itself built with the extension — the project's requirements, architecture, and test plan are live tracer data.
+
 Both are language-agnostic — they document projects written in any programming language.
-
-*Sphinx Needs* defines need types via `needs_types` configuration — each type gets its own directive name (`.. req::`, `.. spec::`, etc.). *Antora Tracer* uses a single `[item]` macro with a `role` attribute — one syntax for all types.
-Both let you define your own domain model.
-
-*Sphinx-Needs* provides `needflow` for in-page graph visualization with PlantUML or Graphviz. *Antora Tracer* provides `tracer:graph[]` and `tracer:graph-coverage[]` macros for in-page graphviz/DOT visualization, plus Neo4j export for external graph queries.
-
-*Sphinx Needs* is mature and well-established. *Antora Tracer* is newer but follows the same traceability principles with a more flexible, config-driven approach.
 Choose based on your documentation toolchain: Sphinx (reStructuredText/Markdown) or Antora (AsciiDoc).
+
+
