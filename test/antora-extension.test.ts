@@ -3399,7 +3399,7 @@ satisfies:REQ-001[]
       rmSync(dir, { recursive: true, force: true });
     });
 
-    it("registers no guidance attachments when the config has no roleGuidance", async () => {
+    it("inherits preset roleGuidance when the config declares none", async () => {
       const configYml = join(tempDir, "agile-config.yml");
       writeFileSync(configYml, "extends: agile\n");
       const addedFiles: any[] = [];
@@ -3435,10 +3435,12 @@ satisfies:REQ-001[]
 
       ctx.fireEvent("contentClassified", { contentCatalog });
 
+      // The agile preset ships roleGuidance for its 8 roles; a config
+      // extending it inherits all of them without declaring any.
       const guidanceFiles = addedFiles.filter((f: any) =>
         f.src?.relative?.startsWith("traceability/guidance/"),
       );
-      expect(guidanceFiles).to.have.length(0);
+      expect(guidanceFiles).to.have.length(8);
     });
   });
 
