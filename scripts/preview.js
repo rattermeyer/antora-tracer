@@ -81,6 +81,7 @@ execSync(`cp -r "${join(ROOT, "landing")}"/* "${PUBLIC}/"`, {
   stdio: "inherit",
 });
 console.log("  copied landing page");
+run("node scripts/generate-landing-stats.js", "Patch landing stats");
 
 console.log("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 console.log("Site ready in public/");

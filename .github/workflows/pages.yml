@@ -45,6 +45,9 @@ jobs:
       - name: Release consistency check
         run: node scripts/release-check.js
 
+      - name: Check landing page stats
+        run: node scripts/check-landing-stats.js
+
       - name: Install Vale
         run: |
           curl -sfL https://github.com/errata-ai/vale/releases/download/v3.15.1/vale_3.15.1_Linux_64-bit.tar.gz | tar xz -C /usr/local/bin vale
