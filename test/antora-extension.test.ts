@@ -1853,6 +1853,34 @@ Target.
       expect(itemOutput).to.include("REQ-072");
     });
 
+    it("separates auto-injected collapsible links from a trailing body list", async () => {
+      const output = await renderDoc(`:traceability-links: true
+:traceability-collapsible: true
+
+[#PRQ-005, item, role=process_requirement, title="Release", considered_by=ARC-031]
+--
+Versioning follows the usual scheme:
+
+* MAJOR for breaking changes
+* PATCH for fixes.
+--
+
+[#ARC-031, item, role=design, title="Landing page"]
+--
+Design.
+--
+`);
+
+      const itemOutput = output.slice(
+        output.indexOf("[#PRQ-005"),
+        output.indexOf("[#ARC-031"),
+      );
+      // The injected output must start after a blank line, so the
+      // [%collapsible] attribute opens a new block instead of merging
+      // into the last list item.
+      expect(itemOutput).to.include("* PATCH for fixes.\n\n[%collapsible]");
+    });
+
     it("should wrap output in [%collapsible] when attribute is true", async () => {
       const ctx = createMockContext({
         playbook: { output: { dir: tempDir }, extensions: [] },

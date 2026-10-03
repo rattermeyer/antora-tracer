@@ -49,7 +49,11 @@ Every release SHALL be tagged with a semver tag (`v0.12.1`) and the version SHAL
 The CHANGELOG SHALL be updated with all notable changes since the previous release.
 The release SHALL be published to npm.
 
-Versioning follows https://semver.org/[Semantic Versioning]: MAJOR for breaking API changes, MINOR for new features, PATCH for bug fixes and internal refactoring.
+Versioning follows https://semver.org/[Semantic Versioning]:
+
+* MAJOR for breaking API changes
+* MINOR for new features
+* PATCH for bug fixes and internal refactoring.
 --
 
 [#PRQ-006, item, role=process_requirement, title="PDF artifacts are generated alongside HTML", validates="REQ-060, REQ-093", considered_by=ARC-031]
