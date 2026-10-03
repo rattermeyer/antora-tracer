@@ -367,6 +367,7 @@ export class AntoraTraceabilityExtension {
     headerEnd: number;
     bodyStart: number;
     bodyEnd: number;
+    delimiter: string;
   }> {
     const results: Array<{
       itemId: string;
@@ -374,6 +375,7 @@ export class AntoraTraceabilityExtension {
       headerEnd: number;
       bodyStart: number;
       bodyEnd: number;
+      delimiter: string;
     }> = [];
 
     const macroStartRe = /\[(?:\.tracer)?#([^,\]]+),\s*item,?/g;
@@ -422,6 +424,7 @@ export class AntoraTraceabilityExtension {
         headerEnd: macroEnd + 1,
         bodyStart,
         bodyEnd: closeDelim.index,
+        delimiter: openDelim[1],
       });
     }
 
@@ -463,9 +466,12 @@ export class AntoraTraceabilityExtension {
         "g",
       );
 
-      for (const { itemId, bodyStart, bodyEnd } of blocks) {
+      for (const { itemId, bodyStart, bodyEnd, delimiter } of blocks) {
         const bodyContent = content.slice(bodyStart, bodyEnd);
         const bodyRanges = this.getInlineCodeRanges(bodyContent);
+        // Example-block items (====) cannot nest the ==== fences that
+        // collapsible link output emits — fall back to plain lists.
+        const collapsibleHere = delimiter === "--" && collapsible;
         let hasExplicitMacro = false;
         let macroMatch: RegExpExecArray | null;
 
@@ -486,7 +492,7 @@ export class AntoraTraceabilityExtension {
                   style,
                   order,
                   currentFile,
-                  collapsible,
+                  collapsibleHere,
                   currentComponent,
                   currentModule,
                   emptyStyle,
@@ -496,20 +502,24 @@ export class AntoraTraceabilityExtension {
         }
 
         if (linksEnabled && !hasExplicitMacro) {
+          const autoOutput = this.buildRelationMacroOutput(
+            itemId,
+            "links",
+            style,
+            order,
+            currentFile,
+            collapsibleHere,
+            currentComponent,
+            currentModule,
+            emptyStyle,
+          );
+          // Collapsible output opens with a block attribute ([%collapsible]);
+          // plain list output must be separated from the last body paragraph
+          // by a blank line or AsciiDoc merges the title into the paragraph.
           replacements.push({
             start: bodyEnd,
             end: bodyEnd,
-            text: this.buildRelationMacroOutput(
-              itemId,
-              "links",
-              style,
-              order,
-              currentFile,
-              collapsible,
-              currentComponent,
-              currentModule,
-              emptyStyle,
-            ),
+            text: collapsibleHere ? autoOutput : `\n${autoOutput}`,
           });
         }
       }

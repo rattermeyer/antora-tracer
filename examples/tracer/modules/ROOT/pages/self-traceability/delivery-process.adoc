@@ -33,13 +33,13 @@ The site build exercises the full extension pipeline — parsing, macro expansio
 == Deployment
 
 [#PRQ-004, item, role=process_requirement, title="Example site deploys from main branch", validates=REQ-072, considered_by=ARC-033]
---
+====
 The example site SHALL deploy to GitHub Pages automatically on every push to `main`.
 The Pages workflow SHALL build the Antora site, generate PDFs, copy the landing page, and deploy to the `gh-pages` branch.
 The deployment SHALL be atomic — either all artifacts deploy or none.
 
 The deployed site serves as the project's public documentation and a live demonstration of the extension's capabilities.
---
+====
 
 == Release
 

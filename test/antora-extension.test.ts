@@ -1826,6 +1826,30 @@ addresses:REQ-001[]
       expect(itemOutput).to.include(".Addressed by");
     });
 
+    it("does not emit ==== collapsible fences inside example-block items", async () => {
+      const output = await renderDoc(`:traceability-links: true
+:traceability-collapsible: true
+
+[#PRQ-001, item, role=process_requirement, title="Deploys from main", validates=REQ-072]
+====
+Body text.
+====
+
+[#REQ-072, item, role=requirement, title="Target"]
+--
+Target.
+--
+`);
+
+      const itemOutput = output.slice(
+        output.indexOf("[#PRQ-001"),
+        output.indexOf("[#REQ-072"),
+      );
+      expect(itemOutput).to.not.include("[%collapsible]");
+      expect(itemOutput).to.include(".Validates");
+      expect(itemOutput).to.include("REQ-072");
+    });
+
     it("should wrap output in [%collapsible] when attribute is true", async () => {
       const ctx = createMockContext({
         playbook: { output: { dir: tempDir }, extensions: [] },
