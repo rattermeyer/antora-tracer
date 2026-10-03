@@ -45,6 +45,9 @@ jobs:
       - name: Release consistency check
         run: node scripts/release-check.js
 
+      - name: Compile tests
+        run: pnpm exec tsc -p tsconfig.test.json
+
       - name: Check landing page stats
         run: node scripts/check-landing-stats.js
 

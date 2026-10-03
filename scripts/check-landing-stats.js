@@ -38,6 +38,10 @@ const actual =
 
 if (!actual) {
   console.error("✖ could not determine passing test count");
+  console.error(
+    "  The suite is read from lib/test/**/*.test.js — compile it first:",
+  );
+  console.error("    pnpm exec tsc -p tsconfig.test.json");
   if (res.stderr) console.error(res.stderr.split("\n").slice(-5).join("\n"));
   process.exit(1);
 }
