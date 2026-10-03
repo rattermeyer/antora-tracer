@@ -36,6 +36,8 @@ antora:
       minLevel: warning
       exclude:
         - documentation-style-guide.adoc
+        - modules/requirements/pages/index.adoc
+        - modules/requirements/partials/item-definition-and-parsing.adoc
 
 ui:
   bundle:
