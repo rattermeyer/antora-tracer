@@ -150,9 +150,10 @@ tracer:links[]
 --
 Test file: `test/graph-and-api.test.ts`
 
-Tests the `TraceabilityGraph` (extended queries: merge, getRelatedItems, getItemsWithRelationTo, getRelationshipsByRoles, findPath, getImpactAnalysis) and graph visualization methods (`toDot`, `toVegaLite`, `toConfigDot`).
+Tests the `TraceabilityGraph` (extended queries: merge, getRelatedItems, getItemsWithRelationTo, getRelationshipsByRoles, findPath, getImpactAnalysis, getSiblings) and graph visualization methods (`toDot`, `toVegaLite`, `toConfigDot`).
 Tests graph integrity validation including circular reference detection (direct, indirect, self-referencing cycles, bidirectional pair exclusion), dangling reference detection with source location and expected-role hints, and invalid relation type reporting with allowed-relations hints.
 Tests bidirectional relationship merge.
+Tests sibling queries — undirected neighbor traversal (shared target, shared source), neighbor-not-sibling exclusion, multiple shared neighbors, relation-type filtering on both sides, empty results, and supersession status with successor IDs.
 Also tests `RequirementsTraceabilityExtension` API methods (processFiles, validate, export, coverage, config access, preset management, lifecycle).
 
 verifies:REQ-053[]
@@ -161,6 +162,10 @@ verifies:REQ-109[]
 verifies:REQ-219[]
 verifies:REQ-220[]
 verifies:REQ-176[]
+verifies:REQ-324[]
+verifies:REQ-325[]
+verifies:REQ-326[]
+verifies:REQ-327[]
 
 tracer:links[]
 --
@@ -212,8 +217,7 @@ tracer:links[]
 [#TST-009, item, role=test, title="Query Command Tests"]
 --
 Test file: `test/query-command.test.ts`
-
-Tests the `query` CLI subcommand end-to-end — reverse (inbound relationships, empty results, unknown ID), impact (connected items, disconnected items), isolated (relationship-less items, role filter), orphaned (superseded items without incoming functional links), path (chain output, no path, unknown ID), and the `--json` flag (valid JSON, empty array).
+Tests the `query` CLI subcommand end-to-end — reverse (inbound relationships, empty results, unknown ID), impact (connected items, disconnected items), isolated (relationship-less items, role filter), orphaned (superseded items without incoming functional links), path (chain output, no path, unknown ID), siblings (table and JSON output with shared neighbors and supersession status, relation-type filter, cross-source snapshot loading, snapshot/input mutual exclusion, empty results, unknown ID), and the `--json` flag (valid JSON, empty array).
 Spawns the compiled CLI binary against a temporary fixture directory.
 
 verifies:REQ-136[]
@@ -223,6 +227,9 @@ verifies:REQ-139[]
 verifies:REQ-140[]
 verifies:REQ-141[]
 verifies:REQ-227[]
+verifies:REQ-301[]
+verifies:REQ-302[]
+verifies:REQ-303[]
 
 tracer:links[]
 --
