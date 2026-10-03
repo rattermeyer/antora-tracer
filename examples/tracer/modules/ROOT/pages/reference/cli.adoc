@@ -366,6 +366,9 @@ npx antora-tracer query linked CHG-001 requirement --snapshot graph.json --json
 npx antora-tracer query isolated --role requirement
 npx antora-tracer query orphaned
 npx antora-tracer query path TST-001 REQ-001
+npx antora-tracer query siblings PRQ-004
+npx antora-tracer query siblings PRQ-004 --relation validates
+npx antora-tracer query siblings PRQ-004 --snapshot site-graph.json
 ----
 
 [width=100%, cols="25,15,60"]
@@ -386,12 +389,20 @@ npx antora-tracer query path TST-001 REQ-001
 
 | `--snapshot <path>`
 | string
-| For `linked`: read items and relationships from a canonical `site-graph` snapshot instead of scanning local AsciiDoc
+| For `linked` and `siblings`: read items and relationships from a canonical `site-graph` snapshot instead of scanning local AsciiDoc
 |===
 
 
 `linked <id> <role>` follows outgoing relationships any number of edges, traversing through items of every role and excluding the start item.
 For a multi-source snapshot, IDs must be globally unique across included sources; use `@antora-tracer/id-server` seeded with `antora-tracer seed antora-playbook.yml` and shared allocation tenant and prefix settings.
+
+`siblings <id>` traverses relationships undirected: an item's neighbors are both its outgoing targets and incoming sources, because every relation has a declared reverse.
+Two items are siblings when they connect to a common neighbor through the same relation type.
+Each result lists the shared neighbors that make the items siblings, plus whether the sibling is superseded — a superseded sibling is often the more interesting review signal.
+`--relation <type>` restricts discovery so that only edges of that relation type contribute, on both the queried item's side and the sibling's side.
+
+For a cross-source graph, build a snapshot with `antora-tracer site-graph <playbook>` and pass it via `--snapshot`; sibling discovery then spans every source the playbook resolves.
+`--snapshot` and `--input` cannot be combined.
 
 Subcommands:
 
@@ -416,6 +427,9 @@ Subcommands:
 
 | `path <from> <to>`
 | Print the shortest relationship path between two items
+
+| `siblings <id>`
+| List items sharing at least one typed neighbor with `<id>`, with the shared neighbors and each sibling's supersession status (optionally `--relation <type>`)
 |===
 
 Exit codes: `0` for success (including empty results), `1` for an unknown item ID or when no path exists.

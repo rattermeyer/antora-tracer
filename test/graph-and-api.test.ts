@@ -1267,6 +1267,128 @@ describe("RequirementsTraceabilityExtension - API Methods", () => {
       expect(rels).to.have.lengthOf(1);
     });
   });
+
+  describe("getSiblings() on extension", () => {
+    const buildGraph = () => {
+      const extension = new RequirementsTraceabilityExtension();
+      const items = [
+        createItem("PRQ-004", "process_requirement"),
+        createItem("PRQ-009", "process_requirement"),
+        createItem("REQ-072", "requirement"),
+        createItem("TEST-020", "test"),
+      ];
+      for (const item of items) {
+        extension.graph.addItem(item);
+      }
+      extension.graph.addRelationship(
+        createRel("R1", "PRQ-004", "REQ-072", "validates"),
+      );
+      extension.graph.addRelationship(
+        createRel("R2", "PRQ-009", "REQ-072", "validates"),
+      );
+      extension.graph.addRelationship(
+        createRel("R3", "TEST-020", "REQ-072", "verifies"),
+      );
+      return extension.graph;
+    };
+
+    it("returns siblings via shared target", () => {
+      const siblings = buildGraph().getSiblings("PRQ-004");
+      expect(siblings.map((s) => s.siblingId)).to.deep.equal([
+        "PRQ-009",
+        "TEST-020",
+      ]);
+      const prq009 = siblings.find((s) => s.siblingId === "PRQ-009")!;
+      expect(prq009.sharedTargets).to.deep.equal(["REQ-072"]);
+    });
+
+    it("returns siblings via shared source (undirected)", () => {
+      const graph = new TraceabilityGraph();
+      graph.addItem(createItem("PRQ-002", "process_requirement"));
+      graph.addItem(createItem("REQ-087", "requirement"));
+      graph.addItem(createItem("REQ-088", "requirement"));
+      graph.addRelationship(
+        createRel("R1", "PRQ-002", "REQ-087", "validates"),
+      );
+      graph.addRelationship(
+        createRel("R2", "PRQ-002", "REQ-088", "validates"),
+      );
+
+      const siblings = graph.getSiblings("REQ-087");
+      expect(siblings.map((s) => s.siblingId)).to.deep.equal(["REQ-088"]);
+      expect(siblings[0].sharedTargets).to.deep.equal(["PRQ-002"]);
+    });
+
+    it("treats neighbors as neighbors, not siblings", () => {
+      // A -> B, C -> B, D -> A: siblings of A are {C} (shared neighbor B), not D
+      const graph = new TraceabilityGraph();
+      for (const id of ["A", "B", "C", "D"]) {
+        graph.addItem(createItem(id, "requirement"));
+      }
+      graph.addRelationship(createRel("R1", "A", "B", "validates"));
+      graph.addRelationship(createRel("R2", "C", "B", "validates"));
+      graph.addRelationship(createRel("R3", "D", "A", "validates"));
+
+      expect(graph.getSiblings("A").map((s) => s.siblingId)).to.deep.equal([
+        "C",
+      ]);
+    });
+
+    it("aggregates multiple shared neighbors", () => {
+      const graph = new TraceabilityGraph();
+      for (const id of ["X", "Y", "N1", "N2"]) {
+        graph.addItem(createItem(id, "requirement"));
+      }
+      graph.addRelationship(createRel("R1", "X", "N1", "validates"));
+      graph.addRelationship(createRel("R2", "X", "N2", "validates"));
+      graph.addRelationship(createRel("R3", "Y", "N1", "validates"));
+      graph.addRelationship(createRel("R4", "Y", "N2", "validates"));
+
+      const siblings = graph.getSiblings("X");
+      expect(siblings[0].sharedTargets).to.deep.equal(["N1", "N2"]);
+    });
+
+    it("filters by relation type on both sides", () => {
+      // PRQ-004 validates REQ-072; TEST-020 verifies REQ-072 — different
+      // relation types sharing the neighbor: excluded under validates filter
+      const siblings = buildGraph().getSiblings("PRQ-004", "validates");
+      expect(siblings.map((s) => s.siblingId)).to.deep.equal(["PRQ-009"]);
+
+      const all = buildGraph().getSiblings("PRQ-004");
+      expect(all.map((s) => s.siblingId)).to.include("TEST-020");
+    });
+
+    it("returns empty for an item with no shared neighbors", () => {
+      const graph = new TraceabilityGraph();
+      graph.addItem(createItem("L1", "requirement"));
+      graph.addItem(createItem("L2", "requirement"));
+      graph.addItem(createItem("L3", "requirement"));
+      graph.addRelationship(createRel("R1", "L1", "L2", "validates"));
+
+      expect(graph.getSiblings("L1")).to.deep.equal([]);
+    });
+
+    it("includes supersession status and successors", () => {
+      const graph = new TraceabilityGraph();
+      for (const id of ["OLD-1", "NEW-1", "CUR-1", "HUB"]) {
+        graph.addItem(createItem(id, "requirement"));
+      }
+      graph.addRelationship(createRel("R1", "OLD-1", "HUB", "validates"));
+      graph.addRelationship(createRel("R2", "NEW-1", "HUB", "validates"));
+      graph.addRelationship(createRel("R3", "CUR-1", "HUB", "validates"));
+      graph.addRelationship(
+        createRel("R4", "NEW-1", "OLD-1", "supersedes"),
+      );
+
+      const siblings = graph.getSiblings("CUR-1");
+      const old1 = siblings.find((s) => s.siblingId === "OLD-1")!;
+      expect(old1.superseded).to.equal(true);
+      expect(old1.successorIds).to.deep.equal(["NEW-1"]);
+      const new1 = siblings.find((s) => s.siblingId === "NEW-1")!;
+      expect(new1.superseded).to.equal(false);
+      expect(new1.successorIds).to.deep.equal([]);
+    });
+  });
 });
 
 // ============================================================================

@@ -44,6 +44,20 @@ export interface ItemRelationship {
   bidirectional?: boolean;
 }
 
+/**
+ * A sibling query result: an item sharing at least one typed neighbor
+ * with the queried item, with the shared neighbors and supersession status.
+ */
+export interface SiblingInfo {
+  siblingId: string;
+  /** Neighbor IDs the sibling and the queried item both connect to. */
+  sharedTargets: string[];
+  /** True when the sibling is superseded by at least one successor. */
+  superseded: boolean;
+  /** Successor IDs when superseded; empty otherwise. */
+  successorIds: string[];
+}
+
 // ============================================================================
 // Supersession Semantics
 // ============================================================================

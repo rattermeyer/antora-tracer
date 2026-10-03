@@ -9,7 +9,7 @@
  */
 
 import type { ConfigLoader } from "./config/TraceabilityConfig.js";
-import type { Item, ItemRelationship } from "./types.js";
+import type { Item, ItemRelationship, SiblingInfo } from "./types.js";
 import { HISTORY_RELATION_TYPES, ROLE_COLORS, SUPERSEDES } from "./types.js";
 
 /**
@@ -555,6 +555,87 @@ export class TraceabilityGraph {
 
     return Array.from(result.values());
   }
+
+  /**
+   * Get items sharing at least one typed neighbor with the given item
+   * (undirected traversal: neighbors are outgoing targets and incoming
+   * sources). Each result carries the shared neighbor IDs, the relation
+   * types connecting them, and the sibling's supersession status.
+   */
+  getSiblings(
+    itemId: string,
+    relationType?: string,
+  ): Array<SiblingInfo> {
+    // Collect neighbors: neighborId -> relation types that connect the item
+    const neighborTypes = new Map<string, Set<string>>();
+    const addNeighbor = (neighborId: string, type: string) => {
+      if (neighborId === itemId) return;
+      const types = neighborTypes.get(neighborId) ?? new Set<string>();
+      types.add(type);
+      neighborTypes.set(neighborId, types);
+    };
+    for (const rel of this.getRelationships(itemId, relationType)) {
+      addNeighbor(rel.targetId, rel.type);
+    }
+    for (const rel of this.getReverseRelationships(itemId, relationType)) {
+      addNeighbor(rel.fromId, rel.type);
+    }
+
+    const siblings = new Map<string, SiblingInfo>();
+    const addSibling = (siblingId: string, neighborId: string) => {
+      if (siblingId === itemId) return;
+      let info = siblings.get(siblingId);
+      if (!info) {
+        info = {
+          siblingId,
+          sharedTargets: [],
+          superseded: false,
+          successorIds: [],
+        };
+        siblings.set(siblingId, info);
+      }
+      if (!info.sharedTargets.includes(neighborId)) {
+        info.sharedTargets.push(neighborId);
+      }
+    };
+
+    // For each neighbor, find other items connected to it. Unfiltered, every
+    // relation type on the neighbor contributes; filtered, only edges of the
+    // requested type (the queried item's own edges already passed the filter).
+    for (const neighborId of neighborTypes.keys()) {
+      const types = relationType
+        ? [relationType]
+        : this.allEdgeTypes(neighborId);
+      for (const type of types) {
+        for (const rel of this.getRelationships(neighborId, type)) {
+          addSibling(rel.targetId, neighborId);
+        }
+        for (const rel of this.getReverseRelationships(neighborId, type)) {
+          addSibling(rel.fromId, neighborId);
+        }
+      }
+    }
+
+    return Array.from(siblings.values())
+      .map((info) => ({
+        ...info,
+        sharedTargets: info.sharedTargets.sort(),
+        superseded: this.isSuperseded(info.siblingId),
+        successorIds: this.isSuperseded(info.siblingId)
+          ? this.getSuccessors(info.siblingId).map((s) => s.id)
+          : [],
+      }))
+      .sort((a, b) => a.siblingId.localeCompare(b.siblingId));
+  }
+
+  /** All relation types on the item's edges, both directions. */
+  private allEdgeTypes(itemId: string): string[] {
+    const types = new Set<string>();
+    for (const rel of this.getRelationships(itemId)) types.add(rel.type);
+    for (const rel of this.getReverseRelationships(itemId)) types.add(rel.type);
+    return Array.from(types);
+  }
+
 
   /**
    * Get items by role that are related to a given item

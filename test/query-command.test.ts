@@ -101,6 +101,7 @@ addresses:REQ-020[]
 New requirement.
 
 supersedes:REQ-020[]
+references:ARC-020[]
 ====
 `;
 
@@ -448,6 +449,112 @@ describe("Query Command", () => {
       const { status, stderr } = runQuery([
         "path",
         "REQ-001",
+        "UNKNOWN-001",
+        ...input(),
+      ]);
+      expect(status).to.equal(1);
+      expect(stderr).to.include("Item not found: UNKNOWN-001");
+    });
+  });
+
+  describe("query siblings", () => {
+    // SAMPLE: DES-001 addresses REQ-001 and REQ-003 -> REQ-001 and
+    // REQ-003 are siblings via shared neighbor DES-001.
+    it("lists siblings with shared neighbors and status as a table", () => {
+      const { stdout, status } = runQuery(["siblings", "REQ-001", ...input()]);
+      expect(status).to.equal(0);
+      expect(stdout).to.include("REQ-003");
+      expect(stdout).to.include("DES-001");
+      expect(stdout).to.include("current");
+    });
+
+    it("emits JSON with shared targets and supersession fields", () => {
+      const result = jsonOf(["siblings", "REQ-001", "--json", ...input()]);
+      expect(result).to.be.an("array");
+      const req003 = (result as any[]).find(
+        (entry) => entry.item.id === "REQ-003",
+      );
+      expect(req003.sharedTargets).to.deep.equal(["DES-001"]);
+      expect(req003.superseded).to.equal(false);
+    });
+
+    it("marks superseded siblings with their successors", () => {
+      // SAMPLE: REQ-021 supersedes REQ-020 and references ARC-020;
+      // ARC-020 addresses REQ-020. REQ-021's neighbors are REQ-020 and
+      // ARC-020; REQ-020 shares ARC-020 with REQ-021, and REQ-020 is
+      // superseded by REQ-021 itself.
+      const result = jsonOf(["siblings", "REQ-021", "--json", ...input()]);
+      const req020 = (result as any[]).find(
+        (entry) => entry.item.id === "REQ-020",
+      );
+      expect(req020.sharedTargets).to.deep.equal(["ARC-020"]);
+      expect(req020.superseded).to.equal(true);
+      expect(req020.successorIds).to.deep.equal(["REQ-021"]);
+
+      const { stdout } = runQuery(["siblings", "REQ-021", ...input()]);
+      expect(stdout).to.include("superseded by REQ-021");
+    });
+
+    it("filters siblings by relation type", () => {
+      // Unfiltered, REQ-001's siblings include IMP-001 (implements DES-001)
+      // and REQ-003 (addressed by DES-001) — both share DES-001.
+      // Filtered to `addresses`, IMP-001 drops out: its edge to the shared
+      // neighbor uses `implements`.
+      const all = jsonOf(["siblings", "REQ-001", "--json", ...input()]);
+      expect((all as any[]).map((e) => e.item.id)).to.include("IMP-001");
+
+      const filtered = jsonOf([
+        "siblings",
+        "REQ-001",
+        "--relation",
+        "addresses",
+        "--json",
+        ...input(),
+      ]);
+      expect((filtered as any[]).map((e) => e.item.id)).to.deep.equal([
+        "REQ-003",
+      ]);
+    });
+
+    it("queries siblings from a cross-source snapshot", () => {
+      // MULTI_SOURCE_SNAPSHOT: UC-001 links REQ-101 and REQ-102 from
+      // different components -> REQ-101 and REQ-102 are siblings via UC-001.
+      const result = jsonOf([
+        "siblings",
+        "REQ-101",
+        "--snapshot",
+        SNAPSHOT_PATH,
+        "--json",
+      ]);
+      expect(result).to.be.an("array");
+      const req102 = (result as any[]).find(
+        (entry) => entry.item.id === "REQ-102",
+      );
+      expect(req102.sharedTargets).to.deep.equal(["UC-001"]);
+      expect(req102.superseded).to.equal(false);
+    });
+
+    it("rejects snapshot and explicit local input together", () => {
+      const { status, stderr } = runQuery([
+        "siblings",
+        "REQ-101",
+        "--snapshot",
+        SNAPSHOT_PATH,
+        "--input",
+        TEST_DIR,
+      ]);
+      expect(status).to.equal(1);
+      expect(stderr).to.include("Use either --input or --snapshot, not both");
+    });
+
+    it("returns an empty result for an item with no shared neighbors", () => {
+      const result = jsonOf(["siblings", "REQ-002", "--json", ...input()]);
+      expect(result).to.deep.equal([]);
+    });
+
+    it("exits 1 with a warning for an unknown item ID", () => {
+      const { status, stderr } = runQuery([
+        "siblings",
         "UNKNOWN-001",
         ...input(),
       ]);
