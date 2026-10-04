@@ -388,11 +388,12 @@ After a build, you’ll find in `<site-output>/traceability/`:
 
 ## Agent Skills
 
-The npm package ships [Agent Skills](https://agentskills.io/specification) that teach AI assistants how to write and review traceable content in an antora-tracer project:
+The npm package ships [Agent Skills](https://agentskills.io/specification) that teach AI assistants how to write, review, and improve traceable content in an antora-tracer project:
 
 - `requirements-writing` — EARS-style functional requirements, "what not how"
 - `use-case-engineering` — Karl Wiegers use case template
 - `review-architecture-diagrams` — diagram review against better-architecture-diagrams principles
+- `semantic-relation-review` — prioritized review of outgoing relation semantics
 
 They live in the `skills/` directory of the installed package. Point your agent harness at them:
 

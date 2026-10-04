@@ -1,0 +1,15 @@
+= Requirement refinement review fixture
+
+[#REQ-912, item, role=requirement, title="Recognize item blocks"]
+--
+When an AsciiDoc page contains a `[item]` block with a configured role, the system SHALL register that block as a traceable item.
+
+refines:REQ-911[]
+--
+
+[#REQ-913, item, role=requirement, title="Reset account password"]
+--
+The system SHALL let an account holder request a password reset using their registered email address.
+
+refines:REQ-911[]
+--

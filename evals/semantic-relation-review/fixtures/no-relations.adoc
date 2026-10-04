@@ -1,0 +1,6 @@
+= Document without outgoing relations
+
+[#ARC-920, item, role=design, title="Plain content transformation"]
+--
+The extension transforms document content in memory before it is published.
+--

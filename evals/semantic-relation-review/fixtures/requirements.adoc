@@ -1,0 +1,28 @@
+= Requirement targets
+
+[#REQ-901, item, role=requirement, title="Protect account data"]
+--
+The system SHALL authenticate each user before exposing that user's account data.
+
+depends_on:REQ-902[]
+--
+
+[#REQ-902, item, role=requirement, title="Parse AsciiDoc items"]
+--
+The system SHALL parse AsciiDoc item blocks and register their declared traceability relationships.
+--
+
+[#REQ-903, item, role=requirement, title="Administration diagnostics view"]
+--
+The system SHALL provide administrators with a view that displays build diagnostics and lets them filter diagnostics by severity.
+--
+
+[#REQ-904, item, role=requirement, title="Bound graph build time"]
+--
+The system SHALL complete a graph build containing 5,000 traceable items within two seconds on the supported CI runner.
+--
+
+[#REQ-905, item, role=requirement, title="Protect sensitive information"]
+--
+The system SHALL protect sensitive user information from unauthorized access.
+--

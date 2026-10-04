@@ -1,0 +1,6 @@
+= Base requirement fixture
+
+[#REQ-911, item, role=requirement, title="Register traceable documentation"]
+--
+The system SHALL register documentation concepts that users identify as traceable.
+--

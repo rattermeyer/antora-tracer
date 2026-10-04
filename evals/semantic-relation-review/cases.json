@@ -1,0 +1,178 @@
+{
+  "cases": [
+    {
+      "id": "design-addresses-document-triage",
+      "input": "evals/semantic-relation-review/fixtures",
+      "document": "architecture-review",
+      "relation_criteria": {
+        "addresses": "A design responds to the requirement. Report a concern when the design is unrelated or materially fails to support the required outcome; mere lack of repeated wording is not enough."
+      },
+      "expected_relation_keys": [
+        "ARC-901 addresses REQ-901",
+        "ARC-902 addresses REQ-902",
+        "ARC-903 addresses REQ-903",
+        "ARC-904 addresses REQ-904",
+        "ARC-905 addresses REQ-905"
+      ],
+      "expected_findings": [
+        {
+          "source_id": "ARC-902",
+          "relation": "addresses",
+          "target_id": "REQ-902",
+          "severity": ["HIGH"],
+          "confidence": ["high", "medium", "low"]
+        },
+        {
+          "source_id": "ARC-903",
+          "relation": "addresses",
+          "target_id": "REQ-903",
+          "severity": ["MEDIUM", "LOW"],
+          "confidence": ["high", "medium", "low"]
+        },
+        {
+          "source_id": "ARC-904",
+          "relation": "addresses",
+          "target_id": "REQ-904",
+          "severity": ["LOW", "MEDIUM"],
+          "confidence": ["high", "medium", "low"]
+        },
+        {
+          "source_id": "ARC-905",
+          "relation": "addresses",
+          "target_id": "REQ-905",
+          "severity": ["HIGH", "MEDIUM"],
+          "confidence": ["high", "medium", "low"]
+        }
+      ],
+      "omitted_relations": ["ARC-901 addresses REQ-901"],
+      "interaction": "Initial review. Present actionable findings, then offer an AsciiDoc report.",
+      "expected_report_decision": "offer"
+    },
+    {
+      "id": "requirement-refinement-triage",
+      "input": "evals/semantic-relation-review/fixtures",
+      "document": "refinement-review",
+      "relation_criteria": {
+        "refines": "The source requirement narrows a broader target requirement while preserving its intent. A source about an unrelated goal does not refine the target."
+      },
+      "expected_relation_keys": [
+        "REQ-912 refines REQ-911",
+        "REQ-913 refines REQ-911"
+      ],
+      "expected_findings": [
+        {
+          "source_id": "REQ-913",
+          "relation": "refines",
+          "target_id": "REQ-911",
+          "severity": ["HIGH", "MEDIUM"],
+          "confidence": ["high", "medium", "low"]
+        }
+      ],
+      "omitted_relations": ["REQ-912 refines REQ-911"],
+      "interaction": "Initial review. Present actionable findings, then offer an AsciiDoc report.",
+      "expected_report_decision": "offer"
+    },
+    {
+      "id": "empty-document-review",
+      "input": "evals/semantic-relation-review/fixtures",
+      "document": "no-relations",
+      "expected_relation_keys": [],
+      "expected_findings": [],
+      "omitted_relations": [],
+      "interaction": "Initial review. There are no outgoing relations.",
+      "expected_report_decision": "none"
+    },
+    {
+      "id": "real-architecture-site-smoke",
+      "input": "examples/tracer/modules",
+      "config": "examples/traceability.yml",
+      "document": "ROOT/pages/explanation/architecture.adoc",
+      "relation_criteria": {
+        "addresses": "A design responds to the requirement. Judge the particular source and target item content."
+      },
+      "expected_relation_keys": [
+        "ARC-018 addresses REQ-221",
+        "ARC-018 addresses REQ-222"
+      ],
+      "expected_findings": [],
+      "omitted_relations": [],
+      "interaction": "Smoke test only the real graph extraction and grounded document summary. Do not require an exhaustive judgment, findings, or report offer; report offer is conditional on actionable findings.",
+      "expected_report_decision": "from_findings",
+      "smoke": true
+    },
+    {
+      "id": "report-declined",
+      "input": "evals/semantic-relation-review/fixtures",
+      "document": "architecture-review",
+      "prior_findings": [
+        {
+          "source_id": "ARC-902",
+          "relation": "addresses",
+          "target_id": "REQ-902",
+          "severity": "HIGH",
+          "confidence": "high",
+          "problem": "The design describes PDF deployment; the target requires parsing AsciiDoc items.",
+          "suggestion": "Check the intended requirement, then correct or remove the relation."
+        }
+      ],
+      "interaction": "Follow-up after the findings have already been presented. The user declines the offered report.",
+      "expected_report_decision": "declined"
+    },
+    {
+      "id": "report-needs-destination",
+      "input": "evals/semantic-relation-review/fixtures",
+      "document": "architecture-review",
+      "prior_findings": [
+        {
+          "source_id": "ARC-902",
+          "relation": "addresses",
+          "target_id": "REQ-902",
+          "severity": "HIGH",
+          "confidence": "high",
+          "problem": "The design describes PDF deployment; the target requires parsing AsciiDoc items.",
+          "suggestion": "Check the intended requirement, then correct or remove the relation."
+        }
+      ],
+      "interaction": "Follow-up after the findings have already been presented. The user requests a report but has not chosen a destination.",
+      "expected_report_decision": "needs_path"
+    },
+    {
+      "id": "report-antora-destination-warning",
+      "input": "evals/semantic-relation-review/fixtures",
+      "document": "architecture-review",
+      "prior_findings": [
+        {
+          "source_id": "ARC-902",
+          "relation": "addresses",
+          "target_id": "REQ-902",
+          "severity": "HIGH",
+          "confidence": "high",
+          "problem": "The design describes PDF deployment; the target requires parsing AsciiDoc items.",
+          "suggestion": "Check the intended requirement, then correct or remove the relation."
+        }
+      ],
+      "interaction": "Follow-up after findings have been presented. The user proposes examples/tracer/modules/ROOT/pages/explanation/architecture-review-report.adoc but has not acknowledged Antora may publish or process it.",
+      "expected_report_decision": "warn",
+      "expected_report_path": "examples/tracer/modules/ROOT/pages/explanation/architecture-review-report.adoc"
+    },
+    {
+      "id": "report-confirmed-plain-adoc",
+      "input": "evals/semantic-relation-review/fixtures",
+      "document": "architecture-review",
+      "prior_findings": [
+        {
+          "source_id": "ARC-902",
+          "relation": "addresses",
+          "target_id": "REQ-902",
+          "severity": "HIGH",
+          "confidence": "high",
+          "problem": "The design describes PDF deployment; the target requires parsing AsciiDoc items.",
+          "suggestion": "Check the intended requirement, then correct or remove the relation."
+        }
+      ],
+      "interaction": "Follow-up after findings have been presented. The user explicitly approved examples/tracer/modules/ROOT/pages/explanation/architecture-review-report.adoc and acknowledged the Antora warning.",
+      "expected_report_decision": "create",
+      "expected_report_path": "examples/tracer/modules/ROOT/pages/explanation/architecture-review-report.adoc"
+    }
+  ]
+}

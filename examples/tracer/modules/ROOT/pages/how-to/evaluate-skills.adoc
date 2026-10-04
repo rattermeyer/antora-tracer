@@ -48,6 +48,33 @@ The default is one trial.
 This layer costs tokens and is not part of `npm test`.
 Run it manually when you change a skill.
 
+== Run the semantic relation review eval
+
+The `semantic-relation-review` skill triages outgoing relationships across one document, using both endpoints' content and the project's relation meanings.
+Its eval covers severity and confidence as separate judgments, direct-target extraction across documents, supported links omitted from findings, and report-consent decisions.
+
+Run the real-CLI extraction checks without contacting a model:
+
+[source,bash]
+----
+node evals/semantic-relation-review/run.mjs --extract-only
+----
+
+To run the semantic rubric, provide credentials accepted by the configured OpenAI-compatible endpoint:
+
+[source,bash]
+----
+LITELLM_BASE_URL=https://litellm.example/v1 \
+LITELLM_API_KEY=<your-litellm-key> \
+EVAL_MODEL=<model-deployed-on-litellm> \
+node evals/semantic-relation-review/run.mjs --trials 3
+----
+
+The runner uses `antora-tracer process --format json` to extract parsed items and edges, then limits judgments to outgoing edges from the selected document and their direct target items.
+It does not follow target items' outgoing edges.
+Follow-up cases verify declined reports, missing destinations, Antora publication warnings, and a user-approved plain AsciiDoc report.
+The eval is non-deterministic and is not part of `npm test`.
+
 == Add a new case
 
 Add an object to `evals/requirements-writing/cases.json`:

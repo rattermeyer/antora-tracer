@@ -18,12 +18,13 @@ It works entirely without the agent skills.
 
 == Add-on: the agent skills
 
-The add-on is a set of xref:how-to/install-skills.adoc[Agent Skills] that teach an AI assistant how to write and review traceable content.
-The package ships three:
+The add-on is a set of xref:how-to/install-skills.adoc[Agent Skills] that teach an AI assistant to write, review, and improve traceable content.
+The package ships four:
 
 * `requirements-writing` — create and review functional requirements in EARS style
 * `use-case-engineering` — create and review use case descriptions
 * `review-architecture-diagrams` — review architecture diagrams
+* `semantic-relation-review` — triage the semantic support of outgoing traceability relations
 
 The skills live in `skills/` and are documented in the xref:how-to/install-skills.adoc[install] and xref:how-to/evaluate-skills.adoc[evaluate] how-to guides.
 They work independently of the extension — a skill guides an agent to produce correct `[item]` blocks, but the extension is not required to run the skill.

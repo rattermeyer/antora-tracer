@@ -326,6 +326,47 @@ prefixes:
 `start` is `max+1` — the first ID the server allocates — never the current maximum and never a formatted `REQ-055` string.
 See xref:how-to/run-id-server.adoc[Run the ID allocation server] for the seeding workflow.
 
+== skills install
+
+Copy Antora Tracer's bundled Agent Skills to supported harness per-user directories.
+Without harness arguments in an interactive terminal, it prompts for a multi-select choice; with explicit harness names it installs without further prompting.
+
+[source,bash]
+----
+npx antora-tracer skills install
+npx antora-tracer skills install pi claude codex
+npx antora-tracer skills install claude --overwrite
+npx antora-tracer skills install pi --dry-run
+----
+
+Harnesses:
+`pi` (copies to `~/.agents/skills/`), `claude` (copies to `~/.claude/skills/`), and `codex` (copies to `~/.codex/skills/`).
+
+The command never replaces an existing skill directory by default.
+Without `--overwrite`, conflicts are skipped in non-interactive mode and prompted individually in interactive mode.
+
+When `pi` is selected, the command prints a note that installing `@antora-tracer/core` as a Pi package auto-discovers its skills and is the recommended approach.
+
+[width=100%, cols="25,15,60"]
+|===
+| Option | Type | Description
+
+| `[harness...]`
+| string (variadic)
+| One or more supported harnesses: `pi`, `claude`, `codex`.
+When not provided in an interactive terminal, a multi-select list is displayed; in non-interactive mode explicit harness names are required.
+
+| `--overwrite`
+| flag
+| Replace existing skill directories without prompting.
+Without this flag, existing skills are never silently replaced.
+
+| `--dry-run`
+| flag
+| Show selected harnesses and planned actions (installs, replaces, skips) without creating directories, prompting for overwrite, or modifying files.
+|===
+
+
 == role-guidance
 
 Resolve and report the authoring guidance for a role.

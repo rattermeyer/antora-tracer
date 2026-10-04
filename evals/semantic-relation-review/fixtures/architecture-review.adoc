@@ -1,0 +1,37 @@
+= Architecture review fixture
+
+[#ARC-901, item, role=design, title="Authentication flow"]
+--
+The authentication service verifies the supplied credentials and creates a session before the account service returns protected account data.
+
+addresses:REQ-901[]
+--
+
+[#ARC-902, item, role=design, title="PDF deployment"]
+--
+The release workflow uploads generated PDF files to the artifact repository after the documentation build completes.
+
+addresses:REQ-902[]
+--
+
+[#ARC-903, item, role=design, title="Diagnostics model"]
+--
+The extension exposes a shared diagnostics model to integrations so they can display processing problems to their users.
+
+addresses:REQ-903[]
+--
+
+[#ARC-904, item, role=design, title="Indexed graph traversal"]
+--
+The graph stores forward and reverse indexes so traversal avoids scanning every relationship for each visited item.
+
+
+addresses:REQ-904[]
+--
+
+[#ARC-905, item, role=design, title="Shared authentication boundary"]
+--
+The edge gateway delegates identity decisions to the authentication platform. It does not define how sensitive account data is protected within downstream services.
+
+addresses:REQ-905[]
+--

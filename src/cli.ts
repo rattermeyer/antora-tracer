@@ -29,6 +29,14 @@ import {
   RequirementsTraceabilityExtension,
   serializeSnapshot,
 } from "./index.js";
+import type { HarnessName } from "./SkillsInstaller.js";
+import {
+  bundledSkillNames,
+  harnessDestination,
+  installSkills,
+  parseHarnessNames,
+  selectHarnesses,
+} from "./SkillsInstaller.js";
 
 // Load a `.env` file from the working directory so `${VAR}` interpolation in
 // configuration resolves without manual shell setup.
@@ -194,7 +202,6 @@ function collectAdocFiles(
     console.error(chalk.red(`Error: Input not found: ${inputPath}`));
     process.exit(1);
   }
-
   const stat = statSync(resolvedPath);
   if (stat.isDirectory()) {
     // Prune generated/vendored trees during traversal: enumerating first
@@ -1346,9 +1353,7 @@ queryProgram
         item.sourceFile ?? "",
         item.sourceLine !== undefined ? String(item.sourceLine) : "",
       ]);
-      console.log(
-        formatTable(["ID", "Title", "File", "Line"], rows),
-      );
+      console.log(formatTable(["ID", "Title", "File", "Line"], rows));
       if (options.context) {
         console.log(`\nContext (${context.length} other-role items):`);
         for (const c of context) {
@@ -1984,5 +1989,101 @@ program
       console.log("Fish loads this completion automatically in new sessions.");
     }
   });
+
+const skillProgram = program
+  .command("skills")
+  .description("Manage bundled Agent Skills");
+type SkillHarness = HarnessName;
+const SKILLS_SOURCE = resolve(
+  dirname(fileURLToPath(import.meta.url)),
+  "../../skills",
+);
+skillProgram
+  .command("install [harness...]")
+  .description("Interactively install bundled skills for pi, claude, or codex")
+  .option("--overwrite", "Replace existing skill directories without prompting")
+  .action(
+    async (requested: string[] = [], options: { overwrite?: boolean }) => {
+      let selected: SkillHarness[];
+      try {
+        if (requested.length > 0) {
+          selected = parseHarnessNames(requested);
+        } else {
+          try {
+            selected = await selectHarnesses(
+              async (prompt) => promptLine(prompt),
+              Boolean(process.stdin.isTTY && process.stdout.isTTY),
+              (harness) =>
+                existsSync(
+                  harnessDestination(harness, process.env.HOME || homedir()),
+                ),
+            );
+          } catch (error) {
+            console.error(
+              error instanceof Error ? error.message : String(error),
+            );
+            process.exitCode = 1;
+            return;
+          }
+          if (selected.length === 0) {
+            console.log("No harnesses selected; no changes made.");
+            return;
+          }
+        }
+      } catch (error) {
+        console.error(error instanceof Error ? error.message : String(error));
+        process.exitCode = 1;
+        return;
+      }
+
+      if (selected.includes("pi")) {
+        console.log(
+          "Pi package alternative: pi install npm:@antora-tracer/core (skills load automatically).",
+        );
+      }
+      let bundledNames: string[];
+      try {
+        bundledNames = bundledSkillNames(SKILLS_SOURCE);
+      } catch (error) {
+        console.error(error instanceof Error ? error.message : String(error));
+        process.exitCode = 1;
+        return;
+      }
+      if (bundledNames.length === 0) {
+        console.error(`No bundled skills found in ${SKILLS_SOURCE}`);
+        process.exitCode = 1;
+        return;
+      }
+      const results = await installSkills({
+        source: SKILLS_SOURCE,
+        home: process.env.HOME || homedir(),
+        harnesses: selected,
+        dryRun: isDryRun(options),
+        overwrite: options.overwrite,
+        interactive: Boolean(process.stdin.isTTY && process.stdout.isTTY),
+        confirmOverwrite: async (harness, skill, destination) => {
+          const answer = await promptLine(
+            `Replace existing ${harness} skill '${skill}' at ${destination}? [y/N] `,
+          );
+          return answer.toLowerCase() === "y";
+        },
+      });
+      let failed = false;
+      for (const result of results) {
+        console.log(`${result.harness}: ${result.destination}`);
+        if (result.error) {
+          console.error(`  failed: ${result.error}`);
+          failed = true;
+        }
+        for (const skill of result.skills) {
+          console.log(
+            `  ${skill.status}: ${skill.name}${skill.error ? ` (${skill.error})` : ""}`,
+          );
+          if (skill.status === "failed") failed = true;
+        }
+      }
+      if (failed) process.exitCode = 1;
+    },
+  );
 
 program.parse(process.argv);

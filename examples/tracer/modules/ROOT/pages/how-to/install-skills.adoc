@@ -2,7 +2,7 @@
 :description: Step-by-step guide for installing the antora-tracer agent skills in pi, Claude Code, and OpenAI Codex
 :keywords: skills, ai, agent, claude, codex, pi, install
 
-The `@antora-tracer/core` npm package ships three https://agentskills.io/specification[Agent Skills] that teach an AI assistant how to write and review traceable content.
+The `@antora-tracer/core` npm package ships four Agent Skills that teach an AI assistant to write, review, and improve traceable content.
 The skills live in the `skills/` directory of the installed package.
 
 == Before you start
@@ -50,7 +50,7 @@ Alternatively, symlink them so package updates are picked up automatically:
 
 [source,bash]
 ----
-for s in requirements-writing use-case-engineering review-architecture-diagrams; do
+for s in requirements-writing use-case-engineering review-architecture-diagrams semantic-relation-review; do
   ln -s "$(pwd)/node_modules/@antora-tracer/core/skills/$s" ~/.claude/skills/$s
 done
 ----
@@ -64,13 +64,32 @@ Copy the skills into the Codex skills directory:
 cp -r node_modules/@antora-tracer/core/skills/* ~/.codex/skills/
 ----
 
+== Install with the CLI installer
+
+`antora-tracer skills install` handles multiple harnesses in one step.
+Without arguments, it prompts interactively for your selection.
+With explicit harness names, it installs without further prompting:
+
+[source,bash]
+----
+antora-tracer skills install
+antora-tracer skills install claude codex
+antora-tracer skills install pi
+----
+
+The installer copies every bundled skill directory into each selected harness's per-user destination and never overwrites existing skills unless `--overwrite` is specified.
+For Pi, the command explains that installing the package through Pi's package manager already auto-loads the skills; the installer only copies standalone skill directories when the user explicitly selects `pi`.
+
+See `antora-tracer skills install --help` and xref:reference/cli.adoc#_skills_install[the CLI reference] for details.
+
 == Verify the install
 
 Ask your agent to list its available skills.
-Confirm the three antora-tracer skills appear:
+Confirm the four antora-tracer skills appear:
 
 * `requirements-writing`
 * `use-case-engineering`
 * `review-architecture-diagrams`
+* `semantic-relation-review`
 
 See xref:explanation/product-structure.adoc[Product Structure] for how the skills relate to the core extension.

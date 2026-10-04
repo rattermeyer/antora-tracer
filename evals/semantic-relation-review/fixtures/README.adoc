@@ -1,0 +1,9 @@
+= Semantic relation review fixtures
+
+`architecture-review.adoc` contains design-to-requirement `addresses` links used to exercise all impact levels, confidence distinct from severity, and omission of an adequately supported link.
+`requirements.adoc` holds those targets in a separate document so the runner must include direct target content without following target-side outgoing links.
+`refinement-review.adoc` compares a requirement that genuinely narrows its parent requirement with one that is unrelated.
+`base-requirements.adoc` contains the shared refinement target in a separate document.
+`no-relations.adoc` exercises an empty document review.
+
+The `real-architecture-site-smoke` case reads the repository's self-traceability architecture page and config, grounding the review extraction in real project content without requiring a model to produce a predetermined finding count.
