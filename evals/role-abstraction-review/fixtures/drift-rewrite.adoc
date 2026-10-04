@@ -1,0 +1,19 @@
+= Drift Fixtures
+
+[#RW-DES-001, item, role=design, title="Document parser"]
+--
+The parser is a single-pass regex engine over the file buffer.
+It records item block positions and verbatim ranges while scanning.
+--
+
+[#RW-DES-002, item, role=design, title="System performance"]
+--
+The system SHALL respond to all user requests within 200 milliseconds under peak load.
+The system SHALL support 10,000 concurrent sessions without degradation.
+--
+
+[#RW-DES-004, item, role=design, title="Matrix generator"]
+--
+The generator renders pairwise role matrices from the graph's index maps.
+Coverage status is computed per row from the configured coverage relations.
+--

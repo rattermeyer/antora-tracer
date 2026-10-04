@@ -369,6 +369,9 @@ npx antora-tracer query path TST-001 REQ-001
 npx antora-tracer query siblings PRQ-004
 npx antora-tracer query siblings PRQ-004 --relation validates
 npx antora-tracer query siblings PRQ-004 --snapshot site-graph.json
+npx antora-tracer query by-role design -i docs/
+npx antora-tracer query by-role design --document explanation/architecture --context --json
+npx antora-tracer query by-role requirement --snapshot site-graph.json
 ----
 
 [width=100%, cols="25,15,60"]
@@ -389,12 +392,17 @@ npx antora-tracer query siblings PRQ-004 --snapshot site-graph.json
 
 | `--snapshot <path>`
 | string
-| For `linked` and `siblings`: read items and relationships from a canonical `site-graph` snapshot instead of scanning local AsciiDoc
+| For `linked`, `siblings`, and `by-role`: read items and relationships from a canonical `site-graph` snapshot instead of scanning local AsciiDoc
 |===
 
 
 `linked <id> <role>` follows outgoing relationships any number of edges, traversing through items of every role and excluding the start item.
 For a multi-source snapshot, IDs must be globally unique across included sources; use `@antora-tracer/id-server` seeded with `antora-tracer seed antora-playbook.yml` and shared allocation tenant and prefix settings.
+
+`by-role <role>` lists all current (non-superseded) items of the role in document order — source file, then line — carrying each item's ID, title, content, and source location, which is the input an abstraction-level review or LLM judge consumes.
+`--document <path>` restricts the slice to one document by path-segment suffix, so `--document architecture` matches `explanation/architecture`.
+`--context` adds a skeleton of the matched documents' other-role items (ID, title, role, line — no content), giving a judge relocation context without paying for full bodies.
+JSON output is `{ items: [...], context? }`.
 
 `siblings <id>` traverses relationships undirected: an item's neighbors are both its outgoing targets and incoming sources, because every relation has a declared reverse.
 Two items are siblings when they connect to a common neighbor through the same relation type.
@@ -430,6 +438,9 @@ Subcommands:
 
 | `siblings <id>`
 | List items sharing at least one typed neighbor with `<id>`, with the shared neighbors and each sibling's supersession status (optionally `--relation <type>`)
+
+| `by-role <role>`
+| List all current items of a role in document order, optionally restricted to one document (`--document`), with skeleton relocation context (`--context`)
 |===
 
 Exit codes: `0` for success (including empty results), `1` for an unknown item ID or when no path exists.

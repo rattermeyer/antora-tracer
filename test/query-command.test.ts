@@ -126,6 +126,11 @@ function jsonOf(args: string[]): unknown {
   return JSON.parse(stdout.trim());
 }
 
+type ByRoleResult = {
+  items: Array<{ id: string; sourceFile: string; sourceLine: number }>;
+  context?: Array<{ id: string; role: string; content?: unknown }>;
+};
+
 const SNAPSHOT_PATH = path.join(TEST_DIR, "site-graph.json");
 
 const MULTI_SOURCE_SNAPSHOT = {
@@ -560,6 +565,110 @@ describe("Query Command", () => {
       ]);
       expect(status).to.equal(1);
       expect(stderr).to.include("Item not found: UNKNOWN-001");
+    });
+  });
+
+  describe("query by-role", () => {
+    // SAMPLE: requirements REQ-001/002/003/999/010/011/020/021, designs
+    // DES-001/002, test TST-001, implementation IMP-001. REQ-010 and
+    // REQ-020 are superseded.
+
+    it("lists current items of a role in document order", () => {
+      const result = jsonOf(["by-role", "requirement", "--json", ...input()]);
+      const items = (result as ByRoleResult).items;
+      const ids = items.map((i) => i.id);
+      // superseded REQ-010 (by REQ-011) and REQ-020 (by REQ-021) excluded
+      expect(ids).to.not.include("REQ-010");
+      expect(ids).to.not.include("REQ-020");
+    it("filters by document with a path-segment suffix", () => {
+      const all = jsonOf(["by-role", "requirement", "--json", ...input()]);
+      const filtered = jsonOf([
+        "by-role",
+        "requirement",
+        "--document",
+        "sample.adoc",
+        "--json",
+        ...input(),
+      ]);
+      const filteredItems = (filtered as ByRoleResult).items;
+      // The fixture keeps all requirements in sample.adoc, so the filter
+      // must keep them all — and each must come from the matched file.
+      expect(filteredItems.length).to.equal(
+        (all as ByRoleResult).items.length,
+      );
+      for (const item of filteredItems) {
+        expect(item.sourceFile).to.include("sample.adoc");
+      }
+      // A non-matching document yields an empty slice.
+      const none = jsonOf([
+        "by-role",
+        "requirement",
+        "--document",
+        "nowhere.adoc",
+        "--json",
+        ...input(),
+      ]);
+      expect((none as ByRoleResult).items).to.deep.equal([]);
+    });
+    });
+
+
+    it("emits context skeleton of other-role items without content", () => {
+      const result = jsonOf([
+        "by-role",
+        "requirement",
+        "--document",
+        "sample.adoc",
+        "--context",
+        "--json",
+        ...input(),
+      ]);
+      const context = (result as ByRoleResult).context;
+      // DES-001, DES-002, IMP-001, TST-001 are the other-role items of
+      // sample.adoc.
+      const contextIds = context?.map((c) => c.id) ?? [];
+      expect(contextIds).to.include("DES-001");
+      expect(contextIds).to.include("TST-001");
+      for (const c of context ?? []) {
+        expect(c.role).to.not.equal("requirement");
+        expect(c.content).to.equal(undefined);
+      }
+    });
+
+    it("returns an empty result for a role with no items", () => {
+      const { stdout, status } = runQuery([
+        "by-role",
+        "nosuchrole",
+        ...input(),
+      ]);
+      expect(status).to.equal(0);
+      expect(stdout).to.include("ID");
+    });
+
+    it("loads a cross-source snapshot", () => {
+      const result = jsonOf([
+        "by-role",
+        "requirement",
+        "--snapshot",
+        SNAPSHOT_PATH,
+        "--json",
+      ]);
+      const ids = (result as ByRoleResult).items.map((i) => i.id);
+      expect(ids).to.include("REQ-101");
+      expect(ids).to.include("REQ-102");
+    });
+
+    it("rejects snapshot and explicit local input together", () => {
+      const { status, stderr } = runQuery([
+        "by-role",
+        "requirement",
+        "--snapshot",
+        SNAPSHOT_PATH,
+        "--input",
+        TEST_DIR,
+      ]);
+      expect(status).to.equal(1);
+      expect(stderr).to.include("Use either --input or --snapshot, not both");
     });
   });
 

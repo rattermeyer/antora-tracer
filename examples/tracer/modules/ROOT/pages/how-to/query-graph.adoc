@@ -85,6 +85,27 @@ npx antora-tracer query orphaned
 npx antora-tracer query orphaned --role requirement
 ----
 
+== Extract all items of a role from one document
+
+`by-role` returns the current items of a role as a document-ordered slice — the input an abstraction-level review needs:
+
+[source,bash]
+----
+npx antora-tracer query by-role design --document explanation/architecture --context --json
+----
+
+The JSON carries each item's ID, title, content, and source line, plus — with `--context` — a skeleton of the document's other-role items (ID and title only) as relocation context.
+
+Review the slice for abstraction drift: an item written at a different altitude than its same-role siblings needs a rewrite; an item in the wrong section of the right document needs a move; an item that reads like a different role needs investigation.
+
+For a cross-repository slice, query a snapshot instead:
+
+[source,bash]
+----
+npx antora-tracer site-graph antora-playbook.yml --out graph.json
+npx antora-tracer query by-role design --document architecture --snapshot graph.json --json
+----
+
 == Find a path between two items
 
 `path` prints the shortest relationship chain between two items:

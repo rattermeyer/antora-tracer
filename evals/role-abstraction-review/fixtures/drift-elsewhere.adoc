@@ -1,0 +1,17 @@
+= Drift Fixtures
+
+[#EW-DES-001, item, role=design, title="Graph lifecycle"]
+--
+The graph is created at contentClassified start, populated during file processing, and finalized before macro expansion.
+--
+
+[#EW-DES-002, item, role=design, title="Snapshot serialization"]
+--
+Snapshots serialize items and relationships to canonical JSON, keyed by stable ID.
+--
+
+[#EW-DES-005, item, role=design, title="Landing page availability"]
+--
+The landing page SHALL be available at the GitHub Pages root URL.
+The page SHALL load in under two seconds on a 3G connection.
+--

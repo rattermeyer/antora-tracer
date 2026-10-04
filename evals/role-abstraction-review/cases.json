@@ -1,0 +1,47 @@
+{
+  "cases": [
+    {
+      "id": "synthetic-rewrite",
+      "input": "evals/role-abstraction-review/fixtures",
+      "role": "design",
+      "document": "drift-rewrite",
+      "expect": [
+        {
+          "id": "RW-DES-002",
+          "verdict": "rewrite"
+        }
+      ]
+    },
+    {
+      "id": "synthetic-move",
+      "input": "evals/role-abstraction-review/fixtures",
+      "role": "design",
+      "document": "drift-move",
+      "expect": [
+        {
+          "id": "MV-DES-003",
+          "verdict": "move_within_document"
+        }
+      ]
+    },
+    {
+      "id": "synthetic-elsewhere",
+      "input": "evals/role-abstraction-review/fixtures",
+      "role": "design",
+      "document": "drift-elsewhere",
+      "expect": [
+        {
+          "id": "EW-DES-005",
+          "verdict": "investigate_elsewhere"
+        }
+      ]
+    },
+    {
+      "id": "real-consistent-slice",
+      "input": "examples/tracer/modules/ROOT/pages",
+      "role": "process_requirement",
+      "document": "delivery-process",
+      "expect": []
+    }
+  ]
+}

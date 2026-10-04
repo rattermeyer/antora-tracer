@@ -1,0 +1,17 @@
+= Abstraction Drift Fixtures
+
+PURPOSE: fixtures for evals/role-abstraction-review. Each file plants one
+of the three abstraction failure modes among consistent items.
+
+drift-rewrite.adoc      — DES-002 uses requirement vocabulary ("SHALL")
+                         among design items describing structure.
+                         Expect: rewrite.
+drift-move.adoc         — DES-003 (a deployment concern) sits in the
+                         runtime-section file after storage design items;
+                         context skeleton holds the deployment items.
+                         Expect: move_within_document.
+drift-elsewhere.adoc    — DES-005 states what the product must do
+                         (requirement altitude) among design items.
+                         Expect: investigate_elsewhere.
+
+Keep this file; the eval reads the .adoc files by name from cases.json.

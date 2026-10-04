@@ -1,0 +1,29 @@
+= Drift Fixtures
+
+[#MV-DES-001, item, role=design, title="Storage design"]
+--
+The storage layer keeps the graph in memory with hash-map indexes.
+Items are keyed by ID; relationships are indexed by source and target.
+--
+
+[#MV-DES-002, item, role=design, title="Query index"]
+--
+The query index maintains forward and reverse relationship maps per item.
+Lookups are O(1) per map access.
+--
+
+[#MV-DES-003, item, role=design, title="Deployment packaging"]
+--
+The Docker image bundles the extension with Node.js 20 and pins the dependency lockfile.
+Container startup probes the health endpoint before serving traffic.
+--
+
+[#MV-OPS-001, item, role=process_requirement, title="Deployment process"]
+--
+The deployment SHALL publish the container image to the registry on every release tag.
+--
+
+[#MV-OPS-002, item, role=process_requirement, title="Rollback process"]
+--
+The deployment SHALL keep the previous image tagged for rollback.
+--
