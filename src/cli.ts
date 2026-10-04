@@ -197,17 +197,33 @@ function collectAdocFiles(
 
   const stat = statSync(resolvedPath);
   if (stat.isDirectory()) {
+    // Prune generated/vendored trees during traversal: enumerating first
+    // and filtering after still walks them (a default-directory scan of
+    // this repo takes >30s in readdirSync-recursion vs ~15ms pruned).
+    // Whole-name segment match, so a file like build-tools.adoc is never
+    // skipped; scanning one of these directories directly is unaffected.
+    const SKIP_DIRS = new Set([
+      "node_modules",
+      "build",
+      "public",
+      ".git",
+      ".pnpm-store",
+    ]);
     const files: { path: string; content: string }[] = [];
-    const entries = readdirSync(resolvedPath, { recursive: true }) as string[];
-    for (const entry of entries) {
-      const fullPath = resolve(resolvedPath, entry as string);
-      if (statSync(fullPath).isFile() && (entry as string).endsWith(".adoc")) {
-        files.push({
-          path: entry as string,
-          content: readFileSync(fullPath, "utf8"),
-        });
+    const walk = (dir: string, rel: string) => {
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        if (entry.isDirectory()) {
+          if (SKIP_DIRS.has(entry.name)) continue;
+          walk(join(dir, entry.name), join(rel, entry.name));
+        } else if (entry.isFile() && entry.name.endsWith(".adoc")) {
+          files.push({
+            path: join(rel, entry.name),
+            content: readFileSync(join(dir, entry.name), "utf8"),
+          });
+        }
       }
-    }
+    };
+    walk(resolvedPath, "");
     return files;
   }
 
@@ -1235,6 +1251,110 @@ queryProgram
           rows,
         ),
       );
+    }
+  });
+
+queryProgram
+  .command("by-role <role>")
+  .description(
+    "List all current items of a role, in document order, optionally one document",
+  )
+  .option(
+    "--document <path>",
+    "Restrict to items whose source file matches the path",
+  )
+  .option(
+    "--context",
+    "Include a skeleton (id, title, role, line) of other-role items in the matched documents",
+  )
+  .option("--snapshot <path>", "Read a canonical site-graph snapshot")
+  .action(async (role: string, options: any, cmd: any) => {
+    const { json } = cmd.parent.opts();
+    const queryCommand = cmd.parent;
+    const { snapshot } = cmd.opts();
+    let graph: RequirementsTraceabilityExtension["graph"];
+
+    if (snapshot && queryCommand.getOptionValueSource("input") === "cli") {
+      console.error(chalk.red("Use either --input or --snapshot, not both"));
+      process.exit(1);
+    }
+
+    if (snapshot) {
+      try {
+        const data = deserializeSnapshot(
+          readFileSync(resolve(process.cwd(), snapshot), "utf8"),
+        );
+        const extension = await createExtension({});
+        for (const item of data.items) extension.graph.addItem(item);
+        for (const relationship of data.relationships) {
+          extension.graph.addRelationship(relationship);
+        }
+        graph = extension.graph;
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        console.error(chalk.red(`Error loading graph snapshot: ${message}`));
+        process.exit(1);
+      }
+    } else {
+      graph = (await buildQueryGraph(cmd)).graph;
+    }
+
+    // Current items of the role, in document order: sourceFile then line.
+    // Document filter matches by path-segment suffix, so `--document
+    // architecture` matches `explanation/architecture`.
+    const document = options.document as string | undefined;
+    const norm = (p: string) => p.replace(/^\.?\//, "").replace(/\.adoc$/, "");
+    const items = graph
+      .getCurrentItemsByRole(role)
+      .filter(
+        (item) =>
+          !document || norm(item.sourceFile ?? "").endsWith(norm(document)),
+      )
+      .sort((a, b) => {
+        const fileCmp = (a.sourceFile ?? "").localeCompare(b.sourceFile ?? "");
+        if (fileCmp !== 0) return fileCmp;
+        return (a.sourceLine ?? 0) - (b.sourceLine ?? 0);
+      });
+
+    // Skeleton: other-role current items of the same documents, id/title only.
+    const matchedFiles = new Set(items.map((i) => i.sourceFile ?? ""));
+    const context = graph
+      .getAllItems()
+      .filter(
+        (i) =>
+          i.role !== role &&
+          (i.sourceFile ?? "") !== "" &&
+          matchedFiles.has(i.sourceFile ?? "") &&
+          !graph.isSuperseded(i.id),
+      )
+      .sort((a, b) => (a.sourceLine ?? 0) - (b.sourceLine ?? 0))
+      .map((i) => ({
+        id: i.id,
+        title: i.title,
+        role: i.role,
+        sourceLine: i.sourceLine,
+      }));
+
+    if (json) {
+      const output: Record<string, unknown> = { items };
+      if (options.context) output.context = context;
+      console.log(JSON.stringify(output, null, 2));
+    } else {
+      const rows = items.map((item) => [
+        item.id,
+        item.title,
+        item.sourceFile ?? "",
+        item.sourceLine !== undefined ? String(item.sourceLine) : "",
+      ]);
+      console.log(
+        formatTable(["ID", "Title", "File", "Line"], rows),
+      );
+      if (options.context) {
+        console.log(`\nContext (${context.length} other-role items):`);
+        for (const c of context) {
+          console.log(`  ${c.id} [${c.role}] ${c.title}`);
+        }
+      }
     }
   });
 
