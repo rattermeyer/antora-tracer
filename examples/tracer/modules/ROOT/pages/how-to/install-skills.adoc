@@ -2,7 +2,7 @@
 :description: Step-by-step guide for installing the antora-tracer agent skills in pi, Claude Code, and OpenAI Codex
 :keywords: skills, ai, agent, claude, codex, pi, install
 
-The `@antora-tracer/core` npm package ships four Agent Skills that teach an AI assistant to write, review, and improve traceable content.
+The `@antora-tracer/core` npm package ships six Agent Skills that teach an AI assistant to write, review, and improve traceable content.
 The skills live in the `skills/` directory of the installed package.
 
 == Before you start
@@ -50,7 +50,7 @@ Alternatively, symlink them so package updates are picked up automatically:
 
 [source,bash]
 ----
-for s in requirements-writing use-case-engineering review-architecture-diagrams semantic-relation-review; do
+for s in requirements-writing use-case-engineering review-architecture-diagrams semantic-relation-review abstraction-level-review write-item; do
   ln -s "$(pwd)/node_modules/@antora-tracer/core/skills/$s" ~/.claude/skills/$s
 done
 ----
@@ -85,11 +85,13 @@ See `antora-tracer skills install --help` and xref:reference/cli.adoc#_skills_in
 == Verify the install
 
 Ask your agent to list its available skills.
-Confirm the four antora-tracer skills appear:
+Confirm the six antora-tracer skills appear:
 
 * `requirements-writing`
 * `use-case-engineering`
 * `review-architecture-diagrams`
 * `semantic-relation-review`
+* `abstraction-level-review`
+* `write-item`
 
 See xref:explanation/product-structure.adoc[Product Structure] for how the skills relate to the core extension.

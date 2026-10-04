@@ -2,6 +2,16 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.28.0] — 2026-10-04
+
+### Added
+- The CLI installs bundled agent skills for Pi, Claude Code, and OpenAI Codex, with dry-run and explicit overwrite support.
+- The `semantic-relation-review` and `abstraction-level-review` skills review traceability links and same-role abstraction drift.
+- The `query by-role` CLI subcommand extracts document-ordered role slices, with optional document filtering, context skeletons, and snapshot input.
+
+### Improved
+- CLI file scans prune generated directories during traversal, avoiding unnecessary enumeration of dependency and build trees.
+
 ## [0.27.1] — 2026-10-03
 
 ### Fixed

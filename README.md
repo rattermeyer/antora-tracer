@@ -394,6 +394,8 @@ The npm package ships [Agent Skills](https://agentskills.io/specification) that 
 - `use-case-engineering` — Karl Wiegers use case template
 - `review-architecture-diagrams` — diagram review against better-architecture-diagrams principles
 - `semantic-relation-review` — prioritized review of outgoing relation semantics
+- `abstraction-level-review` — review abstraction consistency within role/document slices
+- `write-item` — draft traceable items using project role guidance
 
 They live in the `skills/` directory of the installed package. Point your agent harness at them:
 
