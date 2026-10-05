@@ -40,6 +40,13 @@ matrices:
     coverageRelations:
       design: [considered_by]
 
+  - name: requirements-to-design
+    description: "Forward traceability from requirements to design elements"
+    rows: requirement
+    columns: [design]
+    coverageRelations:
+      design: [addresses]
+    rowFilter: "status != 'draft'"
 idAllocation:
   endpoint: https://tracerid.conemso.de
   token: ${TRACER_ID_TOKEN}

@@ -1132,6 +1132,11 @@ tracer:links[]
 --
 
 
+[#REQ-355, item, role=requirement, status=draft, title="Draft requirement excluded from design matrix"]
+--
+This draft requirement exists to demonstrate that the requirements-to-design matrix can exclude items whose status is draft.
+--
+
 [#REQ-354, item, role=requirement, title="query linked — find reachable items by role"]
 --
 The CLI SHALL provide `query linked <id> <role>` that returns each distinct item with the requested role reachable from the starting item by following outgoing graph relationships. Traversal SHALL follow relationships across any number of edges, continue through items of every role, and exclude the starting item from results. Results SHALL include each matching item once, including when paths converge or contain cycles.

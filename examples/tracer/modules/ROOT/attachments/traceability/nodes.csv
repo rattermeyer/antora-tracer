@@ -985,6 +985,7 @@ The command SHALL exit with a non-zero code when errors are found and code 0 whe
 Source: openspec/specs/cli-validate/spec.md
 
 tracer:links[]"""
+REQ-355,REQ-355 — Draft requirement excluded from design matrix,requirement,draft,requirements.adoc,This draft requirement exists to demonstrate that the requirements-to-design matrix can exclude items whose status is draft.
 REQ-354,REQ-354 — query linked — find reachable items by role,requirement,,requirements.adoc,"""The CLI SHALL provide `query linked <id> <role>` that returns each distinct item with the requested role reachable from the starting item by following outgoing graph relationships. Traversal SHALL follow relationships across any number of edges, continue through items of every role, and exclude the starting item from results. Results SHALL include each matching item once, including when paths converge or contain cycles.
 
 Source: openspec/specs/cli-query/spec.md
@@ -3032,7 +3033,11 @@ PRQ-005,PRQ-005 — Release is tagged and versioned,process_requirement,,self-tr
 The CHANGELOG SHALL be updated with all notable changes since the previous release.
 The release SHALL be published to npm.
 
-Versioning follows https://semver.org/[Semantic Versioning]: MAJOR for breaking API changes, MINOR for new features, PATCH for bug fixes and internal refactoring."""
+Versioning follows https://semver.org/[Semantic Versioning]:
+
+* MAJOR for breaking API changes
+* MINOR for new features
+* PATCH for bug fixes and internal refactoring."""
 PRQ-006,PRQ-006 — PDF artifacts are generated alongside HTML,process_requirement,,self-traceability/delivery-process.adoc,"""The Pages workflow SHALL generate PDF artifacts for the requirements, architecture, and test-plan documents using `@antora/pdf-extension` with Ruby and `asciidoctor-pdf`.
 PDFs SHALL be placed alongside HTML output in the deployed site.
 
