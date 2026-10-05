@@ -2,6 +2,11 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.29.0] — 2026-10-05
+
+### Added
+- Item headers support comma-separated `tags`, and matrix definitions can filter rows by status and tag using a constrained `rowFilter` expression.
+
 ## [0.28.0] — 2026-10-04
 
 ### Added
