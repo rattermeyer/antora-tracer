@@ -295,8 +295,8 @@ export interface Item {
   content?: string;                  // Raw AsciiDoc content
   role: string;                      // User-defined role
   status?: string;                   // Free-form status
+  tags?: string[];                   // Comma-separated header tags, parsed as a list
   attributes: Record<string, string>; // Additional attributes
-  sourceFile?: string;               // Source AsciiDoc file
   sourceLine?: number;               // Line number in source
   component?: string;                // Antora component name (absent for CLI)
   module?: string;                   // Antora module name (absent for CLI)
@@ -332,7 +332,8 @@ export interface MatrixDefinition {
   description?: string;
   rows: string;
   columns: string[];
-  coverageRelations: Record<string, string[]>;
+  coverageRelations?: Record<string, string[]>;
+  rowFilter?: string;                 // Safe status/tag expression for rows
 }
 
 export interface Preset extends PresetMetadata {

@@ -15,6 +15,7 @@ import type { LinkResolver } from "./LinkResolver.js";
 import { TemplateRenderer } from "./TemplateRenderer.js";
 import type { TraceabilityGraph } from "./TraceabilityGraph.js";
 import type { Item, ItemRelationship } from "./types.js";
+import { compileRowFilter } from "./RowFilter.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_TEMPLATE_DIR = path.join(__dirname, "templates");
@@ -53,6 +54,7 @@ export interface MatrixConfig {
   rows: string; // Role name for rows
   columns: string[]; // Role names for columns
   coverageRelations?: Record<string, string[]>; // Which relations count for coverage per column
+  rowFilter?: string;
 }
 
 /**
@@ -131,9 +133,12 @@ export class MatrixGenerator {
     const rowRole = config.rows;
     const columnRoles = config.columns;
 
-    // Get current items with the row role (superseded excluded)
-    const rowItems = this.graph.getCurrentItemsByRole(rowRole);
-
+    // Get current items with the row role (superseded excluded), then apply the optional metadata filter.
+    let rowItems = this.graph.getCurrentItemsByRole(rowRole);
+    if (config.rowFilter !== undefined) {
+      const filter = compileRowFilter(config.rowFilter);
+      rowItems = rowItems.filter(filter);
+    }
     if (rowItems.length === 0) {
       return {
         name: config.name,

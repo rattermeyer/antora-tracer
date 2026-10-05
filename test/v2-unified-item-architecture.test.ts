@@ -404,6 +404,18 @@ Requirement body
       expect(result.relationships).to.have.lengthOf(0);
       expect(result.items[0].attributes.priority).to.equal("high");
     });
+
+    it("parses normalized tags and preserves unrelated metadata", () => {
+      const parser = new DocumentParser();
+      const result = parser.parse(
+        `[#REQ-018, item, role=requirement, tags=" security, ,privacy ", priority=high]\n--\nBody\n--\n\n[#REQ-019, item, role=requirement]\n--\nBody\n--\n`,
+        "test.adoc",
+      );
+
+      expect(result.items[0].tags).to.deep.equal(["security", "privacy"]);
+      expect(result.items[0].attributes).to.deep.equal({ priority: "high" });
+      expect(result.items[1].tags).to.deep.equal([]);
+    });
   });
 });
 

@@ -267,6 +267,37 @@ relations:
       }
     });
 
+    it("accepts the supported row filter grammar", () => {
+      const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "tracer-filter-"));
+      const configPath = path.join(tempDir, "traceability.yml");
+      fs.writeFileSync(
+        configPath,
+        `roles: [requirement, design]\nmatrices:\n  - name: filtered\n    rows: requirement\n    columns: [design]\n    rowFilter: "status == 'approved' and ('security' in tags or 'legacy' not in tags)"\n`,
+      );
+
+      try {
+        expect(() => new ConfigLoader().load(configPath)).to.not.throw();
+      } finally {
+        fs.rmSync(tempDir, { recursive: true, force: true });
+      }
+    });
+
+    it("rejects unsupported row filter syntax with the matrix name", () => {
+      const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "tracer-filter-"));
+      const configPath = path.join(tempDir, "traceability.yml");
+      fs.writeFileSync(
+        configPath,
+        `roles: [requirement, design]\nmatrices:\n  - name: unsafe-filter\n    rows: requirement\n    columns: [design]\n    rowFilter: "process.exit()"\n`,
+      );
+
+      try {
+        expect(() => new ConfigLoader().load(configPath)).to.throw(
+          /Matrix 'unsafe-filter' rowFilter:.*unsupported syntax/i,
+        );
+      } finally {
+        fs.rmSync(tempDir, { recursive: true, force: true });
+      }
+    });
     it("should validate matrices configuration", () => {
       const tempDir = path.join(__dirname, "temp");
       if (!fs.existsSync(tempDir)) {

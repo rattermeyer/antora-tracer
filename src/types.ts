@@ -16,6 +16,8 @@ export interface Item {
   content?: string;
   role: string; // User-defined role (requirement, design, test, etc.)
   status?: string;
+  /** Tags parsed from the item header. */
+  tags?: string[];
   attributes: Record<string, string>;
   sourceFile?: string;
   sourceLine?: number;

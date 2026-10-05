@@ -957,4 +957,72 @@ matrices:
       );
     });
   });
+  describe("Matrix row filters", () => {
+    it("filters current rows by status and tags without filtering columns", () => {
+      const graph = new TraceabilityGraph();
+      const addItem = (
+        id: string,
+        role: string,
+        status?: string,
+        tags: string[] = [],
+      ) => graph.addItem({ id, title: id, role, status, tags, attributes: {} });
+
+      addItem("REQ-001", "requirement", "approved", ["security"]);
+      addItem("REQ-002", "requirement", "approved", ["legacy"]);
+      addItem("REQ-003", "requirement", "draft", ["security"]);
+      addItem("REQ-004", "requirement", "approved");
+      addItem("REQ-005", "requirement", "approved", ["security"]);
+      addItem("REQ-006", "requirement", "draft", ["security"]);
+      addItem("DES-001", "design", "draft", ["legacy"]);
+      graph.addRelationship({
+        id: "rel-1",
+        fromId: "REQ-001",
+        targetId: "DES-001",
+        type: "addresses",
+      });
+      graph.addRelationship({
+        id: "rel-2",
+        fromId: "REQ-006",
+        targetId: "REQ-005",
+        type: "supersedes",
+      });
+
+      const tempDir = fs.mkdtempSync(path.join(__dirname, "temp-row-filter-"));
+      const configPath = path.join(tempDir, "traceability.yml");
+      fs.writeFileSync(
+        configPath,
+        `roles: [requirement, design]\nrelations:\n  requirement:\n    design:\n      addresses:\n        reverse: addressed_by\n    requirement:\n      supersedes:\n        reverse: superseded_by\nmatrices:\n  - name: filtered\n    rows: requirement\n    columns: [design]\n    rowFilter: "status == 'approved' and ('security' in tags or 'legacy' not in tags)"\n  - name: not-draft\n    rows: requirement\n    columns: [design]\n    rowFilter: "status != 'draft'"\n  - name: unfiltered\n    rows: requirement\n    columns: [design]\n`,
+      );
+
+      try {
+        const loader = new ConfigLoader();
+        loader.load(configPath);
+        const generator = new MatrixGenerator(graph, loader);
+        const matrix = generator.generateMatrix("filtered");
+        const unfiltered = generator.generateMatrix("unfiltered");
+        const notDraft = generator.generateMatrix("not-draft");
+        expect(matrix.rows.map((row) => row.rowId)).to.deep.equal([
+          "REQ-001",
+          "REQ-004",
+        ]);
+        expect(notDraft.rows.map((row) => row.rowId)).to.deep.equal([
+          "REQ-001",
+          "REQ-002",
+          "REQ-004",
+        ]);
+        expect(
+          matrix.rows[0].cells[0].items.map((item) => item.itemId),
+        ).to.deep.equal(["DES-001"]);
+        expect(unfiltered.rows.map((row) => row.rowId)).to.deep.equal([
+          "REQ-001",
+          "REQ-002",
+          "REQ-003",
+          "REQ-004",
+          "REQ-006",
+        ]);
+      } finally {
+        fs.rmSync(tempDir, { recursive: true, force: true });
+      }
+    });
+  });
 });

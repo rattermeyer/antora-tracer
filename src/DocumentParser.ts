@@ -282,8 +282,12 @@ export class DocumentParser {
       let title = attributes.title;
       title = title ? `${id} \u2014 ${title}` : id;
 
-      // Extract status
+      // Extract status and structured tags.
       const status = attributes.status;
+      const tags = (attributes.tags || "")
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter(Boolean);
 
       // Extract all other attributes
       const itemAttributes: Record<string, string> = { ...attributes };
@@ -291,7 +295,7 @@ export class DocumentParser {
       delete itemAttributes.role;
       delete itemAttributes.title;
       delete itemAttributes.status;
-
+      delete itemAttributes.tags;
       // Recognized relation-name attributes become relationships from this
       // item to each listed target ID; unrecognized keys stay metadata.
       for (const key of Object.keys(itemAttributes)) {
@@ -320,6 +324,7 @@ export class DocumentParser {
         content: this.extractBody(block),
         role,
         status,
+        tags,
         attributes: itemAttributes,
         sourceFile,
         sourceLine: line,

@@ -8,6 +8,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { load as yamlLoad } from "js-yaml";
 import { ROLE_COLORS } from "../types.js";
+import { compileRowFilter } from "../RowFilter.js";
 
 // ============================================================================
 // Configuration Interfaces
@@ -30,6 +31,7 @@ export interface MatrixDefinition {
   rows: string; // Role name for rows
   columns: string[]; // Role names for columns
   coverageRelations?: Record<string, string[]>; // Which relations count for coverage per column
+  rowFilter?: string;
 }
 
 /**
@@ -506,6 +508,19 @@ export class ConfigLoader {
             errors.push(
               `Matrix '${matrix.name}' column role '${column}' is not defined`,
             );
+          }
+        }
+        if (matrix.rowFilter !== undefined) {
+          if (typeof matrix.rowFilter !== "string") {
+            errors.push(`Matrix '${matrix.name}' rowFilter must be a string`);
+          } else {
+            try {
+              compileRowFilter(matrix.rowFilter);
+            } catch (error) {
+              errors.push(
+                `Matrix '${matrix.name}' rowFilter: ${error instanceof Error ? error.message : String(error)}`,
+              );
+            }
           }
         }
       }

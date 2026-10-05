@@ -50,6 +50,7 @@ const COMPARED_FIELDS = [
   "content",
   "role",
   "status",
+  "tags",
   "attributes",
 ] as const;
 
@@ -77,6 +78,13 @@ function fieldsChanged(oldItem: Item, newItem: Item): string[] {
       if (
         canonicalAttributes(oldItem.attributes) !==
         canonicalAttributes(newItem.attributes)
+      ) {
+        changed.push(field);
+      }
+    } else if (field === "tags") {
+      if (
+        JSON.stringify(oldItem.tags ?? []) !==
+        JSON.stringify(newItem.tags ?? [])
       ) {
         changed.push(field);
       }

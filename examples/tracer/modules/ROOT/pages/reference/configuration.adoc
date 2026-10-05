@@ -318,7 +318,23 @@ An array of matrix definitions:
 | `coverageRelations`
 | map
 | Which relation types count as "coverage" per column role. `coverageRelations: design: [addresses, satisfies]` means only `addresses` and `satisfies` from row items to design items count
+
+| `rowFilter`
+| string
+| Optional expression applied to current row items after filtering by `rows`. The expression supports atoms `status == 'value'`, `status != 'value'`, `'tag' in tags`, and `'tag' not in tags`. Combine atoms with `and` and `or`; `and` binds more tightly than `or`, and parentheses group expressions. Unsupported syntax is rejected during configuration loading with the matrix name in the error.
 |===
+
+[source,yaml]
+----
+matrices:
+  - name: approved-security-requirements
+    rows: requirement
+    columns: [design]
+    rowFilter: "status == 'approved' and 'security' in tags"
+----
+
+The filter expression uses an allowlisted grammar and is never evaluated as code.
+Omitting `rowFilter` keeps all current items of the configured row role.
 
 === `roleGuidance`
 

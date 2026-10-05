@@ -61,11 +61,12 @@ describe("diffGraphs", () => {
     expect(modified?.changedFields).to.include("content");
   });
 
-  it("reports title, role, status, and attributes changes", () => {
+  it("reports title, role, status, tags, and attributes changes", () => {
     const prev = build([
       item("REQ-042", "requirement", {
         title: "Old",
         status: "draft",
+        tags: ["old"],
         attributes: { a: "1" },
       }),
     ]);
@@ -74,6 +75,7 @@ describe("diffGraphs", () => {
         title: "New",
         status: "active",
         attributes: { a: "2" },
+        tags: ["new"],
       }),
     ]);
 
@@ -85,8 +87,20 @@ describe("diffGraphs", () => {
       "title",
       "role",
       "status",
+      "tags",
       "attributes",
     ]);
+  });
+
+  it("does not report unchanged tags when comparing item snapshots", () => {
+    const previous = build([
+      item("REQ-042", "requirement", { tags: ["security", "privacy"] }),
+    ]);
+    const next = build([
+      item("REQ-042", "requirement", { tags: ["security", "privacy"] }),
+    ]);
+
+    expect(diffGraphs(previous, next).items).to.deep.equal([]);
   });
 
   it("does not report relationships of a removed item", () => {

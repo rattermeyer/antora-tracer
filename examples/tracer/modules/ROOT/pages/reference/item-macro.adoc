@@ -65,9 +65,17 @@ The `.tracer` role syntax is optional and does not change the `role` attribute u
 | `priority`
 | No
 | Free-form priority: `high`, `medium`, `low`
+
+| `tags`
+| No
+| Comma-separated tags stored as structured item metadata. See the tag value syntax below.
 |===
 
 Any additional attributes are stored in the item's `attributes` map and exported to Neo4j as node properties.
+
+Quote the value when it contains commas, for example `tags="security, privacy"`.
+Surrounding whitespace is trimmed and empty entries are ignored.
+If omitted, the item's tag list is empty.
 
 == Inline Relationship Macros
 
