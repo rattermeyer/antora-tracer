@@ -6,7 +6,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import type { TraceabilityGraph } from "./TraceabilityGraph.js";
-import type { Item, ItemRelationship } from "./types.js";
+import { itemIdentity, type Item, type ItemRelationship } from "./types.js";
 
 /**
  * Options for Neo4j export
@@ -139,7 +139,7 @@ export class Neo4jExporter {
     includeContent: boolean,
     includeAllAttributes: boolean,
   ): void {
-    const headers = ["id", "title", "role", "status", "sourceFile"];
+    const headers = ["id", "identity", "component", "version", "title", "role", "status", "sourceFile"];
     const attributeKeys: string[] = [];
 
     // Collect all attribute keys if including all attributes
@@ -163,6 +163,9 @@ export class Neo4jExporter {
     for (const item of items) {
       const row = [
         item.id,
+        itemIdentity(item),
+        item.component || "",
+        item.version || "",
         this.escapeCSVValue(item.title || ""),
         item.role,
         item.status || "",
@@ -196,6 +199,8 @@ export class Neo4jExporter {
       "id",
       "source",
       "target",
+      "sourceId",
+      "targetId",
       "type",
       "sourceFile",
       "bidirectional",
@@ -205,6 +210,8 @@ export class Neo4jExporter {
     for (const rel of relationships) {
       const row = [
         rel.id,
+        rel.fromIdentity || rel.fromId,
+        rel.targetIdentity || rel.targetId,
         rel.fromId,
         rel.targetId,
         rel.type,
@@ -238,6 +245,9 @@ export class Neo4jExporter {
     for (const item of items) {
       const props: Record<string, string> = {
         id: item.id,
+        identity: itemIdentity(item),
+        component: item.component || "",
+        version: item.version || "",
         title: item.title || "",
         role: item.role,
       };
@@ -260,8 +270,9 @@ export class Neo4jExporter {
         }
       }
 
-      const propsStr = this.formatCypherProperties(props);
-      lines.push(`MERGE (n:Item ${propsStr});`);
+      const escapedIdentity = { ...props, identity: itemIdentity(item) };
+      const escapedProps = this.formatCypherProperties(escapedIdentity);
+      lines.push(`MERGE (n:Item {identity: ${this.formatCypherValue(itemIdentity(item))}}) SET n += ${escapedProps};`);
       lines.push("");
     }
 
@@ -282,7 +293,7 @@ export class Neo4jExporter {
 
       const propsStr = this.formatCypherProperties(props);
       lines.push(
-        `MATCH (source:Item {id: $sourceId}), (target:Item {id: $targetId}) ` +
+        `MATCH (source:Item {identity: ${this.formatCypherValue(rel.fromIdentity || rel.fromId)}}), (target:Item {identity: ${this.formatCypherValue(rel.targetIdentity || rel.targetId)}}) ` +
           `MERGE (source)-[r:RELATIONSHIP ${propsStr}]->(target);`,
       );
       lines.push("");
@@ -290,7 +301,7 @@ export class Neo4jExporter {
 
     // Add indexes for better performance
     lines.push("// Indexes");
-    lines.push("CREATE INDEX IF NOT EXISTS FOR (n:Item) ON (n.id);");
+    lines.push("CREATE INDEX IF NOT EXISTS FOR (n:Item) ON (n.identity);");
     lines.push("CREATE INDEX IF NOT EXISTS FOR (n:Item) ON (n.role);");
     lines.push("");
 
@@ -324,6 +335,11 @@ export class Neo4jExporter {
     return row.map((v) => this.escapeCSVValue(v)).join(",");
   }
 
+  private formatCypherValue(value: string): string {
+    const escaped = value.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+    return `'${escaped.replaceAll("\u0000", "\\u0000")}'`;
+  }
+
   /**
    * Format properties for Cypher
    */
@@ -331,8 +347,7 @@ export class Neo4jExporter {
     const parts: string[] = [];
     for (const [key, value] of Object.entries(props)) {
       // Escape quotes in string values
-      const escapedValue = value.replace(/'/g, "\\'");
-      parts.push(`${key}: '${escapedValue}'`);
+      parts.push(`${key}: ${this.formatCypherValue(value)}`);
     }
     return `{${parts.join(", ")}}`;
   }

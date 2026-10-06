@@ -312,6 +312,8 @@ export class DocumentParser {
             type: key,
             sourceFile,
             line,
+            component: this.component,
+            version: this.version,
           });
         }
         delete itemAttributes[key];
@@ -473,6 +475,8 @@ export class DocumentParser {
             type: relationType,
             sourceFile,
             line,
+            component: item.component,
+            version: item.version,
           };
 
           // Note: Relation validation is deferred to the extension level where the full graph is available.

@@ -135,6 +135,8 @@ Exits with non-zero code if errors are found.
 
 Export the graph to Neo4j-compatible formats.
 Supply either `-i <dir>` (a local directory) or a playbook path (every component and repository in the playbook).
+CSV nodes contain authored `id`, canonical `identity`, `component`, and `version` fields.
+CSV relationships use canonical node identities in `source` and `target`; `sourceId` and `targetId` retain authored IDs.
 
 [source,bash]
 ----

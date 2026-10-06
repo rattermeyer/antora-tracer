@@ -10,7 +10,7 @@
 import type { GraphSnapshot } from "./GraphSnapshot.js";
 import type { TraceabilityGraph } from "./TraceabilityGraph.js";
 import type { Item, ItemRelationship } from "./types.js";
-import { HISTORY_RELATION_TYPES } from "./types.js";
+import { HISTORY_RELATION_TYPES, itemIdentity } from "./types.js";
 
 export type ItemChangeKind = "added" | "removed" | "modified";
 
@@ -56,15 +56,12 @@ const COMPARED_FIELDS = [
 
 // NUL cannot appear in an item ID or component/version name, so it is a safe
 // separator for a composite identity key.
-const KEY_SEP = "\u0000";
-
 /**
  * Component-qualified identity. Items without a component (the single-repo CLI
  * path) keep their bare ID as the key.
  */
 function identityKey(item: Item): string {
-  if (item.component == null) return item.id;
-  return [item.component, item.version ?? "", item.id].join(KEY_SEP);
+  return itemIdentity(item);
 }
 
 function canonicalAttributes(attributes?: Record<string, string>): string {
@@ -96,7 +93,7 @@ function fieldsChanged(oldItem: Item, newItem: Item): string[] {
 }
 
 function relKey(rel: ItemRelationship): string {
-  return `${rel.fromId}|${rel.type}|${rel.targetId}`;
+  return `${rel.fromIdentity ?? rel.fromId}|${rel.type}|${rel.targetIdentity ?? rel.targetId}`;
 }
 
 /**
@@ -153,31 +150,25 @@ function diffData(
     }
   }
 
-  // Relationship deltas: functional links are reported only when their
-  // endpoints survive; history links (`supersedes`) are always reported so a
-  // superseded predecessor's removal is explained.
-  // ponytail: relationships carry bare fromId/targetId, so survival and dedup
-  // key off bare IDs. Same-ID items across components with identical links
-  // collapse here — qualify relKey from the source item's component if that
-  // ceiling ever matters.
-  const oldBareIds = new Set(prevItems.map((i) => i.id));
-  const newBareIds = new Set(nextItems.map((i) => i.id));
-  const surviving = new Set([...oldBareIds].filter((id) => newBareIds.has(id)));
+  // Relationship deltas use canonical endpoints when a graph has resolved scope.
+  const oldItemIdentities = new Set(prevItems.map(identityKey));
+  const newItemIdentities = new Set(nextItems.map(identityKey));
+  const surviving = new Set([...oldItemIdentities].filter((id) => newItemIdentities.has(id)));
   const oldRels = new Set(prevRels.map(relKey));
   const newRels = new Set(nextRels.map(relKey));
 
   const relationships: RelationshipDelta[] = [];
   for (const rel of nextRels) {
     const isHistory = HISTORY_RELATION_TYPES.has(rel.type);
-    if (!oldRels.has(relKey(rel)) && (surviving.has(rel.fromId) || isHistory)) {
+    if (!oldRels.has(relKey(rel)) && (surviving.has(rel.fromIdentity ?? rel.fromId) || isHistory)) {
       relationships.push({ kind: "added", rel });
     }
   }
   for (const rel of prevRels) {
     if (
       !newRels.has(relKey(rel)) &&
-      surviving.has(rel.fromId) &&
-      surviving.has(rel.targetId)
+      surviving.has(rel.fromIdentity ?? rel.fromId) &&
+      surviving.has(rel.targetIdentity ?? rel.targetId)
     ) {
       relationships.push({ kind: "removed", rel });
     }

@@ -10,7 +10,7 @@
 
 import type { ConfigLoader } from "./config/TraceabilityConfig.js";
 import type { Item, ItemRelationship, SiblingInfo } from "./types.js";
-import { HISTORY_RELATION_TYPES, ROLE_COLORS, SUPERSEDES } from "./types.js";
+import { HISTORY_RELATION_TYPES, itemIdentity, ROLE_COLORS, SUPERSEDES } from "./types.js";
 
 /**
  * Warning type for graph operations
@@ -21,7 +21,8 @@ export interface GraphWarning {
     | "invalid_relation"
     | "duplicate_node"
     | "stale_link"
-    | "dangling_link";
+    | "dangling_link"
+    | "ambiguous_target";
   message: string;
   file?: string;
   line?: number;
@@ -49,6 +50,8 @@ export class TraceabilityGraph {
 
   // Role-based indexes
   private _itemsByRole = new Map<string, Map<string, Item>>();
+
+  private _itemsByBareId = new Map<string, Item[]>;
 
   private _relationships = new Map<string, ItemRelationship>();
 
@@ -95,37 +98,32 @@ export class TraceabilityGraph {
    * Add an item to the graph
    */
   addItem(item: Item): void {
-    // Check for duplicate ID
-    if (this._items.has(item.id)) {
-      const existing = this._items.get(item.id)!;
-      const warning: GraphWarning = {
+    const identity = itemIdentity(item);
+    const existing = this._items.get(identity);
+    if (existing) {
+      this._warnings.push({
         type: "duplicate_node",
-        message: `Duplicate item ID: ${item.id}. First defined as ${existing.role} at ${existing.sourceFile}:${existing.sourceLine}. Skipping second definition at ${item.sourceFile}:${item.sourceLine}. Items must be unique within a component version. To reference this item from another page, don't redefine it — use an inline relationship macro (e.g., addresses:${item.id}[]) for traceability, or an xref:${existing.sourceFile}.adoc#${item.id}[${item.id}] for a plain link.`,
+        message: `Duplicate item ID: ${item.id}. First defined as ${existing.role} at ${existing.sourceFile}:${existing.sourceLine}. Skipping second definition at ${item.sourceFile}:${item.sourceLine}. Items must be unique within a component version.`,
         file: item.sourceFile,
         line: item.sourceLine,
-      };
-      this._warnings.push(warning);
+      });
       return;
     }
-
-    // Store the item
-    this._items.set(item.id, item);
-
-    // Index by role
-    if (!this._itemsByRole.has(item.role)) {
-      this._itemsByRole.set(item.role, new Map());
-    }
-    this._itemsByRole.get(item.role)?.set(item.id, item);
-
-    // Invalidate caches
+    this._items.set(identity, item);
+    const byId = this._itemsByBareId.get(item.id) ?? [];
+    byId.push(item);
+    this._itemsByBareId.set(item.id, byId);
+    if (!this._itemsByRole.has(item.role)) this._itemsByRole.set(item.role, new Map());
+    this._itemsByRole.get(item.role)!.set(identity, item);
     this._allItemsCache = null;
   }
 
-  /**
-   * Get an item by ID
-   */
-  getItem(id: string): Item | undefined {
-    return this._items.get(id);
+  getItem(id: string, component?: string, version?: string): Item | undefined {
+    if (component !== undefined) return this._items.get(itemIdentity({ id, component, version }));
+    const direct = this._items.get(id);
+    if (direct) return direct;
+    const matches = this._itemsByBareId.get(id);
+    return matches?.length === 1 ? matches[0] : undefined;
   }
 
   /**
@@ -151,9 +149,7 @@ export class TraceabilityGraph {
    * Get all items with a specific role, excluding superseded items.
    */
   getCurrentItemsByRole(role: string): Item[] {
-    return this.getItemsByRole(role).filter(
-      (item) => !this.isSuperseded(item.id),
-    );
+    return this.getItemsByRole(role).filter((item) => !this.isSuperseded(item.id, item.component, item.version));
   }
 
   /**
@@ -167,7 +163,7 @@ export class TraceabilityGraph {
    * Check if an item with the given ID exists
    */
   hasItem(id: string): boolean {
-    return this._items.has(id);
+    return this.getItem(id) !== undefined;
   }
 
   /**
@@ -187,214 +183,110 @@ export class TraceabilityGraph {
   /**
    * Add a relationship to the graph
    */
+  private resolveEndpoint(id: string, relationship: ItemRelationship, endpoint: "source" | "target"): Item | undefined {
+    if (endpoint === "source" && relationship.fromIdentity) {
+      const source = this._items.get(relationship.fromIdentity);
+      if (source?.id === id) return source;
+    }
+    if (relationship.component != null) {
+      const local = this.getItem(id, relationship.component, relationship.version);
+      if (local) return local;
+      if (endpoint === "source") return undefined;
+    }
+    const matches = this._itemsByBareId.get(id) ?? [];
+    if (matches.length === 1) return matches[0];
+    if (endpoint === "target" && relationship.component != null && matches.length > 1) {
+      this._warnings.push({
+        type: "ambiguous_target",
+        message: `Ambiguous target item ID: ${id}. Relationship ${relationship.fromId} ${relationship.type} ${id} remains unresolved because multiple external targets exist.`,
+        file: relationship.sourceFile,
+        line: relationship.line,
+      });
+    }
+    return undefined;
+  }
+
   addRelationship(relationship: ItemRelationship): void {
-    // Validate that source node exists
-    let sourceNode = this.getItem(relationship.fromId);
-    if (!sourceNode) {
-      const warning: GraphWarning = {
-        type: "unknown_role",
-        message: `Source item not found: ${relationship.fromId}. Relationship '${relationship.type}' will be stored anyway.`,
-        file: relationship.sourceFile,
-        line: relationship.line,
-      };
-      this._warnings.push(warning);
-      // Continue — don't block; target may be added later
-    }
+    let sourceNode = this.resolveEndpoint(relationship.fromId, relationship, "source");
+    let targetNode = this.resolveEndpoint(relationship.targetId, relationship, "target");
+    if (!sourceNode) this._warnings.push({ type: "unknown_role", message: `Source item not found: ${relationship.fromId}. Relationship '${relationship.type}' will be stored anyway.`, file: relationship.sourceFile, line: relationship.line });
+    if (!targetNode) this._warnings.push({ type: "unknown_role", message: `Target item not found: ${relationship.targetId}. Relationship ${relationship.fromId} ${relationship.type} ${relationship.targetId} stored pending target.`, file: relationship.sourceFile, line: relationship.line });
 
-    // Validate that target node exists (warn but don't block — cross-file ordering is normal)
-    let targetNode = this.getItem(relationship.targetId);
-    if (!targetNode) {
-      const warning: GraphWarning = {
-        type: "unknown_role",
-        message: `Target item not found: ${relationship.targetId}. Relationship ${relationship.fromId} ${relationship.type} ${relationship.targetId} stored pending target.`,
-        file: relationship.sourceFile,
-        line: relationship.line,
-      };
-      this._warnings.push(warning);
-      // Continue — target exists in another file that hasn't been processed yet
-    }
-
-    // Canonicalize reverse authoring to the primary direction.
-    // Authoring either name produces the same canonical edge.
     let wasReverse = false;
     if (this._configLoader && sourceNode && targetNode) {
-      const canonical = this._configLoader.canonicalizeRelation(
-        sourceNode.role,
-        targetNode.role,
-        relationship.type,
-      );
-      if (canonical) {
+      const canonical = this._configLoader.canonicalizeRelation(sourceNode.role, targetNode.role, relationship.type);
+      if (canonical && canonical.primary !== relationship.type) {
         wasReverse = true;
-        const tmp = relationship.fromId;
-        relationship.fromId = relationship.targetId;
-        relationship.targetId = tmp;
+        [relationship.fromId, relationship.targetId] = [relationship.targetId, relationship.fromId];
+        [sourceNode, targetNode] = [targetNode, sourceNode];
         relationship.type = canonical.primary;
-        // Re-resolve nodes after flipping to the canonical direction.
-        sourceNode = this.getItem(relationship.fromId);
-        targetNode = this.getItem(relationship.targetId);
       }
     }
-
-    // Dedupe on the canonical edge.
-    const key = `${relationship.fromId}-${relationship.type}-${relationship.targetId}`;
-    if (this._relationships.has(key)) {
-      const existing = this._relationships.get(key)!;
-
+    relationship.fromIdentity = sourceNode ? itemIdentity(sourceNode) : relationship.component != null ? itemIdentity({ id: relationship.fromId, component: relationship.component, version: relationship.version }) : relationship.fromId;
+    relationship.targetIdentity = targetNode ? itemIdentity(targetNode) : relationship.targetId;
+    const key = `${relationship.fromIdentity}\u0000${relationship.type}\u0000${relationship.targetIdentity}`;
+    const existing = this._relationships.get(key);
+    if (existing) {
       if (wasReverse) {
-        // The reverse name of an already-stored edge: mark bidirectional.
         existing.bidirectional = true;
         existing.inverseOf = relationship.id;
-        return;
+      } else if (!existing.bidirectional) {
+        this._warnings.push({ type: "duplicate_node", message: `Duplicate relationship: ${relationship.fromId} ${relationship.type} ${relationship.targetId}`, file: relationship.sourceFile, line: relationship.line });
       }
-
-      if (existing.bidirectional) {
-        // The primary name arriving after a reverse-authored edge: silent.
-        return;
-      }
-
-      // True duplicate: the same primary edge authored twice.
-      const warning: GraphWarning = {
-        type: "duplicate_node",
-        message: `Duplicate relationship: ${relationship.fromId} ${relationship.type} ${relationship.targetId}`,
-        file: relationship.sourceFile,
-        line: relationship.line,
-      };
-      this._warnings.push(warning);
       return;
     }
 
-    // Validate relation based on roles (if config loader is available and both nodes exist)
-    if (this._configLoader && sourceNode && targetNode) {
-      const isValid = this._configLoader.isRelationAllowed(
-        sourceNode.role,
-        targetNode.role,
-        relationship.type,
-      );
-
-      if (!isValid) {
-        // Check if either role is unknown
-        const sourceKnown = this._configLoader
-          .getConfig()
-          .roles.includes(sourceNode.role);
-        const targetKnown = this._configLoader
-          .getConfig()
-          .roles.includes(targetNode.role);
-
-        if (!sourceKnown || !targetKnown) {
-          // If roles are unknown, just warn
-          const warning: GraphWarning = {
-            type: "unknown_role",
-            message: `Relation '${relationship.type}' from '${sourceNode.id}' (role: ${sourceNode.role}) to '${targetNode.id}' (role: ${targetNode.role}) involves unknown role(s). Skipping validation.`,
-            file: relationship.sourceFile,
-            line: relationship.line,
-          };
-          this._warnings.push(warning);
-        } else {
-          // Both roles are known but relation is not allowed
-          const allowed = this._configLoader.getAllowedRelations(
-            sourceNode.role,
-            targetNode.role,
-          );
-          const warning: GraphWarning = {
-            type: "invalid_relation",
-            message: `Relation '${relationship.type}' not allowed: '${sourceNode.id}' (${sourceNode.role}) -> '${targetNode.id}' (${targetNode.role}). Allowed: [${allowed.join(", ")}]`,
-            file: relationship.sourceFile,
-            line: relationship.line,
-          };
-          this._warnings.push(warning);
-
-          // Store the relationship anyway for graceful degradation
-          // but mark it as invalid
-          relationship.autoGenerated = false;
-          this._relationships.set(key, relationship);
-          this._updateRelationshipIndex(relationship);
-
-          // Don't auto-generate inverse for invalid relations
-          return;
-        }
+    if (this._configLoader && sourceNode && targetNode && !this._configLoader.isRelationAllowed(sourceNode.role, targetNode.role, relationship.type)) {
+      const roles = this._configLoader.getConfig().roles;
+      if (roles.includes(sourceNode.role) && roles.includes(targetNode.role)) {
+        const allowed = this._configLoader.getAllowedRelations(sourceNode.role, targetNode.role);
+        this._warnings.push({ type: "invalid_relation", message: `Relation '${relationship.type}' not allowed: '${sourceNode.id}' (${sourceNode.role}) -> '${targetNode.id}' (${targetNode.role}). Allowed: [${allowed.join(", ")}]`, file: relationship.sourceFile, line: relationship.line });
+        relationship.autoGenerated = false;
+        this._relationships.set(key, relationship);
+        this._updateRelationshipIndex(relationship);
+        this._allRelationshipsCache = null;
+        return;
       }
+      this._warnings.push({ type: "unknown_role", message: `Relation '${relationship.type}' from '${sourceNode.id}' (role: ${sourceNode.role}) to '${targetNode.id}' (role: ${targetNode.role}) involves unknown role(s). Skipping validation.`, file: relationship.sourceFile, line: relationship.line });
     }
 
-    // Store the relationship
-    const stored = {
-      ...relationship,
-      autoGenerated:
-        relationship.autoGenerated !== undefined
-          ? relationship.autoGenerated
-          : false,
-      // A reverse-authored edge was named from the other side, so it is
-      // already bidirectional even before the primary name is authored.
-      bidirectional: wasReverse ? true : relationship.bidirectional,
-    };
+    const stored = { ...relationship, autoGenerated: relationship.autoGenerated ?? false, bidirectional: wasReverse ? true : relationship.bidirectional };
     this._relationships.set(key, stored);
-
-    // Update relationship indexes
     this._updateRelationshipIndex(stored);
-
-    // Invalidate caches
     this._allRelationshipsCache = null;
   }
 
-  /**
-   * Re-resolve relationship direction after all items have been collected.
-   * Cross-file relationships can be added before their target item exists,
-   * which makes immediate reverse canonicalization impossible.
-   */
   canonicalizeRelationships(): void {
     const relationships = this.getAllRelationships().map((rel) => ({ ...rel }));
     this._relationships.clear();
     this._relationshipIndex.clear();
     this._reverseRelationshipIndex.clear();
     this._allRelationshipsCache = null;
-
-    for (const relationship of relationships) {
-      this.addRelationship(relationship);
-    }
+    this._warnings = this._warnings.filter((warning) => warning.type !== "ambiguous_target");
+    for (const relationship of relationships) this.addRelationship(relationship);
   }
 
-  /**
-   * Get a relationship by ID
-   */
   getRelationship(id: string): ItemRelationship | undefined {
-    return this._relationships.get(id);
+    return Array.from(this._relationships.values()).find((rel) => rel.id === id);
   }
 
-  /**
-   * Get all relationships
-   */
   getAllRelationships(): ItemRelationship[] {
-    if (this._allRelationshipsCache === null) {
-      this._allRelationshipsCache = Array.from(this._relationships.values());
-    }
+    if (this._allRelationshipsCache === null) this._allRelationshipsCache = Array.from(this._relationships.values());
     return this._allRelationshipsCache;
   }
 
-  /**
-   * Get relationships from a specific item
-   */
-  getRelationships(fromId: string, type?: string): ItemRelationship[] {
-    const fromIndex = this._relationshipIndex.get(fromId);
-    if (fromIndex) {
-      if (type) {
-        return fromIndex.get(type) || [];
-      }
-      return Array.from(fromIndex.values()).flat();
-    }
-    return [];
+  getRelationships(fromId: string, type?: string, component?: string, version?: string): ItemRelationship[] {
+    const source = this.getItem(fromId, component, version);
+    if (!source) return [];
+    const index = this._relationshipIndex.get(itemIdentity(source));
+    return !index ? [] : type ? index.get(type) ?? [] : Array.from(index.values()).flat();
   }
 
-  /**
-   * Get relationships to a specific item (reverse)
-   */
-  getReverseRelationships(targetId: string, type?: string): ItemRelationship[] {
-    const targetIndex = this._reverseRelationshipIndex.get(targetId);
-    if (targetIndex) {
-      if (type) {
-        return targetIndex.get(type) || [];
-      }
-      return Array.from(targetIndex.values()).flat();
-    }
-    return [];
+  getReverseRelationships(targetId: string, type?: string, component?: string, version?: string): ItemRelationship[] {
+    const target = this.getItem(targetId, component, version);
+    if (!target) return [];
+    const index = this._reverseRelationshipIndex.get(itemIdentity(target));
+    return !index ? [] : type ? index.get(type) ?? [] : Array.from(index.values()).flat();
   }
 
   // ========================================================================
@@ -412,16 +304,16 @@ export class TraceabilityGraph {
    * Whether an item has been replaced: at least one incoming `supersedes`
    * relationship targets it.
    */
-  isSuperseded(itemId: string): boolean {
-    return this.getReverseRelationships(itemId, SUPERSEDES).length > 0;
+  isSuperseded(itemId: string, component?: string, version?: string): boolean {
+    return this.getReverseRelationships(itemId, SUPERSEDES, component, version).length > 0;
   }
 
   /**
    * The direct successors of an item — the items that `supersedes` it.
    */
-  getSuccessors(itemId: string): Item[] {
-    return this.getReverseRelationships(itemId, SUPERSEDES)
-      .map((rel) => this.getItem(rel.fromId))
+  getSuccessors(itemId: string, component?: string, version?: string): Item[] {
+    return this.getReverseRelationships(itemId, SUPERSEDES, component, version)
+      .map((rel) => this._items.get(rel.fromIdentity ?? rel.fromId))
       .filter((item): item is Item => item !== undefined);
   }
 
@@ -429,67 +321,39 @@ export class TraceabilityGraph {
    * Whether a superseded item is orphaned: superseded AND no incoming
    * functional (non-history) relationships target it.
    */
-  isOrphaned(itemId: string): boolean {
-    if (!this.isSuperseded(itemId)) return false;
-    return this.getReverseRelationships(itemId).every((rel) =>
-      this.isHistoryRelation(rel.type),
-    );
+  isOrphaned(itemId: string, component?: string, version?: string): boolean {
+    if (!this.isSuperseded(itemId, component, version)) return false;
+    return this.getReverseRelationships(itemId, undefined, component, version).every((rel) => this.isHistoryRelation(rel.type));
   }
 
   /**
    * Relationships whose target item no longer exists.
    */
   getDanglingReferences(): ItemRelationship[] {
-    const dangling: ItemRelationship[] = [];
-    for (const rel of this._relationships.values()) {
-      if (!this.getItem(rel.targetId)) {
-        dangling.push(rel);
-      }
-    }
-    return dangling;
+    return Array.from(this._relationships.values()).filter((rel) => !rel.targetIdentity || !this._items.has(rel.targetIdentity));
   }
 
-  /**
-   * Items that are effectively superseded.
-   */
   getSupersededItems(): Item[] {
-    return this.getAllItems().filter((item) => this.isSuperseded(item.id));
+    return this.getAllItems().filter((item) => this.isSuperseded(item.id, item.component, item.version));
   }
 
   /**
    * Get relationships by type
    */
   getRelationshipsByType(type: string): ItemRelationship[] {
-    const result: ItemRelationship[] = [];
-    for (const rel of this._relationships.values()) {
-      if (rel.type === type) {
-        result.push(rel);
-      }
-    }
-    return result;
+    return Array.from(this._relationships.values()).filter((rel) => rel.type === type);
   }
 
   /**
    * Get relationships filtered by source role and target role
    */
-  getRelationshipsByRoles(
-    sourceRole: string,
-    targetRole: string,
-  ): ItemRelationship[] {
+  getRelationshipsByRoles(sourceRole: string, targetRole: string): ItemRelationship[] {
     const result: ItemRelationship[] = [];
-    const sourceItems = this.getItemsByRole(sourceRole);
-
-    for (const sourceItem of sourceItems) {
-      const targetItems = this.getItemsByRole(targetRole);
-      const targetIds = new Set(targetItems.map((i) => i.id));
-
-      for (const rel of this.getRelationships(sourceItem.id)) {
-        if (targetIds.has(rel.targetId)) {
-          result.push(rel);
-        }
+    for (const source of this.getItemsByRole(sourceRole)) {
+      for (const rel of this.getRelationships(source.id, undefined, source.component, source.version)) {
+        if (this._items.get(rel.targetIdentity ?? rel.targetId)?.role === targetRole) result.push(rel);
       }
     }
-
     return result;
   }
 
@@ -500,59 +364,18 @@ export class TraceabilityGraph {
   /**
    * Get all items that have a specific relation to a given item
    */
-  getRelatedItems(itemId: string, relationType?: string): Item[] {
-    const result: Item[] = [];
-    const rels = this.getRelationships(itemId, relationType);
-
-    for (const rel of rels) {
-      const target = this.getItem(rel.targetId);
-      if (target) {
-        result.push(target);
-      }
-    }
-
-    return result;
+  getRelatedItems(itemId: string, relationType?: string, component?: string, version?: string): Item[] {
+    return this.getRelationships(itemId, relationType, component, version).map((rel) => this._items.get(rel.targetIdentity ?? rel.targetId)).filter((item): item is Item => item !== undefined);
   }
 
-  /**
-   * Get all items that have a specific relation from a given item (reverse)
-   */
-  getItemsWithRelationTo(itemId: string, relationType?: string): Item[] {
-    const result: Item[] = [];
-    const rels = this.getReverseRelationships(itemId, relationType);
-
-    for (const rel of rels) {
-      const source = this.getItem(rel.fromId);
-      if (source) {
-        result.push(source);
-      }
-    }
-
-    return result;
+  getItemsWithRelationTo(itemId: string, relationType?: string, component?: string, version?: string): Item[] {
+    return this.getReverseRelationships(itemId, relationType, component, version).map((rel) => this._items.get(rel.fromIdentity ?? rel.fromId)).filter((item): item is Item => item !== undefined);
   }
 
-  /**
-   * Get all items related to a given item (both directions)
-   */
-  getAllRelatedItems(itemId: string): Item[] {
+  getAllRelatedItems(itemId: string, component?: string, version?: string): Item[] {
     const result = new Map<string, Item>();
-
-    // Get forward relationships
-    for (const rel of this.getRelationships(itemId)) {
-      const target = this.getItem(rel.targetId);
-      if (target) {
-        result.set(target.id, target);
-      }
-    }
-
-    // Get reverse relationships
-    for (const rel of this.getReverseRelationships(itemId)) {
-      const source = this.getItem(rel.fromId);
-      if (source) {
-        result.set(source.id, source);
-      }
-    }
-
+    for (const item of this.getRelatedItems(itemId, undefined, component, version)) result.set(itemIdentity(item), item);
+    for (const item of this.getItemsWithRelationTo(itemId, undefined, component, version)) result.set(itemIdentity(item), item);
     return Array.from(result.values());
   }
 
@@ -562,77 +385,49 @@ export class TraceabilityGraph {
    * sources). Each result carries the shared neighbor IDs, the relation
    * types connecting them, and the sibling's supersession status.
    */
-  getSiblings(
-    itemId: string,
-    relationType?: string,
-  ): Array<SiblingInfo> {
-    // Collect neighbors: neighborId -> relation types that connect the item
+  getSiblings(itemId: string, relationType?: string, component?: string, version?: string): Array<SiblingInfo> {
+    const item = this.getItem(itemId, component, version);
+    if (!item) return [];
+    const identity = itemIdentity(item);
     const neighborTypes = new Map<string, Set<string>>();
-    const addNeighbor = (neighborId: string, type: string) => {
-      if (neighborId === itemId) return;
-      const types = neighborTypes.get(neighborId) ?? new Set<string>();
+    const addNeighbor = (neighbor: string, type: string) => {
+      if (neighbor === identity) return;
+      const types = neighborTypes.get(neighbor) ?? new Set<string>();
       types.add(type);
-      neighborTypes.set(neighborId, types);
+      neighborTypes.set(neighbor, types);
     };
-    for (const rel of this.getRelationships(itemId, relationType)) {
-      addNeighbor(rel.targetId, rel.type);
-    }
-    for (const rel of this.getReverseRelationships(itemId, relationType)) {
-      addNeighbor(rel.fromId, rel.type);
-    }
+    for (const rel of this.getRelationships(itemId, relationType, component, version)) addNeighbor(rel.targetIdentity ?? rel.targetId, rel.type);
+    for (const rel of this.getReverseRelationships(itemId, relationType, component, version)) addNeighbor(rel.fromIdentity ?? rel.fromId, rel.type);
 
-    const siblings = new Map<string, SiblingInfo>();
-    const addSibling = (siblingId: string, neighborId: string) => {
-      if (siblingId === itemId) return;
-      let info = siblings.get(siblingId);
-      if (!info) {
-        info = {
-          siblingId,
-          sharedTargets: [],
-          superseded: false,
-          successorIds: [],
-        };
-        siblings.set(siblingId, info);
-      }
-      if (!info.sharedTargets.includes(neighborId)) {
-        info.sharedTargets.push(neighborId);
-      }
+    const siblings = new Map<string, { sibling: Item; shared: Set<string> }>();
+    const addSibling = (siblingIdentity: string, neighborIdentity: string) => {
+      if (siblingIdentity === identity) return;
+      const sibling = this._items.get(siblingIdentity);
+      if (!sibling) return;
+      const info = siblings.get(siblingIdentity) ?? { sibling, shared: new Set<string>() };
+      info.shared.add(this._items.get(neighborIdentity)?.id ?? neighborIdentity);
+      siblings.set(siblingIdentity, info);
     };
-
-    // For each neighbor, find other items connected to it. Unfiltered, every
-    // relation type on the neighbor contributes; filtered, only edges of the
-    // requested type (the queried item's own edges already passed the filter).
-    for (const neighborId of neighborTypes.keys()) {
-      const types = relationType
-        ? [relationType]
-        : this.allEdgeTypes(neighborId);
+    for (const neighbor of neighborTypes.keys()) {
+      const types = relationType ? [relationType] : this.allEdgeTypes(neighbor);
       for (const type of types) {
-        for (const rel of this.getRelationships(neighborId, type)) {
-          addSibling(rel.targetId, neighborId);
-        }
-        for (const rel of this.getReverseRelationships(neighborId, type)) {
-          addSibling(rel.fromId, neighborId);
-        }
+        for (const rel of this.getRelationships(this._items.get(neighbor)?.id ?? neighbor, type, this._items.get(neighbor)?.component, this._items.get(neighbor)?.version)) addSibling(rel.targetIdentity ?? rel.targetId, neighbor);
+        for (const rel of this.getReverseRelationships(this._items.get(neighbor)?.id ?? neighbor, type, this._items.get(neighbor)?.component, this._items.get(neighbor)?.version)) addSibling(rel.fromIdentity ?? rel.fromId, neighbor);
       }
     }
-
-    return Array.from(siblings.values())
-      .map((info) => ({
-        ...info,
-        sharedTargets: info.sharedTargets.sort(),
-        superseded: this.isSuperseded(info.siblingId),
-        successorIds: this.isSuperseded(info.siblingId)
-          ? this.getSuccessors(info.siblingId).map((s) => s.id)
-          : [],
-      }))
-      .sort((a, b) => a.siblingId.localeCompare(b.siblingId));
+    return Array.from(siblings.values()).map(({ sibling, shared }) => ({
+      siblingId: sibling.id,
+      sharedTargets: Array.from(shared).sort(),
+      superseded: this.isSuperseded(sibling.id, sibling.component, sibling.version),
+      successorIds: this.isSuperseded(sibling.id, sibling.component, sibling.version) ? this.getSuccessors(sibling.id, sibling.component, sibling.version).map((successor) => successor.id) : [],
+    })).sort((a, b) => a.siblingId.localeCompare(b.siblingId));
   }
 
   /** All relation types on the item's edges, both directions. */
-  private allEdgeTypes(itemId: string): string[] {
+  private allEdgeTypes(identity: string): string[] {
     const types = new Set<string>();
-    for (const rel of this.getRelationships(itemId)) types.add(rel.type);
-    for (const rel of this.getReverseRelationships(itemId)) types.add(rel.type);
+    for (const rels of this._relationshipIndex.get(identity)?.values() ?? []) for (const rel of rels) types.add(rel.type);
+    for (const rels of this._reverseRelationshipIndex.get(identity)?.values() ?? []) for (const rel of rels) types.add(rel.type);
     return Array.from(types);
   }
 
@@ -695,151 +490,54 @@ export class TraceabilityGraph {
    */
   validate(): ValidationResult {
     const errors: string[] = [];
-    // Duplicate item IDs are merge-time conflicts: promote them to errors so
-    // `validate` fails rather than silently dropping the second definition.
-    for (const w of this._warnings) {
-      if (w.type === "duplicate_node") errors.push(w.message);
-    }
-    // Filter out stale "pending target/source" warnings that have since been resolved
-    const warnings: GraphWarning[] = this._warnings.filter((w) => {
-      if (w.type === "duplicate_node") return false;
-      if (w.type !== "unknown_role") return true;
-      // Keep only if the item in the message still doesn't exist
-      const targetMatch = w.message.match(
-        /^Target item not found: ([A-Z0-9_-]+)/,
-      );
-      if (targetMatch) return !this.getItem(targetMatch[1]);
-      const sourceMatch = w.message.match(
-        /^Source item not found: ([A-Z0-9_-]+)/,
-      );
-      if (sourceMatch) return !this.getItem(sourceMatch[1]);
+    const warnings: GraphWarning[] = this._warnings.filter((warning) => {
+      if (warning.type === "duplicate_node") { errors.push(warning.message); return false; }
+      if (warning.type === "unknown_role") {
+        const targetMatch = warning.message.match(/^Target item not found: ([A-Z0-9_-]+)/);
+        if (targetMatch && this.getItem(targetMatch[1])) return false;
+        const sourceMatch = warning.message.match(/^Source item not found: ([A-Z0-9_-]+)/);
+        if (sourceMatch && this.getItem(sourceMatch[1])) return false;
+      }
       return true;
     });
-
-    // Check for orphaned relationships (dangling references)
     for (const rel of this._relationships.values()) {
-      const location = rel.sourceFile
-        ? ` at ${rel.sourceFile}${rel.line !== undefined ? `:${rel.line}` : ""}`
-        : "";
-      const isHistory = HISTORY_RELATION_TYPES.has(rel.type);
-      if (!this.getItem(rel.fromId)) {
-        const targetItem = this.getItem(rel.targetId);
-        const targetDetail = targetItem ? ` (role: ${targetItem.role})` : "";
-        const message = `Dangling reference${location}: '${rel.fromId}' declares ${rel.type} -> '${rel.targetId}'${targetDetail} but source '${rel.fromId}' does not exist.`;
-        if (isHistory) {
-          warnings.push({
-            type: "dangling_link",
-            message,
-            file: rel.sourceFile,
-            line: rel.line,
-          });
-        } else {
-          errors.push(message);
-        }
+      const source = this._items.get(rel.fromIdentity ?? rel.fromId);
+      const target = this._items.get(rel.targetIdentity ?? rel.targetId);
+      const location = rel.sourceFile ? ` at ${rel.sourceFile}${rel.line !== undefined ? `:${rel.line}` : ""}` : "";
+      const history = HISTORY_RELATION_TYPES.has(rel.type);
+      if (!source) {
+        const message = `Dangling reference${location}: '${rel.fromId}' declares ${rel.type} -> '${rel.targetId}' but source '${rel.fromId}' does not exist.`;
+        if (history) warnings.push({ type: "dangling_link", message, file: rel.sourceFile, line: rel.line }); else errors.push(message);
       }
-      if (!this.getItem(rel.targetId)) {
-        // Build expected target role hint from config
+      if (!target) {
         let expectedRole = "";
-        const sourceItem = this.getItem(rel.fromId);
-        if (sourceItem && this._configLoader) {
-          const config = this._configLoader.getConfig();
-          const relType = rel.type.toLowerCase();
-          const relations = config.relations || {};
-          const sourceRelations = relations[sourceItem.role];
-          if (sourceRelations) {
-            const matchingTargets: string[] = [];
-            for (const [targetRole, typeMap] of Object.entries(
-              sourceRelations,
-            )) {
-              if (relType in typeMap) {
-                matchingTargets.push(targetRole);
-              }
-            }
-            if (matchingTargets.length > 0) {
-              expectedRole = ` (expected target role: ${matchingTargets.join(" or ")})`;
-            }
-          }
+        if (source && this._configLoader) {
+          const sourceRelations = this._configLoader.getConfig().relations?.[source.role] ?? {};
+          const expected = Object.entries(sourceRelations)
+            .filter(([, typeMap]) => rel.type.toLowerCase() in typeMap)
+            .map(([role]) => role);
+          if (expected.length) expectedRole = ` (expected target role: ${expected.join(" or ")})`;
         }
-        const sourceRole = sourceItem ? ` (role: ${sourceItem.role})` : "";
-        const message = `Dangling reference${location}: '${rel.fromId}'${sourceRole} declares ${rel.type} -> '${rel.targetId}' but target '${rel.targetId}' does not exist${expectedRole}.`;
-        if (isHistory) {
-          warnings.push({
-            type: "dangling_link",
-            message,
-            file: rel.sourceFile,
-            line: rel.line,
-          });
-        } else {
-          errors.push(message);
+        const message = `Dangling reference${location}: '${rel.fromId}'${source ? ` (role: ${source.role})` : ""} declares ${rel.type} -> '${rel.targetId}' but target '${rel.targetId}' does not exist${expectedRole}.`;
+        if (history) warnings.push({ type: "dangling_link", message, file: rel.sourceFile, line: rel.line }); else errors.push(message);
+      }
+      if (source && target && this._configLoader && !this._configLoader.isRelationAllowed(source.role, target.role, rel.type)) {
+        const roles = this._configLoader.getConfig().roles;
+        if (roles.includes(source.role) && roles.includes(target.role)) {
+          const allowed = this._configLoader.getAllowedRelations(source.role, target.role);
+          const hint = allowed.length ? ` Allowed: [${allowed.join(", ")}]` : ` No relations allowed from '${source.role}' to '${target.role}'.`;
+          errors.push(`Invalid relation${location}: '${rel.fromId}' (${source.role}) declares ${rel.type} -> '${rel.targetId}' (${target.role}).${hint}`);
         }
       }
     }
-
-    // Check for invalid relation types (re-check at validate time in case
-    // targets were added later from other files, bypassing addRelationship check)
     if (this._configLoader) {
-      for (const rel of this._relationships.values()) {
-        const sourceNode = this.getItem(rel.fromId);
-        const targetNode = this.getItem(rel.targetId);
-        if (!sourceNode || !targetNode) continue;
-
-        const isValid = this._configLoader.isRelationAllowed(
-          sourceNode.role,
-          targetNode.role,
-          rel.type,
-        );
-        if (!isValid) {
-          const sourceKnown = this._configLoader
-            .getConfig()
-            .roles.includes(sourceNode.role);
-          const targetKnown = this._configLoader
-            .getConfig()
-            .roles.includes(targetNode.role);
-          if (sourceKnown && targetKnown) {
-            const location = rel.sourceFile
-              ? ` at ${rel.sourceFile}${rel.line !== undefined ? `:${rel.line}` : ""}`
-              : "";
-            const allowed = this._configLoader.getAllowedRelations(
-              sourceNode.role,
-              targetNode.role,
-            );
-            const hint =
-              allowed.length > 0
-                ? ` Allowed: [${allowed.join(", ")}]`
-                : ` No relations allowed from '${sourceNode.role}' to '${targetNode.role}'.`;
-            errors.push(
-              `Invalid relation${location}: '${rel.fromId}' (${sourceNode.role}) declares ${rel.type} -> '${rel.targetId}' (${targetNode.role}).${hint}`,
-            );
-          }
-        }
-      }
+      const roles = this._configLoader.getConfig().roles;
+      for (const item of this._items.values()) if (!roles.includes(item.role)) warnings.push({ type: "unknown_role", message: `Item '${item.id}' has unknown role '${item.role}'.`, file: item.sourceFile, line: item.sourceLine });
     }
-
-    // Check for circular references
-    const circularErrors = this.findCircularReferences();
-    errors.push(...circularErrors);
-
-    // Check for items with unknown roles
-    if (this._configLoader) {
-      const knownRoles = this._configLoader.getConfig().roles;
-      for (const item of this._items.values()) {
-        if (!knownRoles.includes(item.role)) {
-          warnings.push({
-            type: "unknown_role",
-            message: `Item '${item.id}' has unknown role '${item.role}'.`,
-            file: item.sourceFile,
-            line: item.sourceLine,
-          });
-        }
-      }
-    }
-
-    // Supersession validation: self-reference, duplicates, and cycles are
-    // errors; functional links to superseded items are advisory warnings.
-    const supersessionIssues = this.findSupersessionIssues();
-    errors.push(...supersessionIssues.errors);
-    warnings.push(...supersessionIssues.warnings);
-
+    errors.push(...this.findCircularReferences());
+    const supersession = this.findSupersessionIssues();
+    errors.push(...supersession.errors);
+    warnings.push(...supersession.warnings);
     return { errors, warnings };
   }
 
@@ -861,12 +559,14 @@ export class TraceabilityGraph {
     for (const rel of this._relationships.values()) {
       if (rel.type !== SUPERSEDES) continue;
 
-      if (rel.fromId === rel.targetId) {
+      const from = rel.fromIdentity ?? rel.fromId;
+      const target = rel.targetIdentity ?? rel.targetId;
+      if (from === target) {
         errors.push(`Self-supersession: '${rel.fromId}' supersedes itself.`);
         continue;
       }
 
-      const key = `${rel.fromId}->${rel.targetId}`;
+      const key = `${rel.fromIdentity ?? rel.fromId}->${rel.targetIdentity ?? rel.targetId}`;
       if (seen.has(key)) {
         errors.push(
           `Duplicate supersedes: '${rel.fromId}' supersedes '${rel.targetId}' more than once.`,
@@ -874,10 +574,8 @@ export class TraceabilityGraph {
       }
       seen.add(key);
 
-      if (!successorMap.has(rel.fromId)) {
-        successorMap.set(rel.fromId, new Set());
-      }
-      successorMap.get(rel.fromId)!.add(rel.targetId);
+      if (!successorMap.has(from)) successorMap.set(from, new Set());
+      successorMap.get(from)!.add(target);
     }
 
     errors.push(...this.findSupersessionCycles(successorMap));
@@ -885,8 +583,9 @@ export class TraceabilityGraph {
     // Functional links to superseded items require review.
     for (const rel of this._relationships.values()) {
       if (HISTORY_RELATION_TYPES.has(rel.type)) continue;
-      if (!this.isSuperseded(rel.targetId)) continue;
-      const successors = this.getSuccessors(rel.targetId)
+      const target = rel.targetIdentity ?? rel.targetId;
+      if (!this.isSuperseded(target)) continue;
+      const successors = this.getSuccessors(target)
         .map((s) => s.id)
         .sort();
       warnings.push({
@@ -943,39 +642,23 @@ export class TraceabilityGraph {
     const errors: string[] = [];
     const visited = new Set<string>();
     const recursionStack = new Set<string>();
-
-    const checkNode = (nodeId: string, path: string[]) => {
-      if (recursionStack.has(nodeId)) {
-        const cycleStartIndex = path.indexOf(nodeId);
-        const cycle = path.slice(cycleStartIndex);
-        errors.push(
-          `Circular reference detected: ${cycle.join(" -> ")} -> ${nodeId}`,
-        );
+    const checkNode = (identity: string, path: string[]) => {
+      if (recursionStack.has(identity)) {
+        const cycleStart = path.indexOf(identity);
+        errors.push(`Circular reference detected: ${path.slice(cycleStart).join(" -> ")} -> ${identity}`);
         return;
       }
-
-      if (visited.has(nodeId)) return;
-
-      visited.add(nodeId);
-      recursionStack.add(nodeId);
-      path.push(nodeId);
-
-      // Follow all forward relationships
-      for (const rel of this.getRelationships(nodeId)) {
-        // Skip auto-generated inverse relationships and bidirectional pairs
-        if (rel.autoGenerated || rel.bidirectional) continue;
-        checkNode(rel.targetId, [...path]);
+      if (visited.has(identity)) return;
+      visited.add(identity);
+      recursionStack.add(identity);
+      path.push(identity);
+      for (const relationships of this._relationshipIndex.get(identity)?.values() ?? []) {
+        for (const rel of relationships) if (!rel.autoGenerated && !rel.bidirectional) checkNode(rel.targetIdentity ?? rel.targetId, [...path]);
       }
-
       path.pop();
-      recursionStack.delete(nodeId);
+      recursionStack.delete(identity);
     };
-
-    // Check all items
-    for (const item of this._items.values()) {
-      checkNode(item.id, []);
-    }
-
+    for (const identity of this._items.keys()) checkNode(identity, []);
     return errors;
   }
 
@@ -987,92 +670,81 @@ export class TraceabilityGraph {
    * Finds a path between two item IDs using depth-limited DFS (iterative)
    * Uses iterative approach with explicit stack to avoid recursion limits
    */
-  findPath(
-    fromId: string,
-    toId: string,
-    maxDepth: number = 5,
-  ): string[] | null {
-    if (fromId === toId) return [fromId];
+  findPath(fromId: string, toId: string, maxDepth: number = 5, component?: string, version?: string): string[] | null {
+    const from = this.getItem(fromId, component, version);
+    const to = this.getItem(toId, component, version);
+    if (!from || !to) return null;
+    const start = itemIdentity(from);
+    const destination = itemIdentity(to);
+    if (start === destination) return [fromId];
     if (maxDepth < 0) return null;
-
-    // Stack entries: { currentId, path, depth }
-    const stack: { currentId: string; path: string[]; depth: number }[] = [
-      { currentId: fromId, path: [fromId], depth: 0 },
-    ];
-    const visited = new Set<string>([fromId]);
-
+    const stack: { identity: string; path: string[]; depth: number }[] = [{ identity: start, path: [fromId], depth: 0 }];
+    const visited = new Set([start]);
     while (stack.length > 0) {
-      const { currentId, path, depth } = stack.pop()!;
-
+      const { identity, path, depth } = stack.pop()!;
       if (depth > maxDepth) continue;
-
-      if (currentId === toId) return path;
-
-      // Push neighbors in reverse order to maintain DFS order (last relationship first)
-      const relationships = this.getRelationships(currentId);
-      for (let i = relationships.length - 1; i >= 0; i--) {
-        const rel = relationships[i];
-        if (!visited.has(rel.targetId)) {
-          visited.add(rel.targetId);
-          stack.push({
-            currentId: rel.targetId,
-            path: [...path, rel.targetId],
-            depth: depth + 1,
-          });
-        }
+      if (identity === destination) return path;
+      const relationships = Array.from(this._relationshipIndex.get(identity)?.values() ?? []).flat();
+      for (let index = relationships.length - 1; index >= 0; index--) {
+        const rel = relationships[index];
+        const target = rel.targetIdentity ?? rel.targetId;
+        if (visited.has(target)) continue;
+        visited.add(target);
+        stack.push({ identity: target, path: [...path, rel.targetId], depth: depth + 1 });
       }
     }
-
     return null;
   }
 
   /**
    * Returns all item IDs reachable from the given ID in either direction (BFS)
    */
-  getImpactAnalysis(itemId: string): string[] {
+  getImpactAnalysis(itemId: string, component?: string, version?: string): string[] {
+    const item = this.getItem(itemId, component, version);
+    if (!item) return [];
     const impacted = new Set<string>();
-    const queue = [itemId];
-
+    const queue = [itemIdentity(item)];
     while (queue.length > 0) {
-      const current = queue.shift()!;
-
-      for (const rel of this.getRelationships(current)) {
-        if (!impacted.has(rel.targetId)) {
-          impacted.add(rel.targetId);
-          queue.push(rel.targetId);
+      const identity = queue.shift()!;
+      for (const relationships of this._relationshipIndex.get(identity)?.values() ?? []) {
+        for (const rel of relationships) {
+          const target = rel.targetIdentity ?? rel.targetId;
+          if (!impacted.has(target)) { impacted.add(target); queue.push(target); }
         }
       }
-
-      for (const rel of this.getReverseRelationships(current)) {
-        if (!impacted.has(rel.fromId)) {
-          impacted.add(rel.fromId);
-          queue.push(rel.fromId);
+      for (const relationships of this._reverseRelationshipIndex.get(identity)?.values() ?? []) {
+        for (const rel of relationships) {
+          const source = rel.fromIdentity ?? rel.fromId;
+          if (!impacted.has(source)) { impacted.add(source); queue.push(source); }
         }
       }
     }
-
-    return Array.from(impacted).filter((id) => id !== itemId);
+    return Array.from(impacted, (identity) => this._items.get(identity)?.id ?? identity).filter((id) => id !== itemId);
   }
 
   /**
    * Return distinct items reachable through outgoing relationships with the requested role.
    */
-  getLinkedItems(itemId: string, role: string): Item[] {
+  getLinkedItems(itemId: string, role: string, component?: string, version?: string): Item[] {
+    const item = this.getItem(itemId, component, version);
+    if (!item) return [];
     const linked: Item[] = [];
-    const visited = new Set([itemId]);
-    const queue = [itemId];
-
+    const visited = new Set([itemIdentity(item)]);
+    const queue = [itemIdentity(item)];
     for (let index = 0; index < queue.length; index++) {
-      for (const rel of this.getRelationships(queue[index])) {
-        if (visited.has(rel.targetId)) continue;
-        visited.add(rel.targetId);
-        const item = this.getItem(rel.targetId);
-        if (!item) continue;
-        if (item.role === role) linked.push(item);
-        queue.push(item.id);
+      const identity = queue[index];
+      for (const relationships of this._relationshipIndex.get(identity)?.values() ?? []) {
+        for (const rel of relationships) {
+          const target = rel.targetIdentity ?? rel.targetId;
+          if (visited.has(target)) continue;
+          visited.add(target);
+          const targetItem = this._items.get(target);
+          if (!targetItem) continue;
+          if (targetItem.role === role) linked.push(targetItem);
+          queue.push(target);
+        }
       }
     }
-
     return linked;
   }
 
@@ -1086,6 +758,7 @@ export class TraceabilityGraph {
   clear(): void {
     this._items.clear();
     this._itemsByRole.clear();
+    this._itemsByBareId.clear();
     this._relationships.clear();
     this._relationshipIndex.clear();
     this._reverseRelationshipIndex.clear();
@@ -1117,88 +790,49 @@ export class TraceabilityGraph {
    * @param fromId The starting item ID
    * @param depth Maximum hops from the starting item (default 1)
    */
-  toDot(fromId: string, depth = 1): string {
-    const item = this.getItem(fromId);
-    if (!item) return "";
-
-    const visited = new Set<string>();
+  toDot(fromId: string, depth = 1, component?: string, version?: string): string {
+    const startItem = this.getItem(fromId, component, version);
+    if (!startItem) return "";
+    const start = itemIdentity(startItem);
+    const visited = new Set<string>([start]);
     const seenEdges = new Set<string>();
-    const edges: Array<{ from: string; to: string; label: string }> = [];
-    const queue: Array<{ id: string; dist: number }> = [
-      { id: fromId, dist: 0 },
-    ];
-    visited.add(fromId);
-
+    const edges: Array<{ from: string; to: string; label: string; relationship: ItemRelationship }> = [];
+    const queue: Array<{ identity: string; dist: number }> = [{ identity: start, dist: 0 }];
     while (queue.length > 0) {
       const current = queue.shift()!;
       if (current.dist >= depth) continue;
-
-      // Outgoing relationships
-      const rels = this._relationshipIndex.get(current.id);
-      if (rels) {
-        for (const [type, typeRels] of rels) {
-          for (const rel of typeRels) {
-            const edgeKey = `${current.id}|${rel.targetId}|${type}`;
-            if (!seenEdges.has(edgeKey)) {
-              edges.push({ from: current.id, to: rel.targetId, label: type });
-              seenEdges.add(edgeKey);
-            }
-            if (!visited.has(rel.targetId)) {
-              visited.add(rel.targetId);
-              queue.push({ id: rel.targetId, dist: current.dist + 1 });
-            }
-          }
+      for (const relationships of this._relationshipIndex.get(current.identity)?.values() ?? []) {
+        for (const rel of relationships) {
+          const from = rel.fromIdentity ?? rel.fromId;
+          const to = rel.targetIdentity ?? rel.targetId;
+          const edgeKey = `${from}|${to}|${rel.type}`;
+          if (!seenEdges.has(edgeKey)) { edges.push({ from, to, label: rel.type, relationship: rel }); seenEdges.add(edgeKey); }
+          if (!visited.has(to)) { visited.add(to); queue.push({ identity: to, dist: current.dist + 1 }); }
         }
       }
-
-      // Incoming relationships (reverse direction)
-      const reverseRels = this._reverseRelationshipIndex.get(current.id);
-      if (reverseRels) {
-        for (const [type, typeRels] of reverseRels) {
-          for (const rel of typeRels) {
-            const edgeKey = `${rel.fromId}|${current.id}|${type}`;
-            if (!seenEdges.has(edgeKey)) {
-              edges.push({ from: rel.fromId, to: current.id, label: type });
-              seenEdges.add(edgeKey);
-            }
-            if (!visited.has(rel.fromId)) {
-              visited.add(rel.fromId);
-              queue.push({ id: rel.fromId, dist: current.dist + 1 });
-            }
-          }
+      for (const relationships of this._reverseRelationshipIndex.get(current.identity)?.values() ?? []) {
+        for (const rel of relationships) {
+          const from = rel.fromIdentity ?? rel.fromId;
+          const to = rel.targetIdentity ?? rel.targetId;
+          const edgeKey = `${from}|${to}|${rel.type}`;
+          if (!seenEdges.has(edgeKey)) { edges.push({ from, to, label: rel.type, relationship: rel }); seenEdges.add(edgeKey); }
+          if (!visited.has(from)) { visited.add(from); queue.push({ identity: from, dist: current.dist + 1 }); }
         }
       }
     }
-
-    // Build DOT output
-    const lines: string[] = [
-      "digraph Traceability {",
-      "  rankdir=LR;",
-      '  node [shape=box, style="rounded,filled", fontname="Helvetica"];',
-      '  edge [fontname="Helvetica", fontsize=10];',
-    ];
-
-    for (const id of visited) {
-      const nodeItem = this.getItem(id);
-      if (!nodeItem) continue;
-      const color = ROLE_COLORS[nodeItem.role] || "#AAAAAA";
-      const label = `${nodeItem.id}\\n${(nodeItem.title || "").substring(0, 40)}`;
-      lines.push(
-        `  "${id}" [fillcolor="${color}", fontcolor=white, label="${label}"];`,
-      );
+    const lines = ["digraph Traceability {", "  rankdir=LR;", '  node [shape=box, style="rounded,filled", fontname="Helvetica"];', '  edge [fontname="Helvetica", fontsize=10];'];
+    for (const identity of visited) {
+      const item = this._items.get(identity);
+      if (!item) continue;
+      const color = ROLE_COLORS[item.role] || "#AAAAAA";
+      const label = `${item.id}\n${(item.title || "").substring(0, 40)}`;
+      lines.push(`  "${identity}" [fillcolor="${color}", fontcolor=white, label="${label}"];`);
     }
-
-    for (const e of edges) {
-      if (visited.has(e.from) && visited.has(e.to)) {
-        const relKey = `${e.from}-${e.label}-${e.to}`;
-        const bidir = this._relationships.get(relKey)?.bidirectional;
-        const attrs = bidir
-          ? `label="${e.label}", dir=both, style=dashed`
-          : `label="${e.label}"`;
-        lines.push(`  "${e.from}" -> "${e.to}" [${attrs}];`);
-      }
+    for (const edge of edges) {
+      if (!visited.has(edge.from) || !visited.has(edge.to)) continue;
+      const attrs = edge.relationship.bidirectional ? `label="${edge.label}", dir=both, style=dashed` : `label="${edge.label}"`;
+      lines.push(`  "${edge.from}" -> "${edge.to}" [${attrs}];`);
     }
-
     lines.push("}");
     return lines.join("\n");
   }
@@ -1219,7 +853,7 @@ export class TraceabilityGraph {
     const item = this.getItem(itemId);
     if (!item) return "";
 
-    const rels = this._relationshipIndex.get(itemId);
+    const rels = this._relationshipIndex.get(itemIdentity(item));
     const satisfiedTypes = new Set<string>();
     if (rels) {
       for (const type of rels.keys()) {
@@ -1326,7 +960,7 @@ export class TraceabilityGraph {
    */
   getPrefixMaxima(): Map<string, { start: number; width: number }> {
     const maxima = new Map<string, { start: number; width: number }>();
-    for (const id of this._items.keys()) {
+    for (const { id } of this._items.values()) {
       const m = /^(.*)-(\d+)$/.exec(id);
       if (!m) continue;
       const prefix = m[1];
@@ -1351,26 +985,15 @@ export class TraceabilityGraph {
    * Update the relationship index for fast queries
    */
   private _updateRelationshipIndex(relationship: ItemRelationship): void {
-    // Update forward index: fromId -> type -> [Relationships]
-    if (!this._relationshipIndex.has(relationship.fromId)) {
-      this._relationshipIndex.set(relationship.fromId, new Map());
-    }
-    const fromIndex = this._relationshipIndex.get(relationship.fromId)!;
-    if (!fromIndex.has(relationship.type)) {
-      fromIndex.set(relationship.type, []);
-    }
-    fromIndex.get(relationship.type)?.push(relationship);
-
-    // Update reverse index: targetId -> type -> [Relationships]
-    if (!this._reverseRelationshipIndex.has(relationship.targetId)) {
-      this._reverseRelationshipIndex.set(relationship.targetId, new Map());
-    }
-    const targetIndex = this._reverseRelationshipIndex.get(
-      relationship.targetId,
-    )!;
-    if (!targetIndex.has(relationship.type)) {
-      targetIndex.set(relationship.type, []);
-    }
-    targetIndex.get(relationship.type)?.push(relationship);
+    const from = relationship.fromIdentity ?? relationship.fromId;
+    const target = relationship.targetIdentity ?? relationship.targetId;
+    if (!this._relationshipIndex.has(from)) this._relationshipIndex.set(from, new Map());
+    const fromIndex = this._relationshipIndex.get(from)!;
+    if (!fromIndex.has(relationship.type)) fromIndex.set(relationship.type, []);
+    fromIndex.get(relationship.type)!.push(relationship);
+    if (!this._reverseRelationshipIndex.has(target)) this._reverseRelationshipIndex.set(target, new Map());
+    const targetIndex = this._reverseRelationshipIndex.get(target)!;
+    if (!targetIndex.has(relationship.type)) targetIndex.set(relationship.type, []);
+    targetIndex.get(relationship.type)!.push(relationship);
   }
 }

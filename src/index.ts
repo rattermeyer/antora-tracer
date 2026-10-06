@@ -319,22 +319,20 @@ export class RequirementsTraceabilityExtension {
   /**
    * Get relationships from an item
    */
-  getRelationships(fromId: string, type?: string): ItemRelationship[] {
-    return this.graph.getRelationships(fromId, type);
+  getRelationships(fromId: string, type?: string, component?: string, version?: string): ItemRelationship[] {
+    return this.graph.getRelationships(fromId, type, component, version);
   }
 
   /**
    * Get items related to a given item
    */
-  getRelatedItems(itemId: string, relationType?: string): Item[] {
-    return this.graph.getRelatedItems(itemId, relationType);
+  getRelatedItems(itemId: string, relationType?: string, component?: string, version?: string): Item[] {
+    return this.graph.getRelatedItems(itemId, relationType, component, version);
   }
 
-  /**
-   * Get items with relation to a given item (reverse)
-   */
-  getItemsWithRelationTo(itemId: string, relationType?: string): Item[] {
-    return this.graph.getItemsWithRelationTo(itemId, relationType);
+  /** Get items with relation to a given item (reverse). */
+  getItemsWithRelationTo(itemId: string, relationType?: string, component?: string, version?: string): Item[] {
+    return this.graph.getItemsWithRelationTo(itemId, relationType, component, version);
   }
 
   /**
@@ -370,15 +368,15 @@ export class RequirementsTraceabilityExtension {
   /**
    * Find path between two items
    */
-  findPath(fromId: string, toId: string, maxDepth?: number): string[] | null {
-    return this.graph.findPath(fromId, toId, maxDepth);
+  findPath(fromId: string, toId: string, maxDepth?: number, component?: string, version?: string): string[] | null {
+    return this.graph.findPath(fromId, toId, maxDepth, component, version);
   }
 
   /**
    * Get impact analysis (all reachable items)
    */
-  getImpactAnalysis(itemId: string): string[] {
-    return this.graph.getImpactAnalysis(itemId);
+  getImpactAnalysis(itemId: string, component?: string, version?: string): string[] {
+    return this.graph.getImpactAnalysis(itemId, component, version);
   }
 
   /**

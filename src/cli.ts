@@ -895,6 +895,7 @@ exportProgram
             pubUrl: file.pubUrl,
           });
         }
+        extension.graph.canonicalizeRelationships();
       } else {
         console.error(chalk.red("Error: Provide -i <dir> or a playbook path"));
         process.exit(1);

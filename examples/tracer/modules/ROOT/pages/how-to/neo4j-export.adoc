@@ -27,28 +27,34 @@ Use `--config` or `--preset` to specify your configuration.
 
 Two files are produced:
 
-- `nodes.csv` — all items with `id`, `role`, `title`, and attributes
-- `relationships.csv` — all relationships with `fromId`, `targetId`, and `type`
+- `nodes.csv` — items with authored `id`, canonical `identity`, `component`, `version`, `role`, `title`, and attributes.
+- `relationships.csv` — edges with canonical `source` and `target` identities, authored `sourceId` and `targetId`, and `type`.
 
-Import into Neo4j:
+For playbook exports, `identity` combines the component, version, and authored item ID with NUL separators.
+Unscoped local exports keep the authored ID as `identity`.
+Relationship `source` and `target` reference these canonical node identities.
+`sourceId` and `targetId` keep the authored IDs.
+
+Import into Neo4j using `identity` as the node key:
 
 [source,cypher]
 ----
 LOAD CSV WITH HEADERS FROM 'file:///nodes.csv' AS row
-CREATE (n:Item {id: row.id, role: row.role, title: row.title});
+CREATE (n:Item {id: row.id, identity: row.identity, component: row.component, version: row.version, role: row.role, title: row.title});
 
 LOAD CSV WITH HEADERS FROM 'file:///relationships.csv' AS row
-MATCH (a:Item {id: row.fromId}), (b:Item {id: row.targetId})
-CREATE (a)-[r:RELATES {type: row.type}]->(b);
+MATCH (a:Item {identity: row.source}), (b:Item {identity: row.target})
+CREATE (a)-[r:RELATES {type: row.type, sourceId: row.sourceId, targetId: row.targetId}]->(b);
 ----
 
 Create indexes for faster queries:
 
 [source,cypher]
 ----
-CREATE INDEX item_id FOR (n:Item) ON (n.id);
+CREATE INDEX item_identity FOR (n:Item) ON (n.identity);
 CREATE INDEX item_role FOR (n:Item) ON (n.role);
 ----
+
 
 == Cypher format
 
