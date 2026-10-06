@@ -2,6 +2,15 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.30.0] — 2026-10-06
+
+### Added
+- Playbook graphs and Neo4j exports preserve component- and version-scoped item identity and relationship endpoints, while unscoped local exports retain bare-ID identity.
+- Graph queries resolve scoped relationships across components and versions, retaining same-scope duplicate detection and warning on ambiguous out-of-scope targets.
+
+### Fixed
+- Preserve authored item IDs when deriving per-prefix seed maxima from scoped graph storage.
+
 ## [0.29.0] — 2026-10-05
 
 ### Added
