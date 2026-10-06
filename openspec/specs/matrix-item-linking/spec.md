@@ -157,6 +157,7 @@ When Antora's `indexify` URL style is active (root-level pages are served as `pa
 ### Requirement: Matrix links resolve partial-defined items to rendered pages
 The HTML matrix SHALL link an item defined in an Antora partial to the page that includes the partial.
 The link SHALL use the including page's published URL and the item's explicit ID fragment.
+The target lookup SHALL accept partial includes with optional attributes and normalize equivalent absolute and relative partial paths.
 The partial source SHALL remain available for source metadata and tooltips but SHALL NOT be emitted as a navigable file URL.
 
 #### Scenario: Matrix row links to an item defined in a partial
@@ -178,3 +179,13 @@ The partial source SHALL remain available for source metadata and tooltips but S
 - **WHEN** a matrix item comes from a partial with no discoverable including page
 - **THEN** the matrix SHALL not emit a file URL to the partial
 - **AND** existing no-link or safe fallback behavior SHALL be preserved
+
+#### Scenario: Matrix link resolves an include with attributes
+- **WHEN** an HTML matrix contains an item defined in a partial included with attributes
+- **THEN** the item link SHALL target the including page with the explicit item anchor
+- **AND** the href SHALL NOT contain the partial source path
+
+#### Scenario: Matrix link resolves an equivalent relative path
+- **WHEN** an item source uses an absolute module path
+- **AND** the including page uses the equivalent relative partial path
+- **THEN** the matrix link SHALL resolve to the including page URL

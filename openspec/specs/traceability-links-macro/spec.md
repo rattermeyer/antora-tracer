@@ -273,6 +273,8 @@ The system SHALL provide a `traceability:links[]` macro that expands to a combin
 ### Requirement: Cross-module and cross-component xref resolution
 When an item in one module has relationships to items in other modules or components, the `traceability:outgoing[]` and `traceability:incoming[]` macros SHALL generate xrefs with the correct Antora prefix (`component:module:` or `module:`) so Antora can resolve them correctly.
 When a relationship target is defined in an Antora partial, the macros SHALL resolve the target to the Antora page that includes that partial and use the explicit item ID as its fragment.
+The target lookup SHALL recognize supported partial include directives with optional attributes and equivalent absolute or relative partial paths.
+The generated xref SHALL preserve component and module qualification.
 If no including page is discoverable, the implementation SHALL retain the existing safe fallback rather than linking to the partial source file.
 
 #### Scenario: Outgoing xref to an item in a different module
