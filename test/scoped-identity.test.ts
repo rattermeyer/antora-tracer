@@ -1,10 +1,11 @@
 import * as fs from "node:fs";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect } from "chai";
-import { Neo4jExporter } from "../src/Neo4jExporter.js";
+import { ConfigLoader } from "../src/config/TraceabilityConfig.js";
 import { RequirementsTraceabilityExtension } from "../src/index.js";
+import { Neo4jExporter } from "../src/Neo4jExporter.js";
 import { TraceabilityGraph } from "../src/TraceabilityGraph.js";
 import { itemIdentity } from "../src/types.js";
 
@@ -79,6 +80,42 @@ describe("component-scoped graph identity", () => {
       component: "foo",
       version: "1",
     });
+  });
+
+  it("merges reverse-authored scoped relations without duplicate warnings", () => {
+    const configDir = mkdtempSync(join(tmpdir(), "scoped-relation-config-"));
+    try {
+      const configPath = join(configDir, "traceability.yml");
+      writeFileSync(
+        configPath,
+        "roles: [objective, requirement]\nrelations:\n  objective:\n    requirement:\n      leads_to:\n        reverse: is_derived_from\n",
+      );
+      const loader = new ConfigLoader();
+      loader.load(configPath);
+      const extension = new RequirementsTraceabilityExtension(loader);
+      extension.process(
+        "[#OBJ-001, item, role=objective]\n====\nleads_to:REQ-001[]\n====\n",
+        { sourceFile: "a.adoc", component: "project", version: "1" },
+      );
+      extension.process(
+        "[#REQ-001, item, role=requirement]\n====\nis_derived_from:OBJ-001[]\n====\n",
+        { sourceFile: "b.adoc", component: "project", version: "1" },
+      );
+      extension.graph.canonicalizeRelationships();
+
+      const relationships = extension.getAllRelationships();
+      expect(relationships).to.have.length(1);
+      expect(relationships[0]).to.include({
+        fromId: "OBJ-001",
+        targetId: "REQ-001",
+        type: "leads_to",
+        bidirectional: true,
+        inverseOf: "REQ-001-is_derived_from-OBJ-001",
+      });
+      expect(extension.graph.getDuplicateWarnings()).to.be.empty;
+    } finally {
+      rmSync(configDir, { recursive: true, force: true });
+    }
   });
 
   it("resolves duplicate endpoint IDs within each relationship's own scope", () => {

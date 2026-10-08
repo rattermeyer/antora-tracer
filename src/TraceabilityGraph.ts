@@ -227,7 +227,7 @@ export class TraceabilityGraph {
     const key = `${relationship.fromIdentity}\u0000${relationship.type}\u0000${relationship.targetIdentity}`;
     const existing = this._relationships.get(key);
     if (existing) {
-      if (wasReverse) {
+      if (wasReverse || relationship.bidirectional) {
         existing.bidirectional = true;
         existing.inverseOf = relationship.id;
       } else if (!existing.bidirectional) {
