@@ -8,6 +8,7 @@ import * as fs from "node:fs";
 import * as http from "node:http";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
+import { tmpdir } from "node:os";
 import { promisify } from "node:util";
 import { expect } from "chai";
 
@@ -1006,6 +1007,28 @@ Content.
       expect(res.stdout.trim()).to.equal("REQ-055");
       expect(seenPath).to.equal("/next-id?prefix=REQ");
       expect(seenAuth).to.equal("Bearer secret-token");
+    });
+    it("accepts an input directory outside the working directory", async () => {
+      fs.mkdirSync(tempDir, { recursive: true });
+      const externalDir = fs.mkdtempSync(
+        path.join(tmpdir(), "antora-tracer-input-"),
+      );
+      fs.writeFileSync(
+        path.join(externalDir, "requirements.adoc"),
+        '[#REQ-001, item, role=requirement, title="External"]\n--\nText\n--\n',
+      );
+
+      try {
+        const res = await runNextId(
+          ["-p", "REQ", "-i", externalDir, "--local"],
+          {},
+          { cwd: tempDir },
+        );
+        expect(res.status).to.equal(0);
+        expect(res.stdout.trim()).to.equal("REQ-002");
+      } finally {
+        fs.rmSync(externalDir, { recursive: true, force: true });
+      }
     });
     it("resolves token environment variables for remote allocation", async () => {
       let seenAuth = "";

@@ -183,25 +183,14 @@ function collectAdocFiles(
 ): { path: string; content: string }[] {
   const resolvedPath = resolve(process.cwd(), inputPath);
 
-  // Validate path is within project directory to prevent path traversal
-  const projectRoot = process.cwd();
-  const normalizedPath = resolve(resolvedPath);
-  const normalizedProjectRoot = resolve(projectRoot);
-
-  if (
-    !normalizedPath.startsWith(normalizedProjectRoot + sep) &&
-    normalizedPath !== normalizedProjectRoot
-  ) {
-    console.error(
-      chalk.red(`Error: Path escapes project directory: ${inputPath}`),
-    );
-    process.exit(1);
-  }
+  // Input paths are explicit read targets and may be outside the working
+  // directory. Output paths remain restricted by ensureDirectory().
 
   if (!existsSync(resolvedPath)) {
     console.error(chalk.red(`Error: Input not found: ${inputPath}`));
     process.exit(1);
   }
+
   const stat = statSync(resolvedPath);
   if (stat.isDirectory()) {
     // Prune generated/vendored trees during traversal: enumerating first

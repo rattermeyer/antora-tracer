@@ -267,6 +267,7 @@ npx antora-tracer next-id --prefix REQ --local -i docs/
 | string
 | Input file or directory to scan for existing IDs.
 Required for a local scan; ignored when a remote allocator is used.
+The path may be relative to the working directory or an absolute path outside it; input files are read-only scan targets.
 
 | `--local`
 | flag
