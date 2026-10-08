@@ -2,6 +2,12 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.30.1] — 2026-10-08
+
+### Fixed
+- CLI input scanning accepts paths outside the project root.
+- Scoped reverse-authored relations now merge after endpoint resolution without a false duplicate error.
+
 ## [0.30.0] — 2026-10-06
 
 ### Added
