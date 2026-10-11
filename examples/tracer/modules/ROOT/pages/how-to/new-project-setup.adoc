@@ -67,17 +67,19 @@ npx antora antora-playbook.yml
 ----
 
 The build should complete without errors.
-The extension is active — you'll see a `traceability/` directory in your output with an index page.
+The example playbook writes generated files to `.tracer/traceability/` under Antora's configured output directory.
+Other projects use `traceability/` by default; set `outputDir` to choose another location.
+Matrix links in navigation resolve through Antora attachments under `_attachments/traceability/`, independent of `outputDir`.
 
 At this stage the matrices are empty because you haven't written any items yet.
 Continue to xref:how-to/write-traceable-items.adoc[How to write traceable items].
 
 == Add navigation links to traceability output
 
-By default, the extension adds a "Traceability" section to your site navigation.
-If your `nav.adoc` already has traceability entries, they'll be merged.
-
-To control whether traceability pages appear in navigation, set `includeInNavigation`:
+By default, the extension adds each generated HTML matrix to a "Traceability" section in site navigation.
+It reuses an existing "Traceability" section and skips matrix links already present.
+CSV files are not added to navigation.
+To disable automatic matrix navigation, set `includeInNavigation`:
 
 [source,yaml]
 ----

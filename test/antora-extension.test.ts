@@ -253,8 +253,7 @@ describe("AntoraTraceabilityExtension", () => {
 
       // Should register handlers for all three events
       expect(ctx.events.contentClassified).to.exist;
-      expect(ctx.events.sitePublished).to.exist;
-      expect(ctx.events.beforeSiteGenerated).to.exist;
+      expect(ctx.events.navigationBuilt).to.exist;
     });
   });
 
@@ -3152,6 +3151,203 @@ The system shall authenticate users.
       expect(addedFiles).to.have.length(0);
       expect(existing.contents).to.be.instanceOf(Buffer);
       expect(existing.contents.toString()).to.not.equal("stale");
+    });
+  });
+
+  describe("Traceability Navigation", () => {
+    type NavigationNode = {
+      content?: string;
+      url?: string;
+      urlType?: string;
+      items?: NavigationNode[];
+      root?: boolean;
+      order?: number;
+    };
+    type TestFile = {
+      path: string;
+      contents: Buffer;
+      src: {
+        path: string;
+        relative: string;
+        basename: string;
+        stem: string;
+        extname: string;
+        module: string;
+        component: string;
+        version: string;
+        family: string;
+      };
+      nav?: { index: number };
+    };
+    type TestCatalog = {
+      registerComponentVersion: (component: string, version: string) => void;
+      addFile: (file: TestFile) => TestFile;
+    };
+    type TestNavigationCatalog = {
+      getNavigation: (
+        component: string,
+        version: string,
+      ) => NavigationNode[] | undefined;
+    };
+
+    function createNavigationCatalog(includeNav = true) {
+      const require = createRequire(import.meta.url);
+      // Antora exposes these CommonJS packages without TypeScript declarations.
+      const ContentCatalog =
+        require("@antora/content-classifier/content-catalog") as new () => TestCatalog;
+      const NavigationBuilder = require("@antora/navigation-builder") as (
+        catalog: TestCatalog,
+      ) => TestNavigationCatalog;
+      const Vinyl = require("vinyl") as new (options: {
+        path: string;
+        contents: Buffer;
+      }) => TestFile;
+      const contentCatalog = new ContentCatalog();
+      contentCatalog.registerComponentVersion("test-component", "1.0.0");
+
+      const files = [
+        ...(includeNav
+          ? [
+              {
+                module: "requirements",
+                family: "nav",
+                relative: "nav.adoc",
+                content:
+                  "* Overview\n* Traceability\n** xref:attachment$traceability/matrix-requirements-to-tests.html[Requirements to tests]\n",
+              },
+            ]
+          : []),
+        {
+          family: "attachment",
+          module: "ROOT",
+          relative: "traceability/matrix-requirements-to-tests.html",
+          content: "<html></html>",
+        },
+        {
+          family: "attachment",
+          module: "requirements",
+          relative: "traceability/matrix-requirements-to-tests.html",
+          content: "<html></html>",
+        },
+        {
+          family: "attachment",
+          module: "ROOT",
+          relative: "traceability/matrix-other.html",
+          content: "<html></html>",
+        },
+        {
+          family: "attachment",
+          module: "ROOT",
+          relative: "traceability/matrix-requirements-to-tests.csv",
+          content: "id,title\n",
+        },
+      ];
+
+      for (const { family, relative, content, module } of files) {
+        const path = `modules/${module}/${family === "nav" ? "" : "attachments/"}${relative}`;
+        const basename = relative.split("/").pop()!;
+        const extension = basename.slice(basename.lastIndexOf("."));
+        const file = new Vinyl({ path, contents: Buffer.from(content) });
+        file.src = {
+          path,
+          relative,
+          basename,
+          stem: basename.slice(0, -extension.length),
+          extname: extension,
+          module,
+          component: "test-component",
+          version: "1.0.0",
+          family,
+        };
+        if (family === "nav") file.nav = { index: 0 };
+        contentCatalog.addFile(file);
+      }
+
+      return {
+        contentCatalog,
+        navigationCatalog: NavigationBuilder(contentCatalog),
+      };
+    }
+
+    it("adds HTML matrices to the existing Traceability section only once", async () => {
+      const { contentCatalog, navigationCatalog } = createNavigationCatalog();
+      const ctx = createMockContext();
+      new AntoraTraceabilityExtension(
+        ctx as unknown as ConstructorParameters<
+          typeof AntoraTraceabilityExtension
+        >[0],
+      );
+      await waitForInit();
+
+      ctx.fireEvent("navigationBuilt", { contentCatalog, navigationCatalog });
+
+      const navigation =
+        navigationCatalog.getNavigation("test-component", "1.0.0") ?? [];
+      const rootItems = navigation.flatMap((entry) => entry.items ?? []);
+      const traceability = rootItems.find(
+        (entry) => entry.content === "Traceability",
+      );
+      const items = traceability?.items ?? [];
+      expect(rootItems.map((entry) => entry.content)).to.include("Overview");
+      expect(items.map((entry) => entry.url)).to.include(
+        "/test-component/1.0.0/_attachments/traceability/matrix-other.html",
+      );
+      expect(
+        items.filter((entry) =>
+          entry.url?.endsWith(
+            "_attachments/traceability/matrix-requirements-to-tests.html",
+          ),
+        ),
+      ).to.have.length(1);
+      expect(items.some((entry) => entry.url?.endsWith(".csv"))).to.equal(
+        false,
+      );
+    });
+
+    it("creates a Traceability section when no navigation exists", async () => {
+      const { contentCatalog, navigationCatalog } =
+        createNavigationCatalog(false);
+      const ctx = createMockContext();
+      new AntoraTraceabilityExtension(
+        ctx as unknown as ConstructorParameters<
+          typeof AntoraTraceabilityExtension
+        >[0],
+      );
+      await waitForInit();
+
+      ctx.fireEvent("navigationBuilt", { contentCatalog, navigationCatalog });
+
+      const navigation =
+        navigationCatalog.getNavigation("test-component", "1.0.0") ?? [];
+      const section = navigation
+        .flatMap((entry) => entry.items ?? [])
+        .find((entry) => entry.content === "Traceability");
+      expect(section?.items?.map((entry) => entry.url)).to.include(
+        "/test-component/1.0.0/_attachments/traceability/matrix-other.html",
+      );
+    });
+
+    it("does not add matrices when includeInNavigation is false", async () => {
+      const { contentCatalog, navigationCatalog } = createNavigationCatalog();
+      const navigationBefore = JSON.stringify(
+        navigationCatalog.getNavigation("test-component", "1.0.0"),
+      );
+      const ctx = createMockContext();
+      new AntoraTraceabilityExtension(
+        ctx as unknown as ConstructorParameters<
+          typeof AntoraTraceabilityExtension
+        >[0],
+        { config: { includeInNavigation: false } },
+      );
+      await waitForInit();
+
+      ctx.fireEvent("navigationBuilt", { contentCatalog, navigationCatalog });
+
+      expect(
+        JSON.stringify(
+          navigationCatalog.getNavigation("test-component", "1.0.0"),
+        ),
+      ).to.equal(navigationBefore);
     });
   });
 

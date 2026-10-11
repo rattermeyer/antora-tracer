@@ -110,7 +110,7 @@ Already have an Antora site? Skip to step 2.
    npx antora antora-playbook.yml
    ```
 
-Open `_site/traceability/index.html` — you'll find matrices and a coverage report.
+For this repository's playbook, open `public/docs/.tracer/traceability/index.html`. Other playbooks generate it at `<output.dir>/<outputDir>/index.html`.
 
 For a complete working project that uses the published npm package, see the
 https://github.com/rattermeyer/antora-tracer-demo[antora-tracer-demo] repository.
@@ -290,7 +290,7 @@ antora:
 | `outputDir` | string | `traceability` | Output directory under site root |
 | `generateMatrices` | boolean | `true` | Generate traceability matrices |
 | `matrixFormats` | string[] | `['html','csv']` | Output formats |
-| `includeInNavigation` | boolean | `true` | Add traceability pages to site navigation |
+| `includeInNavigation` | boolean | `true` | Add generated HTML matrices to the Traceability section in site navigation |
 
 ### Traceability YAML Structure
 

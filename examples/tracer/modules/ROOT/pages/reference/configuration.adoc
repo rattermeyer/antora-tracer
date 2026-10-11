@@ -41,7 +41,7 @@ antora:
 | `outputDir`
 | string
 | `traceability`
-| Output directory relative to the site output root
+| Directory relative to Antora's `output.dir` for direct output files; use `.tracer/traceability` to keep them in a hidden build subdirectory. Attachment URLs remain under `_attachments/traceability/`.
 
 | `generateMatrices`
 | boolean
@@ -56,7 +56,7 @@ antora:
 | `includeInNavigation`
 | boolean
 | `true`
-| Add traceability pages to the Antora site navigation
+| Add generated HTML matrices to the Traceability navigation section, merging with existing entries and skipping links already present.
 
 | `krokiImageFormat`
 | string

@@ -79,7 +79,7 @@ antora:
 ----
 . Project lead creates a `traceability.yml` file extending the preset with any project-specific roles, relations, or matrices
 . Project lead adds `:traceability-links:` document attributes to the pages where relationship macros should render
-. Project lead adds matrix links to the site navigation (e.g., `xref:attachment$traceability/matrix-requirements-to-design.html[]`)
+. The extension adds generated HTML matrix links to the site navigation by default.
 . Project lead runs a first Antora build to verify the extension initializes and matrices generate without errors
 . Project lead shares the setup with the team — team members can now write items in their AsciiDoc pages
 | Alternate Flows |

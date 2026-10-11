@@ -24,7 +24,7 @@ antora:
   extensions:
     - require: ./lib/src/antora-extension.js
       configPath: ./examples/traceability.yml
-      outputDir: traceability
+      outputDir: .tracer/traceability
       generateMatrices: true
       matrixFormats: [html, csv]
       includeInNavigation: true
