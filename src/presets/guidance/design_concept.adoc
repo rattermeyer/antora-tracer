@@ -2,6 +2,56 @@
 
 A `design_concept` item records stable architectural knowledge that should remain useful beyond the change that introduced it.
 Use it for a settled, reusable design approach; keep alternatives and decision rationale in an ADR and change-specific detail in the change item.
+Document visually, use class diagrams, sequence, state or activity diagrams.
+Follow the C4 model, contexts, containers, components.
+Use ER diagrams where useful.
+
+Use `plantuml` for writing diagrams.
+
+== Document Structure
+
+The document structure follows the arc42 template.
+When writing into the architecture document, have the tips in mind regarding the different sections available on https://docs.arc42.org, especially
+
+[cols="1a,3a"]
+|===
+| Section | What to find
+| * https://docs.arc42.org/section-1/[Introduction and Goals]
+| Plain Text
+
+| * https://docs.arc42.org/section-2/[Constraints]
+| Constraints are a special type of requirements, Prefix: `CON`.
+
+| * https://docs.arc42.org/section-3/[Context and Scopes]
+| Plain Text and Context Diagrams
+
+| * https://docs.arc42.org/section-4/[Solution Strategy]
+| Design Concepts
+
+| * https://docs.arc42.org/section-5/[Building Block View]
+|
+* Level 1: Design Concepts
+* Level 2: Design Concepts / Design Elements
+* Level 3+: Design Elements
+
+| * https://docs.arc42.org/section-6/[Runtime View]
+| Design Concepts, Design Elements, Plain Text and Diagrams
+
+| * https://docs.arc42.org/section-7/[Deployment View]
+| Design Concepts, Design Elements, Plain Text and Diagrams
+
+| * https://docs.arc42.org/section-8/[Crosscutting Concepts]
+| Design Concepts and Diagrams
+
+| * https://docs.arc42.org/section-9/[Architecture Decisions]
+| Plain Text
+
+| * https://docs.arc42.org/section-10/[Quality Requirements]
+| Following quality42 structure, system- or product qualities, quality characteristics, dimension
+
+| * https://docs.arc42.org/section-11/[Risks and Technical Debt]
+| * https://docs.arc42.org/section-12/[Glossary]
+|===
 
 == Traceability
 
