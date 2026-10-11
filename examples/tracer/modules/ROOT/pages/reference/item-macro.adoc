@@ -25,6 +25,14 @@ Both `--` (open block) and `====` (example block) are valid delimiters for the i
 The choice is presentational — the parser treats them identically.
 This documentation uses `--`.
 
+=== Item content boundaries
+
+The parser stores only text between the delimiters as item content.
+Section headings such as `=== Rationale` inside the block render as literal text, not as AsciiDoc sections.
+A heading outside the block renders normally, but its text is not part of the graph item or its exports.
+Keep item prose and relationship macros inside the block so they belong to the item.
+Keep display macros such as `tracer:links[]` inside the block; the extension expands them only there.
+
 To add a CSS class to the rendered item block, prefix the ID with the `.tracer` role:
 
 [source,asciidoc]

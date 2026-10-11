@@ -134,9 +134,12 @@ include::partial$04-solution-strategy.adoc[]
 [source,asciidoc]
 ----
 // partials/04-solution-strategy.adoc
-[#ARC-005, item, role=design]
 == Solution Strategy
-...
+
+[#ARC-005, item, role=design, title="Zero operational overhead"]
+--
+Description of how zero operational overhead is achieved.
+--
 ----
 
 Partials are processed on equal footing with pages.
