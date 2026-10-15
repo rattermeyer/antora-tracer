@@ -64,6 +64,7 @@
     "@antora/assembler": "1.0.0-beta.20",
     "@antora/cli": "3.1",
     "@antora/lunr-extension": "^1.0.0-alpha.13",
+    "@antora/navigation-builder": "3.1.15",
     "@antora/pdf-extension": "1.0.0-beta.20",
     "@antora/site-generator": "3.1",
     "@biomejs/biome": "^2.5.5",

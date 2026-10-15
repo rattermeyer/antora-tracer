@@ -47,6 +47,9 @@ importers:
       '@antora/lunr-extension':
         specifier: ^1.0.0-alpha.13
         version: 1.0.0-alpha.13(patch_hash=ff6e4cf6e1d0217ddd57b41d8c6d09fe04af65a23b712d37f249be15fab38b7a)
+      '@antora/navigation-builder':
+        specifier: 3.1.15
+        version: 3.1.15
       '@antora/pdf-extension':
         specifier: 1.0.0-beta.20
         version: 1.0.0-beta.20
