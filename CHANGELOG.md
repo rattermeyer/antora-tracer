@@ -2,6 +2,12 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.31.0] — 2026-10-21
+
+### Added
+- Named relationship display policies filter outgoing, incoming, and combined links by normalized relation type and endpoint roles or attributes; page-level policies override site/component defaults, including for partial items.
+- Matrices can opt into a named policy to omit matching row-to-cell relationships from cells and coverage.
+
 ## [0.30.0] — 2026-10-06
 
 ### Added
