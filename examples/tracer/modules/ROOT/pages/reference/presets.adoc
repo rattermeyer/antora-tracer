@@ -214,7 +214,7 @@ Each preset YAML file follows this structure:
 
 | `extends`
 | string
-| Name of a parent preset to inherit from. The parent's roles, relations, matrices, and labels are deep-merged under this preset (child wins on conflict).
+| Name of a parent preset to inherit from. The parent's roles, relations, matrices, labels, and `linkDisplayPolicies` are merged under this preset; same-named policies are replaced in full.
 
 | `author`
 | string
@@ -235,6 +235,9 @@ Each preset YAML file follows this structure:
 | `traceability.relations`
 | map
 | `sourceRole → targetRole → type → { reverse }`. Each relation type has a mandatory `reverse` (the authorable name from the other side).
+| `traceability.linkDisplayPolicies`
+| map
+| Named display policies, merged by name during preset inheritance; a child replaces a same-named policy in full.
 
 | `traceability.labels`
 | map
@@ -242,7 +245,7 @@ Each preset YAML file follows this structure:
 
 | `traceability.matrices`
 | object[]
-| Array of matrix definitions (name, rows, columns, coverageRelations)
+| Array of matrix definitions (name, rows, columns, coverageRelations, optional linkDisplayPolicy)
 
 | `neo4j.queries`
 | object[]

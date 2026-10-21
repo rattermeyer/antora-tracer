@@ -18,8 +18,16 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { isAbsolute, join } from "node:path";
 import { deflateSync } from "node:zlib";
 import asciidoctor from "@asciidoctor/core";
-import { ConfigLoader, toConfigDot } from "./config/TraceabilityConfig.js";
+import {
+  ConfigLoader,
+  type LinkDisplayPolicy,
+  toConfigDot,
+} from "./config/TraceabilityConfig.js";
 import { RequirementsTraceabilityExtension } from "./index.js";
+import {
+  linkDisplayPolicyKey,
+  shouldHideRelationship,
+} from "./LinkDisplayPolicy.js";
 import {
   LinkResolver,
   type PartialPageTarget,
@@ -149,6 +157,21 @@ type NavigationBuiltEvent = {
       version: string,
       entries: NavigationEntry[],
     ) => NavigationEntry[];
+  };
+};
+
+type ClassifiedFile = {
+  __isPartial?: boolean;
+  contents?: Buffer;
+  path?: string;
+  pub?: { url?: string };
+  src?: {
+    component?: string;
+    contents?: Buffer;
+    fileUri?: string;
+    module?: string;
+    path?: string;
+    version?: string;
   };
 };
 
@@ -332,7 +355,7 @@ export class AntoraTraceabilityExtension {
    * Base values are stringified since YAML attributes may be booleans/numbers.
    */
   private resolveDocAttributes(
-    file: any,
+    file: ClassifiedFile,
     content: string,
   ): Record<string, string> {
     const component = file.src?.component;
@@ -353,6 +376,25 @@ export class AntoraTraceabilityExtension {
       merged[key] = value == null ? "" : String(value);
     }
     return Object.assign(merged, this.parseDocAttributes(content));
+  }
+
+  private resolveLinkDisplayPolicy(
+    attrs: Record<string, string>,
+    sourceFile: string,
+  ): LinkDisplayPolicy | undefined {
+    const policyName = (attrs["traceability-link-policy"] || "").trim();
+    if (!policyName || policyName.toLowerCase() === "none") return undefined;
+
+    const policy =
+      this.traceability?.configLoader?.getConfig().linkDisplayPolicies?.[
+        policyName
+      ];
+    if (!policy) {
+      throw new Error(
+        `Unknown traceability-link-policy '${policyName}' in '${sourceFile}'`,
+      );
+    }
+    return policy;
   }
 
   private isLinksEnabled(attrs: Record<string, string>): boolean {
@@ -471,18 +513,46 @@ export class AntoraTraceabilityExtension {
    * kinds share the same scan/expand/replace pipeline and differ only in
    * which relationship directions they render.
    */
-  private expandRelationMacros(file: any): void {
+  private expandRelationMacros(file: ClassifiedFile, isPartial = false): void {
     if (!this.traceability) return;
+    const contentsBuffer = file.contents || file.src?.contents;
+    if (!contentsBuffer) return;
+
+    let content: string;
     try {
-      const contentsBuffer = file.contents || file.src?.contents;
-      if (!contentsBuffer) return;
-      const content = contentsBuffer.toString("utf8");
-      const docAttrs = this.resolveDocAttributes(file, content);
+      content = contentsBuffer.toString("utf8");
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(
+        `Error expanding relationship links in ${file.src?.path}: ${message}`,
+      );
+      return;
+    }
+
+    const docAttrs = this.resolveDocAttributes(file, content);
+    const linkDisplayPolicy = this.resolveLinkDisplayPolicy(
+      docAttrs,
+      file.src?.path || file.path || "unknown",
+    );
+
+    const originalContent = content;
+    let policyMarkerAdded = false;
+    if (!isPartial && Object.hasOwn(docAttrs, "traceability-link-policy")) {
+      const policyName = (docAttrs["traceability-link-policy"] || "").trim();
+      const policyKey =
+        policyName && policyName.toLowerCase() !== "none"
+          ? linkDisplayPolicyKey(policyName)
+          : "none";
+      content = `:tracer-link-display-policy-key: ${policyKey}\n${content}`;
+      policyMarkerAdded = true;
+    }
+
+    try {
       const linksEnabled = this.isLinksEnabled(docAttrs);
       const hasMacro = RENDERING_MACRO_NAMESPACES.some((ns) =>
         new RegExp(`${ns}:(?:links|outgoing|incoming)\\[\\]`).test(content),
       );
-      if (!hasMacro && !linksEnabled) return;
+      if (!hasMacro && !linksEnabled && !policyMarkerAdded) return;
 
       const style = this.getLinksStyle(docAttrs);
       const order = this.getLinksOrder(docAttrs);
@@ -530,6 +600,8 @@ export class AntoraTraceabilityExtension {
                   currentModule,
                   emptyStyle,
                   delimiter,
+                  linkDisplayPolicy,
+                  isPartial,
                 )
               : "",
           });
@@ -547,6 +619,8 @@ export class AntoraTraceabilityExtension {
             currentModule,
             emptyStyle,
             delimiter,
+            linkDisplayPolicy,
+            isPartial,
           );
           // Injected output must be separated from the last body line by a
           // blank line, whatever the last block is: after a list item, even a
@@ -560,22 +634,23 @@ export class AntoraTraceabilityExtension {
         }
       }
 
-      if (replacements.length > 0) {
-        let modifiedContent = content;
-        for (let i = replacements.length - 1; i >= 0; i--) {
-          const r = replacements[i];
-          modifiedContent =
-            modifiedContent.slice(0, r.start) +
-            r.text +
-            modifiedContent.slice(r.end);
-        }
+      let modifiedContent = content;
+      for (let i = replacements.length - 1; i >= 0; i--) {
+        const r = replacements[i];
+        modifiedContent =
+          modifiedContent.slice(0, r.start) +
+          r.text +
+          modifiedContent.slice(r.end);
+      }
+      if (modifiedContent !== originalContent) {
         const buf = Buffer.from(modifiedContent, "utf8");
         if (file.contents) file.contents = buf;
         if (file.src?.contents) file.src.contents = buf;
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
       this.logger.warn(
-        `Error expanding relationship links in ${file.src?.path}: ${error.message}`,
+        `Error expanding relationship links in ${file.src?.path}: ${message}`,
       );
     }
   }
@@ -597,7 +672,68 @@ export class AntoraTraceabilityExtension {
     currentModule?: string,
     emptyStyle: "none" | "italic" | "admonition" = "none",
     itemDelimiter?: string,
+    linkDisplayPolicy?: LinkDisplayPolicy,
+    isPartial = false,
   ): string {
+    if (isPartial) {
+      const policies =
+        this.traceability?.configLoader?.getConfig().linkDisplayPolicies ?? {};
+      let variants = "";
+      for (const [name, policy] of Object.entries(policies)) {
+        const policyOutput = this.buildRelationMacroOutput(
+          itemId,
+          macroName,
+          style,
+          order,
+          currentFile,
+          collapsible,
+          currentComponent,
+          currentModule,
+          emptyStyle,
+          itemDelimiter,
+          policy,
+        );
+        const policyKey = linkDisplayPolicyKey(name);
+        variants +=
+          `ifdef::tracer-link-display-policy-key[]\n` +
+          `ifeval::["{tracer-link-display-policy-key}" == "${policyKey}"]\n` +
+          `${policyOutput}\nendif::[]\nendif::[]\n`;
+      }
+
+      const unfilteredOutput = this.buildRelationMacroOutput(
+        itemId,
+        macroName,
+        style,
+        order,
+        currentFile,
+        collapsible,
+        currentComponent,
+        currentModule,
+        emptyStyle,
+        itemDelimiter,
+      );
+      const fallbackOutput = linkDisplayPolicy
+        ? this.buildRelationMacroOutput(
+            itemId,
+            macroName,
+            style,
+            order,
+            currentFile,
+            collapsible,
+            currentComponent,
+            currentModule,
+            emptyStyle,
+            itemDelimiter,
+            linkDisplayPolicy,
+          )
+        : unfilteredOutput;
+      variants += `ifndef::tracer-link-display-policy-key[]\n${fallbackOutput}\nendif::[]\n`;
+      variants +=
+        `ifdef::tracer-link-display-policy-key[]\n` +
+        `ifeval::["{tracer-link-display-policy-key}" == "none"]\n` +
+        `${unfilteredOutput}\nendif::[]\nendif::[]\n`;
+      return variants;
+    }
     const directions: RelationDirection[] =
       macroName === "links" ? ["outgoing", "incoming"] : [macroName];
     const combineGroups =
@@ -607,7 +743,12 @@ export class AntoraTraceabilityExtension {
     let combinedOutputIndex = -1;
 
     for (const direction of directions) {
-      const groups = this.buildRelationGroups(itemId, direction, order);
+      const groups = this.buildRelationGroups(
+        itemId,
+        direction,
+        order,
+        linkDisplayPolicy,
+      );
       if (groups.length > 0) {
         if (combineGroups) {
           if (combinedOutputIndex === -1) {
@@ -660,8 +801,10 @@ export class AntoraTraceabilityExtension {
     itemId: string,
     direction: RelationDirection,
     order: "target-id" | "target-title" | "relation-type",
+    linkDisplayPolicy?: LinkDisplayPolicy,
   ): Array<[string, RelItem[]]> {
     const graph = this.traceability!.graph;
+    const currentItem = graph.getItem(itemId);
     const isOutgoing = direction === "outgoing";
     const rels = isOutgoing
       ? graph.getRelationships(itemId)
@@ -679,6 +822,18 @@ export class AntoraTraceabilityExtension {
         : (this.traceability!.configLoader?.getInverseType(rel.type) ??
           rel.type);
 
+      if (
+        linkDisplayPolicy &&
+        currentItem &&
+        shouldHideRelationship(
+          linkDisplayPolicy,
+          groupKey,
+          currentItem,
+          related,
+        )
+      ) {
+        continue;
+      }
       if (!grouped.has(groupKey)) grouped.set(groupKey, []);
       const successors = graph.isSuperseded(related.id)
         ? graph
@@ -999,7 +1154,7 @@ export class AntoraTraceabilityExtension {
   /**
    * Expand traceability:graph[] macros into Kroki GraphViz images.
    */
-  private expandGraphMacros(file: any): void {
+  private expandGraphMacros(file: ClassifiedFile): void {
     if (!this.traceability) return;
     try {
       const contentsBuffer = file.contents || file.src?.contents;
@@ -1013,8 +1168,7 @@ export class AntoraTraceabilityExtension {
       )
         return;
 
-      const graphEnabled =
-        (file as any).__isPartial || this.isGraphEnabled(docAttrs);
+      const graphEnabled = file.__isPartial || this.isGraphEnabled(docAttrs);
       const blocks = this.findItemBlocks(content);
       const replacements: Array<{ start: number; end: number; text: string }> =
         [];
@@ -1117,9 +1271,10 @@ export class AntoraTraceabilityExtension {
         if (file.contents) file.contents = buf;
         if (file.src?.contents) file.src.contents = buf;
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
       this.logger.warn(
-        `Error expanding graphs in ${file.src?.path}: ${error.message}`,
+        `Error expanding graphs in ${file.src?.path}: ${message}`,
       );
     }
   }
@@ -1127,7 +1282,7 @@ export class AntoraTraceabilityExtension {
   /**
    * Expand traceability:graph-coverage[] macros into Kroki Vega-Lite images.
    */
-  private expandCoverageMacros(file: any): void {
+  private expandCoverageMacros(file: ClassifiedFile): void {
     if (!this.traceability) return;
     try {
       const contentsBuffer = file.contents || file.src?.contents;
@@ -1141,8 +1296,7 @@ export class AntoraTraceabilityExtension {
       )
         return;
 
-      const graphEnabled =
-        (file as any).__isPartial || this.isGraphEnabled(docAttrs);
+      const graphEnabled = file.__isPartial || this.isGraphEnabled(docAttrs);
       const blocks = this.findItemBlocks(content);
       const replacements: Array<{ start: number; end: number; text: string }> =
         [];
@@ -1241,9 +1395,10 @@ export class AntoraTraceabilityExtension {
         if (file.contents) file.contents = buf;
         if (file.src?.contents) file.src.contents = buf;
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
       this.logger.warn(
-        `Error expanding coverage in ${file.src?.path}: ${error.message}`,
+        `Error expanding coverage in ${file.src?.path}: ${message}`,
       );
     }
   }
@@ -1252,7 +1407,7 @@ export class AntoraTraceabilityExtension {
    * Expand traceability:config-graph[] macros into Kroki GraphViz images.
    * Renders the effective traceability configuration (roles + declared relations).
    */
-  private expandConfigGraphMacros(file: any): void {
+  private expandConfigGraphMacros(file: ClassifiedFile): void {
     if (!this.traceability) return;
     try {
       const contentsBuffer = file.contents || file.src?.contents;
@@ -1266,8 +1421,7 @@ export class AntoraTraceabilityExtension {
         return;
 
       const docAttrs = this.resolveDocAttributes(file, content);
-      const graphEnabled =
-        (file as any).__isPartial || this.isGraphEnabled(docAttrs);
+      const graphEnabled = file.__isPartial || this.isGraphEnabled(docAttrs);
 
       // Resolve the effective config once; unavailable config strips the macro.
       let config: ReturnType<typeof this.traceability.getConfig>;
@@ -1322,9 +1476,10 @@ export class AntoraTraceabilityExtension {
         if (file.contents) file.contents = buf;
         if (file.src?.contents) file.src.contents = buf;
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
       this.logger.warn(
-        `Error expanding config graph in ${file.src?.path}: ${error.message}`,
+        `Error expanding config graph in ${file.src?.path}: ${message}`,
       );
     }
   }
@@ -1395,8 +1550,8 @@ export class AntoraTraceabilityExtension {
       // Antora xrefs are version-scoped — an xref from v0.10.x cannot resolve
       // to a page in v0.11.x. Clearing the graph between versions prevents
       // items from one version leaking into another version's xref generation.
-      const groupByVersion = (files: any[]) => {
-        const groups = new Map<string, any[]>();
+      const groupByVersion = (files: ClassifiedFile[]) => {
+        const groups = new Map<string, ClassifiedFile[]>();
         for (const file of files) {
           const key = file.src?.version ?? "unknown";
           if (!groups.has(key)) groups.set(key, []);
@@ -1483,8 +1638,8 @@ export class AntoraTraceabilityExtension {
         // Expand macros on partials — mark them so expand methods default
         // links/graph to enabled (partials have no doc attributes of their own)
         for (const file of partialFilesForVersion) {
-          (file as any).__isPartial = true;
-          this.expandRelationMacros(file);
+          file.__isPartial = true;
+          this.expandRelationMacros(file, true);
           this.expandGraphMacros(file);
           this.expandCoverageMacros(file);
           this.expandConfigGraphMacros(file);

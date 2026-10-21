@@ -7,8 +7,8 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { load as yamlLoad } from "js-yaml";
-import { ROLE_COLORS } from "../types.js";
 import { compileRowFilter } from "../RowFilter.js";
+import { ROLE_COLORS } from "../types.js";
 
 // ============================================================================
 // Configuration Interfaces
@@ -32,6 +32,25 @@ export interface MatrixDefinition {
   columns: string[]; // Role names for columns
   coverageRelations?: Record<string, string[]>; // Which relations count for coverage per column
   rowFilter?: string;
+  linkDisplayPolicy?: string;
+}
+
+/** Item conditions applied to the item displayed or linked by a policy rule. */
+export interface LinkDisplayItemMatcher {
+  role?: string;
+  attributes?: Record<string, string>;
+}
+
+/** A relationship and endpoint pair hidden by a link display policy. */
+export interface LinkDisplayHideRule {
+  relation: string;
+  currentItem: LinkDisplayItemMatcher;
+  relatedItem: LinkDisplayItemMatcher;
+}
+
+/** Named set of relationship links to omit from display. */
+export interface LinkDisplayPolicy {
+  hide: LinkDisplayHideRule[];
 }
 
 /**
@@ -130,6 +149,9 @@ export interface TraceabilityConfig {
    * Relationship definitions: sourceRole -> { targetRole -> { type -> { reverse } } }
    */
   relations?: Record<string, Record<string, Record<string, RelationDef>>>;
+
+  /** Named policies that hide displayed relationships by type and endpoints. */
+  linkDisplayPolicies?: Record<string, LinkDisplayPolicy>;
 
   /**
    * Matrix definitions for generation
@@ -382,6 +404,75 @@ export class ConfigLoader {
     }
     config.relations = normalizedRelations;
 
+    if (
+      typeof config.linkDisplayPolicies === "object" &&
+      config.linkDisplayPolicies !== null &&
+      !Array.isArray(config.linkDisplayPolicies)
+    ) {
+      const normalizedPolicies = { ...config.linkDisplayPolicies };
+      for (const [name, policy] of Object.entries(config.linkDisplayPolicies)) {
+        if (
+          typeof policy !== "object" ||
+          policy === null ||
+          Array.isArray(policy) ||
+          !("hide" in policy) ||
+          !Array.isArray(policy.hide)
+        ) {
+          continue;
+        }
+        normalizedPolicies[name] = {
+          ...policy,
+          hide: policy.hide.map((rule) => {
+            if (
+              typeof rule !== "object" ||
+              rule === null ||
+              Array.isArray(rule)
+            ) {
+              return rule;
+            }
+            const relation = "relation" in rule ? rule.relation : undefined;
+            const currentItem =
+              "currentItem" in rule ? rule.currentItem : undefined;
+            const relatedItem =
+              "relatedItem" in rule ? rule.relatedItem : undefined;
+            return {
+              ...rule,
+              ...(typeof relation === "string"
+                ? { relation: relation.toLowerCase() }
+                : {}),
+              ...(typeof currentItem === "object" &&
+              currentItem !== null &&
+              !Array.isArray(currentItem)
+                ? {
+                    currentItem: {
+                      ...currentItem,
+                      ...("role" in currentItem &&
+                      typeof currentItem.role === "string"
+                        ? { role: currentItem.role.toLowerCase() }
+                        : {}),
+                    },
+                  }
+                : {}),
+              ...(typeof relatedItem === "object" &&
+              relatedItem !== null &&
+              !Array.isArray(relatedItem)
+                ? {
+                    relatedItem: {
+                      ...relatedItem,
+                      ...("role" in relatedItem &&
+                      typeof relatedItem.role === "string"
+                        ? { role: relatedItem.role.toLowerCase() }
+                        : {}),
+                    },
+                  }
+                : {}),
+            };
+          }),
+        };
+      }
+      config.linkDisplayPolicies = normalizedPolicies;
+    }
+
     // Normalize roleGuidance keys to lowercase
     if (config.roleGuidance) {
       const normalizedGuidance: Record<string, RoleGuidance> = {};
@@ -441,6 +532,8 @@ export class ConfigLoader {
       }
     }
 
+    const relationshipTypes = new Set<string>();
+
     // Validate relations structure
     if (config.relations) {
       for (const [sourceRole, targets] of Object.entries(config.relations)) {
@@ -470,6 +563,11 @@ export class ConfigLoader {
           }
 
           for (const [type, def] of Object.entries(typeMap)) {
+            relationshipTypes.add(type.toLowerCase());
+            if (def && typeof def.reverse === "string") {
+              relationshipTypes.add(def.reverse.toLowerCase());
+            }
+
             if (
               !def ||
               typeof def.reverse !== "string" ||
@@ -479,6 +577,140 @@ export class ConfigLoader {
                 `Relation type '${type}' ('${sourceRole}' -> '${targetRole}') must declare a 'reverse'`,
               );
             }
+          }
+        }
+      }
+    }
+
+    const policyNames = new Set<string>();
+    const policyDefinitions: unknown = config.linkDisplayPolicies;
+    if (policyDefinitions !== undefined) {
+      if (
+        typeof policyDefinitions !== "object" ||
+        policyDefinitions === null ||
+        Array.isArray(policyDefinitions)
+      ) {
+        errors.push("linkDisplayPolicies must be a map of named policies");
+      } else {
+        for (const [policyName, policy] of Object.entries(policyDefinitions)) {
+          if (policyName.trim() === "") {
+            errors.push("linkDisplayPolicies policy names must be non-empty");
+          }
+
+          if (policyName.trim().toLowerCase() === "none") {
+            errors.push("linkDisplayPolicies policy name 'none' is reserved");
+          }
+          policyNames.add(policyName);
+          if (
+            typeof policy !== "object" ||
+            policy === null ||
+            Array.isArray(policy)
+          ) {
+            errors.push(
+              `linkDisplayPolicies '${policyName}' must be an object`,
+            );
+            continue;
+          }
+          if (
+            !("hide" in policy) ||
+            !Array.isArray(policy.hide) ||
+            policy.hide.length === 0
+          ) {
+            errors.push(
+              `linkDisplayPolicies '${policyName}' must define a non-empty 'hide' array`,
+            );
+            continue;
+          }
+
+          const validateMatcher = (matcher: unknown, matcherPath: string) => {
+            if (
+              typeof matcher !== "object" ||
+              matcher === null ||
+              Array.isArray(matcher)
+            ) {
+              errors.push(`${matcherPath} must be an object`);
+              return;
+            }
+
+            let hasMatcherCondition = false;
+            if ("role" in matcher) {
+              const role = matcher.role;
+              if (typeof role !== "string" || role.trim() === "") {
+                errors.push(`${matcherPath}.role must be a non-empty string`);
+              } else if (!config.roles.includes(role.toLowerCase())) {
+                errors.push(
+                  `${matcherPath}.role '${role}' is not defined in roles`,
+                );
+              } else {
+                hasMatcherCondition = true;
+              }
+            }
+
+            if ("attributes" in matcher) {
+              const attributes = matcher.attributes;
+              if (
+                typeof attributes !== "object" ||
+                attributes === null ||
+                Array.isArray(attributes) ||
+                Object.keys(attributes).length === 0
+              ) {
+                errors.push(
+                  `${matcherPath}.attributes must be a non-empty map`,
+                );
+              } else {
+                let attributesAreValid = true;
+                for (const [key, value] of Object.entries(attributes)) {
+                  if (key.trim() === "") {
+                    errors.push(
+                      `${matcherPath}.attributes keys must be non-empty`,
+                    );
+                    attributesAreValid = false;
+                  }
+                  if (typeof value !== "string") {
+                    errors.push(
+                      `${matcherPath}.attributes.${key} must be a string`,
+                    );
+                    attributesAreValid = false;
+                  }
+                }
+                hasMatcherCondition ||= attributesAreValid;
+              }
+            }
+
+            if (!hasMatcherCondition) {
+              errors.push(
+                `${matcherPath} must specify a configured role or attributes`,
+              );
+            }
+          };
+
+          for (const [index, rule] of policy.hide.entries()) {
+            const rulePath = `linkDisplayPolicies '${policyName}'.hide[${index}]`;
+            if (
+              typeof rule !== "object" ||
+              rule === null ||
+              Array.isArray(rule)
+            ) {
+              errors.push(`${rulePath} must be an object`);
+              continue;
+            }
+            if (!("relation" in rule) || typeof rule.relation !== "string") {
+              errors.push(`${rulePath}.relation must be a non-empty string`);
+            } else if (rule.relation.trim() === "") {
+              errors.push(`${rulePath}.relation must be a non-empty string`);
+            } else if (!relationshipTypes.has(rule.relation.toLowerCase())) {
+              errors.push(
+                `${rulePath}.relation '${rule.relation}' is not defined in relations`,
+              );
+            }
+            validateMatcher(
+              "currentItem" in rule ? rule.currentItem : undefined,
+              `${rulePath}.currentItem`,
+            );
+            validateMatcher(
+              "relatedItem" in rule ? rule.relatedItem : undefined,
+              `${rulePath}.relatedItem`,
+            );
           }
         }
       }
@@ -510,6 +742,21 @@ export class ConfigLoader {
             );
           }
         }
+        if (matrix.linkDisplayPolicy !== undefined) {
+          if (
+            typeof matrix.linkDisplayPolicy !== "string" ||
+            matrix.linkDisplayPolicy.trim() === ""
+          ) {
+            errors.push(
+              `Matrix '${matrix.name}' linkDisplayPolicy must be a non-empty policy name`,
+            );
+          } else if (!policyNames.has(matrix.linkDisplayPolicy)) {
+            errors.push(
+              `Matrix '${matrix.name}' link display policy '${matrix.linkDisplayPolicy}' is not defined`,
+            );
+          }
+        }
+
         if (matrix.rowFilter !== undefined) {
           if (typeof matrix.rowFilter !== "string") {
             errors.push(`Matrix '${matrix.name}' rowFilter must be a string`);
@@ -751,6 +998,13 @@ export class ConfigLoader {
       }
 
       result.matrices = Array.from(matrixMap.values());
+    }
+
+    if (base.linkDisplayPolicies || override.linkDisplayPolicies) {
+      result.linkDisplayPolicies = {
+        ...(base.linkDisplayPolicies || {}),
+        ...(override.linkDisplayPolicies || {}),
+      };
     }
 
     // Merge labels: user overrides preset values

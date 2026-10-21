@@ -10,12 +10,16 @@
 
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import type { ConfigLoader } from "./config/TraceabilityConfig.js";
+import type {
+  ConfigLoader,
+  LinkDisplayPolicy,
+} from "./config/TraceabilityConfig.js";
+import { shouldHideRelationship } from "./LinkDisplayPolicy.js";
 import type { LinkResolver } from "./LinkResolver.js";
+import { compileRowFilter } from "./RowFilter.js";
 import { TemplateRenderer } from "./TemplateRenderer.js";
 import type { TraceabilityGraph } from "./TraceabilityGraph.js";
 import type { Item, ItemRelationship } from "./types.js";
-import { compileRowFilter } from "./RowFilter.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_TEMPLATE_DIR = path.join(__dirname, "templates");
@@ -55,6 +59,8 @@ export interface MatrixConfig {
   columns: string[]; // Role names for columns
   coverageRelations?: Record<string, string[]>; // Which relations count for coverage per column
   rowFilter?: string;
+
+  linkDisplayPolicy?: string;
 }
 
 /**
@@ -178,6 +184,12 @@ export class MatrixGenerator {
       );
     }
 
+    const linkDisplayPolicy = config.linkDisplayPolicy
+      ? this.configLoader?.getConfig().linkDisplayPolicies?.[
+          config.linkDisplayPolicy
+        ]
+      : undefined;
+
     const rows: MatrixRow[] = [];
 
     // Build rows
@@ -194,11 +206,12 @@ export class MatrixGenerator {
 
         // Collect all related items for this column
         const relatedItems = this.findRelatedItemsWithCache(
-          rowItem.id,
+          rowItem,
           colItemIds,
           coverageRels,
           hasCoverageFilter,
           itemById,
+          linkDisplayPolicy,
         );
         const cellItems = relatedItems.map((rel) => ({
           itemId: rel.id,
@@ -256,23 +269,31 @@ export class MatrixGenerator {
    * This is an optimized version that avoids repeated calls to getItemsByRole() and getItem().
    */
   private findRelatedItemsWithCache(
-    rowId: string,
+    rowItem: Item,
     colItemIds: Set<string>,
     coverageRels: string[],
     hasCoverageFilter: boolean,
     itemById: Map<string, Item>,
+    linkDisplayPolicy?: LinkDisplayPolicy,
   ): Item[] {
     const result: Item[] = [];
     const seen = new Set<string>();
 
     // Forward direction: row item → column item
-    const forwardRels = this.graph.getRelationships(rowId);
+    const forwardRels = this.graph.getRelationships(rowItem.id);
     for (const rel of forwardRels) {
       if (colItemIds.has(rel.targetId)) {
         if (hasCoverageFilter && !coverageRels.includes(rel.type)) {
           continue;
         }
         const target = itemById.get(rel.targetId);
+        if (
+          target &&
+          linkDisplayPolicy &&
+          shouldHideRelationship(linkDisplayPolicy, rel.type, rowItem, target)
+        ) {
+          continue;
+        }
         if (target && !seen.has(target.id)) {
           seen.add(target.id);
           result.push(target);
@@ -281,13 +302,25 @@ export class MatrixGenerator {
     }
 
     // Reverse direction: column item → row item
-    const reverseRels = this.graph.getReverseRelationships(rowId);
+    const reverseRels = this.graph.getReverseRelationships(rowItem.id);
     for (const rel of reverseRels) {
       if (colItemIds.has(rel.fromId)) {
         if (hasCoverageFilter && !coverageRels.includes(rel.type)) {
           continue;
         }
         const source = itemById.get(rel.fromId);
+        if (
+          source &&
+          linkDisplayPolicy &&
+          shouldHideRelationship(
+            linkDisplayPolicy,
+            this.configLoader?.getInverseType(rel.type) ?? rel.type,
+            rowItem,
+            source,
+          )
+        ) {
+          continue;
+        }
         if (source && !seen.has(source.id)) {
           seen.add(source.id);
           result.push(source);

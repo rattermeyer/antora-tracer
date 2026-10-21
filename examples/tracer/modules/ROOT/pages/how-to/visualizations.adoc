@@ -104,11 +104,13 @@ Enable relationship rendering for every item with the document attribute:
 ----
 = My Page
 :traceability-links: true
+:traceability-link-policy: l2-to-l3-addressing
 :traceability-style: table
 :traceability-order: target-id
 ----
 
 The component-level `traceability-links` attribute or a page-level header enables the macros and automatic relationship lists; explicit macros control direction and placement for individual items.
+A separate `:traceability-link-policy:` attribute filters relationship lists; define its name under `linkDisplayPolicies`, while graph macros remain unchanged and matrices opt in through `linkDisplayPolicy`.
 See xref:reference/traceability-macros.adoc[Traceability Macros Reference] for all options.
 
 === Local Kroki server

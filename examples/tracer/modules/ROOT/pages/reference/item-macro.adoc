@@ -80,6 +80,7 @@ The `.tracer` role syntax is optional and does not change the `role` attribute u
 |===
 
 Any additional attributes are stored in the item's `attributes` map and exported to Neo4j as node properties.
+Link display policies can match additional item attributes by exact string name and value.
 
 Quote the value when it contains commas, for example `tags="security, privacy"`.
 Surrounding whitespace is trimmed and empty entries are ignored.

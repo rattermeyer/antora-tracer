@@ -581,6 +581,10 @@ export function createExtensionWithPreset(
 export type {
   BuiltInPresetName,
   CompleteConfig,
+  LinkDisplayHideRule,
+  LinkDisplayItemMatcher,
+  LinkDisplayPolicy,
+  MatrixDefinition,
   Preset,
   TraceabilityConfig,
 } from "./config/TraceabilityConfig.js";

@@ -957,6 +957,200 @@ matrices:
       );
     });
   });
+  describe("link display policies", () => {
+    it("filters candidates by endpoint conditions and normalized relation direction", () => {
+      const graph = new TraceabilityGraph();
+      for (const [id, role, level] of [
+        ["REQ-L2", "requirement", "L2"],
+        ["REQ-L3", "requirement", "L3"],
+        ["DES-R3", "design", "L3"],
+        ["DES-A3", "design", "L3"],
+        ["DES-L2", "design", "L2"],
+      ]) {
+        graph.addItem({
+          id,
+          role,
+          title: id,
+          attributes: { "abstraction-level": level },
+        });
+      }
+
+      for (const [id, fromId, targetId, type] of [
+        ["R1", "DES-R3", "REQ-L2", "refines"],
+        ["R2", "REQ-L2", "DES-A3", "addresses"],
+        ["R3", "DES-L2", "REQ-L2", "refines"],
+        ["R4", "REQ-L2", "DES-L2", "addresses"],
+        ["R5", "REQ-L3", "DES-L2", "refines"],
+        ["R6", "DES-R3", "REQ-L3", "refines"],
+        ["R7", "REQ-L3", "DES-A3", "addresses"],
+      ]) {
+        graph.addRelationship({ id, fromId, targetId, type });
+      }
+
+      const tempDir = fs.mkdtempSync(
+        path.join(__dirname, "temp-display-policy-"),
+      );
+      const configPath = path.join(tempDir, "traceability.yml");
+      fs.writeFileSync(
+        configPath,
+        `roles: [requirement, design]
+relations:
+  requirement:
+    design:
+      addresses:
+        reverse: addressed_by
+      refines:
+        reverse: refined_by
+  design:
+    requirement:
+      refines:
+        reverse: refined_by
+linkDisplayPolicies:
+  hierarchy:
+    hide:
+      - relation: refined_by
+        currentItem:
+          attributes:
+            abstraction-level: L2
+        relatedItem:
+          attributes:
+            abstraction-level: L3
+      - relation: addresses
+        currentItem:
+          role: requirement
+        relatedItem:
+          attributes:
+            abstraction-level: L3
+matrices:
+  - name: hierarchy
+    rows: requirement
+    columns: [design]
+    linkDisplayPolicy: hierarchy
+`,
+      );
+
+      try {
+        const configLoader = new ConfigLoader();
+        configLoader.load(configPath);
+        const matrix = new MatrixGenerator(graph, configLoader).generateMatrix(
+          "hierarchy",
+        );
+
+        const itemIdsFor = (rowId: string) =>
+          matrix.rows
+            .find((row) => row.rowId === rowId)
+            ?.cells[0].items.map((item) => item.itemId)
+            .sort();
+        expect(itemIdsFor("REQ-L2")).to.deep.equal(["DES-L2"]);
+        expect(itemIdsFor("REQ-L3")).to.deep.equal(["DES-L2", "DES-R3"]);
+        expect(matrix.coverage.overall).to.equal(100);
+      } finally {
+        fs.rmSync(tempDir, { recursive: true, force: true });
+      }
+    });
+    it("keeps filters opt-in and excludes hidden cells from coverage", () => {
+      const graph = new TraceabilityGraph();
+      for (const [id, role, level] of [
+        ["REQ-L2", "requirement", "L2"],
+        ["REQ-L3", "requirement", "L3"],
+        ["DES-L2", "design", "L2"],
+        ["DES-L3", "design", "L3"],
+      ]) {
+        graph.addItem({
+          id,
+          role,
+          title: id,
+          attributes: { "abstraction-level": level },
+        });
+      }
+      for (const [id, fromId, targetId, type] of [
+        ["R1", "REQ-L2", "DES-L3", "refined_by"],
+        ["R2", "REQ-L2", "DES-L3", "addresses"],
+        ["R3", "REQ-L2", "DES-L2", "addresses"],
+        ["R4", "REQ-L3", "DES-L3", "addresses"],
+        ["R5", "REQ-L3", "DES-L2", "refined_by"],
+      ]) {
+        graph.addRelationship({ id, fromId, targetId, type });
+      }
+
+      const tempDir = fs.mkdtempSync(
+        path.join(__dirname, "temp-policy-coverage-"),
+      );
+      const configPath = path.join(tempDir, "traceability.yml");
+      fs.writeFileSync(
+        configPath,
+        `roles: [requirement, design]
+relations:
+  requirement:
+    design:
+      refined_by:
+        reverse: refines
+      addresses:
+        reverse: addressed_by
+linkDisplayPolicies:
+  hierarchy:
+    hide:
+      - relation: refined_by
+        currentItem:
+          attributes:
+            abstraction-level: L2
+        relatedItem:
+          attributes:
+            abstraction-level: L3
+      - relation: addresses
+        currentItem:
+          role: requirement
+        relatedItem:
+          attributes:
+            abstraction-level: L3
+matrices:
+  - name: unfiltered
+    rows: requirement
+    columns: [design]
+  - name: hierarchy
+    rows: requirement
+    columns: [design]
+    linkDisplayPolicy: hierarchy
+  - name: address-coverage
+    rows: requirement
+    columns: [design]
+    coverageRelations:
+      design: [addresses]
+    linkDisplayPolicy: hierarchy
+`,
+      );
+
+      try {
+        const configLoader = new ConfigLoader();
+        configLoader.load(configPath);
+        const generator = new MatrixGenerator(graph, configLoader);
+        const unfiltered = generator.generateMatrix("unfiltered");
+        const hierarchy = generator.generateMatrix("hierarchy");
+        const addressCoverage = generator.generateMatrix("address-coverage");
+        const idsFor = (matrix: typeof unfiltered, rowId: string) =>
+          matrix.rows
+            .find((row) => row.rowId === rowId)
+            ?.cells[0].items.map((item) => item.itemId)
+            .sort();
+
+        expect(idsFor(unfiltered, "REQ-L2")).to.deep.equal([
+          "DES-L2",
+          "DES-L3",
+        ]);
+        expect(idsFor(hierarchy, "REQ-L2")).to.deep.equal(["DES-L2"]);
+        expect(idsFor(hierarchy, "REQ-L3")).to.deep.equal(["DES-L2"]);
+        expect(idsFor(addressCoverage, "REQ-L2")).to.deep.equal(["DES-L2"]);
+        expect(idsFor(addressCoverage, "REQ-L3")).to.deep.equal([]);
+        expect(
+          addressCoverage.rows.find((row) => row.rowId === "REQ-L3")?.coverage,
+        ).to.equal(0);
+        expect(addressCoverage.coverage.overall).to.equal(50);
+      } finally {
+        fs.rmSync(tempDir, { recursive: true, force: true });
+      }
+    });
+  });
+
   describe("Matrix row filters", () => {
     it("filters current rows by status and tags without filtering columns", () => {
       const graph = new TraceabilityGraph();

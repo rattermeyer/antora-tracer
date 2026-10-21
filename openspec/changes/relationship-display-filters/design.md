@@ -25,6 +25,8 @@ During `contentClassified`, pages and partials are expanded separately. A partia
 
 Add a `linkDisplayPolicies` map to `TraceabilityConfig`. Each policy contains a `hide` list; each rule names a relation type and conditions for `currentItem` and `relatedItem`. Matchers support an optional role and exact string-valued item attributes, allowing projects to use their own levels and apply a rule across roles when role conditions are omitted. All conditions in one rule are ANDed; any matching rule hides the relationship.
 
+Preset inheritance merges policy maps by name; a child policy replaces the full same-named policy, while unmentioned parent policies remain available. This follows the existing keyed-configuration merge pattern.
+
 For example:
 
 ```yaml
@@ -52,9 +54,12 @@ Add optional `MatrixDefinition.linkDisplayPolicy`. Existing `coverageRelations` 
 
 Use `traceability-link-policy` to select a named policy. An absent value means no filtering; `none` explicitly disables an inherited policy. Site and component values provide defaults, and a page-header value takes precedence for all items rendered in that page. Matrix policies remain selected in matrix configuration, not by page attributes.
 
+The selector token `none` is reserved case-insensitively and SHALL NOT be used as a policy name.
+
+
 ### Partial macros render in the including page's policy context
 
-Keep graph collection and macro expansion in the existing `contentClassified` pass. For page-authored items, expand using the page's resolved policy directly. For partials, generate guarded output variants for each configured policy, plus an unfiltered variant for an absent or `none` selector. Use standard AsciiDoc `ifeval` conditionals on `traceability-link-policy`; Asciidoctor evaluates them after including the partial, using the including page's attributes. One partial can therefore be included by pages with different policies without changing graph relationships or duplicating partial files.
+Keep graph collection and macro expansion in the existing `contentClassified` pass. For page-authored items, expand using the page's resolved policy directly. For partials, generate guarded output variants for each configured policy. Pages with a selected policy receive an internal AsciiDoc selector whose value is a safe encoding of the policy name; partial output uses `ifeval` against that selector without embedding user-defined names in condition expressions. An explicit `none` selects unfiltered output. If the including page has no policy selector, partial output falls back to the partial component's resolved policy, or remains unfiltered when there is none. The generated selector exists only in the in-memory page buffer, so one partial can render differently in different including pages without changing graph relationships or duplicating partial files.
 
 Validate policy definitions while loading extension configuration. Validate site/component/page policy references during content processing and matrix references during configuration loading; unknown names fail with a diagnostic naming the policy and its source.
 

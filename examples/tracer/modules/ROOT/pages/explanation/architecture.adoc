@@ -106,7 +106,10 @@ versioned configuration that users can extend or override.
 
 | `traceability.matrices`
 | object[]
-| Array of matrix definitions. Each has `name`, `rows` (role), `columns` (role[]), and `coverageRelations` (map column role to coverage relation types).
+| Array of matrix definitions. Each has `name`, `rows` (role), `columns` (role[]), `coverageRelations`, and optional `linkDisplayPolicy`.
+| `traceability.linkDisplayPolicies`
+| map
+| Named relationship display policies matched against relation type and endpoint roles or attributes.
 
 | `neo4j.queries`
 | object[]
@@ -498,6 +501,7 @@ tracer:links[]
 The `MatrixGenerator` reads matrix definitions from configuration, queries the
 graph for items by role, and computes per-cell coverage based on
 `coverageRelations`.
+An optional `linkDisplayPolicy` filters matching row-to-cell relationships before cells and coverage are calculated.
 Each cell shows related item IDs or `—` for no
 relationships.
 CSV output is direct; HTML output delegates to `TemplateRenderer`.

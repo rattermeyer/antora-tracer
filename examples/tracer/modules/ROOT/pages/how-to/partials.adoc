@@ -29,6 +29,7 @@ Include it in a page:
 ----
 // architecture.adoc
 = Architecture
+:traceability-link-policy: l2-to-l3-addressing
 include::partial$04-solution-strategy.adoc[]
 ----
 
@@ -36,6 +37,10 @@ The extension processes partials during graph population and relationship render
 
 Automatic relationship rendering for items in a partial follows the partial component's `traceability-links` attribute.
 No attribute is needed in the partial, and the including page's header does not override the component setting.
+Link visibility has a separate scope: the including page's resolved `:traceability-link-policy:` overrides the partial component's policy for all included items.
+If no policy resolves in the page context, the partial component's policy applies.
+This filters output only and leaves the relationship graph unchanged.
+Define the selected policy under `linkDisplayPolicies` in `traceability.yml`; see xref:reference/configuration.adoc[Configuration Reference].
 
 == Where links point
 

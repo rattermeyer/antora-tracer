@@ -27,6 +27,10 @@ New content may use either prefix.
 When `:traceability-links:` resolves to true, every item automatically renders its outgoing and incoming relationship lists using the configured display options.
 An explicit `tracer:outgoing[]`, `tracer:incoming[]`, or `tracer:links[]` macro overrides automatic rendering for that item and controls its direction and placement.
 
+A configured `:traceability-link-policy:` can hide selected links from an item's rendered view without changing graph relationships; see xref:reference/configuration.adoc[Configuration Reference].
+The policy applies to automatic lists and explicit relationship-rendering macros.
+An unknown non-`none` policy name reports an error that identifies the source file.
+
 [NOTE]
 ====
 A relationship whose target item lives only in an excluded component (the `excludeComponents` option in xref:reference/configuration.adoc[Configuration]) stays pending and is reported with a "Target item not found" warning.
@@ -75,6 +79,7 @@ Enable automatic relationship rendering for every item on a page with the docume
 ----
 = Architecture
 :traceability-links: true
+:traceability-link-policy: l2-to-l3-addressing
 ----
 
 For a component-wide default, set the attribute in the component descriptor's `antora.yml`:
@@ -84,6 +89,7 @@ For a component-wide default, set the attribute in the component descriptor's `a
 asciidoc:
   attributes:
     traceability-links: true
+    traceability-link-policy: l2-to-l3-addressing
 ----
 
 or in the playbook:
@@ -93,11 +99,17 @@ or in the playbook:
 asciidoc:
   attributes:
     traceability-links: true
+    traceability-link-policy: l2-to-l3-addressing
 ----
 
 A page-level `:traceability-links:` header overrides the component or playbook setting for items authored in that page.
 Items defined in partials use their own component's setting; the including page's header does not override it, and partials need no local setting.
-When the resolved setting is absent or false, explicit relationship rendering macros are stripped from output and automatic links are not added.
+This setting controls whether links render; visibility filtering uses the separate `:traceability-link-policy:` attribute.
+The including page's resolved policy overrides the partial component's policy for all items rendered on that page.
+If no policy resolves in the page context, partial items use their defining component's policy.
+The value `none` disables filtering.
+If no policy resolves for an item or its component, its relationships remain unfiltered.
+When `:traceability-links:` resolves to absent or false, explicit relationship-rendering macros are stripped and automatic links are not added.
 
 === Display options
 
@@ -108,6 +120,10 @@ When the resolved setting is absent or false, explicit relationship rendering ma
 | `:traceability-links:`
 | `true`
 | Renders automatic outgoing and incoming relationship lists and enables explicit rendering macros
+| `:traceability-link-policy:`
+| policy name, `none`
+| Selects a configured policy, defaulting to the inherited site/component value; a page header overrides that value for partial items, and `none` disables filtering.
+
 | `:traceability-style:`
 | `list` (default), `table`, `inline`
 | Display format: bulleted list, AsciiDoc table, or comma-separated inline

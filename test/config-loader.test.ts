@@ -298,6 +298,184 @@ relations:
         fs.rmSync(tempDir, { recursive: true, force: true });
       }
     });
+    it("normalizes link display policy relation and role names", () => {
+      const tempDir = fs.mkdtempSync(
+        path.join(os.tmpdir(), "tracer-link-policy-"),
+      );
+      const configPath = path.join(tempDir, "traceability.yml");
+      fs.writeFileSync(
+        configPath,
+        `roles: [requirement, design]
+relations:
+  requirement:
+    design:
+      refined_by:
+        reverse: refines
+linkDisplayPolicies:
+  detail:
+    hide:
+      - relation: REFINED_BY
+        currentItem:
+          role: REQUIREMENT
+          attributes:
+            abstraction-level: L2
+        relatedItem:
+          attributes:
+            abstraction-level: L3
+`,
+      );
+
+      try {
+        const config = new ConfigLoader().load(configPath) as unknown as {
+          linkDisplayPolicies: Record<string, unknown>;
+        };
+        expect(config.linkDisplayPolicies).to.deep.equal({
+          detail: {
+            hide: [
+              {
+                relation: "refined_by",
+                currentItem: {
+                  role: "requirement",
+                  attributes: { "abstraction-level": "L2" },
+                },
+                relatedItem: {
+                  attributes: { "abstraction-level": "L3" },
+                },
+              },
+            ],
+          },
+        });
+      } finally {
+        fs.rmSync(tempDir, { recursive: true, force: true });
+      }
+    });
+
+    it("rejects a policy rule missing an endpoint matcher", () => {
+      const tempDir = fs.mkdtempSync(
+        path.join(os.tmpdir(), "tracer-link-policy-"),
+      );
+      const configPath = path.join(tempDir, "traceability.yml");
+      fs.writeFileSync(
+        configPath,
+        `roles: [requirement]
+relations:
+  requirement:
+    requirement:
+      refined_by:
+        reverse: refines
+linkDisplayPolicies:
+  incomplete:
+    hide:
+      - relation: refined_by
+        currentItem:
+          attributes:
+            abstraction-level: L2
+`,
+      );
+
+      try {
+        expect(() => new ConfigLoader().load(configPath)).to.throw(
+          /linkDisplayPolicies 'incomplete'.*relatedItem/,
+        );
+      } finally {
+        fs.rmSync(tempDir, { recursive: true, force: true });
+      }
+    });
+
+    it("rejects a policy rule with an unknown relation type", () => {
+      const tempDir = fs.mkdtempSync(
+        path.join(os.tmpdir(), "tracer-link-policy-"),
+      );
+      const configPath = path.join(tempDir, "traceability.yml");
+      fs.writeFileSync(
+        configPath,
+        `roles: [requirement]
+relations:
+  requirement:
+    requirement:
+      refined_by:
+        reverse: refines
+linkDisplayPolicies:
+  unknown-relation:
+    hide:
+      - relation: missing_relation
+        currentItem:
+          attributes:
+            abstraction-level: L2
+        relatedItem:
+          attributes:
+            abstraction-level: L3
+`,
+      );
+
+      try {
+        expect(() => new ConfigLoader().load(configPath)).to.throw(
+          /linkDisplayPolicies 'unknown-relation'.*missing_relation.*not defined/,
+        );
+      } finally {
+        fs.rmSync(tempDir, { recursive: true, force: true });
+      }
+    });
+
+    it("rejects a matrix that references an unknown link display policy", () => {
+      const tempDir = fs.mkdtempSync(
+        path.join(os.tmpdir(), "tracer-link-policy-"),
+      );
+      const configPath = path.join(tempDir, "traceability.yml");
+      fs.writeFileSync(
+        configPath,
+        `roles: [requirement, design]
+matrices:
+  - name: req-design
+    rows: requirement
+    columns: [design]
+    linkDisplayPolicy: missing
+`,
+      );
+
+      try {
+        expect(() => new ConfigLoader().load(configPath)).to.throw(
+          /Matrix 'req-design'.*link display policy 'missing'.*not defined/,
+        );
+      } finally {
+        fs.rmSync(tempDir, { recursive: true, force: true });
+      }
+    });
+    it("rejects the reserved none policy name", () => {
+      const tempDir = fs.mkdtempSync(
+        path.join(os.tmpdir(), "tracer-link-policy-"),
+      );
+      const configPath = path.join(tempDir, "traceability.yml");
+      fs.writeFileSync(
+        configPath,
+        `roles: [requirement]
+relations:
+  requirement:
+    requirement:
+      refined_by:
+        reverse: refines
+linkDisplayPolicies:
+  none:
+    hide:
+      - relation: refined_by
+        currentItem:
+          attributes:
+            abstraction-level: L2
+        relatedItem:
+          attributes:
+            abstraction-level: L3
+`,
+      );
+
+      try {
+        expect(() => new ConfigLoader().load(configPath)).to.throw(
+          /linkDisplayPolicies policy name 'none' is reserved/i,
+        );
+      } finally {
+        fs.rmSync(tempDir, { recursive: true, force: true });
+      }
+    });
+
     it("should validate matrices configuration", () => {
       const tempDir = path.join(__dirname, "temp");
       if (!fs.existsSync(tempDir)) {
@@ -796,6 +974,105 @@ traceability:
     const abMatrix = preset.traceability.matrices!.find((m) => m.name === "ab");
     expect(abMatrix).to.exist;
     expect(abMatrix!.columns).to.deep.equal(["c"]);
+  });
+
+  it("merges named link display policies across presets by name", () => {
+    writePreset(
+      "policy-parent",
+      `name: policy-parent
+version: 1.0.0
+description: parent
+traceability:
+  roles: [a, b]
+  relations:
+    a:
+      b:
+        refines:
+          reverse: refined_by
+  linkDisplayPolicies:
+    shared:
+      hide:
+        - relation: refines
+          currentItem:
+            attributes:
+              abstraction-level: L2
+          relatedItem:
+            attributes:
+              abstraction-level: L3
+    parent-only:
+      hide:
+        - relation: refines
+          currentItem:
+            attributes:
+              abstraction-level: L1
+          relatedItem:
+            attributes:
+              abstraction-level: L2
+`,
+    );
+    writePreset(
+      "policy-child",
+      `name: policy-child
+version: 1.0.0
+description: child
+extends: policy-parent
+traceability:
+  linkDisplayPolicies:
+    shared:
+      hide:
+        - relation: refines
+          currentItem:
+            attributes:
+              abstraction-level: L3
+          relatedItem:
+            attributes:
+              abstraction-level: L4
+    child-only:
+      hide:
+        - relation: refines
+          currentItem:
+            attributes:
+              abstraction-level: L4
+          relatedItem:
+            attributes:
+              abstraction-level: L5
+`,
+    );
+
+    const preset = loader.loadPreset("policy-child");
+    const config = preset.traceability as unknown as {
+      linkDisplayPolicies: Record<string, unknown>;
+    };
+
+    expect(config.linkDisplayPolicies).to.deep.equal({
+      shared: {
+        hide: [
+          {
+            relation: "refines",
+            currentItem: { attributes: { "abstraction-level": "L3" } },
+            relatedItem: { attributes: { "abstraction-level": "L4" } },
+          },
+        ],
+      },
+      "parent-only": {
+        hide: [
+          {
+            relation: "refines",
+            currentItem: { attributes: { "abstraction-level": "L1" } },
+            relatedItem: { attributes: { "abstraction-level": "L2" } },
+          },
+        ],
+      },
+      "child-only": {
+        hide: [
+          {
+            relation: "refines",
+            currentItem: { attributes: { "abstraction-level": "L4" } },
+            relatedItem: { attributes: { "abstraction-level": "L5" } },
+          },
+        ],
+      },
+    });
   });
 
   it("adds new matrices alongside inherited ones and replaces same-name matrices", () => {

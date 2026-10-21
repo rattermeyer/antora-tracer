@@ -23,6 +23,7 @@ This shows item counts per role.
 
 Verify the relation type is listed in `coverageRelations` for the relevant column.
 Only relations matching those types count as coverage in the matrix.
+If the matrix selects `linkDisplayPolicy`, inspect its rules and endpoint roles or attributes; matching links are omitted from cells and coverage.
 
 For example, if your matrix defines `coverageRelations: design: [addresses, satisfies]`, then a `design → requirement` relation using `implements` won't appear in that matrix cell.
 

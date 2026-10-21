@@ -790,6 +790,147 @@ A requirement from a partial file.
       expect(disabledOutput).to.not.include("xref:");
     });
 
+    it("renders one partial under filtered, disabled, and unselected page policies", async () => {
+      const configDir = mkdtempSync(join(tmpdir(), "partial-policy-"));
+      const configPath = join(configDir, "traceability.yml");
+      writeFileSync(
+        configPath,
+        `roles: [requirement]
+relations:
+  requirement:
+    requirement:
+      refined_by:
+        reverse: refines
+linkDisplayPolicies:
+  'my "custom policy':
+    hide:
+      - relation: refined_by
+        currentItem:
+          attributes:
+            abstraction-level: L2
+        relatedItem:
+          attributes:
+            abstraction-level: L3
+`,
+      );
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      // The mock supplies the Antora context methods exercised by this test.
+      const antoraContext = ctx as unknown as ConstructorParameters<
+        typeof AntoraTraceabilityExtension
+      >[0];
+      const ext = new AntoraTraceabilityExtension(antoraContext, {
+        config: { configPath },
+      });
+      await waitForInit();
+      const pageFiles = [
+        {
+          src: {
+            path: "modules/ROOT/pages/filtered.adoc",
+            module: "ROOT",
+            component: "test",
+            version: "1.0",
+          },
+          contents: Buffer.from(
+            `:traceability-link-policy: my "custom policy
+
+include::partial$shared.adoc[]
+`,
+          ),
+        },
+        {
+          src: {
+            path: "modules/ROOT/pages/disabled.adoc",
+            module: "ROOT",
+            component: "test",
+            version: "1.0",
+          },
+          contents: Buffer.from(
+            `:traceability-link-policy: none
+
+include::partial$shared.adoc[]
+`,
+          ),
+        },
+        {
+          src: {
+            path: "modules/ROOT/pages/unselected.adoc",
+            module: "ROOT",
+            component: "test",
+            version: "1.0",
+          },
+          contents: Buffer.from("include::partial$shared.adoc[]\n"),
+        },
+      ];
+      const partialFiles = [
+        {
+          src: {
+            path: "modules/ROOT/partials/shared.adoc",
+            module: "ROOT",
+            component: "test",
+            version: "1.0",
+          },
+          contents: Buffer.from(
+            `[#REQ-L2, item, role=requirement, abstraction-level=L2]
+--
+refined_by:REQ-L3[]
+--
+
+[#REQ-L3, item, role=requirement, abstraction-level=L3]
+--
+Level 3 requirement.
+--
+`,
+          ),
+        },
+      ];
+
+      try {
+        ctx.fireEvent("contentClassified", {
+          contentCatalog: {
+            findBy: ({ family }: { family: string }) =>
+              family === "partial" ? partialFiles : pageFiles,
+            getComponentVersion: () => ({
+              asciidoc: { attributes: { "traceability-links": true } },
+            }),
+          },
+        });
+
+        const partialPath = join(configDir, "shared.adoc");
+        writeFileSync(partialPath, partialFiles[0].contents.toString("utf8"));
+        const renderPage = (pageFile: (typeof pageFiles)[number]) =>
+          String(
+            asciidoctor().convert(
+              pageFile.contents
+                .toString("utf8")
+                .replace("partial$shared.adoc", "shared.adoc"),
+              {
+                safe: "unsafe",
+                base_dir: configDir,
+                header_footer: false,
+                attributes: { "traceability-links": true },
+              },
+            ),
+          );
+
+        const filteredHtml = renderPage(pageFiles[0]);
+        const disabledHtml = renderPage(pageFiles[1]);
+        const unselectedHtml = renderPage(pageFiles[2]);
+        const linksTo = (html: string, id: string) =>
+          (html.match(/<a[^>]+href="[^"]+"/g) ?? []).some((link) =>
+            link.includes(`#${id}`),
+          );
+
+        expect(linksTo(filteredHtml, "REQ-L3")).to.be.false;
+        expect(linksTo(filteredHtml, "REQ-L2")).to.be.true;
+        expect(linksTo(disabledHtml, "REQ-L3")).to.be.true;
+        expect(linksTo(unselectedHtml, "REQ-L3")).to.be.true;
+      } finally {
+        rmSync(configDir, { recursive: true, force: true });
+      }
+    });
+
     it("should expand macros in partial files during Pass 2", async () => {
       const ctx = createMockContext({
         playbook: { output: { dir: tempDir }, extensions: [] },
@@ -1255,6 +1396,287 @@ Description.
       const content = file.contents.toString("utf8");
       expect(content).to.not.include("traceability:outgoing[]");
       expect(content).to.not.include("xref:");
+    });
+
+    it("uses the page policy over the component default", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      // The mock supplies the Antora context methods exercised by these tests.
+      const antoraContext = ctx as unknown as ConstructorParameters<
+        typeof AntoraTraceabilityExtension
+      >[0];
+      const ext = new AntoraTraceabilityExtension(antoraContext);
+      await waitForInit();
+      const file = {
+        src: {
+          path: "modules/ROOT/pages/test.adoc",
+          module: "ROOT",
+          component: "test",
+          version: "1.0",
+        },
+        contents: Buffer.from(
+          `:traceability-link-policy: page-missing
+:traceability-links: true
+
+[#REQ-001, item, role=requirement]
+--
+Requirement.
+--
+`,
+        ),
+      };
+
+      expect(() =>
+        ctx.fireEvent("contentClassified", {
+          contentCatalog: {
+            findBy: ({ family }: { family: string }) =>
+              family === "page" ? [file] : [],
+            getComponentVersion: () => ({
+              asciidoc: { attributes: { "traceability-link-policy": "none" } },
+            }),
+          },
+        }),
+      ).to.throw(/Unknown traceability-link-policy 'page-missing'/);
+      expect(ext.getTraceabilityExtension()).to.exist;
+    });
+
+    it("uses the component policy when the page does not override it", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      // The mock supplies the Antora context methods exercised by this test.
+      const antoraContext = ctx as unknown as ConstructorParameters<
+        typeof AntoraTraceabilityExtension
+      >[0];
+      new AntoraTraceabilityExtension(antoraContext);
+      await waitForInit();
+      const file = {
+        src: {
+          path: "modules/ROOT/pages/test.adoc",
+          module: "ROOT",
+          component: "test",
+          version: "1.0",
+        },
+        contents: Buffer.from(
+          `:traceability-links: true
+
+[#REQ-001, item, role=requirement]
+--
+Requirement.
+--
+`,
+        ),
+      };
+
+      expect(() =>
+        ctx.fireEvent("contentClassified", {
+          contentCatalog: {
+            findBy: ({ family }: { family: string }) =>
+              family === "page" ? [file] : [],
+            getComponentVersion: () => ({
+              asciidoc: {
+                attributes: {
+                  "traceability-link-policy": "component-missing",
+                },
+              },
+            }),
+          },
+        }),
+      ).to.throw(/Unknown traceability-link-policy 'component-missing'/);
+    });
+
+    it("filters automatic links on L2 but keeps the inverse link on L3", async () => {
+      const configDir = mkdtempSync(join(tmpdir(), "link-policy-"));
+      const configPath = join(configDir, "traceability.yml");
+      writeFileSync(
+        configPath,
+        `roles: [requirement]
+relations:
+  requirement:
+    requirement:
+      refined_by:
+        reverse: refines
+linkDisplayPolicies:
+  hierarchy:
+    hide:
+      - relation: refined_by
+        currentItem:
+          attributes:
+            abstraction-level: L2
+        relatedItem:
+          attributes:
+            abstraction-level: L3
+`,
+      );
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      // The mock supplies the Antora context methods exercised by this test.
+      const antoraContext = ctx as unknown as ConstructorParameters<
+        typeof AntoraTraceabilityExtension
+      >[0];
+      const ext = new AntoraTraceabilityExtension(antoraContext, {
+        config: { configPath },
+      });
+      await waitForInit();
+      const l2File = {
+        src: {
+          path: "modules/ROOT/pages/l2.adoc",
+          module: "ROOT",
+          component: "test",
+          version: "1.0",
+        },
+        contents: Buffer.from(
+          `:traceability-links: true
+
+[#REQ-L2, item, role=requirement, abstraction-level=L2]
+--
+refined_by:REQ-L3[]
+--
+`,
+        ),
+      };
+      const l3File = {
+        src: {
+          path: "modules/ROOT/pages/l3.adoc",
+          module: "ROOT",
+          component: "test",
+          version: "1.0",
+        },
+        contents: Buffer.from(
+          `:traceability-links: true
+
+[#REQ-L3, item, role=requirement, abstraction-level=L3]
+--
+Level 3 requirement.
+--
+`,
+        ),
+      };
+
+      try {
+        ctx.fireEvent("contentClassified", {
+          contentCatalog: {
+            findBy: ({ family }: { family: string }) =>
+              family === "page" ? [l2File, l3File] : [],
+            getComponentVersion: () => ({
+              asciidoc: {
+                attributes: { "traceability-link-policy": "hierarchy" },
+              },
+            }),
+          },
+        });
+
+        expect(l2File.contents.toString("utf8")).to.not.include("xref:");
+        expect(l3File.contents.toString("utf8")).to.include("xref:");
+        expect(
+          ext.getTraceabilityExtension().graph.getAllRelationships(),
+        ).to.have.lengthOf(1);
+      } finally {
+        rmSync(configDir, { recursive: true, force: true });
+      }
+    });
+
+    it("filters explicit outgoing, incoming, and combined macro output", async () => {
+      const configDir = mkdtempSync(join(tmpdir(), "link-policy-"));
+      const configPath = join(configDir, "traceability.yml");
+      writeFileSync(
+        configPath,
+        `roles: [requirement]
+relations:
+  requirement:
+    requirement:
+      refined_by:
+        reverse: refines
+      addresses:
+        reverse: addressed_by
+linkDisplayPolicies:
+  hierarchy:
+    hide:
+      - relation: refined_by
+        currentItem:
+          attributes:
+            abstraction-level: L2
+        relatedItem:
+          attributes:
+            abstraction-level: L3
+`,
+      );
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      // The mock supplies the Antora context methods exercised by this test.
+      const antoraContext = ctx as unknown as ConstructorParameters<
+        typeof AntoraTraceabilityExtension
+      >[0];
+      const ext = new AntoraTraceabilityExtension(antoraContext, {
+        config: { configPath },
+      });
+      await waitForInit();
+      const file = {
+        src: {
+          path: "modules/ROOT/pages/links.adoc",
+          component: "test",
+          version: "1.0",
+        },
+        contents: Buffer.from(
+          `:traceability-links: true
+:traceability-link-policy: hierarchy
+
+[#REQ-L2-A, item, role=requirement, abstraction-level=L2]
+--
+refined_by:REQ-L3-A[]
+traceability:outgoing[]
+--
+
+[#REQ-L3-A, item, role=requirement, abstraction-level=L3]
+--
+traceability:incoming[]
+--
+
+[#REQ-L1-B, item, role=requirement, abstraction-level=L1]
+--
+addresses:REQ-L2-B[]
+traceability:incoming[]
+--
+
+[#REQ-L2-B, item, role=requirement, abstraction-level=L2]
+--
+refined_by:REQ-L3-B[]
+traceability:links[]
+--
+
+[#REQ-L3-B, item, role=requirement, abstraction-level=L3]
+--
+traceability:incoming[]
+--
+`,
+        ),
+      };
+
+      try {
+        ctx.fireEvent("contentClassified", {
+          contentCatalog: {
+            findBy: ({ family }: { family: string }) =>
+              family === "page" ? [file] : [],
+            getComponentVersion: () => ({ asciidoc: { attributes: {} } }),
+          },
+        });
+
+        const output = file.contents.toString("utf8");
+        const xrefs = output.match(/xref:[^\\[]+/g) ?? [];
+        expect(xrefs.some((xref) => xref.includes("REQ-L2-A"))).to.be.true;
+        expect(xrefs.some((xref) => xref.includes("REQ-L1-B"))).to.be.true;
+        expect(xrefs.some((xref) => xref.includes("REQ-L2-B"))).to.be.true;
+        expect(xrefs.some((xref) => xref.includes("REQ-L3-A"))).to.be.false;
+        expect(xrefs.some((xref) => xref.includes("REQ-L3-B"))).to.be.false;
+        expect(
+          ext.getTraceabilityExtension().graph.getAllRelationships(),
+        ).to.have.lengthOf(3);
+      } finally {
+        rmSync(configDir, { recursive: true, force: true });
+      }
     });
 
     it("should expand tracer:outgoing[] alias like traceability:outgoing[]", async () => {

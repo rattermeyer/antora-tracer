@@ -171,6 +171,19 @@ relations:
       verifies:
         reverse: verified_by
 
+linkDisplayPolicies:
+  l2-to-l3-addressing:
+    hide:
+      - relation: addressed_by
+        currentItem:
+          role: requirement
+          attributes:
+            abstraction-level: L2
+        relatedItem:
+          role: design
+          attributes:
+            abstraction-level: L3
+
 matrices:
   - name: requirements-to-design
     description: "Forward traceability from requirements to design"
@@ -178,6 +191,7 @@ matrices:
     columns: [design]
     coverageRelations:
       design: [addresses]
+    linkDisplayPolicy: l2-to-l3-addressing
 
 labels:              # optional display names
   addresses: "Addresses"
@@ -195,7 +209,8 @@ Pulls in a built-in preset as the base.
 Your config is deep-merged on top:
 - `roles`: appended (duplicates silently merged)
 - `relations`: merged at all levels
-- `matrices`: appended
+- `matrices`: merged by name; a child replaces a same-named matrix
+- `linkDisplayPolicies`: merged by name; a child replaces a same-named policy in full
 
 If `extends` is omitted, the config is standalone — no preset is loaded.
 
@@ -212,7 +227,7 @@ tracer:
   roles:
     - use_case
 ----
-<1> The parent's roles, relations, matrices, and `labels` are deep-merged under the child
+<1> The parent's roles, relations, matrices, labels, and `linkDisplayPolicies` are merged under the child
 
 Inheritance chains resolve transitively; circular inheritance is rejected.
 See xref:reference/presets.adoc[Presets Reference] for the preset schema.
@@ -254,6 +269,43 @@ relations:
 ----
 
 If a relation type is used that is not declared (or derived as a reverse), the extension reports an error with the allowed alternatives.
+
+=== `linkDisplayPolicies`
+
+`linkDisplayPolicies` is a map of named link display policies.
+Each policy must define a non-empty `hide` array containing one or more rules.
+A matching rule hides a relationship only from the view of its `currentItem`; it does not remove the graph relationship.
+All specified conditions in one rule must match; any matching rule hides the link.
+The relation type is interpreted from the displayed item's perspective using the configured reverse relation, so authored direction does not change matching.
+Each rule's relation type must be declared in `relations`.
+Each endpoint matcher must specify `role`, `attributes`, or both.
+
+[width=100%, cols="25,20,55"]
+|===
+| Rule field | Type | Description
+
+| `relation`
+| string
+| Configured relation type from the `currentItem` perspective, matched exactly.
+
+| `currentItem`, `relatedItem`
+| object
+| Required matchers for the item being displayed and the related item.
+
+| `role`
+| string, optional
+| Configured item role to match exactly.
+
+| `attributes`
+| map of string to string, optional
+| Non-empty map of attribute names to string values; supplied names and values must match exactly, and both conditions must match when `role` and `attributes` are specified.
+|===
+
+The complete policy and matrix-selection example appears in the `traceability.yml` sample above.
+
+Preset inheritance merges policies by name; a child policy replaces the full parent policy with the same name.
+The selector value `none` disables filtering and is reserved as a policy name, case-insensitively.
+Unknown document policy names report the source file; unknown matrix policy names report the matrix and policy.
 
 === Supersession
 
@@ -318,6 +370,10 @@ An array of matrix definitions:
 | `coverageRelations`
 | map
 | Which relation types count as "coverage" per column role. `coverageRelations: design: [addresses, satisfies]` means only `addresses` and `satisfies` from row items to design items count
+
+| `linkDisplayPolicy`
+| string
+| Optional name from `linkDisplayPolicies`; omitted fields leave matrix display unchanged, matching links are excluded from cells and coverage, and unknown names are configuration errors.
 
 | `rowFilter`
 | string

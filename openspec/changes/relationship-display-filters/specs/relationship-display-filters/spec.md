@@ -27,6 +27,18 @@ The configuration SHALL support named link display policies containing one or mo
 - **WHEN** no link display policy is selected
 - **THEN** relationship output SHALL remain unfiltered
 
+#### Scenario: Preset policies merge by name
+- **WHEN** a child preset defines link display policies and extends a preset with policies
+- **THEN** policies with names not defined by the child SHALL remain inherited
+- **AND** a child policy SHALL replace the entire parent policy with the same name
+
+### Requirement: None is reserved for disabling policy filtering
+The system SHALL reserve `none`, case-insensitively, as the value that disables link display filtering and SHALL reject a configured policy name that matches it.
+
+#### Scenario: Reject a policy named none
+- **WHEN** configuration defines a link display policy whose name is `none`, ignoring case
+- **THEN** configuration loading SHALL report that the name is reserved
+
 ### Requirement: Matrices may opt into a link display policy
 A matrix definition MAY select a configured link display policy by name. For policy evaluation, the matrix row item SHALL be the displayed item and each candidate cell item SHALL be the related item. A matching relationship SHALL be omitted from the cell and SHALL NOT count toward matrix coverage. Existing column relation filters SHALL continue to apply. A matrix with no selected policy SHALL preserve its current behavior.
 

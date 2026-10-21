@@ -335,6 +335,7 @@ export interface TraceabilityConfig {
   roles: string[];
   relations: Record<string, Record<string, string[]>>;
   matrices: MatrixDefinition[];
+  linkDisplayPolicies?: Record<string, LinkDisplayPolicy>;
   extends?: string;
 }
 
@@ -345,6 +346,23 @@ export interface MatrixDefinition {
   columns: string[];
   coverageRelations?: Record<string, string[]>;
   rowFilter?: string;                 // Safe status/tag expression for rows
+  linkDisplayPolicy?: string;
+}
+
+
+export interface LinkDisplayPolicy {
+  hide: LinkDisplayHideRule[];
+}
+
+export interface LinkDisplayHideRule {
+  relation: string;
+  currentItem: LinkDisplayItemMatcher;
+  relatedItem: LinkDisplayItemMatcher;
+}
+
+export interface LinkDisplayItemMatcher {
+  role?: string;
+  attributes?: Record<string, string>;
 }
 
 export interface Preset extends PresetMetadata {

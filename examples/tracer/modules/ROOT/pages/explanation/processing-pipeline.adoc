@@ -38,6 +38,8 @@ When `:traceability-links:` resolves to true, each item without an explicit rela
 An explicit `tracer:outgoing[]`, `tracer:incoming[]`, or `tracer:links[]` controls rendering for that item.
 The attribute can be set in a page header or inherited from the component descriptor or playbook; the page header overrides component and playbook values for page items.
 Items defined in partials use the partial component's attribute, independent of the including page's header.
+The independent `:traceability-link-policy:` selector filters rendered relationship lists by relation type and endpoint conditions without changing the working graph.
+The including page's resolved selector applies to its partial items; if no policy resolves in that page context, partial items use the defining component's policy.
 When the resolved attribute is absent or false, explicit relationship-rendering macros are stripped and automatic links are not added.
 
 Display style (list, table, inline), sort order (target-id, target-title, relation-type), and collapsible sections are configurable via document attributes.
@@ -63,7 +65,7 @@ This pass also runs `injectTitleIds()` (prepends ID to title for visible display
 === Artifact registration (per component version)
 
 After Pass 3, the extension registers generated artifacts in the content catalog for each component version, under every module with AsciiDoc content.
-Matrices (HTML, CSV, JSON) are generated from the working graph.
+Matrices (HTML, CSV, JSON) apply an optional matrix link display policy before computing cell contents and coverage.
 A `traceability/graph.json` snapshot serializes the same version's working graph in the canonical `{ format, component, version, items, relationships }` shape, excluding `pubUrl`.
 Both are gated by the `generateMatrices` option and refresh a committed copy in place rather than adding a duplicate.
 
