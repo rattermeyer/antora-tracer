@@ -2,6 +2,11 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.32.1] — 2026-11-08
+
+### Fixed
+- Items defined in partials under a local content source no longer carry an absolute `file://` path as their source file: a `file://` view URL is treated as a filesystem location and the repository-relative source path is used instead, while hosted `http(s)` view URLs stay as authored. Build-machine directories no longer leak into the published `graph.json` snapshot, the Neo4j export, or `query --snapshot` output.
+
 ## [0.32.0] — 2026-11-08
 
 ### Fixed
