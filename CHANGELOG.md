@@ -2,6 +2,14 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.32.0] — 2026-11-08
+
+### Fixed
+- Item blocks closed at end of file are scanned again: a block whose closing `--` delimiter ends the file (an Asciidoctor-valid form) previously went undetected, so its `tracer:links[]` macro and the auto-injected links block rendered as literal prose instead of a relationship list.
+
+### Changed
+- Workspace tooling upgraded to pnpm 12, with build permissions declared in `pnpm-workspace.yaml` and generated skill links excluded from agent directories and the Docker build context.
+
 ## [0.31.0] — 2026-10-21
 
 ### Added
