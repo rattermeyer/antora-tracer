@@ -712,6 +712,59 @@ A requirement from a partial file.
       expect(partialItem!.sourceFile).to.include("github.com");
     });
 
+    it("records a repo-relative source path for local file:// view URLs", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const pageFiles = [
+        {
+          src: {
+            path: "modules/ROOT/pages/architecture.adoc",
+            module: "ROOT",
+            component: "test",
+          },
+          contents: Buffer.from("= Architecture\n"),
+        },
+      ];
+      // A local content source makes Antora emit file:// view URLs for
+      // partials. That is a build-machine path, not a link, so it must never
+      // reach the graph or the published graph.json snapshot.
+      const partialFiles = [
+        {
+          src: {
+            path: "modules/ROOT/partials/architecture/ARC-001-auth.adoc",
+            module: "ROOT",
+            component: "test",
+            fileUri:
+              "file:///home/someone/repo/docs/modules/ROOT/partials/architecture/ARC-001-auth.adoc",
+          },
+          contents: Buffer.from(
+            `[#ARC-001, item, role=architecture, title="Auth"]\n--\nDescription.\n--\n`,
+          ),
+        },
+      ];
+
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "partial" ? partialFiles : pageFiles,
+        },
+      });
+
+      const partialItem = ext
+        .getTraceabilityExtension()
+        .getAllItems()
+        .find((i) => i.id === "ARC-001");
+      expect(partialItem, "Partial item ARC-001 should exist").to.exist;
+      expect(partialItem!.sourceFile).to.not.include("file://");
+      expect(partialItem!.sourceFile).to.equal(
+        "modules/ROOT/partials/architecture/ARC-001-auth",
+      );
+    });
+
     it("uses component link attributes for partials, not including page headers", async () => {
       const ctx = createMockContext({
         playbook: { output: { dir: tempDir }, extensions: [] },

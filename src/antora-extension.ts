@@ -1896,7 +1896,14 @@ export class AntoraTraceabilityExtension {
         return;
       }
       const content = contentsBuffer.toString("utf8");
-      let sourceFile = viewUrl || file.src?.path || file.path || "unknown";
+      // A local content source makes Antora emit a file:// view URL pointing at
+      // the build machine's worktree. That is a filesystem location, not a
+      // link, so fall back to the repo-relative source path for it. Genuine
+      // http(s) view URLs (hosted repositories) are kept as authored.
+      let sourceFile =
+        viewUrl && !viewUrl.startsWith("file://")
+          ? viewUrl
+          : file.src?.path || file.path || "unknown";
       sourceFile = this.normalizeSourceFile(sourceFile);
       const component = file.src?.component || undefined;
       const moduleName = file.src?.module || undefined;
