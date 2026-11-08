@@ -1778,7 +1778,14 @@ program
 
     const supersededPath = join(dirname(sourcePath), "superseded.adoc");
     if (!existsSync(supersededPath)) {
-      writeFileSync(supersededPath, "= Superseded Items\n\n", "utf8");
+      // An item under partials/ is included mid-document, where a level-0
+      // title is illegal. A section heading works both as a standalone page
+      // and as an included fragment.
+      const isPartial = sourcePath.includes(`${sep}partials${sep}`);
+      const header = isPartial
+        ? "== Superseded items\n\n"
+        : "= Superseded Items\n\n";
+      writeFileSync(supersededPath, header, "utf8");
     }
     const existing = readFileSync(supersededPath, "utf8");
     writeFileSync(

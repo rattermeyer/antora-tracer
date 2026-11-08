@@ -90,6 +90,48 @@ describe("Item lifecycle (archive/remove)", () => {
       expect(res.status).to.equal(1);
       expect(res.stderr).to.include("not found");
     });
+
+    it("writes a level-2 header when the item lives in a partial", () => {
+      // An item under partials/ is included mid-document, where a level-0
+      // title is illegal ("level 0 sections can only be used when doctype is
+      // book"). The generated companion must use a section heading instead.
+      const partialDir = path.join(TEST_DIR, "partials", "decisions");
+      fs.mkdirSync(partialDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(partialDir, "DEC-900-old.adoc"),
+        `[#DEC-900, item, role=decision, status=superseded, title="Old decision"]
+--
+Decided long ago.
+--
+`,
+      );
+      // Supersession is relation-based: DEC-901 must supersede DEC-900.
+      fs.writeFileSync(
+        path.join(partialDir, "DEC-901-new.adoc"),
+        `[#DEC-901, item, role=decision, status=accepted, title="New decision"]
+--
+Replaces the old one.
+
+supersedes:DEC-900[]
+--
+`,
+      );
+
+      const res = runCli(["archive", "DEC-900", "-i", TEST_DIR]);
+      expect(res.status, res.stderr).to.equal(0);
+
+      const supersededPath = path.join(partialDir, "superseded.adoc");
+      expect(
+        fs.existsSync(supersededPath),
+        `expected ${supersededPath} to be created`,
+      ).to.be.true;
+      const superseded = fs.readFileSync(supersededPath, "utf8");
+
+      expect(superseded).to.not.match(/^= Superseded Items/m);
+      expect(superseded).to.match(/^== Superseded items\s*$/m);
+      expect(superseded).to.include("[#DEC-900, item");
+      expect(superseded).to.include("Decided long ago.");
+    });
   });
 
   describe("remove", () => {
