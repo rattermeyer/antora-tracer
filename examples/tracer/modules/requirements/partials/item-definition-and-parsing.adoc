@@ -54,9 +54,9 @@ Source: openspec/specs/partial-file-processing/spec.md
 tracer:links[]
 --
 
-[#REQ-144, item, role=requirement, title="Partial items use view URL as source reference"]
+[#REQ-144, item, role=requirement, title="Partial items use a repository source reference"]
 --
-Items from partial files SHALL use the file's view URL as their source file reference, enabling traceability matrix links to resolve to the source repository.
+The system SHALL derive the source file reference of an item defined in a partial file from the file's repository view URL when the content source provides an `http(s)` URL, and from the file's repository-relative source path otherwise, so that traceability matrix links resolve into the source repository and no build-machine filesystem location is recorded.
 
 Source: openspec/specs/partial-file-processing/spec.md
 

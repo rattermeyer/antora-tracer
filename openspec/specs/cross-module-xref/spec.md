@@ -20,7 +20,7 @@ When processing `.adoc` files through the Antora extension, the system SHALL sto
 #### Scenario: Item from partial gets component and module attributes
 - **WHEN** an `[item]` macro is parsed from a partial in component `tracer`, module `ROOT`
 - **THEN** the resulting `Item` SHALL have `component` set to `"tracer"` and `module` set to `"ROOT"`
-- **AND** `sourceFile` is a full URL (view URL, existing behavior for partials)
+- **AND** `sourceFile` is the partial's `http(s)` repository view URL when one is provided, or its repository-relative source path otherwise
 
 #### Scenario: Item parsed via CLI has no component or module
 - **WHEN** an `[item]` macro is parsed outside of the Antora extension (e.g., CLI or standalone use)

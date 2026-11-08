@@ -202,8 +202,13 @@ tracer:links[]
 The `registerContentClassifier()` handler processes both `family: page` and
 `family: partial` files.
 Partial items use Antora's pre-computed `fileUri`
-as their `sourceFile`, making traceability matrix links point directly to the
-partial source in the content repository (for example, GitHub blob URL).
+as their `sourceFile` when it is an `http(s)` repository link, making
+traceability matrix links point directly to the partial source in the content
+repository (for example, GitHub blob URL).
+A local content source yields a `file://` `fileUri` that points at the build
+machine's worktree, so in that case the repository-relative `file.src.path` is
+used instead and no build-machine directory enters the graph or its published
+snapshots.
 The
 `LinkResolver` detects URL `sourceFile` values and returns them unchanged,
 skipping the HTML path conversion.

@@ -304,6 +304,7 @@ export interface Item {
   status?: string;                   // Free-form status
   tags?: string[];                   // Comma-separated header tags, parsed as a list
   attributes: Record<string, string>; // Additional attributes
+  sourceFile?: string;               // Repository source reference (see below)
   sourceLine?: number;               // Line number in source
   component?: string;                // Antora component name (absent for CLI)
   module?: string;                   // Antora module name (absent for CLI)
@@ -326,6 +327,12 @@ export interface ItemRelationship {
   inverseOf?: string;
 }
 ----
+
+`sourceFile` is the item's repository source reference, not a filesystem location.
+Page items use the source path given by the caller (the content catalog for Antora, the input path for the CLI), with the `.adoc` extension and anything up to and including the last `pages/` segment stripped.
+For items in partial files it is the partial's `http(s)` view URL when the content source provides one, and the repository-relative source path otherwise.
+A local content source produces a `file://` view URL, which points at the build machine's worktree, so those partial items fall back to the repository-relative path.
+No `sourceFile` value therefore exposes a build-machine directory, including when it is serialized into a `graph.json` snapshot or a Neo4j export.
 
 == Configuration Types
 

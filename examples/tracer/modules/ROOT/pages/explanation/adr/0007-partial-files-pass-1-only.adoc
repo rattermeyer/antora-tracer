@@ -40,8 +40,9 @@ In the `contentClassified` handler, both `family: page` and `family: partial` fi
 Both are processed through `processAsciiDocFile()` for Pass 1.
 For Pass 2 (macro expansion), only page files are iterated.
 
-Partial items receive `sourceFile` values set to the partial's *view URL* (from the Antora content source), not a local file path.
-This enables matrix links to point to the source repository.
+Partial items receive `sourceFile` values set to the partial's *view URL* (from the Antora content source) when that URL is an `http(s)` repository link, which enables matrix links to point to the source repository.
+A local content source makes Antora emit a `file://` view URL pointing at the build machine's worktree; that is a filesystem location rather than a link, so such partials fall back to the repository-relative source path (`file.src.path`).
+Hosted view URLs stay as authored.
 
 In `buildXref()`, items with `sourceFile` containing `://` (view URLs) use AsciiDoc's `link:` macro.
 Items with `sourceFile` containing `/partials/` fall back to same-page anchors (`xref:#ID`) since partials do not produce HTML pages to xref to.

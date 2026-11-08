@@ -151,8 +151,9 @@ export class LinkResolver {
   private itemToHtmlPath(item: Item): string {
     let sourceFile = item.sourceFile || item.id;
 
-    // If it's already a full URL (partial items use view URL as sourceFile),
-    // return it as-is — no HTML conversion needed
+    // If it's already a full URL (partial items under a hosted content source
+    // use their `http(s)` view URL as sourceFile), return it as-is — no HTML
+    // conversion needed
     if (sourceFile.includes("://")) {
       return sourceFile;
     }

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Process items defined in AsciiDoc partial files (`family: partial`) during the `contentClassified` event, alongside page files. Partial items are registered in the traceability graph with source URLs pointing to the repository, enabling matrix links to resolve to the source. Macro expansion and link substitution passes are skipped for partials since they do not produce rendered HTML output.
+Process items defined in AsciiDoc partial files (`family: partial`) during the `contentClassified` event, alongside page files. Partial items are registered in the traceability graph with source references pointing into the repository — the view URL for hosted content sources, the repository-relative path otherwise — enabling matrix links to resolve to the source without exposing build-machine paths. Macro expansion and link substitution passes are skipped for partials since they do not produce rendered HTML output.
 
 ## Requirements
 
@@ -13,12 +13,25 @@ The system SHALL process items defined in AsciiDoc partial files alongside page 
 - **WHEN** a content catalog contains a partial file with a valid item declaration during `contentClassified`
 - **THEN** the item is registered in the traceability graph with its ID and role
 
-### Requirement: Partial items use view URL as source reference
-Items from partial files SHALL use the file's view URL as their source file reference, enabling traceability matrix links to resolve to the source repository.
+### Requirement: Partial items use a repository source reference
+The system SHALL derive the source file reference of an item defined in a partial file from the file's repository view URL when the content source provides an `http(s)` URL, and from the file's repository-relative source path otherwise, so that traceability matrix links resolve into the source repository and no build-machine filesystem location is recorded.
 
 #### Scenario: Partial item uses the source view URL
-- **WHEN** a partial item is registered and the partial has a repository view URL
+- **WHEN** a partial item is registered and the partial has an `http(s)` repository view URL
 - **THEN** the item's `sourceFile` is set to that view URL
+
+#### Scenario: Local content source falls back to the repository-relative path
+- **WHEN** a partial item is registered and the partial's view URL is a local filesystem location (a `file://` URL)
+- **THEN** the item's `sourceFile` is set to the partial's repository-relative source path, with the `.adoc` extension stripped
+- **AND** the item's `sourceFile` contains no `file://` prefix and no absolute directory from the build machine
+
+#### Scenario: Partial without a view URL falls back to the repository-relative path
+- **WHEN** a partial item is registered and the partial has no view URL
+- **THEN** the item's `sourceFile` is set to the partial's repository-relative source path
+
+#### Scenario: No filesystem location reaches published artifacts
+- **WHEN** the traceability graph is published to a `graph.json` snapshot, a Neo4j export, or `query --snapshot` output
+- **THEN** no partial item's source reference exposes a build-machine filesystem location
 
 ### Requirement: All processing passes apply to partial files
 The system SHALL apply graph population, macro expansion, and link substitution passes to partial files in the same way as page files, because partial content is inlined into pages and reaches the browser.
@@ -27,7 +40,7 @@ The system SHALL apply graph population, macro expansion, and link substitution 
 - **WHEN** a partial file contains `[#REQ-100, item, role=requirement]`
 - **AND** the partial is processed during `contentClassified`
 - **THEN** the item is registered in the traceability graph
-- **AND** the item's `sourceFile` is set to the partial's view URL (pointing to the source repository)
+- **AND** the item's `sourceFile` is set to the partial's repository view URL when one is provided, or its repository-relative source path otherwise
 
 #### Scenario: Partial items appear in matrices with source links
 - **WHEN** a matrix is generated that includes items from partials
