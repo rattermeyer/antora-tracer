@@ -2740,6 +2740,59 @@ traceability:outgoing[]
 `);
       expect(out).to.not.include("No outgoing relationships");
     });
+
+    it("expands links[] in an item block closed at end of file", async () => {
+      // AsciiDoc accepts a block closed at EOF. The item scanner must not
+      // require a trailing newline after the closing delimiter, otherwise the
+      // macro is emitted as literal prose.
+      const out = await renderDoc(
+        `:traceability-links: true
+[#REQ-001, item, role=requirement, title="User Auth"]
+--
+addresses:ARC-001[]
+
+traceability:links[]
+--
+
+[#ARC-001, item, role=architecture, title="Auth Module"]
+--
+Description.
+--
+
+[#REQ-002, item, role=requirement, title="Last item, no trailing newline"]
+--
+addresses:ARC-001[]
+
+tracer:links[]
+--`,
+      );
+      expect(out).to.not.include("tracer:links[]");
+      expect(out).to.not.include("traceability:links[]");
+      expect(out).to.include("ARC-001");
+    });
+
+    it("auto-injects links in an item block closed at end of file", async () => {
+      const out = await renderDoc(
+        `:traceability-links: true
+:traceability-collapsible: true
+[#ARC-009, item, role=architecture, title="Auth Module"]
+--
+Description.
+--
+
+[#REQ-009, item, role=requirement, title="Closed at EOF"]
+--
+addresses:ARC-009[]
+--`,
+      );
+      // Assert on the EOF-closed item's own region: the earlier ARC-009 block
+      // also renders an injected incoming-links block, so a whole-document
+      // check would pass even when the trailing item is never scanned.
+      const region = out.slice(out.indexOf("[#REQ-009"));
+      expect(region).to.not.include("addresses:ARC-009[]");
+      expect(region).to.include(".Links");
+      expect(region).to.include("ARC-009");
+    });
   });
 
   // ========================================================================
