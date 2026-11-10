@@ -244,6 +244,33 @@ Content here
       expect(tracer.warnings).to.deep.equal(existing.warnings);
     });
 
+    it("should parse item headers carrying an additional role class", () => {
+      const parser = new DocumentParser();
+      const existing = parser.parse(
+        `[#REQ-BASE, item, role=requirement]\n--\nBase\n--\n\n[#REQ-001, item, role=requirement, title="Example", status=approved]\n--\nItem body\naddresses:REQ-BASE[]\n--`,
+        "test.adoc",
+      );
+      const classed = parser.parse(
+        `[.tracer#REQ-BASE, item, role=requirement]\n--\nBase\n--\n\n[.tracer.status-approved#REQ-001, item, role=requirement, title="Example", status=approved]\n--\nItem body\naddresses:REQ-BASE[]\n--`,
+        "test.adoc",
+      );
+
+      expect(classed.items).to.have.lengthOf(2);
+      expect(classed.items[1]).to.include({
+        id: "REQ-001",
+        role: "requirement",
+        title: "REQ-001 — Example",
+        status: "approved",
+        content: "Item body\naddresses:REQ-BASE[]",
+      });
+      expect(classed.items[1].attributes).to.deep.equal(
+        existing.items[1].attributes,
+      );
+      expect(classed.relationships).to.deep.equal(existing.relationships);
+      expect(classed.errors).to.deep.equal(existing.errors);
+      expect(classed.warnings).to.deep.equal(existing.warnings);
+    });
+
     it("should parse multiple items", () => {
       const parser = new DocumentParser({});
       const content = `

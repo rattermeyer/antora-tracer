@@ -155,7 +155,8 @@ export class DocumentParser {
     // Recognize both native ID headers and ID headers with a tracer role.
     // Only match at line start to avoid inline backtick references.
     // Use a quote-aware scanner so ']' in a title doesn't end the header.
-    const itemStartRegex = /^[ \t]*\[(?:\.tracer)?#([^,\]]+),\s*item,?/gm;
+    const itemStartRegex =
+      /^[ \t]*\[(?:\.[A-Za-z0-9_-]+)*#([^,\]]+),\s*item,?/gm;
     let match: RegExpExecArray | null;
 
     while ((match = itemStartRegex.exec(content)) !== null) {

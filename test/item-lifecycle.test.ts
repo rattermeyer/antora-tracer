@@ -91,6 +91,40 @@ describe("Item lifecycle (archive/remove)", () => {
       expect(res.stderr).to.include("not found");
     });
 
+    it("archives a superseded item whose header carries an additional role class", () => {
+      fs.writeFileSync(
+        path.join(TEST_DIR, "index.adoc"),
+        `= Test
+
+[.tracer.status-superseded#REQ-042, item, role=requirement, title="Old"]
+--
+Old requirement.
+--
+
+[#REQ-043, item, role=requirement, title="New"]
+--
+New requirement.
+
+supersedes:REQ-042[]
+--
+`,
+      );
+
+      const res = runCli(["archive", "REQ-042", "-i", TEST_DIR]);
+      expect(res.status, res.stderr).to.equal(0);
+
+      const archived = fs.readFileSync(
+        path.join(TEST_DIR, "superseded.adoc"),
+        "utf8",
+      );
+      expect(archived).to.include("[.tracer.status-superseded#REQ-042, item");
+      expect(archived).to.include("Old requirement.");
+      expect(readIndex()).to.not.include(
+        "[.tracer.status-superseded#REQ-042, item",
+      );
+      expect(readIndex()).to.include("REQ-043");
+    });
+
     it("writes a level-2 header when the item lives in a partial", () => {
       // An item under partials/ is included mid-document, where a level-0
       // title is illegal ("level 0 sections can only be used when doctype is

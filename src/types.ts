@@ -42,6 +42,22 @@ export function itemIdentity(item: {
     : [item.component, item.version ?? "", item.id].join("\u0000");
 }
 
+/**
+ * CSS class emitted on an item block for its status value, or undefined when
+ * the item declares no status or the value normalizes to nothing.
+ *
+ * The `tracer-status-` namespace keeps these classes distinct from the matrix's
+ * `status-done|partial|missing` coverage classes, which mean something else.
+ * Status values are free-form, so each run of non-alphanumeric characters
+ * collapses to a single `-`, which also neutralizes digit-leading values.
+ */
+export function statusClass(status: string | undefined): string | undefined {
+  const slug = (status ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return slug ? `tracer-status-${slug}` : undefined;
+}
 
 /** Relationship between items with role information. */
 export interface ItemRelationship {

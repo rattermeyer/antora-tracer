@@ -42,6 +42,7 @@ import {
   RENDERING_MACRO_LOOKAHEAD,
   RENDERING_MACRO_NAMESPACES,
   RENDERING_MACRO_NS,
+  statusClass,
 } from "./types.js";
 
 /**
@@ -454,7 +455,7 @@ export class AntoraTraceabilityExtension {
       delimiter: string;
     }> = [];
 
-    const macroStartRe = /\[(?:\.tracer)?#([^,\]]+),\s*item,?/g;
+    const macroStartRe = /\[(?:\.[A-Za-z0-9_-]+)*#([^,\]]+),\s*item,?/g;
     const verbatimRanges = this.findVerbatimRanges(content);
     let m: RegExpExecArray | null;
 
@@ -1964,7 +1965,7 @@ export class AntoraTraceabilityExtension {
    * Uses quote-aware scanning to find the real closing ']'.
    */
   private unindentItemMacros(content: string): string {
-    const macroStartRe = /^[ \t]+(\[(?:\.tracer)?#[^,\]]+,\s*item,?)/gm;
+    const macroStartRe = /^[ \t]+(\[(?:\.[A-Za-z0-9_-]+)*#[^,\]]+,\s*item,?)/gm;
     const replacements: Array<{ start: number; end: number; text: string }> =
       [];
     let m: RegExpExecArray | null;
@@ -2023,7 +2024,7 @@ export class AntoraTraceabilityExtension {
   private injectTitleIds(content: string): string {
     if (!this.traceability) return content;
 
-    const macroStartRe = /^[ \t]*\[(?:\.tracer)?#([^,\]]+),\s*item,?/gm;
+    const macroStartRe = /^[ \t]*\[(?:\.[A-Za-z0-9_-]+)*#([^,\]]+),\s*item,?/gm;
     const replacements: Array<{ start: number; end: number; text: string }> =
       [];
     let m: RegExpExecArray | null;
@@ -2062,8 +2063,16 @@ export class AntoraTraceabilityExtension {
 
       const fullMacro = content.slice(startPos, macroEnd + 1);
 
+      // Emit the item's status as a CSS class on the block header so a site
+      // stylesheet can decorate it. Unstyled, the class renders nothing.
+      let fixedMacro = fullMacro;
+      const className = statusClass(
+        this.traceability.graph.getItem(id)?.status,
+      );
+      if (className) fixedMacro = addRoleClassToHeader(fixedMacro, className);
+
       // Replace the title attribute value within this macro
-      const fixedMacro = fullMacro.replace(
+      fixedMacro = fixedMacro.replace(
         /title="([^"]*)"/,
         (_titleMatch: string, titleVal: string) => {
           const base = titleVal.startsWith(`${id} \u2014 `)
@@ -2445,7 +2454,7 @@ export class AntoraTraceabilityExtension {
     const graph = this.traceability.graph;
     const verbatimRanges = this.findVerbatimRanges(content);
     return content.replace(
-      /^\[(?:\.tracer)?#([A-Za-z0-9_-]+),\s*item,[^\]]*\]\n(--|====)\n[\s\S]*?\n\2\n?/gm,
+      /^\[(?:\.[A-Za-z0-9_-]+)*#([A-Za-z0-9_-]+),\s*item,[^\]]*\]\n(--|====)\n[\s\S]*?\n\2\n?/gm,
       (match: string, id: string, _delimiter: string, offset: number) =>
         !this.isInsideRange(offset, verbatimRanges) && graph.isSuperseded(id)
           ? ""
@@ -2696,6 +2705,21 @@ th, td { text-align: left; padding: 8px; border-bottom: 1px solid #eee; }
     }
     return this.traceability;
   }
+}
+
+/**
+ * Add a CSS role class to an item block header (`[.tracer#ID, item, ...]`).
+ * No-op when the class is already present, so repeated passes stay idempotent
+ * and an author-written class is left untouched. Headers without a leading
+ * role list and without an anchor are returned unchanged.
+ */
+function addRoleClassToHeader(header: string, className: string): string {
+  const idMatch = header.match(/^\[(?:\.[A-Za-z0-9_-]+)*#/);
+  if (!idMatch) return header;
+  const open = idMatch[0];
+  const rolePrefix = open.slice(1, -1); // ".tracer.status-draft"
+  if (rolePrefix.split(".").includes(className)) return header;
+  return `[${rolePrefix}.${className}${header.slice(open.length - 1)}`;
 }
 
 function register(

@@ -810,7 +810,7 @@ include::example$pass-pipeline.puml[]
 | Uses `toDot()` / `toVegaLite()` / `toConfigDot()`. Opt-in via `:traceability-graph:` document attribute. Independent of Pass 2.
 
 | Pass 3
-| `substituteLinksInFile()` — replace inline relationship macros with `xref:page.html#ID` (pages) or `link:URL#ID` (partials). Also runs `injectTitleIds()` and `unindentItemMacros()`.
+| `substituteLinksInFile()` — replace inline relationship macros with `xref:page.html#ID` (pages) or `link:URL#ID` (partials). Also runs `injectTitleIds()`, which injects the item's title ID and its `tracer-status-<slug>` class, and `unindentItemMacros()`.
 | Pages + partials
 | Needs complete graph (all sourceFiles known) from Pass 1. This is why Pass 1 processes all files before any macro expansion.
 |===

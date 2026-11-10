@@ -333,6 +333,65 @@ traceability:outgoing[]
       expect(output).to.include("xref:");
     });
 
+    it("emits a namespaced status class on items that declare a status", async () => {
+      const ctx = createMockContext();
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const content = `[#REQ-001, item, role=requirement, title="Draft", status="In Review"]
+--
+Body.
+--
+`;
+      const file = {
+        src: { path: "test.adoc", module: "ROOT", component: "tracer" },
+        contents: Buffer.from(content),
+      };
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [file] : [],
+        },
+      });
+      expect(ext.getTraceabilityExtension().graph.getItem("REQ-001")).to.exist;
+
+      const output = file.contents.toString("utf8");
+      const html = String(asciidoctor().convert(output, { safe: "safe" }));
+      expect(html).to.include("tracer-status-in-review");
+      expect(html).to.include('id="REQ-001"');
+      expect(html).to.include("requirement");
+      expect(html).to.include("REQ-001 — Draft");
+    });
+
+    it("emits no status class for items without a status", async () => {
+      const ctx = createMockContext();
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const content = `[#REQ-002, item, role=requirement, title="Plain"]
+--
+Body.
+--
+`;
+      const file = {
+        src: { path: "test.adoc", module: "ROOT", component: "tracer" },
+        contents: Buffer.from(content),
+      };
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [file] : [],
+        },
+      });
+      expect(ext.getTraceabilityExtension().graph.getItem("REQ-002")).to.exist;
+
+      const output = file.contents.toString("utf8");
+      const html = String(asciidoctor().convert(output, { safe: "safe" }));
+      expect(html).to.not.match(/tracer-status-/);
+      expect(html).to.include('id="REQ-002"');
+      expect(html).to.include("REQ-002 — Plain");
+    });
+
     it("should register relationships from inline macros", async () => {
       const ctx = createMockContext({
         playbook: { output: { dir: tempDir }, extensions: [] },
@@ -4735,6 +4794,42 @@ supersedes:REQ-042[]
 
       const content = `
 [.tracer#REQ-042, item, role=requirement, title="Old"]
+--
+Old requirement.
+--
+
+[#REQ-043, item, role=requirement, title="New"]
+--
+New requirement.
+supersedes:REQ-042[]
+--
+`;
+      const file = {
+        src: { path: "test.adoc" },
+        contents: Buffer.from(content),
+      };
+      ctx.fireEvent("contentClassified", {
+        contentCatalog: {
+          findBy: ({ family }: { family: string }) =>
+            family === "page" ? [file] : [],
+        },
+      });
+
+      const output = file.contents.toString("utf8");
+      expect(output).to.not.include("REQ-042");
+      expect(output).to.include("REQ-043");
+      expect(ext.getTraceabilityExtension().graph.getItem("REQ-042")).to.exist;
+    });
+
+    it("hides superseded item blocks whose header carries an additional role class", async () => {
+      const ctx = createMockContext();
+      const ext = new AntoraTraceabilityExtension(ctx as any, {
+        config: { renderSuperseded: false },
+      });
+      await waitForInit();
+
+      const content = `
+[.tracer.status-superseded#REQ-042, item, role=requirement, title="Old"]
 --
 Old requirement.
 --

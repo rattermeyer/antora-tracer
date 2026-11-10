@@ -47,6 +47,91 @@ This form is equivalent to `[#REQ-001, item, ...]` for parsing and traceability.
 Asciidoctor renders it with `id="REQ-001"` and the `tracer` CSS class, in addition to the configured item role class.
 For example, target the title in the HTML UI stylesheet with `.openblock.tracer > .title`.
 The `.tracer` role syntax is optional and does not change the `role` attribute used by the traceability configuration.
+Header role classes are not limited to `tracer`: any class in the header is accepted, so `[.tracer.status-draft#REQ-001, item, ...]` is a valid item declaration.
+
+=== Status class
+
+An item that declares a `status` gets an additional CSS class on its rendered block, derived from the status value:
+
+[source,asciidoc]
+----
+[#REQ-001, item, role=requirement, status="In Review", title="Title"]
+--
+Item content.
+--
+----
+
+Asciidoctor renders it as:
+
+[source,html]
+----
+<div id="REQ-001" class="openblock requirement tracer-status-in-review">
+----
+
+The class name is the status value lowercased, with each run of non-alphanumeric characters replaced by a single `-`, prefixed with `tracer-status-`:
+
+[width=100%, cols="30,70"]
+|===
+| `status` value | Emitted class
+
+| `draft` | `tracer-status-draft`
+| `In Review` | `tracer-status-in-review`
+| `2.1` | `tracer-status-2-1`
+| `open/closed` | `tracer-status-open-closed`
+| omitted, empty, or only punctuation | none
+|===
+
+The class is emitted on every item that declares a status and is never configurable.
+The extension itself renders no icon, badge, or color for it: all decoration comes from a stylesheet.
+The `tracer-` namespace keeps it distinct from the matrix's `status-done`, `status-partial`, and `status-missing` coverage classes, which describe matrix coverage rather than item status.
+The conemso UI theme ships a default glyph for five common statuses, so those render with no project CSS at all:
+
+[width=100%, cols="30,15,55"]
+|===
+| `status` value | Glyph | Class
+
+| `draft` | `✎` | `tracer-status-draft`
+| `review` | `↻` | `tracer-status-review`
+| `approved` | `✓` | `tracer-status-approved`
+| `deprecated` | `⚠` | `tracer-status-deprecated`
+| `superseded` | `⊘` | `tracer-status-superseded`
+|===
+
+The theme appends the glyph to the title with a `::after` rule:
+
+[source,css]
+----
+.doc .openblock.tracer-status-approved > .title::after { content: "\2713"; }
+----
+
+Decorate other statuses, or override the theme, in the site's own stylesheet.
+The class is on the item block, not the title, so target `.title` from it:
+
+[source,css]
+----
+.tracer-status-in-review > .title::after { content: "\21BB"; color: var(--warning-color); }
+----
+
+Glyphs need a font that carries them: the theme's Roboto subsets do not, so a custom rule should name a symbol-capable family, or the browser may substitute one that renders an empty box.
+
+[source,css]
+----
+.tracer-status-in-review > .title::after {
+  content: "\21BB";
+  font-family: "DejaVu Sans", "Segoe UI Symbol", "Apple Symbols", sans-serif;
+}
+----
+
+Scope rules to selected pages by scoping them to a page role.
+A page header `:page-role: show-status-glyphs` renders as a body class, so the decoration applies only where a page asks for it:
+
+[source,css]
+----
+.show-status-glyphs .tracer-status-draft > .title::after { content: "\270E"; }
+----
+
+Status classes are an HTML and CSS feature.
+They have no effect in the PDF and DOCX builds, which do not consume CSS.
 
 == Attributes
 

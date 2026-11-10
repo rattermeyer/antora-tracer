@@ -2,6 +2,15 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [Unreleased]
+
+### Added
+- Item blocks carry a `tracer-status-<value>` CSS class derived from the item's `status`, so a site stylesheet can attach badges or state icons without the extension emitting presentational markup. The class is emitted unconditionally and carries no decoration by itself; the value is lowercased with non-alphanumeric runs collapsed to `-`, and no class is emitted for an absent or empty status. The `antora-ui-conemso` theme appends a glyph to the title for `draft`, `review`, `approved`, `deprecated`, and `superseded`, and the example site's playbook pins that theme release.
+- Item headers accept any role class, not only `.tracer`: `[.tracer.status-draft#REQ-001, item, ...]` is recognized as an item declaration in the parser, macro expansion, superseded-block stripping, and CLI item location.
+
+### Fixed
+- Superseded items whose header carries an additional role class, such as `[.tracer.status-draft#REQ-001, item, ...]`, are now hidden when superseded rendering is disabled. Previously only the `.tracer`-only header form was matched, so those blocks stayed visible in the build.
+
 ## [0.32.1] — 2026-11-08
 
 ### Fixed

@@ -96,6 +96,11 @@ antora:
 
 `excludeComponents` matches Antora component names exactly; no glob or substring matching.
 
+Item status classes are not configurable.
+The extension emits `tracer-status-<value>` on every item that declares a `status`, and the class carries no decoration by itself, so the stylesheet is the switch rather than an option.
+The conemso UI theme draws a glyph for five common statuses; other values need a rule in the site's own stylesheet.
+See xref:reference/item-macro.adoc[Item Macro Reference] for the derived class names and styling examples.
+
 The `KROKI_SERVER_URL` environment variable overrides the `krokiServerUrl` option.
 When set, it is used as the Kroki server base URL instead of the configured value or the default `https://kroki.io`.
 

@@ -7,7 +7,7 @@ import { ConfigLoader } from "../src/config/TraceabilityConfig.js";
 import { RequirementsTraceabilityExtension } from "../src/index.js";
 import { Neo4jExporter } from "../src/Neo4jExporter.js";
 import { TraceabilityGraph } from "../src/TraceabilityGraph.js";
-import { itemIdentity } from "../src/types.js";
+import { itemIdentity, statusClass } from "../src/types.js";
 
 function item(
   id: string,
@@ -51,6 +51,30 @@ describe("component-scoped graph identity", () => {
   it("uses component, version, and item ID while leaving unscoped IDs bare", () => {
     expect(itemIdentity(item("REQ-001", "foo", "1"))).to.equal("foo\u00001\u0000REQ-001");
     expect(itemIdentity(item("REQ-001"))).to.equal("REQ-001");
+  });
+
+  it("normalizes free-form statuses into namespaced classes", () => {
+    expect(statusClass("draft")).to.equal("tracer-status-draft");
+    expect(statusClass("DRAFT")).to.equal("tracer-status-draft");
+    expect(statusClass("In Review")).to.equal("tracer-status-in-review");
+    expect(statusClass("in review")).to.equal("tracer-status-in-review");
+    expect(statusClass("2.1")).to.equal("tracer-status-2-1");
+    expect(statusClass("open/closed")).to.equal("tracer-status-open-closed");
+    expect(statusClass("--draft--")).to.equal("tracer-status-draft");
+  });
+
+  it("emits no class for absent or non-alphanumeric statuses", () => {
+    expect(statusClass(undefined)).to.be.undefined;
+    expect(statusClass("")).to.be.undefined;
+    expect(statusClass("   ")).to.be.undefined;
+    expect(statusClass("!!!")).to.be.undefined;
+  });
+
+  it("namespaces status classes away from matrix coverage classes", () => {
+    // Matrix rows already emit `status-done` for coverage; an item status of
+    // the same word must not produce the identical class name.
+    expect(statusClass("done")).to.not.equal("status-done");
+    expect(statusClass("done")).to.equal("tracer-status-done");
   });
 
   it("keeps IDs distinct across components and versions but deduplicates within one scope", () => {

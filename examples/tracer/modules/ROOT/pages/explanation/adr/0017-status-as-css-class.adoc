@@ -1,0 +1,78 @@
+= ADR-017: Status exposed as a CSS class, not a data attribute
+
+*Status*: accepted +
+*Deciders*: Richard Attermeyer +
+*Date*: 2026-11-10
+
+== Context and Problem Statement
+
+An item block renders through the standard Asciidoctor HTML5 converter, which emits only `id`, `class`, and `style` on the block element.
+Every other block attribute is discarded: `[#REQ-001, item, role=requirement, data-status=draft]` renders `<div id="REQ-001" class="openblock requirement">`, and neither an inline anchor carrying the attribute nor a tree processor setting it on the node changes that.
+Projects therefore had no supported way to decorate an item from its own metadata — adding a status badge or state icon meant copying the value into the block's authored content, or post-processing the generated HTML outside the extension.
+
+Two project constraints bound the solution.
+CON-003 requires that all generated content use standard AsciiDoc constructs rather than raw HTML, so that every backend — including the PDF and DOCX pipelines — keeps working.
+The PDF build is a shipped deliverable: the Pages workflow generates `requirements.pdf`, `architecture.pdf`, and `test-plan.pdf` alongside the HTML site on every push.
+
+== Decision Drivers
+
+* Authors must get a decoration from item metadata without restating the value in the block
+* Output must stay backend-neutral; HTML-only mechanisms are excluded by CON-003
+* The mechanism must not need a converter subclass, an HTML rewrite pass, or a new dependency
+* Existing rendered output, the graph, and the matrix must be unaffected
+* A project that does not want the decoration must be able to switch it off without a rebuild
+
+== Considered Options
+
+* Emit a namespaced CSS class derived from the item status — chosen
+* Emit `data-*` attributes via a `pagesComposed` pass over `page.contents` HTML — rejected: parses generated HTML, HTML-only, no PDF story
+* Emit `data-*` by subclassing the Opal-based HTML5 converter — rejected: most invasive, still HTML-only
+* Render an icon glyph from a configuration map into the block title — rejected: adds a config surface and a value-to-glyph mapping the project does not need
+* Use the `icon:` macro with a Font Awesome UI bundle — rejected: the chosen UI bundle ships no Font Awesome font, and the project sets no `:icons:` attribute, so the macro renders literal text
+
+== Decision Outcome
+
+Chosen option: the extension emits `tracer-status-<slug>` on the item block for every item that declares a `status`.
+`role=` is already a CSS class in the rendered output, so no converter work is involved and the class flows through every backend that reads roles.
+The class is inert — the extension renders no icon, badge, text, or color — so the site stylesheet is both the decoration and the switch.
+
+The `<slug>` is the status value lowercased with each run of non-alphanumeric characters collapsed to a single `-`.
+The `tracer-status-` prefix distinguishes the class from the matrix's `status-done`/`status-partial`/`status-missing` coverage classes, which describe coverage rather than item status, and doubles as a guard against digit-leading values (`status="2.1"` → `tracer-status-2-1`).
+An absent, empty, or punctuation-only status emits no class.
+
+Emission is unconditional and has no configuration option.
+An unstyled class renders nothing, so always-emit costs no visual change, while a configuration switch would require document-attribute plumbing into the substitution pass and a partial-handling rule.
+Per-page control already exists: the UI layout puts `page.attributes.role` on the `<body>` element, so a page header `:page-role: show-status-glyphs` scopes stylesheet rules to that page.
+
+In the same change, item headers accept any role-class prefix rather than only `.tracer`, so an emitted or hand-written class in the header does not break item recognition.
+This generalization also repaired superseded-item stripping, which matched only the `.tracer` header form and therefore left a superseded item written with a status class visible in the build.
+
+Default decoration lives in the `antora-ui-conemso` theme, not in the extension and not in generated CSS.
+The theme is what these sites render with and already carries a Tracer-aware rule, so it draws a glyph after the title for five common statuses: `draft`, `review`, `approved`, `deprecated`, and `superseded`.
+Any other value renders no glyph until the project adds a rule, which keeps the theme from defining a status vocabulary the extension deliberately leaves free-form.
+The extension's playbook pins move to the theme release that carries the glyphs.
+
+== Positive Consequences
+
+* A status glyph needs no extension configuration and no per-item authoring; the common statuses render out of the box through the theme
+* The class is backend-neutral: it appears in every output that renders roles, and unstyled output is byte-identical in appearance to before
+* A project switches a glyph off, or scopes it to selected pages, entirely in its own stylesheet
+* The status value stays the single source of truth — the glyph is derived, so it cannot disagree with the item
+* The graph, snapshot, Neo4j export, and matrix are untouched
+
+== Negative Consequences
+
+* A new status value still needs a stylesheet rule: the theme covers five common values, and anything else renders no glyph until the project adds one
+* The PDF and DOCX builds gain nothing from the class — no CSS is consumed there
+* Superseded item blocks and relationship-list entries are out of scope: relationship links are generated as xref strings, so decorating them needs a separate change
+* The class is emitted for every item that declares a status, so a project that never styles it still carries the class in its HTML
+* Default glyphs live in a separate repository and release train, so shipping a glyph change means releasing the theme and bumping the extension's playbook pins
+* The theme's Roboto subsets carry no symbol glyphs, so the rules depend on a symbol-capable system font being installed; a fallback that lacks the codepoint renders an empty box
+
+== Links
+
+* xref:explanation/architecture.adoc#ARC-003[ARC-003] — the processing flow that rewrites item headers during the `contentClassified` pass
+* xref:reference/item-macro.adoc[Item Macro Reference] — the derived class names and stylesheet examples
+* xref:reference/configuration.adoc[Configuration Reference] — records that no option governs class emission
+* https://github.com/rattermeyer/antora-ui-conemso[antora-ui-conemso] — the theme that ships the default glyphs
+* `openspec/changes/item-status-classes/design.md`
