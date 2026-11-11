@@ -2,7 +2,7 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
-## [Unreleased]
+## [0.33.0] — 2026-11-11
 
 ### Added
 - Item blocks carry a `tracer-status-<value>` CSS class derived from the item's `status`, so a site stylesheet can attach badges or state icons without the extension emitting presentational markup. The class is emitted unconditionally and carries no decoration by itself; the value is lowercased with non-alphanumeric runs collapsed to `-`, and no class is emitted for an absent or empty status. The `antora-ui-conemso` theme appends a glyph to the title for `draft`, `review`, `approved`, `deprecated`, and `superseded`, and the example site's playbook pins that theme release.
