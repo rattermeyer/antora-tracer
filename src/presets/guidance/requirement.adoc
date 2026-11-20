@@ -88,7 +88,9 @@ Exception: when the integration IS the feature — "Neo4j export", "Antora exten
 
 === Atomicity
 
-* One SHALL per block. Multiple SHALLs usually mean multiple requirements — split them.
+* One SHALL per item, not one per paragraph. Multiple SHALLs in one item — in one block or spread over several — usually mean multiple requirements.
+* When the obligations sit at the same level, split them into separate items.
+* When the obligations sit at different levels, state the broader obligation in a parent requirement and let the child `refines` it.
 * A SHALL NOT (prohibition) is its own Unwanted Behaviour requirement, never paired with a positive SHALL.
 * Exception: "and" is fine when it joins aspects of one observable outcome ("displays X and Y in the same view").
 

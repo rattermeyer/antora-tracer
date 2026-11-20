@@ -35,6 +35,12 @@
       "expect_prescription": null,
       "expect_pass": false,
       "block": "[#REQ-006, item, role=requirement, title=\"Parse and matrix\"]\n--\nThe system SHALL parse items and SHALL generate a matrix.\n--"
+    },
+    {
+      "id": "atomicity-shall-not",
+      "expect_prescription": null,
+      "expect_pass": false,
+      "block": "[#REQ-007, item, role=requirement, title=\"Store relationship without mutating source\"]\n--\nThe system SHALL store the relationship and SHALL NOT modify the source file.\n\nrefines:REQ-001[]\ntracer:links[]\n--"
     }
   ]
 }

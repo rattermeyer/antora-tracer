@@ -85,7 +85,8 @@ The concrete class and event names above are antora-tracer internals used as ill
 
 One requirement, one SHALL — and one obligation only.
 
-- **One SHALL per block.** Multiple SHALLs usually means multiple requirements — split them.
+- **One SHALL per item, not one per paragraph.** Multiple SHALLs in one item — in one block or spread over several — usually means multiple requirements.
+- **Same level → split; different level → refine.** Split obligations that sit at the same level into separate items; state a broader obligation in a parent requirement and let the child `refines` it.
 - **SHALL NOT is a separate requirement.** A prohibition is its own Unwanted Behaviour requirement, never paired with a positive SHALL in the same block.
 - **Exception:** "and" is fine when it joins aspects of one observable outcome ("displays X and Y in the same view").
 
@@ -239,7 +240,7 @@ Traceability links from requirements back to use cases depend on the relation ty
 ### SHALL Statement Guidelines
 
 - **Choose the right EARS pattern first.** The pattern determines the sentence structure — ubiquitous, event-driven (`When`), state-driven (`While`), unwanted behaviour (`If … then`), or optional feature (`Where`). See the EARS section above.
-- **One SHALL per requirement.** Multiple SHALLs in one block usually means two requirements — split them.
+- **One SHALL per requirement.** Multiple SHALLs in one item — in one block or spread over several — usually means two requirements; split same-level obligations and refine across levels.
 - **Subject is "the system" or a user-facing feature name**, never an internal component name.
 - **Verb is observable**: "provide", "display", "generate", "register", "validate", "notify" — not "define a type", "build a graph", "use a library".
 - **Object is a user-visible outcome or data artefact**, not an internal data structure.
