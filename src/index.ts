@@ -140,6 +140,7 @@ export class RequirementsTraceabilityExtension {
       module?: string;
       pubUrl?: string;
       version?: string;
+      sourceRoot?: string;
     } = {},
   ): ParserResult & { graph: TraceabilityGraph } {
     this.currentFile = options.sourceFile || "input";
@@ -155,6 +156,7 @@ export class RequirementsTraceabilityExtension {
       options.module,
       options.pubUrl,
       options.version,
+      options.sourceRoot,
     );
 
     // Add parsed items to the graph
@@ -319,20 +321,40 @@ export class RequirementsTraceabilityExtension {
   /**
    * Get relationships from an item
    */
-  getRelationships(fromId: string, type?: string, component?: string, version?: string): ItemRelationship[] {
+  getRelationships(
+    fromId: string,
+    type?: string,
+    component?: string,
+    version?: string,
+  ): ItemRelationship[] {
     return this.graph.getRelationships(fromId, type, component, version);
   }
 
   /**
    * Get items related to a given item
    */
-  getRelatedItems(itemId: string, relationType?: string, component?: string, version?: string): Item[] {
+  getRelatedItems(
+    itemId: string,
+    relationType?: string,
+    component?: string,
+    version?: string,
+  ): Item[] {
     return this.graph.getRelatedItems(itemId, relationType, component, version);
   }
 
   /** Get items with relation to a given item (reverse). */
-  getItemsWithRelationTo(itemId: string, relationType?: string, component?: string, version?: string): Item[] {
-    return this.graph.getItemsWithRelationTo(itemId, relationType, component, version);
+  getItemsWithRelationTo(
+    itemId: string,
+    relationType?: string,
+    component?: string,
+    version?: string,
+  ): Item[] {
+    return this.graph.getItemsWithRelationTo(
+      itemId,
+      relationType,
+      component,
+      version,
+    );
   }
 
   /**
@@ -368,14 +390,24 @@ export class RequirementsTraceabilityExtension {
   /**
    * Find path between two items
    */
-  findPath(fromId: string, toId: string, maxDepth?: number, component?: string, version?: string): string[] | null {
+  findPath(
+    fromId: string,
+    toId: string,
+    maxDepth?: number,
+    component?: string,
+    version?: string,
+  ): string[] | null {
     return this.graph.findPath(fromId, toId, maxDepth, component, version);
   }
 
   /**
    * Get impact analysis (all reachable items)
    */
-  getImpactAnalysis(itemId: string, component?: string, version?: string): string[] {
+  getImpactAnalysis(
+    itemId: string,
+    component?: string,
+    version?: string,
+  ): string[] {
     return this.graph.getImpactAnalysis(itemId, component, version);
   }
 
@@ -616,6 +648,13 @@ export {
   SNAPSHOT_FORMAT,
   serializeSnapshot,
 } from "./GraphSnapshot.js";
+// Item block bounds — the single block-locating scan
+export {
+  findItemBlocks,
+  type ItemBlockBounds,
+  itemBlockBoundsAtLine,
+  itemBlockBoundsAtOffset,
+} from "./ItemBlockBounds.js";
 // Matrix Generator
 export {
   type GeneratedMatrix,
@@ -633,6 +672,8 @@ export {
 } from "./Neo4jExporter.js";
 // Site-graph harvest
 export { type HarvestedFile, harvestSiteFiles } from "./SiteGraph.js";
+// Source-path resolution
+export { resolveSourceFilePath } from "./SourcePath.js";
 // Graph types
 export type { GraphWarning, ValidationResult } from "./TraceabilityGraph.js";
 // Core types

@@ -1,0 +1,38 @@
+= Writing Regulation Items
+
+A `regulation` item records an external regulatory source or obligation relevant to the project context.
+This guidance supports traceability authoring only and does not interpret law or establish regulatory compliance.
+`tracer:links[]` is optional display-only markup and is not part of the item content.
+
+== Item template
+
+[source,asciidoc]
+----
+[#<id>, item, role=regulation, title="<source or obligation>"]
+--
+Source and jurisdiction: <identified regulation and applicable scope>.
+
+Relevant obligation or interpretation: <specific, supported statement>.
+
+<optional link, for example:>
+requires:<system-requirement-id>[]
+
+--
+----
+
+== Optional configured links
+
+A regulation may use `requires` for a `system_requirement`.
+It may use `requires` for a `software_requirement`.
+The configured reverse name is `required_by` for both relations.
+Add a link only when the source, scope, interpretation, and target ID are supported by project evidence.
+
+== Writing and review checklist
+
+* [ ] Identifies the source, jurisdiction, version, and applicable scope when known.
+* [ ] Separates quoted or evidenced obligations from project interpretation.
+* [ ] Links only to requirements that are genuinely required by the recorded source.
+* [ ] Does not invent legal obligations, applicability, or compliance conclusions.
+* [ ] Uses only configured relation names and existing target IDs for optional links.
+* [ ] Avoids claiming that a traceability link or preset use proves compliance.
+* [ ] Includes `tracer:links[]` only when displaying related items is useful.

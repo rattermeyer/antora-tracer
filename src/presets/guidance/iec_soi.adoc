@@ -1,0 +1,40 @@
+= Writing SOI Items
+
+An `soi` item records software of unknown provenance and the evidence gathered about its use.
+This guidance supports traceability authoring only and does not establish IEC 62304, FDA, or other regulatory compliance.
+`tracer:links[]` is optional display-only markup and is not part of the item content.
+
+== Item template
+
+[source,asciidoc]
+----
+[#<id>, item, role=soi, title="<software component>"]
+--
+Origin and identity: <component, version, source, and provenance evidence>.
+
+Intended use, assumptions, and assessment status: <supported detail>.
+
+<optional link, for example:>
+fulfills:<software-requirement-id>[]
+
+--
+----
+
+== Optional configured links
+
+An SOI may use `fulfills` for a `software_requirement`.
+It may use `complies_with` for a `regulation`.
+It may use `complies_with` for a `standard`.
+The configured reverse names are `fulfilled_by` and `complied_with_by`, respectively.
+Use `complies_with` only when the project has documented evidence supporting that statement.
+Add a link only when the target ID exists and the relationship is supported by project evidence.
+
+== Writing and review checklist
+
+* [ ] Identifies the component, version, origin, and provenance evidence where known.
+* [ ] States intended use, assumptions, assessment status, and unresolved unknowns.
+* [ ] Separates recorded evidence from an author’s interpretation.
+* [ ] Does not imply that use of the preset or a link alone proves compliance.
+* [ ] Uses only configured relation names and existing target IDs for optional links.
+* [ ] Avoids unsupported claims about regulation, standards, safety, or provenance.
+* [ ] Includes `tracer:links[]` only when displaying related items is useful.

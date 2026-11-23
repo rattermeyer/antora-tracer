@@ -97,7 +97,7 @@ antora:
         preset: requirements-engineering
 ----
 
-The `requirements-engineering` preset defines five roles (`requirement`, `design`, `implementation`, `test`, `document`) and three matrices.
+The `requirements-engineering` preset defines three roles (`requirement`, `design`, `test`) and two matrices.
 You can explore other presets later — for now, stick with this one.
 
 Build again to verify everything still works:
@@ -112,7 +112,7 @@ The extension is active but won't produce traceability output until you write so
 
 == Step 3: Write your first traceable items
 
-Open `modules/ROOT/pages/index.adoc` and add three traceable items — a requirement, an implementation, and a test:
+Open `modules/ROOT/pages/index.adoc` and add three traceable items — a requirement, a design, and a test:
 
 [source,asciidoc]
 ----

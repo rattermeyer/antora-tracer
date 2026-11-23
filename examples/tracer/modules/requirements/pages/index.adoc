@@ -142,7 +142,7 @@ Source: openspec/specs/functional-siblings/spec.md
 traceability:links[]
 --
 
-[#REQ-336, item, role=requirement, title="Item headers support a tracer role and ID"]
+[#REQ-336, item, role=requirement, title="Item headers support role classes and an ID"]
 --
 The system SHALL recognize `[.tracer#ID, item, ...]` as an item declaration equivalent to `[#ID, item, ...]` with respect to the item's ID, role, title, status, additional attributes, content, and relationships. Existing `[#ID, item, ...]` declarations SHALL remain supported.
 
@@ -151,11 +151,96 @@ Source: openspec/specs/item-header-syntax/spec.md
 traceability:links[]
 --
 
-[#REQ-335, item, role=requirement, title="Tracer-role headers work across item processing"]
+[#REQ-335, item, role=requirement, title="Role-class headers work across item processing"]
 --
 The system SHALL treat the tracer-role header as an item declaration in every processing path that recognizes, transforms, renders, or locates item blocks, including Antora relationship rendering and CLI item lifecycle operations.
 
 Source: openspec/specs/item-header-syntax/spec.md
+
+traceability:links[]
+--
+
+=== Item Metadata Filtering
+
+[#REQ-370, item, role=requirement, title="Items support header tags"]
+--
+An item declaration MAY include a `tags` attribute containing a comma-separated list of tags. The system SHALL expose the parsed tags as a list on the item, trimming surrounding whitespace and ignoring empty entries. Omitting `tags` SHALL produce an empty tag list. Existing item header syntax and other attributes SHALL remain compatible.
+
+Source: openspec/specs/item-metadata-filtering/spec.md
+
+traceability:links[]
+--
+
+[#REQ-371, item, role=requirement, title="Matrix definitions filter rows by item metadata"]
+--
+A matrix definition MAY specify a row filter expression. The matrix SHALL include only current items of the configured row role for which the expression evaluates to true. If no row filter is configured, row selection SHALL remain unchanged. The expression SHALL support status equality/inequality and tag membership tests combined with logical `and`, `or`, and parentheses. Evaluation SHALL NOT execute arbitrary code.
+
+Source: openspec/specs/item-metadata-filtering/spec.md
+
+traceability:links[]
+--
+=== Item Status Classes
+
+[#REQ-372, item, role=requirement, title="Rendered item blocks expose a namespaced class derived from item metadata"]
+--
+When an item declares a `status`, the system SHALL add a CSS class derived from that value to the item's rendered block, in addition to the existing semantic role class. The class SHALL use a distinct namespace so it cannot be confused with the coverage classes the matrix emits for a different meaning. The emitted class SHALL be inert: the system SHALL NOT render any icon, badge, text, or color for it.
+
+Source: openspec/specs/item-status-classes/spec.md
+
+traceability:links[]
+--
+
+[#REQ-373, item, role=requirement, title="Status class names are normalized from free-form values"]
+--
+Item status values are free-form strings. The system SHALL normalize a status value into a class name that is valid as a CSS class and stable for a given value, and SHALL emit a class for every non-empty value. Values differing only in case SHALL produce the same class. A value that normalizes to nothing SHALL emit no class.
+
+Source: openspec/specs/item-status-classes/spec.md
+
+traceability:links[]
+--
+
+[#REQ-374, item, role=requirement, title="Status class emission requires no configuration"]
+--
+The status class SHALL be emitted for every item that declares a status, without a site, component, page, or playbook configuration option, and without an author opting in per item. Choosing whether and where the class becomes visible SHALL be the site stylesheet's responsibility.
+
+Source: openspec/specs/item-status-classes/spec.md
+
+traceability:links[]
+--
+
+[#REQ-375, item, role=requirement, title="Status class emission does not alter item semantics"]
+--
+Emitting the status class SHALL NOT change the item's ID, role, title, stored status value, tags, attributes, or relationships, and SHALL NOT affect the matrix, graph, or export output for that item.
+
+Source: openspec/specs/item-status-classes/spec.md
+
+traceability:links[]
+--
+=== Item Block Bounds
+
+[#REQ-367, item, role=requirement, title="One accessor reports an item block's bounds"]
+--
+The system SHALL expose a single function that, given source content and the position of an item header, returns that item block's bounds. The function SHALL be exported from the package's public entry point and SHALL be the only block-locating implementation in the package.
+
+Source: openspec/specs/item-block-bounds/spec.md
+
+traceability:links[]
+--
+
+[#REQ-368, item, role=requirement, title="Bounds follow the parser's block grammar"]
+--
+The accessor SHALL accept the same item-block forms the parser accepts, and SHALL NOT report bounds for text the parser does not treat as an item block.
+
+Source: openspec/specs/item-block-bounds/spec.md
+
+traceability:links[]
+--
+
+[#REQ-369, item, role=requirement, title="Bounds are the shared implementation for consumers"]
+--
+Consumers that locate, move, or delete item blocks SHALL obtain block bounds from this accessor rather than maintaining their own scan of the content.
+
+Source: openspec/specs/item-block-bounds/spec.md
 
 traceability:links[]
 --
@@ -358,6 +443,99 @@ traceability:links[]
 Relationships declared as header attributes SHALL follow the same canonicalization, validation, and rendering as inline relationship macros.
 
 Source: openspec/specs/relationship-header-attributes/spec.md
+
+traceability:links[]
+--
+
+[#REQ-397, item, role=requirement, title="Selected policy filters rendered item relationships"]
+--
+When a link display policy is selected, the system SHALL apply it to all automatically generated and explicitly requested outgoing, incoming, and combined relationship links. For policy evaluation, the enclosing item SHALL be the displayed item and each linked item SHALL be the related item. The policy SHALL filter only matching links and SHALL NOT change relationship parsing or graph contents.
+
+Source: openspec/specs/traceability-links-macro/spec.md
+
+traceability:links[]
+--
+
+[#REQ-398, item, role=requirement, title="Page policy overrides apply to included partial items"]
+--
+The system SHALL resolve `traceability-link-policy` from site and component defaults, with a page-header value taking precedence for every item rendered in that page, including items defined in included partials. The value `none` SHALL disable policy filtering for the page. If no policy is selected, the system SHALL preserve current unfiltered link output.
+
+Source: openspec/specs/traceability-links-macro/spec.md
+
+traceability:links[]
+--
+=== Relationship Canonicalization
+
+[#REQ-379, item, role=requirement, title="Deferred inverse relations deduplicate after endpoint resolution"]
+--
+When the graph resolves the endpoints of reciprocal primary and reverse-authored relations, it SHALL store one canonical bidirectional relationship and SHALL NOT report the pair as a duplicate.
+
+Source: openspec/specs/relationship-canonicalization/spec.md
+
+traceability:links[]
+--
+=== Relationship Display Filters
+
+[#REQ-380, item, role=requirement, title="Policies match normalized relation types and both endpoints"]
+--
+The configuration SHALL support named link display policies containing one or more hide rules. Each rule SHALL identify a relation type and conditions for the item being displayed and the related item. A condition MAY match the item's role and/or string-valued attributes. All conditions in one rule SHALL match for that rule to hide a link; a link SHALL be hidden when any rule in the selected policy matches. Relation types SHALL be interpreted from the displayed item's perspective using configured inverse types, so matching SHALL NOT depend on which direction authored the relationship. A hide rule SHALL affect display only and SHALL NOT alter or remove the graph relationship.
+
+Source: openspec/specs/relationship-display-filters/spec.md
+
+traceability:links[]
+--
+
+[#REQ-381, item, role=requirement, title="None is reserved for disabling policy filtering"]
+--
+The system SHALL reserve `none`, case-insensitively, as the value that disables link display filtering and SHALL reject a configured policy name that matches it.
+
+Source: openspec/specs/relationship-display-filters/spec.md
+
+traceability:links[]
+--
+
+[#REQ-382, item, role=requirement, title="Matrices may opt into a link display policy"]
+--
+A matrix definition MAY select a configured link display policy by name. For policy evaluation, the matrix row item SHALL be the displayed item and each candidate cell item SHALL be the related item. A matching relationship SHALL be omitted from the cell and SHALL NOT count toward matrix coverage. Existing column relation filters SHALL continue to apply. A matrix with no selected policy SHALL preserve its current behavior.
+
+Source: openspec/specs/relationship-display-filters/spec.md
+
+traceability:links[]
+--
+
+[#REQ-383, item, role=requirement, title="Unknown policy references are rejected"]
+--
+The system SHALL report an actionable configuration error when a site, component, or page AsciiDoc attribute, or a matrix definition, references a link display policy that is not defined.
+
+Source: openspec/specs/relationship-display-filters/spec.md
+
+traceability:links[]
+--
+=== Source Position Fidelity
+
+[#REQ-394, item, role=requirement, title="Inline relationship macros report their own file line"]
+--
+The system SHALL report the source line of a relationship declared by an inline body macro as the 1-based line number, in the source file's own numbering, of the line containing that macro. The reported line SHALL NOT depend on how much leading or interior whitespace the item body contains.
+
+Source: openspec/specs/source-position-fidelity/spec.md
+
+traceability:links[]
+--
+
+[#REQ-395, item, role=requirement, title="Position derivation uses file-absolute offsets"]
+--
+The system SHALL derive a relationship's line from the macro's absolute character offset in the source document, rather than from a line count over the item body with the header line added.
+
+Source: openspec/specs/source-position-fidelity/spec.md
+
+traceability:links[]
+--
+
+[#REQ-396, item, role=requirement, title="Positional warnings name the authored line"]
+--
+The system SHALL report the file line of the relation's macro in every diagnostic derived from a relationship's position, including `dangling_link` and `invalid_relation` warnings from graph validation and the source line printed by relationship queries.
+
+Source: openspec/specs/source-position-fidelity/spec.md
 
 traceability:links[]
 --
@@ -628,7 +806,7 @@ tracer:links[]
 --
 When Antora's `indexify` URL style is active (root-level pages are served as `pagename/index.html`), the system SHALL generate matrix links that include `index.html` in the path for root-level pages so links from traceability matrices resolve to the correct page.
 
-Source: openspec/specs/matrix-generation/spec.md
+Source: openspec/specs/matrix-item-linking/spec.md
 
 tracer:links[]
 --
@@ -1238,6 +1416,23 @@ Source: openspec/specs/env-file-loading/spec.md
 traceability:links[]
 --
 
+[#REQ-362, item, role=requirement, title="query by-role — extract items of one role"]
+--
+The CLI SHALL provide `query by-role <role>` that returns all current (non-superseded) items of the given role, each with its ID, role, title, content, source file, and source line, ordered by source position within each document. The command SHALL accept an optional document path filter, an optional skeleton-context flag, and SHALL support cross-source `site-graph` snapshots, and SHALL reject combining a snapshot with an explicit local input directory.
+
+Source: openspec/specs/cli-query/spec.md
+
+traceability:links[]
+--
+[#REQ-378, item, role=requirement, title="Neo4j exports preserve scoped item identity"]
+--
+Neo4j exports from a playbook SHALL distinguish items by component, version when present, and item ID, so items with the same ID from different component versions remain distinct. Exports from unscoped local input SHALL continue to identify items by bare ID.
+
+Source: openspec/specs/neo4j-export/spec.md
+
+traceability:links[]
+--
+
 === ID Allocation Server
 
 [#REQ-275, item, role=requirement, title="Allocator returns the next ID"]
@@ -1754,6 +1949,61 @@ The diff SHALL match items by component-qualified identity — component, versio
 Source: openspec/specs/multi-source-diff/spec.md
 
 tracer:links[]
+--
+
+[#REQ-376, item, role=requirement, title="Cross-source graphs preserve component-qualified item identity"]
+--
+A graph harvested from an Antora playbook SHALL preserve separate items that share an ID but belong to different component or version scopes. Items without component scope SHALL continue to use bare-ID identity.
+
+Source: openspec/specs/multi-source-diff/spec.md
+
+traceability:links[]
+--
+
+[#REQ-377, item, role=requirement, title="Cross-source relationships retain scoped endpoints"]
+--
+A relationship in a harvested graph SHALL connect the items identified by its source and target references within the applicable component and version scope. Equal bare IDs in other scopes SHALL NOT cause an endpoint to resolve to the wrong item.
+
+Source: openspec/specs/multi-source-diff/spec.md
+
+traceability:links[]
+--
+=== Content Source Roots
+
+[#REQ-363, item, role=requirement, title="Harvested files record their content-source root"]
+--
+When files are harvested from a playbook, each harvested file SHALL record the root directory of the content source it came from, derived from the source's repository location and the source's start path, so that the file's relative path resolves to exactly one file on disk.
+
+Source: openspec/specs/content-source-roots/spec.md
+
+traceability:links[]
+--
+
+[#REQ-364, item, role=requirement, title="Items carry their source root"]
+--
+An item built from a harvested file SHALL carry that file's content-source root alongside its component, module, and version scope, so a consumer holding only the item can resolve its source file.
+
+Source: openspec/specs/content-source-roots/spec.md
+
+traceability:links[]
+--
+
+[#REQ-365, item, role=requirement, title="Source roots are excluded from serialized snapshots"]
+--
+The canonical graph snapshot SHALL NOT contain content-source roots, so that a snapshot is not tied to a build machine's filesystem layout and two harvests taken on different machines remain comparable.
+
+Source: openspec/specs/content-source-roots/spec.md
+
+traceability:links[]
+--
+
+[#REQ-366, item, role=requirement, title="Local resolution prefers the recorded root"]
+--
+When a consumer resolves an item's relative source path to a file, it SHALL prefer the item's recorded content-source root, and SHALL fall back to the consumer's own input directory when no root is recorded.
+
+Source: openspec/specs/content-source-roots/spec.md
+
+traceability:links[]
 --
 
 == Quality Requirements
@@ -2649,6 +2899,154 @@ Source: openspec/specs/template-partials/spec.md
 tracer:links[]
 --
 
+
+=== Agent Skill Installation
+
+[#REQ-356, item, role=requirement, title="Select one or more harnesses interactively"]
+--
+The CLI SHALL provide `antora-tracer skills install` and, when no harness arguments are given in an interactive terminal, SHALL present a multi-select list of supported harnesses and allow the user to confirm one or more selections before installation.
+
+Source: openspec/specs/agent-skill-installation/spec.md
+
+traceability:links[]
+--
+
+[#REQ-357, item, role=requirement, title="Explicit harness arguments support scripted installs"]
+--
+The CLI SHALL accept one or more explicit harness names (`pi`, `claude`, or `codex`) so installations can run without an interactive prompt. It SHALL reject unsupported names before writing any harness destination.
+
+Source: openspec/specs/agent-skill-installation/spec.md
+
+traceability:links[]
+--
+
+[#REQ-358, item, role=requirement, title="Install all bundled skills to per-user destinations"]
+--
+For Claude Code and Codex, the CLI SHALL install each bundled skill directory into the harness's per-user skill directory, creating the destination parent when necessary. For Pi, the CLI SHALL install standalone skills to Pi's documented `~/.agents/skills/` directory and SHALL explain that package installation is the recommended auto-discovery option.
+
+Source: openspec/specs/agent-skill-installation/spec.md
+
+traceability:links[]
+--
+
+[#REQ-359, item, role=requirement, title="Preserve existing installed skills unless replacement is approved"]
+--
+The CLI SHALL NOT silently replace an existing destination skill directory. It SHALL identify conflicts and request explicit overwrite approval before replacing any existing skill content. In non-interactive mode without explicit overwrite authorization, conflicts SHALL be skipped and reported without modifying them.
+
+Source: openspec/specs/agent-skill-installation/spec.md
+
+traceability:links[]
+--
+
+[#REQ-360, item, role=requirement, title="Dry run previews selected installation actions"]
+--
+The command SHALL honor the global `--dry-run` flag, listing selected harnesses, destination paths, new installs, and existing-skill conflicts without creating directories, prompting for overwrite approval, or modifying files.
+
+Source: openspec/specs/agent-skill-installation/spec.md
+
+traceability:links[]
+--
+
+[#REQ-361, item, role=requirement, title="Installation errors are reported per harness"]
+--
+The CLI SHALL report each selected harness's destination and installation result. If a destination cannot be created or written, it SHALL report failure and exit unsuccessfully, without presenting that harness as successfully installed.
+
+Source: openspec/specs/agent-skill-installation/spec.md
+
+traceability:links[]
+--
+=== Semantic Relation Review
+
+[#REQ-387, item, role=requirement, title="Review covers outgoing relations in a selected document"]
+--
+The review SHALL accept a document as its scope and inspect the outgoing relationships declared by traceable items in that document. For each relation, the review SHALL consider the full source and target item content, item IDs and roles, configured relation type, and any available project-specific definition of that relation.
+
+Source: openspec/specs/semantic-relation-review/spec.md
+
+traceability:links[]
+--
+
+[#REQ-388, item, role=requirement, title="Review uses configured relation meanings"]
+--
+The review SHALL use the project's configured roles and relation types and apply explicit project-specific relation criteria when available. It SHALL NOT assume that a relation name has one universal meaning. If no explicit semantic criteria are available, it SHALL state that limitation and make judgments cautiously from the configured relation, inverse label, roles, and item content.
+
+Source: openspec/specs/semantic-relation-review/spec.md
+
+traceability:links[]
+--
+
+[#REQ-389, item, role=requirement, title="Structural validity is kept separate from semantic review"]
+--
+The review SHALL NOT duplicate structural validation of allowed role-relation pairs or target existence. Relations that are structurally invalid or have missing targets SHALL be excluded from semantic findings and identified as requiring the project's structural validation workflow.
+
+Source: openspec/specs/semantic-relation-review/spec.md
+
+traceability:links[]
+--
+
+[#REQ-390, item, role=requirement, title="Findings are prioritized by impact with confidence reported separately"]
+--
+Each actionable finding SHALL have a HIGH, MEDIUM, or LOW impact severity, a confidence indication separate from severity, a concise statement of the problem, and a concise suggested action. Severity SHALL reflect the likely impact of leaving the relationship as written; confidence SHALL reflect the strength of evidence for the judgment. Relationships with no actionable semantic concern SHALL be omitted from the findings list.
+
+Source: openspec/specs/semantic-relation-review/spec.md
+
+traceability:links[]
+--
+
+[#REQ-391, item, role=requirement, title="Findings are presented interactively before any report is written"]
+--
+The review SHALL first present a concise document-level count or summary, then present actionable findings in severity order with their source item, relation, target item, problem, suggested action, and confidence. It SHALL allow the user to discuss or clarify findings and SHALL ask whether to create an AsciiDoc report only after presenting the findings. It SHALL NOT modify source documents or create a report without explicit user approval.
+
+Source: openspec/specs/semantic-relation-review/spec.md
+
+traceability:links[]
+--
+
+[#REQ-392, item, role=requirement, title="Optional AsciiDoc report is safe and user-directed"]
+--
+If the user approves creating a report, the review SHALL confirm the destination path before writing. The report SHALL contain the agreed findings and SHALL NOT contain traceable `[item]` blocks or relationship macros. Before writing next to an Antora-managed document, the review SHALL warn that Antora may publish or process the report. The report SHALL not be placed beside the source document without explicit path approval.
+
+Source: openspec/specs/semantic-relation-review/spec.md
+
+traceability:links[]
+--
+
+[#REQ-393, item, role=requirement, title="Review remains distinct from abstraction-level review"]
+--
+The review SHALL assess the meaning of outgoing relationships between linked items, including items of different roles. It SHALL NOT replace or duplicate the `abstraction-level-review` skill's judgment about altitude consistency among same-role items in one document.
+
+Source: openspec/specs/semantic-relation-review/spec.md
+
+traceability:links[]
+--
+=== Role Abstraction Review
+
+[#REQ-384, item, role=requirement, title="Role extraction returns same-role items in document order"]
+--
+The system SHALL provide an extraction that returns all current (non-superseded) items of a given role, ordered by their position in the source document, each carrying its ID, title, content, and source location.
+
+Source: openspec/specs/role-abstraction-review/spec.md
+
+traceability:links[]
+--
+
+[#REQ-385, item, role=requirement, title="Extraction carries skeleton context for relocation"]
+--
+The extraction SHALL support including a skeleton of the same document's items of other roles, consisting of ID and title only, so a judge can reason about moving an item to a different section of the same document.
+
+Source: openspec/specs/role-abstraction-review/spec.md
+
+traceability:links[]
+--
+
+[#REQ-386, item, role=requirement, title="Abstraction review applies a three-verdict model"]
+--
+An abstraction review of an extracted role slice SHALL classify findings into exactly three verdicts: *rewrite* (the item sits in the right document and role but its text is at the wrong abstraction level), *move within document* (the item belongs in a different section of the same document), and *investigate elsewhere* (the item's role or home document appears wrong). The review SHALL NOT answer where an *investigate elsewhere* item should go; it flags the item for follow-up.
+
+Source: openspec/specs/role-abstraction-review/spec.md
+
+traceability:links[]
+--
 
 === Current OpenSpec Coverage
 

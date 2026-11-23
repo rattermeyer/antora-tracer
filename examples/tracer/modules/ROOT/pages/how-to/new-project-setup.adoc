@@ -10,20 +10,26 @@ This guide covers adding Antora Tracer to a project — whether greenfield or ex
 == Choose a preset
 
 Start by picking the preset that matches your domain.
-Four presets ship with the extension:
+Six presets ship with the extension:
 
 [width=100%, cols="25,75"]
 |===
 | Preset | Best for
 
 | `requirements-engineering`
-| Systems and software engineering with five roles and three matrices
+| Systems and software engineering with three roles (`requirement`, `design`, `test`) and two matrices
+
+| `requirements-engineering-max`
+| Traditional requirements-driven projects with business goals, user needs, use cases, quality attributes, and design decisions
+
+| `spec-driven-development`
+| Durable project knowledge with use cases, requirements, changes, ADRs, design concepts, and tests
 
 | `agile`
 | Scrum teams with epics, features, user stories, tasks, bugs, and tests
 
 | `medical-iec62304`
-| Medical device software compliant with IEC 62304, with risk and hazard tracking
+| Medical device software following IEC 62304, with risk and hazard tracking
 
 | `minimal`
 | Getting started and prototypes — only requirements and tests

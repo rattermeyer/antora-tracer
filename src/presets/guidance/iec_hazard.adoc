@@ -1,0 +1,38 @@
+= Writing Hazard Items
+
+A `hazard` item identifies a potential source or condition of harm relevant to the product context.
+This guidance supports traceability authoring only and does not establish IEC 62304, FDA, or other regulatory compliance.
+`tracer:links[]` is optional display-only markup and is not part of the item content.
+
+== Item template
+
+[source,asciidoc]
+----
+[#<id>, item, role=hazard, title="<hazard name>"]
+--
+Hazard source or condition: <specific source or condition>.
+
+Potential affected context or harm: <supported description>.
+
+<optional link, for example:>
+poses:<risk-id>[]
+
+--
+----
+
+== Optional configured links
+
+A hazard may use `poses` for a `risk`.
+It may use `mitigated_by` for a `mitigation`.
+The configured reverse names are `posed_by` and `mitigates`, respectively.
+Add a link only when the target ID exists and the relationship is supported by the hazard analysis.
+
+== Writing and review checklist
+
+* [ ] Names a concrete source or condition that can lead to harm.
+* [ ] Separates the hazard from the resulting risk and from controls.
+* [ ] Defines affected context or assumptions when they change the analysis.
+* [ ] Avoids unsupported severity, likelihood, or regulatory conclusions.
+* [ ] Uses only configured relation names and existing target IDs for optional links.
+* [ ] Avoids claiming that a traceability link or preset use proves compliance.
+* [ ] Includes `tracer:links[]` only when displaying related items is useful.

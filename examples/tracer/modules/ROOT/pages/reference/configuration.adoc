@@ -31,7 +31,7 @@ antora:
 | `preset`
 | string
 | `requirements-engineering`
-| Built-in preset name. Overridden by `configPath`. Valid: `requirements-engineering`, `agile`, `medical-iec62304`, `minimal`
+| Built-in preset name. Overridden by `configPath`. Valid: `requirements-engineering`, `requirements-engineering-max`, `spec-driven-development`, `agile`, `medical-iec62304`, `minimal`
 
 | `configPath`
 | string
@@ -105,7 +105,7 @@ The `KROKI_SERVER_URL` environment variable overrides the `krokiServerUrl` optio
 When set, it is used as the Kroki server base URL instead of the configured value or the default `https://kroki.io`.
 
 When matrix generation is enabled, the extension also registers a per-version `graph.json` snapshot as a site attachment under `traceability/graph.json`.
-The snapshot contains every item and relationship of that component version in the canonical `{ format, component, version, items, relationships }` shape, with per-item scope fields but no per-page `pubUrl`.
+The snapshot contains every item and relationship of that component version in the canonical `{ format, component, version, items, relationships }` shape, with per-item scope fields but no per-page `pubUrl` and no build-machine content-source root.
 It gives each published version a machine-readable record of its traceability graph.
 
 == Build version

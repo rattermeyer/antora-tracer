@@ -1,0 +1,33 @@
+= Writing Agile Feature Items
+
+A `feature` item describes a coherent capability that groups related user stories and delivers a recognizable product outcome.
+
+== Item template
+
+[source,asciidoc]
+----
+[item, id=<id>, role=feature, title="<short capability title>"]
+====
+<Capability and the user or business outcome it provides.>
+
+<Scope boundary or notable constraint.>
+
+<Optional configured links.>
+
+====
+----
+The optional `tracer:links[]` macro may be added when rendered link output is useful.
+
+== Writing and review checklist
+
+* Describe one coherent capability and its observable outcome.
+* Set a boundary that makes it clear which stories belong in the feature.
+* Avoid turning the feature into a solution design or task list.
+* Use an existing target ID for each link and omit links whose targets are not known.
+* Confirm the item uses `role=feature` and that every relation name comes from this preset.
+
+== Optional configured links
+
+Use `broken_down_into:<user-story-id>[]` from a feature to a user story; the user-story-side reverse is `broken_down_from:<feature-id>[]`.
+Use `verified_by:<test-id>[]` from a feature to a test; the test-side reverse is `verifies:<feature-id>[]`.
+Include only links supported by the configured relation and only when the target ID is real.

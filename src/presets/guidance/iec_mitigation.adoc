@@ -1,0 +1,39 @@
+= Writing Mitigation Items
+
+A `mitigation` item describes a specific control or change intended to reduce a hazard or risk.
+This guidance supports traceability authoring only and does not establish IEC 62304, FDA, or other regulatory compliance.
+`tracer:links[]` is optional display-only markup and is not part of the item content.
+
+== Item template
+
+[source,asciidoc]
+----
+[#<id>, item, role=mitigation, title="<control name>"]
+--
+The product SHALL <control behavior or risk reduction outcome>.
+
+Applicability, assumptions, and evidence needed to assess the control: <detail>.
+
+<optional link, for example:>
+mitigates:<risk-id>[]
+
+--
+----
+
+== Optional configured links
+
+A mitigation may use `mitigates` for a `risk`.
+It may use `addresses` for a `hazard`.
+It may use `implements` for a `software_requirement`.
+The configured reverse names are `mitigated_by`, `addressed_by`, and `implemented_by`, respectively.
+Add a link only when the target ID exists and the relationship is supported by the risk analysis.
+
+== Writing and review checklist
+
+* [ ] Describes a concrete control and the risk-reduction outcome it is intended to provide.
+* [ ] States activation, scope, failure behavior, or assumptions when relevant.
+* [ ] Is distinguishable from the risk or hazard it controls.
+* [ ] Identifies evidence needed to assess effectiveness without asserting unperformed results.
+* [ ] Uses only configured relation names and existing target IDs for optional links.
+* [ ] Avoids claiming that a traceability link or preset use proves compliance.
+* [ ] Includes `tracer:links[]` only when displaying related items is useful.

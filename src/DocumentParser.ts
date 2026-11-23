@@ -3,6 +3,7 @@
  */
 
 import type { ConfigLoader } from "./config/TraceabilityConfig.js";
+import { itemBlockBoundsAtOffset } from "./ItemBlockBounds.js";
 import {
   type Item,
   type ItemRelationship,
@@ -75,6 +76,7 @@ export class DocumentParser {
   private module?: string;
   private version?: string;
   private pubUrl?: string;
+  private sourceRoot?: string;
 
   constructor(options: ParserOptions = {}) {
     this.currentFile = options.sourceFile || "";
@@ -92,6 +94,7 @@ export class DocumentParser {
     module?: string,
     pubUrl?: string,
     version?: string,
+    sourceRoot?: string,
   ): ParserResult {
     // Validate input
     if (typeof content !== "string") {
@@ -103,6 +106,7 @@ export class DocumentParser {
     this.module = module;
     this.pubUrl = pubUrl;
     this.version = version;
+    this.sourceRoot = sourceRoot;
 
     this.warnings = [];
     this.errors = [];
@@ -216,9 +220,10 @@ export class DocumentParser {
         continue;
       }
 
-      // Extract block content (between ==== or -- delimiters)
-      const block = this.extractBlock(content, startPosition);
-      if (!block) {
+      // Locate the block once: the accessor is the single scan for the parser
+      // and every other consumer.
+      const bounds = itemBlockBoundsAtOffset(content, startPosition);
+      if (!bounds) {
         this.warnings.push({
           type: "invalid_attribute",
           message: `Item block macro at line ${line} has no content block (missing delimiter)`,
@@ -327,12 +332,11 @@ export class DocumentParser {
       }
 
       // Create the item
-      const body = this.extractBody(block, startPosition);
-      bodyAbsoluteStarts.set(id, body.absoluteStart);
+      bodyAbsoluteStarts.set(id, bounds.bodyTextStart);
       const item: Item = {
         id,
         title,
-        content: body.content,
+        content: bounds.bodyText,
         role,
         status,
         tags,
@@ -343,6 +347,7 @@ export class DocumentParser {
         module: this.module,
         version: this.version,
         pubUrl: this.pubUrl,
+        sourceRoot: this.sourceRoot,
       };
 
       result.items.push(item);
@@ -548,60 +553,6 @@ export class DocumentParser {
     }
 
     return ranges;
-  }
-
-  private extractBlock(content: string, startIndex: number): string | null {
-    // Find opening delimiter: ==== or -- (must be alone on a line)
-    const m = content.slice(startIndex).match(/\n(====|--)\n/);
-    if (!m || m.index === undefined) return null;
-    const delimiter = m[1];
-    const delimiterIndex = startIndex + m.index + 1;
-    // Closing delimiter: same delimiter, alone on a line, terminated by
-    // newline or end-of-file.
-    const closeRegex = new RegExp(`\\n${delimiter}(?:\\n|$)`, "g");
-    closeRegex.lastIndex = delimiterIndex + delimiter.length + 1;
-    const closeMatch = closeRegex.exec(content);
-    if (!closeMatch) return null;
-    return content.substring(
-      startIndex,
-      closeMatch.index + closeMatch[0].length,
-    );
-  }
-
-  /**
-   * Extract the item body, returning the trimmed body text (item content) plus
-   * the absolute index of its first character in the source document.
-   *
-   * `blockStart` is the absolute index at which `block` begins, so
-   * `blockStart + bodyStart` is an absolute index even though `bodyStart` is
-   * measured against the block. The leading whitespace that `trim` removes must
-   * be added back, because macro offsets are measured against the trimmed text:
-   * the trimmed body's first character is the anchor, so
-   * `lineAt(source, absoluteStart + offset)` yields the file line of a
-   * character offset within `content`.
-   */
-  private extractBody(
-    block: string,
-    blockStart: number,
-  ): { content: string; absoluteStart: number } {
-    // Find the delimiter: either ==== or --.
-    // Check for ==== as a delimiter (line of its own), not just in body text.
-    const hasEqualsDelim = /\n====\r?\n/.test(block);
-    const delimiter = hasEqualsDelim ? "====" : "--";
-    const start = block.indexOf(`\n${delimiter}\n`);
-    if (start === -1) return { content: "", absoluteStart: blockStart };
-    const bodyStart = start + delimiter.length + 2;
-    // Closing delimiter may terminate the file (no trailing newline).
-    const closeRegex = new RegExp(`\\n${delimiter}(?:\\n|$)`, "g");
-    closeRegex.lastIndex = bodyStart;
-    const closeMatch = closeRegex.exec(block);
-    if (!closeMatch) return { content: "", absoluteStart: blockStart };
-    const raw = block.substring(bodyStart, closeMatch.index);
-    return {
-      content: raw.trim(),
-      absoluteStart:
-        blockStart + bodyStart + (raw.length - raw.trimStart().length),
-    };
   }
 
   private lineAt(content: string, position: number): number {

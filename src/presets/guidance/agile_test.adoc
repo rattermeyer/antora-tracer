@@ -1,0 +1,38 @@
+= Writing Agile Test Items
+
+A `test` item describes a verification procedure with observable inputs, actions, and expected results.
+
+== Item template
+
+[source,asciidoc]
+----
+[item, id=<id>, role=test, title="<short verification title>"]
+====
+Setup: <preconditions and test data>.
+
+Steps: <actions to perform>.
+
+Expected: <observable result and pass condition>.
+
+<Optional configured links.>
+
+====
+----
+The optional `tracer:links[]` macro may be added when rendered link output is useful.
+
+== Writing and review checklist
+
+* Make setup, actions, and expected results independently understandable.
+* State the observable pass condition, including relevant failure behaviour.
+* Keep the procedure repeatable and tied to the behaviour under review.
+* Use an existing target ID for each link and omit links whose targets are not known.
+* Confirm the item uses `role=test` and that every relation name comes from this preset.
+
+== Optional configured links
+
+Use `verifies:<user-story-id>[]` from a test to a user story; the story-side reverse is `verified_by:<test-id>[]`.
+Use `validates:<acceptance-criterion-id>[]` from a test to an acceptance criterion; the criterion-side reverse is `validated_by:<test-id>[]`.
+Use `tests:<task-id>[]` from a test to a task; the task-side reverse is `tested_by:<test-id>[]`.
+Use `tests:<spike-id>[]` from a test to a spike; the spike-side reverse is `tested_by:<test-id>[]`.
+Use `reproduces:<bug-id>[]` from a test to a bug; the bug-side reverse is `reproduced_by:<test-id>[]`.
+Include only links supported by the configured relation and only when the target ID is real.

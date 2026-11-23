@@ -432,6 +432,109 @@ verifies:REQ-283[]
 tracer:links[]
 --
 
+[#TST-023, item, role=test, title="Item Block Bounds Tests"]
+--
+Test file: `test/item-block-bounds.test.ts`
+
+Tests the shared `ItemBlockBounds` accessor: offsets for an item located by absolute offset and by source line, the `--` and `====` delimiter forms, an EOF-closed block, a class-prefixed header, a quoted-`]` title, and an indented header; no bounds for an item-shaped header inside a listing block, a header without a delimiter, or an unterminated block; and agreement with the parser's `Item` for every example-site item.
+
+verifies:REQ-367[]
+verifies:REQ-368[]
+verifies:REQ-369[]
+
+tracer:links[]
+--
+
+[#TST-024, item, role=test, title="Scoped Identity Tests"]
+--
+Test file: `test/scoped-identity.test.ts`
+
+Tests component- and version-qualified item identity: the same ID in different components or versions stays distinct, unscoped items keep bare-ID identity, and scoped relationships resolve across components and versions.
+
+verifies:REQ-260[]
+verifies:REQ-261[]
+verifies:REQ-262[]
+verifies:REQ-263[]
+verifies:REQ-264[]
+verifies:REQ-376[]
+verifies:REQ-377[]
+
+tracer:links[]
+--
+
+[#TST-025, item, role=test, title="Shell Completion Tests"]
+--
+Test file: `test/shell-completion.test.ts`
+
+Tests the `completion` command: script generation for Bash, Zsh, and Fish, installation to the per-user completion directory, and the activation steps printed by installation.
+
+verifies:REQ-351[]
+verifies:REQ-350[]
+verifies:REQ-349[]
+verifies:REQ-304[]
+verifies:REQ-305[]
+verifies:REQ-306[]
+
+tracer:links[]
+--
+
+[#TST-026, item, role=test, title="Skills Install Tests"]
+--
+Test file: `test/skills-install.test.ts`
+
+Tests the `install` command for bundled agent skills: interactive harness selection, explicit harness arguments for scripted installs, per-user destination resolution, replacement approval for existing skills, dry-run previews, and per-harness error reporting.
+
+verifies:REQ-356[]
+verifies:REQ-357[]
+verifies:REQ-358[]
+verifies:REQ-359[]
+verifies:REQ-360[]
+verifies:REQ-361[]
+
+tracer:links[]
+--
+
+[#TST-027, item, role=test, title="Env File Loading Tests"]
+--
+Test file: `test/env-file-loading.test.ts`
+
+Tests `.env` loading by the CLI entry points and the precedence of an existing process environment variable over the `.env` file.
+
+verifies:REQ-345[]
+verifies:REQ-344[]
+verifies:REQ-312[]
+verifies:REQ-313[]
+
+tracer:links[]
+--
+
+[#TST-028, item, role=test, title="Playbook Neo4j Export Tests"]
+--
+Test file: `test/neo4j-export-playbook.test.ts`
+
+Tests `export neo4j` against a playbook: input requirement, cross-repository export, and preservation of scoped item identity in the exported nodes and relationships.
+
+verifies:REQ-348[]
+verifies:REQ-347[]
+verifies:REQ-346[]
+verifies:REQ-378[]
+verifies:REQ-320[]
+verifies:REQ-321[]
+verifies:REQ-322[]
+
+tracer:links[]
+--
+
+[#TST-029, item, role=test, title="Requirements Grader Tests"]
+--
+Test file: `test/requirements-grader.test.ts`
+
+Tests the requirement-grading helper used by the skill evals: it parses an item block and scores it against the EARS, atomicity, and testability rules.
+
+
+tracer:links[]
+--
+
 ifdef::ssembler-backend-pdf[]
 == Changelog
 [cols="1,2,2,3"]

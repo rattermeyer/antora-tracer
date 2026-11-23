@@ -1,11 +1,11 @@
 = Presets Reference
-:description: Complete definitions of all four built-in presets — roles, relations, matrices, and Neo4j queries
+:description: Complete definitions of all six built-in presets — roles, relations, matrices, and Neo4j queries
 :keywords: antora, traceability, presets, reference
 :toc: macro
 
 toc::[]
 
-The extension ships with four built-in presets.
+The extension ships with six built-in presets.
 Each is a self-contained YAML configuration defining roles, allowed relations, and matrix definitions.
 
 [[requirements-engineering]]
@@ -52,6 +52,75 @@ Each pair is declared once; the reverse direction is allowed automatically.
 | `requirements-to-tests`
 | requirement
 | test
+|===
+
+[[requirements-engineering-max]]
+== requirements-engineering-max
+
+Full requirements-engineering model for traditional requirements-driven projects.
+Eleven roles spanning business goals, user needs, use cases, quality attributes and scenarios, requirements, design concepts, design elements, design decisions, test cases, and constraints.
+
+[width=100%, cols="20,80"]
+|===
+| Roles | `business_goal`, `user_need`, `use_case`, `quality_attribute`, `quality_scenario`, `requirement`, `design_concept`, `design_element`, `test_case`, `design_decision`, `constraint`
+| Matrices | `requirements-to-design`, `requirements-to-tests`
+| Version | 1.0.0
+|===
+
+*Relations:*
+
+[width=100%, cols="40,30,30"]
+|===
+| Relation | Forward | Reverse
+
+| `business_goal → user_need` | `motivates` | `is_motivated_by`
+| `business_goal → quality_attribute` | `motivates` | `is_motivated_by`
+| `user_need → use_case` | `described_by` | `describes`
+| `quality_attribute → quality_scenario` | `characterized_by` | `characterizes`
+| `quality_scenario → design_concept` | `drives` | `is_driven_by`
+| `design_concept → design_element` | `is_realized_by` | `realizes`
+| `requirement → requirement` | `refines` | `refined_by`
+| `requirement → requirement` | `depends_on` | `is_prerequisite_of`
+| `requirement → requirement` | `conflicts_with` | `conflicts_with`
+| `requirement → requirement` | `supersedes` | `superseded_by`
+| `requirement → design_element` | `motivates` | `is_motivated_by`
+| `requirement → test_case` | `is_verified_by` | `verifies`
+| `design_decision → design_concept` | `influences` | `influenced_by`
+| `design_decision → design_concept` | `supersedes` | `superseded_by`
+| `design_decision → design_element` | `motivates` | `is_motivated_by`
+| `design_decision → design_decision` | `influences` | `influenced_by`
+| `design_decision → design_decision` | `supersedes` | `superseded_by`
+| `design_element → design_element` | `depends_on` | `is_prerequisite_of`
+| `design_element → design_element` | `refines` | `refined_by`
+| `constraint → design_element` | `restricts` | `is_restricted_by`
+|===
+
+[[spec-driven-development]]
+== spec-driven-development
+
+Durable project knowledge with temporary, change-scoped execution plans.
+Six roles: use cases, requirements, changes, ADRs, design concepts, and tests.
+
+[width=100%, cols="20,80"]
+|===
+| Roles | `use_case`, `requirement`, `change`, `adr`, `design_concept`, `test`
+| Matrices | `use-cases-to-requirements`, `changes-to-requirements`, `requirements-to-design-concepts`, `requirements-to-tests`
+| Workflow | `change` (`proposed`, `refined`, `accepted`, `implemented`, `verified`, `closed`, `rejected`), `adr` (`proposed`, `accepted`, `rejected`, `superseded`), `requirement` (`draft`, `reviewed`, `approved`, `superseded`), `design_concept` (`draft`, `accepted`, `deprecated`)
+| Version | 1.0.0
+|===
+
+*Relations:*
+
+[width=100%, cols="40,30,30"]
+|===
+| Relation | Forward | Reverse
+
+| `use_case → requirement` | `leads_to` | `is_derived_from`
+| `change → requirement` | `addresses` | `addressed_by`
+| `change → adr` | `records` | `recorded_by`
+| `adr → design_concept` | `leads_to` | `derived_from`
+| `design_concept → requirement` | `addresses` | `addressed_by`
+| `test → requirement` | `verifies` | `verified_by`
 |===
 
 [[agile]]

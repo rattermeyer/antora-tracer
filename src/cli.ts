@@ -19,6 +19,7 @@ import { config } from "dotenv";
 import { dump as yamlDump } from "js-yaml";
 
 import { resolveIdAllocationToken } from "./config/TraceabilityConfig.js";
+import { itemBlockBoundsAtLine } from "./ItemBlockBounds.js";
 import {
   BUILT_IN_PRESETS,
   ConfigLoader,
@@ -37,6 +38,7 @@ import {
   parseHarnessNames,
   selectHarnesses,
 } from "./SkillsInstaller.js";
+import { resolveSourceFilePath } from "./SourcePath.js";
 
 // Load a `.env` file from the working directory so `${VAR}` interpolation in
 // configuration resolves without manual shell setup.
@@ -233,63 +235,23 @@ function collectAdocFiles(
 }
 
 /**
- * Resolve an item's sourceFile (relative to the input directory) to an
- * absolute filesystem path.
- */
-function resolveSourceFilePath(
-  input: string,
-  sourceFile: string | undefined,
-): string {
-  if (!sourceFile) {
-    throw new Error("Item has no source file recorded");
-  }
-  const root = resolve(process.cwd(), input);
-  const full = resolve(root, sourceFile);
-  if (full !== root && !full.startsWith(root + sep)) {
-    throw new Error(`Source file escapes input directory: ${sourceFile}`);
-  }
-  return full;
-}
-
-/**
  * Extract an item's full block (header line through the closing delimiter)
  * given the file content and the item's 1-indexed source line.
+ *
+ * Delegates to the shared `ItemBlockBounds` accessor, so the CLI locates blocks
+ * by the same grammar as the parser and the extension.
  */
 function extractItemBlock(
   content: string,
   sourceLine: number | undefined,
 ): { block: string; startLine: number; endLine: number } | null {
   if (sourceLine === undefined) return null;
-  const lines = content.split("\n");
-  const headerIdx = sourceLine - 1;
-  if (headerIdx < 0 || headerIdx >= lines.length) return null;
-  if (!/\[(?:\.[A-Za-z0-9_-]+)*#[^,\]]+,\s*item,?/.test(lines[headerIdx]))
-    return null;
-
-  let openIdx = -1;
-  for (let i = headerIdx + 1; i < lines.length; i++) {
-    const t = lines[i].trim();
-    if (t === "--" || t === "====") {
-      openIdx = i;
-      break;
-    }
-  }
-  if (openIdx === -1) return null;
-  const delimiter = lines[openIdx].trim();
-
-  let closeIdx = -1;
-  for (let i = openIdx + 1; i < lines.length; i++) {
-    if (lines[i].trim() === delimiter) {
-      closeIdx = i;
-      break;
-    }
-  }
-  if (closeIdx === -1) return null;
-
+  const bounds = itemBlockBoundsAtLine(content, sourceLine);
+  if (!bounds) return null;
   return {
-    block: lines.slice(headerIdx, closeIdx + 1).join("\n"),
-    startLine: headerIdx + 1,
-    endLine: closeIdx + 1,
+    block: bounds.blockText,
+    startLine: bounds.startLine,
+    endLine: bounds.endLine,
   };
 }
 
@@ -883,6 +845,7 @@ exportProgram
             module: file.module,
             version: file.version,
             pubUrl: file.pubUrl,
+            sourceRoot: file.sourceRoot,
           });
         }
         extension.graph.canonicalizeRelationships();
@@ -1055,6 +1018,7 @@ program
             module: file.module,
             version: file.version,
             pubUrl: file.pubUrl,
+            sourceRoot: file.sourceRoot,
           });
         }
       } else {
@@ -1670,6 +1634,7 @@ program
           module: file.module,
           version: file.version,
           pubUrl: file.pubUrl,
+          sourceRoot: file.sourceRoot,
         });
       }
       const snapshot = serializeSnapshot(extension.graph);
@@ -1758,7 +1723,11 @@ program
       );
       process.exit(1);
     }
-    const sourcePath = resolveSourceFilePath(options.input, item.sourceFile);
+    const sourcePath = resolveSourceFilePath(
+      options.input,
+      item.sourceFile,
+      item.sourceRoot,
+    );
     const content = readFileSync(sourcePath, "utf8");
     const extracted = extractItemBlock(content, item.sourceLine);
     if (!extracted) {
@@ -1822,7 +1791,11 @@ program
       );
       process.exit(1);
     }
-    const sourcePath = resolveSourceFilePath(options.input, item.sourceFile);
+    const sourcePath = resolveSourceFilePath(
+      options.input,
+      item.sourceFile,
+      item.sourceRoot,
+    );
     const content = readFileSync(sourcePath, "utf8");
     const extracted = extractItemBlock(content, item.sourceLine);
     if (!extracted) {

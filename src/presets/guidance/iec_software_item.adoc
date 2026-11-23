@@ -1,0 +1,40 @@
+= Writing Software Item Items
+
+A `software_item` item identifies a software-level component that satisfies requirements and is composed of units.
+This guidance supports traceability authoring only and does not establish IEC 62304, FDA, or other regulatory compliance.
+`tracer:links[]` is optional display-only markup and is not part of the item content.
+
+== Item template
+
+[source,asciidoc]
+----
+[#<id>, item, role=software_item, title="<component name>"]
+--
+This software item provides <responsibility or externally observable capability>.
+
+<boundary, interface, or allocation detail>
+
+<optional link, for example:>
+satisfies:<software-requirement-id>[]
+
+--
+----
+
+== Optional configured links
+
+A software item may use `satisfies` for a `software_requirement`.
+It may use `composed_of` for a `software_unit`.
+It may use `addresses` for a `risk`.
+It may use `validated_by` for a `test_procedure`.
+The configured reverse names are `satisfied_by`, `composed_of_by`, `addressed_by`, and `validates`, respectively.
+Add a link only when the target ID exists and the relationship is supported by project evidence.
+
+== Writing and review checklist
+
+* [ ] Names a bounded software responsibility rather than a vague subsystem.
+* [ ] Describes responsibility and observable boundary without duplicating design detail.
+* [ ] Records meaningful requirement, risk, composition, or validation links only.
+* [ ] Makes interfaces or ownership boundaries clear when they affect traceability.
+* [ ] Uses only configured relation names and existing target IDs for optional links.
+* [ ] Avoids claiming that a traceability link or preset use proves compliance.
+* [ ] Includes `tracer:links[]` only when displaying related items is useful.

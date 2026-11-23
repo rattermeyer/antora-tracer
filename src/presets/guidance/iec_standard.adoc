@@ -1,0 +1,38 @@
+= Writing Standard Items
+
+A `standard` item records an external technical or process standard that informs project requirements.
+This guidance supports traceability authoring only and does not interpret a standard or establish compliance with it.
+`tracer:links[]` is optional display-only markup and is not part of the item content.
+
+== Item template
+
+[source,asciidoc]
+----
+[#<id>, item, role=standard, title="<standard name>"]
+--
+Standard reference and scope: <identified source and applicable subject>.
+
+Relevant guidance or project interpretation: <specific, supported statement>.
+
+<optional link, for example:>
+informs:<system-requirement-id>[]
+
+--
+----
+
+== Optional configured links
+
+A standard may use `informs` for a `system_requirement`.
+It may use `informs` for a `software_requirement`.
+The configured reverse name is `informed_by` for both relations.
+Add a link only when the standard, scope, and target ID are supported by project evidence.
+
+== Writing and review checklist
+
+* [ ] Identifies the standard, edition, scope, and relevant section when known.
+* [ ] Distinguishes source guidance from project decisions and requirements.
+* [ ] Links only to requirements genuinely informed by the recorded source.
+* [ ] Does not invent standards obligations or claim conformance from a link.
+* [ ] Uses only configured relation names and existing target IDs for optional links.
+* [ ] Avoids claiming that a traceability link or preset use proves compliance.
+* [ ] Includes `tracer:links[]` only when displaying related items is useful.

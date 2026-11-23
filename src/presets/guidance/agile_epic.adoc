@@ -1,0 +1,34 @@
+= Writing Agile Epic Items
+
+An `epic` item describes a substantial product outcome or initiative that can be delivered through several smaller items.
+
+== Item template
+
+[source,asciidoc]
+----
+[item, id=<id>, role=epic, title="<short outcome title>"]
+====
+<Outcome and the user or business problem it addresses.>
+
+<Boundaries, success signal, or important scope note.>
+
+<Optional configured links.>
+
+====
+----
+The optional `tracer:links[]` macro may be added when rendered link output is useful.
+
+== Writing and review checklist
+
+* State the outcome and why it matters, rather than a list of implementation tasks.
+* Keep the scope large enough to justify decomposition into features or user stories.
+* Make the boundary and completion signal concrete enough to review.
+* Use an existing target ID for each link and omit links whose targets are not known.
+* Confirm the item uses `role=epic` and that every relation name comes from this preset.
+
+== Optional configured links
+
+Use `contains:<feature-id>[]` from an epic to a feature; the feature-side reverse is `contained_in:<epic-id>[]`.
+Use `contains:<user-story-id>[]` from an epic to a user story; the user-story-side reverse is `contained_in:<epic-id>[]`.
+Use `validated_by:<test-id>[]` from an epic to a test; the test-side reverse is `validates:<epic-id>[]`.
+Include only links supported by the configured relation and only when the target ID is real.

@@ -138,7 +138,7 @@ include::example$config-resolution.puml[]
 | Element | Description
 
 | Built-in presets
-| YAML files in `src/presets/` shipped with the extension. Define roles, relations, matrices, and optional Neo4j queries for common domains (`requirements-engineering`, `agile`, `medical-iec62304`, `minimal`). Selected via `--preset` flag or `preset` playbook config.
+| YAML files in `src/presets/` shipped with the extension. Define roles, relations, matrices, and optional Neo4j queries for common domains (`requirements-engineering`, `requirements-engineering-max`, `spec-driven-development`, `agile`, `medical-iec62304`, `minimal`). Selected via `--preset` flag or `preset` playbook config.
 
 | User config (`traceability.yml`)
 | Optional YAML file. Deep-merged on top of the preset. Overrides roles, adds custom matrices, extends relations. Path configured via `--config` flag or `configPath` playbook config.
@@ -603,6 +603,7 @@ tracer:links[]
 [#ARC-044, item, role=design, title="Item lifecycle CLI: archive and remove"]
 --
 The `archive` and `remove` commands are the first source-mutating CLI commands, enabled by block-extent detection that locates an item's full block (header through the closing delimiter) and refuses ambiguous edits.
+Block extents come from the exported `ItemBlockBounds` accessor, the single scan shared with the parser and the extension, so a block's bounds cannot diverge between consumers.
 `archive <ID>` moves a superseded block to the module's `superseded.adoc`; `remove <ID>` deletes an orphaned block after a `y/N` prompt or an isolated block after typing the ID.
 Mutation lives in the CLI, never the extension, which remains read-only on source files.
 

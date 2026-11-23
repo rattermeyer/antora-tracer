@@ -1,12 +1,15 @@
-= Writing Qualities
+= Writing Quality Attributes
 
-Instead of invention something new, we want to align with existing standards.
-We have chosen to follow the https://quality.arc42.org[Quality42] quality model.
-So, when writing a quality first check there if a quality is already described there.
+A `quality_attribute` item states a quality characteristic the system or service is expected to exhibit.
 
-== Dimensions
+== Aligning with existing standards
 
-Qualities are defined along the 9 dimensions / tags
+Instead of inventing something new, align with existing standards.
+We follow the https://quality.arc42.org[Quality42] quality model.
+When writing a quality, first check whether it is already described there, and use that definition rather than inventing one.
+Otherwise, check an appropriate https://quality.arc42.org/standards/[standard] for a definition.
+
+Qualities are defined along nine dimensions:
 
 * efficient
 * flexible
@@ -22,21 +25,16 @@ Qualities are defined along the 9 dimensions / tags
 
 [source,asciidoc]
 ----
-[#<quality-id>, item, role=quality, title="<quality>"]
+[#<quality-attribute-id>, item, role=quality_attribute, title="<quality characteristic>"]
 --
 Tags: <quality-dimension>
 
-<quality definition>
+The system exhibits <quality characteristic> under <condition> with <measure or target>.
 --
 ----
-
-* If a definition can be found on https://quality.arc42.org/qualities/[Quality42] use it, don't invent anything.
-* Otherwise, check an appropriate https://quality.arc42.org/standards/[Standard] if it contains a definition
-
 == Optional traceability
 
 Traceability is optional and each relation requires a configured target ID.
-You find the possible relationships using `
 
 [source,asciidoc]
 ----

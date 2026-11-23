@@ -24,10 +24,14 @@ export interface GraphSnapshot {
 /**
  * Serialize a graph to the canonical snapshot format. Items keep their scope
  * fields (`component`, `module`, `version`) but drop the per-page `pubUrl`,
- * which embeds the version segment and is recomputable.
+ * which embeds the version segment and is recomputable. The content-source
+ * `sourceRoot` is dropped too: it is an absolute build-machine directory, and
+ * a snapshot must stay machine-independent so two harvests remain comparable.
  */
 export function serializeSnapshot(graph: TraceabilityGraph): string {
-  const items = graph.getAllItems().map(({ pubUrl: _pubUrl, ...item }) => item);
+  const items = graph
+    .getAllItems()
+    .map(({ pubUrl: _pubUrl, sourceRoot: _sourceRoot, ...item }) => item);
   const relationships = graph.getAllRelationships();
   return JSON.stringify(
     { format: SNAPSHOT_FORMAT, items, relationships },

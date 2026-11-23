@@ -215,6 +215,7 @@ export interface CompleteConfig extends TraceabilityConfig {
  */
 export const BUILT_IN_PRESETS = [
   "requirements-engineering",
+  "requirements-engineering-max",
   "spec-driven-development",
   "agile",
   "medical-iec62304",

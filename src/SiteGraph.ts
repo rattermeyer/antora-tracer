@@ -9,6 +9,8 @@
  * core parser. No `convertDocuments`/`composePage`/`publishFiles` runs.
  */
 
+import { join } from "node:path";
+
 /** A harvested AsciiDoc file with its Antora scope metadata. */
 export interface HarvestedFile {
   path: string;
@@ -17,6 +19,14 @@ export interface HarvestedFile {
   module?: string;
   version?: string;
   pubUrl?: string;
+  /**
+   * Absolute directory of the content source this file came from — the
+   * repository worktree joined with the source's start path. Joining `path`
+   * to it yields exactly one file on disk, even when two sources declare the
+   * same relative path. Unset when the source provides no worktree (e.g. a
+   * bare repository read from the git tree).
+   */
+  sourceRoot?: string;
 }
 
 type PlaybookBuilder = (args: string[]) => Record<string, any>;
@@ -45,7 +55,8 @@ export function findTraceabilityExtensionEntry(
     const candidate = entry as Record<string, unknown>;
     const requireValue =
       typeof candidate.require === "string" ? candidate.require : undefined;
-    const name = typeof candidate.name === "string" ? candidate.name : undefined;
+    const name =
+      typeof candidate.name === "string" ? candidate.name : undefined;
     if (
       requireValue === "@antora-tracer/core/antora-extension" ||
       requireValue === "./lib/src/antora-extension.js" ||
@@ -57,8 +68,6 @@ export function findTraceabilityExtensionEntry(
   }
   return undefined;
 }
-
-
 
 async function loadAntoraModule<T>(name: string): Promise<T> {
   try {
@@ -95,7 +104,8 @@ export async function harvestSiteFiles(
     extEntry && typeof extEntry.config === "object" && extEntry.config !== null
       ? (extEntry.config as Record<string, unknown>)
       : extEntry;
-  const excludeList = rawConfig?.excludeComponents ?? rawConfig?.excludecomponents;
+  const excludeList =
+    rawConfig?.excludeComponents ?? rawConfig?.excludecomponents;
   const excludeComponents = Array.isArray(excludeList)
     ? excludeList.filter((c): c is string => typeof c === "string")
     : [];
@@ -109,6 +119,17 @@ export async function harvestSiteFiles(
       if (excludeComponents.includes(file.src.component)) continue;
       const content = file.contents?.toString?.("utf8");
       if (content == null) continue;
+      const origin = file.src.origin;
+      // The content source's root is the repository worktree joined with the
+      // source's start path. A source read from the git tree (bare repo) has
+      // `worktree` false and provides no root; leave it unset rather than
+      // inventing one.
+      const worktree = origin?.worktree;
+      const startPath = origin?.startPath;
+      const sourceRoot =
+        typeof worktree === "string" && worktree.length > 0
+          ? join(worktree, typeof startPath === "string" ? startPath : "")
+          : undefined;
       files.push({
         path: file.src.path,
         content,
@@ -116,6 +137,7 @@ export async function harvestSiteFiles(
         module: file.src.module,
         version: file.src.version,
         pubUrl: file.pub?.url,
+        sourceRoot,
       });
     }
   }

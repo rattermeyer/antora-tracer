@@ -26,7 +26,6 @@ traceability:
     - design_element
     - test_case
     - design_decision
-    - design_element
     - constraint
 
   roleGuidance:
@@ -39,10 +38,10 @@ traceability:
       page: guidance/user_need.adoc
     use_case:
       page: guidance/use_case.adoc
-    quality:
-      page: guidance/quality.adoc
+    quality_attribute:
+      page: guidance/quality_attribute.adoc
     quality_scenario:
-      page: guidance/quality_requirement.adoc
+      page: guidance/quality_scenario.adoc
     design_concept:
       page: guidance/design_concept.adoc
     design_element:
@@ -68,18 +67,14 @@ traceability:
       use_case:
         described_by:
           reverse: describes
-    quality:
-      quality_requirement:
+    quality_attribute:
+      quality_scenario:
         characterized_by:
           reverse: characterizes
-    quality_requirement:
-      solution_strategy:
+    quality_scenario:
+      design_concept:
         drives:
           reverse: is_driven_by
-    solution_strategy:
-      design_concept:
-        motivates:
-          reverse: is_motivated_by
     design_concept:
       design_element:
         is_realized_by:
@@ -131,16 +126,16 @@ traceability:
     - name: requirements-to-design
       description: "Forward traceability from requirements to design elements"
       rows: requirement
-      columns: [design]
+      columns: [design_element]
       coverageRelations:
-        design: [addresses]
+        design_element: [motivates]
 
     - name: requirements-to-tests
       description: "Direct traceability from requirements to their tests"
       rows: requirement
-      columns: [test]
+      columns: [test_case]
       coverageRelations:
-        test: [verifies]
+        test_case: [is_verified_by]
 
 neo4j:
     queries:
@@ -156,17 +151,17 @@ neo4j:
       - name: design-coverage
         description: "Design elements and their requirement/test coverage"
         cypher: |
-          MATCH (d:Item {role: 'design'})
+          MATCH (d:Item {role: 'design_element'})
           OPTIONAL MATCH (d)-[:ADDRESSES]->(r:Item {role: 'requirement'})
-          OPTIONAL MATCH (d)-[:VALIDATED_BY]->(t:Item {role: 'test'})
+          OPTIONAL MATCH (d)-[:VALIDATED_BY]->(t:Item {role: 'test_case'})
           RETURN d.id, d.title, count(r) as requirements, count(t) as tests
           ORDER BY requirements DESC, tests DESC
 
       - name: traceability-chain
         description: "Full traceability chain from requirement to design to test"
         cypher: |
-          MATCH path = (r:Item {role: 'requirement'})<-[:ADDRESSES]-(d:Item {role: 'design'})
-                     <-[:VALIDATES]-(t:Item {role: 'test'})
+          MATCH path = (r:Item {role: 'requirement'})<-[:ADDRESSES]-(d:Item {role: 'design_element'})
+                     <-[:VALIDATES]-(t:Item {role: 'test_case'})
           RETURN r.id as requirement, d.id as design, t.id as test
           ORDER BY r.id, d.id, t.id
 
@@ -174,8 +169,8 @@ neo4j:
         description: "What would be affected by changing a requirement?"
         cypher: |
           MATCH (r:Item {id: $requirementId, role: 'requirement'})
-          OPTIONAL MATCH (r)<-[:ADDRESSES]-(d:Item {role: 'design'})
-          OPTIONAL MATCH (r)<-[:VERIFIES]-(t:Item {role: 'test'})
+          OPTIONAL MATCH (r)<-[:ADDRESSES]-(d:Item {role: 'design_element'})
+          OPTIONAL MATCH (r)<-[:VERIFIES]-(t:Item {role: 'test_case'})
           RETURN r.id as requirement, collect(d.id) as designs, collect(t.id) as tests
 
       - name: circular-dependencies

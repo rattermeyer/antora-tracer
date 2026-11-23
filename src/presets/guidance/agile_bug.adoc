@@ -1,0 +1,38 @@
+= Writing Agile Bug Items
+
+A `bug` item records an observed defect, its impact, and enough evidence to reproduce and resolve it.
+
+== Item template
+
+[source,asciidoc]
+----
+[item, id=<id>, role=bug, title="<short defect title>"]
+====
+Observed: <what happened>.
+
+Expected: <what should have happened>.
+
+Reproduction: <preconditions and steps that reproduce the defect>.
+
+Impact: <affected user, workflow, or scope>.
+
+<Optional configured links.>
+
+====
+----
+The optional `tracer:links[]` macro may be added when rendered link output is useful.
+
+== Writing and review checklist
+
+* Separate observed behaviour from expected behaviour.
+* Give reproducible steps, relevant conditions, and the impact of the defect.
+* Keep one defect per item unless the symptoms share one confirmed cause.
+* Use an existing target ID for each link and omit links whose targets are not known.
+* Confirm the item uses `role=bug` and that every relation name comes from this preset.
+
+== Optional configured links
+
+Use `blocks:<user-story-id>[]` from a bug to a user story; the story-side reverse is `blocked_by:<bug-id>[]`.
+Use `fixed_by:<task-id>[]` from a bug to a task; the task-side reverse is `fixes:<bug-id>[]`.
+Use `reproduced_by:<test-id>[]` from a bug to a test; the test-side reverse is `reproduces:<bug-id>[]`.
+Include only links supported by the configured relation and only when the target ID is real.

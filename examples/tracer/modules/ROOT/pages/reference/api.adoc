@@ -139,6 +139,38 @@ export interface ParserResult {
 Two-pass approach: find `[item]` block macros, then scan content for inline relationship macros (`<type>:<TARGET-ID>[]`).
 Supports verbatim block exclusion, source file and line tracking.
 
+== ItemBlockBounds
+
+`src/ItemBlockBounds.ts` — the single authoritative locator for an item block's position and extent.
+
+[source,typescript]
+----
+export interface ItemBlockBounds {
+  itemId: string;          // Item ID as authored in the header
+  headerStart: number;     // Absolute offset of the header's '['
+  headerEnd: number;       // Absolute offset just past the header's ']'
+  bodyStart: number;       // Absolute offset of the first body character
+  bodyEnd: number;         // Absolute offset of the newline before the closing delimiter
+  bodyTextStart: number;   // Absolute offset of the body's first non-whitespace character
+  blockEnd: number;        // Absolute offset just past the closing delimiter
+  delimiter: "--" | "===="; // The delimiter form
+  startLine: number;       // 1-based line of the header
+  endLine: number;         // 1-based line of the closing delimiter
+  blockText: string;       // Header through closing delimiter
+  bodyText: string;        // The item body, trimmed as `Item.content` is
+}
+
+export function itemBlockBoundsAtOffset(content: string, headerOffset: number): ItemBlockBounds | null;
+export function itemBlockBoundsAtLine(content: string, sourceLine: number): ItemBlockBounds | null;
+export function findItemBlocks(content: string): ItemBlockBounds[];
+export function findVerbatimRanges(content: string): Array<{ start: number; end: number }>;
+----
+
+`itemBlockBoundsAtOffset` takes the absolute offset of the header's `[`; `itemBlockBoundsAtLine` takes a 1-based source line and resolves the offset itself.
+Both return `null` when the position is not an item block — no delimiter, an unterminated block, or a header inside a `----`/`....` verbatim fence.
+Offsets are the primitive; `startLine` and `endLine` are derived, and `content.slice(headerStart, blockEnd)` equals `blockText` exactly.
+The parser, the CLI's `archive`/`remove`, and the Antora extension all locate blocks through this module, so the item-block grammar has one home.
+
 == MatrixGenerator
 
 `src/MatrixGenerator.ts` — config-driven matrix generation.
@@ -287,7 +319,7 @@ export function serializeSnapshot(graph: TraceabilityGraph): string;
 export function deserializeSnapshot(json: string): GraphSnapshot;
 ----
 
-`serializeSnapshot` keeps item scope fields (`component`, `module`, `version`) and drops per-page `pubUrl`.
+`serializeSnapshot` keeps item scope fields (`component`, `module`, `version`) and drops the per-page `pubUrl` and the build-machine `sourceRoot`.
 `deserializeSnapshot` rejects unknown `format` values and malformed snapshots.
 
 == Data Model
@@ -310,6 +342,7 @@ export interface Item {
   module?: string;                   // Antora module name (absent for CLI)
   version?: string;                  // Antora component version (absent for CLI)
   pubUrl?: string;                   // Antora published URL (absent for CLI)
+  sourceRoot?: string;               // Content-source root the sourceFile is relative to (absent for CLI)
 }
 
 export interface ItemRelationship {
@@ -333,6 +366,46 @@ Page items use the source path given by the caller (the content catalog for Anto
 For items in partial files it is the partial's `http(s)` view URL when the content source provides one, and the repository-relative source path otherwise.
 A local content source produces a `file://` view URL, which points at the build machine's worktree, so those partial items fall back to the repository-relative path.
 No `sourceFile` value therefore exposes a build-machine directory, including when it is serialized into a `graph.json` snapshot or a Neo4j export.
+
+`sourceRoot` is the absolute directory of the content source an item was harvested from, so that its relative `sourceFile` resolves to exactly one file even when two sources declare the same relative path.
+It is set only when an item comes from a playbook source whose origin provides a worktree: a harvest records the repository worktree joined with the source's start path, and a source read from the git tree (a bare repository) records no root.
+Items built from local files without a playbook carry no root, and a consumer treats that as the single-source case where its own input directory is the root.
+Because the root is a build-machine path, `serializeSnapshot` and the extension's `graph.json` writer drop it alongside `pubUrl`, so no published artifact exposes it.
+
+== SiteGraph
+
+`src/SiteGraph.ts` — harvest a playbook's complete cross-source graph without generating site output.
+
+[source,typescript]
+----
+export interface HarvestedFile {
+  path: string;                      // Component-root-relative source path
+  content: string;
+  component?: string;
+  module?: string;
+  version?: string;
+  pubUrl?: string;
+  sourceRoot?: string;               // Content-source root (absent without a worktree)
+}
+
+export async function harvestSiteFiles(playbookPath: string): Promise<HarvestedFile[]>;
+----
+
+Each harvested file records its content-source root, derived from the file's Antora origin metadata, so a consumer can resolve `path` to exactly one file on disk.
+
+`src/SourcePath.ts` — resolve an item's relative `sourceFile` to an absolute path:
+
+[source,typescript]
+----
+export function resolveSourceFilePath(
+  input: string,
+  sourceFile: string | undefined,
+  sourceRoot?: string,
+): string;
+----
+
+The recorded `sourceRoot` is preferred; when it is absent the caller's `input` directory is used.
+A resolved path that escapes the chosen root is rejected rather than returned.
 
 == Configuration Types
 

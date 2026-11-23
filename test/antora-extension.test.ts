@@ -4011,6 +4011,86 @@ satisfies:REQ-001[]
       expect(snapshot.version).to.equal("1.0.0");
       expect(snapshot.items).to.have.length(2);
       expect(snapshot.relationships).to.have.length(1);
+      // The published payload keeps its documented field set: every item key
+      // is one the format documents (a key with an undefined value — e.g. an
+      // absent `status` — is simply omitted by JSON), and never a
+      // content-source root, a per-page pubUrl, or a build-machine absolute
+      // path.
+      const raw = graphFiles[0].contents.toString();
+      const documented: Record<string, true> = {
+        id: true,
+        role: true,
+        title: true,
+        content: true,
+        status: true,
+        tags: true,
+        attributes: true,
+        component: true,
+        module: true,
+        version: true,
+        sourceFile: true,
+        sourceLine: true,
+      };
+      for (const snapshotItem of snapshot.items) {
+        for (const key of Object.keys(snapshotItem)) {
+          expect(
+            documented[key] === true,
+            `unexpected item field '${key}' in published graph.json`,
+          ).to.be.true;
+        }
+        expect(snapshotItem).to.not.have.property("sourceRoot");
+        expect(snapshotItem).to.not.have.property("pubUrl");
+      }
+      expect(raw).to.not.contain("sourceRoot");
+      expect(raw).to.not.match(/(?:^|["\s:])\/(?:home|Users|tmp|var)\//);
+    });
+
+    it("drops an injected source root from the published snapshot", async () => {
+      const addedFiles: any[] = [];
+      const contentCatalog = createCatalog({
+        addFile: (file: any) => {
+          addedFiles.push(file);
+          return file;
+        },
+      });
+
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      ctx.fireEvent("contentClassified", { contentCatalog });
+
+      // Inject a rooted item onto the working graph, then serialize it through
+      // the extension's own snapshot writer: the root must not survive.
+      const traceExt = ext.getTraceabilityExtension();
+      traceExt.graph.addItem({
+        id: "REQ-999",
+        role: "requirement",
+        title: "Rooted",
+        attributes: {},
+        component: "test-component",
+        module: "ROOT",
+        version: "1.0.0",
+        sourceFile: "test.adoc",
+        sourceRoot: "/build/machine/test-component",
+      });
+
+      // `serializeGraphSnapshot` is private; reach it through a narrow typed
+      // view rather than an untyped cast.
+      const extWithWriter = ext as unknown as {
+        serializeGraphSnapshot(component: string, version: string): string;
+      };
+      const payload = extWithWriter.serializeGraphSnapshot(
+        "test-component",
+        "1.0.0",
+      );
+      expect(payload).to.not.contain("/build/machine");
+      const parsed = JSON.parse(payload);
+      const injected = parsed.items.find((i: any) => i.id === "REQ-999");
+      expect(injected).to.exist;
+      expect(injected).to.not.have.property("sourceRoot");
     });
 
     it("snapshot items carry component, module, and version and exclude pubUrl", async () => {

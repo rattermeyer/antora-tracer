@@ -1,0 +1,38 @@
+= Writing Test Case Items
+
+A `test_case` item captures one concrete scenario and its expected result within a test procedure.
+This guidance supports traceability authoring only and does not establish IEC 62304, FDA, or other regulatory compliance.
+`tracer:links[]` is optional display-only markup and is not part of the item content.
+
+== Item template
+
+[source,asciidoc]
+----
+[#<id>, item, role=test_case, title="<scenario name>"]
+--
+Given <precondition>, when <stimulus>, then <observable expected result>.
+
+Inputs and expected evidence: <specific values or artifacts>.
+
+<optional link, for example:>
+part_of:<test-procedure-id>[]
+
+--
+----
+
+== Optional configured links
+
+A test case may use `part_of` for a `test_procedure`.
+It may use `traces_to` for a `software_requirement`.
+The configured reverse names are `contains` and `traced_by`, respectively.
+Add a link only when the target ID exists and the case actually covers it.
+
+== Writing and review checklist
+
+* [ ] Defines a specific precondition, stimulus, and observable expected result.
+* [ ] Provides concrete inputs and evidence requirements where needed for repeatability.
+* [ ] Covers one scenario and separates meaningful alternate or error scenarios.
+* [ ] Does not report a pass or failure before execution.
+* [ ] Uses only configured relation names and existing target IDs for optional links.
+* [ ] Avoids claiming that a traceability link or preset use proves compliance.
+* [ ] Includes `tracer:links[]` only when displaying related items is useful.

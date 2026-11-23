@@ -442,3 +442,327 @@ leads_to:REQ-082[]
 tracer:links[]
 --
 
+[#UC-016, item, role=use_case, title="Developer installs the agent skills"]
+--
+[width=100%, cols="25h,75a"]
+|===
+| ID | UC-016
+| Title | Developer installs the agent skills
+| Goal | Developer makes the bundled agent skills available to their AI coding harness so the assistant writes and reviews traceable content
+| Primary Actor | Developer using an AI coding assistant (pi, Claude Code, or OpenAI Codex)
+| Preconditions | The `@antora-tracer/core` package is installed And the harness is running
+| Trigger | Developer wants their assistant to follow the project's traceability conventions
+| Basic Flow |
+. Developer runs `antora-tracer install` and selects one or more harnesses interactively
+. The CLI installs every bundled skill to each selected harness's per-user destination
+. Developer restarts the harness so it discovers the new skills
+. The assistant applies the skills when authoring or reviewing items
+| Alternate Flows |
+. *Scripted install:* Developer passes explicit harness arguments so no prompt appears.
+. *Preview first:* Developer runs a dry run to see the selected installation actions without writing anything.
+. *Existing skills present:* The CLI preserves an already-installed skill unless the developer approves replacement.
+. *One harness fails:* The CLI reports the error per harness And continues with the others.
+| Postconditions | The selected harnesses have the bundled skills installed at their per-user destinations And the assistant can use them
+| Priority | Medium
+| Frequency | Once per project or harness setup
+| Notes | Skills live in the package's `skills/` directory; the harness discovers them from its user skill directory.
+|===
+
+leads_to:REQ-356[]
+leads_to:REQ-357[]
+leads_to:REQ-358[]
+leads_to:REQ-359[]
+leads_to:REQ-360[]
+leads_to:REQ-361[]
+
+tracer:links[]
+--
+
+[#UC-017, item, role=use_case, title="Team member supersedes an item"]
+--
+[width=100%, cols="25h,75a"]
+|===
+| ID | UC-017
+| Title | Team member supersedes an item
+| Goal | Team member retires a replaced item while keeping its history and a link to its successor
+| Primary Actor | Team member who authors traceable content
+| Preconditions | The replacement item exists or is about to be written And the project's relations allow `supersedes`
+| Trigger | An existing item is replaced by a new one
+| Basic Flow |
+. Team member writes the successor item and declares `supersedes:<old-id>[]` in its block
+. The graph derives the old item's superseded state from the relationship
+. Current matrices exclude the superseded item And it renders with a `(superseded by ...)` marker
+. Team member optionally runs `antora-tracer archive <old-id>` to move the block to the module's `superseded.adoc`
+| Alternate Flows |
+. *Superseded content should be hidden:* The project sets the render toggle so superseded blocks and links are not shown.
+. *Orphaned or isolated block should be deleted:* Team member runs `antora-tracer remove <id>`, which refuses until the item is orphaned or isolated and confirms before deleting.
+| Postconditions | The old item stays traceable as history And the successor is linked And current matrices drop the old item
+| Priority | Medium
+| Frequency | Whenever an item is replaced
+| Notes | Superseded state is derived from the graph, never from a `status=` attribute; do not edit an item in place to replace it.
+|===
+
+leads_to:REQ-203[]
+leads_to:REQ-208[]
+leads_to:REQ-233[]
+leads_to:REQ-238[]
+
+tracer:links[]
+--
+
+[#UC-018, item, role=use_case, title="Team member resolves a duplicate ID at merge"]
+--
+[width=100%, cols="25h,75a"]
+|===
+| ID | UC-018
+| Title | Team member resolves a duplicate ID at merge
+| Goal | Team member finds and fixes a duplicate item ID introduced by parallel work before it ships
+| Primary Actor | Team member merging branches in a shared git repository
+| Preconditions | Two branches each added an item that chose the same ID
+| Trigger | Branches merge and the combined tree contains two items with one ID
+| Basic Flow |
+. Team member runs `antora-tracer validate` over the tree
+. The CLI reports the duplicate ID with each definition's file and line
+. Team member gives one item a fresh ID, allocated through the shared allocator when configured
+. Team member re-runs `validate` And it reports no duplicate
+| Alternate Flows |
+. *Build-time detection:* The extension fails the build on a duplicate ID unless the site opts out, so the collision surfaces before publishing.
+. *Prevention:* Team member allocates IDs through the shared allocator so parallel branches never pick the same next ID.
+| Postconditions | Each item ID is unique within its component version And the graph keeps both items and their relationships
+| Priority | High
+| Frequency | Per merge that adds items on more than one branch
+| Notes | The graph keeps the first definition and drops the second, so an undetected duplicate is silent data loss.
+|===
+
+leads_to:REQ-292[]
+
+tracer:links[]
+--
+
+[#UC-019, item, role=use_case, title="Reviewer diffs two versions of the documentation"]
+--
+[width=100%, cols="25h,75a"]
+|===
+| ID | UC-019
+| Title | Reviewer diffs two versions of the documentation
+| Goal | Reviewer sees which traceable items were added, removed, or modified between two snapshots
+| Primary Actor | Reviewer or architect assessing a change
+| Preconditions | Two sets of AsciiDoc sources are available (directories, worktrees, or refs)
+| Trigger | Reviewer needs to know what changed between two versions
+| Basic Flow |
+. Reviewer runs `antora-tracer diff --from <old> --to <new>`
+. The CLI reports each item as added, removed, or modified with its changed fields
+. For a complete cross-source view, Reviewer builds a snapshot with `site-graph` and diffs the snapshots instead
+. Reviewer follows the listed item IDs to the affected content
+| Alternate Flows |
+. *Cross-repository change:* Reviewer diffs playbook snapshots so items from every content source and version are compared together.
+. *Supersession:* A superseded predecessor is reported as removed And its successor as added.
+| Postconditions | Reviewer holds a delta of added, removed, and modified items And the diff leaves the sources unchanged
+| Priority | Medium
+| Frequency | Per review of a version change
+| Notes | The diff matches items by component-qualified identity, so the same ID in different components or versions is not conflated.
+|===
+
+leads_to:REQ-212[]
+leads_to:REQ-216[]
+leads_to:REQ-264[]
+leads_to:REQ-376[]
+
+tracer:links[]
+--
+
+[#UC-020, item, role=use_case, title="Site maintainer indexes traceable items in search"]
+--
+[width=100%, cols="25h,75a"]
+|===
+| ID | UC-020
+| Title | Site maintainer indexes traceable items in search
+| Goal | Site maintainer makes traceable item anchors discoverable in the site's search index
+| Primary Actor | Site maintainer
+| Preconditions | The `@antora/lunr-extension` is registered in the playbook
+| Trigger | Readers cannot find items like `REQ-001` through the site search
+| Basic Flow |
+. Site maintainer applies the shipped patch that teaches lunr to index item anchors
+. The build indexes each item anchor as a separate search result
+. Reader searches for an item ID And the result links to that item's anchor
+| Alternate Flows |
+. *No lunr extension:* The patch is not needed And the site search stays unchanged.
+| Postconditions | Item anchors appear as search results And each links to its item
+| Priority | Low
+| Frequency | Once per site
+| Notes | An item renders as a plain element with an `id`, which lunr does not treat as a navigable anchor without the patch.
+|===
+
+leads_to:REQ-079[]
+
+tracer:links[]
+--
+
+[#UC-021, item, role=use_case, title="Technical writer generates DOCX output"]
+--
+[width=100%, cols="25h,75a"]
+|===
+| ID | UC-021
+| Title | Technical writer generates DOCX output
+| Goal | Technical writer produces a Word document from the assembled documentation for review or regulatory submission
+| Primary Actor | Technical writer preparing a deliverable
+| Preconditions | Ruby, Pandoc 3.x, and Node.js are installed And the assembler configurations exist
+| Trigger | A review workflow or submission requires a DOCX file
+| Basic Flow |
+. Technical writer runs the DOCX assembler configuration for the target document
+. The assembler produces AsciiDoc And the `adoc-to-docx` wrapper converts it through DocBook to DOCX
+. Technical writer opens the DOCX And confirms the content and diagrams
+| Alternate Flows |
+. *PDF instead:* Technical writer uses the corresponding PDF assembler configuration.
+| Postconditions | A DOCX file exists at the configured output path
+| Priority | Medium
+| Frequency | Per submission or review cycle
+| Notes | The DOCX assembler configs mirror the PDF ones and differ only in the build command.
+|===
+
+leads_to:REQ-135[]
+
+tracer:links[]
+--
+
+[#UC-022, item, role=use_case, title="Author lints prose with Vale"]
+--
+[width=100%, cols="25h,75a"]
+|===
+| ID | UC-022
+| Title | Author lints prose with Vale
+| Goal | Author catches prose-quality issues in the documentation during the build
+| Primary Actor | Author or reviewer of documentation prose
+| Preconditions | The `vale` and `asciidoctor` executables are on `PATH` And the Vale extension is registered
+| Trigger | The site builds and prose should be checked
+| Basic Flow |
+. Author registers the Vale extension in the playbook
+. During the build, the extension lints page and partial source content
+. The build reports prose findings at the configured minimum level
+. Author fixes the findings And rebuilds
+| Alternate Flows |
+. *Exclude a file:* The extension's `exclude` list skips a file, for example a style guide.
+. *No Vale installed:* The extension reports the missing executable rather than failing silently.
+| Postconditions | Prose findings are reported And addressed
+| Priority | Low
+| Frequency | Every build
+| Notes | Vale complements the source-layout checker, which enforces one sentence per line.
+|===
+
+leads_to:REQ-151[]
+
+tracer:links[]
+--
+
+[#UC-023, item, role=use_case, title="Operator deploys the ID allocation server"]
+--
+[width=100%, cols="25h,75a"]
+|===
+| ID | UC-023
+| Title | Operator deploys the ID allocation server
+| Goal | Operator runs a shared allocator so the team's `next-id` hands out collision-free IDs
+| Primary Actor | Team lead or operator
+| Preconditions | Node.js 22.5 or later And the `@antora-tracer/id-server` package or a repository checkout
+| Trigger | The team needs shared, collision-free ID allocation
+| Basic Flow |
+. Operator configures the server (port, tokens or projects, per-prefix widths and start values)
+. Operator starts the server, from source or with Docker
+. Operator seeds each prefix's `start` value with `antora-tracer seed` so allocation continues from the current maximum
+. Team members point `idAllocation.endpoint` at the server And receive shared IDs
+| Alternate Flows |
+. *No allocator:* `next-id` falls back to a local `max+1` scan, which cannot prevent duplicates under parallel work.
+| Postconditions | The server is running And responds to `next-id` requests with unique, padded IDs per tenant and prefix
+| Priority | Medium
+| Frequency | Once per team or deployment
+| Notes | The server is a standalone companion package, not part of the extension or CLI.
+|===
+
+leads_to:REQ-275[]
+leads_to:REQ-276[]
+leads_to:REQ-277[]
+leads_to:REQ-278[]
+leads_to:REQ-279[]
+
+tracer:links[]
+--
+
+[#UC-024, item, role=use_case, title="Developer serves the site with Docker"]
+--
+[width=100%, cols="25h,75a"]
+|===
+| ID | UC-024
+| Title | Developer serves the site with Docker
+| Goal | Developer serves the built site locally, optionally behind authentication
+| Primary Actor | Developer or demo presenter
+| Preconditions | Docker Engine 24 or later And Docker Compose v2 And a built `public/` directory
+| Trigger | Developer wants to preview or demo the site
+| Basic Flow |
+. Developer builds the site so `public/` exists
+. Developer runs the Caddy image, or a Compose file, over the `public/` directory
+. Developer opens the served site And confirms pages and matrices
+| Alternate Flows |
+. *Behind OIDC:* Developer uses the Compose file with the OAuth2 proxy so only authenticated users see the site.
+. *Behind Authelia:* Developer uses the forward-auth Compose file for a local demo.
+| Postconditions | The site is served from `public/` And reachable at the container's address
+| Priority | Low
+| Frequency | Per preview or demo
+| Notes | The image copies `public/` at build time, so build the site first.
+|===
+
+tracer:links[]
+--
+
+[#UC-025, item, role=use_case, title="Skill author evaluates the agent skills"]
+--
+[width=100%, cols="25h,75a"]
+|===
+| ID | UC-025
+| Title | Skill author evaluates the agent skills
+| Goal | Skill author measures the quality of the agent skills in two layers
+| Primary Actor | Skill author or maintainer
+| Preconditions | The repository is checked out And dependencies are installed
+| Trigger | A skill changes or is added And its quality must be checked
+| Basic Flow |
+. Skill author runs the deterministic checks as part of the test suite
+. Skill author runs the LLM rubric, which asks a model to grade fixtures and return a structured verdict
+. Skill author reads the findings And revises the skill
+| Alternate Flows |
+. *Deterministic layer only:* The mechanical checks run in CI without calling a model.
+| Postconditions | Both layers report And the skill meets the rubric
+| Priority | Low
+| Frequency | Per skill change
+| Notes | Skills are prompts, so they are evaluated by a grader plus an LLM rubric rather than unit tests alone.
+|===
+
+leads_to:REQ-296[]
+
+tracer:links[]
+--
+
+[#UC-026, item, role=use_case, title="Maintainer shows the build version"]
+--
+[width=100%, cols="25h,75a"]
+|===
+| ID | UC-026
+| Title | Maintainer shows the build version
+| Goal | Maintainer renders the build's version string in the HTML, PDF, and DOCX footers
+| Primary Actor | Site maintainer
+| Preconditions | The site builds inside a git repository so `git describe` succeeds
+| Trigger | Readers need to know which version of the docs they are viewing
+| Basic Flow |
+. The extension computes `git describe --tags --always --dirty` once per build
+. It exposes the value as the `site.keys.git_describe` site key and the `{git_describe}` attribute
+. Maintainer renders it in the footer partial or in AsciiDoc content
+| Alternate Flows |
+. *No git repository:* Neither key is set And the build continues unchanged.
+| Postconditions | The version string renders in each output format
+| Priority | Low
+| Frequency | Once per site
+| Notes | The value is exposed under one key in two channels: a site key for templates and an attribute for content.
+|===
+
+leads_to:REQ-253[]
+leads_to:REQ-254[]
+
+tracer:links[]
+--

@@ -29,6 +29,14 @@ export interface Item {
   version?: string;
   /** Antora published URL of the item's page (e.g., "/tracer/stable/index.html"). Absent for CLI usage. */
   pubUrl?: string;
+  /**
+   * Absolute directory of the content source this item came from — the root
+   * its relative `sourceFile` is resolved against. Set when harvested from a
+   * playbook source with a worktree; absent for local, non-Antora usage, where
+   * the consumer's own input directory is the root. Excluded from serialized
+   * snapshots so a snapshot is not tied to a build machine's layout.
+   */
+  sourceRoot?: string;
 }
 
 /** Stable graph identity. Unscoped local items retain their authored ID. */

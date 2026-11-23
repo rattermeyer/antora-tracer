@@ -25,6 +25,7 @@ The order matters — each pass depends on the result of earlier ones.
 === Pass 1: Parse and populate the graph
 
 `DocumentParser` scans every page and partial for `[item]` blocks and inline relationship macros.
+Block extents come from the shared `ItemBlockBounds` accessor, so the parser, the CLI's lifecycle commands, and the extension's macro expansion locate an item block by one grammar.
 Items and relationships are registered in the `TraceabilityGraph`.
 Both pages and partials are processed here.
 Files from components named by the `excludeComponents` extension option are filtered out before this pass, so excluded components never enter the graph and receive no macro expansion or generated attachments.
