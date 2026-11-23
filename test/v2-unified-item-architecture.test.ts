@@ -444,6 +444,64 @@ Requirement body
       expect(result.items[1].tags).to.deep.equal([]);
     });
   });
+
+  describe("Inline relation source lines", () => {
+    /** 1-based file line of the only relationship macro in the content. */
+    function relationLine(content: string): number {
+      const parser = new DocumentParser();
+      const result = parser.parse(content, "test.adoc");
+      expect(result.relationships).to.have.lengthOf(1);
+      return result.relationships[0].line as number;
+    }
+
+    /** 1-based line of the first occurrence of `needle`. */
+    function fileLineOf(content: string, needle: string): number {
+      return content.slice(0, content.indexOf(needle)).split("\n").length;
+    }
+
+    for (const blankLines of [0, 1, 2]) {
+      it(`reports the macro's own line with ${blankLines} leading blank line(s)`, () => {
+        const content = `\n[#DES-001, item, role=design]\n====\n${"\n".repeat(blankLines)}addresses:REQ-001[]\n====\n`;
+        expect(relationLine(content)).to.equal(
+          fileLineOf(content, "addresses:REQ-001[]"),
+        );
+      });
+    }
+
+    it("reports the macro's own line in a later item of a multi-item document", () => {
+      const content =
+        "\n[#REQ-001, item, role=requirement]\n====\nReq 1\n====\n\n[#DES-001, item, role=design]\n====\naddresses:REQ-001[]\n====\n";
+      expect(relationLine(content)).to.equal(
+        fileLineOf(content, "addresses:REQ-001[]"),
+      );
+    });
+
+    it("reports a distinct line per relation in one body", () => {
+      const content =
+        "\n[#DES-001, item, role=design]\n====\n\naddresses:REQ-001[]\n\nsatisfies:REQ-002[]\n====\n";
+      const parser = new DocumentParser();
+      const result = parser.parse(content, "test.adoc");
+
+      expect(
+        result.relationships.map((r) => [r.targetId, r.line]),
+      ).to.deep.equal([
+        ["REQ-001", fileLineOf(content, "addresses:REQ-001[]")],
+        ["REQ-002", fileLineOf(content, "satisfies:REQ-002[]")],
+      ]);
+    });
+
+    it("keeps a header-attribute relation on the header line", () => {
+      const parser = new DocumentParser({ configLoader: makeRelationLoader() });
+      const content =
+        "\n[#DES-001, item, role=design, addresses=REQ-001]\n====\n\nDesign body.\n====\n";
+      const result = parser.parse(content, "test.adoc");
+
+      expect(result.relationships).to.have.lengthOf(1);
+      expect(result.relationships[0].line).to.equal(
+        fileLineOf(content, "[#DES-001"),
+      );
+    });
+  });
 });
 
 describe("TraceabilityGraph", () => {

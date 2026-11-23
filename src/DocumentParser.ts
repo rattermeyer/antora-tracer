@@ -118,6 +118,9 @@ export class DocumentParser {
     };
 
     const seen = new Set<string>();
+    // Absolute index of each item's trimmed body in the source document, so the
+    // second pass can report relationship lines in the file's own numbering.
+    const bodyAbsoluteStarts = new Map<string, number>();
 
     // First pass: Parse all [item] block macros
     this.parseItemMacros(
@@ -126,6 +129,7 @@ export class DocumentParser {
       seen,
       result,
       verbatimRanges,
+      bodyAbsoluteStarts,
     );
 
     // Second pass: Parse inline relationship macros from item content
@@ -133,6 +137,7 @@ export class DocumentParser {
       content,
       sourceFile || this.currentFile,
       result,
+      bodyAbsoluteStarts,
     );
 
     // Add accumulated warnings and errors to result
@@ -151,6 +156,7 @@ export class DocumentParser {
     seen: Set<string>,
     result: ParserResult,
     verbatimRanges: Array<{ start: number; end: number }>,
+    bodyAbsoluteStarts: Map<string, number>,
   ): void {
     // Recognize both native ID headers and ID headers with a tracer role.
     // Only match at line start to avoid inline backtick references.
@@ -321,10 +327,12 @@ export class DocumentParser {
       }
 
       // Create the item
+      const body = this.extractBody(block, startPosition);
+      bodyAbsoluteStarts.set(id, body.absoluteStart);
       const item: Item = {
         id,
         title,
-        content: this.extractBody(block),
+        content: body.content,
         role,
         status,
         tags,
@@ -419,9 +427,10 @@ export class DocumentParser {
    * Parse inline relationship macros from item content
    */
   private parseInlineMacrosFromItems(
-    _content: string,
+    content: string,
     sourceFile: string,
     result: ParserResult,
+    bodyAbsoluteStarts: Map<string, number>,
   ): void {
     // Build a map of item IDs to their role for efficient lookup
     const itemRoleMap = new Map<string, string>();
@@ -451,8 +460,12 @@ export class DocumentParser {
         if (this.isInsideRange(match.index, backtickRanges)) continue;
 
         const macro = match[1];
-        const line =
-          this.lineAt(itemContent, match.index) + (item.sourceLine || 0);
+        // Derive the line from the macro's absolute offset in the document;
+        // itemContent is trimmed, so it is not a usable coordinate system.
+        const line = this.lineAt(
+          content,
+          (bodyAbsoluteStarts.get(item.id) ?? 0) + match.index,
+        );
 
         // Split macro into relation type and target ID
         const colonIndex = macro.indexOf(":");
@@ -539,14 +552,14 @@ export class DocumentParser {
 
   private extractBlock(content: string, startIndex: number): string | null {
     // Find opening delimiter: ==== or -- (must be alone on a line)
-    let m = content.slice(startIndex).match(/\n(====|--)\n/);
+    const m = content.slice(startIndex).match(/\n(====|--)\n/);
     if (!m || m.index === undefined) return null;
-    const blockStart = startIndex + m.index! + 1;
     const delimiter = m[1];
+    const delimiterIndex = startIndex + m.index + 1;
     // Closing delimiter: same delimiter, alone on a line, terminated by
     // newline or end-of-file.
     const closeRegex = new RegExp(`\\n${delimiter}(?:\\n|$)`, "g");
-    closeRegex.lastIndex = blockStart + delimiter.length + 1;
+    closeRegex.lastIndex = delimiterIndex + delimiter.length + 1;
     const closeMatch = closeRegex.exec(content);
     if (!closeMatch) return null;
     return content.substring(
@@ -555,20 +568,40 @@ export class DocumentParser {
     );
   }
 
-  private extractBody(block: string): string {
+  /**
+   * Extract the item body, returning the trimmed body text (item content) plus
+   * the absolute index of its first character in the source document.
+   *
+   * `blockStart` is the absolute index at which `block` begins, so
+   * `blockStart + bodyStart` is an absolute index even though `bodyStart` is
+   * measured against the block. The leading whitespace that `trim` removes must
+   * be added back, because macro offsets are measured against the trimmed text:
+   * the trimmed body's first character is the anchor, so
+   * `lineAt(source, absoluteStart + offset)` yields the file line of a
+   * character offset within `content`.
+   */
+  private extractBody(
+    block: string,
+    blockStart: number,
+  ): { content: string; absoluteStart: number } {
     // Find the delimiter: either ==== or --.
     // Check for ==== as a delimiter (line of its own), not just in body text.
     const hasEqualsDelim = /\n====\r?\n/.test(block);
     const delimiter = hasEqualsDelim ? "====" : "--";
     const start = block.indexOf(`\n${delimiter}\n`);
-    if (start === -1) return "";
+    if (start === -1) return { content: "", absoluteStart: blockStart };
     const bodyStart = start + delimiter.length + 2;
     // Closing delimiter may terminate the file (no trailing newline).
     const closeRegex = new RegExp(`\\n${delimiter}(?:\\n|$)`, "g");
     closeRegex.lastIndex = bodyStart;
     const closeMatch = closeRegex.exec(block);
-    if (!closeMatch) return "";
-    return block.substring(bodyStart, closeMatch.index).trim();
+    if (!closeMatch) return { content: "", absoluteStart: blockStart };
+    const raw = block.substring(bodyStart, closeMatch.index);
+    return {
+      content: raw.trim(),
+      absoluteStart:
+        blockStart + bodyStart + (raw.length - raw.trimStart().length),
+    };
   }
 
   private lineAt(content: string, position: number): number {

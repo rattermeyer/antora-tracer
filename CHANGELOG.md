@@ -2,6 +2,14 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [Unreleased]
+
+### Changed
+- The requirement guidance's Atomicity section now states one obligation per item rather than one SHALL per block, and directs same-level obligations to split into separate items and different-level obligations to become a parent and a refining child. The `requirements-writing` skill's atomicity rules match, and its eval cases gain a paired positive-and-prohibition case.
+
+### Fixed
+- Inline relationship macros report the line they are authored on. The line was derived from the item's trimmed body with the header line added, so every body-authored relationship was reported one or more lines early — one line per leading blank line at the top of the body. Relationship line numbers now come from the macro's absolute offset in the source file, so `validate` warnings (`dangling_link`, `invalid_relation`) and the `query reverse` and `query siblings` tables name the real macro line. Header-attribute relationships are unchanged and still report the header line.
+
 ## [0.33.0] — 2026-11-11
 
 ### Added
