@@ -2,14 +2,34 @@
 
 A `quality_attribute` item states a quality characteristic the system or service is expected to exhibit.
 
+== Aligning with existing standards
+
+Instead of inventing something new, align with existing standards.
+We follow the https://quality.arc42.org[Quality42] quality model.
+When writing a quality, first check whether it is already described there, and use that definition rather than inventing one.
+Otherwise, check an appropriate https://quality.arc42.org/standards/[standard] for a definition.
+
+Qualities are defined along nine dimensions:
+
+* efficient
+* flexible
+* maintainable
+* operable
+* reliable
+* safe
+* secure
+* suitable
+* usable
+
 == Item template
 
 [source,asciidoc]
 ----
 [#<quality-attribute-id>, item, role=quality_attribute, title="<quality characteristic>"]
 --
-The system exhibits <quality characteristic> under <condition> with <measure or target>.
+Tags: <quality-dimension>
 
+The system exhibits <quality characteristic> under <condition> with <measure or target>.
 --
 ----
 == Optional traceability
