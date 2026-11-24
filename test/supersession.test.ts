@@ -17,12 +17,17 @@ function setup(): { graph: TraceabilityGraph; loader: ConfigLoader } {
   writeFileSync(
     cfg,
     [
-      "roles: [requirement, design]",
+      "roles: [requirement, design, test]",
       "relations:",
       "  requirement:",
       "    requirement:",
       "      supersedes:",
       "        reverse: superseded_by",
+      "    # test -> requirement, declared with the requirement as source; the",
+      "    # authorable reverse name is `verifies`.",
+      "    test:",
+      "      verified_by:",
+      "        reverse: verifies",
       "  design:",
       "    requirement:",
       "      addresses:",
@@ -232,6 +237,60 @@ describe("Supersession", () => {
     expect(stale[0].message).to.include("REQ-043");
     // supersedes itself is not flagged as stale
     expect(stale[0].message).to.not.include("supersedes");
+  });
+
+  it("warns about a functional link authored with the superseded item as source", () => {
+    // `verifies` is declared `requirement.test.verified_by`, so authoring
+    // `verifies:REQ-042[]` on a test stores the requirement as the edge's
+    // source. The stale-link check must see it anyway.
+    const { graph } = setup();
+    add(graph, "REQ-042", "requirement");
+    add(graph, "REQ-043", "requirement");
+    add(graph, "TST-008", "test");
+    graph.addRelationship({
+      id: "r1",
+      fromId: "REQ-043",
+      targetId: "REQ-042",
+      type: "supersedes",
+    });
+    // Stored edge is REQ-042 -> TST-008 : verified_by (the canonical primary).
+    graph.addRelationship({
+      id: "r2",
+      fromId: "REQ-042",
+      targetId: "TST-008",
+      type: "verified_by",
+    });
+
+    const result = graph.validate();
+    const stale = result.warnings.filter((w) => w.type === "stale_link");
+    expect(
+      stale,
+      "a link stored with the superseded item as source must still warn",
+    ).to.have.lengthOf(1);
+    expect(stale[0].message).to.include("REQ-042");
+    expect(stale[0].message).to.include("REQ-043");
+  });
+
+  it("does not treat a source-side functional link as absent when judging orphaned", () => {
+    const { graph } = setup();
+    add(graph, "REQ-042", "requirement");
+    add(graph, "REQ-043", "requirement");
+    add(graph, "TST-008", "test");
+    graph.addRelationship({
+      id: "r1",
+      fromId: "REQ-043",
+      targetId: "REQ-042",
+      type: "supersedes",
+    });
+    graph.addRelationship({
+      id: "r2",
+      fromId: "REQ-042",
+      targetId: "TST-008",
+      type: "verified_by",
+    });
+
+    // REQ-042 is verified by TST-008, so it is not orphaned.
+    expect(graph.isOrphaned("REQ-042")).to.be.false;
   });
 
   it("excludes superseded items from current-item queries and matrices", () => {

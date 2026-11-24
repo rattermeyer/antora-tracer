@@ -3,12 +3,12 @@
  * Tests the CLI module exports and basic functionality
  */
 
-import { execFile, execFileSync } from "node:child_process";
+import { execFile, execFileSync, spawnSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as http from "node:http";
+import { tmpdir } from "node:os";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
-import { tmpdir } from "node:os";
 import { promisify } from "node:util";
 import { expect } from "chai";
 
@@ -249,6 +249,50 @@ implements:DES-001[]
         expect(html).to.include("</html");
       } finally {
         cleanupTempFile(filePath);
+      }
+    });
+  });
+
+  describe("Duplicate item ID detection", () => {
+    it("reports a same-file duplicate ID as an error and exits non-zero", () => {
+      const tempDir = path.join(__dirname, "temp-dup-id");
+      fs.mkdirSync(tempDir, { recursive: true });
+      const configPath = path.join(tempDir, "traceability.yml");
+      const adocPath = path.join(tempDir, "index.adoc");
+      fs.writeFileSync(configPath, "extends: minimal\n");
+      fs.writeFileSync(
+        adocPath,
+        [
+          "= T",
+          "",
+          '[#REQ-001, item, role=requirement, title="A"]',
+          "--",
+          "The system SHALL do a thing.",
+          "--",
+          "",
+          '[#REQ-001, item, role=requirement, title="A duplicate"]',
+          "--",
+          "The system SHALL do another thing.",
+          "--",
+          "",
+        ].join("\n"),
+      );
+      try {
+        const cliPath = path.join(__dirname, "..", "src", "cli.js");
+        const res = spawnSync(
+          "node",
+          [cliPath, "validate", "-i", tempDir, "--config", configPath],
+          { encoding: "utf8" },
+        );
+        expect(res.status, res.stdout + res.stderr).to.not.equal(0);
+        const out = `${res.stdout}${res.stderr}`;
+        expect(out).to.include("Duplicate item ID");
+        // Both definitions are named, with file and line.
+        expect(out).to.include("REQ-001");
+        expect(out).to.match(/index\.adoc:3/);
+        expect(out).to.match(/index\.adoc:8/);
+      } finally {
+        fs.rmSync(tempDir, { recursive: true, force: true });
       }
     });
   });

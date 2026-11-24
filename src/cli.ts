@@ -7,6 +7,7 @@ import {
   readdirSync,
   readFileSync,
   statSync,
+  unlinkSync,
   writeFileSync,
 } from "node:fs";
 import { homedir } from "node:os";
@@ -460,13 +461,19 @@ program
     try {
       if (options.input) {
         const adocFiles = collectAdocFiles(options.input);
-        extension.processFiles(adocFiles);
+        const { result } = extension.processFiles(adocFiles);
         const validation = extension.graph.validate();
-        if (validation.errors.length > 0) {
-          console.log(
-            chalk.red(`Validation Errors (${validation.errors.length}):`),
-          );
-          for (const error of validation.errors) {
+        // Parser errors (duplicate IDs within one file) are diagnostics too;
+        // the graph reports cross-file duplicates, the parser reports
+        // same-file ones. Both are errors that fail the command.
+        const parserErrors = result.errors;
+        const allErrors = [
+          ...parserErrors.map((e) => e.message),
+          ...validation.errors,
+        ];
+        if (allErrors.length > 0) {
+          console.log(chalk.red(`Validation Errors (${allErrors.length}):`));
+          for (const error of allErrors) {
             console.log(chalk.red(`  - ${error}`));
           }
           process.exit(1);
@@ -1515,9 +1522,12 @@ supersessionProgram
     }
 
     const successors = graph.getSuccessors(id);
-    const staleRels = graph
-      .getReverseRelationships(id)
-      .filter((rel) => !graph.isHistoryRelation(rel.type));
+    // A functional link may store the superseded item as source or target; the
+    // "other" endpoint is the item that still points at the superseded one.
+    const staleRels = graph.getFunctionalLinksInvolving(id).map((rel) => {
+      const other = rel.fromId === id ? rel.targetId : rel.fromId;
+      return { rel, other };
+    });
 
     if (json) {
       console.log(
@@ -1526,8 +1536,8 @@ supersessionProgram
             id,
             superseded: graph.isSuperseded(id),
             successors: successors.map((s) => s.id),
-            staleLinks: staleRels.map((rel) => ({
-              from: rel.fromId,
+            staleLinks: staleRels.map(({ rel, other }) => ({
+              from: other,
               type: rel.type,
             })),
             impact: options.impact ? graph.getImpactAnalysis(id) : undefined,
@@ -1544,10 +1554,10 @@ supersessionProgram
       }
       if (staleRels.length > 0) {
         console.log(chalk.yellow("Functional links requiring review:"));
-        const rows = staleRels.map((rel) => {
-          const item = graph.getItem(rel.fromId);
+        const rows = staleRels.map(({ rel, other }) => {
+          const item = graph.getItem(other);
           return [
-            rel.fromId,
+            other,
             item?.role ?? "",
             rel.type,
             rel.sourceFile ?? "",
@@ -1744,7 +1754,16 @@ program
       extracted.startLine - 1,
       extracted.endLine - extracted.startLine + 1,
     );
-    writeFileSync(sourcePath, lines.join("\n"), "utf8");
+    const remainder = lines.join("\n");
+    // `archive` moves the block. When it was the file's only content, the
+    // source file is removed rather than left behind as a zero-byte stub that
+    // Antora would still classify. A whitespace-only remainder is empty in
+    // practice and is removed too.
+    if (remainder.trim() === "") {
+      unlinkSync(sourcePath);
+    } else {
+      writeFileSync(sourcePath, remainder, "utf8");
+    }
 
     const supersededPath = join(dirname(sourcePath), "superseded.adoc");
     if (!existsSync(supersededPath)) {

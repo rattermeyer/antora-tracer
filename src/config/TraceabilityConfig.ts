@@ -534,6 +534,12 @@ export class ConfigLoader {
     }
 
     const relationshipTypes = new Set<string>();
+    // Reverse name -> the primary it resolves to, with the role pair that
+    // declared it. A reverse name must identify exactly one primary; two
+    // relations claiming the same reverse for different primaries make
+    // `getInverseType` order-dependent. Verbatim reuse of the same
+    // (primary, reverse) pair across role pairs is fine and stays allowed.
+    const reverseOwners = new Map<string, { primary: string; pair: string }>();
 
     // Validate relations structure
     if (config.relations) {
@@ -567,6 +573,21 @@ export class ConfigLoader {
             relationshipTypes.add(type.toLowerCase());
             if (def && typeof def.reverse === "string") {
               relationshipTypes.add(def.reverse.toLowerCase());
+            }
+
+            // A reverse name must resolve to exactly one primary.
+            if (def && typeof def.reverse === "string") {
+              const reverse = def.reverse.toLowerCase();
+              const primary = type.toLowerCase();
+              const pair = `${sourceRole} -> ${targetRole}`;
+              const owner = reverseOwners.get(reverse);
+              if (owner && owner.primary !== primary) {
+                errors.push(
+                  `Relation reverse name '${def.reverse}' is ambiguous: it is the reverse of '${owner.primary}' (${owner.pair}) and of '${type}' (${pair})`,
+                );
+              } else if (!owner) {
+                reverseOwners.set(reverse, { primary, pair });
+              }
             }
 
             if (

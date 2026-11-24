@@ -78,6 +78,58 @@ describe("Item lifecycle (archive/remove)", () => {
       expect(superseded).to.include("Old requirement.");
     });
 
+    it("removes the source file when the archived block was its only content", () => {
+      // The item lives alone in its own partial; the successor lives elsewhere.
+      const partialDir = path.join(TEST_DIR, "partials", "requirements");
+      fs.mkdirSync(partialDir, { recursive: true });
+      const loneSource = path.join(partialDir, "REQ-042-old.adoc");
+      fs.writeFileSync(
+        loneSource,
+        `[#REQ-042, item, role=requirement, title="Old"]
+--
+Old requirement.
+--
+`,
+      );
+      fs.writeFileSync(
+        path.join(TEST_DIR, "index.adoc"),
+        `= Test
+
+[#REQ-043, item, role=requirement, title="New"]
+--
+New requirement.
+
+supersedes:REQ-042[]
+--
+`,
+      );
+
+      const res = runCli(["archive", "REQ-042", "-i", TEST_DIR]);
+      expect(res.status, res.stderr).to.equal(0);
+
+      // The block is moved, not copied: the emptied source file is gone.
+      expect(
+        fs.existsSync(loneSource),
+        "the emptied source file must be removed",
+      ).to.be.false;
+      const superseded = fs.readFileSync(
+        path.join(partialDir, "superseded.adoc"),
+        "utf8",
+      );
+      expect(superseded).to.include("[#REQ-042, item");
+      expect(superseded).to.include("Old requirement.");
+    });
+
+    it("keeps a source file that still holds other content", () => {
+      // index.adoc also holds REQ-043, so it must survive the archive.
+      const res = runCli(["archive", "REQ-042", "-i", TEST_DIR]);
+      expect(res.status, res.stderr).to.equal(0);
+
+      expect(fs.existsSync(path.join(TEST_DIR, "index.adoc"))).to.be.true;
+      expect(readIndex()).to.not.include("[#REQ-042, item");
+      expect(readIndex()).to.include("REQ-043");
+    });
+
     it("rejects a non-superseded item with no file change", () => {
       const res = runCli(["archive", "REQ-100", "-i", TEST_DIR]);
       expect(res.status).to.equal(1);

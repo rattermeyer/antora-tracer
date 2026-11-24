@@ -121,7 +121,9 @@ export class DocumentParser {
       errors: [],
     };
 
-    const seen = new Set<string>();
+    // First definition of each ID in this file, so a duplicate can name both
+    // locations. Cross-file duplicates are reported by the graph instead.
+    const seen = new Map<string, number>();
     // Absolute index of each item's trimmed body in the source document, so the
     // second pass can report relationship lines in the file's own numbering.
     const bodyAbsoluteStarts = new Map<string, number>();
@@ -157,7 +159,7 @@ export class DocumentParser {
   private parseItemMacros(
     content: string,
     sourceFile: string,
-    seen: Set<string>,
+    seen: Map<string, number>,
     result: ParserResult,
     verbatimRanges: Array<{ start: number; end: number }>,
     bodyAbsoluteStarts: Map<string, number>,
@@ -251,18 +253,21 @@ export class DocumentParser {
         });
       }
 
-      // Check for duplicate ID
-      if (seen.has(id)) {
+      // Check for duplicate ID. The first definition wins; a same-file repeat
+      // is reported with both locations, and the block is skipped so its body
+      // cannot corrupt the surviving item's relationship offsets.
+      const firstLine = seen.get(id);
+      if (firstLine !== undefined) {
         this.errors.push({
           type: "duplicate_id",
-          message: `Duplicate item ID: ${id}. An item with this ID already exists.`,
+          message: `Duplicate item ID: ${id}. First defined at ${sourceFile}:${firstLine}. Skipping second definition at ${sourceFile}:${line}. Items must be unique within a component version.`,
           file: sourceFile,
           line,
           position: startPosition,
         });
         continue;
       }
-      seen.add(id);
+      seen.set(id, line);
 
       // Extract role
       let role = attributes.role;

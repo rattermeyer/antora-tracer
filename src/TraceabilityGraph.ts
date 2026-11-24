@@ -318,12 +318,37 @@ export class TraceabilityGraph {
   }
 
   /**
-   * Whether a superseded item is orphaned: superseded AND no incoming
-   * functional (non-history) relationships target it.
+   * Functional (non-history) relationships that involve an item at either
+   * endpoint. A relation can store the item as source or target depending on
+   * how it is declared — `requirement.test.verified_by` stores the requirement
+   * as source when a test authors `verifies:REQ-NNN[]` — so a supersession
+   * check that inspects only the target side misses those links.
+   */
+  getFunctionalLinksInvolving(
+    itemId: string,
+    component?: string,
+    version?: string,
+  ): ItemRelationship[] {
+    const item = this.getItem(itemId, component, version);
+    if (!item) return [];
+    const identity = itemIdentity(item);
+    return Array.from(this._relationships.values()).filter(
+      (rel) =>
+        !this.isHistoryRelation(rel.type) &&
+        ((rel.fromIdentity ?? rel.fromId) === identity ||
+          (rel.targetIdentity ?? rel.targetId) === identity),
+    );
+  }
+
+  /**
+   * Whether a superseded item is orphaned: superseded AND no functional
+   * (non-history) relationship involves it at either endpoint.
    */
   isOrphaned(itemId: string, component?: string, version?: string): boolean {
     if (!this.isSuperseded(itemId, component, version)) return false;
-    return this.getReverseRelationships(itemId, undefined, component, version).every((rel) => this.isHistoryRelation(rel.type));
+    return (
+      this.getFunctionalLinksInvolving(itemId, component, version).length === 0
+    );
   }
 
   /**
@@ -580,17 +605,22 @@ export class TraceabilityGraph {
 
     errors.push(...this.findSupersessionCycles(successorMap));
 
-    // Functional links to superseded items require review.
+    // Functional links to superseded items require review. The superseded
+    // item may be the stored source or the stored target, depending on how the
+    // relation is declared, so both endpoints are checked.
     for (const rel of this._relationships.values()) {
       if (HISTORY_RELATION_TYPES.has(rel.type)) continue;
-      const target = rel.targetIdentity ?? rel.targetId;
-      if (!this.isSuperseded(target)) continue;
-      const successors = this.getSuccessors(target)
+      const superseded = [rel.fromId, rel.targetId].find((id) =>
+        this.isSuperseded(id),
+      );
+      if (!superseded) continue;
+      const successors = this.getSuccessors(superseded)
         .map((s) => s.id)
         .sort();
+      const other = superseded === rel.fromId ? rel.targetId : rel.fromId;
       warnings.push({
         type: "stale_link",
-        message: `Relation '${rel.type}' from '${rel.fromId}' targets '${rel.targetId}', which is superseded by ${successors.join(", ")}.`,
+        message: `Relation '${rel.type}' between '${other}' and '${superseded}' requires review: '${superseded}' is superseded by ${successors.join(", ")}.`,
         file: rel.sourceFile,
         line: rel.line,
       });

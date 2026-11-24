@@ -533,6 +533,63 @@ matrices:
     });
   });
 
+  describe("Reverse-name validation", () => {
+    function writeConfig(name: string, content: string): string {
+      const tempDir = path.join(__dirname, "temp-reverse");
+      fs.mkdirSync(tempDir, { recursive: true });
+      const configPath = path.join(tempDir, name);
+      fs.writeFileSync(configPath, content);
+      return configPath;
+    }
+
+    it("rejects two relations that declare the same reverse name for different primaries", () => {
+      const configPath = writeConfig(
+        "conflict.yml",
+        [
+          "roles: [requirement, test, documentation]",
+          "relations:",
+          "  requirement:",
+          "    test:",
+          "      verified_by:",
+          "        reverse: verifies",
+          "  documentation:",
+          "    requirement:",
+          "      explains:",
+          "        reverse: verifies",
+        ].join("\n"),
+      );
+      try {
+        expect(() => new ConfigLoader().load(configPath)).to.throw(/verifies/);
+      } finally {
+        fs.rmSync(path.dirname(configPath), { recursive: true, force: true });
+      }
+    });
+
+    it("accepts the same reverse name reused for the same primary", () => {
+      const configPath = writeConfig(
+        "benign.yml",
+        [
+          "roles: [requirement, test, documentation]",
+          "relations:",
+          "  requirement:",
+          "    test:",
+          "      verified_by:",
+          "        reverse: verifies",
+          "  documentation:",
+          "    requirement:",
+          "      verified_by:",
+          "        reverse: verifies",
+        ].join("\n"),
+      );
+      try {
+        const config = new ConfigLoader().load(configPath);
+        expect(config.roles).to.include("documentation");
+      } finally {
+        fs.rmSync(path.dirname(configPath), { recursive: true, force: true });
+      }
+    });
+  });
+
   describe("Role Validation", () => {
     it("should check if a role is known after loading config", () => {
       const tempDir = path.join(__dirname, "temp");

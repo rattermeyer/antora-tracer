@@ -185,6 +185,8 @@ export class AntoraTraceabilityExtension {
   private readonly playbook: any;
   private contentCatalog: any = null;
   private partialPageMap: PartialPageTargets = new Map();
+  /** Parser duplicate-ID messages for the version being processed. */
+  private duplicateIdMessages: string[] = [];
 
   constructor(
     private readonly context: AntoraExtensionContext,
@@ -1549,7 +1551,11 @@ export class AntoraTraceabilityExtension {
           this.traceability.graph.clear();
         }
 
-        // Process files to populate the traceability graph
+        // Process files to populate the traceability graph. Same-file
+        // duplicate IDs are reported by the parser (the graph sees only
+        // cross-file ones); collect them so the duplicate check below covers
+        // both cases.
+        this.duplicateIdMessages = [];
         for (const file of pageFilesForVersion) {
           this.processAsciiDocFile(file);
         }
@@ -1570,11 +1576,16 @@ export class AntoraTraceabilityExtension {
 
         // Duplicate item IDs are merge-time conflicts, not recoverable state.
         // Fail the build so the collision surfaces instead of silently
-        // dropping one definition, unless the site opts out.
+        // dropping one definition, unless the site opts out. Cross-file
+        // duplicates come from the graph; same-file ones from the parser.
         const duplicates =
           this.traceability?.graph.getDuplicateWarnings() ?? [];
-        if (duplicates.length > 0) {
-          const details = duplicates.map((d) => d.message).join("\n");
+        const duplicateDetails = [
+          ...duplicates.map((d) => d.message),
+          ...this.duplicateIdMessages,
+        ];
+        if (duplicateDetails.length > 0) {
+          const details = duplicateDetails.join("\n");
           const summary = `Duplicate item IDs detected in version '${version}' (components: ${components.join(", ")}):\n${details}`;
           if (this.config.allowDuplicateIds) {
             this.logger.warn(summary);
@@ -1863,13 +1874,18 @@ export class AntoraTraceabilityExtension {
       sourceFile = this.normalizeSourceFile(sourceFile);
       const component = file.src?.component || undefined;
       const moduleName = file.src?.module || undefined;
-      this.traceability.process(content, {
+      const parsed = this.traceability.process(content, {
         sourceFile,
         component,
         module: moduleName,
         version: file.src?.version || undefined,
         pubUrl: file.pub?.url,
       });
+      for (const error of parsed.errors) {
+        if (error.type === "duplicate_id") {
+          this.duplicateIdMessages.push(error.message);
+        }
+      }
     } catch (error: any) {
       this.logger.warn(`Error processing ${file.src?.path}: ${error.message}`);
     }

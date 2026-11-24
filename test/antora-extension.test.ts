@@ -4340,6 +4340,38 @@ satisfies:REQ-001[]
   // ========================================================================
 
   describe("Duplicate item ID detection", () => {
+    it("should fail the build when one file defines the same item ID twice", async () => {
+      const ctx = createMockContext({
+        playbook: { output: { dir: tempDir }, extensions: [] },
+      });
+      const ext = new AntoraTraceabilityExtension(ctx as any);
+      await waitForInit();
+
+      const oneFile = `[#REQ-001, item, role=requirement, title="Auth"]
+====
+The system shall authenticate users.
+====
+
+[#REQ-001, item, role=requirement, title="Auth duplicate"]
+====
+The system shall log authentication events.
+====
+`;
+
+      expect(() =>
+        ctx.fireEvent(
+          "contentClassified",
+          createContentClassifiedEvent([
+            {
+              path: "modules/ROOT/pages/a.adoc",
+              content: oneFile,
+              component: "tracer",
+            },
+          ]),
+        ),
+      ).to.throw(/Duplicate item IDs detected/);
+    });
+
     it("should fail the build when two files define the same item ID", async () => {
       const ctx = createMockContext({
         playbook: { output: { dir: tempDir }, extensions: [] },
