@@ -1161,7 +1161,7 @@ supersedes:REQ-174[]
 Source: openspec/specs/preset-inheritance/spec.md
 
 tracer:links[]"""
-REQ-175,REQ-175,,,REQ-175 — Relations are declared keyed with a mandatory reverse,requirement,,requirements.adoc,"""The `relations` config SHALL map `sourceRole → targetRole → relationType → { reverse }`, where `reverse` is required and names the authorable reverse relation type.
+REQ-175,REQ-175,,,REQ-175 — Relations are declared keyed with a mandatory reverse,requirement,,requirements.adoc,"""The `relations` config SHALL map `sourceRole → targetRole → relationType → { reverse }`, where `reverse` is required and names the authorable reverse relation type. A reverse name SHALL identify exactly one primary: two relations SHALL NOT declare the same `reverse` name for different primaries.
 
 Source: openspec/specs/reverse-relations/spec.md
 
@@ -1339,7 +1339,7 @@ REQ-139,REQ-139,,,REQ-139 — query isolated — find items with no relationship
 Source: openspec/specs/cli-query/spec.md
 
 tracer:links[]"""
-REQ-227,REQ-227,,,REQ-227 — query orphaned — find superseded items with no incoming functional links,requirement,,requirements.adoc,"""The CLI SHALL provide `query orphaned` that returns all effectively superseded items that have no incoming functional (non-history) relationships.
+REQ-227,REQ-227,,,REQ-227 — query orphaned — find superseded items with no functional links,requirement,,requirements.adoc,"""The CLI SHALL provide `query orphaned` that returns all effectively superseded items that are orphaned. An item is orphaned when no functional (non-history) relationship involves it at either endpoint — whether the superseded item is the relationship's stored source or its stored target.
 
 Source: openspec/specs/cli-query/spec.md
 
@@ -1538,7 +1538,7 @@ REQ-203,REQ-203,,,REQ-203 — Superseded state is derived from relationships,req
 Source: openspec/specs/traceable-item-supersession/spec.md
 
 tracer:links[]"""
-REQ-228,REQ-228,,,REQ-228 — Orphaned state is derived from supersession and incoming functional links,requirement,,requirements.adoc,"""An effectively superseded item SHALL be considered orphaned when no incoming functional (non-history) relationship targets it.
+REQ-228,REQ-228,,,REQ-228 — Orphaned state is derived from supersession and functional links,requirement,,requirements.adoc,"""An effectively superseded item SHALL be considered orphaned when no functional (non-history) relationship involves it at either endpoint. A functional link counts whether the superseded item is the relationship's stored source or its stored target.
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
@@ -1568,7 +1568,7 @@ REQ-208,REQ-208,,,REQ-208 — Superseded item blocks link to successors,requirem
 Source: openspec/specs/traceable-item-supersession/spec.md
 
 tracer:links[]"""
-REQ-209,REQ-209,,,REQ-209 — CLI reports supersession impact,requirement,,requirements.adoc,"""When a supersession check is requested, the CLI SHALL report direct successors and incoming functional relationships requiring review.
+REQ-209,REQ-209,,,REQ-209 — CLI reports supersession impact,requirement,,requirements.adoc,"""When a supersession check is requested, the CLI SHALL report direct successors and every functional relationship requiring review, listing the item that still points at the superseded one regardless of which endpoint the relationship stores as its source.
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
@@ -1578,7 +1578,7 @@ REQ-210,REQ-210,,,REQ-210 — Supersession checks do not modify source files,req
 Source: openspec/specs/traceable-item-supersession/spec.md
 
 tracer:links[]"""
-REQ-211,REQ-211,,,REQ-211 — Validation warns about stale functional links,requirement,,requirements.adoc,"""When a functional relationship targets an effectively superseded item, validation SHALL emit a non-blocking warning naming the source item, relation type, predecessor, and all direct successors.
+REQ-211,REQ-211,,,REQ-211 — Validation warns about stale functional links,requirement,,requirements.adoc,"""When a functional relationship involves an effectively superseded item at either endpoint, validation SHALL emit a non-blocking warning naming the item that still points at the superseded one, the relation type, the predecessor, and all direct successors.
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
@@ -1613,7 +1613,7 @@ REQ-232,REQ-232,,,REQ-232 — Overview page lists dangling references,requiremen
 Source: openspec/specs/supersession-overview/spec.md
 
 tracer:links[]"""
-REQ-235,REQ-235,,,REQ-235 — archive moves a superseded item to the module's superseded page,requirement,,requirements.adoc,"""The CLI SHALL provide `archive <ID>` that moves a superseded item's full block to a `superseded.adoc` page in the same module as the source file.
+REQ-235,REQ-235,,,REQ-235 — archive moves a superseded item to the module's superseded page,requirement,,requirements.adoc,"""The CLI SHALL provide `archive <ID>` that moves a superseded item's full block to a `superseded.adoc` page in the same module as the source file. When the archived block was the source file's only content, the CLI SHALL remove the now-empty source file, so the block is moved rather than copied.
 
 Source: openspec/specs/item-lifecycle/spec.md
 
@@ -2723,7 +2723,7 @@ The `role-guidance` CLI command resolves and reports the page and prefix, and th
 At build time, `resolveGuidanceEntries()` renders each resolved page to HTML and registers it as `traceability/guidance/<role>.html` in the content catalog (same attachment mechanism as matrices), so guidance renders in the consuming site without the project copying pages into its own content sources.
 
 tracer:links[]"""
-ARC-041,ARC-041,,,ARC-041 — Supersession lifecycle states and queries,design,,explanation/architecture.adoc,"""The supersession lifecycle has three graph-level states: `isolated` (no relationships), `orphaned` (superseded with no incoming functional links), and `dangling reference` (a link whose target no longer exists).
+ARC-041,ARC-041,,,ARC-041 — Supersession lifecycle states and queries,design,,explanation/architecture.adoc,"""The supersession lifecycle has three graph-level states: `isolated` (no relationships), `orphaned` (superseded with no functional links, at either endpoint), and `dangling reference` (a link whose target no longer exists).
 `TraceabilityGraph.isOrphaned()`, `getSupersededItems()`, and `getDanglingReferences()` expose them, and `validate()` classifies a dangling link as an advisory `dangling_link` warning when its type is a history relation (`supersedes`/`superseded_by`) and an error otherwise.
 
 addresses:REQ-227[]
@@ -3357,7 +3357,7 @@ Covers same-page xref generation, cross-page xref generation with basename path 
 
 tracer:links[]"""
 TST-009,TST-009,,,TST-009 — Query Command Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/query-command.test.ts`
-Tests the `query` CLI subcommand end-to-end — reverse (inbound relationships, empty results, unknown ID), impact (connected items, disconnected items), isolated (relationship-less items, role filter), orphaned (superseded items without incoming functional links), path (chain output, no path, unknown ID), siblings (table and JSON output with shared neighbors and supersession status, relation-type filter, cross-source snapshot loading, snapshot/input mutual exclusion, empty results, unknown ID), and the `--json` flag (valid JSON, empty array).
+Tests the `query` CLI subcommand end-to-end — reverse (inbound relationships, empty results, unknown ID), impact (connected items, disconnected items), isolated (relationship-less items, role filter), orphaned (superseded items without functional links at either endpoint), path (chain output, no path, unknown ID), siblings (table and JSON output with shared neighbors and supersession status, relation-type filter, cross-source snapshot loading, snapshot/input mutual exclusion, empty results, unknown ID), and the `--json` flag (valid JSON, empty array).
 Spawns the compiled CLI binary against a temporary fixture directory.
 
 verifies:REQ-136[]

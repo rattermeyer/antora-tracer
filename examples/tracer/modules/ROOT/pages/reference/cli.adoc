@@ -475,7 +475,7 @@ Subcommands:
 | List items with no relationships (optionally `--role <role>`)
 
 | `orphaned`
-| List superseded items with no incoming functional links (optionally `--role <role>`)
+| List superseded items with no functional links (optionally `--role <role>`)
 
 | `path <from> <to>`
 | Print the shortest relationship path between two items
@@ -548,7 +548,7 @@ Only superseded items can be archived — a non-superseded or unknown ID is reje
 == remove
 
 Remove an orphaned or isolated item's block from its source file.
-Orphaned items (superseded, no incoming functional links) are removed after a `y/N` confirmation; isolated items (no relationships at all) require typing the item ID verbatim.
+Orphaned items (superseded, no functional links) are removed after a `y/N` confirmation; isolated items (no relationships at all) require typing the item ID verbatim.
 
 [source,bash]
 ----

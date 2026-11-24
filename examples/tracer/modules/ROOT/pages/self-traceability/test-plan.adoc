@@ -217,7 +217,7 @@ tracer:links[]
 [#TST-009, item, role=test, title="Query Command Tests"]
 --
 Test file: `test/query-command.test.ts`
-Tests the `query` CLI subcommand end-to-end — reverse (inbound relationships, empty results, unknown ID), impact (connected items, disconnected items), isolated (relationship-less items, role filter), orphaned (superseded items without incoming functional links), path (chain output, no path, unknown ID), siblings (table and JSON output with shared neighbors and supersession status, relation-type filter, cross-source snapshot loading, snapshot/input mutual exclusion, empty results, unknown ID), and the `--json` flag (valid JSON, empty array).
+Tests the `query` CLI subcommand end-to-end — reverse (inbound relationships, empty results, unknown ID), impact (connected items, disconnected items), isolated (relationship-less items, role filter), orphaned (superseded items without functional links at either endpoint), path (chain output, no path, unknown ID), siblings (table and JSON output with shared neighbors and supersession status, relation-type filter, cross-source snapshot loading, snapshot/input mutual exclusion, empty results, unknown ID), and the `--json` flag (valid JSON, empty array).
 Spawns the compiled CLI binary against a temporary fixture directory.
 
 verifies:REQ-136[]

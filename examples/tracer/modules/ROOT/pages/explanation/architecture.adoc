@@ -337,7 +337,7 @@ tracer:links[]
 
 [#ARC-041, item, role=design, title="Supersession lifecycle states and queries"]
 --
-The supersession lifecycle has three graph-level states: `isolated` (no relationships), `orphaned` (superseded with no incoming functional links), and `dangling reference` (a link whose target no longer exists).
+The supersession lifecycle has three graph-level states: `isolated` (no relationships), `orphaned` (superseded with no functional links, at either endpoint), and `dangling reference` (a link whose target no longer exists).
 `TraceabilityGraph.isOrphaned()`, `getSupersededItems()`, and `getDanglingReferences()` expose them, and `validate()` classifies a dangling link as an advisory `dangling_link` warning when its type is a history relation (`supersedes`/`superseded_by`) and an error otherwise.
 
 addresses:REQ-227[]

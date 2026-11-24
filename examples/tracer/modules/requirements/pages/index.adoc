@@ -956,7 +956,7 @@ tracer:links[]
 
 [#REQ-175, item, role=requirement, title="Relations are declared keyed with a mandatory reverse"]
 --
-The `relations` config SHALL map `sourceRole → targetRole → relationType → { reverse }`, where `reverse` is required and names the authorable reverse relation type.
+The `relations` config SHALL map `sourceRole → targetRole → relationType → { reverse }`, where `reverse` is required and names the authorable reverse relation type. A reverse name SHALL identify exactly one primary: two relations SHALL NOT declare the same `reverse` name for different primaries.
 
 Source: openspec/specs/reverse-relations/spec.md
 
@@ -1271,9 +1271,9 @@ Source: openspec/specs/cli-query/spec.md
 tracer:links[]
 --
 
-[#REQ-227, item, role=requirement, title="query orphaned — find superseded items with no incoming functional links"]
+[#REQ-227, item, role=requirement, title="query orphaned — find superseded items with no functional links"]
 --
-The CLI SHALL provide `query orphaned` that returns all effectively superseded items that have no incoming functional (non-history) relationships.
+The CLI SHALL provide `query orphaned` that returns all effectively superseded items that are orphaned. An item is orphaned when no functional (non-history) relationship involves it at either endpoint — whether the superseded item is the relationship's stored source or its stored target.
 
 Source: openspec/specs/cli-query/spec.md
 
@@ -1630,9 +1630,9 @@ Source: openspec/specs/traceable-item-supersession/spec.md
 tracer:links[]
 --
 
-[#REQ-228, item, role=requirement, title="Orphaned state is derived from supersession and incoming functional links"]
+[#REQ-228, item, role=requirement, title="Orphaned state is derived from supersession and functional links"]
 --
-An effectively superseded item SHALL be considered orphaned when no incoming functional (non-history) relationship targets it.
+An effectively superseded item SHALL be considered orphaned when no functional (non-history) relationship involves it at either endpoint. A functional link counts whether the superseded item is the relationship's stored source or its stored target.
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
@@ -1686,7 +1686,7 @@ tracer:links[]
 
 [#REQ-209, item, role=requirement, title="CLI reports supersession impact"]
 --
-When a supersession check is requested, the CLI SHALL report direct successors and incoming functional relationships requiring review.
+When a supersession check is requested, the CLI SHALL report direct successors and every functional relationship requiring review, listing the item that still points at the superseded one regardless of which endpoint the relationship stores as its source.
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
@@ -1704,7 +1704,7 @@ tracer:links[]
 
 [#REQ-211, item, role=requirement, title="Validation warns about stale functional links"]
 --
-When a functional relationship targets an effectively superseded item, validation SHALL emit a non-blocking warning naming the source item, relation type, predecessor, and all direct successors.
+When a functional relationship involves an effectively superseded item at either endpoint, validation SHALL emit a non-blocking warning naming the item that still points at the superseded one, the relation type, the predecessor, and all direct successors.
 
 Source: openspec/specs/traceable-item-supersession/spec.md
 
@@ -1771,7 +1771,7 @@ tracer:links[]
 
 [#REQ-235, item, role=requirement, title="archive moves a superseded item to the module's superseded page"]
 --
-The CLI SHALL provide `archive <ID>` that moves a superseded item's full block to a `superseded.adoc` page in the same module as the source file.
+The CLI SHALL provide `archive <ID>` that moves a superseded item's full block to a `superseded.adoc` page in the same module as the source file. When the archived block was the source file's only content, the CLI SHALL remove the now-empty source file, so the block is moved rather than copied.
 
 Source: openspec/specs/item-lifecycle/spec.md
 

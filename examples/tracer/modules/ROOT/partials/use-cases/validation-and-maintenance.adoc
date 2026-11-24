@@ -100,7 +100,7 @@ tracer:links[]
 | Trigger | Requirements Engineer determines that an existing item is obsolete and must be replaced or removed
 | Basic Flow |
 . Requirements Engineer marks the successor as replacing the obsolete predecessor
-. Requirements Engineer runs the supersession check for the predecessor to list direct successors And incoming functional relationships requiring review
+. Requirements Engineer runs the supersession check for the predecessor to list direct successors And functional relationships requiring review, whether the predecessor is the link's source or its target
 . Requirements Engineer runs validation to confirm the supersession structure is valid — no self-reference, duplicate, or cycle — And to review stale functional-link warnings
 . The build renders the superseded item with a marker linking to every direct successor And current-state matrices omit the superseded item
 . Requirements Engineer reviews functional relationships that still target the obsolete item And updates them to the successor

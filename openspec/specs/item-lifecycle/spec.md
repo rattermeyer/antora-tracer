@@ -36,10 +36,10 @@ The CLI SHALL provide `archive <ID>` that moves a superseded item's full block t
 - **THEN** `archive` SHALL report an error and make no file change
 
 ### Requirement: remove deletes an orphaned item
-The CLI SHALL provide `remove <ID>` that deletes an orphaned item's block after a normal confirmation prompt.
+The CLI SHALL provide `remove <ID>` that deletes an orphaned item's block after a normal confirmation prompt. An item is orphaned when it is superseded and no functional (non-history) relationship involves it at either endpoint.
 
 #### Scenario: Orphaned item is removed after confirmation
-- **WHEN** REQ-042 is orphaned (superseded, no incoming functional links)
+- **WHEN** REQ-042 is orphaned (superseded, no functional links at either endpoint)
 - **AND** the user confirms at the prompt
 - **THEN** the block SHALL be removed from its source file
 

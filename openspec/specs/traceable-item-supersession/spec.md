@@ -36,7 +36,7 @@ An item SHALL be effectively superseded when at least one valid incoming `supers
 - **THEN** REQ-042 SHALL be effectively superseded
 - **AND** REQ-043 SHALL remain current unless another item supersedes it
 
-### Requirement: Orphaned state is derived from supersession and incoming functional links
+### Requirement: Orphaned state is derived from supersession and functional links
 An effectively superseded item SHALL be considered orphaned when no functional (non-history) relationship involves it at either endpoint. A functional link counts whether the superseded item is the relationship's stored source or its stored target.
 
 #### Scenario: Superseded with no functional links is orphaned

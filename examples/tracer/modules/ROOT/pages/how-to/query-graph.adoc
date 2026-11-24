@@ -77,7 +77,7 @@ npx antora-tracer query isolated --role requirement
 
 == Find orphaned items
 
-`orphaned` lists superseded items with no incoming functional links — the items that are safe to archive or remove:
+`orphaned` lists superseded items with no functional links — the items that are safe to archive or remove. A link counts whether the superseded item is the relationship's source or its target:
 
 [source,bash]
 ----
