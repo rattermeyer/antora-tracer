@@ -7,7 +7,9 @@ Cross-file duplicates are already caught (the graph reports both definitions and
 ## What Changes
 
 - Same-file duplicate IDs are reported by `validate` with a non-zero exit, naming both source locations, matching the existing cross-file behaviour.
-- The parser stops discarding a same-file duplicate before the graph sees it; duplicate detection happens once, in the graph.
+- The parser keeps dropping the repeated block (the first definition wins) and names **both** locations in its duplicate-ID error, instead of only the second.
+- `validate` and the Antora extension surface the parser's duplicate-ID error, which both previously ignored — `validate` read only the graph, and the extension read only `getDuplicateWarnings()`.
+- Cross-file duplicate detection (the graph's `duplicate_node`) is unchanged.
 
 ## Capabilities
 
@@ -20,7 +22,9 @@ _None._
 
 ## Impact
 
-- `src/DocumentParser.ts` — the per-file duplicate guard that drops the second block.
-- `src/TraceabilityGraph.ts` — duplicate detection is the single authority (unchanged behaviour for cross-file duplicates).
-- `test/` — a regression test at the `validate` command level.
+- `src/DocumentParser.ts` — the duplicate-ID error now names both the first and the repeated definition's line.
+- `src/cli.ts` — `validate` prints parser errors alongside graph validation errors and exits non-zero.
+- `src/antora-extension.ts` — the per-version duplicate check folds in the parser's duplicate-ID errors, so a same-file duplicate fails the build as a cross-file one already did.
+- `src/TraceabilityGraph.ts` — unchanged; the cross-file path already reported both locations.
+- `test/` — regression tests at the `validate` command level and the extension level.
 - No config, snapshot, or API change.
