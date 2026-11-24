@@ -7,7 +7,7 @@ A relation SHALL be declared once with a mandatory reverse name, so that the two
 ## Requirements
 
 ### Requirement: Relations are declared keyed with a mandatory reverse
-The `relations` config SHALL map `sourceRole → targetRole → relationType → { reverse }`, where `reverse` is required and names the authorable reverse relation type.
+The `relations` config SHALL map `sourceRole → targetRole → relationType → { reverse }`, where `reverse` is required and names the authorable reverse relation type. A reverse name SHALL identify exactly one primary: two relations SHALL NOT declare the same `reverse` name for different primaries.
 
 #### Scenario: Reverse declaration pairs two types
 - **WHEN** config declares `relations.use_case.requirement.leads_to.reverse = is_derived_from`
@@ -22,6 +22,15 @@ The `relations` config SHALL map `sourceRole → targetRole → relationType →
 #### Scenario: Missing reverse is rejected
 - **WHEN** a relation type is declared without a `reverse` value
 - **THEN** configuration validation SHALL fail with an error naming the relation type
+
+#### Scenario: Conflicting reverse name is rejected
+- **WHEN** two relations declare the same `reverse` name but different primaries
+- **THEN** configuration validation SHALL fail with an error naming the reverse name and both `sourceRole → targetRole` pairs
+
+#### Scenario: Reused reverse name for the same primary is accepted
+- **WHEN** two relations declare the same `(primary, reverse)` pair under different role pairs
+- **THEN** configuration validation SHALL accept it
+- **AND** the reverse name SHALL resolve to that primary
 
 ### Requirement: Authoring the reverse name canonicalizes to the primary edge
 When an item authors a relationship using a reverse type, the graph SHALL store the canonical primary edge (primary direction and primary type), not the reverse-authored form.

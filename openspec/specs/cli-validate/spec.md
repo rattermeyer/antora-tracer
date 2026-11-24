@@ -31,6 +31,6 @@ No Antora build SHALL be required.
 - **AND** exits with a non-zero code
 
 #### Scenario: Duplicate item ID is reported
-- **WHEN** the same item ID is defined more than once across the input files
+- **WHEN** the same item ID is defined more than once, whether the repeated definitions are in one file or across files
 - **THEN** the command reports it as an error naming the duplicate ID and the file and line of both definitions
 - **AND** exits with a non-zero code

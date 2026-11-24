@@ -37,11 +37,11 @@ An item SHALL be effectively superseded when at least one valid incoming `supers
 - **AND** REQ-043 SHALL remain current unless another item supersedes it
 
 ### Requirement: Orphaned state is derived from supersession and incoming functional links
-An effectively superseded item SHALL be considered orphaned when no incoming functional (non-history) relationship targets it.
+An effectively superseded item SHALL be considered orphaned when no functional (non-history) relationship involves it at either endpoint. A functional link counts whether the superseded item is the relationship's stored source or its stored target.
 
 #### Scenario: Superseded with no functional links is orphaned
 - **WHEN** REQ-043 supersedes REQ-042
-- **AND** no functional relationship targets REQ-042
+- **AND** no functional relationship involves REQ-042
 - **THEN** REQ-042 SHALL be orphaned
 
 #### Scenario: Superseded but still referenced is not orphaned
@@ -49,9 +49,14 @@ An effectively superseded item SHALL be considered orphaned when no incoming fun
 - **AND** ARC-001 declares `addresses:REQ-042[]`
 - **THEN** REQ-042 SHALL NOT be orphaned
 
+#### Scenario: Superseded item as the stored source of a functional link is not orphaned
+- **WHEN** REQ-043 supersedes REQ-042
+- **AND** a test authors `verifies:REQ-042[]`, storing a relationship whose source is REQ-042
+- **THEN** REQ-042 SHALL NOT be orphaned
+
 #### Scenario: History links alone leave an item orphaned
 - **WHEN** REQ-043 supersedes REQ-042
-- **AND** the only incoming relationship to REQ-042 is `REQ-043 supersedes REQ-042`
+- **AND** the only relationship involving REQ-042 is `REQ-043 supersedes REQ-042`
 - **THEN** REQ-042 SHALL be orphaned
 
 #### Scenario: Non-superseded items are never orphaned
@@ -108,7 +113,7 @@ When a superseded item's source block is rendered, the system SHALL display a su
 - **AND** the marker SHALL link to both REQ-043 and REQ-044
 
 ### Requirement: CLI reports supersession impact
-When a supersession check is requested, the CLI SHALL report direct successors and incoming functional relationships requiring review.
+When a supersession check is requested, the CLI SHALL report direct successors and every functional relationship requiring review, listing the item that still points at the superseded one regardless of which endpoint the relationship stores as its source.
 
 #### Scenario: Direct impact report
 - **WHEN** `antora-tracer supersession check REQ-042` runs
@@ -116,6 +121,11 @@ When a supersession check is requested, the CLI SHALL report direct successors a
 - **AND** DES-007 still `addresses` REQ-042
 - **THEN** the output SHALL name REQ-043 as a successor
 - **AND** SHALL report DES-007 and its `addresses` relation as requiring review
+
+#### Scenario: Source-side functional link is listed for review
+- **WHEN** a test authors `verifies:REQ-042[]`, storing REQ-042 as the relationship's source
+- **AND** REQ-043 supersedes REQ-042
+- **THEN** `supersession check REQ-042` SHALL list the test's link under "Functional links requiring review"
 
 #### Scenario: Optional transitive impact report
 - **WHEN** `antora-tracer supersession check REQ-042 --impact` runs
@@ -129,7 +139,7 @@ When a supersession check is requested, the CLI SHALL NOT modify any source file
 - **THEN** every AsciiDoc source file SHALL remain byte-for-byte unchanged
 
 ### Requirement: Validation warns about stale functional links
-When a functional relationship targets an effectively superseded item, validation SHALL emit a non-blocking warning naming the source item, relation type, predecessor, and all direct successors.
+When a functional relationship involves an effectively superseded item at either endpoint, validation SHALL emit a non-blocking warning naming the item that still points at the superseded one, the relation type, the predecessor, and all direct successors.
 
 #### Scenario: Advisory warning names affected items
 - **WHEN** DES-007 `addresses` REQ-042
@@ -137,6 +147,12 @@ When a functional relationship targets an effectively superseded item, validatio
 - **THEN** validation SHALL warn that DES-007's `addresses` relation requires review
 - **AND** SHALL name REQ-042 and REQ-043
 - **AND** SHALL NOT fail validation solely because of this warning
+
+#### Scenario: Warning covers a link stored with the superseded item as source
+- **WHEN** TST-008 authors `verifies:REQ-042[]`, storing REQ-042 as the relationship's source
+- **AND** REQ-043 supersedes REQ-042
+- **THEN** validation SHALL warn that the relation requires review
+- **AND** SHALL name REQ-042 and REQ-043
 
 ### Requirement: Superseded items and links can be hidden
 The system SHALL support a display-only `renderSuperseded` option. When set to false, superseded item blocks and the `supersedes`-related links in their successors SHALL be omitted from rendered output, without affecting the graph or matrices.
