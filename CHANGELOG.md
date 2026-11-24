@@ -2,7 +2,7 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
-## [Unreleased]
+## [0.34.0] — 2026-11-24
 
 ### Added
 - One exported accessor locates an item block's bounds — `itemBlockBoundsAtOffset`, `itemBlockBoundsAtLine`, and `findItemBlocks` in `src/ItemBlockBounds.ts` — returning header, body, and closing-delimiter offsets, the delimiter form, the item ID, and derived 1-based lines. The parser, the CLI's `archive`/`remove`, and the extension's macro expansion all locate blocks through it, replacing three independent scans with one grammar, so bounds cannot diverge between consumers. Folding the extension's scan in also removes false blocks from headers quoted inside prose; measured on the example site, the shared scan loses no real block and drops 8 false ones, none of which carried a macro. The parser's `extractBlock`/`extractBody` are gone, and `Item.content` and relationship line numbers are unchanged.
