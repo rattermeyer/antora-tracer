@@ -2474,9 +2474,11 @@ tracer:links[]
 --
 The example site navigation SHALL include a "Self-Traceability" section containing the pages that demonstrate the extension tracing its own development artifacts:
 
+* Our Traceability Model
 * Requirements
 * Use Cases
 * Test Plan
+* Delivery Process
 * Dashboard
 
 Source: openspec/specs/doc-self-traceability/spec.md
