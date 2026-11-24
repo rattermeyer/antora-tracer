@@ -1,4 +1,4 @@
-= The Traceability Model
+= Our Traceability Model
 :description: The roles and relations Antora Tracer uses to trace its own development artifacts
 :keywords: antora, traceability, model, roles, relations, self-traceability
 :toc: macro
