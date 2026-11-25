@@ -2,6 +2,17 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.36.0] — 2026-11-25
+
+### Added
+- `TraceabilityGraph.getWorkflowValidationErrors()` enforces the configuration's `validation.<role>.<status>.requiresRoles` rules. The key was declared in the config type, populated by the `spec-driven-development` preset, and parsed — but no consumer read it, so a project that configured a gate got none and `validate` reported success for exactly the state the config forbids. An item whose `status` matches a rule must now have a relationship, in either direction, to an item of each required role; the check reads the graph alone, so the CLI and the Antora build share one enforcement point. Configuration loading also rejects a rule that names an undeclared role, a `requiresRoles` value that is not a list, and a rule for an undeclared role — unsatisfiable config now fails at startup instead of silently doing nothing.
+
+### Changed
+- Every CLI command keeps stdout machine-readable: only a command's primary output goes to stdout, and progress, status, and confirmation lines go to stderr. `matrix -f json` and `matrix -f csv` previously wrote their progress banner to stdout, so the output could not be piped into a parser without knowing to skip the first line; `seed`, `site-graph`, and `diff-graphs` carried the same hazard for their structured output. Writing to a file with `-o` now leaves stdout empty. No exit code, option, or output content changed. Progress is not suppressed — an interactive user still sees it, and `2>/dev/null` silences it.
+
+### Fixed
+- `antora-tracer validate` and the Antora build now fail when an item reaches a status whose configured `requiresRoles` are unmet, instead of reporting success. Previously a configured workflow gate had no effect anywhere.
+
 ## [0.35.0] — 2026-11-25
 
 ### Added
