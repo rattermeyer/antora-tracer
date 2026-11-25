@@ -2,6 +2,14 @@
 
 All notable changes to the Antora Requirements Traceability Extension.
 
+## [0.35.0] — 2026-11-25
+
+### Added
+- `harvestIntoGraph(target, playbook)` builds a playbook's cross-source graph through one code path: it feeds every harvested file into the target and runs the collection-boundary relationship canonicalization. `site-graph`, `seed`, and `neo4j` all use it instead of duplicating the loop, so a command that harvests a playbook can no longer forget the canonicalization pass. Exported alongside `harvestSiteFiles` and the new `HarvestTarget` interface.
+
+### Fixed
+- `site-graph` and `seed` produced a different snapshot for an unchanged tree on every run, so `diff-graphs` reported phantom deltas and could not back a change-approval step. Two causes: the harvest returned files in Antora's `findBy` order, which is not stable across runs, and those two commands never ran the collection-boundary canonicalization that `neo4j` and the Antora build path already ran — so a reverse-authored relation (`verified_by:` for the `verifies:` primary) was stored in its authored direction whenever the authoring file was read before the file defining the other endpoint. The harvest now sorts by component, version, module, and path, and every harvesting command canonicalizes once after the last file, so two harvests of an unchanged tree produce identical snapshots and `diff-graphs` reports no changes.
+
 ## [0.34.0] — 2026-11-24
 
 ### Added
