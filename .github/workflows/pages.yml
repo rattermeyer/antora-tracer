@@ -10,10 +10,12 @@ permissions:
   pages: write
   id-token: write
 
-# Allow one concurrent deployment
+# Allow one concurrent deployment. Do NOT cancel in-progress runs: a cancelled
+# Pages deployment can leave the Pages service rejecting the next one with
+# "Deployment failed, try again later". Queue instead.
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -58,10 +60,26 @@ jobs:
       - name: Build site
         run: node scripts/preview.js --ci
 
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:
           path: public
 
+  # Deploy in its own job: deploy-pages queries artifact metadata immediately
+  # after upload, and in a single job it intermittently fails with "No artifacts
+  # named github-pages" before the artifact API has propagated
+  # (actions/deploy-pages#451). A job boundary plus the environment gate gives
+  # the artifact time to settle and is the documented Pages pattern.
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v5
