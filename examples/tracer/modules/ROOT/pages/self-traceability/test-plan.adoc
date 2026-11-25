@@ -471,9 +471,6 @@ Tests the `completion` command: script generation for Bash, Zsh, and Fish, insta
 verifies:REQ-351[]
 verifies:REQ-350[]
 verifies:REQ-349[]
-verifies:REQ-304[]
-verifies:REQ-305[]
-verifies:REQ-306[]
 
 tracer:links[]
 --
@@ -502,8 +499,6 @@ Tests `.env` loading by the CLI entry points and the precedence of an existing p
 
 verifies:REQ-345[]
 verifies:REQ-344[]
-verifies:REQ-312[]
-verifies:REQ-313[]
 
 tracer:links[]
 --
@@ -518,9 +513,6 @@ verifies:REQ-348[]
 verifies:REQ-347[]
 verifies:REQ-346[]
 verifies:REQ-378[]
-verifies:REQ-320[]
-verifies:REQ-321[]
-verifies:REQ-322[]
 
 tracer:links[]
 --
