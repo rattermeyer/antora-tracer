@@ -1926,7 +1926,7 @@ tracer:links[]
 
 [#REQ-262, item, role=requirement, title="Graph snapshots serialize to JSON"]
 --
-A harvested graph SHALL serialize to a canonical JSON snapshot containing the item and relationship lists, with each item carrying its scope fields, so a snapshot can be stored and diffed later.
+A harvested graph SHALL serialize to a canonical JSON snapshot containing the item and relationship lists, with each item carrying its scope fields, so a snapshot can be stored and diffed later. The snapshot SHALL be deterministic: harvesting an unchanged tree twice SHALL produce the same items and relationships in the same order, with reverse-authored relations stored in their primary direction.
 
 Source: openspec/specs/multi-source-diff/spec.md
 

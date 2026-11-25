@@ -315,8 +315,10 @@ tracer:links[]
 
 [#ARC-046, item, role=design, title="Site-graph harvest and canonical snapshots"]
 --
-`SiteGraph.harvestSiteFiles(playbook)` resolves an Antora playbook through `@antora/playbook-builder`, `@antora/content-aggregator`, and `@antora/content-classifier` — stopping before document conversion — and returns each `.adoc` page and partial with its `component`, `module`, and `version` scope.
-The CLI `site-graph` command feeds those files into the core parser and serializes the graph with `GraphSnapshot.serializeSnapshot()`, which drops per-page `pubUrl` and stamps a `format: 1` schema version.
+`SiteGraph.harvestSiteFiles(playbook)` resolves an Antora playbook through `@antora/playbook-builder`, `@antora/content-aggregator`, and `@antora/content-classifier` — stopping before document conversion — and returns each `.adoc` page and partial with its `component`, `module`, and `version` scope, sorted by component, version, module, and path so the harvest order is stable.
+`SiteGraph.harvestIntoGraph()` feeds those files into the core parser and runs `canonicalizeRelationships()` once at the collection boundary, so a reverse-authored relation stores its primary direction regardless of which endpoint's file was read first (see xref:explanation/adr/0015-deferred-canonicalization.adoc[ADR-015]).
+The `site-graph`, `seed`, and `neo4j` commands all harvest through this helper; `GraphSnapshot.serializeSnapshot()` then drops per-page `pubUrl` and stamps a `format: 1` schema version.
+Together these make two harvests of an unchanged tree produce identical snapshots.
 The Antora packages are optional dependencies loaded lazily, so the CLI still runs without them.
 
 addresses:REQ-260[]

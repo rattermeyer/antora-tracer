@@ -290,7 +290,7 @@ tracer:links[]
 --
 Test file: `test/graph-snapshot.test.ts`
 
-Tests `serializeSnapshot`/`deserializeSnapshot` round-trips (scope fields preserved, `pubUrl` dropped, unknown format and malformed snapshots rejected), `diffSnapshots` over JSON snapshots (same ID in different components not conflated, cross-component superseded pairs), component-qualified `diffGraphs` identity with bare-ID fallback, and the `site-graph` harvest resolving a multi-component playbook with component, module, and version scope, omitting components named by the extension's `excludeComponents`.
+Tests `serializeSnapshot`/`deserializeSnapshot` round-trips (scope fields preserved, `pubUrl` dropped, unknown format and malformed snapshots rejected), `diffSnapshots` over JSON snapshots (same ID in different components not conflated, cross-component superseded pairs), component-qualified `diffGraphs` identity with bare-ID fallback, and the `site-graph` harvest resolving a multi-component playbook with component, module, and version scope, omitting components named by the extension's `excludeComponents`. Also covers snapshot determinism: a reverse-authored relation canonicalizes to its primary direction regardless of harvest order, and the harvest returns a stable file order on the real multi-source playbook.
 
 verifies:REQ-260[]
 verifies:REQ-261[]
