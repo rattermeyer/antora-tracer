@@ -143,7 +143,18 @@ git commit -m "chore(release): v0.19.0"
 git tag v0.19.0
 git branch v0.19.x v0.19.0
 
-# 5. Verify and push; the tag push stages both packages for approval.
+# 5. On the branch, replace main's descriptor with the refname projection.
+#    The release commit carries main's `version: main` + `prerelease: true`;
+#    left as-is the branch also resolves to version `main` and Antora fails the
+#    build with "Duplicate version detected". The branch must derive its own
+#    version (v0.19.x -> 0.19), so switch it to the projection:
+git switch v0.19.x
+#   examples/tracer/antora.yml: `version: main` + `prerelease: true`
+#   becomes  version:\n  v(?<v>+({0..9}).+({0..9})).x: $<v>
+git commit -am "chore(release): derive v0.19.x component version from the refname"
+git switch main
+
+# 6. Verify and push; the tag push stages both packages for approval.
 node scripts/release-check.js
 git push origin main v0.19.0 v0.19.x
 ```
@@ -156,6 +167,10 @@ Wait for the `Release` workflow to finish staging before approving both versions
 - Never tag before the changelog and playbook edits are committed.
 - The stable docs build from a maintenance branch (`vX.Y.x`), never from the
   tag itself — a tag is immutable.
+- The maintenance branch MUST carry the refname projection, not main's
+  `version: main` + `prerelease: true`. A branch created at the release commit
+  inherits main's descriptor and resolves to version `main`, which collides with
+  the `main` branch and fails the Antora build with "Duplicate version detected".
 - Run `node scripts/release-check.js` before publish; it fails loudly on a
   version/tag/branch/changelog mismatch.
 - Don't bump `blog/antora.yml` unless blog content changed; it's versioned
