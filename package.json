@@ -53,12 +53,6 @@
     "js-yaml": "^4.3.1",
     "mustache": "^4.2.0"
   },
-  "overrides": {
-    "js-yaml": "^4.3.1",
-    "@istanbuljs/load-nyc-config": {
-      "js-yaml": "^3.15.1"
-    }
-  },
   "devDependencies": {
     "@antora/asciidoc-loader": "3.1.15",
     "@antora/assembler": "1.0.0-beta.20",
@@ -79,10 +73,8 @@
     "chalk": "^5.6.2",
     "commander": "^12.1.0",
     "downdoc": "^1.1.0-stable",
-    "mocha": "^11.7.6",
+    "mocha": "^12.0.3",
     "nyc": "^18.0.0",
-    "ts-mocha": "^11.1.0",
-    "ts-node": "^10.9.2",
     "tsx": "^4.23.1",
     "typescript": "^7.0.2",
     "vinyl": "^3.0.1"
