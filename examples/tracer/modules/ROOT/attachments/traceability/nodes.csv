@@ -2824,6 +2824,19 @@ Projects (tenants) are persisted in the server's SQLite store and managed at run
 Each prefix's `start` and `width` resolve per `(tenant, prefix)` via an opt-in `tenantPrefixes` override, falling back to the global `prefixes` block, so an operator can give two tenants non-overlapping `start` ranges for the same prefix (see xref:explanation/adr/0016-tenant-scoped-id-prefix-settings.adoc[ADR-016]).
 
 tracer:links[]"""
+ARC-049,ARC-049,,,ARC-049 — Workflow validation gates in the graph,design,,explanation/architecture.adoc,"""*Workflow validation gates*
+
+`TraceabilityGraph.getWorkflowValidationErrors()` enforces the configuration's `validation.<role>.<status>.requiresRoles` rules.
+For every item whose `status` matches a configured rule, it requires at least one relationship to an item of each listed role.
+The lookup is undirected: a relation stores with either endpoint as source depending on which side authored it (`change addresses requirement` versus `requirement addressed_by change`), so the check reads both directions rather than the outgoing side alone.
+
+`validate()` includes these errors, so the CLI and the Antora build share one enforcement point.
+The build fails on them next to the duplicate-ID gate, so a site cannot publish in a state its configuration forbids.
+
+The check is graph-only — no filesystem — unlike ordering rules about `tspec/<change-id>/tasks.md`, which the graph cannot see.
+`ConfigLoader` rejects a rule naming an undeclared role, since such a rule could never be satisfied; this is the same treatment the matrix `rows` and `columns` checks give.
+
+tracer:links[]"""
 ARC-030,ARC-030,,,ARC-030 — CI/CD PDF build and deployment pipeline,design,,explanation/architecture.adoc,"""The GitHub Actions CI workflow (`.github/workflows/ci.yml` and `pages.yml`)
 builds and deploys the example site to GitHub Pages.
 The pages workflow
@@ -3176,7 +3189,7 @@ verifies:REQ-273[]
 tracer:links[]"""
 TST-004,TST-004,,,TST-004 — ConfigLoader Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/config-loader.test.ts`
 
-Tests the `ConfigLoader` — initialization, built-in preset listing and loading, preset structure validation (including pairwise matrix definitions), configuration loading from file, missing file handling, invalid YAML handling, role and relation validation, matrix definition retrieval, configuration merging (including label overrides), idAllocation validation and environment interpolation, and error messages for invalid configurations and preset names.
+Tests the `ConfigLoader` — initialization, built-in preset listing and loading, preset structure validation (including pairwise matrix definitions), configuration loading from file, missing file handling, invalid YAML handling, role and relation validation, matrix definition retrieval, configuration merging (including label overrides), idAllocation validation and environment interpolation, workflow `validation` rule validation (undeclared rule role, undeclared `requiresRoles` entry, non-list `requiresRoles`), and error messages for invalid configurations and preset names.
 
 verifies:REQ-083[]
 verifies:REQ-084[]
@@ -3197,6 +3210,7 @@ TST-005,TST-005,,,TST-005 — Graph and API Tests,test,,self-traceability/test-p
 
 Tests the `TraceabilityGraph` (extended queries: merge, getRelatedItems, getItemsWithRelationTo, getRelationshipsByRoles, findPath, getImpactAnalysis, getSiblings) and graph visualization methods (`toDot`, `toVegaLite`, `toConfigDot`).
 Tests graph integrity validation including circular reference detection (direct, indirect, self-referencing cycles, bidirectional pair exclusion), dangling reference detection with source location and expected-role hints, and invalid relation type reporting with allowed-relations hints.
+Tests workflow gate enforcement (`validation.<role>.<status>.requiresRoles`): an unmet rule reports the item, role, status, and required role; a satisfied rule passes with the relation authored from either endpoint; a relation to an item of a different role does not satisfy it; and an item with no status, or a status with no rule, is not gated.
 Tests bidirectional relationship merge.
 Tests sibling queries — undirected neighbor traversal (shared target, shared source), neighbor-not-sibling exclusion, multiple shared neighbors, relation-type filtering on both sides, empty results, and supersession status with successor IDs.
 Also tests `RequirementsTraceabilityExtension` API methods (processFiles, validate, export, coverage, config access, preset management, lifecycle).
@@ -3211,6 +3225,7 @@ verifies:REQ-340[]
 verifies:REQ-339[]
 verifies:REQ-338[]
 verifies:REQ-337[]
+verifies:REQ-399[]
 
 tracer:links[]"""
 TST-006,TST-006,,,TST-006 — MatrixGenerator Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/matrix-generator.test.ts`

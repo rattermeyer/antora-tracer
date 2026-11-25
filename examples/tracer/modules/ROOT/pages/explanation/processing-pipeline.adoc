@@ -83,7 +83,7 @@ The working graph's lifecycle:
 
 . **Population** (Pass 1, per version): The working graph is cleared, then items and relationships are added for that version. Validation runs on each `addRelationship()` call. After each version, the working graph is merged into the full graph.
 
-. **Quiescent** (between Pass 1 and Pass 2, within a version): The working graph is complete for that version. Queries and macro expansion are safe.
+. **Quiescent** (between Pass 1 and Pass 2, within a version): The working graph is complete for that version. Queries and macro expansion are safe. The configured workflow gates (`validation.<role>.<status>.requiresRoles`) are checked here, once the version's relationships are known — an unmet rule fails the build before any output is generated.
 
 . **Macro expansion** (Pass 2/2b/3): The working graph is read-only. Macros query it to generate output. No new items or relationships are added.
 

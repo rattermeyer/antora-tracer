@@ -127,7 +127,7 @@ tracer:links[]
 --
 Test file: `test/config-loader.test.ts`
 
-Tests the `ConfigLoader` — initialization, built-in preset listing and loading, preset structure validation (including pairwise matrix definitions), configuration loading from file, missing file handling, invalid YAML handling, role and relation validation, matrix definition retrieval, configuration merging (including label overrides), idAllocation validation and environment interpolation, and error messages for invalid configurations and preset names.
+Tests the `ConfigLoader` — initialization, built-in preset listing and loading, preset structure validation (including pairwise matrix definitions), configuration loading from file, missing file handling, invalid YAML handling, role and relation validation, matrix definition retrieval, configuration merging (including label overrides), idAllocation validation and environment interpolation, workflow `validation` rule validation (undeclared rule role, undeclared `requiresRoles` entry, non-list `requiresRoles`), and error messages for invalid configurations and preset names.
 
 verifies:REQ-083[]
 verifies:REQ-084[]
@@ -152,6 +152,7 @@ Test file: `test/graph-and-api.test.ts`
 
 Tests the `TraceabilityGraph` (extended queries: merge, getRelatedItems, getItemsWithRelationTo, getRelationshipsByRoles, findPath, getImpactAnalysis, getSiblings) and graph visualization methods (`toDot`, `toVegaLite`, `toConfigDot`).
 Tests graph integrity validation including circular reference detection (direct, indirect, self-referencing cycles, bidirectional pair exclusion), dangling reference detection with source location and expected-role hints, and invalid relation type reporting with allowed-relations hints.
+Tests workflow gate enforcement (`validation.<role>.<status>.requiresRoles`): an unmet rule reports the item, role, status, and required role; a satisfied rule passes with the relation authored from either endpoint; a relation to an item of a different role does not satisfy it; and an item with no status, or a status with no rule, is not gated.
 Tests bidirectional relationship merge.
 Tests sibling queries — undirected neighbor traversal (shared target, shared source), neighbor-not-sibling exclusion, multiple shared neighbors, relation-type filtering on both sides, empty results, and supersession status with successor IDs.
 Also tests `RequirementsTraceabilityExtension` API methods (processFiles, validate, export, coverage, config access, preset management, lifecycle).
@@ -166,6 +167,7 @@ verifies:REQ-340[]
 verifies:REQ-339[]
 verifies:REQ-338[]
 verifies:REQ-337[]
+verifies:REQ-399[]
 
 tracer:links[]
 --

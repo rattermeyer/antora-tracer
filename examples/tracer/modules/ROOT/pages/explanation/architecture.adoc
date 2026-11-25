@@ -637,6 +637,23 @@ Each prefix's `start` and `width` resolve per `(tenant, prefix)` via an opt-in `
 tracer:links[]
 --
 
+[#ARC-049, item, role=design, title="Workflow validation gates in the graph", addresses="REQ-399"]
+--
+*Workflow validation gates*
+
+`TraceabilityGraph.getWorkflowValidationErrors()` enforces the configuration's `validation.<role>.<status>.requiresRoles` rules.
+For every item whose `status` matches a configured rule, it requires at least one relationship to an item of each listed role.
+The lookup is undirected: a relation stores with either endpoint as source depending on which side authored it (`change addresses requirement` versus `requirement addressed_by change`), so the check reads both directions rather than the outgoing side alone.
+
+`validate()` includes these errors, so the CLI and the Antora build share one enforcement point.
+The build fails on them next to the duplicate-ID gate, so a site cannot publish in a state its configuration forbids.
+
+The check is graph-only — no filesystem — unlike ordering rules about `tspec/<change-id>/tasks.md`, which the graph cannot see.
+`ConfigLoader` rejects a rule naming an undeclared role, since such a rule could never be satisfied; this is the same treatment the matrix `rows` and `columns` checks give.
+
+tracer:links[]
+--
+
 [#ARC-030, item, role=design, title="CI/CD PDF build and deployment pipeline"]
 --
 The GitHub Actions CI workflow (`.github/workflows/ci.yml` and `pages.yml`)
