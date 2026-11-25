@@ -11,6 +11,7 @@ import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { expect } from "chai";
+import { load as yamlLoad } from "js-yaml";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -659,6 +660,96 @@ Bad syntax.
       expect(matrix.rows).to.be.an("array").that.is.empty;
       expect(matrix.coverage).to.be.an("object");
       expect(matrix.coverage.overall).to.equal(0);
+    });
+  });
+
+  describe("Command stdout stays machine-readable", () => {
+    const cliPath = path.join(__dirname, "..", "src", "cli.js");
+
+    /** A fixture whose config declares one matrix, plus one item. */
+    function makeMatrixFixture(): { dir: string; config: string } {
+      const dir = fs.mkdtempSync(path.join(tmpdir(), "stdout-"));
+      const docs = path.join(dir, "docs");
+      fs.mkdirSync(docs, { recursive: true });
+      fs.writeFileSync(
+        path.join(docs, "p.adoc"),
+        '[#REQ-001, item, role=requirement, title="A requirement"]\n--\nBody.\n--\n',
+      );
+      const config = path.join(dir, "traceability.yml");
+      fs.writeFileSync(
+        config,
+        `roles: [requirement]\nmatrices:\n  - name: reqs\n    description: Reqs\n    rows: requirement\n    columns: [requirement]\n    coverageRelations:\n      requirement: []\n`,
+      );
+      return { dir, config };
+    }
+
+    it("matrix -f json writes only JSON to stdout", () => {
+      const { dir, config } = makeMatrixFixture();
+      try {
+        const stdout = execFileSync(
+          "node",
+          [
+            cliPath,
+            "matrix",
+            "-i",
+            path.join(dir, "docs"),
+            "--config",
+            config,
+            "-t",
+            "reqs",
+            "-f",
+            "json",
+          ],
+          { encoding: "utf8" },
+        );
+        // Must parse as-is: a progress banner on stdout would break this.
+        const parsed = JSON.parse(stdout) as { name: string };
+        expect(parsed.name).to.equal("reqs");
+      } finally {
+        fs.rmSync(dir, { recursive: true, force: true });
+      }
+    });
+
+    it("matrix -f csv writes only CSV to stdout", () => {
+      const { dir, config } = makeMatrixFixture();
+      try {
+        const stdout = execFileSync(
+          "node",
+          [
+            cliPath,
+            "matrix",
+            "-i",
+            path.join(dir, "docs"),
+            "--config",
+            config,
+            "-t",
+            "reqs",
+            "-f",
+            "csv",
+          ],
+          { encoding: "utf8" },
+        );
+        const firstLine = stdout.split("\n")[0];
+        expect(firstLine).to.match(/^Row ID,/);
+      } finally {
+        fs.rmSync(dir, { recursive: true, force: true });
+      }
+    });
+
+    it("seed writes only YAML to stdout", () => {
+      const { dir } = makeMatrixFixture();
+      try {
+        const stdout = execFileSync(
+          "node",
+          [cliPath, "seed", "-i", path.join(dir, "docs")],
+          { encoding: "utf8" },
+        );
+        // yamlLoad rejects a leading banner line; a plain key/value parses.
+        const parsed = yamlLoad(stdout) as { prefixes: Record<string, unknown> };
+        expect(parsed.prefixes).to.have.property("REQ");
+      } finally {
+        fs.rmSync(dir, { recursive: true, force: true });
+      }
     });
   });
 

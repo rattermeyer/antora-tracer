@@ -108,6 +108,18 @@ function isDryRun(options: any): boolean {
 }
 
 /**
+ * Write a progress/status line to stderr.
+ *
+ * Commands whose stdout carries structured data (`matrix -f json|csv`, `seed`,
+ * `site-graph`, `diff-graphs --json`, `query`) must keep stdout parseable, so
+ * every human-facing progress or confirmation line goes to stderr instead.
+ * stderr is not suppressed, so an interactive user still sees it.
+ */
+function status(message: string): void {
+  console.error(message);
+}
+
+/**
  * Request the next ID from a remote allocator.
  * Fails closed: non-2xx, network error, timeout, or malformed body throws.
  */
@@ -296,7 +308,7 @@ program
   )
   .option("-f, --format <format>", "Output format: html, csv, or json", "html")
   .action(async (options) => {
-    console.log(chalk.blue("Processing requirements traceability..."));
+    status(chalk.blue("Processing requirements traceability..."));
     if (!options.input) {
       console.error(chalk.red("Error: Input file or directory is required"));
       process.exit(1);
@@ -388,7 +400,7 @@ program
   .option("-o, --output <path>", "Output file path (defaults to stdout)")
   .option("--templates <path>", "Custom templates directory")
   .action(async (options) => {
-    console.log(chalk.blue("Generating traceability matrix..."));
+    status(chalk.blue("Generating traceability matrix..."));
     const extension = await createExtension(options);
     try {
       let output: string;
@@ -426,7 +438,7 @@ program
       }
       if (options.output) {
         if (isDryRun(options)) {
-          console.log(
+          status(
             chalk.yellow(`[DRY RUN] Would write matrix to: ${options.output}`),
           );
         } else {
@@ -434,13 +446,13 @@ program
           const stream = createWriteStream(options.output);
           stream.write(output);
           stream.end();
-          console.log(chalk.green(`Matrix written to: ${options.output}`));
+          status(chalk.green(`Matrix written to: ${options.output}`));
         }
       } else {
         if (!isDryRun(options)) {
           console.log(output);
         } else {
-          console.log(chalk.yellow("[DRY RUN] Would output matrix to stdout"));
+          status(chalk.yellow("[DRY RUN] Would output matrix to stdout"));
         }
       }
     } catch (error: any) {
@@ -456,7 +468,7 @@ program
   )
   .option("-i, --input <path>", "Input file or directory to validate")
   .action(async (options) => {
-    console.log(chalk.blue("Validating requirements traceability..."));
+    status(chalk.blue("Validating requirements traceability..."));
     const extension = await createExtension(options);
     try {
       if (options.input) {
@@ -520,7 +532,7 @@ presetProgram
   .command("list")
   .description("List available built-in presets")
   .action(() => {
-    console.log(chalk.blue("Available Presets:"));
+    status(chalk.blue("Available Presets:"));
     console.log("");
     const configLoader = new ConfigLoader();
     const presets = configLoader.listPresets();
@@ -546,7 +558,7 @@ presetProgram
   .description("Show details of a preset")
   .arguments("<name>")
   .action((name: string) => {
-    console.log(chalk.blue(`Preset: ${name}`));
+    status(chalk.blue(`Preset: ${name}`));
     console.log("");
     try {
       const configLoader = new ConfigLoader();
@@ -622,7 +634,7 @@ presetProgram
   .arguments("<name>")
   .option("-o, --output <path>", "Output directory for config file", ".")
   .action((name: string, options: any) => {
-    console.log(chalk.blue(`Initializing from preset: ${name}`));
+    status(chalk.blue(`Initializing from preset: ${name}`));
     try {
       const configLoader = new ConfigLoader();
       const preset = configLoader.loadPreset(name);
@@ -777,7 +789,7 @@ configProgram
     "Path to config file (default: auto-discovered)",
   )
   .action(async (options) => {
-    console.log(chalk.blue("Validating traceability configuration..."));
+    status(chalk.blue("Validating traceability configuration..."));
     try {
       const configLoader = new ConfigLoader();
       const configPath = options.config || configLoader.getConfigPath();
@@ -837,7 +849,7 @@ exportProgram
   )
   .option("-f, --format <format>", "Export format: csv or cypher", "csv")
   .action(async (playbook, options) => {
-    console.log(chalk.blue("Exporting to Neo4j..."));
+    status(chalk.blue("Exporting to Neo4j..."));
     const extension = await createExtension(options);
     try {
       if (options.input) {
@@ -895,7 +907,7 @@ program
   )
   .option("-i, --input <path>", "Input file or directory")
   .action(async (options) => {
-    console.log(chalk.blue("Traceability Statistics"));
+    status(chalk.blue("Traceability Statistics"));
     if (!options.input) {
       console.error(chalk.red("Error: Input file or directory is required"));
       process.exit(1);
@@ -1014,7 +1026,7 @@ program
       const yaml = seedToYaml(extension.getPrefixMaxima());
       if (options.output) {
         writeFileSync(resolve(process.cwd(), options.output), yaml, "utf8");
-        console.log(chalk.green(`Seed written to ${options.output}`));
+        status(chalk.green(`Seed written to ${options.output}`));
       } else {
         console.log(yaml);
       }
@@ -1619,7 +1631,7 @@ program
       const snapshot = serializeSnapshot(extension.graph);
       if (options.out) {
         writeFileSync(resolve(process.cwd(), options.out), snapshot, "utf8");
-        console.log(chalk.green(`Snapshot written to ${options.out}`));
+        status(chalk.green(`Snapshot written to ${options.out}`));
       } else {
         console.log(snapshot);
       }
