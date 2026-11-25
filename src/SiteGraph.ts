@@ -34,6 +34,53 @@ type AggregateContent = (playbook: any) => Promise<any[]>;
 type ClassifyContent = (playbook: any, aggregate: any[], config: any) => any;
 
 /**
+ * The slice of the extension the harvest drives: per-file ingestion plus the
+ * collection-boundary canonicalization. Structural so this module does not
+ * depend on the extension class.
+ */
+export interface HarvestTarget {
+  process(
+    content: string,
+    options: {
+      sourceFile?: string;
+      component?: string;
+      module?: string;
+      version?: string;
+      pubUrl?: string;
+      sourceRoot?: string;
+    },
+  ): unknown;
+  graph: { canonicalizeRelationships(): void };
+}
+
+/**
+ * Harvest a playbook and feed every file into the target's graph.
+ *
+ * Canonicalization runs once after the last file. A reverse-authored relation
+ * (`verified_by:` for a `verifies:` primary) is only flipped to its primary
+ * direction when both endpoints already exist in the graph, so without this
+ * pass the stored direction depends on which endpoint's file was ingested
+ * first — and harvest order is not guaranteed (ADR-015).
+ */
+export async function harvestIntoGraph(
+  target: HarvestTarget,
+  playbookPath: string,
+): Promise<void> {
+  const files = await harvestSiteFiles(playbookPath);
+  for (const file of files) {
+    target.process(file.content, {
+      sourceFile: file.path,
+      component: file.component,
+      module: file.module,
+      version: file.version,
+      pubUrl: file.pubUrl,
+      sourceRoot: file.sourceRoot,
+    });
+  }
+  target.graph.canonicalizeRelationships();
+}
+
+/**
  * Locate the antora-tracer extension entry in a playbook. Shared by the
  * extension's `loadConfig` and the CLI harvest path so the `require`-match
  * list has a single home.
@@ -141,5 +188,14 @@ export async function harvestSiteFiles(
       });
     }
   }
+  // Antora's `findBy` order is not guaranteed stable across runs, and the
+  // caller's graph records edges in ingestion order. Sort by the fields that
+  // scope a file so two harvests of the same tree ingest identically.
+  files.sort((a, b) =>
+    (a.component ?? "").localeCompare(b.component ?? "") ||
+    (a.version ?? "").localeCompare(b.version ?? "") ||
+    (a.module ?? "").localeCompare(b.module ?? "") ||
+    a.path.localeCompare(b.path),
+  );
   return files;
 }

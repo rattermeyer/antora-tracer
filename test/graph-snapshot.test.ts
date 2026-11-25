@@ -3,17 +3,19 @@
  * site-graph harvest (multi-source-diff).
  */
 
-import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { expect } from "chai";
+import { ConfigLoader } from "../src/config/TraceabilityConfig.js";
 import { diffGraphs, diffSnapshots } from "../src/GraphDiff.js";
 import {
   deserializeSnapshot,
   serializeSnapshot,
 } from "../src/GraphSnapshot.js";
 import { RequirementsTraceabilityExtension } from "../src/index.js";
-import { harvestSiteFiles } from "../src/SiteGraph.js";
+import { harvestIntoGraph, harvestSiteFiles } from "../src/SiteGraph.js";
 import { resolveSourceFilePath } from "../src/SourcePath.js";
 import { TraceabilityGraph } from "../src/TraceabilityGraph.js";
 import type { Item, ItemRelationship } from "../src/types.js";
@@ -416,5 +418,89 @@ describe("recorded roots resolve on the real playbook", () => {
       ).to.be.true;
     }
     expect(rootedItems).to.be.greaterThan(0);
+  });
+});
+
+describe("reverse-authored relations canonicalize regardless of harvest order", () => {
+  /**
+   * Build a git-backed fixture whose requirement authors the REVERSE form
+   * (`verified_by:TST-001[]`) while the test page defines the endpoint. Which
+   * endpoint's file is ingested first decides whether `addRelationship` can
+   * flip the edge, so this only holds if the harvest canonicalizes.
+   */
+  function makeFixture(): { playbook: string; dir: string } {
+    const dir = mkdtempSync(join(tmpdir(), "reverse-canon-"));
+    const pages = join(dir, "content", "modules", "ROOT", "pages");
+    mkdirSync(pages, { recursive: true });
+    writeFileSync(
+      join(dir, "content", "antora.yml"),
+      "name: fx\ntitle: Fixture\nversion: '1.0'\nstart_page: index.adoc\n",
+      "utf8",
+    );
+    writeFileSync(
+      join(pages, "index.adoc"),
+      '[#REQ-001, item, role=requirement, title="A requirement"]\n--\nBody.\nverified_by:TST-001[]\n--\n',
+      "utf8",
+    );
+    writeFileSync(
+      join(pages, "test.adoc"),
+      '[#TST-001, item, role=test, title="A test"]\n--\nBody.\n--\n',
+      "utf8",
+    );
+    writeFileSync(
+      join(dir, "traceability.yml"),
+      "roles: [requirement, design, test]\nrelations:\n  test:\n    requirement:\n      verifies:\n        reverse: verified_by\n",
+      "utf8",
+    );
+    const playbook = join(dir, "playbook.yml");
+    writeFileSync(
+      playbook,
+      "site:\n  title: Fixture\ncontent:\n  sources:\n    - url: .\n      start_path: content\n      branches: HEAD\nui:\n  bundle:\n    url: https://example.com/ui-bundle.zip\n",
+      "utf8",
+    );
+    execFileSync("git", ["init", "-q"], { cwd: dir });
+    execFileSync("git", ["add", "-A"], { cwd: dir });
+    execFileSync(
+      "git",
+      ["-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qm", "init"],
+      { cwd: dir },
+    );
+    return { playbook, dir };
+  }
+
+  it("stores the primary direction no matter which endpoint is read first", async function () {
+    this.timeout(30000);
+    const { playbook, dir } = makeFixture();
+    try {
+      // Exercise the production path: the harvest ingests in its own order and
+      // canonicalizes at the boundary. The requirement page (which authors the
+      // reverse form) is named to sort *after* the test page, so the endpoint
+      // is unknown when the edge is first added — the failing case.
+      const loader = new ConfigLoader();
+      loader.load(join(dir, "traceability.yml"));
+      const extension = new RequirementsTraceabilityExtension(loader);
+      await harvestIntoGraph(extension, playbook);
+
+      const rels = extension.graph
+        .getAllRelationships()
+        .map((r) => `${r.fromId}--${r.type}-->${r.targetId}`);
+      expect(rels).to.deep.equal(["TST-001--verifies-->REQ-001"]);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("harvests the real multi-source playbook in a stable order", async function () {
+    this.timeout(120000);
+    // A two-file fixture happens to be stable; the real playbook (500+ files
+    // across sources) is where `findBy` order actually varies run to run.
+    const playbook = resolve(process.cwd(), "antora-playbook.yml");
+    const orders = new Set<string>();
+    for (let i = 0; i < 3; i += 1) {
+      const files = await harvestSiteFiles(playbook);
+      expect(files.length).to.be.greaterThan(50);
+      orders.add(files.map((f) => `${f.component}/${f.version}/${f.path}`).join("\n"));
+    }
+    expect(orders.size).to.equal(1);
   });
 });

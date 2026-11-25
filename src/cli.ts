@@ -27,7 +27,7 @@ import {
   deserializeSnapshot,
   diffGraphs,
   diffSnapshots,
-  harvestSiteFiles,
+  harvestIntoGraph,
   RequirementsTraceabilityExtension,
   serializeSnapshot,
 } from "./index.js";
@@ -844,18 +844,7 @@ exportProgram
         const adocFiles = collectAdocFiles(options.input);
         extension.processFiles(adocFiles);
       } else if (playbook) {
-        const files = await harvestSiteFiles(playbook);
-        for (const file of files) {
-          extension.process(file.content, {
-            sourceFile: file.path,
-            component: file.component,
-            module: file.module,
-            version: file.version,
-            pubUrl: file.pubUrl,
-            sourceRoot: file.sourceRoot,
-          });
-        }
-        extension.graph.canonicalizeRelationships();
+        await harvestIntoGraph(extension, playbook);
       } else {
         console.error(chalk.red("Error: Provide -i <dir> or a playbook path"));
         process.exit(1);
@@ -1017,17 +1006,7 @@ program
       if (options.input) {
         extension.processFiles(collectAdocFiles(options.input));
       } else if (playbook) {
-        const files = await harvestSiteFiles(playbook);
-        for (const file of files) {
-          extension.process(file.content, {
-            sourceFile: file.path,
-            component: file.component,
-            module: file.module,
-            version: file.version,
-            pubUrl: file.pubUrl,
-            sourceRoot: file.sourceRoot,
-          });
-        }
+        await harvestIntoGraph(extension, playbook);
       } else {
         console.error(chalk.red("Error: Provide -i <dir> or a playbook path"));
         process.exit(1);
@@ -1636,17 +1615,7 @@ program
   .action(async (playbook: string, options: any) => {
     try {
       const extension = await createExtension({});
-      const files = await harvestSiteFiles(playbook);
-      for (const file of files) {
-        extension.process(file.content, {
-          sourceFile: file.path,
-          component: file.component,
-          module: file.module,
-          version: file.version,
-          pubUrl: file.pubUrl,
-          sourceRoot: file.sourceRoot,
-        });
-      }
+      await harvestIntoGraph(extension, playbook);
       const snapshot = serializeSnapshot(extension.graph);
       if (options.out) {
         writeFileSync(resolve(process.cwd(), options.out), snapshot, "utf8");

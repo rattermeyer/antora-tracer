@@ -671,7 +671,12 @@ export {
   type Neo4jExportResult,
 } from "./Neo4jExporter.js";
 // Site-graph harvest
-export { type HarvestedFile, harvestSiteFiles } from "./SiteGraph.js";
+export {
+  type HarvestedFile,
+  type HarvestTarget,
+  harvestIntoGraph,
+  harvestSiteFiles,
+} from "./SiteGraph.js";
 // Source-path resolution
 export { resolveSourceFilePath } from "./SourcePath.js";
 // Graph types
