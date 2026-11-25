@@ -348,6 +348,50 @@ labels:
 
 If a type has no `labels` entry, the humanized type name is used: underscores become spaces, sentence-cased (`is_derived_from` → "Is derived from").
 
+=== `workflow`
+
+Optional map of `role → { states, transitions }`, declaring the lifecycle states an item of that role may hold and the legal moves between them.
+
+[source,yaml]
+----
+workflow:
+  change:
+    states: [proposed, refined, accepted, implemented, verified, closed, rejected]
+    transitions:
+      proposed: [refined, rejected]
+      refined: [accepted, proposed]
+      accepted: [implemented, rejected]
+----
+
+`workflow` is declarative data: it documents the lifecycle for readers and presets. The extension does not enforce transitions — the graph alone cannot see the authoring order a transition check would need.
+
+=== `validation`
+
+Optional map of `role → status → { requiresRoles }`, declaring which related roles an item must have reached a given status.
+
+[source,yaml]
+----
+validation:
+  change:
+    accepted:
+      requiresRoles: [requirement]
+  adr:
+    accepted:
+      requiresRoles: [design_concept]
+----
+
+An item whose `status` matches a rule must have at least one relationship — authored from either side — to an item of each role in `requiresRoles`.
+A violation is a validation error, reported by `antora-tracer validate` (non-zero exit) and by the Antora build, which fails on it like any other graph error.
+
+`validate` reports an unmet rule as:
+
+[source,text]
+----
+Unmet workflow requirement at docs/change.adoc:1: 'CHG-001' (role: change, status: accepted) requires a related item with role 'requirement'.
+----
+
+A rule that names a role the configuration does not declare is rejected when the configuration loads, since it could never be satisfied.
+
 === `matrices`
 
 An array of matrix definitions:
