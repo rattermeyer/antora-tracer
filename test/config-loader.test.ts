@@ -531,6 +531,54 @@ matrices:
         fs.rmSync(tempDir, { recursive: true, force: true });
       }
     });
+
+    it("rejects a requiresRoles entry naming an undeclared role", () => {
+      const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "wf-cfg-"));
+      const configPath = path.join(tempDir, "config.yml");
+      fs.writeFileSync(
+        configPath,
+        `roles: [change, requirement]\nvalidation:\n  change:\n    accepted:\n      requiresRoles: [nonexistent]\n`,
+      );
+      try {
+        expect(() => new ConfigLoader().load(configPath)).to.throw(
+          /names role 'nonexistent', which is not defined/,
+        );
+      } finally {
+        fs.rmSync(tempDir, { recursive: true, force: true });
+      }
+    });
+
+    it("rejects a requiresRoles value that is not a list", () => {
+      const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "wf-cfg-"));
+      const configPath = path.join(tempDir, "config.yml");
+      fs.writeFileSync(
+        configPath,
+        `roles: [change, requirement]\nvalidation:\n  change:\n    accepted:\n      requiresRoles: requirement\n`,
+      );
+      try {
+        expect(() => new ConfigLoader().load(configPath)).to.throw(
+          /requiresRoles must be a list of roles/,
+        );
+      } finally {
+        fs.rmSync(tempDir, { recursive: true, force: true });
+      }
+    });
+
+    it("rejects a validation rule for an undeclared role", () => {
+      const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "wf-cfg-"));
+      const configPath = path.join(tempDir, "config.yml");
+      fs.writeFileSync(
+        configPath,
+        `roles: [change, requirement]\nvalidation:\n  nosuchrole:\n    accepted:\n      requiresRoles: [requirement]\n`,
+      );
+      try {
+        expect(() => new ConfigLoader().load(configPath)).to.throw(
+          /Validation rule role 'nosuchrole' is not defined/,
+        );
+      } finally {
+        fs.rmSync(tempDir, { recursive: true, force: true });
+      }
+    });
   });
 
   describe("Reverse-name validation", () => {

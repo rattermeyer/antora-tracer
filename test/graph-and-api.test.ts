@@ -546,6 +546,94 @@ describe("TraceabilityGraph - Extended Queries", () => {
     });
   });
 
+  describe("validate() enforces validation.<role>.<status>.requiresRoles", () => {
+    function loaderWithValidation(): ConfigLoader {
+      const dir = mkdtempSync(join(tmpdir(), "wf-"));
+      const cfgPath = join(dir, "config.yml");
+      writeFileSync(
+        cfgPath,
+        `roles:\n  - change\n  - requirement\n  - adr\n  - design_concept\nrelations:\n  change:\n    requirement:\n      addresses:\n        reverse: addressed_by\n  adr:\n    design_concept:\n      leads_to:\n        reverse: derived_from\nvalidation:\n  change:\n    accepted:\n      requiresRoles: [requirement]\n`,
+      );
+      const loader = new ConfigLoader();
+      loader.load(cfgPath);
+      rmSync(dir, { recursive: true, force: true });
+      return loader;
+    }
+
+    function itemWithStatus(
+      id: string,
+      role: string,
+      status: string,
+    ): any {
+      return { ...createItem(id, role), status };
+    }
+
+    /** The workflow-rule errors in a validation result. */
+    function workflowErrors(graph: TraceabilityGraph): string[] {
+      return graph.validate().errors.filter((e) => e.includes("workflow"));
+    }
+
+    it("reports an item whose required role is unmet", () => {
+      const graph = new TraceabilityGraph(loaderWithValidation());
+      graph.addItem(itemWithStatus("CHG-001", "change", "accepted"));
+
+      const errors = workflowErrors(graph);
+      expect(errors).to.have.lengthOf(1);
+      expect(errors[0]).to.include("CHG-001");
+      expect(errors[0]).to.include("'requirement'");
+    });
+
+    it("passes when a relation to the required role exists", () => {
+      // Control: the same item without the relation must error, so a green
+      // result below cannot come from the rule being inert.
+      const unmet = new TraceabilityGraph(loaderWithValidation());
+      unmet.addItem(itemWithStatus("CHG-001", "change", "accepted"));
+      expect(workflowErrors(unmet)).to.have.lengthOf(1);
+
+      const graph = new TraceabilityGraph(loaderWithValidation());
+      graph.addItem(itemWithStatus("CHG-001", "change", "accepted"));
+      graph.addItem(createItem("REQ-001", "requirement"));
+      graph.addRelationship(createRel("R1", "CHG-001", "REQ-001", "addresses"));
+
+      expect(workflowErrors(graph)).to.be.empty;
+    });
+
+    it("passes when the relation is authored from the other endpoint", () => {
+      const graph = new TraceabilityGraph(loaderWithValidation());
+      graph.addItem(itemWithStatus("CHG-001", "change", "accepted"));
+      graph.addItem(createItem("REQ-001", "requirement"));
+      graph.addRelationship(
+        createRel("R1", "REQ-001", "CHG-001", "addressed_by"),
+      );
+
+      expect(workflowErrors(graph)).to.be.empty;
+    });
+
+    it("passes when the related item's role differs from a linked one", () => {
+      // A relation to an item of the wrong role must not satisfy the rule.
+      const graph = new TraceabilityGraph(loaderWithValidation());
+      graph.addItem(itemWithStatus("CHG-001", "change", "accepted"));
+      graph.addItem(createItem("ADR-001", "adr"));
+      graph.addRelationship(createRel("R1", "CHG-001", "ADR-001", "records"));
+
+      expect(workflowErrors(graph)).to.have.lengthOf(1);
+    });
+
+    it("ignores a status with no configured rule", () => {
+      const graph = new TraceabilityGraph(loaderWithValidation());
+      graph.addItem(itemWithStatus("CHG-001", "change", "proposed"));
+
+      expect(workflowErrors(graph)).to.be.empty;
+    });
+
+    it("ignores an item with no status", () => {
+      const graph = new TraceabilityGraph(loaderWithValidation());
+      graph.addItem(createItem("CHG-001", "change"));
+
+      expect(workflowErrors(graph)).to.be.empty;
+    });
+  });
+
   describe("bidirectional relationship merge", () => {
     it("should merge inverse pair into single bidirectional edge", () => {
       const dir = mkdtempSync(join(tmpdir(), "cfg-"));

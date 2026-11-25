@@ -1594,6 +1594,17 @@ export class AntoraTraceabilityExtension {
           }
         }
 
+        // Configured workflow gates (validation.<role>.<status>.requiresRoles)
+        // are graph-level obligations; fail the build like any other graph
+        // error so a site cannot publish in a state its config forbids.
+        const workflowErrors =
+          this.traceability?.graph.getWorkflowValidationErrors() ?? [];
+        if (workflowErrors.length > 0) {
+          throw new Error(
+            `Unmet workflow requirements in version '${version}' (components: ${components.join(", ")}):\n${workflowErrors.join("\n")}`,
+          );
+        }
+
         // Expand macros on pages
         for (const file of pageFilesForVersion) {
           this.expandRelationMacros(file);
