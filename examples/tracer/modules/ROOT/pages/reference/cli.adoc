@@ -15,6 +15,23 @@ npx antora-tracer <command> --help
 
 Global options (`--config`, `--preset`) are inherited by all commands.
 
+== Output streams
+
+Standard output carries only a command's primary output — the matrix, the
+snapshot, the query result, the generated script.
+Progress, status, and confirmation lines go to standard error, so a command's
+stdout can be piped straight into a parser:
+
+[source,bash]
+----
+npx antora-tracer matrix -i docs/ -t requirements-to-design -f json | jq .rows
+npx antora-tracer seed -i docs/ > prefixes.yml
+----
+
+`Generating traceability matrix...` and similar lines still appear in a
+terminal, and when a command writes to a file with `-o` its stdout is empty.
+Redirect stderr to `/dev/null` to silence progress entirely.
+
 == completion
 
 Generate shell completion scripts for Bash, Zsh, or Fish, or install one for the current user.

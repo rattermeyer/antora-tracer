@@ -112,13 +112,14 @@ tracer:links[]
 --
 Test file: `test/cli.test.ts`
 
-Tests the Commander-based CLI — process command (valid content, empty content, invalid paths, malformed macros), matrix command (generation, empty graph), validate command (invalid graph state), export command (empty graph), stats command (empty statistics), preset commands (invalid names, init, listing), help command, and next-id command (sequential ID generation, padding preservation, prefix matching, remote allocation, fail-closed errors, authentication failures, and --local bypass).
+Tests the Commander-based CLI — process command (valid content, empty content, invalid paths, malformed macros), matrix command (generation, empty graph), validate command (invalid graph state), export command (empty graph), stats command (empty statistics), preset commands (invalid names, init, listing), help command, and next-id command (sequential ID generation, padding preservation, prefix matching, remote allocation, fail-closed errors, authentication failures, and --local bypass), and that `matrix -f json`, `matrix -f csv`, and `seed` write only parseable data to stdout.
 
 verifies:REQ-056[]
 verifies:REQ-150[]
 verifies:REQ-271[]
 verifies:REQ-272[]
 verifies:REQ-273[]
+verifies:REQ-400[]
 
 tracer:links[]
 --

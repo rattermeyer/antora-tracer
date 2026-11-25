@@ -602,6 +602,27 @@ operates standalone — it does not require an Antora build pipeline.
 tracer:links[]
 --
 
+[#ARC-050, item, role=design, title="Machine-readable stdout, progress on stderr", addresses="REQ-400"]
+--
+*Stream split*
+
+Each command writes only its primary output to stdout and routes progress,
+status, and confirmation lines to stderr, so stdout can be piped into a parser
+without stripping a banner.
+A `status()` helper in `src/cli.ts` owns the stderr side; the primary data write
+stays a plain `console.log`, and that asymmetry is the contract.
+
+`query`, `site-graph`, and `diff-graphs --json` already followed the pattern;
+`matrix` (`-f json`/`-f csv`) and `seed` did not, and their banners made the
+output unparseable.
+The contract is stated in the CLI reference.
+
+The alternative — a `--quiet` flag — was rejected: it would leave the default
+output broken and add something to remember.
+
+tracer:links[]
+--
+
 [#ARC-044, item, role=design, title="Item lifecycle CLI: archive and remove"]
 --
 The `archive` and `remove` commands are the first source-mutating CLI commands, enabled by block-extent detection that locates an item's full block (header through the closing delimiter) and refuses ambiguous edits.

@@ -1354,6 +1354,11 @@ REQ-141,REQ-141,,,REQ-141 — JSON output flag,requirement,,requirements.adoc,""
 Source: openspec/specs/cli-query/spec.md
 
 tracer:links[]"""
+REQ-400,REQ-400,,,"""REQ-400 — Structured output goes to stdout, progress to stderr""",requirement,,requirements.adoc,"""Every CLI command SHALL write only its primary output to stdout and SHALL write progress, status, and confirmation lines to stderr, so a command's stdout can be piped directly into a parser. This applies to machine-readable output (`matrix -f json|csv`, `seed`, `site-graph`, `diff-graphs --json`, `query --json`) and to human-facing banners and confirmations alike.
+
+Source: openspec/specs/cli-query/spec.md
+
+tracer:links[]"""
 REQ-150,REQ-150,,,REQ-150 — CLI exposes a validate command,requirement,,requirements.adoc,"""The CLI SHALL provide a `validate` command that reads AsciiDoc source files and reports validation errors — invalid relation types, dangling references, duplicate item IDs, circular references, and unmet configured workflow requirements — with diagnostics naming the source and target item IDs with roles, the invalid relation type, and the allowed alternatives.
 No Antora build SHALL be required.
 The command SHALL exit with a non-zero code when errors are found and code 0 when the input is valid.
@@ -1939,7 +1944,7 @@ REQ-191,REQ-191,,,"""REQ-191 — Reference pages for macro syntax, configuration
 * Traceability display macros (outgoing, incoming, links, graph, graph-coverage)
 * Configuration options (all playbook options, traceability.yml schema — including `workflow` states/transitions and `validation` rules)
 * Built-in presets (complete definition of each)
-* CLI commands and flags
+* CLI commands and flags, including the stdout/stderr contract
 * Public API surface (methods, signatures, data model interfaces)
 
 Source: openspec/specs/doc-reference/spec.md
@@ -2799,6 +2804,23 @@ The CLI
 operates standalone — it does not require an Antora build pipeline.
 
 tracer:links[]"""
+ARC-050,ARC-050,,,"""ARC-050 — Machine-readable stdout, progress on stderr""",design,,explanation/architecture.adoc,"""*Stream split*
+
+Each command writes only its primary output to stdout and routes progress,
+status, and confirmation lines to stderr, so stdout can be piped into a parser
+without stripping a banner.
+A `status()` helper in `src/cli.ts` owns the stderr side; the primary data write
+stays a plain `console.log`, and that asymmetry is the contract.
+
+`query`, `site-graph`, and `diff-graphs --json` already followed the pattern;
+`matrix` (`-f json`/`-f csv`) and `seed` did not, and their banners made the
+output unparseable.
+The contract is stated in the CLI reference.
+
+The alternative — a `--quiet` flag — was rejected: it would leave the default
+output broken and add something to remember.
+
+tracer:links[]"""
 ARC-044,ARC-044,,,ARC-044 — Item lifecycle CLI: archive and remove,design,,explanation/architecture.adoc,"""The `archive` and `remove` commands are the first source-mutating CLI commands, enabled by block-extent detection that locates an item's full block (header through the closing delimiter) and refuses ambiguous edits.
 Block extents come from the exported `ItemBlockBounds` accessor, the single scan shared with the parser and the extension, so a block's bounds cannot diverge between consumers.
 `archive <ID>` moves a superseded block to the module's `superseded.adoc`; `remove <ID>` deletes an orphaned block after a `y/N` prompt or an isolated block after typing the ID.
@@ -3178,13 +3200,14 @@ verifies:REQ-300[]
 tracer:links[]"""
 TST-003,TST-003,,,TST-003 — CLI Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/cli.test.ts`
 
-Tests the Commander-based CLI — process command (valid content, empty content, invalid paths, malformed macros), matrix command (generation, empty graph), validate command (invalid graph state), export command (empty graph), stats command (empty statistics), preset commands (invalid names, init, listing), help command, and next-id command (sequential ID generation, padding preservation, prefix matching, remote allocation, fail-closed errors, authentication failures, and --local bypass).
+Tests the Commander-based CLI — process command (valid content, empty content, invalid paths, malformed macros), matrix command (generation, empty graph), validate command (invalid graph state), export command (empty graph), stats command (empty statistics), preset commands (invalid names, init, listing), help command, and next-id command (sequential ID generation, padding preservation, prefix matching, remote allocation, fail-closed errors, authentication failures, and --local bypass), and that `matrix -f json`, `matrix -f csv`, and `seed` write only parseable data to stdout.
 
 verifies:REQ-056[]
 verifies:REQ-150[]
 verifies:REQ-271[]
 verifies:REQ-272[]
 verifies:REQ-273[]
+verifies:REQ-400[]
 
 tracer:links[]"""
 TST-004,TST-004,,,TST-004 — ConfigLoader Tests,test,,self-traceability/test-plan.adoc,"""Test file: `test/config-loader.test.ts`

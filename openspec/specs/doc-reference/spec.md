@@ -10,7 +10,7 @@ The example site SHALL include Reference pages exhaustively documenting:
 - Traceability display macros (outgoing, incoming, links, graph, graph-coverage)
 - Configuration options (all playbook options, traceability.yml schema — including `workflow` states/transitions and `validation` rules)
 - Built-in presets (complete definition of each)
-- CLI commands and flags
+- CLI commands and flags, including the stdout/stderr contract
 - Public API surface (methods, signatures, data model interfaces)
 
 #### Scenario: Item macro reference is exhaustive
@@ -22,6 +22,11 @@ The example site SHALL include Reference pages exhaustively documenting:
 - **WHEN** a reader views the configuration reference
 - **THEN** the `workflow` key is documented with its `states` and `transitions`
 - **AND** the `validation` key is documented with its `requiresRoles` obligation and the error an unmet rule produces
+
+#### Scenario: CLI reference states the stdout contract
+- **WHEN** a reader views the CLI reference
+- **THEN** it SHALL state that stdout carries only the command's primary output
+- **AND** it SHALL state that progress and status lines go to stderr
 
 #### Scenario: Preset reference lists all built-in presets with complete definitions
 - **WHEN** a reader views the preset reference
